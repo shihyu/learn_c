@@ -1,13 +1,6 @@
 #include <stdio.h>
 
-void swap(int a, int b)
-{
-    printf("swap[+] a=%d, b=%d\n",a,b);
-    int temp = a;
-    a = b;
-    b = temp;
-    printf("swap[-] a=%d, b=%d\n",a,b);
-}
+void swap(int a, int b);
 
 int main(int argc, char *argv[])
 {
@@ -16,9 +9,18 @@ int main(int argc, char *argv[])
 
     a = 50;
     b = 100;
-    printf("a=%d, b=%d\n",a,b);
+    printf("main [+]a=%d, b=%d a address=%p, b address=%p\n",a,b,&a,&b);
     swap(a,b);
-    printf("a=%d, b=%d\n",a,b);
+    printf("main [-]a=%d, b=%d a address=%p, b address=%p\n",a,b,&a,&b);
 
     return 0;
+}
+
+void swap(int a, int b)
+{
+    printf("swap [+]a=%d, b=%d a address=%p, b address=%p\n",a,b,&a,&b);
+    int temp = a;
+    a = b;
+    b = temp;
+    printf("swap [-]a=%d, b=%d a address=%p, b address=%p\n",a,b,&a,&b);
 }
