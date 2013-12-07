@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/Namespace.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>名稱空間（Namespace）</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index.html">C++
+Gossip: 名稱空間（Namespace）</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+隨著程式碼撰寫越來越多，程式內容越來越大，您會發現管理程式中的變數名稱、函式名稱、類別名稱也會是一件麻煩的事，尤其是一些同名問題的發生，例如在程
+式中，您也許會定義一個Point類別代表2維空間的點，也許在程式的某個地方，您也會定義一個Point類別來表示一個3維空間的點，其它像函式同名、
+共用變數同名的情況也可能發生，當這種情況發生時，其中一個定義就可能將另一個定義給覆寫掉了。 <br>
+
+
+
+      <br>
+
+
+
+
+C++提供名稱空間的概念，它就像是一個管理容器，可以將您所定義的名稱區域在名稱空間之下，而不會有相互衝突的發生，例如您定義了一個
+dimension2d與dimension3d的名稱空間，在它們之下都有一個Point類別，但由於屬於不同的名稱空間，所以這兩個名稱並不會有所衝
+突。 <br>
+
+
+
+      <br>
+
+
+
+
+C++使用"namespace"關鍵字來定義一個名稱空間，其語法如下所示： <br>
+
+
+
+      </small>
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">namespace
+名稱
+{ </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+// 類別、函式或變數宣告 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">};</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+一個例子如下所示： </small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>Point2D.h</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>namespace d2d { <br>    int i, j, k; <br><br>    class Point2D {<br>    public: <br>        Point2D() {<br>            _x = 0; <br>            _y = 0;<br>        } <br> <br>        Point2D(int x, int y) : _x(x), _y(y) {<br>        }<br> <br>        int x() {return _x;} <br>        int y() {return _y;} <br> <br>     private:<br>        int _x;<br>        int _y; <br>    }; <br>};</pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+在名稱空間中的成員，可以直接使用當中所宣告的識別字，但如果您要在名稱空間之外使用這些成員，則要使用範圍解析運算子::，例如d2d::
+Point2D，您要指明要使用哪一個名稱空間下的哪個類別，下面這個程式提供一個簡單的示範： </small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>main.cpp</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include "Point2D.h"<br>using namespace std; <br><br>int main() {<br>    d2d::Point2D p1(10, 10); <br><br>    cout &lt;&lt; "(x , y) : (" <br>         &lt;&lt; p1.x() &lt;&lt; ", " <br>         &lt;&lt; p1.y() &lt;&lt; ")"<br>         &lt;&lt; endl; <br> <br>    return 0; <br>} </pre>
+
+
+
+
+      <br>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">(x , y) : (10, 10)</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      <small>
+當然每次若都要使用範圍解析運算子來指明使用哪個名稱空間下的成員，也是相當麻煩，您可以使用"using"關鍵字指明所要使用的名稱空間或其下的成員，
+則被指定的名稱空間或其下的成員就可以直接被使用，"using"有兩種用法，如下所示： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">using
+名稱空間::成員 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">using
+namespace 名稱空間</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+一個例子如下所示：</small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>main.cpp</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include "Point.h"<br>using namespace std; <br>using d2d::Point2D; <br><br>int main() { <br>    Point2D p1(10, 10); <br><br>    cout &lt;&lt; "(x , y) : (" <br>         &lt;&lt; p1.x() &lt;&lt; ", " <br>         &lt;&lt; p1.y() &lt;&lt; ")"<br>         &lt;&lt; endl; <br> <br>    return 0; <br>} </pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+這個程式的執行結果與上一個相同；如果您確定將使用某個名稱空間下的所有類別，則可以使用第二種方式來指定名稱空間，例如：</small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>main.cpp</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include "Point.h"<br>using namespace std;<br>using namespace d2d; <br><br>int main() {<br>    Point2D p1(10, 10); <br><br>    cout &lt;&lt; "(x , y) : (" <br>         &lt;&lt; p1.x() &lt;&lt; ", " <br>         &lt;&lt; p1.y() &lt;&lt; ")"<br>         &lt;&lt; endl; <br><br>    return 0; <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+C++的標準函式庫皆定義在std名稱空間中，這也就是為什麼每次在撰寫程式時，總會在檔案的最前頭加上using namespace
+std;的原因。 <br>
+
+
+
+      <br>
+
+
+
+
+您還可以定義一種未命名的名稱空間，這可以建立唯一的識別字，只允許您在同一個檔案中使用這些識別字，例如：</small>
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>namespace { <br>    int i, j, k; <br><br>    class Point2D {<br>    public: <br>        Point2D() {<br>            _x = 0; <br>            _y = 0;<br>        } <br> <br>        Point2D(int x, int y) : _x(x), _y(y) {<br>        }<br> <br>        int x() {return _x;} <br>        int y() {return _y;} <br> <br>    private:<br>        int _x;<br>        int _y; <br>    }; <br>};</pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+如果在檔案中如上宣告，則i, j, k, Point2D等都只限於該檔案中使用，在其它檔案中就無法使用這些識別字。</small><br>
+
+
+
+ </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+     <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/Namespace.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

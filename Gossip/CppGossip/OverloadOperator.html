@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/OverloadOperator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>重載運算子</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip:&nbsp;重載運算子</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+在C++中，預設除了基本資料型態可以使用運算子進行運算，例如int、double、char等，如果您要將兩個物件相加，預設上是不可行的。 <br>
+
+
+      <br>
+
+
+
+然而很多情況下，您會想要將兩個物件的某些屬性值相加，並傳回運算後的結果，例如座標相加，如果您定義了Point2D類別，當中有x與y兩個屬性成員，
+您會想要透過+或-運算子的動作得到座標相加或相減的動作，或是透過++與--來達到遞增或遞減的運算，在C++中，這可以透過重載運算子來達到目的。
+      <br>
+
+
+      <br>
+
+
+
+運算子的重載其實是函式重載的一個延伸應用，您指定要重載哪一個運算子，並在類別中定義運算子如何動作，運算子重載的語法宣告如下所示： <br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">傳
+回值
+類別名稱::operator#(參數列) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; //
+實作重載內容 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+其中#中需指明您要重載哪一個運算子，例如重載一個+運算子，#處就替換為+運算子。<br>
+
+
+      <br>
+
+
+
+如果要重載++或--運算子，必須要注意到前置與後置的問題，例如一個變數x，您知道++前置時（++x）與++後置時（x++）實際上意義並不相同，在
+重載時為了要區別前置與後置，C++中使用一個int參數來作區別：<br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">傳
+回型態
+operator++();&nbsp; // 前置，例如++x</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">傳
+回型態
+operator++(int); // 後置，例如x++</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">傳
+回型態 operator--();&nbsp; // 前置 ，例如 --x</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">傳
+回型態 operator--(int); // 後置，例如 x--</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+在後置中會傳入一個0，但實質上沒有作用，只是作為識別前置與後置之用，通常在重載++與--運算子時，前置與後置都要重載；下面這個範例告訴您如何重載
++與-運算子，以及++與--運算子，以完成上面所提及的座標相加、相減、遞增、遞減的運算： </small><br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>Point2D.h</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>class Point2D { <br>public: <br>    Point2D();<br>    Point2D(int, int);<br>    int x() {return _x;} <br>    int y() {return _y;} <br>    Point2D operator+(const Point2D&amp;); // 重載+運算子 <br>    Point2D operator-(const Point2D&amp;); // 重載-運算子 <br>    Point2D&amp; operator++(); // 重載++前置，例如 ++p <br>    Point2D operator++(int); // 重載++後置，例如 p++<br>    Point2D&amp; operator--(); // 重載--前置，例如 --p <br>    Point2D operator--(int); // 重載--後置，例如 p--<br> <br>private:<br>    int _x;<br>    int _y; <br>}; <br></pre>
+
+
+
+      <br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>Point2D.cpp</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>#include "Point2D.h"<br><br>Point2D::Point2D() {<br>    _x = 0;<br>    _y = 0;<br>}<br><br>Point2D::Point2D(int x, int y) {<br>    _x = x;<br>    _y = y;<br>}<br><br>Point2D Point2D::operator+(const Point2D &amp;p) { <br>    Point2D tmp(_x + p._x, _y + p._y); <br>    return tmp; <br>} <br><br>Point2D Point2D::operator-(const Point2D &amp;p) { <br>    Point2D tmp(_x - p._x, _y - p._y); <br>    return tmp; <br>} <br><br>Point2D&amp; Point2D::operator++() { <br>    _x++; <br>    _y++; <br><br>    return *this; <br>} <br><br>Point2D Point2D::operator++(int) { <br>    Point2D tmp(_x, _y); <br>    _x++; <br>    _y++; <br><br>    return tmp; <br>} <br><br>Point2D&amp; Point2D::operator--() { <br>    _x--; <br>    _y--; <br><br>    return *this; <br>} <br><br>Point2D Point2D::operator--(int) { <br>    Point2D tmp(_x, _y); <br>    _x--; <br>    _y--; <br><br>    return tmp; <br>} <br></pre>
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li>main.cpp</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt;<br>#include "Point2D.h"<br>using namespace std;<br><br>int main() {<br>    Point2D p1(5, 5);<br>    Point2D p2(10, 10);<br>    Point2D p3; <br><br>    p3 = p1 + p2; <br>    cout &lt;&lt; "p3(x, y) = (" <br>         &lt;&lt; p3.x() &lt;&lt; ", " &lt;&lt; p3.y() <br>         &lt;&lt; ")" &lt;&lt; endl; <br><br>    p3 = p2 - p1; <br>    cout &lt;&lt; "p3(x, y) = (" <br>         &lt;&lt; p3.x() &lt;&lt; ", " &lt;&lt; p3.y() <br>         &lt;&lt; ")" &lt;&lt; endl;<br> <br>    p3 = ++p1;<br>    cout &lt;&lt; "p3(x, y) = (" <br>         &lt;&lt; p3.x() &lt;&lt; ", " &lt;&lt; p3.y() <br>         &lt;&lt; ")" &lt;&lt; endl; <br><br>    return 0;<br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>
+執行結果：</small></span><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">p3(x, y) = (15, 15)<br>
+
+
+
+p3(x, y) = (5, 5)<br>
+
+
+
+p3(x, y) = (6, 6)<br>
+
+
+
+            </span></small><span style="color: rgb(255, 255, 255);"> </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+      <small>
+在重載+與-號運算子時，所接收的物件引數來自被重載的運算子右邊，例如在程式碼中加法運算時，+右邊是p2，所以傳入的物件引數就是p2物件，減法運算
+時-號右邊是p1，所以傳入的就是p1物件，在傳入引數時，您使用傳參考的方式進行，這可以省去物件複製的動作，您也可以不使用傳參考，這對這個程式並不
+造
+成結果的差異，但使用傳參考方式可以節省CPU在複製物件時的處理時間。 <br>
+
+
+      <br>
+
+
+
+大部份的運算子都是可以被重載的，除了以下的運算子之外： <br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">.&nbsp;
+&nbsp;::&nbsp; &nbsp;.*&nbsp; &nbsp;?:</span></small><br>
+
+
+
+      </div>
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+       <br>
+
+      </center>
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/OverloadOperator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

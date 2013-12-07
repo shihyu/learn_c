@@ -1,0 +1,843 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/Socket.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Socket 類別</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: Socket 類別</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在TCP/IP
+底層的運作必須處理封包、標頭、格式、交握等的細節，這實在不是什麼好差事，為此Berkeley
+UNIX提出Socket的概念，將網路連線簡化為資料流（data
+stream）的概念，這個資料流在客戶端與伺服端各有一個接口（port），而資料流就像是在一個連接兩接口的纜線中傳遞，程式設計人員使用
+Socket的概念來撰寫網路連線程式，只要處理主機資訊與連接埠，而不用關心底層的瑣碎運作。 <br>
+
+
+
+      <br>
+
+
+
+簡而言之，就如同檔案輸出入一樣，Socket將網路連線也視作一種輸出入的動作，資料的傳遞就像是將資料寫入與讀入。 <br>
+
+
+
+      <br>
+
+
+
+在Java中提供Socket類別來支援Socket概念，這邊介紹四個建構式： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public Socket(String host, int port) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public Socket(InetAddress host, int port) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public Socket(String host, int port, InetAddress interface, int localPort) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public Socket(InetAddress host, int port, InetAddress interface, int localPort)</span></small><br>
+
+
+
+      </div>
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><small>除了第一個建構函式必須同時處理UnknownHostException（無法識別主機）與IOException（無法建立連線時）之外，其它的建構式只需處理IOException。 <br>
+
+
+
+      <br>
+
+
+
+第一與第二個建構式讓您指定遠端主機與連接時所使用的連接埠，而本機的部份則交由程式自行決定，第三與第四個建構函式可以讓您指定遠端與本身的資訊。 <br>
+
+
+
+      <br>
+
+
+
+您可以直接指定主機名稱來建立Socket物件，然而使用InetAddress會比較有效率，在真正進行Socket連線之前，如果在建立InetAddress物件時無法取得主機資訊，則可以提前進行相關的處理。 <br>
+
+
+
+      <br>
+
+
+
+下面這個程式可以讓您掃描指定主機上所開啟的連接埠（0~1023），這邊指定本機為對象建立Socket連線，如果某個連接埠有開啟，就會建立連線，此時顯示該連接埠開啟的訊息： <br>
+
+
+
+      </small></span>
+      
+      
+      
+      <ul>
+
+
+
+        <li><span class="postbody"><small>ScanPort.java</small></span></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br>import java.net.*;<br><br>public class ScanPort {<br>    public static void main(String[] args) {  <br>        try {<br>            String hostname = "localhost";<br>            InetAddress address = InetAddress.getByName(hostname); <br><br>            for(int i = 0; i &lt; 1024; i++) { <br>                try { <br>                    Socket skt = new Socket(address, i); <br>                    // 連線表示有開啟 Port <br>                    System.out.printf("%nPort: %d Opened..", i); <br>                    skt.close(); <br>                } <br>                catch(IOException e) { <br>                    System.out.print("."); <br>                    // 無法建立連線，沒有開啟 Port <br>                } <br>            } <br>        } <br>        catch(UnknownHostException e) { <br>            e.printStackTrace();<br>        } <br>    } <br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>在建立了Socket物件之後，可以取得Socket物件的相關資訊，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>public InetAddress getInetAddress() </small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>public int getPort() </small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>public int getLocalPort() </small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>public inetAddress getLocalAddress()</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+以上的方法由上而下分別為取得Socket連接對象位址、連接對象連接埠、本機連接埠、本機位址。 <br>
+
+
+      <br>
+
+
+如果要取過Socket物件接受或輸出資訊，可以使用getInputStream()與getOutputStream()兩個方法，就如同檔案I/O
+一樣，您只要將它當作串流資料來處理即可，至於網路上的資訊是如何交換的，您並不用得知，Java會自動幫您完成相關的協定確認。 <br>
+
+
+      <br>
+
+
+下面這個程式模擬Telnet程式，您可以用它來與遠端主機進行「以行為主」的文字或指令溝通，也就是每下一行文字或指令就按Enter鍵，然後程式會將您的指令傳送出去，並顯示遠端主機的回應訊息，為了同時處理遠端主機的回應與本機使用者的輸入，程式使用多執行緒：<br>
+
+
+      </small></span>
+      
+      
+      <ul>
+
+
+        <li><small>SocketToStdout.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      <span class="postbody"></span>
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br>import java.net.*;<br><br>public class SocketToStdout implements Runnable {<br>    private Socket skt;<br>    <br>    public SocketToStdout(Socket skt) {<br>        this.skt = skt;<br>    }<br>    <br>    public void run() {<br>        BufferedReader sktReader;<br>        try { <br>            sktReader = new BufferedReader(<br>                    new InputStreamReader(skt.getInputStream()));<br>            <br>            String sktMessage = null;<br>            while((sktMessage = sktReader.readLine()) != null) {<br>                System.out.println(sktMessage); <br>            }<br><br>            skt.close(); <br>        } <br>        catch(IOException e) { <br>            System.out.println(e.toString()); <br>        } <br>    }<br>}</pre>
+
+
+      <span class="postbody"><br>
+
+
+      </span>
+      
+      
+      <ul>
+
+
+        <li><small>StdInToSocket.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      <span class="postbody"></span>
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br>import java.net.Socket;<br><br>public class StdInToSocket implements Runnable {<br>    private Socket skt;<br>    <br>    public StdInToSocket(Socket skt) {<br>        this.skt = skt;<br>    }<br>    <br>    public void run() {<br>        String userInput; <br>        BufferedReader stdInReader; <br>        PrintStream socketStream; <br><br>        try { <br>            stdInReader = new BufferedReader(<br>                            new InputStreamReader(System.in)); <br>            socketStream = new PrintStream(skt.getOutputStream()); <br><br>            while(true) { <br>                if(skt.isClosed()) {<br>                     break; <br>                }<br>                userInput = stdInReader.readLine(); <br>                socketStream.println(userInput); <br>            } <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace();<br>        } <br><br>    }<br>}</pre>
+
+
+      <span class="postbody"><br>
+
+
+      </span>
+      
+      
+      <ul>
+
+
+        <li><small>ConnectDemo.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br>import java.net.*;<br><br>public class ConnectDemo {<br>    public static void main(String[] args) {<br>        String hostname = "localhost"; <br>        int port = 23; <br>        InetAddress address; <br>        BufferedReader buf; <br>        String read; <br><br>        if(args.length &gt; 1) { <br>            hostname = args[0]; <br>            port = Integer.parseInt(args[1]); <br>        } <br><br>        try { <br>            address = InetAddress.getByName(hostname); <br>            try {<br>                Socket skt = new Socket(address, port);<br>                Thread sktToStd = new Thread(new SocketToStdout(skt));<br>                Thread stdToSkt = new Thread(new StdInToSocket(skt));<br>                <br>                sktToStd.start();<br>                stdToSkt.start();<br>                <br>            } catch (IOException e) {<br>                e.printStackTrace();<br>            }<br>        } <br>        catch(UnknownHostException e) { <br>            System.out.println(e.toString()); <br>        } <br><br>    }<br>}</pre>
+
+
+      <span class="postbody"><br>
+
+
+      <small>下面的執行結果是連接至FTP站台的測試，可以輸入簡單的ASCII指令跟FTP站台互動（使用FTP協定指令）： </small></span><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java onlyfun.caterpillar.ConnectDemo ftp.isu.edu.tw 21<br>
+
+220-歡迎光臨義守大學檔案伺服器<br>
+
+220-<br>
+
+220-本站提供以下軟體可供下載：<br>
+
+220-*******************************************************************************<br>
+
+220-/pub/BeOS/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BeOS 作業系統<br>
+
+220-/pub/CPAN/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Perl 程式語言 (Comprehensive Perl Archive Network)<br>
+
+220-/pub/CPatch/&nbsp;&nbsp;&nbsp;&nbsp; 中文化軟體 (收集大量的 Windows 共享軟體與中文化程式)<br>
+
+220-/pub/Documents/&nbsp; 各類文件收集<br>
+
+220-/pub/FreeBSD/&nbsp;&nbsp;&nbsp; FreeBSD 作業系統<br>
+
+220-/pub/Game/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 免費遊戲軟體<br>
+
+220-/pub/Hardware/&nbsp;&nbsp; 硬體驅動程式<br>
+
+220-/pub/Linux/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Linux 作業系統<br>
+
+220-/pub/MsDownload/ 微軟相關軟體更新 (例如 Service Pack 等)<br>
+
+220-/pub/RFC/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Request for Comments (RFC 文件)<br>
+
+220-/pub/Solaris/&nbsp;&nbsp;&nbsp; Solaris 作業系統<br>
+
+220-/pub/Yesterday/&nbsp; 昨日小築完整 mirror (收集大量 Windows 相關軟體)<br>
+
+220-*******************************************************************************<br>
+
+220-<br>
+
+220-另外，歡迎使用者多多利用 HTTP 的方式登入，一來有較佳的<br>
+
+220-傳輸效能，介面功能也較為完善，您還可以利用檔案搜尋引擎<br>
+
+220-快速找到您所需求的檔案，網址如下：<br>
+
+220-<br>
+
+220-http://ftp.isu.edu.tw<br>
+
+220 <br>
+
+            <span style="font-weight: bold;">QUIT</span><br>
+
+221 Goodbye.<br>
+
+
+
+
+            </span></small><span style="color: rgb(255, 255, 255);"></span></td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <span class="postbody"><small>
+      <br>
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+   <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/Socket.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+</html>

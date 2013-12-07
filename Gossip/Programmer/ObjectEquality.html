@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ObjectEquality.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>Wat？為何不相等？</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: Wat？為何不相等？<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=75742">Wat？為何不相等？</a><br>
+      <br>
+      相等與否看似簡單議題，但因語言中夾雜多個元素而變得複雜，不明就理的開發者面對時戰戰競競，瞭若指掌的開發者侃侃而談玩Wat（What諧音字，無意義但出乎意料的結果）。相等性的諸多議題反映出語言中的細微特性，不搞懂這些細微特性，程式中隨時就會出現Wat脫口而出的狀況。<br>
+      <br>
+      <dl>
+        <dt>基本型態與物件型態的相等性</dt>
+      </dl>
+      <br>
+      有些程式語言為了效率，型態系統中有基本型態與物件型態，基本型態的相等性是比較值，物件型態的相等性通常是依方法定義比較狀態，有時則會針對物件參考（Reference）是否相等進行比較。<span
+        class="courier">程式普遍來說多採用==作為相等性的比較符號，然而==符號作用為何，依程式語言而有所不同。</span><span><br>
+      </span><br>
+      以Java為例，<span class="courier">基本型態使用==比較時，是在比較數值是否相同，物件型態使用==比較時，是在比較參考是否相同，如果要比較兩物件狀態的相等性，則必須定義並使用equals方法。JavaScript基本上也使用==進行相等比較</span>，基本型態比較值，物件型態則比較物件參考，JavaScript沒有規範比較狀態相等性的方法名稱，有賴開發者自行定義。<br>
+      <br>
+      有些語言只有物件型態，然而物件的相等性依舊有兩種情況，也就是比較物件狀態或是物件參考的相等性。以Ruby為例，所有資料都是物件，<span
+        class="courier">==用於比較物件狀態相等性，可自行定義==方法定義比較流程，如果要比較參考相等性，則使用equal?方法</span>。<br>
+      <br>
+      <dl>
+        <dt>語言特殊定義影響相等性判斷</dt>
+      </dl>
+      <br>
+      程式語言普遍來說，基本型態的相等性是比較值，物件型態的相等性是比較物件狀態或物件參考，然而讓事情變得複雜的是語言中的特殊定義。<br>
+      <br>
+      例如Java中被<span class="courier">""</span>包括的字串無論出現幾次，只要字元序列相同，只會在字串池（String pool）產生一個String實例，因此<span
+        class="courier">new String("ABC") == new String("ABC")會是false，但"ABC" == "ABC"卻會是true；如果Integer a = 100; Integer b = 100;，則a == b會是true，但a與b的值100改為200時，a == b卻會是false</span>，這主要是自動裝箱（Auto-boxing）語法動了手腳，開發者若不明就理，Wat就脫口而出。追根究底，如果開發者想要的是物件狀態相等性，那在Java中應該使用<span
+        class="courier">equals方法而不是==</span>。<br>
+      <br>
+      JavaScript雖可使用<span class="courier">==</span>進行相等比較，然而JavaScript偏向弱型別（Weak type），也就是許多情況下可自動發生型態轉換以換取語法簡潔，例如<span
+        class="courier">==可允許型態轉換後的比較，像是'123' == 123、'' == 0、[] + [] == ""等都會是true</span>，然而JavaScript過於寬鬆的<span
+        class="courier">==常令開發者難以掌握，建議採用嚴格的===，只要兩邊型態不一，就會判斷為false</span>，型態相同時才進一步比較參考。有些語言中還會有些特殊值，必須用特殊方法比較。例如JavaScript中的NaN絕不等於任何值，如果想判斷某變數是否為<span
+        class="courier">NaN，必須使用isNaN</span>方法來判斷。<br>
+      <br>
+      <dl>
+        <dt>同時運用equals與hashCode的場合</dt>
+      </dl>
+      <br>
+      有些API對相等性會有特定要求，通常要求在定義狀態相等性方法時，同時定義可傳回雜湊碼的方法。以Java為例，<span class="courier">通常要求定義equals時同時定義hashCode方法</span>，Ruby則是定義<span
+        class="courier">eql?與hash</span>方法，JavaScript則視程式庫要求的方法名稱而定。舉例來說，<span
+        class="courier">如果Point類別中有兩個public的x與y成員，而且僅定義equals方法如下</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>if(that instanceof Point) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; Point p = (Point) that;</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return this.x == p.x &amp;&amp; this.y == p.y;</strong></span><span><strong><br>
+          </strong></span><span><strong>} <br>
+            return false;</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <span class="courier">若s參考HashSet實例，呼叫s.add(new Point(1, 1))兩次，可能會收集到兩個代表座標(1, 1)的Point實例，這是因為HashSet實作會先在內部資料結構中，看看對應hashCode的雜湊桶</span>（Hash bucket）看看是否已收集物件，<span
+        class="courier">如果有才進一步使用equals比較狀態相等性，如果對應的雜湊桶沒有收集物件，那麼就直接把新物件放到該雜湊桶。在新建物件時，預設的hashCode實作通常會有不同值，因此先前HashSet才會收集到兩個物件，如果Point實例代表的座標相同時不想重複收集，</span>需依Java API文件中<span
+        class="courier">Object類別對於hashCode</span>的規範進行定義。<br>
+      <br>
+      <span class="courier">通常定義equals引用的物件資料成員，在定義hashCode時也會用來產生雜湊碼，因此定義equasl與hashCode時，應避免使用會變動的資料成員。例如上述Point類別的hashCode若定義為傳回41 * (41 + x) + y，如果p參考至座標(1, 1)的Point實例，s參考至HashSet實例，s.add(p)後若執行p.x = 2，測試set.contains(p)時就會是false，造成明明是同一實例，HashSet中卻找不到的問題，原因在於hashCode根據x、y計算雜湊值，x既然變動，算出來的雜湊值就不同，依照先前HashSet判斷物件是否重複的規則，自然就會認定set.contains(p)結果是false。</span><br>
+      <br>
+      <dl>
+        <dt>參數化型態的相等性</dt>
+      </dl>
+      <br>
+      在能夠參數化型態的語言中，型態參數實例化可視為新型態，例如Java中，<span class="courier">ArrayList&lt;String&gt;可視為新型態，ArrayList&lt;Integer&gt;可視為新型態，那麼new ArrayList&lt;String&gt;().equals(new ArrayList&lt;Integer&gt;())的結果會是什麼呢？答案是true！</span>Wat？<span
+        class="courier">ArrayList&lt;String&gt;與ArrayList&lt;Integer&gt;不是應該算不同型態嗎？</span><br>
+      <br>
+      Java泛型採用型態抹除，泛型語法中指定的型態資訊主要用於編譯時期檢查，執行時期無法使用泛型語法中指定的型態資訊。具體來說，如果有個<span
+        class="courier">class Basket&lt;T&gt;包裹了T[]，其equals方法定義為：</span><br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>if(o instanceof Basket&lt;?&gt;) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; Basket that = (Basket) o;</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return Arrays.deepEquals(this.things, that.things); </strong></span><span><strong><br>
+          </strong></span><span><strong>} </strong></span><span><strong><br>
+          </strong></span><span><strong>return false;</strong></span><span><br>
+        </span></div>
+      <br>
+      <span class="courier">程式中Basket&lt;?&gt;不可改為Basket&lt;T&gt;（會造成編譯錯誤），因為執行時期無法使用泛型語法中對T的實際型態指定（那是用於編譯時期檢查），Arrays.deepEquals會先比較this.things與that.things的長度，長度不同傳回false，如果相同則逐一取得元素使用equals比較，只要有一個比較結果為false，結果就是false，否則就為true。在new Basket&lt;Integer&gt;().equals(new Basket&lt;String&gt;())時，內部包裹物件長度都為0，沒有任何元素可比較出false的結果，所以結果自然是true。</span><br>
+      <br>
+      <dl>
+        <dt>繼承關係下父子類別的相等性</dt>
+      </dl>
+      <br>
+      <span class="courier">如果有Point3D繼承先前Point類別並新增z軸資訊，有趣現象就發生了，依目前Point的equals定義，new Point(1, 1).equals(new Point3D(1, 1, 1))會是true。</span>Wat？平面座標的點怎麼會等於立體座標的點？假設這是你要的結果，<span
+        class="courier">因為你考慮的是立體座標的點投射在xy平面上是否相等，那麼new Point(1, 1, 1).equals(new Point3D(1, 1))會是true或是false呢？如果是false</span>，那就違反Java API文件<span
+        class="courier">Object對equals</span>規範的對稱性（Symmetric）原則，<span class="courier">如果是true，那麼你顯然忽略z軸資訊。如果Point3D的equals定義傳入Point實例時只比較x、y，傳入Point3D實例就比較x、y、z呢？那麼又會違反equals</span>規範的傳遞性（Transitive）原則。<br>
+      <br>
+      一般來說，對於不同的類別實例，會將之視為不同。<span class="courier">上例基本上可以在instanceof判斷後，再使用this.getClass() == p.getClass()判斷，也就是直接判斷實例的類別，讓不同類別的實例視為不相等，就此例而言，使得Point只能與Point比，Point3D只能與Point3D比，直接解決不同繼承階層下equals的原則問題。</span><br>
+      <br>
+      Wat？為何相等性要考量這麼多因素？這無非反映出程式語言都會有些細微特性，有的特性是好的，有的特性則要迴避，使用程式庫時也要瞭解規範，網路上偶而會出現「其實你並不懂 XXX」的文章，通常也在強調對語言或技術必須有一定程度瞭解，才不至於誤觸地雷。那麼，<span
+        class="courier">若a為0.1，那麼a + a + a == 0.3的結果是true還是false呢？</span>Wat？<br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ObjectEquality.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

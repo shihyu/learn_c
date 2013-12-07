@@ -1,0 +1,1905 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/ by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:02:44 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link type="text/css" href="css/stdlayout.css" rel="stylesheet">
+
+
+
+
+  
+  
+  
+  <link type="text/css" href="css/print.css" rel="stylesheet">
+
+
+
+
+  
+  
+  
+  <meta http-equiv="content-type" content="text/html; charset=Big5">
+
+
+
+
+  
+  
+  
+  <meta content="Hibernate, ORM" name="keywords">
+
+
+
+  
+  
+  
+  <title>Hibernate 學習筆記</title>
+</head>
+
+
+<body>
+
+
+
+
+<br>
+
+
+
+
+<div style="text-align: center;">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 15;
+google_ad_format = "728x15_0ads_al";
+google_ad_channel = "";
+google_color_border = "FFFFFF";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1>開源框架：Hibernate Gossip</h1>
+
+
+
+
+<img style="width: 90px; height: 95px; float: left;" alt="冬眠。。呼。。。" title="冬眠。。呼。。。" src="images/bush.jpg">Hibernate
+是「物件/關係對應」（Object/Relational
+Mapping）的解決方案，簡寫為ORM，簡單的說就是將 Java 中的物件與物件關係，映射至關聯式資料庫中的表格與表格之間的關係，
+Hibernate 提供了這個過程中自動對應轉換的方案。<br>
+
+
+
+
+<br>
+
+
+
+
+2001年未 Hibernate 第一個版本發表，2003年6月8日 Hibernate 2 發表，並於年未獲得 Jolt
+2004 大獎，後被 JBOSS 收納而成為其子項目之一，2005年3月 Hibernate 3
+正式發表，當中有了一些重大的改變，這份文件將以之前
+Hibernate 2 時撰寫的 <a href="http://www.javaworld.com.tw/confluence/pages/viewpage.action?pageId=833">文
+件</a> 為基礎，針對 Hibernate 3作重新整理的動作，所使用的版本為Hibernate 3.2。<br>
+
+
+
+
+<br>
+
+
+
+
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<table style="text-align: left; width: 964px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 694px; vertical-align: top;">
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>基礎入門</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+從一個最基本的物件關係映射自動化程式，瞭解
+Hibernate 組成的基本元素，並進一步瞭解 Hibernate 的基礎語義、配置等概念。 </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>O/R 映射入門</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 第一個 Hibernate 程式很簡單，將一個物件映射至一個資料表。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="setUpHibernate.html">配
+置 Hibernate</a> </small></li>
+
+
+
+
+          <li><small><a href="FirstHibernate.html">第
+一個 Hibernate</a></small></li>
+
+
+
+
+          <li><small><a href="SecondHibernate.html">第
+二個 Hibernate</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>基本配置</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 瞭解一下配置文件、映射文件中各種元素的意義，在進入物件關係映射的學習之前，這是必備的基本功夫。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="ConfigFile.html">配
+置文件</a></small></li>
+
+
+
+
+          <li><small><a href="DatabaseConnection.html">資
+料庫連結</a></small></li>
+
+
+
+
+          <li><small><a href="HibernateHbmFile.html">映
+射文件</a></small></li>
+
+
+
+
+          <li><small><a href="ImplementNamingStrategy.html">實作命名策略</a><br>
+
+
+
+
+            </small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>從 Session 到實體物件</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 瞭解一下Session的作用，從中學習到實體物件的生命週期與資料識別。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="Session.html">Session</a></small></li>
+
+
+
+
+          <li><small><a href="SessionManagement.html">Session
+管理</a></small></li>
+
+
+
+
+          <li><small><a href="EntityObjectLifeCycle.html">實
+體物件生命週期</a></small></li>
+
+
+
+
+          <li><small><a href="DataIdentity.html">資
+料識別（Data
+Identity）</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>Validatable、Lifecycle、Interceptor</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 分別透過這三個介面，來進行資料驗證、於 CRUD（Create Retrieve Update
+Delete）作對應動作、攔截動作。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="LifecycleValidatable.html">Lifecycle
+介面、Validatable 介面</a></small></li>
+
+
+
+
+          <li><small><a href="Interceptor.html">Interceptor
+介面</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>資料查詢</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; <small>您可以使用Criteria物
+件，以物件導向模型的方式查詢資料，或使用Hibernate推薦的HQL，必要時也可以自訂SQL語法。</small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>Criteria 查詢</small></li>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="CriteriaBasic.html">Criteria
+基本查詢</a></small></li>
+
+
+
+
+          <li><small><a href="CriteriaAdvanced.html">Criteria
+進階查詢</a></small></li>
+
+
+
+
+          <li><small><a href="DetchedCriteria.html">DetchedCriteria</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>HQL（Hibernate Query Language）</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 這是 Hibernate 官方所推薦的查詢語言，接近 SQL 的語法，並提供更多的特性與封裝。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="Query.html">Query</a></small></li>
+
+
+
+
+          <li><small><a href="SelectHQL.html">基
+本查詢</a></small></li>
+
+
+
+
+          <li><small><a href="WhereGroupOrder.html">where、
+group
+by、order by 子句</a></small></li>
+
+
+
+
+          <li><small><a href="UpdateDelete.html">更
+新、刪除</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>SQL 支援</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; Hibernate 提供了對 SQL 的支援，並可以自行定義持久化方式。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="SQLQuery.html">建立
+SQL 查詢</a></small></li>
+
+
+
+
+          <li><small><a href="CustomInsertUpdateDelete.html">自定義
+insert、update、delete</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <small><br>
+
+
+
+
+      <br>
+
+
+
+
+      </small>
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>Object-Relational Mapping</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp; 學習
+Hibernate，大部份的時間都在瞭解如何實現映射，而從中您也可以瞭解到不少關聯式資料庫的表格設計方式。 </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>實體映射</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 來看看一些進階的實體映射議題。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="CompactPK1.html">複
+合主鍵（一）</a></small></li>
+
+
+
+
+          <li><small><a href="CompactPK2.html">複
+合主鍵（二）</a></small></li>
+
+
+
+
+          <li><small><a href="BlobClob.html">Blob、
+Clob</a></small></li>
+
+
+
+
+          <li><small><a href="BlobClob_Oracle.html">Blob、
+Clob -
+Oracle 9i</a></small></li>
+
+
+
+
+          <li><small><a href="Component.html">Component&nbsp;</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>動態映射</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp; &nbsp; &nbsp;Hibernate
+3引入了動態模型設定，適時的使用或混用，可以增加程式設計時的彈性。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="DynamicModel.html">動
+態模型（Dynamic
+Model）</a></small></li>
+
+
+
+
+          <li><small><a href="MixDynamicStaticModel.html">混
+用靜態模型與動態模型</a></small></li>
+
+
+
+
+          <li><small><a href="OneClassMultiTable.html">使
+用一個類別映射多個表格</a><br>
+
+
+
+
+            </small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>繼承映射</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp;
+在物件導向設計中，繼承關係是很常見的，但繼承與關聯式資料庫有著先天上的差異，繼承關係至表格的設計上有幾種方式。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="InheritanceTablePerConcreteClass.html">繼
+承 - Table per concrete class with implicit polymorphism</a></small></li>
+
+
+
+
+          <li><a href="InheritanceTablePerConcreteClass2.html"><small>繼
+承 - Table per concrete class with unions</small></a></li>
+
+
+
+
+          <li><small><a href="InheritanceTablePerClassHierarchy.html">繼
+承 - Table per class hierarchy</a></small></li>
+
+
+
+
+          <li><small><a href="InheritanceTablePerSubClass.html">繼承
+- Table per &nbsp;subclass</a></small></li>
+
+
+
+
+          <li><small><a href="MixingInheritance.html">繼
+承 - 混合模式</a><br>
+
+
+
+
+            </small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>集合（collection）映射</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 實體物件中包括多個值類型物件（value type
+object）時，需要另一個集合表格（collection table）來與之對應。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="Set.html">Set</a></small></li>
+
+
+
+
+          <li><small><a href="Bag.html">Bag</a></small></li>
+
+
+
+
+          <li><small><a href="List.html">List</a>
+            </small></li>
+
+
+
+
+          <li><small><a href="Map.html">Map</a></small></li>
+
+
+
+
+          <span style="text-decoration: underline;"><span style="font-weight: bold;"></span></span><li><small><a href="SortCollection.html"><span class="Topic">集
+合的排序</span></a></small></li>
+
+
+
+
+          <li><small><a href="ComponentInsideContainer.html">內含
+Component 的集合</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+        <li><small>關係映射</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 來看看實體與實體之間的多對一、一對多、一對一、多對多如何與Java物件之間進行映射。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="ManyToOne.html">多
+對一</a></small></li>
+
+
+
+
+          <li><small><a href="OneToMany.html">一
+對多</a></small></li>
+
+
+
+
+          <li><small><a href="OneToOneUniqueFK.html">一
+對一（唯一外鍵關聯）</a></small></li>
+
+
+
+
+          <li><small><a href="OneToOnePK.html">一
+對一（主鍵關聯）</a></small></li>
+
+
+
+
+          <li><small><a href="ManyToMany.html">多
+對多</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small>
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>效能</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      <small> </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small><small><a href="ContainerLazyInitialization.html"><span class="Topic"></span></a></small>映射設定</small></li>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="cascade.html">cascade
+的意義</a></small></li>
+
+
+
+
+          <li><small><a href="One-ManyAndInverse.html"><span class="Topic">雙向關聯（inverse 的意義）</span></a></small></li>
+
+
+
+
+          <li><a href="PersistenceContext.html"><small>Persistence
+Context</small></a><small><a href="ContainerLazyInitialization.html"><span class="Topic"></span></a></small></li>
+
+
+
+
+          <li><small><a href="LazyInitialization.html"><span class="Topic"></span><span class="Topic">延
+遲初始（Lazy Initialization）</span></a></small></li>
+
+
+
+
+          <li><small><a href="DynamicSQL.html">動
+態 SQL 產生</a></small></li>
+
+
+
+
+          <li><small><a href="ImmutableEntity.html">Immutable
+實體</a><br>
+
+
+
+
+            </small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>快取</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 一級快取是在Session層次實作，二級快取可以跨越 Session 生命週期，Hibernate
+透過第三方來實現二級快取，這邊也來看看 Query 的快取。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><small><a href="SessionLevelCache.html">簡
+介快取（Session
+Level）</a></small></li>
+
+
+
+
+          <li><small><a href="SecondLevelCache.html">二
+級快取（Second-
+level）</a></small></li>
+
+
+
+
+          <li><small><a href="QueryCache.html">Query
+快取</a></small></li>
+
+
+
+
+          <li><small><a href="QueryListIterator.html">Query.list
+()、iterator()</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small style="font-weight: bold;">交易</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>交易入門</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><a href="TransactionABC.html"><small>簡
+介交易管理</small></a></li>
+
+
+
+
+          <li><small><a href="TransactionJDBC.html">基
+於JDBC的交易管理</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>並行控制</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>&nbsp;
+&nbsp;
+&nbsp; &nbsp; 對於交易的隔離層級（Isolation Level），Hibernate 透過兩種 Locking
+機制來保證資料在操作過程中不會被干擾。</small></div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+          <li><a href="IsolationLevel.html"><small>簡
+介隔離層級</small></a></li>
+
+
+
+
+          <li><small><a href="OptimisticLocking.html">樂
+觀鎖定
+（Optimistic Locking）</a></small></li>
+
+
+
+
+          <li><small><a href="PessimisticLocking.html">悲
+觀鎖定
+（Pessimistic Locking）</a></small></li>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        
+        
+        
+        <ul>
+
+
+
+
+        
+        
+        
+        </ul>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <small> </small>
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>Hibernate Annotations 與 EntityManager</small></dt>
+
+
+
+
+        <dd><small>Hibernate實作了JPA規格，Hibernate
+Annotations與Hibernate EntityManager提供了與JPA/EJB3的相容性。</small></dd>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><a href="HibernateAnnotation.html"><small>Hibernate
+Annotations</small></a></li>
+
+
+
+
+        <li><a href="HibernateEntityManager.html"><small>Hibernate
+EntityManager</small></a></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small>
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>Hibernate Tool</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;透過一些Hibernate
+Tool來自動從映射文件生成資料庫表格，或從資料表反向生成映射文件或POJO。<br>
+
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small><a href="HbmToTable.html">從映
+射文件生成資料表</a></small></li>
+
+
+
+
+        <li><small><a href="TableToHbmPOJO.html">從
+資
+料表生成映射文件與POJO</a></small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small>
+      
+      
+      
+      <dl>
+
+
+
+
+        <dt><small>附錄</small></dt>
+
+
+
+
+      
+      
+      
+      </dl>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small><a href="Hibernate2ToHibernate3.html">從
+Hibernate 2 到 Hibernate 3</a></small></li>
+
+
+
+
+        <li><small><a href="http://www.hibernate.org/">Hibernate
+官方網站</a></small></li>
+
+
+
+
+        <li><small><a href="http://forum.javaeye.com/">Java
+視線論譠</a></small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><br>
+
+
+
+
+      
+      
+      
+      <div align="center"> 
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+<!--
+<script language="JavaScript" src="../js/home.js"></script>
+<script language="JavaScript" src="../js/montage.js"></script>
+<script language="JavaScript">
+monTimeout = 10000;var urls = new Array();
+var imgs = new Array();
+var caps = new Array();
+urls[0] = "http://www.sunelearning.com.tw/index.jsp?src=T";
+imgs[0] = "../images/elearning-600-160.gif";
+caps[0] = "Sun 數位學院暑期特惠";
+urls[1] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4526&l=zh_TW";
+imgs[1] = "../images/sun_summer_160x600banner.jpg";
+caps[1] = "Sun 訓練中心暑期促銷";
+urls[2] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4521&l=zh_TW";
+imgs[2] = "../images/DL_banner_160X600.jpg";
+caps[2] = "2008 JCD 線上講座"; montage( urls, imgs, caps, 160, 600, monTimeout);
+</script>--></div>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       </center>
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <center><!-- adsense for content-->
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><!-- adsense for content end--></center>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/ by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:03:14 GMT -->
+</html>

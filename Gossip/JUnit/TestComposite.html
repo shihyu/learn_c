@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/TestComposite.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:20 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>自由組合測試</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 自由組合測試<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>繼續</small> <small><big><a href="TestCommand.html"><small>你來寫，我來跑</small></a></big> 的故事，隔天你上班了，測試人員紅著眼來找你（顯然睡眠不足），說他想要任意組合測試，例如<span style="font-family: Courier New,Courier,monospace;">CalculatorPlusTest與</span></small><small style="font-family: Courier New,Courier,monospace;">CalculatorMinusTest一起測，</small><small style="font-family: Courier New,Courier,monospace;">CalculatorDivideTest與</small><small style="font-family: Courier New,Courier,monospace;">CalculatorMultiplyTest一起測，CalculatorOOOTest、</small><small style="font-family: Courier New,Courier,monospace;">CalculatorXXXTest、</small><small><span style="font-family: Courier New,Courier,monospace;">CalculatorYYYTest...等一起測，</span>總之聽來想在抱怨，你昨天給的執行器作不到這點。<br>
+      <br>
+你盤算了一下，自由組合，這有什麼難的，你的<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>可以給他更多組合的彈性，總之你先設計了一個<span style="font-family: Courier New,Courier,monospace;">TestSuite</span>：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">package test.cc.openhome;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">import java.util.*;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class TestSuite implements Test {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; private List&lt;Test&gt; tests;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public TestSuite() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; tests = new ArrayList&lt;Test&gt;();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; @Override</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public void run() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for (Test test : tests) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; test.run();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public void add(Test test) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; tests.add(test);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+      <small><br>
+接著重構了一下<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">package test.cc.openhome;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class TestRunner {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void run(Test test) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; test.run();<br>
+&nbsp;&nbsp;&nbsp; }</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+接著告訴測試人員要組合測試，可以使用<span style="font-family: Courier New,Courier,monospace;">TestSuite</span>，例如</small><small style="font-family: Courier New,Courier,monospace;">CalculatorPlusTest與</small><small><span style="font-family: Courier New,Courier,monospace;">CalculatorMinusTest</span>一起測</small><small>：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">package test.cc.openhome;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class CalculatorPlusMinusTest {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static Test suite() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestSuite suite = new TestSuite();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new CalculatorPlusTest());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new CalculatorMinusTest());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return suite;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestRunner.run(suite());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+      <small><br>
+例如</small><small style="font-family: Courier New,Courier,monospace;">CalculatorDivideTest與</small><small style="font-family: Courier New,Courier,monospace;">CalculatorMultiplyTest一起測：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">package test.cc.openhome;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class CalculatorDivideMultiplyTest {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static Test suite() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestSuite suite = new TestSuite();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new CalculatorDivideTest());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new Calculator</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Multiply</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Test());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return suite;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestRunner.run(suite());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+      <small><br>
+      </small><small>或是</small><small style="font-family: Courier New,Courier,monospace;">CalculatorOOOTest、</small><small style="font-family: Courier New,Courier,monospace;">CalculatorXXXTest、</small><small><span style="font-family: Courier New,Courier,monospace;">CalculatorYYYTest...等一起測：<br>
+</span></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">package test.cc.openhome;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class CalculatorOOOXXXYYYTest {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static Test suite() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestSuite suite = new TestSuite();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new CalculatorOOOTest());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new Calculator</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">XXX</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Test());<br>
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(new CalculatorYYY</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Test());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return suite;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestRunner.run(suite());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+      <small><br>
+對了，別忘了告訴測試人員，想全部組合在一起測也沒問題：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">package test.cc.openhome;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class CalculatorAllTest {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static Test suite() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestSuite suite = new TestSuite();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">CalculatorPlusMinusTest.suite()</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Calculator</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">DivideMultiply</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">.suite()</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">);</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.add(</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Calculator</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">OOXXXYYY</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Test.suite()</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return suite;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestRunner.run(suite());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>想怎麼組合就怎麼組合...其實這是 </small><small><a href="../DesignPattern/CompositePattern.htm">Composite
+模式</a> 的實現....所以，今天你又可以早點下班了...<br>
+      </small><br>
+      <small>故事還沒完...</small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/TestComposite.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:20 GMT -->
+</html>

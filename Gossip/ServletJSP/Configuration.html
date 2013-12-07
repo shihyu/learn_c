@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Configuration.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:37 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>組態方式</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 組態方式<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Servlet 3.0中，要為Web應用程式進行Servlet、過濾器、傾聽器的組態設定有幾種方式：<br>
+      </small>
+      <ul>
+        <li><small>透過<span style="font-family: Courier New,Courier,monospace;">@WebServlet、@WebFilter、@WebListener</span>等標註的設定</small></li>
+        <li><small>透過web.xml的設定，如果web.xml中所設定的Servlet、過濾器等類別中已包括標註，則以web.xml中的設定為主</small></li>
+        <li style="font-family: Courier New,Courier,monospace;"><small>在容器初始化時，</small><small>透過ServletContext的<span style="font-weight: bold;">addServlet()</span>、<span style="font-weight: bold;">addFilter()</span>、<span style="font-weight: bold;">addListener()</span>等方法來設定，這可以實作</small><small>在ServletContextListener的contextInitialized()中，或者是<span style="font-weight: bold;">ServletContainerInitializer</span>的<span style="font-weight: bold;">onStartup()</span>中實作</small></li>
+      </ul>
+      <br>
+      <small>第三種方式以Servlet為例，<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>上所新增的相關方法有：<br>
+      </small>
+      <ul>
+        <li><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServletRegistration.Dynamic addServlet(java.lang.String servletName,</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> java.lang.Class&lt;? extends Servlet&gt; servletClass)</span></small></li>
+        <li><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServletRegistration.Dynamic addServlet(java.lang.String servletName,</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> Servlet servlet)</span></small></li>
+        <li><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServletRegistration.Dynamic addServlet(java.lang.String servletName,</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> java.lang.String className)</span></small></li>
+        <li><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;T extends Servlet&gt; T createServlet(java.lang.Class&lt;T&gt; clazz)</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> throws ServletException</span></small></li>
+        <li><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">ServletRegistration getServletRegistration(java.lang.String servletName)</small></li>
+        <li><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">java.util.Map&lt;java.lang.String,? extends ServletRegistration&gt; getServletRegistrations()</small></li>
+      </ul>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServletRegistration</span>有<span style="font-weight: bold;">getMappings()</span>與<span style="font-weight: bold;">addMapping()</span>可以取得或增加</small><small>Servlet的對應（Mapping）</small><small style="font-family: Courier New,Courier,monospace;">訊息，也就是相當於</small><small>web.xml</small><small style="font-family: Courier New,Courier,monospace;">中&lt;servlet-mapping&gt;的資訊。<br>
+      <br>
+      </small><small>在一個JAR</small><small style="font-family: Courier New,Courier,monospace;">檔案中如果有個</small><small style="font-weight: bold;"><span style="font-family: monospace;">META-INF/services/javax.servlet.ServletContainerInitializer</span></small><small style="font-family: Courier New,Courier,monospace;">檔案，該檔案是個文件檔案，當中所撰寫的類別名稱若實作了ServletContainerInitializer介面</small><small style="font-family: Courier New,Courier,monospace;">，則在容器啟動時，將會載入這些類別並執行其onStartup()方法：<br>
+      <br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">..<br>
+@HandlesTypes({OOO.class, XXX.class}) <br>
+void onStartup(java.util.Set&lt;java.lang.Class&lt;?&gt;&gt; c, ServletContext ctx)</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException {<br>
+&nbsp;&nbsp; ...<br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}<br>
+...<br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">其中<span style="font-weight: bold;">@HandlesTypes</span>中所指定的類別，將傳入給onStartup()的第一個參數，以便在onStartup()中處理。<br>
+      <br>
+如果要決定</small><small><span style="font-family: monospace;">Servlet</span></small><small style="font-family: Courier New,Courier,monospace;">、過濾器、傾聽器的載入順序</small><small style="font-family: Courier New,Courier,monospace;">，則一定要在</small><small>web.xml</small><small style="font-family: Courier New,Courier,monospace;">中設定，載入的順序就是其在</small><small>web.xml</small><small style="font-family: Courier New,Courier,monospace;">中宣告的順序</small><small style="font-family: Courier New,Courier,monospace;">（</small><small>Servlet</small><small style="font-family: Courier New,Courier,monospace;">的話，就是load-on-startup值一樣時的情況）</small><small style="font-family: Courier New,Courier,monospace;">。<br>
+      <br>
+      </small><small>實際上，在Servlet 3.0中支援對</small><small>Servlet</small><small>、過濾器、傾聽器抽換性（pluggability），可以藉由在JAR中包括符合要求的文件，就可以達到置換JAR檔案即抽換</small><small>Servlet</small><small>、過濾器、傾聽器的目的，這之後會再說明。</small><br>
+      <br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Configuration.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:37 GMT -->
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QString.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QString</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QString</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在C++中有兩種字串的表現方式，一種是 <a href="../CppGossip/string1.html">C 風格的字串</a>，也就是最後以''\0結尾的字元陣列，另一種是 <a href="../CppGossip/string2.html">string 型態</a> 的字串。<br>
+
+
+      <br>
+
+
+在Qt中，提供QString作為字串的表現形式，使用16位元Unicode來表現QString中的字元，可以在字串中包括'\0'字元，建立QString實例並賦予初值：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QString str = "caterpillar";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cout &lt;&lt; str.length() &lt;&lt; endl;</span></small><br>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>在Qt中會自動把"caterpillar"包裝為QString實例，length()方法可以傳回字串的字元長度，以上例
+來說，將會傳回"caterpillar"的長度為11，如果要QString轉為字元陣列，也就是char
+*的形式傳回，則要使用toAscii()或toLatin1()方法傳回QByteArray，QByteArray包括位元陣列，您可以data()
+方法傳回char *或使用constData()傳回const char*，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; str.toAscii().data() &lt;&lt; endl;</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+由QByteArray的data()或constData()傳回的char*是QByteArray所擁有，QByteArray使用完畢後，會負責
+char*的記憶體回收。Qt提供一個巨集函式qPrintable()，可以讓您直接執行toAscii().constData()，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">cout &lt;&lt; qPrintable(str) &lt;&lt; endl;</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+您也可以使用QString的toStdString()，這會傳回&lt;iostream&gt;的std::string。<br>
+
+      <br>
+
+
+QString可以使用append()來附加字串，也可以直接使用+、+=運算子來串接""包括的字串，或是QString的實例，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str = "1234";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; &amp;str &lt;&lt; endl;&nbsp;&nbsp; </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">str += str;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; qPrintable(str) &lt;&lt; endl;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">str = str + "5678";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; qPrintable(str) &lt;&lt; endl;</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+您可以使用QString的at()方法來傳回每個字元的QChar物件，也可以直接使用[]運算子，使用toAscii()或toLatin1()可以取得char，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>QString str = "ABCD";</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; </small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>for(int i = 0; i &lt;str.length(); i++) {</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; cout &lt;&lt; str.at(i).toAscii() &lt;&lt; endl;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>}</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>for(int i = 0; i &lt;str.length(); i++) {</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; cout &lt;&lt; str[i].toAscii() &lt;&lt; endl;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>}</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+可以使用</small></span><span class="postbody"><small>=指定運算子來複製字串：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str1 = "1234";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str2 = str1;</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+      </small></span><span class="postbody"><small>您可以直接使用==、!=來比較兩個QString的字元內容是否相同，大小寫是有區分的，或是使用&gt;、&gt;=、&lt;、&lt;=等比較運算，例如：<br style="font-weight: bold;">
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str1 = "ABC";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str2 = "ABC";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; (str1 == str2) &lt;&lt; endl; </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; (str1 != str2) &lt;&lt; endl;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; (str1 &gt; str2) &lt;&lt; endl; </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; (str1 &lt; str2) &lt;&lt; endl;</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+      </small></span><span class="postbody"><small>QString有類似C語言printf()函式的sprintf()，可用於格式化字串，例如以下將顯示"caterpillar:1975-5-26"：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>QString str;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>str.sprintf("%s:%d-%d-%d", "caterpillar", 1975, 5, 26);</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>cout &lt;&lt; qPrintable(str) &lt;&lt; endl;</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><br>
+
+
+      <small>另一個更簡單的方式是使用佔位字元配合arg()方法，不用特別指定格式指定字，例如以下的顯示結果與上面是相同的：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str = </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QString("%1:%2-%3-%4").arg("caterpillar").arg(1975).arg(5).arg(26);</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">cout &lt;&lt; qPrintable(str) &lt;&lt; endl;</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><br>
+
+
+      <small>要將數值轉為QString實例，可以使用靜態的number()方法或是使用物件的setNum()方法，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">QString str2 = QString::number(100);</span></small></div>
+
+
+      <span class="postbody"><br>
+
+
+      <small>要將字串轉為數值，可以使用QString的toInt()、toDouble()等方法，如果無法順利轉換，將傳回0，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QString str = "1975";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">int number = str.toInt();</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+QString本身還擁有許多的方法可供操作，像是toUpper()可將字元轉為大寫，toLower()可將字元轉為小寫，replace()方法可
+指定置換子字串，split()方法可以進行字串分割並傳回QStringList，當中包括切割過後的各個QString物件，startsWith
+()測試字串是否以某個子字串作為開頭，endWith()測試字串是否以某個子字串作為結束。<br>
+
+
+      <br>
+
+
+關於QString上各種可用的方法，可以直接參考Qt的線上文件有關於QString的說明。<br>
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QString.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:42 GMT -->
+</html>

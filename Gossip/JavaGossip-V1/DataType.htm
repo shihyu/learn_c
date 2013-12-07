@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/DataType.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>資料型態</title></head><body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">Java Gossip:&nbsp;<span class="wikilink">資
+料型態</span></a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>程式在執行的過程中，需要運算許多的資訊，也需要儲存許多的資訊，這些資訊可能是由使用者輸入、從檔案中取得，甚至是由網路上得到，在程式運行的過程中，
+這些資訊透過<span style="font-weight: bold;">「變數」（Variable）</span>加以儲存，以便程式隨時取
+用。 <br>
+
+      <br>
+
+
+一個變數用來指向一個記憶體空間，資料就是儲存在這個空間中，使用變數名稱來取得資料相信會比使用記憶體位置來得方便；然而由於資料在儲存時所需要的容量
+不一，不同的資料必須要配給不同的空間大小來儲存，在Java中對不同的資料區分有幾種不同的「資料型態」（Data type）。<br>
+
+      <br>
+
+
+在Java中基本的資料型態主要區分為「整數」（Integer）、「位元」（Byte）、「浮點數」（Float）、「字元」（Character）與
+布林數（Boolean）幾種，而這幾種還可以細分，如下所示： </small>
+
+      <br>
+
+
+      
+      <h2><span class="createlink">&nbsp;整數</span></h2>
+
+      <small>
+只儲存整數數值，可細分為<span style="font-weight: bold;">「短整數」（short）（佔2個位元組）</span>、<span style="font-weight: bold;">整數（int）（佔4個位元組）</span>與<span style="font-weight: bold;">長整數（long）（佔8個位元組）</span>，長整數所佔的記憶體比整數來得多，可表示
+的數值範圍也就較大，同樣的整數可表示的整數數值範圍也比短整數來得大。</small><br>
+
+
+      <br>
+
+
+      
+      <h2>位元</h2>
+
+      <small>
+Java提供有<span style="font-weight: bold;">byte</span>資料型態，專門儲存位元資料，例如影像位元資
+料，一個byte資料型態佔一個位元組，而必要的話，byte資料型態也可以用於儲存整數數值。</small><br>
+
+
+      <br>
+
+
+      
+      <h2>浮點數</h2>
+
+      <small>
+主要用來儲存小數數值，也可以用來儲存範圍更大的整數，可分為<span style="font-weight: bold;">浮點數（float）
+（佔4個位元組）</span>與<span style="font-weight: bold;">倍精度浮點數（double）（佔8個位元組）</span>，
+倍精度浮點數所使用的記憶體空間比浮點數來得多，可表示的數值範圍與精確度也比較大。</small><br>
+
+
+      <br>
+
+
+      
+      <h2>字元</h2>
+
+      <small>
+用來儲存字元，Java的字元採<span style="font-weight: bold;">Unicode編碼</span>，其中前128個
+字元編碼與ASCII編碼相容；每個字元資料型態佔兩個位元組，可儲存的字元範圍由<span style="font-weight: bold;">\
+u0000到\uFFFF</span>，由於Java的字元採用Unicode編碼，一個中文字與一個英文字母在Java中同樣都是用一個字元來表示。</small><br>
+
+
+      <br>
+
+
+      
+      <h2>布林數</h2><small>有<span style="font-weight: bold;">true</span>與<span style="font-weight: bold;">false</span>兩
+個數值，分別表示邏輯的「真」與「假」，Java將布林值抽象化，底層沒有實際對應的型態，也不允許其它型態與布林值之間的轉換。<br>
+
+      <br>
+
+      <br>
+
+
+因為每種資料型態所佔有的記憶體大小不同，因而可以儲存的數值範圍也就不同，例如整數int的記憶體空間是4個位元組，所以它可以儲存的整數範圍為-
+2147483648至2147483647，如果儲存值超出這個範圍的話稱之為<span style="font-weight: bold;">「溢
+值」（Overflow）</span>，會造成程式不可預期的結果，您可以使用下面這個程式獲得數值的儲存範圍：</small>
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li> DataRange.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>public class DataRange { <br>    public static void main(String[] args) { <br>        System.out.printf("short range: %d ~ %d\n", <br>                               Short.MAX_VALUE, Short.MIN_VALUE); <br>        System.out.printf("int range: %d ~ %d\n", <br>                               Integer.MAX_VALUE, Integer.MIN_VALUE); <br>        System.out.printf("long range: %d ~ %d\n",<br>                               Long.MAX_VALUE, Long.MIN_VALUE); <br>        System.out.printf("byte range: %d ~ %d\n", <br>                               Byte.MAX_VALUE, Byte.MIN_VALUE); <br>        System.out.printf("float range: %e ~ %e\n", <br>                               Float.MAX_VALUE, Float.MIN_VALUE); <br>        System.out.printf("double range: %e ~ %e\n", <br>                               Double.MAX_VALUE, Double.MIN_VALUE); <br>    } <br>}</pre>
+
+
+      <br>
+
+      <small>
+其中<span style="font-weight: bold;">Byte、Integer、Long、Float、Double</span>都
+是java.lang套件下的類別名稱，而 <span style="font-weight: bold;">MAX_VALUE</span>與<span style="font-weight: bold;">MIN_VALUE</span>則是各類別中所定義的靜態常數成員，分別表示該資料型態可儲
+存的數值最大與最小範圍，%e表示用科學記號顯示，執行結果如下所示： </small><span class="postbody"></span><br>
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">short range: 32767 ~ -32768<br>
+
+
+int range: 2147483647 ~ -2147483648<br>
+
+
+long range: 9223372036854775807 ~ -9223372036854775808<br>
+
+
+byte range: 127 ~ -128<br>
+
+
+float range: 3.402823e+38 ~ 1.401298e-45<br>
+
+
+double range: 1.797693e+308 ~ 4.900000e-324</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+      </span></td>
+
+
+    </tr>
+
+
+  
+        
+        </tbody>
+      
+      </table>
+
+
+      <br>
+
+      <small>
+其中浮點數所取得是正數的最大與最小範圍，加上負號即為負數的最大與最小範圍。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/DataType.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

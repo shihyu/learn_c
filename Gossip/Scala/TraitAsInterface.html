@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/TraitAsInterface.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>作為規範介面的特徵</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 作為規範介面的特徵</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>繼
+承的目的之一，在於延用父類別已有的程式碼，並重新定義不適合或增加新的定義，然後有些時候，並不適合用繼承來解決問題，尤其在單一繼承的語言中，例如在
+Scala中，一次只能繼承自一個類別，多重繼承在Scala中是不允許的，這使得「是一種」（is
+a）的關係在繼承時更為加強，例如，你繼承自鳥類，就必然「是一種」鳥。<br><br>舉個例子來說，鳥會飛，</small><small>超人也會飛，但超人不會是一種鳥（如果你硬要說鳥人也是超人，那我投降），如果你只是為了飛行這個行為，讓超人去繼承鳥就不適當。<br><br>在Scala中，你可以定義<span style="font-weight: bold;">特徵（Trait）</span>，類別可以<span style="font-weight: bold;">繼承（extends）</span>特徵：<br></small><pre><span style="font-weight: bold;">trait Flyer {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def fly(): Unit</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>class Bird <span style="font-weight: bold;">extends Flyer</span> {<br>    def fly() = println("使用翅膀")<br>}<br><br>class Superman <span style="font-weight: bold;">extends Flyer</span> {<br>    def fly() = println("使用超人披風")<br>}<br><br>def doFly(<span style="font-weight: bold;">flyer: Flyer</span>) {<br>    flyer.fly()<br>}<br><br>val bird = new Bird<br>val man = new Superman<br>doFly(bird)     // 顯示使用翅膀<br>doFly(man)      // 顯示使用超人披風</pre><small><br>你使用<span style="font-weight: bold;">trait</span>關鍵字來定義特徵，<span style="font-weight: bold;">特徵的作用之一，就是規範必須實作的介面</span>，也就是特徵中僅定義無任何實作程式碼的抽象方法，如果定義的是無實作的抽象方法，則繼承特徵的類別必須實作（如同Java的interface）。<br><br>若類別本身沒有繼承自別的父類別，則可以直接繼承特徵，也就是直接使用<span style="font-weight: bold;">extends</span>關鍵字。上例中，iamFly()函式可接受具Flyer特徵的物件進行多型操作。<br><br>類別亦可繼承自某個父類別，並<span style="font-weight: bold;">具有（with）</span>指定的特徵，例如：<br></small><pre>trait Flyer {<br>    def fly(): Unit<br>}<br><br>class Animal<br><br>class Bird extends Animal <span style="font-weight: bold;">with</span> Flyer {<br>    def fly() = println("使用翅膀")<br>}<br><br>val bird = new Bird<br>bird.fly()            // 顯示使用翅膀</pre><small><br>一個類別可以具有多個特徵，例如：<br></small><pre>trait Flyer {<br>    def fly(): Unit<br>}<br><br>trait Sailer {<br>    def cruise(): Unit<br>}<br><br>class Vehicle<br><br>class SeaPlane extends Vehicle<span style="font-weight: bold;"> with</span> Flyer <span style="font-weight: bold;">with</span> Sailer {<br>    def fly() = println("使用螺旋槳")<br>    def cruise() = println("航行")<br>}</pre><small><br>特徵可以繼承自另一個特徵，例如：<br></small><pre>trait Sailer {<br>    def cruise(): Unit<br>}<br><br>trait Diver extends Sailer {<br>    def dive(): Unit<br>}<br><br>class Submarine extends Diver {<br>    def cruise() = println("航行")<br>    def dive() = println("潛水")<br>}</pre><small><br>如果要繼承多個特徵，則特徵之間亦使用with結合，例如：<br></small><pre>trait A<br>trait B<br>trait C extends A with B</pre><small><br><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/TraitAsInterface.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

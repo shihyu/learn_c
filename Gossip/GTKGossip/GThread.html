@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GThread.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:24 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>GThread</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">GTK Gossip: GThread</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>一個進程（Process）是一個包括有自身執行位址的程式，在一個多工的作業系統中，可以分配CPU時間給每一個進程，CPU在片段時間中執行某個進程，然後下一個時間片段跳至另一個進程去執行，由於轉換速度很快，這使得每個程式像是在同時進行處理一般。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+一個執行緒是進程中的一個執行流程，一個進程中可以同時包括多個執行緒，也就是說一個程式中同時可能進行多個不同的子流程，這使得一個程式可以像是同時間
+處理多個事務，例如一方面接受網路上的資料，另一方面同時計算資料並顯示結果，一個多執行緒程式可以同時間處理多個子流程。<br>
+      <br>
+在GLib中，提供GThread來實現可攜式的執行緒解決方案，以 </small><small><big><a href="SignalEmitStop.html"><small>內
+建 Signal 的發射與停止</small></a></big> 中的範例來說，當中使用到 pthread，因而只能在 Linux 之類的系統中執行，您可以改寫為使用GThread的方式，例如：<br>
+      </small>
+      <ul>
+        <li><small>gthread_demo.c</small></li>
+      </ul>
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">gpointer signal_thread(gpointer arg)</span> {<br>    int i;<br>    for(i = 0; i &lt; 5; i++) {<br> <span style="font-weight: bold;">       g_usleep(1000000); // 暫停一秒</span><br>        g_signal_emit_by_name(arg, "clicked");<br>    } <br>}<br><br>// 自訂Callback函式<br>void button_clicked(GtkWidget *button, gpointer data) {<br>    g_print("按鈕按下：%s\n", (char *) data);<br>}<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *button;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br><br>    button = gtk_button_new_with_label("按我");<br>    gtk_container_add(GTK_CONTAINER(window), button);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br>    g_signal_connect(GTK_OBJECT(button), "clicked",<br>                     G_CALLBACK(button_clicked), "哈囉！按鈕！");<br><br>    gtk_widget_show(window);<br>    gtk_widget_show(button);<br><br><span style="font-weight: bold;">    if(!g_thread_supported()) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        g_thread_init(NULL);<br>    }<br></span>        <br>    <span style="font-weight: bold;">g_thread_create(signal_thread, button, FALSE, NULL);</span><br>    <br>    gtk_main();<br><br>    return 0;<br>}</pre>
+      <small><br>
+在使用g_thread_create()函式之前，先使用g_thread_supported()函式檢查一下執行緒系統是否已初始化，
+signal_thread是自訂的callback函式，所建立的GThread會執行該函式，g_usleep()是用來暫停執行緒之用，單位是微
+秒。<br>
+      <br>
+為了編譯這個程式，您必須設定gthread-2.0程式庫路徑資訊，可以使用pkg-config取得這個資訊，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">pkg-config --libs gthread-2.0</span></small><br>
+      </div>
+      <small><br>
+事實上，GThread要在建立GMainLoop下才能使用，Main
+Loop的目的是等待事件的發生，並呼叫適當的callback函式，在GTK的程式，不用自行建立Main
+Loop，因為在gtk_init()中已幫您建立，而Main Loop的執行則是在gtk_main()中替您進行。<br>
+      <br>
+下面這個範例程式，示範了如何自行建立Main Loop，並建立三個執行緒，其中一個執行緒會執行checking_thread()函式，以檢查另兩個執行緒是否已完成，若已完成則結束Main Loop：<br>
+      </small>
+      <ul>
+        <li>gthread_demo.c</li>
+      </ul>
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">gboolean thread1_end = FALSE;</span><br style="font-weight: bold;"><span style="font-weight: bold;">gboolean thread2_end = FALSE;</span><br><br>gpointer thread1(gpointer data) {<br>    int i;<br>    for(i = 0; i &lt; 10; i++) {<br>        g_print("Thread1: %s\n", data);<br>        g_usleep(1000000);<br>    }<br><span style="font-weight: bold;">    thread1_end = TRUE;</span><br>}<br><br>gpointer thread2(gpointer data) {<br>    int i;<br>    for(i = 0; i &lt; 10; i++) {<br>        g_print("Thread2: %s\n", data);<br>        g_usleep(1000000);<br>    }<br><span style="font-weight: bold;">    thread2_end = TRUE;</span><br>}<br><br>gpointer checking_thread(gpointer mloop) {<br><span style="font-weight: bold;">    while(TRUE) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if(thread1_end &amp;&amp; thread2_end) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            g_main_loop_quit(mloop);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            break;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        g_usleep(1000);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;">}<br><br>int main(int argc, char *argv[]) {<br>    GMainLoop *mloop;<br>    <br>    if(!g_thread_supported()) {<br>        g_thread_init(NULL);<br>    }<br>    <br style="font-weight: bold;"><span style="font-weight: bold;">    mloop = g_main_loop_new(NULL, FALSE);</span><br style="font-weight: bold;"><br style="font-weight: bold;">    g_thread_create(thread1, "Running", FALSE, NULL);<br>    g_thread_create(thread2, "Going", FALSE, NULL);<br>    g_thread_create(checking_thread, mloop, FALSE, NULL);<br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    g_main_loop_run(mloop);</span><br>    <br>    return 0;<br>}</pre>
+      <br>
+      <small>一個執行的結果如下所示：</small><span class="postbody"><small><br>
+
+
+
+
+
+
+
+      </small></span><span class="postbody"></span>
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="color: rgb(255, 255, 255);">Thread1: Running<br>
+Thread2: Going<br>
+Thread2: Going<br>
+Thread1: Running<br>
+Thread1: Running<br>
+Thread2: Going<br>
+Thread2: Going<br>
+Thread1: Running<br>
+Thread1: Running<br>
+Thread2: Going<br>
+Thread1: Running<br>
+Thread2: Going<br>
+Thread2: Going<br>
+Thread1: Running<br>
+Thread2: Going<br>
+Thread1: Running<br>
+Thread1: Running<br>
+Thread2: Going<br>
+Thread1: Running<br>
+Thread2: Going</small><small style="color: rgb(255, 255, 255);"></small><br>
+
+
+
+
+
+
+            
+            </td>
+
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+
+
+      </small></span><small><br>
+      </small>
+
+      <span class="postbody"><br>
+
+
+      </span> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+      <br>
+
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<span class="postbody"><br>
+
+
+<br>
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GThread.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:24 GMT -->
+</html>

@@ -1,0 +1,1315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GTKOO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GTK 的物件導向架構</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GTK 的物件導向架構</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>GTK 基本上是使用 C 語言來撰寫，即使C語言本身不支援物件導向，但GTK在架構上運用了一些方式，使得使用GTK時可以支援許多物件導向的概念。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+在物件導向的封裝特性上，GTK以結構（structure）的方式來模擬類別，事實上GTK也直接稱這些結構為類別，以建構GtkWindow的程式碼為例：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">window = gtk_window_new(GTK_WINDOW_TOPLEVEL);</span></small><br>
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+      <small>在函式的組織上，與GtkWindow相關的函式，都是以gtk_window名稱作為開頭，gtk_window_new()就像是物件導向程式語言中的建構式，如果要設置GtkWindow的相關屬性，例如標題名稱：<br>
+
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");</span></small></span><br>
+
+
+
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+      <small>gtk_window_set_title()的第一個參數接受GtkWindow指標，透過這種方式，讓實際上屬於全域的函
+式，看來就像是專屬於GtkWindow所使用，就如同物件上所帶有的公開（public）方法（method）或成員函式（member
+function），而在私有（private）的模擬上，GTK使用static函式，例如在gtkwindow.c原始程式碼中，可以看到：<br>
+
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_dispose&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GObject&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+*object);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_destroy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkObject&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *object);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_finalize&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GObject&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+*object);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_show&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *widget);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_hide&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *widget);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_map&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *widget);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_unmap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *widget);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_realize&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *widget);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>static
+void
+gtk_window_unrealize&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *widget);</small></span><br>
+
+
+
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+
+
+
+這些static函式不會出現在gtkwindow.h標頭文件中，僅可在gtkwindow.c中使用，這看起來就像是GtkWindow的專屬私用函式。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+在繼承上，GTK實際上使用結構鏈接（link）的方式，在<big> </big></small></span><small><big><a href="FirstGTK.html"><small>第一個 GTK 程式</small></a> </big>中看過以下的繼承關係：</small><span class="postbody"><small></small></span><span class="postbody"><small><br>
+
+
+
+
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">GObject<br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;+--</span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">GInitiallyUnowned<br>
+
+
+
+
+
+
+
+
+
+
+
+&nbsp; &nbsp;&nbsp; +-- GtkObject<br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkWidget<br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkContainer<br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkBin<br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkWindow</span></small></span><span class="postbody"><br>
+
+
+
+
+
+
+      </span><span class="postbody"><small><br>
+
+
+
+
+
+
+以GtkContainer為例，在gtkcontainer.h中有如下的定義：<br>
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>typedef struct _GtkContainer&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; GtkContainer;<br>
+
+
+
+...<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+struct _GtkContainer<br>
+
+
+
+
+
+
+{<br>
+
+
+
+
+
+
+&nbsp; <span style="color: rgb(255, 0, 0);">GtkWidget widget;</span><br>
+
+
+
+
+
+
+&nbsp; <br>
+
+
+
+
+
+
+&nbsp; GtkWidget *focus_child;<br>
+
+
+
+
+
+
+&nbsp; <br>
+
+
+
+
+
+
+&nbsp; guint border_width : 16;<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+&nbsp; /*&lt; private &gt;*/<br>
+
+
+
+
+
+
+&nbsp; guint need_resize : 1;<br>
+
+
+
+
+
+
+&nbsp; guint resize_mode : 2;<br>
+
+
+
+
+
+
+&nbsp; guint reallocate_redraws : 1;<br>
+
+
+
+
+
+
+&nbsp; guint has_focus_chain : 1;<br>
+
+
+
+
+
+
+};<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      </small></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small></small></span></div>
+
+
+
+
+
+
+      <span class="postbody"><small>GtkContainer的成員中有一個GtkWidget，而再來看到gtkwidget.h：<br>
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>typedef struct _GtkWindow&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GtkWindow;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>...</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>struct _GtkWidget</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>{</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; /* The object structure needs to be the first</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp; *&nbsp; element in the widget structure in order for</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp; *&nbsp; the object mechanism to work correctly. This</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp; *&nbsp; allows a GtkWidget pointer to be cast to a</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp; *&nbsp; GtkObject pointer.</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp; */</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; <span style="color: rgb(255, 0, 0);">GtkObject object;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; &nbsp; ...</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>};</small></span><br>
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+GtkWidget中有個成員為GtkObject，以如此的鏈結關係來維持物件上的繼承關係架構，而在gtk_window_set_title()函式的使用例子中：<br>
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");</span></small></span><br>
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+      <small>GTK_WINDOW是一個巨集，用來進行指標型態轉型動作：<br>
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span class="postbody"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">#define GTK_WINDOW(obj)<br>
+
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_WINDOW, GtkWindow))</span></span></small><br>
+
+
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>
+
+G_TYPE_CHECK_INSTANCE_CAST巨集定義在GLib的gtype.h（</small></span><span class="postbody"><small>/usr/include/glib-2.0/gobject/gtype.h</small></span><span class="postbody"><small>）中：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">#define G_TYPE_CHECK_INSTANCE_CAST(instance, g_type, c_type)&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (_G_TYPE_CIC ((instance), (g_type), c_type))</span></small></span><br style="font-weight: bold;">
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+      </small></span><span class="postbody"><small>
+
+G_TYPE_CHECK_INSTANCE_CAST巨集會檢查instance是否為g_type的一個實例，如果不是的話就發出警示訊息，若是的話就將指標轉型為c_type型態（參考 </small></span><a href="http://library.gnome.org/devel/gobject/unstable/gobject-Type-Information.html#G-TYPE-CHECK-INSTANCE-CAST:CAPS"><span class="postbody"><small>
+
+G_TYPE_CHECK_INSTANCE_CAST </small></span></a><span class="postbody"><small><a href="http://library.gnome.org/devel/gobject/unstable/gobject-Type-Information.html#G-TYPE-CHECK-INSTANCE-CAST:CAPS">線上文件說明</a>）。<br>
+
+
+
+
+      <br>
+
+
+
+
+      </small></span><small>即便在熟悉C++、Java等支援物件導向程式語言的人來說，這樣的架構在物件導向的概念上並不完整，但確實在易讀與維護性上加強了不少。</small><br>
+
+
+
+
+      <span class="postbody">
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GTKOO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+</html>

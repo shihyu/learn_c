@@ -1,0 +1,549 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QListBoxQComboBoxSS.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QListBox、QComboBox 的 Signals 與 Slots 處理</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip:&nbsp;QListBox、QComboBox 的 Signals 與 Slots 處理</a></h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>這個範例改寫自Qt的線上說明文件之範例，介紹如何處理QListBox與QComboBox的選取與應用。 <br>
+
+
+      <br>
+
+
+首先編輯listboxcombo.h定義檔： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>listboxcombo.h</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#ifndef LISTBOX_COMBO_H<br>#define LISTBOX_COMBO_H<br><br>#include &lt;qvbox.h&gt;<br><br>class QListBox;<br>class QLabel;<br><br>class ListBoxCombo : public QVBox<br>{<br>    Q_OBJECT<br><br>public:<br>    ListBoxCombo( QWidget *parent = 0, const char *name = 0 );<br><br>protected:<br>    QListBox *lb1, *lb2;<br>    QLabel *label1, *label2;<br><br>protected slots:<br>    void slotLeft2Right();<br>    void slotCombo1Activated( const QString &amp;s );<br><br>};<br><br>#endif  </pre>
+
+
+      <small><br>
+
+
+再來編輯listboxcombo.cpp： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>listboxcombo.cpp</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include "listboxcombo.h"<br><br>#include &lt;qcombobox.h&gt;<br>#include &lt;qlistbox.h&gt;<br>#include &lt;qhbox.h&gt;<br>#include &lt;qpushbutton.h&gt;<br>#include &lt;qstring.h&gt;<br>#include &lt;qpixmap.h&gt;<br>#include &lt;qlabel.h&gt;<br>#include &lt;qimage.h&gt;<br>#include &lt;qpainter.h&gt;<br>#include &lt;qstyle.h&gt;<br><br>/*<br>* Constructor<br>*<br>* Creates child widgets of the ListBoxCombo widget<br>*/<br><br>ListBoxCombo::ListBoxCombo( QWidget *parent, const char *name )<br>    : QVBox( parent, name )<br>{<br>    setMargin( 5 );<br>    setSpacing( 5 );<br><br>    unsigned int i;<br>    QString str;<br><br>    QHBox *row1 = new QHBox( this );<br>    row1-&gt;setSpacing( 5 );<br><br>    // Create a multi-selection ListBox...<br>    lb1 = new QListBox( row1 );<br>    lb1-&gt;setSelectionMode( QListBox::Multi );<br><br>    // ...insert a pixmap item...<br>    lb1-&gt;insertItem( QPixmap( "dog.xpm" ) );<br>    // ...and 100 text items<br>    for ( i = 0; i &lt; 100; i++ ) {<br>        str = QString( "Listbox Item %1" ).arg( i );<br>        if ( !( i % 4 ) )<br>            lb1-&gt;insertItem( QPixmap( "fileopen.xpm" ), str );<br>        else<br>            lb1-&gt;insertItem( str );<br>    }<br><br>    // Create a pushbutton...<br>    QPushButton *arrow1 = new QPushButton( " -&gt; ", row1 );<br>    // ...and connect the clicked SIGNAL with the SLOT slotLeft2Right<br>    connect( arrow1, SIGNAL( clicked() ), this, SLOT( slotLeft2Right() ) );<br><br>    // create an empty single-selection ListBox<br>    lb2 = new QListBox( row1 );<br><br>    QHBox *row2 = new QHBox( this );<br>    row2-&gt;setSpacing( 5 );<br><br>    QVBox *box1 = new QVBox( row2 );<br>    box1-&gt;setSpacing( 5 );<br><br>    // Create an editable Combobox and a label below...<br>    QComboBox *cb1 = new QComboBox( TRUE, box1 );<br>    label2 = new QLabel( "Current Item: Combobox Item 0", box1 );<br>    label2-&gt;setMaximumHeight( label2-&gt;sizeHint().height() * 2 );<br>    label2-&gt;setFrameStyle( QFrame::Panel | QFrame::Sunken );<br><br>    // ... and insert 50 items into the Combobox<br>    for ( i = 0; i &lt; 50; i++ ) {<br>        str = QString( "Combobox Item %1" ).arg( i );<br>        if ( !( i % 4 ) )<br>            cb1-&gt;insertItem( QPixmap( "fileopen.xpm" ), str );<br>        else<br>            cb1-&gt;insertItem( str );<br>    }<br><br>    // Connect the activated SIGNALs of the Comboboxes with SLOTs<br>    connect( cb1, SIGNAL( activated( const QString &amp; ) ), <br>             this, SLOT( slotCombo1Activated( const QString &amp; ) ) );<br>}<br><br>/*<br>* SLOT slotLeft2Right<br>*<br>* Copies all selected items of the first ListBox into the<br>* second ListBox<br>*/<br><br>void ListBoxCombo::slotLeft2Right()<br>{<br>    // Go through all items of the first ListBox<br>    for ( unsigned int i = 0; i &lt; lb1-&gt;count(); i++ ) {<br>         QListBoxItem *item = lb1-&gt;item( i );<br>   // if the item is selected...<br>        if ( item-&gt;isSelected() ) {<br>             // ...and it is a text item...<br>             if ( item-&gt;pixmap() &amp;&amp; !item-&gt;text().isEmpty() )<br>                lb2-&gt;insertItem( *item-&gt;pixmap(), item-&gt;text() );<br>             else if ( !item-&gt;pixmap() )<br>                lb2-&gt;insertItem( item-&gt;text() );<br>             else if ( item-&gt;text().isEmpty() )<br>                lb2-&gt;insertItem( *item-&gt;pixmap() );<br>        }<br>    }<br>}<br><br>/*<br>* SLOT slotCombo1Activated( const QString &amp;s )<br>*<br>* Sets the text of the item which the user just selected<br>* in the second Combobox (and is now the value of s) to<br>* the second Label.<br>*/<br><br>void ListBoxCombo::slotCombo1Activated( const QString &amp;s )<br>{<br>    label2-&gt;setText( QString( "Current Item: %1" ).arg( s ) );<br>}<br><br><br>最後是主函式main.cpp：<br>代碼:<br>#include "listboxcombo.h"<br>#include &lt;qapplication.h&gt;<br><br>int main( int argc, char **argv )<br>{<br>    QApplication a( argc, argv );<br><br>    ListBoxCombo listboxcombo;<br>    listboxcombo.resize( 400, 270 );<br>    listboxcombo.setCaption( "Qt Example - Listboxes and Comboboxes" );<br>    a.setMainWidget( &amp;listboxcombo );<br>    listboxcombo.show();<br><br>    return a.exec();<br>}  </pre>
+
+
+      <small><br>
+
+
+關於配置的部份我們就不再說明了，您應該已經很熟悉了，請多利用線上說明得知相關的配置方法；我們說明這個程式中的幾個重要方法或技巧。 <br>
+
+
+      <br>
+
+
+      </small><small>設定QListBox為可多重選取：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">lb1-&gt;setSelectionMode( QListBox::Multi ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>這是個設定多個項目的技巧，我們使用QString的引數方法並搭配迴圈，產生100個選項，arg(i)會插入%1的位置：</small><br style="font-weight: bold;">
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">for ( i = 0; i &lt; 100; i++ ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; str = QString( "Listbox Item %1" ).arg( i ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if ( !( i % 4 ) ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lb1-&gt;insertItem( QPixmap( "fileopen.xpm" ), str ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; else </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lb1-&gt;insertItem( str ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>當按下按鈕時，將執行slotLeft2Right()，這個函式會將選取的部份插入至右邊的QListBox；而當選取QComboBox時，會執行slotCombo1Activated()，這個函式會將其下方的QLabel設定為選取的項目文字：</small><br style="font-weight: bold;">
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">connect( arrow1, SIGNAL( clicked() ), this, SLOT( slotLeft2Right() ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">........ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">connect( cb1, SIGNAL( activated( const QString &amp; ) ), <br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;this, SLOT( slotCombo1Activated( const QString &amp; ) ) ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+      <br>
+
+
+      </small><small>使用QListBoxItem儲存取出的QListBox的項目，以進行選取狀態測試，isSelected()可以測試選項是否被選取，
+由於選項中有圖、文與文圖並存的項目，所以我們分別判斷圖文的存在，以呼叫相對應的insertItem()方法來插入項目至右邊的QListBox：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">void ListBoxCombo::slotLeft2Right() </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">{ </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; // Go through all items of the first ListBox </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; for ( unsigned int i = 0; i &lt; lb1-&gt;count(); i++ ) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QListBoxItem *item = lb1-&gt;item( i ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp; // if the item is selected... </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ( item-&gt;isSelected() ) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // ...and it is a text item... </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if ( item-&gt;pixmap() &amp;&amp; !item-&gt;text().isEmpty() ) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lb2-&gt;insertItem( *item-&gt;pixmap(), item-&gt;text() ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else if ( !item-&gt;pixmap() ) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lb2-&gt;insertItem( item-&gt;text() ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else if ( item-&gt;text().isEmpty() ) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lb2-&gt;insertItem( *item-&gt;pixmap() ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">} </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+下圖為程式執行的畫面： <br>
+
+
+      </small><img style="width: 408px; height: 297px;" alt="" src="images/QListBoxQComboBoxSS-1.jpg"><br>
+
+
+
+
+
+
+
+
+      <small></small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QListBoxQComboBoxSS.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:58 GMT -->
+</html>

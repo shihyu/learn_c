@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/PostfixCal.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>後序式的運算</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip:&nbsp;後序式的運算</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+說明
+將 <a class="wikilink" href="InFixPostfix.htm">中序式轉換為後序式</a>
+的好處是，不用處理運算子先後順序問題，只要依序由運算式由前往後讀取即可。</small> 
+      
+      <h2> 解法</h2>
+
+      <small>
+
+
+運算時由後序式的前方開始讀取，遇到運算元先存入堆疊，如果遇到運算子，則由堆疊中取出兩個運算元進行對應的運算，然後將結果存回堆疊，如果運算式讀取完
+畢，那麼堆疊頂的值就是答案了，例如我們計算12+34+*這個運算式（也就是(1+2)*(3+4)）：</small> 
+
+  
+    
+      
+      <table border="1" width="50%">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>讀取 </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>堆疊 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>1 </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>1 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>2 </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>1 2 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>+ </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>3 // 1+2 後存回 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>3 </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>3 3 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>4 </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>3 3 4 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>+ </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>3 7 // 3+4 後存回 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>* </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>21 // 3 * 7 後存回</small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>#define MAX 80<br><br>void inToPostfix(char*, char*); // 中序轉後序 <br>int priority(char); // 運算子優先<br>double eval(char*); <br>double cal(char, double, double); <br><br>int main(void) { <br>    char infix[MAX] = {'\0'}; <br><br>    printf("運算式："); <br>    scanf("%s", infix); <br>    printf("%f", eval(infix));<br>    <br>    return 0; <br>} <br><br>void inToPostfix(char* infix, char* postfix) { <br>    char stack[MAX] = {'\0'};<br>    int i, j, top;<br>    for(i = 0, j = 0, top = 0; infix[i] != '\0'; i++) switch(infix[i]) { <br>        case '(':              // 運算子堆疊 <br>            stack[++top] = infix[i]; <br>            break; <br>        case '+': case '-': case '*': case '/': <br>            while(priority(stack[top]) &gt;= priority(infix[i])) { <br>                postfix[j++] = stack[top--];<br>            } <br>            stack[++top] = infix[i]; // 存入堆疊 <br>            break; <br>        case ')': <br>            while(stack[top] != '(') { // 遇 ) 輸出至 ( <br>                postfix[j++] = stack[top--];<br>            } <br>            top--;  // 不輸出 ( <br>            break; <br>        default:  // 運算元直接輸出 <br>            postfix[j++] = infix[i];<br>    }<br>    while(top &gt; 0) { <br>        postfix[j++] = stack[top--];<br>    }<br>} <br><br>int priority(char op) { <br>    switch(op) { <br>        case '+': case '-': return 1;<br>        case '*': case '/': return 2;<br>        default:            return 0;<br>    } <br>} <br><br>double eval(char* infix) {<br>    char postfix[MAX]= {'\0'};<br>    char opnd[2] = {'\0'};<br>    double stack[MAX] = {0.0}; <br>    <br>    inToPostfix(infix, postfix);    <br><br>    int top, i;<br>    for(top = 0, i = 0; postfix[i] != '\0'; i++) switch(postfix[i]) { <br>        case '+': case '-': case '*': case '/': <br>            stack[top - 1] = cal(postfix[i], stack[top - 1], stack[top]); <br>            top--; <br>            break; <br>        default: <br>            opnd[0] = postfix[i];<br>            stack[++top] = atof(opnd);<br>    }             <br>    <br>    return stack[top];<br>}<br><br>double cal(char op, double p1, double p2) { <br>    switch(op) { <br>        case '+': return p1 + p2; <br>        case '-': return p1 - p2; <br>        case '*': return p1 * p2; <br>        case '/': return p1 / p2; <br>    } <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>// 使用 <a href="InFixPostfix.htm">中序式轉後序式</a> 中的 Infix<br>import java.util.*;<br><br>public class Calculator {<br>    private static double cal(char op, double p1, double p2) {<br>        switch(op) { <br>            case '+': return p1 + p2; <br>            case '-': return p1 - p2; <br>            case '*': return p1 * p2; <br>            case '/': return p1 / p2;<br>            default:  throw new ArithmeticException(op + " not defined");<br>        }<br>    }<br>    <br>    public static double eval(String expr) {<br>        LinkedList&lt;Double&gt; stack = new LinkedList&lt;&gt;();<br>        for(char c : Infix.toPostfix(expr).toCharArray()) {<br>            if("+-*/".indexOf(c) != -1) {<br>                double p2 = stack.removeLast();<br>                double p1 = stack.removeLast();<br>                stack.add(cal(c, p1, p2));<br>            } else { stack.add(Double.parseDouble(String.valueOf(c))); } <br>        }<br>        return stack.getLast();<br>    }        <br>    <br>    public static void main(String[] args) {<br>        System.out.println(eval(args[0]));<br>    }<br>}</pre>
+
+
+
+      <br><ul><li><a name="Python"></a>Python</li></ul><pre># 使用 <a href="InFixPostfix.htm">中序式轉後序式</a> 中的 toPostfix<br>from sys import argv<br>from functools import reduce<br><br>def eval(expr):<br>    def doStack(stack, c):<br>        if c in "+-*/":<br>            return stack[0:-2] + [<br>                {'+': float.__add__,<br>                 '-': float.__sub__,<br>                 '*': float.__mul__,<br>                 '/': float.__floordiv__}[c](stack[-2], stack[-1])]<br>        else:<br>            return stack + [float(c)]<br>            <br>    return reduce(doStack, toPostfix(expr), [])[-1]<br><br>print(eval(argv[1]))</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>// 使用 <a href="InFixPostfix.htm">中序式轉後序式</a> 中的 toPostfix<br>def eval(expr: String) = {<br>    ((Nil:List[Double]) /: Infix.toPostfix(expr)) {<br>        (stack, c) =&gt; {<br>            if("+-*/".contains(c)) {<br>                val op1 = stack.tail.head<br>                val op2 = stack.head<br>                (c match {<br>                    case '+' =&gt; op1 + op2<br>                    case '-' =&gt; op1 - op2<br>                    case '*' =&gt; op1 * op2<br>                    case '/' =&gt; op1 / op2<br>                }) :: stack.tail.tail<br>            } else c.toString.toDouble :: stack<br>        }<br>    }.head<br>}<br><br>println(eval(args(0)))</pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre># 使用 <a href="InFixPostfix.htm">中序式轉後序式</a> 中的 toPostfix<br><br>def eval(expr)<br>    toPostfix(expr).split("").reduce([]) { |stack, c|<br>        if "+-*/".include? c<br>            stack[0...-2] + [stack[-2].send(c, stack[-1])]<br>        else<br>            stack + [c.to_f]<br>        end<br>    } [-1]<br>end<br><br>print(eval(ARGV[0]))<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript<br>
+        </li>
+      </ul>
+      <pre>// 使用 <a href="InFixPostfix.htm">中序式轉後序式</a> 中的 toPostfix<br>function evaluate(expr) {<br>    var stack = [];<br>    toPostfix(expr).split('').forEach(function(c) {<br>        if('+-*/'.indexOf(c) !== -1) {<br>            var p2 = stack.pop();<br>            var p1 = stack.pop();<br>            stack.push(cal(c, p1, p2));<br>        } else {<br>            stack.push(parseInt(c));<br>        }<br>    });<br>    return stack.pop();<br>}<br><br>print(evaluate('(1+2)*(3+4)'));<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>{- 使用 <a href="InFixPostfix.htm">中序式轉後序式</a> 中的 toPostfix -}<br><br>import qualified Data.Map as Map<br>import System(getArgs)<br><br>eval expr = last $ foldl doStack [] (toPostfix expr)<br>    where<br>        chr2flt c = fromInteger $ read [c]<br>        doStack stack c =<br>            if c `elem` "+-*/" then<br>                let opts = Map.fromList [('+', (+)), ('-', (-)), <br>                                         ('*', (*)), ('/', (/))]<br>                    (Just opt) = Map.lookup c opts<br>                in ((head $ tail stack) `opt` (head stack)) : <br>                   (tail $ tail stack)<br>            else (chr2flt c) : stack<br>            <br>main = do<br>    args &lt;- getArgs<br>    print $ eval $ args !! 0<br></pre>
+<br>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/PostfixCal.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QFtp.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:05 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QFtp</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QFtp</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QFtp在使用上與 </small><small><big><a href="QHttp.html"><small>QHttp</small></a></big> 非常類似，只不過FTP機制比HTTP來得更為複雜一些，所以QFtp上可以進行的相關操作更為豐富，以下先製作一個簡單的程式，使用QFtp進行FTP檔案下載，首先是FtpGet的定義：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>FtpGet.h</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#ifndef FTPGET_H<br>#define FTPGET_H<br><br>#include &lt;QObject&gt;<br><br>class QUrl;<br>class QFtp;<br>class QFile;<br><br>class FtpGet : public QObject {<br>    Q_OBJECT<br><br>public:<br>    FtpGet(QObject *parent = 0);<br>    void downloadFile(const QUrl &amp;url);<br>    <br>signals:<br>    void finished();<br>    <br>private slots:<br>    void done(bool error);<br>    <br>private:<br>    QFtp *ftp;<br>    QFile *file;<br>    <br>};<br><br>#endif</pre>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+      <small>定義上與上一個QHttp故意設計的類似，基本上實作也非常接近：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li><small>FtpGet.cpp</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;QtNetwork&gt;<br>#include &lt;QFile&gt;<br>#include &lt;iostream&gt;<br>#include "FtpGet.h"<br>using namespace std;<br><br>FtpGet::FtpGet(QObject *parent) : QObject(parent) {<br>    ftp = new QFtp(this);<br>    connect(ftp, SIGNAL(done(bool)), this, SLOT(done(bool)));<br>}<br><br>void FtpGet::downloadFile(const QUrl &amp;url) {<br>    QFileInfo fileInfo(url.path());<br>    QString fileName = fileInfo.fileName();<br><br>    file = new QFile(fileName);<br>    if (!file-&gt;open(QIODevice::WriteOnly)) {<br>        cerr &lt;&lt; "Unable to save the file" &lt;&lt; endl;<br>        delete file;<br>        file = 0;<br>        return;<br>    }<br>     <br>    ftp-&gt;setTransferMode(QFtp::Passive);<br>    ftp-&gt;connectToHost(url.host(), url.port(21));<br>    ftp-&gt;login("user", "passwd");<br>    ftp-&gt;get(url.path(), file);<br>    ftp-&gt;close();<br>}<br><br>void FtpGet::done(bool error) {<br>    if (error) {<br>        cerr &lt;&lt; "Error: " &lt;&lt; qPrintable(ftp-&gt;errorString()) &lt;&lt; endl;<br>    } else { <br>        cerr &lt;&lt; "File downloaded as " &lt;&lt; qPrintable(file-&gt;fileName())<br>             &lt;&lt; endl;<br>    }<br>    file-&gt;close();<br>    delete file;<br>    file = 0;<br>    <br>    emit finished();<br>}</pre>
+
+      <span class="postbody"><small><br>
+
+您可以使用QFtp的setTransferMode()來設定傳送模式，例如上面的程式設定為被動</small></span><span class="postbody"><small>（Passive）</small></span><span class="postbody"><small>模式，要連接至伺服器，使用connectToHost()方法，要登入則使用login()方法，下載檔案使用get()（上傳則使用put()）等，接下來寫個簡單的測試程式：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li>main.cpp</li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;QCoreApplication&gt;<br>#include &lt;QUrl&gt;<br>#include "FtpGet.h"<br>#include &lt;iostream&gt;<br>using namespace std;<br><br>int main(int argc, char *argv[]) {<br>    QCoreApplication app(argc, argv);<br>    <br>    FtpGet getter;<br>    getter.downloadFile(<br>        QUrl("ftp://caterpillar.onlyfun.net/public_html/index.html"));<br>    <br>    QObject::connect(&amp;getter, SIGNAL(finished()),<br>                     &amp;app, SLOT(quit()));<br>    <br>    return app.exec();<br>}</pre>
+
+      <span class="postbody"><small><br>
+
+在Qt的說明文件中，有個 <a href="http://doc.trolltech.com/4.3.3/network-ftp.html">FTP Example</a> 範例，您可以參考當中的程式，了解更多有關QFtp的使用方式。<br>
+
+      <br>
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QFtp.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:05 GMT -->
+</html>

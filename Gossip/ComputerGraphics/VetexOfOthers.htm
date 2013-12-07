@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/VetexOfOthers.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:13 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>旋轉體、錐狀體、柱狀體頂點</title></head><body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics: 旋轉體、錐狀體、柱狀體頂點<br>
+
+
+
+</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>
+
+
+
+
+
+
+
+由於旋轉體、錐狀體、柱狀體的幾何性質，使得它們的頂點配置具有規則而容易以運算來進行配置，觀念上十分簡單。</small><br>
+
+
+
+      
+      
+      <h2>旋轉體</h2>
+
+      <small>
+
+假設旋轉體是繞著Y軸旋轉，則可以先定義出一條錂線上的頂點，與它們各自距Y軸的距離，接下來只要旋轉這些頂點，就可以得出旋轉體所有的頂點，如下所示：</small><br>
+
+
+
+
+
+
+
+
+
+      <img style="width: 451px; height: 258px;" alt="" src="images/vetexOfOthers-1.jpg"><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+真實世界中的旋轉體很多，所以這個方法可以畫出各種不同的旋轉體；下面這個程式畫出一個高腳杯，它不儲存頂點，而直接利用運算後的頂點來繪製酒杯的骨架，採取的方法是先用迴圈畫圈圈，再由一次迴圈來畫錂線： </small><br>
+
+
+
+
+
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> Demo.java</li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+      
+      
+      <pre>package cc.openhome;<br><br>import java.awt.Color;<br>import java.awt.Graphics;<br>import javax.swing.JApplet;<br><br>import static java.lang.Math.*;<br><br>public class Demo extends JApplet {<br>    private final static double[] Y_LOCATIONS =<br>                     {180, 140, 100, 60, 20, 10, 4, 0};<br>    private final static double[] R_DISTANCES =<br>                     {100, 55, 10, 10, 10, 50, 80, 80};<br>    private int orgX;<br>    private int orgY;<br><br>    public void init() {<br>        super.init();<br>        setBackground(Color.black);<br>        setSize(300, 300);<br>        orgX = getWidth() / 3;<br>        orgY = getHeight() - 80;<br>    }<br><br>    public void paint(Graphics g) {<br>        g.setColor(Color.yellow);<br>        drawCircle(g);<br>        drawLine(g);<br>    }<br><br>    private void drawCircle(Graphics g) {<br>        // 360 度畫圈<br>        for (int i = 0; i &lt; Y_LOCATIONS.length; i++) {<br>            // 我們要畫線段，所以求出第一點不用畫<br>            double x = R_DISTANCES[i] * cos(0);<br>            double z = R_DISTANCES[i] * sin(0);<br>            int startX = orgX + xAfterRotateAroundXZ(x, Y_LOCATIONS[i], z);<br>            int startY = orgY - yAfterRotateAroundXZ(x, Y_LOCATIONS[i], z);<br>            for (int j = 1; j &lt;= 360; j += 10) {<br>                // 計算 x, z 座標<br>                x = R_DISTANCES[i] * cos(toRadians(j));<br>                z = R_DISTANCES[i] * sin(toRadians(j));<br>                // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心<br>                int endX = orgX + xAfterRotateAroundXZ(x, Y_LOCATIONS[i], z);<br>                int endY = orgY - yAfterRotateAroundXZ(x, Y_LOCATIONS[i], z);<br>                g.drawLine(startX, startY, endX, endY);<br>                startX = endX;<br>                startY = endY;<br>            }<br>        }<br>    }<br><br>    private void drawLine(Graphics g) {<br>        // 畫錂線<br>        for (int j = 0; j &lt;= 360; j += 60) {<br>            // 我們要畫線段，所以求出第一點不用畫<br>            double x = R_DISTANCES[0] * cos(toRadians(j));<br>            double z = R_DISTANCES[0] * sin(toRadians(j));<br>            int startX = orgX + xAfterRotateAroundXZ(x, Y_LOCATIONS[0], z);<br>            int startY = orgY - yAfterRotateAroundXZ(x, Y_LOCATIONS[0], z);<br>            for (int i = 1; i &lt; Y_LOCATIONS.length; i++) {<br>                x = R_DISTANCES[i] * cos(toRadians(j));<br>                z = R_DISTANCES[i] * sin(toRadians(j));<br>                // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心<br>                int endX = orgX + xAfterRotateAroundXZ(x, Y_LOCATIONS[i], z);<br>                int endY = orgY - yAfterRotateAroundXZ(x, Y_LOCATIONS[i], z);<br>                g.drawLine(startX, startY, endX, endY);<br>                startX = endX;<br>                startY = endY;<br>            }<br>        }<br>    }<br><br>    private int xAfterRotateAroundXZ(double x, double y, double z) {<br>        // 從斜角繪製<br>        // 繞 x 軸轉 30 度，繞 z 軸轉 -25 度<br>        double rotateX = toRadians(30);<br>        double rotateZ = toRadians(-25);<br>        return (int) (x * cos(rotateZ) -<br>                     (y * cos(rotateX) - z * sin(rotateX)) * sin(rotateZ));<br>    }<br><br>    private int yAfterRotateAroundXZ(double x, double y, double z) {<br>        // 從斜角繪製<br>        // 繞 x 軸轉 30 度，繞 z 軸轉 -25 度<br>        double rotateX = toRadians(30);<br>        double rotateZ = toRadians(-25);<br>        return (int) (x * sin(rotateZ) +<br>                     (y * cos(rotateX) - z * sin(rotateX)) * cos(rotateZ));<br>    }<br>}</pre><br>
+      <small>以下是使用HTML5 Canvas的方式（如果瀏覽器支援HTML5 Canvas，例如最新版的Firexfox、Chrome、IE9等，可以直接將下面的內容存為HTML或按下檔名連結，直接載入瀏覽器執行觀看結果：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">
+      </span></span>
+      <ul>
+        <li><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><a href="html/VetexOfOthers-1.html">VetexOfOthers-1.html</a></span></span></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function toRadians(angle) {<br>                    return angle * Math.PI / 180;<br>                }<br>                <br>                var sin = Math.sin;<br>                var cos = Math.cos;<br>                var sqrt = Math.sqrt;<br>                <br>                function xAfterRotateAroundXZ(x, y, z) {<br>                    // 從斜角繪製<br>                    // 繞 x 軸轉 30 度，繞 z 軸轉 -25 度<br>                    var rotateX = toRadians(30);<br>                    var rotateZ = toRadians(-25);<br>                    return parseInt(x * cos(rotateZ) -<br>                     (y * cos(rotateX) - z * sin(rotateX)) * sin(rotateZ));<br>                }<br>                <br>                function yAfterRotateAroundXZ(x, y, z) {<br>                   // 從斜角繪製<br>                   // 繞 x 軸轉 30 度，繞 z 軸轉 -25 度<br>                   var rotateX = toRadians(30);<br>                   var rotateZ = toRadians(-25);<br>                    return parseInt(x * sin(rotateZ) +<br>                     (y * cos(rotateX) - z * sin(rotateX)) * cos(rotateZ));<br>                }<br>                <br>                var Y_LOCATIONS = [180, 140, 100, 60, 20, 10, 4, 0];<br>                var R_DISTANCES = [100, 55, 10, 10, 10, 50, 80, 80];<br>                <br>                var canvas1 = document.getElementById('canvas1');<br>                var orgX = canvas1.width / 3;<br>                var orgY = canvas1.height - 80;<br>                <br>                var context = canvas1.getContext('2d');<br>                context.beginPath();<br>                <br>                // 360 度畫圈<br>                for(var i = 0; i &lt; Y_LOCATIONS.length; i++) {<br>                    // 我們要畫線段，所以求出第一點不用畫<br>                    var x = R_DISTANCES[i] * cos(0);<br>                    var z = R_DISTANCES[i] * sin(0);<br>                    var startX = orgX + xAfterRotateAroundXZ(<br>                                          x, Y_LOCATIONS[i], z);<br>                    var startY = orgY - yAfterRotateAroundXZ(<br>                                          x, Y_LOCATIONS[i], z);<br>                    context.moveTo(startX, startY);                      <br>                    for(var j = 1; j &lt;= 360; j += 10) {<br>                        // 計算 x, z 座標<br>                        x = R_DISTANCES[i] * cos(toRadians(j));<br>                        z = R_DISTANCES[i] * sin(toRadians(j));<br>                        // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心<br>                        var endX = orgX + xAfterRotateAroundXZ(<br>                                           x, Y_LOCATIONS[i], z);<br>                        var endY = orgY - yAfterRotateAroundXZ(<br>                        x, Y_LOCATIONS[i], z);<br>                        context.lineTo(endX, endY);<br>                    }<br>                }<br>                <br>                // 畫錂線<br>                for(var j = 0; j &lt;= 360; j += 60) {<br>                    // 我們要畫線段，所以求出第一點不用畫<br>                    var x = R_DISTANCES[0] * cos(toRadians(j));<br>                    var z = R_DISTANCES[0] * sin(toRadians(j));<br>                    var startX = orgX + xAfterRotateAroundXZ(<br>                                          x, Y_LOCATIONS[0], z);<br>                    var startY = orgY - yAfterRotateAroundXZ(x, <br>                                          Y_LOCATIONS[0], z);<br>                    context.moveTo(startX, startY);<br>                    for(var i = 1; i &lt; Y_LOCATIONS.length; i++) {<br>                        x = R_DISTANCES[i] * cos(toRadians(j));<br>                        z = R_DISTANCES[i] * sin(toRadians(j));<br>                        // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心<br>                        var endX = orgX + xAfterRotateAroundXZ(x, <br>                                             Y_LOCATIONS[i], z);<br>                        var endY = orgY - yAfterRotateAroundXZ(x, <br>                                             Y_LOCATIONS[i], z);<br>                        <br>                        context.lineTo(endX, endY);<br>                    }<br>                }<br>                context.stroke();<br>                context.closePath();<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;       <br>        &lt;canvas id="canvas1" width="300" height="300"&gt;&lt;/canvas&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+
+
+
+
+      <br>
+
+
+
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">在Firefox下的效果如下：<br>
+      <img style="width: 300px; height: 300px;" alt="" src="images/VetexOfOthers-5.png"><br>
+      <br>
+</span></span>
+      
+      
+      <h2> 錐狀體</h2>
+
+      <small>
+
+
+錐狀體將底面所有的頂點放置在XZ平面上，底面與錐頂點的交點為(xc, 0, yc)，高度為h，則錐頂點的座標為(xc, h,
+yc)，如下所示： <br>
+
+      <img style="width: 330px; height: 175px;" alt="" src="images/vetexOfOthers-3.jpg"></small>
+
+      <br>
+
+
+
+      
+      
+      <h2> 柱狀體</h2>
+
+      <small>
+
+
+柱狀體將底面所有的頂點放置在XZ平面上，高度為h，則頂點座標配置如下所示：</small><br>
+
+
+
+      <img style="width: 351px; height: 223px;" alt="" src="images/vetexOfOthers-4.jpg"><br>
+
+
+      </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/VetexOfOthers.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:16 GMT -->
+</html>

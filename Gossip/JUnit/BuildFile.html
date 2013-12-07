@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/BuildFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:31 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>建構檔案</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 建構檔案<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ant
+中，你想要執行哪些任務，任務的執行順序，任務執行過程中共用的屬性，都是定義在<span style="font-weight: bold;">build.xml</span>檔
+案中。通常一個專案會有一個build.xml，例如，以下將待會要執行的一些任務定義在build.xml中：<br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>&lt;project name="example" default="run"&gt; <br>    &lt;property name="src.dir" value="src"/&gt; <br>    &lt;property name="bin.dir" value="bin"/&gt; <br>    &lt;property name="bak.dir" value="bak"/&gt;<br><br>    &lt;target name="prepare"&gt; <br>        &lt;mkdir dir="${bin.dir}"/&gt; <br>        &lt;mkdir dir="${bak.dir}"/&gt; <br>        &lt;copy todir="${bak.dir}"&gt; <br>            &lt;fileset dir="${bin.dir}"/&gt; <br>        &lt;/copy&gt; <br>    &lt;/target&gt; <br><br>    &lt;target name="compile" depends="prepare"&gt; <br>        &lt;javac srcdir="${src.dir}" destdir="${bin.dir}"/&gt; <br>    &lt;/target&gt;<br><br>    &lt;target name="run" depends="compile"&gt;<br>        &lt;java classname="cc.openhome.HelloAnt"&gt;<br>            &lt;classpath path="${bin.dir}"/&gt;<br>        &lt;/java&gt;<br>    &lt;/target&gt;<br>&lt;/project&gt;<br></pre>
+      <br>
+      <small>這邊打算</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">進
+行的工作是：編譯src/cc/openhome中的HelloAnt.java，其編譯成果將儲存至bin目錄中，如果
+bin目錄不存在就建立它，每一次編譯將bin中前一次編譯的成果複製至bak目錄，如果bak目錄不存在就建立它，最後執行程式。想像一下，原本你在文
+字模式下，要執行完這些動作，需要下哪些指令（javac、java、copy等）與相關引數（-d、-cp、-sourcepath等），也想像一下，
+在IDE中也許本來並沒有備份這個選項，你可以使用Ant來完成。<br>
+      <br>
+在上例中，build.xml是以<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;project&gt;</span>為
+根標籤。一個build.xml中可以定義多個任務，
+這些任務可能是建立目錄、編譯原始碼、搬移檔案、產生doc文件、進行測試、產生測試報告等，這些任務通常組織為一個<span style="font-weight: bold;">目標 （target）</span>。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">&lt;project&gt;
+中包括數個<span style="font-weight: bold;">&lt;target&gt;</span>，每一個&lt;
+target&gt;有一個名稱</span>， &lt;project&gt;的任務執行進入點預設是名稱為<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">"run"</span>的
+      <span style="font-family: Courier New,Courier,monospace;">&lt;target&gt;</span>，
+每個<span style="font-family: Courier New,Courier,monospace;">&lt;target&gt;
+可以使用<span style="font-weight: bold;">depends</span>屬性指定依賴其它的&lt;
+target&gt;，也就是所依賴的&lt;target&gt;必須先執行完成，才會執行自己的目標。</span>在上例中，<span style="font-family: Courier New,Courier,monospace;">"run"的完成依賴於
+"compile"的完成，"compile"的完成又依賴於"prepare"的完成，所以在建構開始時，會先執行"prepare"，完成後再執行
+"compile"，最後執行"run"。</span><br>
+      <br>
+建<span style="font-family: Courier New,Courier,monospace;">構過程中&lt;
+target&gt;所共享的屬性，可以使用<span style="font-weight: bold;">&lt;property&gt;</span></span>標
+籤設定，每一個屬性的值會有個名稱對應，以這個例子而言，您設定了程式碼來源位置、編譯結果目標目錄與備份目錄。<br>
+      <br>
+HelloAnt.java只是個簡單的程式：<br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span>
+      <pre>package cc.openhome;<br>public class HelloAnt { <br>    public static void main(String[] args) { <br>        System.out.println("Hello! Ant!!"); <br>    } <br>}<br></pre>
+      <br>
+      <small>就這個例子而言，使用Ant是有點小題大作了，不過這讓我們可以將焦點集中在Ant本身的設定與執行。</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small>編
+輯好build.xml之後，在文字模式下於build.xml所在的目錄中，直接下<span style="font-weight: bold;">ant</span>指
+令即可開始建構專案，ant預設會讀取同一個目錄下的build.xml，第一次執行ant時會出現以下的文字提示建構過程：</small><span class="Apple-converted-space"> </span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;ant<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">Buildfile:
+C:\workspace\example\build.xml<br>
+            <br>
+prepare:<br>
+&nbsp;&nbsp;&nbsp; [mkdir] Created dir: C:\workspace\example\bin<br>
+&nbsp;&nbsp;&nbsp; [mkdir] Created dir: C:\workspace\example\bak<br>
+            <br>
+compile:<br>
+&nbsp;&nbsp;&nbsp; [javac] C:\workspace\example\build.xml:14: warning:
+'includeantruntime' was not<br>
+set, defaulting to build.sysclasspath=last; set to false for repeatable
+builds<br>
+&nbsp;&nbsp;&nbsp; [javac] Compiling 1 source file to
+C:\workspace\example\bin<br>
+            <br>
+run:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java] Hello! Ant!!<br>
+            <br>
+BUILD SUCCESSFUL<br>
+Total time: 1 second</span></small><span style="color: rgb(255, 255, 255);"><br>
+            </span></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">可以看到ant已
+經完成了所指定的工作，現在假設修改了HelloAnt.java並存檔，接下來再次下達ant指令，這次出現以下的文字提示建構過程：<span class="Apple-converted-space"> </span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;ant</span></small><small><span style="color: rgb(255, 255, 255);"><br>
+Buildfile: C:\workspace\example\build.xml<br>
+            <br>
+prepare:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [copy] Copying 1 file to
+C:\workspace\example\bak<br>
+            <br>
+compile:<br>
+&nbsp;&nbsp;&nbsp; [javac] C:\workspace\example\build.xml:14: warning:
+'includeantruntime' was<br>
+not set, defaulting to build.sysclasspath=last; set to false for
+repeatable buil<br>
+ds<br>
+            <br>
+run:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java] Hello! Ant!!<br>
+            <br>
+BUILD SUCCESSFUL<br>
+Total time: 0 seconds</span></small><span style="color: rgb(255, 255, 255);"><br>
+            </span></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">這次由於bin與
+bak目錄已經存在，就不用再進行新建目錄的工作，ant檢查bin中有之前構建的檔案，於是將它複製至bak目錄中。<br>
+      <br>
+在建</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">構</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">程式時，有些目標
+所定義的任務可能是可選的，可以藉由在設定<span style="font-family: Courier New,Courier,monospace;">&lt;target&gt;</span>時
+設定<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">if</span>條
+件，並在建構時指定該條件為<span style="font-family: Courier New,Courier,monospace;">true
+或 false，以決定該目標是否要執行，例如可以這麼設定：</span><br style="font-family: Courier New,Courier,monospace;">
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;target
+name="some" if="conditional"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+some task..... </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/target&gt;
+      </span></span></span><br style="font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;</span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">使用if設定條件
+目標時，表示只有在conditional被設置時才會被執行，在執行</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">ant</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">指令時，您就可以如下來決定some是否
+要執行：</span><br style="font-family: Courier New,Courier,monospace;">
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">ant
+-buildfile build.xml -Dconditional=true </span></span></span><br style="font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">您也可以使用<span style="font-weight: bold;">unless</span>來設定條件目標：</span><br style="font-family: Courier New,Courier,monospace;">
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: bold; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">&lt;target
+name="some" unless="conditional"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: bold; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+some task..... </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: bold; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">&lt;/target&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;</span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">由於您使用了
+unless來設定條件目標，所以只有在conditional沒有被設定時，目標才會被執行。由於</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">ant</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">可以在一個建構檔案中調用另一個</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">建構檔案</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">，在調用的時候，兩個</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">建構檔案</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">之間可能會有一些重複的屬性設定，如果您
+想要避免某個屬性被重複設定了，可以這麼撰寫：</span><br style="font-family: Courier New,Courier,monospace;">
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;target
+name="setProperties" unless="setProperties"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;property name="someProperty" value="someValue"/&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+... </span></span></span><br style="font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/target&gt;
+      </span></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+&nbsp; <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+你在啟動ant指令時，也可以指定目標，例如：<br>
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ant
+prepare</span></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;ant&gt;</span>標
+籤，在一個</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">建構檔案</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">中調用另一個</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">建構檔案</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">，一個簡單的例子
+如下：<br>
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;project
+name="someProject" default="all"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+...... </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;target name="some" depends="other"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;ant antfile="./project2/build.xml"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;property name="condition_name" value="true"&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;/ant&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;target&gt; </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;
+...... </span></span></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/project&gt;
+      </span></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">&nbsp;<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">在&lt;property&gt;
+中設定value為true，當您在另一個建構中有目標使用了條件式（if或unless）時，這可以給予該條件一個true的特性值。</span><br>
+      <br>
+您也可以指定專案的目錄來調用預設的build.xml，例如：<br>
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;project
+name="someProject" default="all"&gt; </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+.... </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;target name="some" depends="other"&gt; </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;ant dir="./project2"&gt; </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;property name="condition_name" value="true"&gt; </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;/ant&gt; </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;target&gt; </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+.... </span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/project&gt;
+      </span></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">&nbsp;<br>
+      <br>
+您也可以僅僅調用另一個建構檔案中的某個目標，例如：<br>
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;ant
+antfile="./project2/build.xml" target="prepare"/&gt;</span></span></span><br class="Apple-interchange-newline">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <br>
+      <br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/BuildFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:31 GMT -->
+</html>

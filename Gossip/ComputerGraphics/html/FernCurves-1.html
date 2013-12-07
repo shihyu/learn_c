@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/FernCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:54 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript" src="js/turtle.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                function fern(leng, min, k1, k2) {
+                    turtle.move(leng);
+                    if (leng > min) {
+                        turtle.turn(70.0);
+                        fern(k2 * leng, min, k1, k2);
+                        turtle.turn(-71.0);
+                        turtle.move(k1 * leng);
+                        turtle.turn(-69.0);
+                        fern(k1 * k2 * leng, min, k1, k2);
+                        turtle.turn(68.0);
+                        fern(k1 * k1 * leng, min, k1, k2);
+                        turtle.turn(1.0);
+                        turtle.warp(-k1 * leng);
+                        turtle.turn(1.0);
+                     }
+                     turtle.warp(-leng);
+                }
+            
+                var canvas1 = document.getElementById('canvas1');
+                var context = canvas1.getContext('2d');
+                var turtle = new Turtle(context);
+                
+                turtle.window(0, 0, canvas1.width, canvas1.height);
+                
+                turtle.view(0, 0, canvas1.width, canvas1.height);
+                turtle.setPoint(150, 0);
+                turtle.setAngle(90);
+                
+                fern(30, 0.1, 0.9, 0.3);
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="300" height="300"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/FernCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:54 GMT -->
+</html>

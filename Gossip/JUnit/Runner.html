@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Runner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:27 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>自訂 Runner</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 自訂 Runner<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在
+JUnit 3 中，<a href="TestRunner.html">TestRunner </a>是個啟始測試的入口，其角色在JUnit
+4中，相當於 <a href="JUnitCore.html">JUnitCore</a> 的角色。<br>
+      <br>
+在JUnit 4中，自訂<span style="font-family: Courier New,Courier,monospace;">Runner</span>的
+意義在於，測試可以有各種執行方式，而不僅僅是JUnit 3中<span style="font-family: Courier New,Courier,monospace;">setUp()、testXXX()、
+tearDown()</span>的順序，JUnit 4中自訂<span style="font-family: Courier New,Courier,monospace;">Runner</span>的方式，可以
+讓使用者用自己想要的方式，自訂、擴充執行測試的方式。<br>
+      <br>
+舉例來說，你也許會想要將別的測試框架下所撰寫的測試程式，整合至JUnit 4中一併執行，就可以自訂<span style="font-family: Courier New,Courier,monospace;">Runner</span>來執到目的。
+事實上，JUnit 4中整合JUnit 3測試程式的方式，就已提供了<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">JUnit38ClassRunner</span>，
+它擴充自<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">Runner</span>類
+別。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">Runner</span>類
+別有兩個方法必須實作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public
+abstract Description getDescription();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public abstract void run(RunNotifier
+notifier);</span></small><br>
+      </div>
+      <small><br>
+測試的啟始點是<span style="font-family: Courier New,Courier,monospace;">run()</span>方
+法，<span style="font-family: Courier New,Courier,monospace;">run()</span>方
+法接受一個<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">RunNotifier</span>物
+件，在測試的各個階段，會呼叫</small><small><span style="font-family: Courier New,Courier,monospace;">RunNotifier的各個通知方法，
+通知對測試各階段感興趣，且有向RunNofifier註冊的RunListener。若過程中需要記錄相關資訊，則會使用<span style="font-weight: bold;">Description</span>物件加以記錄，你可以實作getDescription
+()來傳回Description物件。<br>
+      <br>
+舉個例子來說，JUnitCore的run()方法是如下實作的：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public Result
+run(Runner runner) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; Result result= new Result();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; RunListener listener= result.createListener();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; fNotifier.addFirstListener(listener);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; try {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+fNotifier.fireTestRunStarted(runner.getDescription());</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; runner.run(fNotifier);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+fNotifier.fireTestRunFinished(result);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; } finally {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; removeListener(listener);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; return result;</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br>
+      <br>
+這邊以先前開發的簡單框架最後成品作範例，示範如何自訂Runner，使之可在</span>JUnit 4<span style="font-family: Courier New,Courier,monospace;">架構下執行：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package cc.openhome;<br><br>import org.junit.runner.Description;<br>import org.junit.runner.Runner;<br>import org.junit.runner.notification.Failure;<br>import org.junit.runner.notification.RunNotifier;<br><br style="font-weight: bold;"><span style="font-weight: bold;">import test.cc.openhome.Test;</span><br style="font-weight: bold;"><span style="font-weight: bold;">import test.cc.openhome.TestCase;</span><br style="font-weight: bold;"><span style="font-weight: bold;">import test.cc.openhome.TestResult;</span><br style="font-weight: bold;"><span style="font-weight: bold;">import test.cc.openhome.TestSuite;</span><br><br>public class GossipRunner extends Runner {<br>    private Test test;<br>    private Class&lt;?&gt; clz;<br><br>    public GossipRunner(Class&lt;?&gt; clz) {<br>        this.test = new TestSuite(clz.asSubclass(TestCase.class));<br>        this.clz = clz;<br>    }<br><br>    @Override<br>    public Description getDescription() {<br>        return makeDescription(clz, test);<br>    }<br><br>    public static Description makeDescription(Class&lt;?&gt; clz, Test test) {<br>        if (test instanceof TestCase) {<br>            TestCase testCase = (TestCase) test;<br>            return Description.createTestDescription(<br>            		clz, testCase.getName());<br>        } else if (test instanceof TestSuite) {<br>            Description description = <br>            	Description.createSuiteDescription(clz);<br>            TestSuite suite = (TestSuite) test;<br>            for (Test t : suite.get()) {<br>                TestCase testCase = (TestCase) t;<br>                description.addChild(makeDescription(clz, testCase));<br>            }<br>            return description;<br>        } else {<br>            return Description.createSuiteDescription(test.getClass());<br>        }<br>    }<br><br>    @Override<br>    public void run(final RunNotifier notifier) {<br>        TestResult result = new TestResult() {<br>            @Override<br>            public void run(TestCase test) {<br>                Description description = makeDescription(clz, test);<br>                <span style="font-weight: bold;">notifier.fireTestStarted(description);</span><br>                try {<br>                    test.run();<br>                } catch (Throwable t) {<br><span style="font-weight: bold;">                    notifier.fireTestFailure(new Failure(description, t));</span><br>                }<br><span style="font-weight: bold;">                notifier.fireTestFinished(description);</span><br>            }<br>        };<br>        test.runTest(result);<br>    }<br>}<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+這邊的重點之一，在於Description的建立，Description實作了</span></small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><a href="../DesignPattern/SingletonPattern.htm" style="color: rgb(68, 68, 68); font-weight: bold; text-decoration: none;">
+Singleton 模式</a> 的概念，將建構式定義為<span style="font-family: Courier New,Courier,monospace;">private</span>，因而必須
+透過相關的靜態（<span style="font-family: Courier New,Courier,monospace;">static）
+方法來建立Description</span>物件。你可以根據測試的階層，事先建立好<span style="font-family: Courier New,Courier,monospace;">Description</span>的
+階層，每個</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;">階層的</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">Description</span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;">描述一個測試的結
+果：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Description description = </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Description.createSuiteDescription(clz);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TestSuite suite = (TestSuite) test;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (Test t : suite.get()) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TestCase testCase = (TestCase) t;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+description.addChild(makeDescription(clz, testCase));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return description;</span><br>
+      <br>
+之後若需要取得某階層的<span style="font-family: Courier New,Courier,monospace;">Description</span>物
+件，則可以指定類別與名稱來取得：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TestCase testCase = (TestCase) test;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return Description.createTestDescription(</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">clz,
+testCase.getName());</span><br>
+      <br>
+上面的範例將這兩個需求，撰寫在同一個<span style="font-family: Courier New,Courier,monospace;">makeDescription()中，
+並透過instanceof</span>來判斷要執行哪個。例如，在建立<span style="font-family: Courier New,Courier,monospace;">TestResult子類實例時，重新定
+義的run()</span>如下：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public void run(TestCase test) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Description description = makeDescription(clz, test);</span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+notifier.fireTestStarted(description);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+try {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+test.run();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+} catch (Throwable t) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+notifier.fireTestFailure(new Failure(description, t));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+notifier.fireTestFinished(description);</span><br>
+      <br>
+由於先前的簡單範例框架並沒有實作的面面俱到，所以沒有如JUnit 3中，定義有<span style="font-family: Courier New,Courier,monospace;">RunListener，可以新增至
+TestResult中，所以這邊採取了繼承TestResult後，重新定義run()的方式實作了通知的部份。<br>
+      <br>
+現在你可以在先前的範例中，CalculatorTest中如下使用：<br>
+      </span></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;"></span></span></span>
+      <pre>package cc.openhome;<br><br>import org.junit.runner.RunWith;<br><span style="font-weight: bold;">import test.cc.openhome.TestCase;</span><br><br><span style="font-weight: bold;">@RunWith(value = GossipRunner.class)</span><br>public class CalculatorTest extends TestCase {<br>    private Calculator calculator;<br>    <br>    public void setUp() {<br>        calculator = new Calculator();<br>    }<br><br>    public void tearDown() {<br>        calculator = null;<br>    }<br><br>    public void testPlus() {<br>        int expected = 1;<br>        int result = calculator.plus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>        <br>    public void testMinus() {<br>        int expected = 1;<br>        int result = calculator.minus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>}<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+以下在是在</span>Eclipse<span style="font-family: Courier New,Courier,monospace;">中執行的結果（這邊沒有區分Error或
+Failure，所以畫面中都用Error來記錄錯誤的部份）：<br>
+      <img style="border: 1px solid ; width: 516px; height: 394px;" alt="" src="images/Runner-1.png"><br>
+      <br>
+      </span></small><small><br>
+      <br>
+      <br>
+      </small><small><br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      </small><br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Runner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:28 GMT -->
+</html>

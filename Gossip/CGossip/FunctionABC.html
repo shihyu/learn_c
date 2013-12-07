@@ -1,0 +1,914 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/FunctionABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>函式簡介</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">C&nbsp;Gossip: 函式簡介</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+到目前為止都只使用一個函式（Function），也就是main()主函式，將所有的程式寫在主函式中只適合一些小程式，如果您的程式比較大，您會發現
+到有某些程式碼會經常使用，而由於撰寫在同一個主函式中的關係，這些程式碼會一再被重覆的撰寫，對於程式中出現兩次以上被重覆使用的程式片段，您可以將之
+定義為函式以便重覆呼叫。<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+函式用來將程式組織為一個小的、獨立的運行單元，一個函式可以接受資料，並運行其中的算法，最後將結果傳回。<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+在C中函式的組成主要包括四個部份：返回值、函式名稱、參數列與函式主體。前三者被稱為函式宣告或函式原型（Function
+prototype），函式原型描述的是函式的介面，通常宣告在一個獨立的表頭
+檔中，而被含入每一個想要呼叫函式的檔案中，以下是一個函式宣告的範例：</small>
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li>math.h</li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>int myPow2(int); <br>int myPow(int, int);</pre>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <small>
+在C中如果呼叫函式不傳回任何值，則宣告為void，若不傳入任何引數，則參數列保持空白即可，您也可以使用void來加以註明，表頭檔案被儲存為.h檔案，接著您
+可以根據函式原型來實作函式主體，例如：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li>math.c</li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <pre>#include "math.h"<br><br>int myPow2(int num) { <br>    return num*num; <br>} <br><br>int myPow(int n, int p) { <br>    int r = 1; <br>    int i;<br>    for(i = 0; i &lt; p; i++) {<br>        r *= n;<br>    }<br> <br>    return r; <br>}</pre>
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+      </span><small>
+在含入表頭檔案時，如果表頭檔案與含入表頭檔的文件在同一個目錄下，那麼就使用雙引號""來包括表頭檔案名稱，如果是標準或專案專屬的表頭檔，例如C
+的標準表頭檔，那麼則使用角括號&lt;&gt;來括住，編譯器在尋找時就會從所設定的目錄中開始尋找。<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+接著您可以在含入表頭檔後，直接呼叫所定義的函式，例如：</small>
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li>main.c</li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br>#include "math.h"<br><br>int main(void) {<br>    int num = 0;<br>    int power = 0; <br><br>    printf("輸入數值："); <br>    scanf("%d", &amp;num); <br><br>    printf("輸入平方："); <br>    scanf("%d", &amp;power); <br><br>    printf("%d 平方：%d\n", num, myPow2(num));<br>    printf("%d 的 %d 次方 %d\n", num, power, myPow(num, power));<br>    <br>    return 0;<br>}</pre>
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+      </span><small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">輸入數值：10<br>
+
+
+
+
+
+
+
+
+
+輸入平方：3<br>
+
+
+
+
+
+
+10 平方：100<br>
+
+
+
+
+
+
+
+
+
+10 的3次方：1000</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+      <small>
+在編譯時期，編譯器會對被呼叫函式作檢查，如果無法根據函式名稱、提供的引數型態與函式宣告上參數型態來決定被呼叫的函式，則會出現編譯錯誤，這就是必須
+先作函式宣告的原因，這對編譯器的檢查工作是必要的資料。</small><br>
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/FunctionABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+</html>

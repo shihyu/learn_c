@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/FilterImplSetting.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Filter 的實作與設定</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: Filter 的實作與設定<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>以下實作一個簡單的效能量測過濾器，可用來記錄請求與回應間的時間差，了解Servlet處理請求到回應所需花費的時間。</small><br>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br><br><span style="font-weight: bold;">@WebFilter(filterName="performance", urlPatterns={"/*"})</span><br>public class PerformanceFilter <span style="font-weight: bold;">implements Filter</span> {<br>    private FilterConfig filterConfig;<br>    <br>    @Override<br>    public void init(FilterConfig filterConfig) throws ServletException {<br>        this.filterConfig = filterConfig;<br>    }<br><br>    @Override<br>    public void doFilter(ServletRequest request, ServletResponse response,<br>             FilterChain chain) throws IOException, ServletException {<br>        long begin = System.currentTimeMillis();<br>        chain.doFilter(request, response);<br>        filterConfig.getServletContext().log("Request process in " +<br>                (System.currentTimeMillis() - begin) + " milliseconds");<br>    }<br><br>    @Override<br>    public void destroy() {}<br>}<br></pre>
+      <br>
+      <small>當過濾器類別被載入容器時並實例化後，容器會執行其<span style="font-family: Courier New,Courier,monospace;">init()方法並傳入FilterConfig</span>物件作為參數。在<span style="font-family: Courier New,Courier,monospace;">doFilter()的實作中，先記錄目前的系統時間，接著呼叫FilterChain的doFilter()</span>繼續接下來的過濾器或Servlet，當<span style="font-family: Courier New,Courier,monospace;">FilterChain的doFilter()</span>返回時，取得系統時間並減去先前記錄的時間，就是請求與回應間的時間差。</small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">過濾器的設定與Servlet的設定很類似。<span style="font-weight: bold;">@WebFilter</span>中的<span style="font-weight: bold;">filterName</span>設定過濾器名稱，<span style="font-weight: bold;">urlPatterns</span>設定哪些URL請求必須套用哪個過濾器，可套用的URL模式與</small><small>Servlet</small><small style="font-family: Courier New,Courier,monospace;">基本上相同，而<span style="font-weight: bold;">"/*</span>"表示套用在所有的</small><small>URL</small><small style="font-family: Courier New,Courier,monospace;">請求。</small><br>
+      <br>
+      <small>如果要在web.xml中設定，則可以如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;web-app ...&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;filter&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-name&gt;performance&lt;/filter-name&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-class&gt;cc.openhome.PerformanceFilter&lt;/filter-class&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/filter&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;filter-mapping&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-name&gt;performance&lt;/filter-name&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/filter-mapping&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; // 略...</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/web-app&gt;</small><br>
+      </div>
+      <small><br>
+      </small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;filter&gt;</span>標籤中使用<span style="font-weight: bold;">&lt;filter-name&gt;</span>與<span style="font-weight: bold;">&lt;filter-class&gt;</span>設定過濾器名稱與類別名稱。而在<span style="font-weight: bold;">&lt;filter-mapping&gt;</span>中，則用<span style="font-weight: bold;">&lt;filter-name&gt;</span>與<span style="font-weight: bold;">&lt;url-pattern&gt;</span>來設定哪些</span>URL請<span style="font-family: Courier New,Courier,monospace;">求必須套用哪個過濾器</span>。<br>
+      <br>
+在過濾器的請求套用上，除了指定URL模式之外，你也可以指定Servlet名稱，這可以透過<span style="font-family: Courier New,Courier,monospace;">@WebServlet的servletNames</span>來設定：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@WebFilter(filterName="performance", <span style="color: red;">servletNames={"SomeServlet"}</span>)</span></small><br>
+      </div>
+      <small><br>
+或web.xml中，在&lt;filter-mapping&gt;中使用&lt;servlet-name&gt;來設定：<br>
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;filter-mapping&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-name&gt;performance&lt;/filter-name&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">&lt;servlet-name&gt;SomeServlet&lt;/servlet-name&gt;</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/filter-mapping&gt;</small><br>
+      <br>
+      <small>如果想一次符合所有的Servlet名稱，則可以使用星號（*）。如果在過濾器初始化時，想要讀取一些參數，可以在<span style="font-family: Courier New,Courier,monospace;">@WebFilter中使用<span style="font-weight: bold;">@WebInitParam</span>設定<span style="font-weight: bold;">initParams</span>。例如：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">...</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">@WebFilter(filterName="performance", urlPatterns={"/*"}, servletNames={""},</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">initParams={</span></span></small><br style="font-weight: bold; color: red;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+@WebInitParam(name = "PARAM1", value = "VALUE1"),</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+@WebInitParam(name = "PARAM2", value = "VALUE2")</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">)</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">public class PerformanceFilter implements Filter {</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private String PARAM1;</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private String PARAM2;</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; </span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; @Override</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void init(FilterConfig filterConfig) throws ServletException {</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PARAM1 = filterConfig.getInitParameter("PARAM1");</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PARAM2 = filterConfig.getInitParameter("PARAM2");</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; ...</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">}</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><br>
+若要在web.xml中設定過濾器的初始參數，可以在<span style="font-family: Courier New,Courier,monospace;">&lt;filter&gt;標籤之中，使用<span style="font-weight: bold;">&lt;init-param&gt;</span></span>進行設定，web.xml中的設定會覆蓋標註的設定。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;filter&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-name&gt;PerformanceFilter&lt;/filter-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-class&gt;cc.openhome.PerformanceFilter&lt;/filter-class&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;init-param&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-name&gt;PARAM1&lt;/param-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-value&gt;VALUE1&lt;/param-value&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/init-param&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;init-param&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-name&gt;PARAM2&lt;/param-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-value&gt;VALUE2&lt;/param-value&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/init-param&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/filter&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br>
+      </div>
+      <br>
+      <small>觸發過濾器的時機，預設是瀏覽器直接發出請求。如果是那些透過<span style="font-family: Courier New,Courier,monospace;">RequestDispatcher的forward()或include()的請求</span>，設定<span style="font-family: Courier New,Courier,monospace;">@WebFilter的<span style="font-weight: bold;">dispatcherTypes</span></span>。例如：<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">@WebFilter(filterName="some", urlPatterns={"/some"}, </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">dispatcherTypes={</span><br style="color: red;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DispatcherType.FORWARD, DispatcherType.INCLUDE, </span></span></small><br style="color: red;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DispatcherType.REQUEST</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">, </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">DispatcherType.ERROR, </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">DispatcherType.ASYNC<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="color: red;">}</span><br>
+)</span></small><br>
+      </div>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">如果不設定任何
+dispatcherTypes，則預設為REQUEST。FORWARD就是指透過RequestDispatcher的forward()而來的請求
+可以套用過濾器。INCLUDE就是指透過RequestDispatcher的include()而來的請求可以套用過濾器。ERROR是指由容器處理
+例外而轉發過來的請求可以觸發過濾器。ASYNC是指非同步處理的請求可以觸發過濾器（之後還會說明非同步處理）。</small><br>
+      <br>
+      <small>若要在web.xml中設定，則可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;dispatcher&gt;</span>標籤。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;filter-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter-name&gt;SomeFilter&lt;/filter-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;servlet-name&gt;*.do&lt;/servlet-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;dispatcher&gt;INCLUDE&lt;/dispatcher&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;<br>
+      </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;dispatcher&gt;ASYNC&lt;/dispatcher&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/filter-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+      </div>
+      <small><br>
+你可以透過&lt;<span style="font-family: Courier New,Courier,monospace;">url-pattern&gt;
+或&lt;servlet-name&gt;來指定，哪些URL請求或哪些Servlet可套用過濾器。如果同時具備&lt;url-
+pattern&gt;與&lt;servlet-name&gt;，則先比對&lt;url-pattern&gt;，再比對&lt;servlet-name&gt;</span>。如果有某個URL或Servlet會套用多個過濾器，則根據<span style="font-family: Courier New,Courier,monospace;">&lt;filter-mapping&gt;</span>在web.xml中出現的先後順序，來決定過濾器的執行順序。<br>
+      <br>
+      <br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/FilterImplSetting.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:23 GMT -->
+</html>

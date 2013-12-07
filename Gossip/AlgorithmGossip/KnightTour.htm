@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/KnightTour.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:36 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>騎士走棋盤</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 騎士走棋盤</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+      
+      
+      <h2>&nbsp;說明</h2>
+
+
+      <small>
+騎士旅遊（Knight tour）在十八世紀初倍受數學家與拼圖迷的注意，它什麼時候被提出已不可考，騎士的走法為西洋棋的走法，騎士可以由任一個位置出發，它要如何走完[所有的位置？</small><br>
+
+
+
+      
+      
+      <h2>解法</h2>
+
+
+      <small>
+騎士的走法，基本上可以使用遞迴來解決，一個聰明的解法由J.C.
+Warnsdorff在1823年提出，簡單的說，先將最難的位置走完，接下來的路就寬廣了，騎士所要走的下一步，「為下一步再選擇時，所能走的步數最少
+的一步。」，使用這個方法，可以有較高的機率找出走法。 </small><br>
+
+
+
+
+
+
+      
+      
+      <h2> 演算法</h2>
+
+
+
+
+      
+      
+      <pre>FOR(m = 2; m &lt;= 總步數; m++) <br>    測試下一步可以走的八個方向，記錄可停留的格數 count。<br><br>    IF(count == 0) <br>        遊歷失敗<br>    ELSE IF(count == 1) <br>        下一步只有一個可能<br>    ELSE <br>        找出下一步的出路最少的格子，如果出路值相同，則選第一個遇到的出路。 <br><br>    走最少出路的格子，記錄騎士的新位置。  <br></pre>
+
+
+
+
+
+      
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li><a name="C"></a> C
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      <pre>#include &lt;stdio.h&gt; <br>#define SIZE 8<br><br>typedef struct {<br>    int x; <br>    int y;<br>} Step;<br><br>Step step(int, int);<br>void travel(int[][SIZE], Step);<br>void possible(int[][SIZE], Step, int*);<br>int count(int*);<br>Step get(Step, int*, int);<br>Step hard(int[][SIZE], Step, int*);<br>int isVisitable(int[][SIZE], Step);<br><br>int main(void) {<br>    int board[SIZE][SIZE] = {0};<br>    <br>    travel(board, step(5, 6));<br>    <br>    int i;<br>    for(i = 0; i &lt; SIZE; i++) {<br>        int j;<br>        for(j = 0; j &lt; SIZE; j++) {<br>            printf("%3d", board[i][j]);<br>        }<br>        printf("\n");<br>    }<br><br>    return 0;<br>} <br><br>Step step(int x, int y) {<br>    Step s = {x, y};<br>    return s;<br>}<br><br>void travel(int board[][SIZE], Step start) {<br>    board[start.x][start.y] = 1;<br>    <br>    Step current = start;<br>    <br>    int s;<br>    for(s = 2; s &lt; 65; s++) {<br>        int possibleSteps[SIZE] = {0};<br>        possible(board, current, possibleSteps);<br>        <br>        int c = count(possibleSteps);<br>        if(c == 0) {<br>            break;<br>        }<br>        if(c == 1) {<br>            current = get(current, possibleSteps, 1);<br>        }<br>        else {<br>            current = hard(board, current, possibleSteps);<br>        }<br>        <br>        board[current.x][current.y] = s;<br>    }<br>}<br><br>void possible(int board[][SIZE], Step current, int* possibleSteps) {<br>     int dirs[8][2] = {{-2, 1}, {-1, 2}, {1, 2},   {2, 1}, <br>                       {2, -1}, {1, -2}, {-1, -2}, {-2, -1}};<br>     int i;<br>     for(i = 0; i &lt; SIZE; i++) {<br>         Step s = step(current.x + dirs[i][0], current.y + dirs[i][1]);<br>         if(isVisitable(board, s)) {<br>             possibleSteps[i] = 1;<br>         }<br>     }<br>}<br><br>int count(int* possibleSteps) {<br>    int c, i;<br>    for(c = 0, i = 0; i &lt; SIZE; i++) if(possibleSteps[i]) {<br>        c++;<br>    }<br>    return c;<br>}<br><br>Step get(Step current, int* possibleSteps, int number) {<br>    int dirs[8][2] = {{-2, 1}, {-1, 2}, {1, 2},   {2, 1}, <br>                      {2, -1}, {1, -2}, {-1, -2}, {-2, -1}};<br><br>    int c, i;<br>    for(c = 0, i = 0; i &lt; SIZE; i++) if(possibleSteps[i]) {<br>        c++;<br>        if(c == number) {<br>            break;<br>        }<br>    }<br>    <br>    return step(current.x + dirs[i][0], current.y + dirs[i][1]);<br>}<br><br>Step hard(int board[][SIZE], Step current, int* possibleSteps) {<br>    int minPossibleSteps[SIZE] = {0};<br>    possible(board, get(current, possibleSteps, 1), minPossibleSteps);<br><br>    int minIndex, i;<br>    for(minIndex = 0, i = 1; i &lt; count(possibleSteps); i++) {<br>        int nextPossibleSteps[SIZE] = {0};<br>        Step s = get(current, possibleSteps, i + 1);<br>        possible(board, s, nextPossibleSteps);<br>        if(count(nextPossibleSteps) &lt; count(minPossibleSteps)) {<br>            minIndex = i;<br>            int j;<br>            for(j = 0; j &lt; SIZE; j++) {<br>                minPossibleSteps[j] = nextPossibleSteps[j];<br>            }<br>        }<br>    }<br>    <br>    return get(current, possibleSteps, minIndex + 1);<br>}<br><br>int isVisitable(int board[][SIZE], Step step) {<br>    return step.x &gt; -1 &amp;&amp; step.x &lt; SIZE &amp;&amp;<br>           step.y &gt; -1 &amp;&amp; step.y &lt; SIZE &amp;&amp;<br>           !board[step.x][step.y];<br>}<br></pre>
+
+
+
+
+
+      
+      
+      <br><ul>
+
+
+        <li><a name="Java"></a> Java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      <pre>import java.util.*;<br>import static java.lang.System.out;<br><br>public class Knight {<br>    public static class Step {<br>        final int x, y;<br>        public Step(int x, int y) {<br>            this.x = x;<br>            this.y = y;<br>        }<br>    }<br>    <br>    public static int[][] travel(Step start) {<br>        int[][] board = new int[8][8];<br>        <br>        board[start.x][start.y] = 1;<br>        Step current = start;<br>        for(int s = 2; s &lt; 65; s++) {<br>            List&lt;Step&gt; possibleSteps = possible(board, current);<br>            <br>            if(possibleSteps.isEmpty()) {<br>                break;<br>            }<br>            <br>            if(possibleSteps.size() == 1) {<br>                current = possibleSteps.get(0);<br>            } else {<br>                current = hard(board, possibleSteps);<br>            } <br>            <br>            board[current.x][current.y] = s;<br>        }<br>        <br>        return board;<br>    }<br>    <br>    public static List&lt;Step&gt; possible(int[][] board, Step step) {<br>        int[][] dirs = {{-2, 1}, {-1, 2}, {1, 2},   {2, 1}, <br>                        {2, -1}, {1, -2}, {-1, -2}, {-2, -1}};<br>                        <br>        List&lt;Step&gt; steps = new ArrayList&lt;&gt;();<br>        for(int[] dir : dirs) {<br>            Step s = new Step(step.x + dir[0], step.y + dir[1]);<br>            if(isVisitable(board, s)) {<br>                steps.add(s);<br>            }<br>        }<br>        return steps;<br>    }<br>    <br>    public static boolean isVisitable(int[][] board, Step step) {<br>        return step.x &gt; -1 &amp;&amp; step.x &lt; 8 &amp;&amp;<br>               step.y &gt; -1 &amp;&amp; step.y &lt; 8 &amp;&amp;<br>               board[step.x][step.y] == 0;<br>    }<br>    <br>    public static Step hard(int[][] board, List&lt;Step&gt; steps) {<br>        int minIndex = 0;<br>        List&lt;Step&gt; minPossibleSteps = possible(board, steps.get(0));<br>        for(int i = 1; i &lt; steps.size(); i++) {<br>            List&lt;Step&gt; possibleSteps = possible(board, steps.get(i));<br>            if(possibleSteps.size() &lt; minPossibleSteps.size()) {<br>                minIndex = i;<br>                minPossibleSteps = possibleSteps;<br>            }<br>        }        <br>        return steps.get(minIndex);<br>    }<br>    <br>    public static void main(String[] args) {<br>        for(int[] row : travel(new Step(5, 6))) {<br>            for(int step : row) {<br>                out.printf("%3d", step);<br>            }<br>            out.println();<br>        }<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>from functools import reduce<br><br>class Knight:<br>    @staticmethod<br>    def travel(start):<br>        route = [start]<br>        current = start<br>        for m in range(1, 64):<br>            possibleSteps = Knight.possible(route, current)<br>            if len(possibleSteps) == 0:<br>                break;<br>            if len(possibleSteps) == 1:<br>                current = possibleSteps[0]<br>            else:<br>                current = Knight.hard(route, possibleSteps)<br>            route.append(current)<br>        return route<br>    <br>    @staticmethod<br>    def possible(route, step):<br>        dirs = [(-2, 1), (-1, 2), (1, 2),   (2, 1), <br>                (2, -1), (1, -2), (-1, -2), (-2, -1)]<br>        steps = [(step[0] + dir[0], step[1] + dir[1]) for dir in dirs]<br>        return [step for step in steps if Knight.isVisitable(route, step)]<br><br>    @staticmethod<br>    def isVisitable(route, step):<br>        return step[0] &gt; -1 and step[0] &lt; 8 and \<br>               step[1] &gt; -1 and step[1] &lt; 8 and \<br>               not step in route<br><br>    @staticmethod<br>    def hard(route, steps):<br>        allSteps = [Knight.possible(route, step) for step in steps]<br>        minIndex = reduce(<br>            lambda c, i: i if len(allSteps[i]) &lt; len(allSteps[c]) else c, <br>            range(1, len(steps)), 0)<br>        return steps[minIndex]<br><br>route = Knight.travel((5, 6))<br>for i in range(8):<br>    for j in range(8):<br>        print("%3d" % (route.index((i, j)) + 1), end="")<br>    print()<br></pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>case class Step(x: Int, y: Int)<br><br>object Knight {<br>    def travel(start: Step) = visit(start::Nil, start)<br>    <br>    def visit(route: List[Step], step: Step): List[Step] = {<br>        if(route.size == 64) route<br>        else {<br>            val steps = possible(route, step);<br>            steps.size match {<br>                case 0 =&gt; route<br>                case 1 =&gt; visit(steps.head::route, steps.head)<br>                case _ =&gt; val s = hard(route, steps)<br>                          visit(s::route, s)<br>            }<br>        }<br>    }<br><br>    def isVisitable(route: List[Step], step: Step) = {<br>        step.x &gt; -1 &amp;&amp; step.x &lt; 8 &amp;&amp;<br>        step.y &gt; -1 &amp;&amp; step.y &lt; 8 &amp;&amp; <br>        !route.contains(step)<br>    }<br><br>    def possible(route: List[Step], step: Step) = {<br>        val dirs = List((-2, 1), (-1, 2), (1, 2),  (2, 1),<br>                        (2, -1), (1, -2), (-1, -2), (-2, -1));<br>    <br>        (for{dir &lt;- dirs<br>             s = Step(step.x + dir._1, step.y + dir._2)<br>             if isVisitable(route, s)<br>         } yield s).toList<br>    }<br><br>    def hard(route: List[Step], steps: List[Step]) = {<br>        val allSteps = for(step &lt;- steps) yield possible(route, step)<br>        val minIndex = (0 /: (1 until steps.size))((c, i) =&gt; <br>                 if(allSteps(i).size &lt; allSteps(c).size) i else c)<br>        steps(minIndex)<br>    }<br>}<br><br>val route = Knight.travel(Step(5, 6))<br><br>for(i &lt;- 0 until 8) {<br>    for(j &lt;- 0 until 8) {<br>        printf("%3d", 64 - route.indexOf(Step(i, j)))<br>    }<br>    println<br>}</pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>#encoding: Big5<br>class Knight<br>    def self.travel(start)<br>        route = [start]<br>        current = start<br>        63.times do<br>            possibleSteps = possible(route, current)<br>            if possibleSteps.size == 0<br>                break<br>            end<br>            if possibleSteps.size == 1<br>                current = possibleSteps[0]<br>            else<br>                current = hard(route, possibleSteps)<br>            end<br>            route &lt;&lt; current<br>        end<br>        route<br>    end<br>    <br>    def self.possible(route, step)<br>        [[-2, 1], [-1, 2], [1, 2], [2, 1], <br>         [2, -1], [1, -2], [-1, -2], [-2, -1]]<br>            .map { |dir| {x: step[:x] + dir[0], y: step[:y] + dir[1]} }<br>            .find_all { |s| isVisitable(route, s)}<br>    end<br><br>    def self.isVisitable(route, step)<br>        step[:x] &gt; -1 and step[:x] &lt; 8 and<br>        step[:y] &gt; -1 and step[:y] &lt; 8 and<br>        not route.include? step<br>    end<br>    <br>    def self.hard(route, steps)<br>        allSteps = steps.map { |step| possible(route, step) }<br>        minIndex = (1...steps.size).reduce(0) { |c, i| <br>            if allSteps[i].size &lt; allSteps[c].size; i else c end <br>        }<br>        steps[minIndex]<br>    end<br>end<br><br>route = Knight.travel x: 5, y: 6<br>0.upto(7) do |i|<br>    0.upto(7) do |j|<br>        printf "%3d ", route.index({x: i, y: j}) + 1<br>    end<br>    puts<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>var knight = function() {    <br>    function possible(board, step) {<br>        return [[-2, 1], [-1, 2], [1, 2],   [2, 1], <br>                [2, -1], [1, -2], [-1, -2], [-2, -1]]<br>                .map(function(dir) {<br>                     return {x: step.x + dir[0], y: step.y + dir[1]};<br>                 })<br>                .filter(function(s) {<br>                    return isVisitable(board, s);<br>                });<br>    }<br>    <br>    function isVisitable(board, step) {<br>        return step.x &gt; -1 &amp;&amp; step.x &lt; 8 &amp;&amp;<br>               step.y &gt; -1 &amp;&amp; step.y &lt; 8 &amp;&amp;<br>               board[step.x][step.y] === undefined;<br>    }<br>    <br>    function hard(board, steps) {<br>        minIndex = 0;<br>        minPossibleSteps = possible(board, steps[0]);<br>        for(var i = 0; i &lt; steps.length; i++) {<br>            possibleSteps = possible(board, steps[i]);<br>            if(possibleSteps.length &lt; minPossibleSteps.length) {<br>                minIndex = i;<br>                minPossibleSteps = possibleSteps;<br>            }<br>        }<br>        return steps[minIndex];<br>    }<br>    <br>    return function(start) {<br>        var board = [[], [], [], [], [], [], [], []];<br>        board[start.x][start.y] = 1;<br>        current = start;<br>        for(var s = 2; s &lt; 65; s++) {<br>            possibleSteps = possible(board, current);<br>            if(possibleSteps.length === 0) {<br>                break;<br>            }<br>            if(possibleSteps.length === 1) {<br>                current = possibleSteps[0];<br>            } else {<br>                current = hard(board, possibleSteps);<br>            }<br>            board[current.x][current.y] = s;<br>        }<br>        return board;<br>    };<br>}();<br><br>var layout = '';<br>knight({x: 5, y: 6}).forEach(function(row) {<br>    row.forEach(function(step) {<br>        layout += ' ' + ((step + '').length === 2 ? '' : ' ') + step;<br>    });<br>    layout += '\n';<br>});<br>print(layout);<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>import Control.Monad<br>import Text.Printf<br>import Data.List<br><br>travel start = visit (start:[]) start<br><br>visit route step = <br>    if length route == 64 then route<br>    else case (length steps) of <br>             0 -&gt; route<br>             1 -&gt; visit ((head steps):route) (head steps)<br>             _ -&gt; visit (s:route) s<br>    where steps = possible route step<br>          s = hard route steps<br><br>possible route (x, y) = [step | step &lt;- steps, isVisitable route step]<br>    where dirs = [[-2, 1], [-1, 2], [1, 2],   [2, 1],<br>                  [2, -1], [1, -2], [-1, -2], [-2, -1]]<br>          steps = [(x + dir !! 0, y + dir !! 1) | dir &lt;- dirs]<br><br>isVisitable route step@(x, y) = <br>    x &gt; -1 &amp;&amp; x &lt; 8 &amp;&amp; y &gt; -1 &amp;&amp; y &lt; 8 &amp;&amp; not (step `elem` route)<br><br>hard route steps = steps !! (foldl (\c i -&gt; <br>    if length (allSteps !! i) &lt; length (allSteps !! c) <br>        then i else c) <br>        0 [1..length steps - 1])<br>    where allSteps = [possible route step | step &lt;- steps]<br><br>main = do<br>    let route = travel (5, 6)<br>    forM [0..7] (\i -&gt; do<br>        forM [0..7] (\j -&gt; do<br>            let (Just a) = elemIndex (i, j) route<br>            printf "%3d" $ 64 - a)<br>        putStrLn "")<br></pre>
+<br>
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/KnightTour.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:36 GMT -->
+</html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ClassObject.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>簡介 Class</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 簡介 Class</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>一個Class物件代表了Java應用程式在運行時所載入的類別或介面，也用來表達enum（屬於類別的一種）、 annotation（屬於介面的一種）、陣列、原生型態（primitive type）、void。<br>
+
+      <br>
+
+
+
+Class沒有公開（public）的建構函式，Class物件是由JVM自動產生，每當一個類別被載入時，JVM就自動為其生成一個Class物件。<br>
+
+      <br>
+
+
+
+您可以透過Object的<span style="font-weight: bold;">getClass()</span>來取得每一個物件對應的Class物件，或者是透過<span style="font-weight: bold;">class常量（Class literal）</span>，下面這個程式簡單的使用getClass()方法來取得String類別的一些基本資訊：</small>
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> ClassDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>public class ClassDemo {<br>    public static void main(String[] args) {<br>        String name = "caterpillar";<br>        Class stringClass = name.getClass();<br>        System.out.println("getName: " + <br>                    stringClass.getName()); <br>        System.out.println("isInterface: " + <br>                    stringClass.isInterface()); <br>        System.out.println("isPrimitive: " + <br>                    stringClass.isPrimitive()); <br>        System.out.println("isArray: " + <br>                    stringClass.isArray()); <br>        System.out.println("SuperClass: " + <br>                    stringClass.getSuperclass().getName());<br>    }<br>} <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+執行結果：</small><span class="postbody"></span><br>
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">getName: java.lang.String<br>
+
+
+
+isInterface: false<br>
+
+
+
+isPrimitive: false<br>
+
+
+
+isArray: false<br>
+
+
+
+SuperClass: java.lang.Object</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+您也可以直接使用以下的方式來取得String類別的Class物件：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Class stringClass = String.class;</span><br style="font-weight: bold; font-style: italic;">
+
+
+
+      <span style="font-weight: bold; font-style: italic;">&nbsp;</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+在Java中，<span style="font-weight: bold;">陣列也屬於一個類別，也有對應的Class物件</span>，這個
+物件是由所有具相同元素與維度的陣列所共用，而原生型態像是boolean, byte, char, short, int, long,
+float, double以及關鍵字void，也都有對應的Class物件，您也都可以用類別常量（Class
+literal）來取得這些物件，例如：</small><br>
+
+
+
+      
+      <ul>
+
+        <li> ClassDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>public class ClassDemo { <br>    public static void main(String[] args) { <br>        System.out.println(boolean.class.getName()); <br>        System.out.println(boolean.class.isPrimitive()); <br>        System.out.println(void.class.getName()); <br>    } <br>} <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+執行結果： </small><span class="postbody"></span><br>
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">boolean <br>
+
+
+
+true <br>
+
+
+
+void&nbsp;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+在一些應用中，您無法事先知道使用者將載入什麼類別，您可以使用<span style="font-weight: bold;">Class的forName()方法</span>實現動態加載類別，下面這個例子讓您可以指定類別名稱
+來獲得類別的相關資訊：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li> ClassDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>public class ClassDemo {<br>    public static void main(String[] args) { <br>        try {<br>            Class c = Class.forName(args[0]);<br>            System.out.println("getName: " + <br>                          c.getName()); <br>            System.out.println("isInterface: " + <br>                             c.isInterface()); <br>            System.out.println("isPrimitive: " + <br>                             c.isPrimitive()); <br>            System.out.println("isArray: " + c.isArray()); <br>            System.out.println("SuperClass: " + <br>                             c.getSuperclass().getName());<br>        }<br>        catch(ClassNotFoundException e) {<br>            e.printStackTrace();<br>        }<br>    }<br>} <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+執行結果：</small><br>
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java ClassDemo java.util.ArrayList<br>
+
+
+
+getName: java.util.ArrayList<br>
+
+
+
+isInterface: false<br>
+
+
+
+isPrimitive: false<br>
+
+
+
+isArray: false<br>
+
+
+
+SuperClass: java.util.AbstractList</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+Class物件的訊息是在編譯時期就被加入至.class檔案中，它是Java支援<span style="font-weight: bold;">執行時期型別辨識（RTTI，Run-
+Time Type Information或Run-Time Type
+Identification）</span>的一種方式，在編譯時期編譯器會先檢查對應的.class檔案，而執行時期JVM在沒有用到該類別時，就不會載入它，如果
+要用到時，JVM會先檢查對應的Class物件是否已經載入，如果沒有載入，則會尋找對應的.class檔案並載入它。 <br>
+
+      <br>
+
+
+
+您可以使用Class.forName()方法動態加載類別，之後使用<span style="font-weight: bold;">Class的newInstance()方法</span>產生實例，下面這個程式是個簡單的示
+範，您可以動態載入實現List的類別</small>
+
+
+：<br>
+
+
+
+
+      
+      <ul>
+
+        <li> ClassDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br><br>public class ClassDemo {<br>    public static void main(String[] args) { <br>        try {<br>            Class c = Class.forName(args[0]);<br>            List list = (List) c.newInstance();<br>            <br>            for(int i = 0; i &lt; 10; i++) {<br>                list.add("element " + i);<br>            }<br>            <br>            for(Object o: list.toArray()) {<br>                System.out.println(o);<br>            }<br>        }<br>        catch(ClassNotFoundException e) {<br>            e.printStackTrace();<br>        } catch (InstantiationException e) {<br>            e.printStackTrace();<br>        } catch (IllegalAccessException e) {<br>            e.printStackTrace();<br>        }<br>    }<br>} <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+執行結果：</small><br>
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java ClassDemo java.util.ArrayList<br>
+
+
+
+element 0<br>
+
+
+
+element 1<br>
+
+
+
+element 2<br>
+
+
+
+element 3<br>
+
+
+
+element 4<br>
+
+
+
+element 5<br>
+
+
+
+element 6<br>
+
+
+
+element 7<br>
+
+
+
+element 8<br>
+
+
+
+element 9</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+   <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ClassObject.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

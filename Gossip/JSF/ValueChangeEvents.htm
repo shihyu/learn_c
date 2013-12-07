@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/ValueChangeEvents.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:16 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>值變事件</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">JSF Gossip:&nbsp;值變事件 </a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+如果使用者改變了JSF輸入元件的值後送出表單，就會發生值變事件（Value Change
+Event），這會丟出一個javax.faces.event.ValueChangeEvent物件，如果您想要處理這個事件，有兩種方式，一是直接
+設定JSF輸入元件的valueChangeListener屬性，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>&nbsp;&lt;h:selectOneMenu value="#{user.locale}" <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+onchange="this.form.submit();"<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+valueChangeListener="#{user.changeLocale}"&gt;<br>
+
+
+      <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; &lt;f:selectItem itemValue="zh_TW" itemLabel="Chinese"/&gt;<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; &lt;f:selectItem itemValue="en" itemLabel="English"/&gt;<br>
+
+
+&nbsp;&lt;/h:selectOneMenu&gt;<br>
+
+
+      </small></div>
+
+      <small>
+&nbsp;<br>
+
+
+為了模擬GUI中選擇了選單項目之後就立即發生反應，我們在onchange屬性中使用了JavaScript，其作用是在選項項目發生改變之後，立即送
+出表單，而不用按下提交按鈕；而valueChangeListener屬性所綁定的user.changeLocale方法必須接受
+ValueChangeEvent物件，例如：</small><br>
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>UserBean.java<br>
+
+
+
+
+
+
+  </li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.faces.event.ValueChangeEvent;<br><br>public class UserBean {<br>    private String locale = "en";<br>    private String name;<br>    private String password;<br>    private String errMessage;<br>   <br>    public void changeLocale(ValueChangeEvent event) {<br>        if(locale.equals("en"))<br>            locale = "zh_TW";<br>        else<br>            locale = "en";<br>    }<br>    <br>    public void setLocale(String locale) {<br>        this.locale = locale;<br>    }<br>    <br>    public String getLocale() {<br>        if (locale == null) {<br>            locale = "en";<br>        }<br>        return locale;<br>    }<br>    <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>   <br>    public String getName() {<br>        return name;<br>    }<br>   <br>    public void setPassword(String password) {<br>        this.password = password;<br>    }<br>   <br>    public String getPassword() {<br>        return password;<br>    }<br>   <br>    public void setErrMessage(String errMessage) {<br>        this.errMessage = errMessage;<br>    }<br>   <br>    public String getErrMessage() {<br>        return errMessage;<br>    }<br>   <br>    public String verify() {<br>        if(!name.equals("justin") ||<br>           !password.equals("123456")) {<br>            errMessage = "名稱或密碼錯誤";<br>            return "failure";<br>        }<br>        else {<br>            return "success";<br>        }<br>    }<br>}</pre>
+
+
+
+
+
+
+      <br>
+
+      <small>
+另一個方法是實作javax.faces.event.ValueChangeListener介面，並定義其processValueChange() 方法，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;package onlyfun.caterpillar;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;public class SomeListener implements ValueChangeListener {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void processValueChange(ValueChangeEvent event) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;}</span><br>
+
+
+      </small></div>
+
+      <small>
+&nbsp;<br>
+
+
+然後在JSF頁面上使用&lt;f:valueChangeListener&gt;標籤，並設定其type屬性，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>&nbsp;&lt;h:selectOneMenu value="#{user.locale}" <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+onchange="this.form.submit();"&gt;<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; &lt;f:valueChangeListener <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="onlyfun.caterpillar.SomeListener"/&gt;<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; &lt;f:selectItem itemValue="zh_TW" itemLabel="Chinese"/&gt;<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; &lt;f:selectItem itemValue="en" itemLabel="English"/&gt;<br>
+
+
+&nbsp;&lt;/h:selectOneMenu&gt; <br>
+
+
+      </small></div>
+
+      <small>
+&nbsp;<br>
+
+
+下面這個頁面是對 <a href="ImmediateEvents.htm">立即事件</a> 中的範例程式作一個修改，將語言選項改以下拉式選單的選擇方式呈現，這必須配合上面提供的UserBean類別來使用：</small><br>
+
+
+      
+      <ul>
+
+        <li>index.jsp</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %&gt;<br>&lt;%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %&gt;<br>&lt;%@page contentType="text/html;charset=UTF8"%&gt;<br><br>&lt;f:view locale="#{user.locale}"&gt;<br>&lt;f:loadBundle basename="messages" var="msgs"/&gt;<br><br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;&lt;h:outputText value="#{msgs.titleText}"/&gt;&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br><br>    &lt;h:form&gt;<br>        &lt;h:selectOneMenu value="#{user.locale}" <br>                  immediate="true"<br>                  onchange="this.form.submit();"       <br>                  valueChangeListener="#{user.changeLocale}"&gt;<br><br>            &lt;f:selectItem itemValue="zh_TW" <br>                          itemLabel="Chinese"/&gt;<br>            &lt;f:selectItem itemValue="en" <br>                          itemLabel="English"/&gt;<br>        &lt;/h:selectOneMenu&gt;<br>    <br>        &lt;h3&gt;&lt;h:outputText value="#{msgs.hintText}"/&gt;&lt;/h3&gt;<br>        &lt;h:outputText value="#{msgs.nameText}"/&gt;:<br>                &lt;h:inputText value="#{user.name}"/&gt;&lt;p&gt;<br>        &lt;h:outputText value="#{msgs.passText}"/&gt;: <br>                &lt;h:inputSecret value="#{user.password}"/&gt;&lt;p&gt;         <br>        &lt;h:commandButton value="#{msgs.commandText}" <br>                        action="#{user.verify}"/&gt;       <br>    &lt;/h:form&gt;<br><br>&lt;/body&gt;<br>&lt;/html&gt;<br>	<br>&lt;/f:view&gt;</pre>
+
+
+      <br>
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/ValueChangeEvents.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:16 GMT -->
+</html>

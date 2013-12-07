@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/DeclarativeSecurity.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+<head>
+
+
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>宣告式安全</title></head><body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 宣告式安全</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+      <br>
+
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>EJB3的宣告式安全，可以使用Annotation來宣告基於Role的授權，指明類別或哪些方法可以被哪些角色所存取。<br>
+      <br>
+您可以在類別上使用@DeclarRoles宣告有效的Role名稱，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Stateless<br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@DeclarRoles({"admin", "manager"})</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class HelloBeanImpl implements HelloBean {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+如果您沒有宣告有效的Role名稱，則容器也會自動根據所設定的@RolesAllowed來建立，</small><small>@RolesAllowed可以套用在類別或方法上，若套用在類別上，則該類別的所有方法都必須是指定的Role才可以存取，若套用在方法上，則該方法必須是</small><small>指定的Role才可以存取，例如：</small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Stateless<br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@DeclarRoles({"admin", "manager"})</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class HelloBeanImpl implements HelloBean {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; @RolesAllowed("admin")<br>
+&nbsp; &nbsp; public void doAdmin() {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; ...<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp; ...<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+您也可以使用@PermitAll或@DenyAll來標註整個類別或方法，標註@PermitAll表示可以被任何Role使用呼叫，@DenyAll則是相反，</small><small>表示任何Role都不得使用呼叫，在某些環境中，不適合呼叫某些方法或類別時，您就可以使用@DenyAll來設定，而不用直接修改程式碼。</small><br>
+      <small><br>
+您可以使用@RunAs標註類別或方法，在執行時A Role的方法中，若呼叫了某些B Role才能呼叫的方法，則可暫時以B Role來執行，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Stateless</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@DeclarRoles({"admin", "manager"})</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">@RunAs("admin")</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class HelloBeanImpl implements HelloBean {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; @RolesAllowed("admin")</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public void doAdmin() {</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }<br>
+</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; @RolesAllowed("admin")<br>
+&nbsp; &nbsp; public void doAdmin() {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; ...<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@RolesAllowed("manager")</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public void doManager() {</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; doAdmin(); // 需要 admin 的 Role 才能執行</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+manager的Role執行doManager()，由於其中執行了admin的Role才可以執行的方法，若沒有設定如上的@RunAs，則會發生錯誤。<br>
+      <br>
+Java EE的安全是基於</small><small>JAAS（</small><small>Java Authentication and
+Authorization Service），若為Web應用程式，可以搭配Web容器的URL
+Pattern為基礎的宣告安全設定，當使用者登入後，Web容器會將通過驗證的Principal傳遞給EJB容器，可以很簡單的完成驗證與EJB3上
+的宣告授權。若不透過Web容器的宣告安全設定而想使用EJB3宣告授權，需要深入了解JAAS的內容，這已不在這個文件的說明範圍。<br>
+      <br>
+以下配合Web容器的 </small><small><a href="../ServletJSP/DeclarativeSecurityBasic.html">宣告式基本驗證</a></small><small>，讓Web容器為您作驗證，並在Servlet中呼叫EJB3的Bean，看看如何使用EJB3的宣告安全，首先是Bean的撰寫：<br>
+      </small>
+      <ul>
+        <li><small>HelloBean.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import javax.ejb.Remote;<br><br>@Remote<br>public interface HelloBean {<br>    public String doHello(String message);<br>    public String doSecurity(String message);<br>}</pre>
+      <small><br>
+      </small>
+      <ul>
+        <li><small>HelloBeanImpl.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import javax.annotation.security.*;<br>import javax.ejb.Stateless;<br><br>@Stateless<br>public class HelloBeanImpl implements HelloBean {<br><span style="font-weight: bold;">    @RolesAllowed("foo")</span><br>    public String doSecurity(String message) {<br>        return message + "security processed....";<br>    }<br>    <br>    public String doHello(String message) {<br>        return message + "processed....";<br>    }<br>}</pre>
+      <small><br>
+其中doSecurity()必須是foo的Role才可以存取，其它方法則無限制，若您撰寫一個Servlet如下：<br>
+      </small>
+      <ul>
+        <li>HelloServlet.java</li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import javax.ejb.EJB;<br><br>public class HelloServlet extends HttpServlet {<br><span style="font-weight: bold;">    @EJB</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private HelloBean hello;</span><br>   <br>    protected void processRequest(HttpServletRequest request, <br>                                HttpServletResponse response)<br>                        throws ServletException, IOException {<br>        String method = request.getParameter("method");<br>        <br>        if("security".equals(method)) {<br>            <span style="font-weight: bold;">response.getWriter().println(hello.doSecurity("info...."));</span><br>        }<br>        else {<br>            <span style="font-weight: bold;">response.getWriter().println(hello.doHello("hello...."));</span><br>        }<br>    } <br><br>    protected void doGet(HttpServletRequest request, <br>                         HttpServletResponse response)<br>                       throws ServletException, IOException {<br>        processRequest(request, response);<br>    } <br><br>    protected void doPost(HttpServletRequest request,<br>                          HttpServletResponse response)<br>                       throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br><br>    public String getServletInfo() {<br>        return "Short description";<br>    }<br>}</pre>
+      <br>
+      <small>這個Servlet使用Web的安全宣告加以保護，只能是foo或orz的Role才可以請求：<br>
+      </small>
+      <ul>
+        <li><small>web.xml</small></li>
+      </ul>
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" <br>  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <br>  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee <br>  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"&gt;<br>      <br>    &lt;servlet&gt; <br>        &lt;servlet-name&gt;HelloServlet&lt;/servlet-name&gt; <br>        &lt;servlet-class&gt;onlyfun.caterpillar.HelloServlet&lt;/servlet-class&gt; <br>    &lt;/servlet&gt;<br> <br>    &lt;servlet-mapping&gt; <br>        &lt;servlet-name&gt;HelloServlet&lt;/servlet-name&gt; <br>        &lt;url-pattern&gt;/HelloServlet&lt;/url-pattern&gt; <br>    &lt;/servlet-mapping&gt; <br>      <br><span style="font-weight: bold;">    &lt;security-role&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;role-name&gt;foo&lt;/role-name&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/security-role&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;security-role&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;role-name&gt;orz&lt;/role-name&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/security-role&gt; </span><br>    <br>    &lt;security-constraint&gt;<br>        &lt;display-name&gt;SecurityConstraint&lt;/display-name&gt;<br>        &lt;web-resource-collection&gt;<br>            &lt;web-resource-name&gt;Secret Information&lt;/web-resource-name&gt;<br><span style="font-weight: bold;">            &lt;url-pattern&gt;/HelloServlet&lt;/url-pattern&gt;</span><br>        &lt;/web-resource-collection&gt;<br>        &lt;auth-constraint&gt;<br><span style="font-weight: bold;">            &lt;role-name&gt;foo&lt;/role-name&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;role-name&gt;orz&lt;/role-name&gt;</span><br>        &lt;/auth-constraint&gt;<br>    &lt;/security-constraint&gt;<br>    <br>    &lt;login-config&gt;<br>        &lt;auth-method&gt;BASIC&lt;/auth-method&gt;<br>        &lt;realm-name&gt;file&lt;/realm-name&gt;<br>    &lt;/login-config&gt;<br>&lt;/web-app&gt;</pre>
+      <small><br>
+若您的Glassfish上有caterpillar及justin使用者，群組分別設為fooGroup與orzGroup，而sun-web.xml的設定如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &lt;security-role-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;role-name&gt;foo&lt;/role-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;group-name&gt;fooGroup&lt;/group-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &lt;/security-role-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &lt;security-role-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;role-name&gt;orz&lt;/role-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;group-name&gt;orzGroup&lt;/group-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &lt;/security-role-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+      </div>
+      <small><br>
+若您請求/HelloServlet，並指定method=security參數，當使用caterpillar登入時，才可以呼叫HelloBean的doSecurity()，若使用justin登入，雖可以通過驗證來請求，但因Role不正確，所以呼叫</small><small>HelloBean的doSecurity()時，就會出現授權失敗的錯誤。<br>
+      <br>
+若不指定</small><small>method=security參數，則呼叫的是HelloBean的doHello()，則無論登入的是caterpillar或justin，都可以正確執行。</small><br>
+      <small><br>
+      </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/DeclarativeSecurity.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+</html>

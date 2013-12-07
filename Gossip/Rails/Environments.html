@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Environments.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>專案環境</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror environments" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 專案環境<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>當你使用rails new建立新專案，會建立預設的專案環境，至今為止，大致也看過專案中幾個目錄、檔案或設定選項的作用，這一篇中再作個整理。</p>
+      <p>專案目錄中一開始最常接觸的是app目錄，主要是放置應用程式碼檔案的目錄：</p>
+      <ul>
+        <li>[app]</li>
+        <ul>
+          <li>[assets]<br>
+            放置Web應用程式使用的JavaScript檔案、樣式表（Style sheet）檔案與圖檔等靜態檔案資源，在 <a
+              href="Assets.html">資源（Assets）</a> 文件中曾介紹過。<br>
+          </li>
+        </ul>
+        <ul>
+          <ul>
+            <li>[images]</li>
+            <li>[javascripts]</li>
+            <ul>
+              <li>application.js<br>
+              </li>
+            </ul>
+            <li>[stylesheets]</li>
+            <ul>
+              <li>application.css<br>
+              </li>
+            </ul>
+          </ul>
+          <li>[controllers]<br>
+            放置控制器程式碼檔案，控制器通常繼承自定義在application_controller.rb中的<span class="courier">ApplicationController</span>，命名慣例是xxx_controller.rb中定義<span
+              class="courier">XxxController</span>控制器類別作為控制器，如果遵照Rails的RESTful慣例，xxx通常是個複數英文名詞，例如在bookmarks_controller.rb中定義<span
+              class="courier">BookmarksController</span>控制器類別，與網址/bookmarks對應。<br>
+          </li>
+          <ul>
+            <li>application_controller.rb<br>
+            </li>
+          </ul>
+          <li>[models]<br>
+            放置模型程式碼檔案，模型通常繼承自<span class="courier">ActiveRecord::Base</span>，命名慣例是在xxx_yyy.rb中定義<span
+              class="courier">XxxYyy</span>模型類別，對應於資料庫中xxx_yyys表格，例如在auction_item.rb中定義<span
+              class="courier">AuctionItem</span>模型類別，對應的是資料表格auction_items。<br>
+          </li>
+          <li>[views]<br>
+            放置樣版與版型檔案的地方，在 <a href="Template.html">樣版（Template）</a> 與 <a
+              href="Layout.html">版型（Layout）</a> 文件中介紹過。<br>
+          </li>
+          <ul>
+            <li>[layouts]</li>
+            <ul>
+              <li>application.htm.erb</li>
+            </ul>
+          </ul>
+          <li>[helpers]<br>
+            放置定義輔助方法檔案的地方，在 <a href="Helper.html">輔助方法（Helper）</a> 文件中介紹過。<br>
+          </li>
+          <ul>
+            <li>application_helper.rb</li>
+          </ul>
+          <li>[mailers]<br>
+            放置郵件寄送程式碼檔案，郵件類別通常繼承自<span class="courier">ActionMailer::Base</span>，命名慣例是xxx_yyy.rb中定義<span
+              class="courier">XxxYyy</span>郵件類別，如果類別定義中包括一個<span class="courier">ooo</span>動作，則會使用app/views/xxx_yyy中的ooo.text.erb或ooo.html.erb作為樣版檔案。有關郵件發送，之後還會介紹。<br>
+          </li>
+        </ul>
+      </ul>
+      <ul>
+      </ul>
+      <p>專案中另一常接觸的目錄為config，主要放置應用程式相關設定檔案：</p>
+      <ul>
+        <li>[config]</li>
+        <ul>
+          <li>routes.rb<br>
+            路由設定檔案，可參考 <a href="Routing.html">基本路由</a>、<a href="RESTful.html">RESTful 與 Rails</a> 等文件的說明。<br>
+          </li>
+          <li>database.yml<br>
+            資料庫設定檔案，當中可以看到development、test、production三個設定區段，<a href="MVC.html">MVC 與 Rails</a> 文件中作過簡介。<br>
+          </li>
+          <li>environment.rb<br>
+            初始Rails應用程式的檔案，不需要修改（Rails3之前還用來放置一些核心選項設定，但Rails3之後核心選項設定已改放application.rb）。</li>
+          <li>application.rb<br>
+            放置Rails核心選項設定的檔案，像是先前文件看過的config.encoding，就是在這邊設定，這邊設定的選項會影響development、test、production三個環境。<br>
+          </li>
+          <li>boot.rb<br>
+            載入bundler環境，設定Gemfile中列出的gems，不需要修改。<br>
+          </li>
+          <li>[environments]<br>
+            非Rails核心選項，可依development、production、test環境需求不同設定的選項，會分別放置至以下三個.rb檔案。<br>
+          </li>
+          <ul>
+            <li>development.rb</li>
+            <li>production.rb</li>
+            <li>test.rb<br>
+            </li>
+          </ul>
+          <li>[initializers]<br>
+          </li>
+          <ul>
+            <li>secret_token.rb<br>
+              設定簽署Cookie（signed cookies）時需要到的密鑰，可參考 <a href="Cookie.html">Cookie</a> 文件中的說明。<br>
+            </li>
+            <li>session_store.rb<br>
+              設定使用的session store，可參考 <a href="Session2.html">session 原理</a> 文件中的說明。<br>
+            </li>
+            <li>wrap_parameters.rb<br>
+              設定包裹參數功能，可參考 <a href="ParamsRequest.html">params 與 request</a> 文件中的說明。<br>
+            </li>
+            <li>mime_types.rb<br>
+              設定Rails內建格式支援，可參考 <a href="RespondToWith.html">respond_to 與 respond_with</a> 文件中的說明。<br>
+            </li>
+            <li>backtrace_silencers.rb<br>
+              可設定關閉一些程式庫的例外追蹤（backtrace）。<br>
+            </li>
+            <li>inflections.rb<br>
+              在Rails的命名慣例中，常有英文單複數的對照，英文中有些單字不只是加上s就是複數名詞，例如person與people，這個檔案可設定Rails預設外的轉換規則。<br>
+            </li>
+          </ul>
+          <li>[locales]<br>
+            放置國際化翻譯詞彙檔案，之後還會介紹。<br>
+          </li>
+          <ul>
+            <li>en.yml</li>
+          </ul>
+        </ul>
+      </ul>
+      <p>如果有在進行資料庫維護與修改，db資料夾也是經常接觸：</p>
+      <ul>
+        <li>[db]</li>
+        <ul>
+          <li>[migrate]<br>
+            放置資料庫遷移.rb檔案，可參考 <a href="Migrations.html">資料庫遷移</a> 文件說明。<br>
+          </li>
+          <ul>
+            <li>development.sqlite、test.sqlite<br>
+              新建Rails專案後，預設就會有這兩個sqlite資料庫檔案，分別作為開發與測試時使用的資料庫，如果設定RAILS_ENV環境變數為production，下rake db:create，就會建立production.sqlite，作為實際產品上線時的資料庫。<br>
+            </li>
+            <li>schema.rb<br>
+              記得資料庫遷移至今的結構異動，你不用更動這個檔案，每次資料庫遷移都會自動更新這個檔案，如果你執行rake db:reset，就會刪除資料庫檔案，重建資料庫檔案，然後載入schema.rb中的異動，可參考 <a
+                href="http://edgeguides.rubyonrails.org/migrations.html#schema-dumping-and-you">Schema Dumping and You</a> 文件的說明。<br>
+            </li>
+            <li>seeds.rb<br>
+              如果你有一些預計要填入資料庫中的資料，可以撰寫在這個檔案中，然後執行rake db:seed就可以了。<br>
+            </li>
+          </ul>
+        </ul>
+      </ul>
+      <p>還有一些其它資料夾與檔案：</p>
+      <ul>
+        <li>[doc]<br>
+          存放程式庫說明文件。<br>
+        </li>
+        <li>[lib]<br>
+          存放可信任的共用類別、模組或相關資產檔案。<br>
+        </li>
+        <ul>
+          <li>[assets]</li>
+          <li>[tasks]<br>
+            存放Rake任務檔案。<br>
+          </li>
+        </ul>
+        <li>[log]<br>
+          存放開發記錄檔。<br>
+        </li>
+        <ul>
+          <li>development.log</li>
+        </ul>
+        <li>[public]<br>
+          可被HTTP公開存取的檔案會放在這個資料夾中。<br>
+        </li>
+        <li>[script]<br>
+          Rails腳本檔案。<br>
+        </li>
+        <ul>
+          <li>rails</li>
+        </ul>
+        <li>[test]<br>
+          測試相關檔案會放在這，可參考 <a href="Test.html">認識 Rails 測試</a>。<br>
+        </li>
+        <li>[tmp]<br>
+          暫存檔案的資料夾。<br>
+        </li>
+        <li>[vendor]<br>
+          廠商、第三方plugin與相關資源。<br>
+        </li>
+        <li>config.ru<br>
+          如果用基於Rake的伺服器啟動應用程式時的設定檔案。<br>
+        </li>
+        <li>Gemfile<br>
+          記錄應用程式使用的Gem。<br>
+        </li>
+        <li>Rakefile<br>
+          記錄可於命令列載入執行的Rake任務。<br>
+        </li>
+        <li>README<br>
+          說明應用程式功能的文件。<br>
+        </li>
+      </ul>
+      <p>存放在app/controllers、app/models等路徑的程式檔案，Rails會依命名慣例（如先前介紹過的控制器、模型等慣例）來載入。Rails的命名實例是檔名為小寫，底線區隔，類別名稱為大小駝峰式命名，例如若程式中使用到<span
+          class="courier">XxxYyy</span>類別，會自動至預設路徑中載入xxx_yyy.rb，也就是相當於自動<span
+          class="courier">require "xxx_yyy"</span>，如果有模組作為名稱空間，例如程式中使用到<span
+          class="courier">Ooo::XxxYyy</span>，則會自動至預設路徑中的ooo目錄載入xxx_yyy.rb，也就是相當於自動<span
+          class="courier">require "ooo/xxx_yyy"</span>。<br>
+      </p>
+      <p>如果預設路徑之外，你有其它擺放程式檔案的路徑，可以在application.rb中自行定義config.autoload_paths，例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong># Custom directories with classes and modules you want to be autoloadable.<br>
+          config.autoload_paths += %W(#{config.root}/abc </strong><strong>#{config.root}/cde</strong><strong>)</strong><br>
+      </p>
+      <p>正如先前看到的，Rails有三種執行環境設定，分別為development環境、test環境與production環境，不同的設定檔是放在config/environments中的development.rb、test.rb與production.rb，根據環境變數RAILS_ENV或RACK_ENV設定為哪一個環境，或是執行rails server時指定-e選項為哪一個環境（像是rails s -e production，如果是Rails Console，則可以指定rails c production），啟動時就會選用哪一個設定檔中的選項，如果必要，也可以自訂環境設定檔，只要在config/environments中有對應名稱的.rb檔就可以了。有關各種選項設定的意義，可以參考 <a
+          href="%20http_/edgeguides.rubyonrails.org/configuring.html">Configuring Rails Applications</a> 文件。<br>
+      </p>
+      <br>
+      <br>
+      &nbsp; <br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Environments.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:10 GMT -->
+</html>

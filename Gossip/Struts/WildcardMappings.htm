@@ -1,0 +1,494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/WildcardMappings.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>ActionMappings 通配字元</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: ActionMappings 通配字元</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+在Struts中，您所有關於請求轉發等的設定都是在struts-config.xml中定義，很快的，您的 struts-config.xml就會膨漲為好幾百行，甚至好幾千行。<br>
+
+      <br>
+
+
+
+您可以使用 <a href="ModuleUnit.htm">模組化程式</a> 的方式，將相關的功能設定加以分類，並撰寫在不同的struts-config-xxx.xml模組設定檔案中。<br>
+
+      <br>
+
+
+
+在Struts 1.2中新增了通配字元（wildcard）設定，您可以在struts-config.xml中使用通配字元，透過事前設計好的命名規範，加上通配字元設定，您可以大量的減少struts-config.xml中的設定行數。<br>
+
+      <br>
+
+
+
+以一個實際的例子來看，如果您本來的struts-config.xml中的設定是這樣的：</small>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>struts-config.xml</li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <pre>....<br> &lt;action    <br>    path="/editProfile"<br>    type="onlyfun.caterpillar.EditProfileAction"<br>    name="profileForm"<br>    scope="request"<br>    validate="false"&gt;<br>    &lt;forward <br>        name="failure" <br>        path="/mainMenu.jsp"/&gt;<br>    &lt;forward <br>        name="success" <br>        path="/profile.jsp"/&gt;<br> &lt;/action&gt;<br><br> &lt;action    <br>    path="/editDocument"<br>    type="onlyfun.caterpillar.EditDocumentAction"<br>    name="documentForm"<br>    scope="request"<br>    validate="false"&gt;<br>    &lt;forward <br>        name="failure" <br>        path="/mainMenu.jsp"/&gt;<br>    &lt;forward <br>        name="success" <br>        path="/document.jsp"/&gt;<br> &lt;/action&gt;<br>....</pre>
+
+
+
+      <br>
+
+      <small>
+
+則在Struts 1.2中可以這麼撰寫就好了：</small><br>
+
+
+
+      
+      <ul>
+
+        <li>struts-config.xml</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>....<br> &lt;action    <br>    path="/edit*"<br>    type="onlyfun.caterpillar.Edit{1}Action"<br>    name="{1}Form"<br>    scope="request"<br>    validate="false"&gt;<br>    &lt;forward <br>        name="failure" <br>        path="/mainMenu.jsp"/&gt;<br>    &lt;forward <br>        name="success" <br>        path="/{1}.jsp"/&gt;<br> &lt;/action&gt;<br>....</pre>
+
+
+
+      <br>
+
+      <small>
+
+如上設定，如果是edit開頭的請求，就會與通配字元比對，並將除去前綴部份字串作為查找Action的依據，例如
+/editProfile.do就會查找EditProfileAction的action設定，而/editDocument.do就會查找
+EditDocumentAction的action設定。<br>
+
+      <br>
+
+
+
+通配字元*最多可以設定九個，依序對應至{1}到{9}，例如/edit*Profile*.do與edit{1}Profile{2}Action的關係。<br>
+
+      <br>
+
+
+
+設定{0}的話，表示會包括整個請求，即包括前綴，例如/edit*.do與Admin{0}Action的關係的一個例子是，在請求為 /editProfile.do時，會呼叫AdminEditProfileAction這個action。<br>
+
+      <br>
+
+
+
+通配字元設定主要包括以下：</small>
+
+
+
+
+
+      <br>
+
+
+
+      
+      <table align="left" border="1" width="100%">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small> </small>*</td>
+
+
+
+
+      <td align="left" valign="top"><small>比對一個或多個字元，不包括斜線 ('/') 字元 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>** </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>比對一個或多個字元，包括斜線 ('/') 字元 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>\character </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>反斜線字元被用於跳脫字元，所以 \* 會用於比對星號 ('*')，而
+\\ 比對反斜線 ('\'). </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+      <br clear="all">
+
+
+
+
+      <br>
+
+      <small>
+
+
+目前Struts 1.2中 &lt;action-mappings&gt; 支持通配字元設定的屬性有：<br>
+
+      </small>
+
+      
+      <ul>
+
+        <li><small>type</small></li>
+
+        <li><small>name</small></li>
+
+        <li><small>roles</small></li>
+
+        <li><small>parameter</small></li>
+
+        <li><small>attribute</small></li>
+
+        <li><small>forward</small></li>
+
+        <li><small>include</small></li>
+
+        <li><small>input</small></li>
+
+      
+      </ul>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/WildcardMappings.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

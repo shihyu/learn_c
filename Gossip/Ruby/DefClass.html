@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/DefClass.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>定義類別</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 定義類別<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ruby中要定義類別非常的簡單，例如你可以定義一個帳戶（<span style="font-family: Courier New,Courier,monospace;">Account</span>）類別：<br>
+      </small>
+      <pre># encoding: Big5<br><span style="font-weight: bold;">class Account; end</span><br><br>acct = Account.new<br><br>def acct.initialize(number, name, balance)<br>    @number = number<br>    @name = name<br>    @balance = balance<br>end<br><br>def acct.number<br>    @number<br>end<br><br>def acct.name<br>    @name<br>end<br><br>def acct.balance<br>    @balance<br>end<br><br>def acct.deposit(money)<br>    if money &lt;= 0<br>        raise  ArgumentError, "必須是正數"<br>    end<br>    @balance += money<br>end<br><br>def acct.withdraw(money)<br>    if money &gt; @balance<br>        raise  RuntimeError, "餘額不足"<br>    end<br>    @balance -= money<br>end<br><br>acct.initialize("123-456-789", "Justin", 0)<br>puts acct.number    # 123-456-789<br>puts acct.name      # Justin<br><br>acct.deposit(100)<br>puts acct.balance   # 100<br>acct.withdraw(50)<br>puts acct.balance   # 50<br></pre>
+      <small><br>
+      </small><small>上例中，<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">class</span>用來定義一個類別，為了突顯Ruby可直接於類別實例上定義方法的特性，現在還沒有定義類別內容。要建立類別的實例（Instance），直接呼叫<span style="font-family: Courier New,Courier,monospace;">Account.new</span>來建立。建立物件之後，可以直接於物件建立<span style="font-weight: bold;">單例方法（Singleton method）</span>，透過<span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> . </span>來傳送訊息給接收者，執行對應的方法。<br>
+      <br>
+      </small><small>以<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">@</span>開頭的變數稱為<span style="font-weight: bold;">實例變數（Instance variable）</span>，顧名思義，為個別物件擁有的變數，實例變數無法直接由外部存取，必須自行定義方法，外部才可以取得實例變數的值，這也就是為何，上例中要再特別定義<span style="font-family: Courier New,Courier,monospace;">name、number、balance</span>等方法的原因。<br>
+      <br>
+上面這個例子定義了類別，但沒有封裝的概念，<span style="font-family: Courier New,Courier,monospace;">deposit、withdraw</span>等方法，都僅屬於<span style="font-family: Courier New,Courier,monospace;">acct</span>參考的物件擁有，可以將物件建立後的初始化動作，以及會用到的相關操作定義在類別之中。來看看下面這個例子：<br>
+      </small>
+      <pre># encoding: Big5<br><span style="font-weight: bold;">class Account</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def initialize(number, name, balance)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @number = number</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @name = name</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @balance = balance</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    def number</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @number</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    def name</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @name</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    def name=(value)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @name = value</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    def balance</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @balance</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    def deposit(money)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if money &lt;= 0</span><br style="font-weight: bold;"><span style="font-weight: bold;">            raise  ArgumentError, "必須是正數"</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @balance += money</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    def withdraw(money)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if money &gt; @balance</span><br style="font-weight: bold;"><span style="font-weight: bold;">            raise  RuntimeError, "餘額不足"</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br style="font-weight: bold;"><span style="font-weight: bold;">        @balance -= money</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><span style="font-weight: bold;">end</span><br><br>acct = Account.new("123-456-789", "Justin", 0)<br><br>puts acct.number    # 123-456-789<br>puts acct.name      # Justin<br><br>acct.deposit(100)<br>puts acct.balance   # 100<br>acct.withdraw(50)<br>puts acct.balance   # 50<br><br><span style="font-weight: bold;">acct.name = "Caterpillar"</span><br>puts acct.name      # caterpillar<br></pre>
+      <small><br>
+      呼叫<span style="font-family: Courier New,Courier,monospace;">Account.new</span>建立實例之後，會自動呼叫<span style="font-family: Courier New,Courier,monospace;">initialize</span>方法進行初始化的動作，傳給<span style="font-family: Courier New,Courier,monospace;">Account.new的引數，會依序傳給initialize</span>方法作為引數（如果要定義物件被銷毀前要執行的方法，可以搜尋<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ObjectSpace.define_finalizer</span>方法的使用）。如果要使用等號指定，可以自行定義如<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">name=</span>的方法，將<span style="font-weight: bold;">實例方法（Instance method）</span>與實例變數定義在類別之中，每個建構的實例就都會擁有類別中定義的方法與各自的實例變數。<br>
+      <br>
+上例中，建立物件並初始化之後，為了可以取得與設定實例變數，必須自行定義方法。實際上，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">attr_reader</span>方法定義取值方法，<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">attr_writer</span>定義設值方法，或者使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">attr_accessor</span>同時定義取值與設值方法，</small><small><span style="font-family: Courier New,Courier,monospace;">attr_reader</span>、<span style="font-family: Courier New,Courier,monospace;">attr_writer與</span><span style="font-family: Courier New,Courier,monospace;">attr_accessor接受的是 </span></small><small><a href="Symbol.html">符號型態</a> 實例</small><small>。例如：<br>
+      </small>
+      <pre># encoding: Big5<br>class Account<br><span style="font-weight: bold;">    attr_reader   :number, :balance</span><br style="font-weight: bold;"><span style="font-weight: bold;">    attr_accessor :name</span><br>    <br>    def initialize(number, name, balance)<br>        @number = number<br>        @name = name<br>        @balance = balance<br>    end<br><br>    def deposit(money)<br>        if money &lt;= 0<br>            raise  ArgumentError, "必須是正數"<br>        end<br>        @balance += money<br>    end<br><br>    def withdraw(money)<br>        if money &gt; @balance<br>            raise  RuntimeError, "餘額不足"<br>        end<br>        @balance -= money<br>    end<br>end<br><br>acct = Account.new("123-456-789", "Justin", 0)<br><br>puts acct.number    # 123-456-789<br>puts acct.name      # Justin<br><br>acct.deposit(100)<br>puts acct.balance   # 100<br>acct.withdraw(50)<br>puts acct.balance   # 50<br><br>acct.name = "Caterpillar"<br>puts acct.name<br></pre>
+      <small>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small>在Ruby中定義類別之後，可以在後續再度開啟類別增加新的定義，所有已建構的實例，將直接擁有增加的新定義。例如 </small><small><big><a href="Array.html"><small>陣列型態</small></a></big> 中就看過這麼一個例子：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Array<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def ^(that)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self + that - (self &amp; that)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; admins = ["Justin", "caterpillar"]<br>
+=&gt; ["Justin", "caterpillar"]<br>
+&gt;&gt; users = ["momor", "hamini", "Justin"]<br>
+      =&gt; ["momor", "hamini", "Justin"]<br></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; admins ^ users<br></span>
+=&gt; ["caterpillar", "momor", "hamini"]<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;">&nbsp;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">Array原本沒有^方法，在上例中開啟Array類別定義了^方法，使Array實例都可以呼叫^方法。可以開啟類別定義新方法，既有的類別已定義的方法，也可以移除，只要使用<span style="font-weight: bold;">remove_method</span>方法（</small><small>若必要，也可以移除實例變數，可搜尋<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">remove_instance_variable</span>方法的使用</small><small style="font-family: Courier New,Courier,monospace;">）。例如：</small><small><br></small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; s = Some.new<br>
+            </span>=&gt; #&lt;Some:0x28e7560&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; s.some<br>
+            </span>some<br>
+=&gt; nil<br>
+            <span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; remove_method :some<br>
+&gt;&gt; end<br>
+            </span>=&gt; Some<span style="font-weight: bold;"><br>
+&gt;&gt; s.some<br>
+            </span>NoMethodError: undefined method `some' for #&lt;Some:0x28e7560&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):60<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt; s2 = Some.new<br>
+            </span>=&gt; #&lt;Some:0x28bbe08&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; s2.some<br>
+            </span>NoMethodError: undefined method `some' for #&lt;Some:0x28bbe08&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):62<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+<small>在Ruby，定義於類別中的方法，預設會是公開（<span style="font-family: Courier New,Courier,monospace;">public</span>），可以使用<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public</span>、<span style="font-weight: bold;">private</span>或<span style="font-weight: bold;">protected</span></span>方法定義指定的方法為公開、私有或受保護，<span style="font-weight: bold;">公開的方法可以直接指定物件接收者（包括</span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">self</span><span style="font-weight: bold;">）直接呼叫，私有方法則只能在有繼承關係的類別體系中不透過</span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">self</span><span style="font-weight: bold;">呼叫，受保護方法則可以在有繼承關係的類別體系中指定物件接收者（包括</span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">self</span><span style="font-weight: bold;">）呼叫</span>。例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; priv_method<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def priv_method<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "priv_method"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; private :priv_method<br>
+&gt;&gt; end<br>
+</span>=&gt; Some<span style="font-weight: bold;"><br>
+&gt;&gt; s = Some.new<br>
+            </span>=&gt; #&lt;Some:0x287fd78&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; s.some<br>
+            </span>some<br>
+priv_method<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; s.priv_method</span><br>
+NoMethodError: private method `priv_method' called for #&lt;Some:0x287fd78&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):28<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">initialize方法一定是private。</span><br>
+<br>
+可以使用<span style="font-weight: bold;">instance_of?</span>方法測試物件是否為某個類別的實例，如果要知道是否為某個繼承體系的實例，則可以使用<span style="font-weight: bold;">is_a?</span>或===方法。例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; s.instance_of? Some<br>
+</span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt; s.instance_of? Object<br>
+            </span>=&gt; false<span style="font-weight: bold;"><br>
+&gt;&gt; s.is_a? Object<br>
+            </span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt; s.is_a? Some<br>
+            </span>=&gt; true<span style="font-weight: bold;"><br>&gt;&gt; Some === s<br>
+</span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt; Object === s<br>
+            </span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>之後會學到繼承，在Ruby中，所有的類別都是<span style="font-family: Courier New,Courier,monospace;">Object的子類別，因此所有物件都是一種Object</span>。</small><br>
+
+      <small><br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/DefClass.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

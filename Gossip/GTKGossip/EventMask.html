@@ -1,0 +1,924 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/EventMask.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>事件遮罩（Event Mask）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: 事件遮罩（Event Mask）</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>事件遮罩決定了一個Widget會接收到哪些事件，不同的Widget會有不同預設的事件遮罩，您可以使用<span class="postbody">gtk_widget_set_events()來設定事件遮罩：</span><br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">void gtk_widget_set_events(GtkWidget *widget, gint events);</span></small></span><br>
+
+      <span class="postbody"></span></div>
+
+      <span class="postbody"><small><br>
+
+使用gtk_widget_set_events()要特別小心，因為您直接改變了Widget的事件遮罩，不小心的話有可能破壞了Widget的功能，您可以使用gtk_widget_events()增加一些特別事件的事件遮罩：</small><br>
+
+      </span>
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;" class="postbody"><span style="font-weight: bold;">void gtk_widget_add_events(GtkWidget *widget, gint events);</span></span></small><br>
+
+      <span class="postbody"></span></div>
+
+      <small><span class="postbody"><br>
+
+gtk_widget_set_events()或</span></small><span class="postbody"><small>gtk_widget_events()必須在Widget實現之前呼叫才有作用，events是GdkEventMask的enum：<br>
+
+      </small></span>
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>typedef enum</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>{</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_EXPOSURE_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 1,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_POINTER_MOTION_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 2,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_POINTER_MOTION_HINT_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 3,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_BUTTON_MOTION_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 4,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_BUTTON1_MOTION_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 5,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_BUTTON2_MOTION_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 6,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_BUTTON3_MOTION_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 7,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_BUTTON_PRESS_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 8,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_BUTTON_RELEASE_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 9,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_KEY_PRESS_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 10,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_KEY_RELEASE_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 11,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_ENTER_NOTIFY_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 12,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_LEAVE_NOTIFY_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 13,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_FOCUS_CHANGE_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 14,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_STRUCTURE_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 15,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_PROPERTY_CHANGE_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 16,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_VISIBILITY_NOTIFY_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 17,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_PROXIMITY_IN_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 18,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_PROXIMITY_OUT_MASK&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 19,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_SUBSTRUCTURE_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 20,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_SCROLL_MASK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1 &lt;&lt; 21,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp; GDK_ALL_EVENTS_MASK&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 0x3FFFFE</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>} GdkEventMask;</small></span><br>
+
+      <span class="postbody"></span></div>
+
+      <span class="postbody"><br>
+
+      <small>事件遮罩與事件的對應如下（取自 <a href="http://developer.gnome.org/doc/GGAD/sec-gdkevent.html">Events</a> 表格三）：</small></span><span class="postbody"><br>
+
+      </span>
+      
+      <table class="CALSTABLE" style="background-color: rgb(255, 255, 255);" border="1" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <th align="left" valign="top"><small>遮罩
+              </small></th>
+
+
+              <th align="left" valign="top"><small>事件類型
+              </small></th>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_EXPOSURE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_EXPOSE</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_POINTER_MOTION_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_MOTION_NOTIFY</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_POINTER_MOTION_HINT_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                N/A
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_BUTTON_MOTION_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_MOTION_NOTIFY</span>
+                (滑鼠按鈕按下)
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_BUTTON1_MOTION_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_MOTION_NOTIFY</span>
+                (滑鼠按鈕1按下)
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_BUTTON2_MOTION_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_MOTION_NOTIFY</span>
+                (滑鼠按鈕2按下)
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_BUTTON3_MOTION_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_MOTION_NOTIFY</span>
+                (滑鼠按鈕3按下)
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_BUTTON_PRESS_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_BUTTON_PRESS</span>,
+                <span class="STRUCTNAME">GDK_2BUTTON_PRESS</span>,
+                <span class="STRUCTNAME">GDK_3BUTTON_PRESS</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_BUTTON_RELEASE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_BUTTON_RELEASE</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_KEY_PRESS_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_KEY_PRESS</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_KEY_RELEASE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_KEY_RELEASE</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_ENTER_NOTIFY_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_ENTER_NOTIFY</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_LEAVE_NOTIFY_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_LEAVE_NOTIFY</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_FOCUS_CHANGE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_FOCUS_IN</span>, <span class="STRUCTNAME">GDK_FOCUS_OUT</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_STRUCTURE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_CONFIGURE</span>,
+                <span class="STRUCTNAME">GDK_DESTROY</span>, <span class="STRUCTNAME">GDK_MAP</span>, <span class="STRUCTNAME">GDK_UNMAP</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_PROPERTY_CHANGE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_PROPERTY_NOTIFY</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_VISIBILITY_NOTIFY_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_VISIBILITY_NOTIFY</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_PROXIMITY_IN_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_PROXIMITY_IN</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_PROXIMITY_OUT_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_PROXIMITY_OUT</span>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">
+                GDK_SUBSTRUCTURE_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>對子視窗接收 <span class="STRUCTNAME">GDK_STRUCTURE_MASK</span>&nbsp;事件<i class="EMPHASIS"></i>
+              </small></td>
+
+
+            </tr>
+
+
+            <tr>
+
+
+              <td align="left" valign="top"><small>
+                <span class="STRUCTNAME">GDK_ALL_EVENTS_MASK</span>
+              </small></td>
+
+
+              <td align="left" valign="top"><small>所有事件</small></td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      <br>
+
+      <span class="postbody"><small>舉個實際的例子來說，GtkWindow預設是不接收滑鼠移動事件，您要使用</small></span><small><span class="postbody"></span></small><span class="postbody"><small>gtk_widget_events()增加</small></span><span class="postbody"><small>GDK_POINTER_MOTION遮罩，才可以捕捉滑鼠移動事件，例如下面的程式在滑鼠於視窗中移動時，將在標題列中顯示目前的座標值：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li><span class="postbody"><small>motion.c</small></span></li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>gboolean motion_event_handler(<br>            GtkWidget *widget, GdkEventMotion *event, gpointer data) {<br>    char pos[20];<br><br>    sprintf(pos, "(%d, %d)", (int) event-&gt;x, (int) event-&gt;y);<br>    gtk_window_set_title(GTK_WINDOW(widget), pos);<br><br>    return FALSE;<br>}<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br><span style="font-weight: bold;">    gtk_widget_add_events(window, GDK_POINTER_MOTION_MASK);</span><br><br><span style="font-weight: bold;">    g_signal_connect(GTK_OBJECT(window), "motion_notify_event",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     G_CALLBACK(motion_event_handler), NULL);</span><br><br>    gtk_widget_show(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+      <span class="postbody"><br>
+
+      <small>一個執行的畫面如下所示：<br>
+
+      <br>
+
+      <img style="width: 210px; height: 230px;" alt="" src="images/EventMask-1.jpg"><br>
+
+      </small><br>
+
+      <br>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/EventMask.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+</html>

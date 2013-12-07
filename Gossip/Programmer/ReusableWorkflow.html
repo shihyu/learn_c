@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ReusableWorkflow.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>實現共用程式樣版的模式</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 實現共用程式樣版的模式<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=76525">實現共用程式樣版的模式</a><br>
+      <br>
+      撰寫程式時，分離程式中通用流程與特定實現的模式經常可見，將通用流程抽取成為共用的程式樣版，可減少程式碼重複並增加可維護性，熟悉之後開發者更易於發現通用流程特徵，避免撰寫重複流程，令開發者設計時可專注於特定實作。<br>
+      <br>
+      <dl>
+        <dt>以繼承重用父類別中的程式樣版</dt>
+      </dl>
+      <br>
+      實現共用程式樣版的方式之一，是透過繼承來共用父類別中的流程，Gof設計模式分類中稱此種模式為樣版方法（Template method）。具體實例之一是Servlet的實作，在<span
+        class="courier">HttpServlet</span>的<span class="courier">service</span>方法中，實現了判斷與預處理GET、POST等HTTP方法的流程樣版，並在GET時呼叫<span
+        class="courier">doGet</span>、POST時呼叫<span class="courier">doPost</span>等，想實作Servlet進行請求處理與回應，只要繼承<span
+        class="courier">HttpServlet</span>，並依需求重新定義<span class="courier">doGet</span>、<span
+        class="courier">doPost</span>即可。<br>
+      <br>
+      樣版方法模式的特定實現是放在子類別中，這些特定實現可能用於父類別中多個具有共用樣版的方法中。繼承顯然是樣版方法模式的一大特徵，這是考量共用樣版是否放在父類別中的重要因素。由於具有父子類別關係，父類別中某些需特定實現的方法可有預設實作，減輕子類別必須逐一實作方法的負擔，子類別只要依需求重新定義某些方法；由於具有繼承關係，子類別可直接取用父類別中權限允許的定義，子類別需要實作的方法也不一定要公開（<span
+        class="courier">public</span>），而可以是受保護（<span class="courier">protected</span>）的方法。<br>
+      <br>
+      不過樣版方法中，擁有共用流程的類別與具備特定實現的類別必然具備「是一種」（is a）的關係，在只允許繼承單一實作類別的語言中形成最大限制。在JDK8中，介面允許預設方法（Default method），某類別實現具預設方法的介面時，就可擁有預設方法中的程式樣版，只要再實現未實作的抽象方法，就可擁有完整功能。如果將實作具備預設方法的介面，看作是一種受限多重繼承，實際上此種機制也是樣版方法模式的實現。Scala中的<span
+        class="courier">Trait</span>、Ruby中的<span class="courier">Module</span>，也是實作樣版方法模式的機制之一。<br>
+      &nbsp;&nbsp;&nbsp; <br>
+      <dl>
+        <dt>以組合重用實境類別中的程式樣版</dt>
+      </dl>
+      <br>
+      若不想以繼承方式實作程式樣版共用，可採用策略（Strategy）模式，將特定實作定義在策略類別中，共用程式樣版則定義在實境（Context）類別，並以組合（Composition）方式建立完整功能。具體案例是JDK中的<span
+        class="courier">TreeSet</span>或<span class="courier">TreeMap</span>，在建立實例時可指定自訂的<span
+        class="courier">Comparator</span>，<span class="courier">TreeSet</span>或<span
+        class="courier">TreeMap</span>在排序插入的元素時有既定流程，實際兩元素的前後順序則委託（Delegate）給<span
+        class="courier">Comparator</span>來判斷。<br>
+      <br>
+      策略模式特定實現是定義在策略類別，策略物件可能會用於父類別中多個具共用樣版的方法中。組合與委託是策略模式的一大特徵，因而實境類別可於執行時期切換策略物件。例如JDK的Swing可於執行時期切換版面管理員（Layout manager），達到重新配置版面元件的效果。由於需要取得特定實作結果時是採委託方式，策略物件的方法往往必須公開。<br>
+      <br>
+      樣版方法與策略模式作用上看似雷同，決定採用哪種方式，實際上就是在繼承與組合之間作抉擇。如果需要繼承多型，也就是必須以父類別型態來操作子類別實例，像是Web容器（Container）必須透過Servlet型態來操作<span
+        class="courier">HttpServlet</span>子類別實例，那就採用樣版方法。如果不需要繼承多型，由於採用策略模式時實境類別與策略類別間沒有繼承關係，通常可預留較大彈性。由於繼承一般是比較不鼓勵的，因而可以的情況下採用策略模式，必要的情況下採用樣版模式。<br>
+      <br>
+      <dl>
+        <dt>以回呼重用特定方法中的程式樣版</dt>
+      </dl>
+      <br>
+      如果類別功能繁多，而個別功能僅需要某幾個特定實作，若採用樣版方法模式，繼承父類別後得一次實作許多特定方法，造成子類別實作時的麻煩，若採用策略模式，策略類別得一次實作許多特定方法，造成策略類別實作時的麻煩；雖然可在父類別或策略類別中進行預設實作，分別減輕子類別或策略類別實作時的負擔，然而又會造成必須繼承笨重父類別的問題。<br>
+      <br>
+      如果類別的功能繁多，可以採用樣版回呼（Template callback）模式，將個別功能所需的特定實作，打散至各個回呼物件。舉例來說，JDBC實作程式碼往往出現許多重複流程，僅小部份需要特定實作，而JDBC操作中有許多增刪查改的小功能，Spring框架在實現<span
+        class="courier">JdbcTemplate</span>時，採取樣版回呼模式，在需要某個JDBC操作時僅要求特定回呼物件。例如，在<span
+        class="courier">update</span>方法需要設定<span class="courier">"INSERT INTO user (name,age) VALUES(?,?)"</span>語法中佔位字元實際參數時，可如下實作：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>jdbcTemplate.update(sql, new PreparedStatementSetter() {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; public void setValues(PreparedStatement ps) throws SQLException {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setString(1, name); ps.setInt(2, age);</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; }</span></strong><strong><span><br>
+          </span></strong><strong><span>});</span></strong></div>
+      <br>
+      JDK的<span class="courier">Collections類別sort方法，也是採用樣版回呼模式，使用sort排序List時可傳入Comparator實例</span>，自訂排序時兩元素的順序。對於非類別基礎（Class-based）語言來說，樣版回呼（Template callback）模式更為重要，不過這類語言通常存在一級（First-class）函式，所以更常見的稱呼是回呼函式（Callback function），比方說對JavaScript的陣列排序可以寫為：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>[1, 3, 2, 5, 4].sort(function(a, b) </span></strong><strong><span>{</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; </span></strong><strong><span>return a - b; </span></strong><strong><span><br>
+          </span></strong><strong><span>});</span></strong></div>
+      <br>
+      回呼方式不是沒有缺點，以Java來說，現階段採用回呼物件必須使用匿名內部類別實作，語法負擔較大，未來JDK8可採用Lambda語法的話，語法上可較為簡潔。設計時也應避免回呼物件或函式形成過深巢狀結構，形成回呼地獄（Callback hell）的問題。例如：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>readXML(function(xml) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; toJSON(xml, function(json) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sendToServer(json, function(response) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; logToDatabase(response, function(...) {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></strong><strong><span>});</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></strong><strong><span>});</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; </span></strong><strong><span>});</span></strong><strong><span><br>
+          </span></strong><strong><span>});</span></strong></div>
+      <br>
+      <dl>
+        <dt>觀察樣版程式碼熟悉重複特徵</dt>
+      </dl>
+      <br>
+      有些程式碼可簡單看出重複流程，例如處理輸入輸出或JDBC時的例外處理流程，往往一眼就看得出重複與累贅，因而可直接抽取加以封裝，之後重複運用，然而有些程式碼中即使存在重複流程，也很難直接察覺。舉例來說，如果有個<span
+        class="courier">List&lt;Album&gt;的albums與加總整數用的total</span>，想計算花在超過40歲歌手的唱片錢有多少，可能如下撰寫：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>for(Album album : albums) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; Singer singer = album.getSinger();</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; if(singer.getAge() &gt; 40) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; total += album.getPrice();</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; }</span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong></div>
+      <br>
+      觀察已抽取出的樣版程式碼，通常可以找出重複的特徵。例如利用迴圈對清單作<span class="courier">if判斷，通常代表針對List</span>作過濾（Filter）；在迴圈中從某元素取得另一元件值，通常表示從<span
+        class="courier">List</span>中匹配（Map）出另一個<span class="courier">List</span>；在迴圈中逐一取得元件值作計算，通常代表著左折疊（Fold left）或右折疊（Fold Right）。<span
+        class="courier">因此若List定義有filter、map、reduce方法，可針對albums作filter(album -&gt; album.getSinger().getAge() &gt; 40)取得符合的專輯清單，然後再對傳回的專輯清單map(album -&gt; album.getPrice())匹配出價格清單，最後使用reduce(0, (seed, price) -&gt; seed + price)</span>對價格清單作加總。程式不僅避免重複流程，還具有簡潔的語意。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ReusableWorkflow.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

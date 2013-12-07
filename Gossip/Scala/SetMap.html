@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/SetMap.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>Set 與 Map</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: Set 與 Map</a></h1>
+
+<table style="text-align: left; height: 32px; width: 953px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center style="width: 240px;"> </center></td>
+
+      <td style="vertical-align: top; text-align: left; width: 687px;"><small>Set無序集合物件，物件所收集的元素不重複。在Scala中，預設的Set實作是<span style="font-weight: bold;">不可變動的（Immutable）</span>，如果你要建立Set實例，以下是個例子：<br></small><pre>val names1 = Set("Justin", "caterpillar", "momor")<br>names1.foreach(println)  // 逐行顯示Justin、caterpillar、momor<br><br>val names2 = names1 + "caterpillar"<br>names2.foreach(println)  // 逐行顯示Justin、caterpillar、momor<br><br>val names3 = names1 + "hamimi"<br>names3.foreach(println)  // 逐行顯示Justin、caterpillar、momor、hamimi</pre><small><br>+
+可用來於集合中新增元素，由於預設的Set實作是不可變動的，所以實際上會建立一個新的Set物件傳回，但由於Set中的元素不重複，如果要加入的元素是
+重複的，就會直接傳回原來的Set實例，因此範例中names2中實際上並沒有增加元素，而且直接傳回names1的實例。<br><br>要從元素中刪
+除某個元素，可以使用-方法。如果要串接兩個Set，則可以使用++（也就是聯集操作，因為Set不允許重複），如果要從某個Set中，刪去另一個Set
+物件所指定的元素，則可以使用--，如果要作交集操作，則使用**，如果要比較兩個Set物件的內含元素是否相同，可以直接使用==。以下是直接從直譯環
+境作個示範：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; val x = Set(1, 2, 3, 4, 5)<br>x: scala.collection.immutable.Set[Int] = Set(5, 3, 1, 4, 2)<br><br>scala&gt; x - 2<br>res3: scala.collection.immutable.Set[Int] = Set(5, 3, 1, 4)<br><br>scala&gt; x ++ Set(6, 7, 8, 9)<br>res4: scala.collection.immutable.Set[Int] = Set(5, 1, 6, 9, 2, 7, 3, 8, 4)<br><br>scala&gt; x -- Set(2, 3)<br>res5: scala.collection.immutable.Set[Int] = Set(5, 1, 4)<br><br>scala&gt; x ** Set(3, 4, 5, 6, 7)<br>res6: scala.collection.immutable.Set[Int] = Set(5, 3, 4)<br><br>scala&gt; x == Set(1, 2, 3, 4, 5)<br>res7: Boolean = true<br><br>scala&gt;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<br><small>剛剛提過，預設的Set實作是不可變動的，實際上，預設是使用 <a href="http://www.scala-lang.org/docu/files/api/scala/collection/immutable/Set.html">scala.collection.immutable.Set</a> 的實作（事實上，不可變動的群集定義都是位於 scala.collection.immutable 套件之中），如果你需要可變動的Set，則可以匯入（import）<a href="http://www.scala-lang.org/docu/files/api/scala/collection/mutable/Set.html">scala.collection.mutable.Set</a>（</small><small>可變動的群集定義都是位於 scala.collection.mutable 套件之中</small><small>）。例如：<br></small><pre>import scala.collection.mutable.Set<br><br>val names = Set("Justin", "caterpillar", "momor")<br>names.foreach(println)<br><br>names += "hamimi"<br>names.foreach(println)   // 逐行顯示Justin、caterpillar、momor、hamimi</pre><br><small>在上例中，呼叫了names的+=方法，由於你匯入了scala.collection.mutable.Set，所以使用的是可變動的Set，+=是該Set實作物件上的方法，這會將元素加入同一個Set實例，而不是建立新的Set實例。<br><br>事實上，先前未匯入</small><small>scala.collection.mutable.Set時，你程式中所使用的Set名稱所參考的物件，其實是定義在scala.Predef中：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">package scala</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">object Predef {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp;type Map[A,&nbsp;B] = collection.immutable.Map[A, B]</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp;type Set[A] = collection.immutable.Set[A]</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; val Map = collection.immutable.Map</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; val Set = collection.immutable.Set</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br></small><small>val宣告了Map與Set分別參考至collection.immutable.Set與</small><small>collection.immutable.Map物件，而type為</small><small>collection.immutable.Set[A]與</small><small>collection.immutable.Map[A, B]建立了別名Set[A]與Map[A, B]。</small><br><small><br>Map是具有鍵/值（Key/Value）的字典物件。在Scala中預設的Map實作是不可變動的，理由在上面的程式碼片段可以看到，預設的Map是 <a href="http://www.scala-lang.org/docu/files/api/scala/collection/immutable/Map.html">collection.immutable.Map</a> 的實作。要建立Map物件，以下是個範例：<br></small><pre>val rooms = Map(101 -&gt; "Justin", 102 -&gt; "caterpillar")<br>println(rooms(101))   // 顯示 Justin<br>println(rooms(102))   // 顯示 caterpillar</pre><small><br><span style="font-family: Courier New,Courier,monospace;">-&gt;</span>左
+邊指定鍵，右邊是值。指定鍵要取回值時，是使用()，從先前的介紹你大概也可以推論出，rooms(101)這樣的指定時，其實會轉換為呼叫
+rooms.apply(101)這樣的呼叫。由於預設的Map是不可變動的，所以如下要更新Map中的元素，實際上會傳回新的Map物件，例如：<br></small><pre>val rooms = Map(101 -&gt; "Justin", 102 -&gt; "caterpillar")<br><br> // 下面真正是變成 val newRooms = rooms.apply(101, "Hamimi")<br>val newRooms = rooms(101) = "Hamimi"  <br>println(rooms(101))      // 顯示 Justin<br>println(newRooms(101))   // 顯示 Hamimi</pre><small><br>範
+例中第二行程式碼其實是很不直覺，因為=運算應該是沒有傳回值的（也就是結果是Unit），不過事實上如註解中所說明的，rooms(101) =
+"Hamimi"實際上會變成rooms.update(101, "Hamimi")，而update方法傳回的是新的Map物件。<br><br>同樣的，如果你要使用可變動的Map實作，則可以匯入 <a href="http://www.scala-lang.org/docu/files/api/scala/collection/mutable/Map.html">collection.mutable.Map</a>，例如：<br></small><pre>import collection.mutable.Map<br><br>val rooms = Map[String, String]()<br><br>rooms("101") = "Justin"<br>println(rooms("101"))<br><br>rooms += ("102" -&gt; "caterpillar")<br>rooms.foreach(println)</pre><small><br>這個例子同時示範了如何新增鍵/值元素至Map中，也就是使用("102" -&gt; "caterpillar")這樣的寫法，另外也示範了，在呼叫Map的foreach方法時，每次foreach會取得</small><small><big><a href="ListTuple.html"><small> Tuple</small></a> </big>物件，</small><small>代表了該次迭代時的鍵/值，這個例子會顯示以下的結果：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Justin<br>(101,Justin)<br>(102,caterpillar)</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+<br><small>下面這個例子則示範如何使用傳入的 Tuple：</small><br><pre>import collection.mutable.Map<br>val rooms = Map[String, String]()<br><br>rooms("101") = "Justin"<br><br>rooms += ("102" -&gt; "caterpillar")<br>rooms.foreach(element =&gt; { <br>                           val (key, value) = element<br>                           println(key + ": " + value) <br>                         })</pre><small><br></small><small>這個例子會顯示以下的結果：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">101: Justin<br>102: caterpillar</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table><br><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/SetMap.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

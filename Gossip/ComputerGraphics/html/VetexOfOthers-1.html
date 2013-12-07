@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/VetexOfOthers-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:51 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                function toRadians(angle) {
+                    return angle * Math.PI / 180;
+                }
+                
+                var sin = Math.sin;
+                var cos = Math.cos;
+                var sqrt = Math.sqrt;
+                
+                function xAfterRotateAroundXZ(x, y, z) {
+                    // 從斜角繪製
+                    // 繞 x 軸轉 30 度，繞 z 軸轉 -25 度
+                    var rotateX = toRadians(30);
+                    var rotateZ = toRadians(-25);
+                    return parseInt(x * cos(rotateZ) -
+                     (y * cos(rotateX) - z * sin(rotateX)) * sin(rotateZ));
+                }
+                
+                function yAfterRotateAroundXZ(x, y, z) {
+                   // 從斜角繪製
+                   // 繞 x 軸轉 30 度，繞 z 軸轉 -25 度
+                   var rotateX = toRadians(30);
+                   var rotateZ = toRadians(-25);
+                    return parseInt(x * sin(rotateZ) +
+                     (y * cos(rotateX) - z * sin(rotateX)) * cos(rotateZ));
+                }
+                
+                var Y_LOCATIONS = [180, 140, 100, 60, 20, 10, 4, 0];
+                var R_DISTANCES = [100, 55, 10, 10, 10, 50, 80, 80];
+                
+                var canvas1 = document.getElementById('canvas1');
+                var orgX = canvas1.width / 3;
+                var orgY = canvas1.height - 80;
+                
+                var context = canvas1.getContext('2d');
+                context.beginPath();
+                
+                // 360 度畫圈
+                for(var i = 0; i < Y_LOCATIONS.length; i++) {
+                    // 我們要畫線段，所以求出第一點不用畫
+                    var x = R_DISTANCES[i] * cos(0);
+                    var z = R_DISTANCES[i] * sin(0);
+                    var startX = orgX + xAfterRotateAroundXZ(
+                                          x, Y_LOCATIONS[i], z);
+                    var startY = orgY - yAfterRotateAroundXZ(
+                                          x, Y_LOCATIONS[i], z);
+                    context.moveTo(startX, startY);                      
+                    for(var j = 1; j <= 360; j += 10) {
+                        // 計算 x, z 座標
+                        x = R_DISTANCES[i] * cos(toRadians(j));
+                        z = R_DISTANCES[i] * sin(toRadians(j));
+                        // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心
+                        var endX = orgX + xAfterRotateAroundXZ(
+                                           x, Y_LOCATIONS[i], z);
+                        var endY = orgY - yAfterRotateAroundXZ(
+                        x, Y_LOCATIONS[i], z);
+                        context.lineTo(endX, endY);
+                    }
+                }
+                
+                // 畫錂線
+                for(var j = 0; j <= 360; j += 60) {
+                    // 我們要畫線段，所以求出第一點不用畫
+                    var x = R_DISTANCES[0] * cos(toRadians(j));
+                    var z = R_DISTANCES[0] * sin(toRadians(j));
+                    var startX = orgX + xAfterRotateAroundXZ(
+                                          x, Y_LOCATIONS[0], z);
+                    var startY = orgY - yAfterRotateAroundXZ(x, 
+                                          Y_LOCATIONS[0], z);
+                    context.moveTo(startX, startY);
+                    for(var i = 1; i < Y_LOCATIONS.length; i++) {
+                        x = R_DISTANCES[i] * cos(toRadians(j));
+                        z = R_DISTANCES[i] * sin(toRadians(j));
+                        // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心
+                        var endX = orgX + xAfterRotateAroundXZ(x, 
+                                             Y_LOCATIONS[i], z);
+                        var endY = orgY - yAfterRotateAroundXZ(x, 
+                                             Y_LOCATIONS[i], z);
+                        
+                        context.lineTo(endX, endY);
+                    }
+                }
+                context.stroke();
+                context.closePath();
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="300" height="300"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/VetexOfOthers-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:51 GMT -->
+</html>

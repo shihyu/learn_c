@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/Lob.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>Lob 物件</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: Lob 物件</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+      <br>
+
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>關於BLOB、CLOB，可以先參考一下 <a href="../JavaGossip-V2/BLOBAndCLOB.htm">將
+檔案存入資料庫</a> 這篇文章。<br>
+      <br>
+      </small><small>在Hibernate中，您可以直接對Blob、Clob作映射，例如在T_USER表格中，若有BLOB與CLOB欄位分別為photo與resume，則您可以如下設計一個User類別：<br>
+      </small>
+      <ul>
+        <li><small>User.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.Serializable;<br>import javax.persistence.Entity;<br>import javax.persistence.GeneratedValue;<br>import javax.persistence.GenerationType;<br>import javax.persistence.Id;<br>import javax.persistence.Lob;<br>import javax.persistence.Table;<br><br>@Entity<br>@Table(name="T_USER")<br>public class User implements Serializable {<br>    @Id<br>    @GeneratedValue(strategy = GenerationType.AUTO)<br>    private Long id;<br>    private String name;<br>    private Long age;<br><br><span style="font-weight: bold;">    @Lob</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private byte[] photo;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    @Lob</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private char[] resume;</span><br><br>    public Long getId() { return id; }<br>    public void setId(Long id) { this.id = id; }<br><br>    public Long getAge() { return age;  }<br>    public void setAge(Long age) { this.age = age; }<br><br>    public String getName() { return name; }<br>    public void setName(String name) { this.name = name; }<br><br>    public byte[] getPhoto() { return photo; }<br>    public void setPhoto(byte[] photo) { this.photo = photo; }<br><br>    public char[] getResume() { return resume; }<br>    public void setResume(char[] resume) { this.resume = resume; }<br>}</pre>
+      <br>
+      <small>無論是映射至BLOB或CLOB的欄位，在JPA中都是使用@Lob來標註，而JPA會自動根據屬性來判斷是要採用BLOB或CLOB的處理方式儲存至表格中，若屬性是byte[]型態，則以BLOB方式處理，若屬性是char[]型態，則使用CLOB方式處理。<br>
+      <br>
+一個儲存檔案至表格的範例如下：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileInputStream inputStream = <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; new FileInputStream("c://workspace//caterpillar.jpg");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; byte[] photo = new byte[inputStream.available()];</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inputStream.read(photo);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inputStream.close();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User user = new User();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user.setName("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user.setAge(new Long(35));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user.setPhoto(photo);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user.setResume("Bla....Bla....resume text!!".toCharArray());<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EntityManager entityManager =<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+JPAUtil.getEntityManagerFactory().createEntityManager();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EntityTransaction etx = entityManager.getTransaction();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.begin();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.persist(user);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.commit();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.close();<br>
+      </span><br>
+      <br>
+而一個取出檔案的範例如下：<br>
+      </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EntityManager entityManager =<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+JPAUtil.getEntityManagerFactory().createEntityManager();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EntityTransaction etx = entityManager.getTransaction();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.begin();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User user = entityManager.find(User.class, id);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.commit();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.close();<br>
+      <br>
+      </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileOutputStream outputStream = <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; new FileOutputStream("c://workspace//caterpillar2.jpg");<br>
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; outputStream.write(user.getPhoto());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; outputStream.close();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br>
+      </small><br>
+      <small></small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/Lob.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+</html>

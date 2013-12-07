@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/MouseGoMaze2.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:36 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>老鼠走迷官（二）</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 老鼠走迷官（二）</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+      
+      <h2>&nbsp;說明</h2>
+
+      <small>
+
+由於迷宮的設計，老鼠走迷宮的入口至出口路徑可能不只一條，如何求出所有的路徑呢？</small><br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+求所有路徑看起來複雜但其實更簡單，只要在老鼠走至出口時顯示經過的路徑，然後退回上一格重新選擇下一個位置繼續遞迴就可以了，比求出單一路徑還簡單，我們的程式只要作一點修改就可以了。 </small><br>
+
+
+
+      
+      <h2> 演算法</h2>
+
+
+
+
+      
+      <pre>Procedure GO(maze[])<br>    VISIT(maze, START_I, START_J, END_I, END_J)<br>    <br>Procedure VISIT(maze[], i, j, end_i, end_j)<br>    IF maze[i][j] == 0<br>        maze[i][j] = 1<br>        IF maze[end_i][end_j] == 1<br>            PRINT maze<br>        ELSE<br>            VISIT(maze, i, j + 1, end_i, end_j)<br>            VISIT(maze, i + 1, j, end_i, end_j)<br>            VISIT(maze, i, j - 1, end_i, end_j)<br>            VISIT(maze, i - 1, j, end_i, end_j)<br>        maze[i][j] = 0<br></pre>
+
+
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h&gt;<br>#define SIZE 9<br><br>typedef struct {<br>    int x; <br>    int y;<br>} Point;<br><br>Point pt(int, int);<br>void visit(int[][SIZE], Point, Point, void (*)(int[][SIZE]));<br>void print(int[][SIZE]);<br><br>int main(void) { <br>    int maze[SIZE][SIZE] = {{2, 2, 2, 2, 2, 2, 2, 2, 2},<br>                            {2, 0, 0, 0, 0, 0, 0, 0, 2},<br>                            {2, 0, 2, 2, 0, 2, 2, 0, 2},<br>                            {2, 0, 2, 0, 0, 2, 0, 0, 2},<br>                            {2, 0, 2, 0, 2, 0, 2, 0, 2},<br>                            {2, 0, 0, 0, 0, 0, 2, 0, 2},<br>                            {2, 2, 0, 2, 2, 0, 2, 2, 2},<br>                            {2, 0, 0, 0, 0, 0, 0, 0, 2},<br>                            {2, 2, 2, 2, 2, 2, 2, 2, 2}}; <br><br>    visit(maze, pt(1, 1), pt(7, 7), print);<br><br>    return 0; <br>}<br><br>Point pt(int x, int y) {<br>    Point p = {x, y};<br>    return p;<br>}<br><br>void visit(int maze[][SIZE], Point start, <br>           Point end, void (*take)(int[][SIZE])) {<br>    if(!maze[start.x][start.y]) {<br>         maze[start.x][start.y] = 1;<br>         if(maze[end.x][end.y]) {<br>             take(maze);<br>         }<br>         else {<br>             visit(maze, pt(start.x, start.y + 1), end, take);<br>             visit(maze, pt(start.x + 1, start.y), end, take);<br>             visit(maze, pt(start.x, start.y - 1), end, take);<br>             visit(maze, pt(start.x - 1, start.y), end, take);<br>         }<br>         maze[start.x][start.y] = 0;<br>    }<br>}<br><br>void print(int maze[][SIZE]) {<br>    int i, j;<br>    for(i = 0; i &lt; SIZE; i++) { <br>        for(j = 0; j &lt; SIZE; j++) switch(maze[i][j]) {<br>            case 0 : printf("  "); break;<br>            case 1 : printf("◇"); break;<br>            case 2 : printf("█"); <br>        }<br>        printf("\n"); <br>    }     <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>import static java.lang.System.out;<br><br>class Point {<br>    final int x;<br>    final int y;<br>    Point(int x, int y) {<br>        this.x = x;<br>        this.y = y;<br>    }<br>}<br><br>interface Boss {<br>    void take(int[][] maze);<br>}<br><br>public class Mouse {    <br>    public static void visit(int[][] maze, Point pt, Point end, Boss boss) {<br>        if(isVisitable(maze, pt)) {<br>            maze[pt.x][pt.y] = 1;<br>            if(isEnd(maze, end)) {<br>                boss.take(maze);<br>            } else {<br>                visit(maze, new Point(pt.x, pt.y + 1), end, boss);<br>                visit(maze, new Point(pt.x + 1, pt.y), end, boss);<br>                visit(maze, new Point(pt.x, pt.y - 1), end, boss);<br>                visit(maze, new Point(pt.x - 1, pt.y), end, boss);<br>            }<br>            maze[pt.x][pt.y] = 0;<br>        }<br>    }<br><br>    private static boolean isVisitable(int[][] maze, Point pt) {<br>        return maze[pt.x][pt.y] == 0;<br>    }<br>    <br>    public static boolean isEnd(int[][] maze, Point end) {<br>        return maze[end.x][end.y] == 1;<br>    }<br>    <br>    public static void main(String[] args) {<br>    <br>        Mouse.visit(new int[][] {<br>        <br>            {2, 2, 2, 2, 2, 2, 2, 2, 2},<br>            {2, 0, 0, 0, 0, 0, 0, 0, 2},<br>            {2, 0, 2, 2, 0, 2, 2, 0, 2},<br>            {2, 0, 2, 0, 0, 2, 0, 0, 2},<br>            {2, 0, 2, 0, 2, 0, 2, 0, 2},<br>            {2, 0, 0, 0, 0, 0, 2, 0, 2},<br>            {2, 2, 0, 2, 2, 0, 2, 2, 2},<br>            {2, 0, 0, 0, 0, 0, 0, 0, 2},<br>            {2, 2, 2, 2, 2, 2, 2, 2, 2}},<br>                        <br>            new Point(1, 1), new Point(7, 7), <br><br>            // JDK8 Lambda<br>            maze -&gt; {<br>                for(int[] row : maze) {<br>                    for(int block : row) switch(block) {<br>                        case 0: out.print("  "); break;<br>                        case 1: out.print("◇"); break;<br>                        case 2: out.print("█");<br>                    }<br>                    out.println();<br>                }<br>            }<br>        );<br>    }<br>} <br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>class Mouse:<br>    @staticmethod<br>    def go(maze, start, end, take):<br>        Mouse.visit(maze, start, end, [], take)<br>    <br>    @staticmethod<br>    def visit(maze, pt, end, route, take):<br>        if Mouse.isVisitable(maze, pt, route):<br>            route.append(pt)<br>            if Mouse.isEnd(route, end):<br>                take(maze, route)<br>            else:<br>                Mouse.visit(maze, (pt[0], pt[1] + 1), end, route, take)<br>                Mouse.visit(maze, (pt[0] + 1, pt[1]), end, route, take)<br>                Mouse.visit(maze, (pt[0], pt[1] - 1), end, route, take)<br>                Mouse.visit(maze, (pt[0] - 1, pt[1]), end, route, take)<br>            route.pop()<br>    <br>    @staticmethod<br>    def isVisitable(maze, pt, route):<br>        return maze[pt[0]][pt[1]] == 0 and pt not in route<br>        <br>    @staticmethod<br>    def isEnd(route, end):<br>        return end in route<br><br>def console(maze, route):<br>    for i in range(len(maze)):<br>        for j in range(len(maze[i])):<br>            if (i, j) in route:<br>                print("◇", end="")<br>            else:<br>                {<br>                    0 : lambda: print("  ", end=""),<br>                    2 : lambda: print("█",end="")<br>                }[maze[i][j]]()<br>        print()<br>   <br>Mouse.go([<br>           [2, 2, 2, 2, 2, 2, 2, 2, 2],<br>           [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>           [2, 0, 2, 2, 0, 2, 2, 0, 2],<br>           [2, 0, 2, 0, 0, 2, 0, 0, 2],<br>           [2, 0, 2, 0, 2, 0, 2, 0, 2],<br>           [2, 0, 0, 0, 0, 0, 2, 0, 2],<br>           [2, 2, 0, 2, 2, 0, 2, 2, 2],<br>           [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>           [2, 2, 2, 2, 2, 2, 2, 2, 2]<br>         ], (1, 1), (7, 7), console)</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>case class Point(x: Int, y: Int)<br><br>object Mouse {<br>    def go(maze: List[List[Int]], start: Point, end: Point) = {<br>        visit(maze, start, end, Nil)<br>    }<br>    <br>    def visit(maze: List[List[Int]], pt: Point, <br>              end: Point, route: List[Point]): List[List[Point]] = {<br>        if(isVisitable(maze, pt, route)) {<br>            if(isEnd(pt, end)) {<br>                (end::route)::Nil <br>            } else {<br>                visit(maze, Point(pt.x, pt.y + 1), end, pt::route) ++<br>                visit(maze, Point(pt.x + 1, pt.y), end, pt::route) ++<br>                visit(maze, Point(pt.x, pt.y - 1), end, pt::route) ++<br>                visit(maze, Point(pt.x - 1, pt.y), end, pt::route)<br>            }<br>        } else {<br>            Nil<br>        }<br>    }<br>    <br>    def isVisitable(maze: List[List[Int]], pt: Point, route: List[Point]) = {<br>        maze(pt.x)(pt.y) == 0 &amp;&amp; !route.contains(pt)<br>    }<br>    <br>    def isEnd(pt: Point, end: Point) = {<br>        pt == end<br>    }<br>}<br><br>val maze = List(<br>                List(2, 2, 2, 2, 2, 2, 2, 2, 2),<br>                List(2, 0, 0, 0, 0, 0, 0, 0, 2),<br>                List(2, 0, 2, 2, 0, 2, 2, 0, 2),<br>                List(2, 0, 2, 0, 0, 2, 0, 0, 2),<br>                List(2, 0, 2, 0, 2, 0, 2, 0, 2),<br>                List(2, 0, 0, 0, 0, 0, 2, 0, 2),<br>                List(2, 2, 0, 2, 2, 0, 2, 2, 2),<br>                List(2, 0, 0, 0, 0, 0, 0, 0, 2),<br>                List(2, 2, 2, 2, 2, 2, 2, 2, 2)<br>            )<br><br>val allRoute = Mouse.go(maze, Point(1, 1), Point(7, 7))<br><br>allRoute.foreach( route =&gt;<br>    for(i &lt;- 0 until maze.length) {<br>        for(j &lt;- 0 until maze(i).length) {<br>            if(route.contains(Point(i, j))) {<br>                print("◇")<br>            } else {<br>                maze(i)(j) match {<br>                    case 0 =&gt; print("  ")<br>                    case 2 =&gt; print("█")<br>                }<br>            }<br>        }<br>        println()<br>    }<br>)<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>#encoding: Big5<br>class Mouse<br>    def self.go(maze, start, goal)<br>        visit(maze, start, goal, [], -&gt;(m, r) { yield(m, r) })<br>    end<br>    <br>    def self.visit(maze, pt, goal, route, take)<br>        if isVisitable(maze, pt, route)<br>            route &lt;&lt; pt<br>            if isGoal(route, goal)<br>                take.call(maze, route)<br>            else<br>                visit(maze, {x: pt[:x], y: pt[:y] + 1}, goal, route, take)<br>                visit(maze, {x: pt[:x] + 1, y: pt[:y]}, goal, route, take)<br>                visit(maze, {x: pt[:x], y: pt[:y] - 1}, goal, route, take)<br>                visit(maze, {x: pt[:x] - 1, y: pt[:y]}, goal, route, take)<br>            end<br>            route.pop<br>        end<br>    end<br>    <br>    def self.isVisitable(maze, pt, route)<br>        maze[pt[:x]][pt[:y]] == 0 and not route.include? pt<br>    end<br>   <br>    def self.isGoal(route, goal)<br>        route.include? goal<br>    end<br>end<br><br>maze = [<br>           [2, 2, 2, 2, 2, 2, 2, 2, 2],<br>           [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>           [2, 0, 2, 2, 0, 2, 2, 0, 2],<br>           [2, 0, 2, 0, 0, 2, 0, 0, 2],<br>           [2, 0, 2, 0, 2, 0, 2, 0, 2],<br>           [2, 0, 0, 0, 0, 0, 2, 0, 2],<br>           [2, 2, 0, 2, 2, 0, 2, 2, 2],<br>           [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>           [2, 2, 2, 2, 2, 2, 2, 2, 2]<br>       ]<br><br>Mouse.go(maze, {x: 1, y: 1}, {x: 7, y: 7}) do |maze, route|<br>    0.upto(maze.size - 1) do |i|<br>        0.upto(maze[i].size - 1) do |j|<br>            if route.include?({x: i, y: j})<br>                print "◇"<br>            else<br>                case maze[i][j]<br>                    when 0 then print "  "<br>                    when 2 then print "█"<br>                end<br>            end<br>        end<br>        puts<br>    end<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>var mouse = function() {<br>    function isVisitable(maze, pt) {<br>        return maze[pt.x][pt.y] === 0;<br>    }<br>    <br>    function isEnd(maze, end) {<br>        return maze[end.x][end.y] === 1;<br>    }<br>    <br>    return function visit(maze, pt, end, take) {<br>        if(isVisitable(maze, pt)) {<br>            maze[pt.x][pt.y] = 1;<br>            if(isEnd(maze, end)) {<br>                take(maze);<br>            }<br>            else {<br>                visit(maze, {x: pt.x, y: pt.y + 1}, end, take);<br>                visit(maze, {x: pt.x + 1, y: pt.y}, end, take);<br>                visit(maze, {x: pt.x, y: pt.y - 1}, end, take);<br>                visit(maze, {x: pt.x - 1, y: pt.y}, end, take);<br>            }<br>            maze[pt.x][pt.y] = 0;<br>        }<br>    };<br>}();<br><br>mouse([[2, 2, 2, 2, 2, 2, 2, 2, 2],<br>       [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>       [2, 0, 2, 2, 0, 2, 2, 0, 2],<br>       [2, 0, 2, 0, 0, 2, 0, 0, 2],<br>       [2, 0, 2, 0, 2, 0, 2, 0, 2],<br>       [2, 0, 0, 0, 0, 0, 2, 0, 2],<br>       [2, 2, 0, 2, 2, 0, 2, 2, 2],<br>       [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>       [2, 2, 2, 2, 2, 2, 2, 2, 2]],<br>      {x: 1, y: 1}, {x: 7, y: 7},<br>      function(maze) {<br>          var layout = '';<br>          maze.forEach(function(row) {<br>              row.forEach(function(block) {<br>                  switch(block) {<br>                      case 0: layout += '  '; break;<br>                      case 1: layout += '◇'; break;<br>                      case 2: layout += '█';<br>                  }<br>             });<br>             layout += '\n';<br>          });<br>          print(layout);<br>      });<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>mouse maze start end = visit maze start end []<br>    where visit maze pt end route = <br>              if isVisitable maze pt route then <br>                  if isEnd pt end then (end:route):[]<br>                  else visit maze (fst pt, snd pt + 1) end (pt:route) ++<br>                       visit maze (fst pt + 1, snd pt) end (pt:route) ++<br>                       visit maze (fst pt, snd pt - 1) end (pt:route) ++<br>                       visit maze (fst pt - 1, snd pt) end (pt:route)<br>              else []<br>                                    <br>          isVisitable maze pt route = <br>              maze !! fst pt !! snd pt == 0 &amp;&amp; not (pt `elem` route)<br>              <br>          isEnd pt end = pt == end<br>          <br>         <br>main = sequence[<br>          sequence [putStrLn row | row &lt;- toSymbol maze route] <br>          | route &lt;- mouse maze start end]<br>          <br>    where maze = [[2, 2, 2, 2, 2, 2, 2, 2, 2],<br>                  [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>                  [2, 0, 2, 2, 0, 2, 2, 0, 2],<br>                  [2, 0, 2, 0, 0, 2, 0, 0, 2],<br>                  [2, 0, 2, 0, 2, 0, 2, 0, 2],<br>                  [2, 0, 0, 0, 0, 0, 2, 0, 2],<br>                  [2, 2, 0, 2, 2, 0, 2, 2, 2],<br>                  [2, 0, 0, 0, 0, 0, 0, 0, 2],<br>                  [2, 2, 2, 2, 2, 2, 2, 2, 2]]<br>              <br>          start = (1, 1)<br>          end = (7, 7)<br>          <br>          width = length maze<br>          height = length $ maze !! 0<br>          <br>          toSymbol maze route = [[if (i, j) `elem` route then 'M' <br>                                  else case (maze !! i !! j) of <br>                                           0 -&gt; ' '<br>                                           2 -&gt; 'X' | j &lt;- [0..height - 1]<br>                                 ] | i &lt;- [0..width - 1]]<br></pre>
+<br>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/MouseGoMaze2.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:36 GMT -->
+</html>

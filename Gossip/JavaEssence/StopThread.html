@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/StopThread.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:10 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>停止執行緒</title></head>
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 停止執行緒</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你想要停止一個執行緒的執行，當你查看API時，你會發現Thread的<span style="font-weight: bold;">stop()</span>方法已經被標示為<span style="font-weight: bold;">deprecated</span>，使用這個方法來停止一個執行緒是不被建議的。<br>
+
+      <br>
+
+
+
+請見：<a href="http://java.sun.com/j2se/1.4.2/docs/guide/misc/threadPrimitiveDeprecation.html">Why Are Thread.stop, Thread.suspend, Thread.resume and Runtime.runFinalizersOnExit Deprecated?</a>&nbsp;<br>
+
+      <br>
+
+
+
+如果你想要停止一個執行緒，你最好自行實作。<br>
+
+      <br>
+
+
+
+一個執行緒要進入死亡（Dead）狀態，就是執行完run()方法，簡單的說，如果你想要停止一個執行緒的執行，就要<span style="font-weight: bold;">提供一個方式讓執行緒可以執行完run()，而這也是自行實作執行緒停止的基本概念。</span><br style="font-weight: bold;">
+
+      <br>
+
+
+
+例如，如果執行緒的run()方法中執行的是一個重複執行的迴圈，你可以提供一個控制旗標（Flag）來控制迴圈是否執行，藉此讓迴圈有可能終止、執行緒可以離開 run()方法以終止執行緒： <br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Some implements Runnable { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private boolean isContinue = true; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void terminate() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; isContinue = false; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void run() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; while(isContinue) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // ... some statements </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+如果執行緒因為執行sleep()或是wait()而進入阻斷（Blocked）或等待池（Wait）狀態，而你想要停止它，你可以使用interrupt()，而程式會丟出InterruptedException例外，因而使得執行緒
+離開run()方法。例如：</small> <br>
+
+
+
+
+      
+      <ul><li> Some.java </li></ul>
+
+
+
+
+      
+      <pre>public class Some implements Runnable {<br>    public void run() { <br>        System.out.println("sleep....going to not runnable"); <br>        try { <br>            Thread.sleep(9999); <br>        } <br>        catch(InterruptedException e) { <br>            System.out.println("I am interrupted...."); <br>        } <br>    } <br>} <br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul><li> Main.java </li></ul>
+
+
+
+
+      
+      <pre>public class Main { <br>    public static void main(String[] args) { <br>        Thread thread = new Thread(new Some()); <br>        thread.start(); <br>        thread.interrupt(); <br>    } <br>} <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+如果程式因為IO而進入阻斷狀態，基本上你必須等待IO完成才能離開阻斷狀態，你無法使用interrupt()來使得執行緒離開run()方法，你要提供替代的方法，基本上的概念也是引發一個例外，而這個例外要
+如何引發，要看你所使用的IO而定。<br><br>例如你使用readLine()在等待網路上的一個訊息，此時執行緒進入阻斷狀態直到讀到訊息，你要讓它離開run()的方法，就是由另一個執行緒呼叫close()關閉它的串流，這時會引發一個IOException例外而使得
+執行緒離開run()方法，例如：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Client implements Runnable { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private Socket skt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // ..... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void terminate() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; skt.close(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void run() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // ..... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BufferedReader buf = new BufferedReader(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new InputStreamReader(skt.getInputStream())); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 讀取客戶端訊息</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 執行readLine()會進入阻斷狀態</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 直到讀到客戶端訊息</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; while((userMessage = buf.readLine()) != null) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // .... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; catch(IOException e) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("執行緒被終止......."); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+上面這個程式是個簡單的架構示範，實際的設計必須視你的程式功能與IO類型而定。<br>
+
+      <br>
+
+
+
+除了stop()之外，<span style="font-weight: bold;">suspend()、resume()</span>方法也被標示為<span style="font-weight: bold;">"deprecated"</span>，這些方法如果你要達成相同的功能，你都必須自行實作，在將來新的Java版本中如果這些功能被實現，它也可能是新的介面，而不是使用現有的方法。<br>
+
+      <br>
+
+
+
+有關於執行緒的終止，還可以參考 <a href="../DesignPattern/TwoPhaseTermination.htm">Two-phase Termination 模式</a>。</small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/StopThread.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:10 GMT -->
+</html>

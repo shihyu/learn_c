@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/MathPI.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:48 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>蒙地卡羅法求 PI</title></head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Algorithm Gossip: 蒙地卡羅法求 PI</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 676px; vertical-align: top;">
+      <h2>&nbsp;說明</h2>
+      <small>蒙地卡羅為摩洛哥王國之首都，該國位於法國與義大利國境，以賭博聞名。蒙地卡羅的基本原理為以亂數配合面積公式來進行解題，這
+種以機率來解題的方式帶有賭博的意味，雖然在精確度上有所疑慮，但其解題的思考方向卻是個值得學習的方式。</small><br>
+      <h2>解法</h2>
+      <small>蒙地卡羅的解法適用於與面積有關的題目，例如求PI值或橢圓面積，這邊介紹如何求PI值；假設有一個圓半徑為1，所以四分之一
+圓面積就為PI，而包括此四分之一圓的正方形面積就為1，如下圖所示： </small><br>
+      <div style="text-align: center;"><img style="width: 352px; height: 170px;" alt="蒙地卡羅" title="蒙地卡羅" src="images/mathPI-1.jpg"></div>
+      <br>
+      <small>如果隨意的在正方形中投射飛標（點）好了，則這些飛標（點）有些會落於四分之一圓內，假設所投射的飛標（點）有n點，在圓內的
+飛標（點）有c點，則依比例來算，就會得到上圖中最後的公式。<br>
+      <br>
+至於如何判斷所產生的點落於圓內，很簡單，令亂數產生X與Y兩個數值，如果X^2+Y^2小於1就是落在圓內。 </small> <br>
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp;
+&nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp;
+      <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+      <ul>
+        <li><a name="C"></a> C </li>
+      </ul>
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br>#include &lt;time.h&gt; <br><br>#define N 50001<br><br>int main(void) { <br>    srand(time(NULL)); <br>    <br>    int sum = 0;<br>    <br>    int i;<br>    for(i = 1; i &lt; N; i++) { <br>        double x = (double) rand() / RAND_MAX; <br>        double y = (double) rand() / RAND_MAX; <br>        if((x * x + y * y) &lt; 1) {<br>            sum++; <br>        }<br>    } <br><br>    printf("PI = %f\n", (double) 4 * sum / (N - 1));<br>    <br>    return 0; <br>} <br></pre>
+      <br>
+      <ul>
+        <li> <a name="Java"></a>Java </li>
+      </ul>
+      <pre>import static java.lang.Math.*;<br>public class MonteCarlo {<br>    public static void main(String[] args) {<br>        final int N = 50001;<br>        int sum = 0; <br>        for(int i = 1; i &lt; N; i++) if(pow(random(), 2) + pow(random(), 2) &lt; 1) {<br>            sum++;<br>        }<br>        System.out.printf("PI = %f%n", 4.0 * sum / (N - 1));  <br>    }<br>}<br></pre>
+      <br>
+      <ul>
+        <li><a name="Python"></a>Python</li>
+      </ul>
+      <pre>from random import random<br>N = 50001<br>print("PI =", 4 * len([1 for i in range(1, N) <br>        if random() ** 2 + random() ** 2 &lt; 1]) / (N - 1))</pre>
+      <br>
+      <ul>
+        <li><a name="Scala"></a>Scala</li>
+      </ul>
+      <pre>import java.lang.Math._<br>val N = 50000<br>printf("PI = %f%n", 4.0 * (for(i &lt;- 1 to N<br>   if(pow(random(), 2) + pow(random(), 2) &lt; 1)) yield 1).size / N)</pre>
+      <br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>N = 50000<br>print "PI = ", 4.0 * (1...N).map { <br>    rand ** 2 + rand ** 2 &lt; 1 ? 1 : 0 }.reduce(:+) / N<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>Array.prototype.reduce = function(init, f) {<br>    var value = init;<br>    for(var i = 0; i &lt; this.length; i++) {<br>        value = f(value, this[i]);<br>    }<br>    return value;<br>};<br><br>function range(n) {<br>    var r = [];<br>    for(var i = 0; i &lt; n; i++) {<br>        r[i] = i;<br>    }<br>    return r;<br>}<br><br>var n = 50000;<br>print(4 * range(n).map(function() {<br>    var x = Math.random();<br>    var y = Math.random();<br>    return x * x + y * y &lt; 1 ? 1 : 0;<br>}).reduce(0, function(ac, elem) {<br>    return ac + elem;<br>}) / n);<br></pre>
+<br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>import System.Random<br><br>rand gen n= take n $ randomRs (0.0, 1.0) gen::[Float]<br><br>main = do<br>    gen1 &lt;- getStdGen<br>    gen2 &lt;- newStdGen<br>    let n = 50000<br>        ic = length [1 | (x, y) &lt;- <br>                 zip (rand gen1 n) (rand gen2 n), (x ** 2 + y ** 2) &lt; 1]<br>    print (4 * fromIntegral ic / fromIntegral n)<br></pre>
+      <br>
+      </td>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/MathPI.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:49 GMT -->
+</html>

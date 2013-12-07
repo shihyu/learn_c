@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ListTuple.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>List 與 Tuple</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: List 與 Tuple</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><a href="https://www.scala-lang.org/docu/files/api/scala/List.html">scala.List</a> 是有序的物件群集（Collection），與 <a href="Array.html">陣列</a>（或Java的List）不同的是，在Scala中，List是<span style="font-weight: bold;">不可變動的（Immutable）</span>，這表示你不可以改變物件的內容或狀態，就如同 <a href="String.html">字串</a> 一樣。<br><br>Scala鼓勵你使用或設計不可變動的物件，因為不可變動物件不會有複雜的狀態變化，你不用擔心物件在傳遞的過程中，不小心被改變了狀態，在多執行緒環境下，也不用擔心共用存取的競速（Race condition）問題。<br><br>在Scala中要建立List，必須使用工廠方法：<br></small><pre>val list = List(10, 20, 30)<br>for(i &lt;- 0 until list.length) {<br>    println(list(i))<br>}</pre><small><br>上例中，建立了一個List，內含元素10、20、30，要取得元素同樣是指定索引，索引可使用()的方式來指定，就如同陣列索引的指定方式，List是不可變動的，所以你無法使用list(0) = 20這樣的方式來改變List的元素內容。<br><br></small><small>List是抽象類別，你沒辦法直接用來建立實例，如果你要建立一個List物件，沒有任何的元素的話，可以使用List()或者是寫下Nil（Nil是List[Nothing]的實例）。List的==被定義為可以比較兩個List的元素是否相同，以下是個範例：<br></small><pre>val list1 = List(10, 20, 30)<br>val list2 = List(10, 20, 30)<br>val list3 = List(20, 30, 40)<br>println(list1 == list2)      // 顯示 true<br>println(list1 == list3)      // 顯示 false<br>println(List() == Nil)       // 顯示 true</pre><small><br>如果要在List中附加元素，可以使用::方法，不過要注意，::是將元素附加至List的前端，由於List是不可變動的，所以傳回的是新建立的List物件，例如：<br></small><pre>val list1 = List(10, 20, 30)<br>(5 :: list1).foreach(println)      // 逐行顯示 5、10、20、30<br><br>val list2 = 1 :: 2:: 3:: 4 :: Nil<br>list2.foreach(println)             // 逐行顯示 1、2、3、4</pre><small><br>上
+例中，還示範了如何從空List逐步附加元素。Scala沒有提供將元素附加至List後端的方法（其實本來是有+方法，不過已經被標示為
+deprecation，也就是廢棄不建議使用），將元素附加至List前端很快速，只需要常數時間（Constant
+time），但將元素附加至List後端，則會隨著List的長度而增加線性時間。<br><br>在 </small><small><a href="OperatorPrecedenceAssociativity.html">操作順序與關聯</a> 中有提過</small><small>，如果運算方法最後一個字元是:，其實該方法是屬於右邊物件，所以5 :: list1，其實是list1.::(5)，例如：<br></small><pre>val list1 = List(10, 20, 30)<br>list1.::(5).foreach(println)     // 逐行顯示 5、10、20、30</pre><small><br>如果你想串接兩個List，則可以使用:::方法，例如：<br></small><pre>val list1 = List(10, 20, 30)<br>val list2 = List(40, 50, 60)<br>(list1 ::: list2).foreach(println)  // 逐行顯示 10、20、30、40、50、60<br>list2.:::(list1).foreach(println)   // 逐行顯示 10、20、30、40、50、60</pre><small><br>:::同樣是以:結尾，所以是由右邊物件呼叫的方法，在上面的範例也有示範過了。如果你要將一個List附加至另一個List之後，其實也可以使用++方法，例如：<br></small><pre>val list1 = List(10, 20, 30)<br>val list2 = List(40, 50, 60)<br>(list1 ++ list2).foreach(println)  // 逐行顯示 10、20、30、40、50、60</pre><small><br>使用++似乎與使用:::的作用相同，不過有所不同的是，++是由左邊物件呼叫的方法，而++右邊的物件可以是 <a href="https://www.scala-lang.org/docu/files/api/scala/Iterable.html">scala.Iterable</a> 物件，而不用得是List，例如，你可以將陣列的元素內容附加至List之後：<br></small><pre>val list = List(10, 20, 30)<br>val arr = Array(40, 50, 60)<br>(list ++ arr).foreach(println)  // 逐行顯示 10、20、30、40、50、60</pre><small><br>如果你忽略:結尾的方法其實是由右邊物件呼叫，那麼有可能會發生像以下的錯誤：<br></small><pre>val list = List(10, 20, 30)<br>val arr = Array(40, 50, 60)<br>val result = (list ::: arr) // 這是錯的</pre><small><br>執行時會顯示的錯誤訊息如下，指出了:::並非陣列可呼叫的方法：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">...: error: value ::: is not a member of Array[Int]<br>val result = (list ::: arr)<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; ^<br></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+<br><small>你可以使用-從List中刪去指定的元素，注意所有符合的元素都會被刪掉：<br></small><pre>val list = List(10, 10, 20, 20, 30, 30)<br>(list - 20).foreach(println)             // 逐行顯示 10、10、30、30</pre><br><small>使用--的話，則可以刪去另一個List物件中所擁有的元素，例如：<br></small><pre>val list1 = List(10, 20, 30, 40, 50)<br>val list2 = List(20, 30)<br>(list1 -- list2).foreach(println)       // 逐行顯示 10、40、50</pre><br><small>List中的元素必須是相同的類型，如果你想要在某個群集物件中放置不同型態的物件，而且又要群集物件記得每個元素的型態，則可以使用Tuple（List中如果放置不同型態的物件，則List會全部視為 <a href="http://www.scala-lang.org/docu/files/api/scala/Any.html">scala.Any</a>，這是Scala所有類別的最頂層父類別，每個物件的型態資訊基本上就失去了，你必須自己記得放了什麼）。Tuple同樣是不可變動的。一個例子如下所示：<br></small><pre>val tuple = (10, "Justin", true)<br>println(tuple._1)   // 顯示 10<br>println(tuple._2)   // 顯示 Justin<br>println(tuple._3)   // 顯示 true</pre><br><small>注意到，存取元素時是使用_n的方式，而n是從1開始（這是來自其它有靜態型別tuple特性的語言傳統，如Haskell），由於Tuple中每個元素的型態資訊不同，因此無法僅靠像List或陣列的索引存取方式來記得型態資訊，因而給予每個元素個別的_n名稱。<br><br>在建立Tuple時，可以直接在()中指定元素，不過要注意的是，如果你的Tuple中只有一個元素，則必須使用Tuple()來定義，例如：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">val tuple = Tuple(1)</span></small><br></div><small><br></small><small>上例中，</small><small>Tuple其實是 <a href="http://www.scala-lang.org/docu/files/api/scala/Predef$object.html">scala.Predef</a> 中定義的名稱，如果你沒有使用上例的方式，而是直接用(1)，則會被視為定義一個整數，而非Tuple。Tuple的實際型態是根據它所包括的元素個數來決定（</small><small>包括參數化類型資訊</small><small>），例如：<br></small><pre>val tuple1 = (10, "Justin")<br>val tuple2 = (10, "Justin", true)<br>println(tuple1.getClass)  // 顯示 class scala.Tuple2<br>println(tuple2.getClass)  // 顯示 class scala.Tuple3</pre><small><br>上例中，tuple1的參數化類型為Tuple2[Int, String]，tuple2則為Tuple3[Int, String, Boolean]。Tuple最大的用途之一，就是可以同時指定多個變數，例如：<br></small><pre>val (id, name) = (123, "Justin")<br>println(id)           // 顯示 123<br>println(name)         // 顯示 Justin</pre><br><small>上例中，實際上宣告了兩個變數id與name，並被分別指定Tuple物件中對應的值。當你要從函式傳回兩個以上的物件時，這個特性就很有用：<br></small><pre>def info(data: String) = {<br>    // 作一些事情<br>    val id = 123           // 取得 id 了<br>    val name = "Justin"    // 取得名稱了<br>    (id, name)<br>}<br><br>val (id, name) = info("一些輸入資料")<br>println(id)          // 顯示 123<br>println(name)        // 顯示 Justin</pre><br><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ListTuple.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

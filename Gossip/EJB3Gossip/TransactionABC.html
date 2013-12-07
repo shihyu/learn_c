@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/TransactionABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>簡介交易</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 簡介交易</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+      </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>交
+易（Transaction）是一個單元工作（unit of
+work），包括一個起始點，標註交易開始，這個單元工作包括了數個步驟來完成，交易結束時的動作有兩個，數個步驟全部執行成功，交易才算成功並提交變
+更，只有當中有一個失敗，則整個交易宣告失敗並回復所有變更。<br>
+
+
+
+
+      <br>
+
+
+
+
+交易的參與者包括：起始與結束交易的應用程式、交易的資源管理者（像是資料庫、訊息服務、應用伺服器），交易管理者在交易涉及多個資源時，負責協調交易時
+的相關資源。<br>
+
+
+
+
+      <br>
+
+
+
+
+      </small><small>交易的四個基本要求是原子性（Atomicity）、一致性
+（Consistency）、隔離行為（Isolation behavior）與持續性（Durability），依英文字母首字簡稱為ACID。<br>
+
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>原子性</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>一個交易是一個單
+元工作，當中可能包括數個步驟，這些步驟要嘛全部執行成功，若有一個失敗，則整個交易宣告失敗，交易中其它步驟也必須撤消曾經執行過的動作，回到交易前的
+狀態，就像什麼事也沒有發生過。</small><br>
+
+
+
+
+      <br>
+
+
+
+
+      <small>在資料庫上執行單元工作為資料庫交易（database
+transaction），單元中每個步驟就是每一句SQL的執行，您要定義啟始一個交易邊界（通常是以一個BEGIN的指令開始），在所有的SQL語句
+下達之後，再整個COMMIT進行所有的操作變更，此時交易成功，或者是因為某個SQL的錯誤，而進行ROLLBACK的動作，此時交易失敗。<br>
+
+
+      <br>
+
+
+交易的三種基本型態有Flat Transaction、Nested Transaction與Chanied Transaction。<br>
+
+
+      </small></div>
+
+
+      
+      
+      <ul>
+
+
+        
+        
+        <ul>
+
+
+          <li><small>Flat Transaction</small></li>
+
+
+        
+        
+        </ul>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <div style="margin-left: 80px;"><small>交易中無其它交易，為一個單元操作，簡單的程式示意如下：<br>
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">begin transaction XXX</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">end transaction XXX</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      </small></div>
+
+
+      
+      
+      <ul>
+
+
+        
+        
+        <ul>
+
+
+          <li><small>Nested Transaction</small></li>
+
+
+        
+        
+        </ul>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <div style="margin-left: 80px;"><small>在交易中包括其它交易，外部交易要成功，內部交易必須全部成功，應用程式可以重試內部交易，若有外部交易回復，則內部所有交易都要回復，簡單的程式示意如下：<br>
+
+
+      </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">begin transaction XXX</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp;</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">begin transaction OOO</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; end transaction OOO</span></small><br>
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">begin transaction ZZZ</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; end transaction ZZZ</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">end transaction XXX</span></small><small><br>
+
+
+      </small></div>
+
+
+      
+      
+      <ul>
+
+
+        
+        
+        <ul>
+
+
+          <li><small>Chanied Transaction</small></li>
+
+
+        
+        
+        </ul>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <div style="margin-left: 80px;"><small>交易不僅有單一提交點，而可以有多個中斷點（break point），若要回復，則回復動作將至上一個中斷點，而非整個交易被回復。</small></div>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>
+
+      <br>
+
+
+
+
+      </small><small>該開始一個新的交易，或何時交易該被暫停，或者方法是否要在交易中進行，這是</small><small>由
+      <a href="TransactionDemarcation.html">交易</a></small><small><a href="TransactionDemarcation.html">區間（Transaction
+Demarcation）</a><a href="TransactionDemarcation.html"> </a>或稱</small><small>傳播行為（Propagation
+behavior）所定義，</small><small>它定義了交易的邊界（Boundaries）。</small><br>
+
+
+
+
+      <small> <br>
+
+
+
+
+      </small> </div>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>一致性</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>指交易所作用的資
+料集合在交易前後必須一致，也就是這組資料集合若交易成功，則整個資料集合都必須是交易操作後的狀態，若交易失敗，所整個資料集合必須與開始交易之前一樣
+完全沒有變更，不能發生整個資料集合，部份有變更，而部份沒變更的狀態。<br>
+
+
+
+
+      <br>
+
+
+
+
+例如轉帳的行為，A原有20000，B原有10000，A轉10000給B，交易成功的話，最後A必須變成10000，B變成20000，交易失敗的話，
+必須A為20000，B為10000，而不能發生A為20000（未扣款），B也為20000（已入款）的情況。</small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>隔離行為、隔離層級</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>在多人使用的環境
+下，每個使用者可能進行自己的交易，交易與交易之間，必須互不干擾，使用者不會意識到別的使用者正在進行交易，就好像只有自己在進行操作一樣。<br>
+
+
+
+
+      <br>
+
+
+隔離設定與</small><small>與特定的資源相關，並</small><small>不在 Java EE 規範之中。<br>
+
+
+      <br>
+
+
+您可以進一步參考：</small><small><big><a href="../HibernateGossip/IsolationLevel.html"><small>簡
+介隔離層級</small></a></big>。</small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>持續性</small></li>
+
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>交易一旦成功，則
+所有的變更必須保存下來，即使系統掛了，交易的結果也不能遺失，這個功能是建立在資料庫或相關資源伺服器之上。</small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在交易的定義上，可以使用宣告式（Declarative）或編程式（Programmatical）的方式，宣告式依賴於容器所提供的
+服務，可以在定義檔上定義交易邊界、隔離層級等，無需修改程式原始碼，而編程式的交易則是直接使用JDBC或相關框架的API，以撰寫原始碼的方式，</small><small>可
+以更細部的</small><small>定義交易邊界、隔離層級等資訊。</small><br>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/TransactionABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+</html>

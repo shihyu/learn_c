@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/GenericAlgorithm.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>泛型演算（Generic Algorithms）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">Frozm
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: 泛型演算（Generic Algorithms）</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>Qt
+的全域函式中，包括了一些適用Qt容器的泛型演算函式，像是qFind()可以指定容器直接進行搜尋，也可以指定起始與結束迭代器位址，進行指定值搜尋，
+若搜尋到則傳回該值的迭代器位址，若沒有找到，則傳回容器end()方法的迭代器位址。qSort()可以對容器進行排序。qBinaryFind()可
+以以二元搜尋的方式搜尋已遞增排序容器中指定的值。例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">QStringList list;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush" &lt;&lt; "justin";</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br>
+
+
+// 以下顯示momor、bush、justin &nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">QStringList::iterator i = qFind(list.begin(), list.end(), "momor");</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">while(i != list.end()) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; (*i).toAscii().data() &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; ++i;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">cout &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br>
+
+
+// 排序 &nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">qSort(list.begin(), list.end());<br>
+
+
+      <br>
+
+
+// 以下顯示momor<br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">QStringList::iterator j = qBinaryFind(list.begin(), list.end(), "momor");</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">while(j != list.end()) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp;&nbsp;&nbsp; cout &lt;&lt; (*j).toAscii().data() &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; ++j;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>qSort()預設使用遞增排序，如果要以遞減排序的方式，則可以傳入qGreater&lt;T&gt;()，類似的，qBinaryFind()也可以使用qGreater&lt;T&gt;()指定在遞減排序的容器中進行二元搜尋，例如：<br>
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; QStringList list;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush" &lt;&lt; "justin";</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br>
+
+
+      <span style="font-weight: bold;">&nbsp;<span style="font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; // 遞增排序</span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; qSort(list.begin(), list.end(), qGreater&lt;QString&gt;());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 以下顯示momor、justin、caterpillar、bush</span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; QStringList::const_iterator iterator = list.begin();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; while(iterator != list.end()) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; cout &lt;&lt; (*iterator).toAscii().data() &lt;&lt; endl;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ++iterator;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; QStringList::iterator j = qBinaryFind(list.begin(), list.end(), <br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; "caterpillar",
+qGreater&lt;QString&gt;());<br>
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 以下顯示caterpillar、bush</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; while(j != list.end()) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cout &lt;&lt; (*j).toAscii().data() &lt;&lt; endl;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ++j;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br>
+
+
+      </small><br>
+
+
+      <small>您也可以自定義排序規則，例如依字串長度進行排序：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">bool lengthLessThan(const QString &amp;str1, const QString &amp;str2) {</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; return str1.length() &lt; str2.length();</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">}</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      
+      
+      <div style="margin-left: 40px;"><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small>然後再指定給qSort()，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QStringList list;<br>
+
+
+list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush" &lt;&lt; "justin";<br>
+
+
+      <br>
+
+
+qSort(list.begin(), list.end(), lengthLessThan);<br>
+
+
+      <br>
+
+
+// 以下顯示bush、momor、justin、caterpillar<br>
+
+
+QStringList::const_iterator iterator = list.begin();<br>
+
+
+while(iterator != list.end()) {<br>
+
+
+&nbsp;&nbsp;&nbsp; cout &lt;&lt; (*iterator).toAscii().data() &lt;&lt; endl;<br>
+
+
+&nbsp;&nbsp;&nbsp; ++iterator;<br>
+
+
+}</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><br>
+
+
+      <small>與qSort()類似的qStableSort()，則是在比較兩個項目相同時，會保留兩個項目原有的先後順序。</small><br>
+
+
+      <br>
+
+
+      <small>在這邊僅列出幾個泛型演算的例子，更多泛型演算的函式，可以查詢Qt的 <a href="http://doc.trolltech.com/4.3.3/qtalgorithms.html">&lt;QtAlgorithms&gt; - Generic Algorithms</a> 中之介紹。</small><br>
+
+
+      <br>
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/GenericAlgorithm.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:42 GMT -->
+</html>

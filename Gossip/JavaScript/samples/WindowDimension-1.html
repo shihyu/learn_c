@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/WindowDimension-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:18 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <style type="text/css">
+            #message1 {
+                text-align: center;
+                vertical-align: middle;
+                color: #ffffff;
+                background-color: #ff0000;
+                width: 100px;
+                height: 50px;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function(event) {
+                function style(obj, prop) {
+                    if(window.getComputedStyle) {
+                        return window.getComputedStyle(obj, null)[prop];
+                    }
+                    else if(obj.currentStyle) {
+                        return obj.currentStyle[prop];
+                    }
+                    else {
+                        return null;
+                    }
+                }            
+                function opacity(element, value) {
+                    if(value === undefined) { // 取得不透明度
+                        var opt = style(element, 'opacity') 
+                                     || style(element, 'filter');
+                        if(opt === '') {
+                            return 1;
+                        }
+                        if(opt.indexOf('alpha') !== -1)  {
+                            return opt.substring(14, opt.length - 1) / 100;
+                        }
+                        return parseFloat(opt);
+                    }
+                
+                    if(style(element, 'opacity') !== undefined) {
+                        element.style.opacity = value;
+                    }
+                    else {
+                        element.style.filter = 
+                           'alpha(opacity=' + parseInt(value * 100) + ')';
+                    }
+                }            
+                function screenWidthHeight() {
+                    return {
+                        width: screen.width,
+                        height: screen.height
+                    };
+                }
+                
+                function screenAvailWidthHeight() {
+                    return {
+                        width: screen.availWidth,
+                        height: screen.availHeight
+                    };
+                }
+                
+                function windowXY() {
+                    var xy = {};
+                    if(window.screenX) {
+                        xy.x = window.screenX;
+                        xy.y = window.screenY;
+                    }
+                    else if(window.screenLeft) {
+                        xy.x = window.screenLeft;
+                        xy.y = window.screenTop;
+                    }
+                    return xy;
+                }
+                
+                function windowWidthHeight() {
+                    var wh = {};
+                    if(window.outerWidth) {
+                        wh.width = window.outerWidth;
+                        wh.height = window.outerHeight;
+                    }
+                    else if(document.documentElement.offsetWidth) {
+                        wh.width = document.documentElement.offsetWidth;
+                        wh.height = document.documentElement.offsetHeight;
+                    }
+                    else if(document.body.offsetWidth) {
+                        wh.width = document.body.offsetWidth;
+                        wh.height = document.body.offsetHeight;
+                    }
+                    return wh;
+                }
+                
+                function htmlWidthHeight() {
+                    return {
+                        width: window.documentElement.scrollWidth,
+                        height: window.documentElement.scrollHeight
+                    };
+                }
+                
+                function bodyWidthHeight() {
+                    return {
+                        width: window.body.scrollWidth,
+                        height: window.body.scrollHeight
+                    };
+                }
+                
+                function viewPortWidthHeight() {
+                    var wh = {};
+                    if(window.innerWidth) {
+                        wh.width = window.innerWidth;
+                        wh.height = window.innerHeight;
+                    }
+                    else if(document.documentElement.clientWidth) {
+                        wh.width = document.documentElement.clientWidth;
+                        wh.height = document.documentElement.clientHeight;
+                    }
+                    else if(document.body.clientWidth) {
+                        wh.width = document.body.clientWidth;
+                        wh.height = document.body.clientHeight;
+                    }
+                    return wh;
+                }
+                
+                function scrollXY() {
+                    var xy = {};
+                    if(window.pageXOffset) {
+                        xy.x = window.pageXOffset;
+                        xy.y = window.pageYOffset;
+                    }
+                    else if(document.documentElement.srollLeft) {
+                        xy.x = document.documentElement.srollLeft;
+                        xy.y = document.documentElement.srollTop;
+                    }
+                    else if(document.body.srollLeft) {
+                        xy.x = document.body.srollLeft;
+                        xy.y = document.body.srollTop;
+                    }
+                    return xy;
+                }
+                
+                var message1 = document.getElementById('message1');
+                opacity(message1, 0.5);
+                
+                var viewPortWH = viewPortWidthHeight();
+                
+                message1.style.width = viewPortWH.width + 'px';
+                message1.style.paddingTop = viewPortWH.height / 2 + 'px'
+                message1.style.height = viewPortWH.height / 2 + 'px';
+                
+                document.getElementById('confirm').onclick = function() {
+                    message1.style.width = '0px';
+                    message1.style.height = '0px';
+                    message1.style.paddingTop = '0px';
+                    message1.style.display = 'none';
+                };
+            };
+        </script>        
+    </head>
+    <body>
+        這些是一些文字<br>這些是一些文字<br>這些是一些文字<br>
+        <button>其它元件</button>
+        <div id="message1">
+            看點廣告吧！<br><br>
+            <button id="confirm">確定</button>
+        </div>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/WindowDimension-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:18 GMT -->
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/NOfM.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>m 元素清單的 n 元素子清單</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip:&nbsp;m 元素清單的 n 元素子清單</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+      
+      <h2>說明</h2>
+
+      <small>
+
+假設有個清單擁有m個元素，任意從清單中取出n個元素，則這n個元素形成的可能子清單有哪些？</small><br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+假設有5個元素的清單，任意取出3個元素的可能子清單如下：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">[1 2 3]<br>
+[1 2 4]<br>
+[1 2 5]<br>
+[1 3 4]<br>
+[1 3 5]<br>
+[1 4 5]<br>
+[2 3 4]<br>
+[2 3 5]<br>
+[2 4 5]<br>
+[3 4 5]</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+這些子清單示範使用字典順序排列，如此可觀察出一些規則：<br>
+
+      </small>
+
+      
+      <ol>
+
+        <li><small>如果最右元素小於m，該元素遞增1</small></li>
+
+        <li><small>如果清單list最右元素等於m，則遞增1的位置pos為第一個list[pos + 1] - list[pos] &gt; 1的位置</small></li>
+
+        <li><small>每次遞增1的位置往左移後，必須重新調整右邊的元素為遞減順序</small></li>
+
+      
+      </ol>
+
+
+
+      <small><br>
+
+
+
+關鍵在於哪個位置必須進行加1動作，到底是最右位置要加1？還是其它位置？</small>
+
+      <br>
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>#define MAX 20 <br><br>void init(int*, int);<br>int position(int*, int, int);<br>void next(int*, int, int);<br>void print(int*, int);<br><br>int main(void) { <br>    int list[MAX] = {0};<br>    int m, n; <br>    <br>    printf("清單個數 m："); <br>    scanf("%d", &amp;m); <br>    printf("取出個數 n："); <br>    scanf("%d", &amp;n); <br>    <br>    init(list, n);<br>    print(list, n);<br>    while(hasNext(list, m, n)) {<br>        next(list, m, n);<br>        print(list, n);<br>    } <br><br>    return 0; <br>}<br><br>void init(int* list, int n) {<br>    int i;<br>    for(i = 0; i &lt; n; i++) { list[i] = i + 1; }<br>}<br><br>int position(int* list, int m, int n) {<br>    if(list[n - 1] != m) {<br>        return n - 1;<br>    }<br>    else {<br>        int pos = n - 2;<br>        while(list[pos + 1] - list[pos] == 1) { pos--; }<br>        return pos;<br>    }<br>}<br><br>int hasNext(int* list, int m, int n) {<br>    return list[0] &lt; m - n + 1;<br>}<br><br>void next(int* list, int m, int n) {<br>    int pos = position(list, m, n);<br>    list[pos]++; <br>    int i;<br>    for(i = pos + 1; i &lt; n; i++) { list[i] = list[i - 1] + 1; }<br>}<br><br>void print(int* list, int n) {<br>    int i;        <br>    for(i = 0; i &lt; n; i++) { printf("%d ", list[i]); }<br>    putchar('\n'); <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>import java.util.*;<br><br>public class SubList {<br>    public static class IdxArray&lt;T&gt; {<br>        private int m;<br>        private int[] idxArray;<br>        <br>        private IdxArray(int m, int[] idxArray) {<br>            this.m = m;<br>            this.idxArray = idxArray;<br>        }<br>        <br>        public boolean hasNext() {<br>            return idxArray[0] &lt; m - idxArray.length;<br>        }<br>        <br>        public IdxArray&lt;T&gt; next() {            <br>            int[] idxArr = Arrays.copyOf(idxArray, idxArray.length);<br>            int pos = position();<br>            idxArr[pos]++;<br>            for(int i = pos + 1; i &lt; idxArr.length; i++) {<br>                idxArr[i] = idxArr[i - 1] + 1;<br>            }<br>            return new IdxArray&lt;&gt;(m, idxArr);<br>        }<br>        <br>        public List&lt;T&gt; toList(List&lt;T&gt; src) {<br>            List&lt;T&gt; lt = new ArrayList&lt;&gt;();<br>            for(int idx : idxArray) { lt.add(src.get(idx)); }<br>            return lt;<br>        }<br>        <br>        private int position() {<br>            if(idxArray[idxArray.length - 1] != m - 1) {<br>                return idxArray.length - 1;<br>            }<br>            else {<br>                int pos = idxArray.length - 2;<br>                while(idxArray[pos + 1] - idxArray[pos] == 1) { pos--; }<br>                return pos;<br>            }<br>        }<br>        <br>        public static &lt;T&gt; IdxArray&lt;T&gt; get(int m, int n) {<br>            int[] idxArray = new int[n];<br>            for(int i = 0; i &lt; n; i++) {<br>                idxArray[i] = i;<br>            }<br>            return new IdxArray&lt;&gt;(m, idxArray);<br>        }<br>    }<br>    <br>    public static &lt;T&gt; List&lt;List&lt;T&gt;&gt; from(List&lt;T&gt; src, int n) {<br>        IdxArray&lt;T&gt; idxArray = IdxArray.get(src.size(), n);<br>        List&lt;List&lt;T&gt;&gt; all = new ArrayList&lt;&gt;();<br>        all.add(idxArray.toList(src));<br>        while(idxArray.hasNext()) {<br>            idxArray = idxArray.next();<br>            all.add(idxArray.toList(src));<br>        }<br>        return all;<br>    }<br><br>    public static void main(String[] args) {<br>        List&lt;Integer&gt; src = Arrays.asList(1, 2, 3, 4, 5);<br>        for(List&lt;Integer&gt; lt : from(src, 3)) {<br>            System.out.println(lt);<br>        }<br>    }<br>}</pre>
+
+
+
+      <br><ul><li><a name="Python"></a>Python</li></ul><pre>class IdxArray:<br>    def __init__(self, m, idxArray):<br>        self.m = m<br>        self.idxArray = idxArray<br>        <br>    def position(self):<br>        idxArray = self.idxArray<br>        def oneDif(pos):<br>            return (oneDif(pos - 1) <br>                if idxArray[pos + 1] - idxArray[pos] == 1 else pos)<br>        return (len(idxArray) - 1 <br>                   if idxArray[len(idxArray) - 1] != self.m - 1 <br>                   else oneDif(len(idxArray) - 2))<br>        <br>    def hasNext(self):<br>        return self.idxArray[0] &lt; self.m - len(self.idxArray)<br>        <br>    def next(self):<br>        pos = self.position()<br>        idxArray = self.idxArray<br>        return IdxArray(self.m, idxArray[0:pos] +<br>            list(range(idxArray[pos] + 1, <br>                idxArray[pos] + 1 + len(idxArray) - pos)))<br>        <br>    def toList(self, src):<br>        return [src[idx] for idx in self.idxArray]<br><br>    @staticmethod    <br>    def subList(m, n):<br>        return IdxArray(m, list(range(n)))<br>    <br>def subLts(src, n):<br>    def iter(idxArray):<br>        return ([idxArray.toList(src)] + <br>            (iter(idxArray.next()) if idxArray.hasNext() else []))<br>    return iter(IdxArray.subList(len(src), n))<br>    <br>for lt in subLts([1, 2, 3, 4, 5], 3):<br>    print(lt)<br></pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>class IdxList[T] private (m: Int, idxList: List[Int]) {<br>    def pos = {<br>        def oneDif(p: Int): Int = {<br>            if(idxList(p + 1) - idxList(p) == 1) oneDif(p - 1) <br>            else p<br>        }<br>        if(idxList(idxList.size - 1) != m - 1) idxList.size - 1 <br>        else oneDif(idxList.size - 2)<br>    }<br>    <br>    def hasNext = idxList(0) &lt; m - idxList.size<br>    <br>    def next = {<br>        new IdxList[T](m, idxList.slice(0, pos) ++ <br>          ((idxList(pos) + 1) to (idxList(pos) + idxList.size - pos)).toList)<br>    }<br>    <br>    def toList(src: List[T]) = <br>        (for(idx &lt;- idxList) yield src(idx)).toList<br>}<br><br>object IdxList {<br>    def apply[T](m: Int, n: Int) = new IdxList[T](m, (0 until n).toList)<br>}<br><br>def from[T](src: List[T], n: Int) = {<br>    def iter(idxList: IdxList[T]): List[List[T]] = {<br>        idxList.toList(src) :: <br>            (if(idxList.hasNext) iter(idxList.next) else Nil)<br>    }<br>    iter(IdxList(src.size, n))<br>}<br><br>from(List(1, 2, 3, 4, 5), 3).foreach(println)<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>class IdxList<br>    def initialize(m, idxArray)<br>        @m = m<br>        @idxArray = idxArray<br>    end<br>        <br>    def pos<br>        oneDif = -&gt;(p) {<br>            @idxArray[p + 1] - @idxArray[p] == 1 ? oneDif.call(p - 1) : p<br>        }<br>        @idxArray[@idxArray.size - 1] != @m - 1 ? <br>            @idxArray.size - 1 : oneDif.call(@idxArray.size - 2)<br>    end<br>        <br>    def hasNext<br>        @idxArray[0] &lt; @m - @idxArray.size<br>    end<br>        <br>    def next<br>        IdxList.new(@m, <br>            @idxArray[0...pos] + ((@idxArray[pos] + 1) ..<br>                (@idxArray[pos] + @idxArray.size - pos)).to_a<br>        )<br>    end<br>        <br>    def toList(src)<br>        @idxArray.map {|idx| src[idx]}<br>    end<br><br>    def self.subList(m, n)<br>        IdxList.new(m, (0...n).to_a)<br>    end<br>end<br><br>def subLts(src, n)<br>    iter = -&gt;(idxArray) {<br>        [idxArray.toList(src)] + <br>            (idxArray.hasNext ? iter.call(idxArray.next) : [])<br>    }<br>    iter.call(IdxList.subList(src.size, n))<br>end<br><br>subLts([1, 2, 3, 4, 5], 3).each do |lt|<br>    print("#{lt}\n")<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>function IdxArray(m, idxArray) {<br>    this.m = m;<br>    this.idxArray = idxArray;<br>}<br><br>IdxArray.prototype.hasNext = function() {<br>    return this.idxArray[0] &lt; this.m - this.idxArray.length;<br>};<br><br>IdxArray.prototype.position = function() {<br>    if(this.idxArray[this.idxArray.length - 1] != this.m - 1) {<br>        return this.idxArray.length - 1;<br>    }<br>    else {<br>        var pos = this.idxArray.length - 2;<br>        while(this.idxArray[pos + 1] - this.idxArray[pos] == 1) { pos--;}<br>        return pos;<br>    }<br>};<br><br>IdxArray.prototype.next = function() {<br>    var pos = this.position();<br>    var idxArr = this.idxArray.slice(0, pos);<br>    idxArr.push(this.idxArray[pos] + 1);<br>    for(var i = pos + 1; i &lt; this.idxArray.length; i++) {<br>        idxArr.push(idxArr[i - 1] + 1);<br>    }<br>    return new IdxArray(this.m, idxArr);<br>};<br><br>IdxArray.prototype.toList = function(src) {<br>    return this.idxArray.map(function(idx) { return src[idx]; });<br>};<br><br>IdxArray.get = function(m, n) {<br>    var idxArray = [];<br>    for(var i = 0; i &lt; n; i++) { idxArray.push(i); }<br>    return new IdxArray(m, idxArray);<br>};<br><br>function from(src, n) {<br>    var idxArray = IdxArray.get(src.length, n);<br>    var all = [];<br>    all.push(idxArray.toList(src));<br>    while(idxArray.hasNext()) {<br>        idxArray = idxArray.next();<br>        all.push(idxArray.toList(src));<br>    }<br>    return all;<br>}<br><br>from([1, 2, 3, 4, 5], 3).forEach(function(lt) { print(lt); });<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>data IdxList = IdxList Int [Int] deriving (Show)<br><br>hasNext (IdxList m idxLt)= idxLt !! 0 &lt; m - length idxLt<br><br>pos (IdxList m idxLt) =<br>    if idxLt !! (length idxLt - 1) /= m - 1 then length idxLt - 1<br>    else oneDif (length idxLt - 2)<br>    where <br>        oneDif p =<br>            if idxLt !! (p + 1) - idxLt !! p == 1 then oneDif $ p - 1<br>            else p<br><br>next idxList@(IdxList m idxLt) = <br>    IdxList m (take p idxLt ++ <br>        [(idxLt !! p + 1) .. (idxLt !! p + length idxLt - p)])<br>    where p = pos idxList<br><br>toList (IdxList _ idxLt) src = [src !! idx | idx &lt;- idxLt]<br><br>get m n = IdxList m [0 .. n - 1]<br><br>from src n = iter $ get (length src) n<br>    where<br>        iter idxList = <br>            toList idxList src : if hasNext idxList <br>                                    then iter $ next idxList<br>                                    else []<br>                                    <br>main = sequence [print lt | lt &lt;- from [1, 2, 3, 4, 5] 3]<br></pre>
+      <br>
+
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/NOfM.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+</html>

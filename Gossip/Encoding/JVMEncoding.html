@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/JVMEncoding.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>JVM 預設編碼</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: JVM 預設編碼<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果在正體中文Windows中，</small><small>你使用以下的程式來讀取內含「測試」文字的檔案：<br>
+      </small>
+      <pre>import java.io.*;<br>public class Main {<br>    public static void main(String[] args) throws Exception {<br>        BufferedReader reader = new BufferedReader(new FileReader(args[0]));<br>        System.out.println(reader.readLine());<br>        reader.close();<br>    }<br>}<br></pre>
+      <span style="font-family: Courier New,Courier,monospace;"><br>
+      </span>
+      <small>如果該檔案是使用MS950處理，那上面的程式可以正確讀出並顯示「測試」，如果文字檔案不是MS950，那就會顯示亂碼，例如，假設是UTF-8儲存「測試」的文字檔案：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main sample.txt<br>
+皜祈岫<br>
+</span></small></td></tr></tbody>
+      
+      </table>
+
+
+
+      <br>
+      <small>有些API若不指定編碼，通常會使用JVM<span style="font-family: Courier New,Courier,monospace;">預設編碼，預設會與作業系統預設編碼相同，可以使用Charset.defaultCharset()取得預設編碼，</span>在API中，有許多API若不指定編碼，就會採用JVM預設編碼，像是<span style="font-family: Courier New,Courier,monospace;">String建構式、getBytes()方法或這邊看到的FileReader等。<br>
+      <br>
+為了要正確讀取文字檔案，你要使用InputStreamReader，將讀入的位元組指定編碼進行字串轉換。例如：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>import java.io.*;<br>public class Main {<br>    public static void main(String[] args) throws Exception {<br>        BufferedReader reader = new BufferedReader(<br>            new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));<br>        System.out.println(reader.readLine());<br>        reader.close();<br>    }<br>}<br></pre>
+      <br>
+      <small>在正體中文Windows中，如下執行這個程式讀取UTF-8的文字檔案就可以正確顯示「測試」：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main sample.txt<br>
+測試</span></small></td></tr></tbody>
+      </table>
+      <br>
+      <small>在啟動JVM時，其實可以使用<span style="font-weight: bold;">-Dfile.encoding</span>指定JVM預設編碼，例如：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java -Dfile.encoding=UTF-8 Main sample.txt<br>
+皜祈岫</span></small></td></tr></tbody>
+      </table>
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">這次你看到了亂碼，這是因為System.out實際上是PrintStream實例，</span>會使用JVM預設編碼輸出文字，就上例而言，<span style="font-family: Courier New,Courier,monospace;">System.out使用UTF-8</span>輸出了文字，但你的Console顯示時是使用什麼編碼呢？<br>
+      <br>
+程式都是正確的，問題是出在Console，這不單是發生在Windows的Console，也常有程式設計人員指著IDE中的Console問，為什麼看到亂碼或問號，請改變一下你的Console顯示編碼！要不然，在程式中改變一下<span style="font-family: Courier New,Courier,monospace;">System.out</span>的編碼處理：<br>
+      </small>
+      <pre>import java.io.*;<br>public class Main {<br>    public static void main(String[] args) throws Exception {<br>	System.setOut(new PrintStream(System.out, true, "Big5"));<br>		<br>        BufferedReader reader = new BufferedReader(new FileReader(args[0]));<br>        System.out.println(reader.readLine());<br>        reader.close();<br>    }<br>}<br></pre>
+      <small><br>
+在這個程式中，不指定<span style="font-family: Courier New,Courier,monospace;">FileReader</span>的讀取，所以會使用JVM預設編碼，而<span style="font-family: Courier New,Courier,monospace;">System.out</span>會用Big5，所以讀取UTF-8文字檔案時，若如下：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java -Dfile.encoding=UTF-8 Main sample.txt<br>
+測試</span></small></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>由於</small><small>指定了</small><small>JVM預設編碼為UTF-8，所以程式中的<span style="font-family: Courier New,Courier,monospace;">FileReader</span>會用UTF-8讀取文字檔案，而輸出至主控台時，使用Big5編碼進行處理。<br>
+      <br>
+使用某些API時，最好明確指定使用何種編碼，或者至少，要確認你的JVM預設編碼到底是什麼，以及API是否使用JVM預設編碼。<br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/JVMEncoding.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+</html>

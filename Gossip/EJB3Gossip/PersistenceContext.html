@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/PersistenceContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Persistence Context</title>
+
+
+</head>
+
+
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">EJB3 Gossip:
+Persistence Context</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>PersistenceContext
+是個由 <a href="EntityManager.html">EntityManager</a>
+管理的集合物件，其管理一堆Entity實例，Entity在PersistenceContext的Persistence
+scope管理期間為Managed狀態。<br>
+
+      <br>
+
+若為Container</small><small>-Managed EntityManager，可透過</small><small>@PersistenceContext
+的type來設定PersistenceContext的存活範圍為以交易為範圍，或是為延伸範圍，若為</small><small>Application-Managed
+EntityManager，則PersistenceContext存活範圍在EntityManager建立與關閉之間，</small><small>這
+在 </small><small><big><a href="EntityManagerScope.html"><small>EntityManager&amp;
+nbsp;範圍</small></a></big> </small><small>有
+說明。<br>
+
+      <br>
+
+PersistenceContext管理的Entity為Managed狀態，基本上此時你對Entity實例的任何屬性變動，
+PersistenceContext都會將之對應至資料庫的變動，不過每次在程式中一旦變動Entity就作資料庫IO會有效能議題，因此實際上對
+Entity的變動，不會馬上反應出資料庫中，而是會等到EntityManager作了flush()之後，在這之前對Entity的變動，會被收集起
+來，再一次進行資料庫的變更。<br>
+
+      <br>
+
+EntityManager的flush()執行時機可能在：<br>
+
+      </small>
+      <ul>
+
+        <li><small>flush()的FlushModeType預設是AUTO時：</small></li>
+
+        <ul>
+
+          <li><small>如果是Transaction-scoped EntityManager，在</small><small>交
+易確認時會flush()。</small></li>
+
+          <li><small>如果是Extended-scoped EntityManager，或者</small><small>Application-Managed
+EntityManager，則</small><small>是在EntityManager關閉時flush()</small><small>。</small></li>
+
+        </ul>
+
+        <li><small>如果查詢某個實體前，該實體有變動，則會先flush()再進行查詢。</small></li>
+
+        <li><small>主動呼叫EntityManager的flush()方法。<br>
+
+          </small></li>
+
+      </ul>
+
+      <small><br>
+
+可以使用EntityManager的setFlushMode()設定</small><small>FlushModeType，
+預設是</small><small>FlushModeType.</small><small>AUTO，
+可以設定為</small><small>FlushModeType.COMMIT，則只有在您主動確認一個交易，才會進行
+flush()，如果您設定</small><small>FlushModeType.COMMIT，在查詢資料之前若
+Entity有變動，則您要主動flush()，再進行查詢，才不致查詢到舊資料。<br>
+
+      <br>
+
+由於PersistenceContext的Persistence Scope存活期間會管理Entity，所以在大量儲存物件時，</small><small>PersistenceContext
+中管理的Entity實例會不斷的增加，甚至最後導致</small><small>OutOfMemoryError，</small><small>可
+以主動每隔一段時間使用EntityManager的flush()強制同步Entity與資料庫，再使用clear()清除
+PersistenceContext中管理的Entity實例。</small><br>
+
+      <small><br>
+
+      <br>
+
+      <br>
+
+      </small><small><br>
+
+      <br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/PersistenceContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+</html>

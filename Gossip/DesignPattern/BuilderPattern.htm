@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/BuilderPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:03 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Builder 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern: Builder 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br>      
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>如果您有個物件必須建立，物件是由個別組件（Component）組合而成，個別組件建立非常複雜，但說明如何運用組件建立非
+常簡單，您希望將<span style="font-weight: bold;">建立複雜組件</span>與<span style="font-weight: bold;">運用組件方式</span>分離，則可以使用Builder模式。<br>
+      <br>
+舉
+例來說，您想要建立一個迷宮產生程式，迷宮使用二維陣列來定義，0表示道路，1表示牆，2表示寶物，根據所定義的二維迷宮陣列，您想要程式自動產生各種不
+同材質的迷宮，例如磚牆迷宮，鑽石迷宮等。在不同的繪圖引擎下，建立各種材質非常複雜，但建立迷宮的表達方式很簡單，像是這邊要道牆，那邊要條路，旁邊要
+放個寶藏之類的。<br>
+      <br>
+您可以在程式中定義兩個角色，一個是指導迷宮建立流程的MazeDirector角色，一個是建立迷宮中每個區塊的MazeBuilder角色：<br>
+      </small>
+      <pre>interface Maze {<br>    public void paint();<br>}<br><br>interface MazeBuilder {<br>    void buildRoad(int i, int j);<br>    void buildWall(int i, int j);<br>    void buildTreasure(int i, int j);<br>    Maze getMaze();<br>}<br><br>class MazeDirector {<br>    private int[][] maze;<br>    private MazeBuilder builder;<br>    <br>    MazeDirector(int[][] maze, MazeBuilder builder) {<br>    	this.maze = maze;<br>    	this.builder = builder;<br>    }<br>    <br>    Maze build() {<br>        for(int i = 0; i &lt; maze.length; i++) {<br>            for(int j = 0; j &lt; maze[i].length; j++) {<br>                switch (maze[i][j]) {<br>                    case 0:<br>                    	builder.buildRoad(i, j);<br>                        break;<br>                    case 1:<br>                    	builder.buildWall(i, j);<br>                        break;<br>                    case 2:<br>                    	builder.buildTreasure(i, j);<br>                        break;<br>                }<br>            }<br>        }<br>        return builder.getMaze();<br>    }<br>}</pre>
+      <small> <br>
+您可以實作不同的MazeBuilder，使用不同的材質來建立迷宮中每個區塊，例如：<br>
+      </small>
+      <pre>class PlainBuilder implements MazeBuilder {<br>    private char[][] maze;<br>	<br>    PlainBuilder(int i, int j) {<br>	this.maze = new char[i][j];<br>    }<br>    public void buildRoad(int i, int j) {<br>        maze[i][j] = '　';<br>    }<br>    public void buildWall(int i, int j) {<br>        maze[i][j] = '□';<br>    }<br>    public void buildTreasure(int i, int j) {<br>        maze[i][j] = '★';<br>    }<br><br>    @Override<br>    public Maze getMaze() {<br>	return new Maze() {<br>		@Override<br>		public void paint() {<br>                    for(char[] row : maze) {<br>                        for(char ele : row) {<br>                            System.out.print(ele);<br>                        }<br>                        System.out.println();<br>                    }<br>		}<br>             };<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        final int[][] material = {<br>                {1, 1, 1, 1, 1, 1, 1}, <br>                {1, 0, 0, 0, 0, 2, 1}, <br>                {1, 0, 1, 0, 1, 0, 1}, <br>                {1, 0, 2, 1, 0, 1, 1}, <br>                {1, 1, 0, 1, 0, 1, 1}, <br>                {1, 0, 0, 2, 0, 0, 1}, <br>                {1, 1, 1, 1, 1, 1, 1}};<br><br>        MazeDirector director = new MazeDirector(material, <br>                new PlainBuilder(material.length, material[0].length));<br>        director.build().paint();<br>    }<br>}</pre>
+      <small><br>
+乍看之下，Builder模式與 </small><small><a href="AbstractFactory.htm">Abstract
+Factory 模式</a> 很類似，其中最主要的差別在於，Abstract
+Factory模式著重在不同的工廠實作提供不同的一組產品給組件使用，產品之間並不見得有<span style="font-weight: bold;">「部份」（Part of）</span>的概念。Builder模式則強調Builder中
+所建立的組件，彼此之間有著</small><small>「部份」（Part
+of）的概念，並依Director的流程來建立組件與組件之間的關係，也就是說，<span style="font-weight: bold;">Builder
+組件建立</span>與<span style="font-weight: bold;">Director流程指導</span>之間為彼此合作關
+係（為強調出兩者關係，或許取名叫Director-Builder模式會更適合）。<br>
+      </small><small><br>
+可以使用下面的UML 類別圖來表示Builder模式：<br>
+      <img style="width: 633px; height: 212px;" alt="" src="images/Builder-1.jpg"><br>
+      </small><small><br>
+      </small><small>圖中Builder介面指的是，物件必須具有</small><small>Builder所定義之公開協
+定，而非專指Java中的interface定義。</small><small>對於靜態語言來說，例如Java，必須使用型態來宣告變數，因此根據需
+求，可以使用interfact或abstract class來定義Builder</small><small>所定義之公開協定。對於動態語言來
+說，例如Python，真正的型態資訊是在物件之上（而非變數），因此要求的是物件必須具有</small><small>Buildert之公開方法
+（無論是「哪一種」物件）</small>。<small>若以Python實作，以下是個參考範例：<br>
+      </small>
+      <pre>class Maze:<br>    def __init__(self, maze):<br>        self.maze = maze<br>    def paint(self):<br>        for row in self.maze:<br>            for c in row:<br>                print(c, end="")<br>            print()<br>        <br>class MazeBuilder:<br>    def __init__(self, row, column):<br>        self.maze = [[''] * column for i in range(row)]<br>    def buildRoad(self, i, j):<br>        self.maze[i][j] = '　'<br>    def buildWall(self, i, j):<br>        self.maze[i][j] = '□'        <br>    def buildTreasure(self, i, j):<br>        self.maze[i][j] = '★'<br>    def getMaze(self):<br>        return Maze(self.maze)<br><br>class MazeDirector:<br>    def __init__(self, maze, builder):<br>       self.maze = maze<br>       self.builder = builder<br>    def build(self):<br>        for i in range(len(self.maze)):<br>            for j in range(len(self.maze[i])):<br>                if self.maze[i][j] == 0:<br>                    self.builder.buildRoad(i, j)<br>                elif self.maze[i][j] == 1:<br>                    self.builder.buildWall(i, j)<br>                elif self.maze[i][j] == 2:<br>                    self.builder.buildTreasure(i, j)<br>        return builder.getMaze()<br><br>material = [[1, 1, 1, 1, 1, 1, 1], <br>            [1, 0, 0, 0, 0, 2, 1], <br>            [1, 0, 1, 0, 1, 0, 1], <br>            [1, 0, 2, 1, 0, 1, 1], <br>            [1, 1, 0, 1, 0, 1, 1], <br>            [1, 0, 0, 2, 0, 0, 1], <br>            [1, 1, 1, 1, 1, 1, 1]]<br>            <br>builder = MazeBuilder(len(material), len(material[0]))<br>director = MazeDirector(material, builder)<br>director.build().paint()</pre>
+      <small><br>
+在<a href="GoF.htm"> Gof </a>中有給出了一個不錯的例子，以設計文件剖析器為例，該剖析器可以將文件轉換為其它的格式，以
+DOC文件剖析器為例好了，假設希望析剖器可以將DOC文件轉換為RTF或是PDF文件，可以如下設計結構：<br>
+      </small><small><img style="width: 482px; height: 256px;" alt="" title="Builder" src="images/Builder-2.jpg"><br>
+      <br>
+      <br>
+      </small><small><br>
+      </small> </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/BuilderPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:07 GMT -->
+</html>

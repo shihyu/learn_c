@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/EratosthenesPrime.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:49 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Eratosthenes篩選求質數</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip:&nbsp;Eratosthenes篩選求質數</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+      
+      
+      <h2>說明</h2>
+
+
+      <small>大於1的數，除了自身之外，無法被其它整數整除的數稱之為質數，要求質數很簡單，但如何快速的求出質數則一直是程式設計人員與數學家努力的課題，在這邊介紹一個著名的 Eratosthenes求質數方法。</small><br>
+
+
+
+      
+      
+      <h2>解法</h2>
+
+
+      <small>
+首先知道這個問題可以使用迴圈來求解，將一個指定的數除以所有小於它的數，若可以整除就不是質數，然而如何減少迴圈的檢查次數？如何求出小於N的所有質數？<br>
+
+
+      <br>
+
+
+
+首先假設要檢查的數是N好了，則事實上只要檢查至N的開根號就可以了，道理很簡單，假設A*B =
+N，如果A大於N的開根號，則事實上在小於A之前的檢查就可以先檢查到B這個數可以整除N。不過在程式中使用開根號會精確度的問題，所以可以使用
+i * i &lt;= N進行檢查，且執行更快。<br>
+
+
+      <br>
+
+
+
+再來假設有一個篩子存放1～N，例如：<br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">2　3　4　5　6　7　8　9　10　11　12　13　14　15　16　17　18　19　20　21 ........ N</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+先將2的倍數篩去：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">2　3　5　7　9　11　13　15　17　19　21 ........ N</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+再將3的倍數篩去：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">2　3　5　7　11　13　17　19　........ N</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+再來將5的倍數篩去，再來將7的質數篩去，再來將11的倍數篩去........，如此進行到最後留下的數就都是質數，這就是Eratosthenes篩選方法（Eratosthenes Sieve Method）。<br>
+
+
+      <br>
+
+
+
+檢查的次數還可以再減少，事實上，只要檢查6n + 1與6n + 5就可以了，也就是直接跳過2與3的倍數，使得程式中的if的檢查動作可以減少。 </small>
+      <br>
+
+
+
+
+
+
+      
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a> &nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li><a name="C"></a> C
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>#define N 1000 <br><br>void create(int*);<br>void filter(int*, int);<br><br>int main(void) { <br>    int primes[N + 1] = {0};<br>    create(primes);<br>    <br>    int i;<br>    for(i = 2; i &lt; N; i++) if(primes[i]) { <br>        printf("%4d", i); <br>    }<br>&nbsp;<br>    return 0; <br>} <br><br>void create(int* primes) {<br>    primes[2] = primes[3] = primes[5] = 1;<br>    <br>    int i;<br>    for(i = 1;6 * i + 5 &lt;= N; i++) {<br>        primes[6 * i + 1] = primes[6 * i + 5] = 1; <br>    }<br>    if(6 * i + 1 &lt;= N) { primes[6 * i + 1] = 1; }<br>    <br>    int n;<br>    for(n = 0;(6 * n + 5) * (6 * n + 5) &lt;= N; n++) {<br>        filter(primes, 6 * n + 1);<br>        filter(primes, 6 * n + 5);<br>    }     <br>    if((6 * n + 1) * (6 * n + 1) &lt;= N) { filter(primes, 6 * n + 1); }  <br>}<br><br>void filter(int* primes, int i) {<br>    if(primes[i]) { <br>        int j;<br>        for(j = 2; j * i &lt;= N; j++) {<br>            primes[j * i] = 0; <br>        }<br>    }<br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li><a name="Java"></a> Java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      <pre>import java.util.*;<br><br>public class Prime {<br>    public static List&lt;Integer&gt; create(int max) {<br>        LinkedList&lt;Integer&gt; primes = new LinkedList&lt;&gt;();<br>        primes.add(2); primes.add(3); primes.add(5);<br>        for(int i = 1; i &lt;= (max - 5) / 6; i++) {<br>            primes.add(6 * i + 1); primes.add(6 * i + 5);<br>        }<br>        if(primes.getLast() + 2 &lt;= max) {<br>            primes.add(primes.getLast() + 2);<br>        }<br><br>        for(int i = 2; i &lt; primes.size(); i++) {<br>            Integer p = primes.get(i);<br>            for(int j = 2; j * p &lt;= primes.getLast(); j++) {<br>                primes.remove(Integer.valueOf(j * p));<br>            }<br>        }<br>        return primes;<br>    }<br>    <br>    public static void main(String[] args) {<br>        for(Integer p : create(1000)) {<br>            System.out.printf("%4d", p);<br>        }<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>def flatten(list):<br>    return [item for subList in list for item in subList]<br><br>def iterate(counter, primes):<br>    if counter &lt; len(primes):<br>        newps = primes[0:counter + 1] + list(<br>          filter(lambda p: p % primes[counter] != 0, primes[counter + 1:]))<br>        return iterate(counter + 1, newps)<br>    else:<br>        return primes<br>    <br>def create(max):<br>    comp = flatten(<br>        [[6 * i + 1, 6 * i + 5] for i in range(1, (max - 5) // 6 + 1)])<br>    primes = [2, 3, 5] + comp + \<br>        ([comp[-1] + 2] if comp[-1] + 2 &lt;= max else [])<br>    return iterate(2, primes)<br>    <br>for p in create(1000):<br>    print("%4d" % p, end="")<br></pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>def create(max: Int) = {<br>    val comp = (for(i &lt;- 1 to (max - 5) / 6) <br>            yield List(6 * i + 1, 6 * i + 5)).toList.flatten<br>    val primes = List(2, 3, 5) ++ comp ++ <br>            (if(comp.last + 2 &lt;= max) List(comp.last + 2) else Nil)<br>    iterate(2, primes)<br>}<br><br>def iterate(counter: Int, primes: List[Int]): List[Int] = {<br>    if(counter &lt; primes.size) {<br>        val newps = primes.take(counter + 1) ++ <br>              primes.drop(counter + 1).filter(p =&gt; p % primes(counter) != 0)<br>        iterate(counter + 1, newps)<br>    } else  primes<br>}<br><br>create(1000).foreach(printf("%4d", _))</pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>def iterate(counter, primes)<br>    if counter &lt; primes.size<br>        newps = primes.take(counter + 1) + primes.drop(counter + 1)<br>                    .select { |p| p % primes[counter] != 0}<br>        iterate(counter + 1, newps)<br>    else<br>        primes<br>    end<br>end<br>    <br>def create(max)<br>    comp = (1..(max - 5) / 6).map {|i| [6 * i + 1, 6 * i + 5] }.flatten<br>    primes = [2, 3, 5] + comp + (comp[-1] + 2 &lt;= max ? [comp[-1] + 2] : [])<br>    iterate(2, primes)<br>end<br>    <br>create(1000).each do |p|<br>    printf("%4d", p)<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>Array.prototype.reduce = function(init, f) {<br>    var value = init;<br>    for(var i = 0; i &lt; this.length; i++) {<br>        value = f(value, this[i]);<br>    }<br>    return value;<br>};<br><br>function range(from, to) {<br>    var r = [];<br>    for(var c = 0, i = from; i &lt; to; c++, i++) { r[i] = i; } <br>    return r;<br>}<br><br>function iterate(counter, primes) {<br>    if(counter &lt; primes.length) {<br>        var newps = primes.slice(0, counter + 1).concat(<br>                primes.slice(counter + 1, primes.length)<br>                      .filter(function(p) { <br>                          return p % primes[counter] != 0; <br>                      }));<br>        return iterate(counter + 1, newps);<br>    } else {<br>        return primes;<br>    }<br>}<br><br>function create(max) {<br>    var comp = range(1, parseInt((max - 5) / 6) + 1).map(function(i) {<br>        return [6 * i + 1, 6 * i + 5];<br>    }).reduce([], function(ac, list) {<br>        return ac.concat(list);<br>    });<br>    var last = comp.pop();<br>    var primes = [2, 3, 5].concat(<br>            comp, last + 2 &lt;= max ? [last, last + 2] : [last]);<br>    return iterate(2, primes);<br>}<br><br>print(create(1000).join(' '));<br></pre>
+<br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>flatten list = [item | subList &lt;- list, item &lt;- subList]<br><br>iter counter primes = <br>    if counter &lt; length primes then<br>        let newps = take (counter + 1) primes ++ <br>                (filter (\p -&gt; p `mod` (primes !! counter) /= 0) $ <br>                     drop (counter + 1) primes)<br>        in iter (counter + 1) newps<br>    else primes<br>    <br>create max = iter 2 primes<br>    where comp = flatten [[6 * i + 1, 6 * i + 5] | i &lt;- [1..(max - 5) `div` 6]]<br>          primes = [2, 3, 5] ++ comp ++ <br>              if last comp + 2 &lt;= max then [last comp + 2] else []<br><br>main = print $ create 1000<br></pre>
+<br>
+
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+
+      <br>
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/EratosthenesPrime.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:49 GMT -->
+</html>

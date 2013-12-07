@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/Validator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>實作 Validator</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 實作 Validator</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>使
+用SimpleFormController時，您可以搭配一個org.springframework.validation.Validator介面
+的實作物件，幫助您作基本的伺服端資料驗證工作，您可以設計一個通用的Validator，將之當作一個Bean注入給需要進行表單驗證的其它Bean物
+件。<br>
+
+      <br>
+
+Validator介面有兩個必須實作的方法，其定義如下所示：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">package org.springframework.validation;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public interface Validator {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; boolean supports(Class clazz);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; void validate(Object obj, Errors errors);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+
+      </div>
+
+      <small><br>
+
+supports()方法回傳一個boolean值，表示是否支援對所傳入的物件進行驗證，只有在傳回true的情況下，才會使用validate()方
+法進行驗證工作，在validate()方法的參數中，obj表示傳入的表單物件，您可以對它進行一些驗證，如果有錯誤的話，可以使用Errors的
+reject()或rejectValue()等方法加入錯誤訊息，在後續的處理中，若errors物件中包括錯誤訊息，會回到getViewPage
+()所設定的頁面。<br>
+
+      <br>
+
+來看一個簡單的實作：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">package onlyfun.caterpillar; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">import org.springframework.validation.Validator; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">import org.springframework.validation.Errors; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class LoginValidator implements Validator { </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public boolean supports(Class clazz) { </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return clazz.equals(LoginForm.class); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void validate(Object obj, Errors errors) { </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LoginForm form = (LoginForm) obj; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(form.getPassword().length() &lt; 4 ) { </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; errors.rejectValue("password", </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"less-than-four", null, "密碼不得小於四個字元"); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+
+      </div>
+
+      <small><br>
+
+這個Validator類別可以搭配7.2.7介紹的SimpleFormDemo專案來使用，驗證通常是在檢查資料的完備性、安全性等條件，像是檢查密碼的格式就是一例，至於使用者名稱與密碼是否正確，這該算是後繼的Controller的處理工作。<br>
+
+      <br>
+
+搭配SimpleFormController來使用Validator，您只要在Bean定義檔中加入Validator的Bean定義，以及讓SimpleFormController參考到它即可，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;bean id="loginValidator" </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; class="onlyfun.caterpillar.LoginValidator"/&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;bean id="loginAction" </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; class="onlyfun.caterpillar.LoginAction"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;property name="commandClass"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;onlyfun.caterpillar.LoginForm&lt;/value&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/property&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;property name="validator"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;ref bean="loginValidator"/&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/property&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;property name="successView"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;success&lt;/value&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/property&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;property name="formView"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;form&lt;/value&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/property&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/bean&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></small><br style="font-weight: bold;">
+
+      </div>
+
+      <small><br>
+
+"validator"屬性參考至loginValidator實例，只要有設定"validator"，SimpleFormController就會使用它。<br>
+
+      <br>
+
+在進行驗證時，您可以使用org.springframework.validation.ValidationUtils，上面有一些方便的靜態方法，
+像是rejectIfEmpty()、rejectIfEmptyOrWhitespace()等，可以查查線上API文件看如何使用。<br>
+
+      <br>
+
+另一方面，對於AbstractWizardFormController，您可以重新定義它的validatePage()方法來進行驗證，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; protected void validatePage(Object command, </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Errors errors, int page) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (YourCommand) your = (YourCommand) command;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; switch(page) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 1:</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+validator.validateSome(your, errors);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 2:</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+validator.validateOther(your, errors);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">..</small><br>
+
+      </div>
+
+      <small><br>
+
+每進行一頁Wizard表單，都會呼叫該方法一次，讓您針對該次送出的數據進行驗證，"page"參數表示該次送出表單的頁數，與
+SimpleFormController的Validator不同的是，AbstractWizardFormController不會自動調用
+Validator的validate()方法，您要根據當次頁面的資料自行進行對應的方法驗證，通常採取如上的委託物件，將驗證交由一個
+Validator物件來執行。<br>
+
+      <br>
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/Validator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+</html>

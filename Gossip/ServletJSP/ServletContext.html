@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ServletContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>簡介 ServletContext</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 簡介 ServletContext<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><span style="font-family: Courier New,Courier,monospace;">ServletContext</span>介面定義了Servlet所運行的應用程式環境的一些行為與觀點，你可以使用<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>實作物件來取得所請求資源的URL、設定與儲存屬性、應用程式初始參數，甚至動態設定Servlet實例。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">ServletContext</span>本身的名稱令人困惑，因為它以<span style="font-family: Courier New,Courier,monospace;">Servlet</span>名稱作為開頭，容易被誤認為僅是單一Servlet的代表物件。事實上，當整個Web應用程式載入Web容器之後，容器會生成一個<span style="font-family: Courier New,Courier,monospace;">ServletContext物件作為整個應用程式的代表，並設定給ServletConfig，你只要透過ServletConfig的getServletContext()方法就可以取得ServletContext物件。</span>以下則先簡介幾個需要注意的方法：<br>
+      <br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">getRequestDispatcher()</span>方法可以取得<span style="font-family: Courier New,Courier,monospace;">RequestDispatcher</span>實例，使用時路徑的指定必須以<span style="font-family: Courier New,Courier,monospace;">"/"</span>作為開頭，這個斜線代表應用程式環境根目錄（Context Root）。正如 </small><small><small><big><big><a href="DispatchRequest.html"><small>調派請求</small></a></big> </big></small></small><small>的說明，</small><small>取得<span style="font-family: Courier New,Courier,monospace;">RequestDispatcher</span>實例之後，就可以進行請求的轉發（Forward）或包含（Include）。<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">context.getRequestDispatcher("/pages/some.jsp").forward(request, response);</span></small><br>
+      </div>
+      <small><br>
+以<span style="font-family: Courier New,Courier,monospace;">"/"</span>作為開頭有時稱為<span style="font-weight: bold;">環境相對（Context-relative）路徑</span>，沒有以<span style="font-family: Courier New,Courier,monospace;">"/"</span>作為開頭則稱為<span style="font-weight: bold;">請求相對（Request-relative）路徑</span>。實際上<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest
+的getRequestDispatcher()方法在實作時，若是環境相對路徑，則直接委託給ServletContext的
+getRequestDispatcher()；若是請求相對路徑，則轉換為環境相對路徑，再委託給ServletContext的
+getRequestDispatcher()來取得RequestDispatcher。</span><br>
+      <br>
+如果想要知道Web應用程式的某個目錄中有哪些檔案，則可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">getResourcePaths()</span>方法。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">for(String avatar : </span></small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">getServletContext().getResourcePaths("/")</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">) {</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 顯示 avatar 文字...</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;"></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+使用時指定路徑必須以"/"作為開頭，表示相對於應用程式環境根目錄，傳回的路徑會像是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/welcome.html</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/catalog/</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/catalog/index.html</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/catalog/products.html</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/customer/</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/customer/login.jsp</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/WEB-INF/</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/WEB-INF/web.xml</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">/WEB-INF/classes/com.acme.OrderServlet.class</small><br>
+      </div>
+      <small><br>
+可以看到，這個方法會連同WEB-INF的資訊都列出來。如果是個目錄資訊，則會以<span style="font-family: Courier New,Courier,monospace;">"/"</span>作結尾。以下這個範例利用了<span style="font-family: Courier New,Courier,monospace;">getResourcePaths()</span>方法，自動取得avatars目錄下的圖片路徑，並透過<span style="font-family: Courier New,Courier,monospace;">&lt;img&gt;</span>標籤來顯示圖片：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name = "AvatarServlet", urlPatterns = {"/avatar.view"},<br>            initParams = {<br>                @WebInitParam(name = "AVATAR_DIR", value = "/avatars")<br>            }<br>)<br>public class AvatarServlet extends HttpServlet {<br>    private String AVATAR_DIR;<br><br>    @Override<br>    public void init() throws ServletException {<br>        super.init();<br>        AVATAR_DIR = getInitParameter("AVATAR_DIR");<br>    }<br><br>    protected void doGet(HttpServletRequest request,<br>            HttpServletResponse response)<br>            throws ServletException, IOException {<br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br>        out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Servlet AvatarServlet&lt;/title&gt;");<br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br>        for (String avatar : getServletContext()<br>                                <span style="font-weight: bold;">.getResourcePaths(AVATAR_DIR)</span>) {<br>            avatar = avatar.replaceFirst("/", "");<br>            out.println("&lt;img src=\"" + avatar + "\"&gt;");<br>        }<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>        out.close();<br>    }<br>}<br></pre>
+      <small>
+      <br>
+如果想在Web應用程式中讀取某個檔案的內容，則可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">getResourceAsStream()</span>方法，使用時指定路徑必須以<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">"/"</span>作為開頭，表示相對於應用程式環境根目錄，或者相對是/WEB-INF/lib中JAR檔案裏<span style="font-weight: bold;">META-INF/resources</span>的路徑（Web應用程式中，JAR檔案必須放在/WEB-INF/lib中，這是規定），執行結果會傳回<span style="font-family: Courier New,Courier,monospace;">InputStream</span>實例，接著你就可以運用它來讀取檔案內容。底下是個讀取PDF並傳送給客戶端的範例：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="Ebook", urlPatterns={"/ebook.view"},<br>            initParams={<br>                @WebInitParam(name="PDF_FILE", value="/WEB-INF/jdbc.pdf")<br>            }<br>)<br>public class Ebook extends HttpServlet {<br>    private String PDF_FILE;<br><br>    @Override<br>    public void init() throws ServletException {<br>        super.init();<br>        PDF_FILE = getInitParameter("PDF_FILE");<br>    }<br>    <br>    protected void doGet(HttpServletRequest request,<br>                          HttpServletResponse response)<br>                      throws ServletException, IOException {<br>        String passwd = request.getParameter("passwd");<br>        if("123456".equals(passwd)) {<br>            response.setContentType("application/pdf");<br>            InputStream in = this.getServletContext()<br>                                 <span style="font-weight: bold;">.getResourceAsStream(PDF_FILE)</span>;<br>            OutputStream out = response.getOutputStream();<br>            byte[] buffer = new byte[1024];<br>            int length = -1;<br>            while((length = in.read(buffer)) != -1) {<br>                out.write(buffer, 0, length);<br>            }<br>            in.close();<br>            out.close();<br>        }<br>    }<br>}<br></pre>
+      <small><br>
+正如在 </small><small><big><a href="ServletConfig.html"><small>ServletConfig</small></a></big> </small><small>介紹過的，每個Servlet都會有一個相對應的<span style="font-family: Courier New,Courier,monospace;">ServletConfig</span>物件，你可以透過<span style="font-family: Courier New,Courier,monospace;">ServletConfig</span>的<span style="font-family: Courier New,Courier,monospace;">getInitParameter()</span>方法來讀取初始參數，而每個Web應用程式都會有一個相對應的<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>，針對「應用程式」初始化時所需用到的一些參數資料，你可以在web.xml中設定應用程式初始參數，設定時使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;context-param&gt;</span>標籤來定義。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;web-app ...&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;context-param&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-name&gt;MESSAGE&lt;/param-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-value&gt;/WEB-INF/messages.txt&lt;/param-value&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/context-param&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; …</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/web-app&gt;</small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">每一對初始參數要使用一個&lt;context-param&gt;來定義。之後在程式中可以透過ServletContext的<span style="font-weight: bold;">getInitParameter()</span></span>方法來讀取初始參數。因此Web應用程式初始參數常被稱為<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>初始參數。<br>
+      <br>
+&nbsp;在整個Web應用程式生命週期，Servlet所需共用的資料，則可以設定為<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>屬性。由於<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>在Web應用程式存活期間都會一直存在，所以設定為<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>屬性的資料，除非你主動移除，否則也是一直存活於Web應用程式之中。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">可以透過ServletContext的<span style="font-weight: bold;">setAttribute()</span>方法設定物件為ServletContext屬性，之後可透過ServletContext的<span style="font-weight: bold;">getAttribute()</span>方法取出該屬性。若要移除屬性，則透過ServletContext的<span style="font-weight: bold;">removeAttribute()</span>方法。<br>
+      <br>
+</span>Web<span style="font-family: Courier New,Courier,monospace;">容器會提供每個ServletContext一個暫存目錄，這個目錄的資訊可以藉由ServletContext的getAttribute()方法取得<span style="font-weight: bold;">javax.servlet.context.tempdir</span>屬性來得知。<br>
+      </span>
+      <br>
+注意！<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>並非執行緒安全，所以必要時必須注意屬性設定時共用存取的問題。<br>
+<br>
+
+      </small><br>
+
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ServletContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:12 GMT -->
+</html>

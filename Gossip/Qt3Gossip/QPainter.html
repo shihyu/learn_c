@@ -1,0 +1,382 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QPainter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:51 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QPainter 類別 - 畫筆與畫刷</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: QPainter 類別 - 畫筆與畫刷</a></h1>
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QPainter類別可以在一個「繪圖裝置」（paint device）上進行圖形繪製，這個繪圖裝置可以是一個Widget或是printer，我們在繪圖前必須指定我們要在哪一個裝置上進行繪圖，例如： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QPainter paint(&amp;物件名稱); </span></small><br>
+
+      </div>
+
+      <small><br>
+
+我們可以如上在建立物件時指定繪圖裝置，或是在之後再使用begin()方法來指定，若不使用繪圖裝置時，則可以使用end()方法來解除。 <br>
+
+      <br>
+
+QPainter提供畫筆、畫刷、字型等的設定，這邊先介紹如何使用畫筆（Pen）與畫刷（Brush），畫筆與線的繪製有關，而畫刷與面的繪製有關，我們使用下面這個簡單的程式來作示範： <br>
+
+      <br>
+
+      </small>
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qwidget.h&gt;<br>#include &lt;qpainter.h&gt;<br>#include &lt;qpen.h&gt;<br>#include &lt;qpixmap.h&gt;<br>#include &lt;qdrawutil.h&gt;<br><br>class DrawView : public QWidget {<br>public:<br>    DrawView() {<br>        setBackgroundColor(white);  // 背景為白色<br>    }<br><br>protected:<br>    void drawShapes(QPainter *p, int sx, int sy);<br>    void paintEvent(QPaintEvent*);<br>};<br><br>void DrawView::drawShapes(QPainter *p, int sx, int sy) {<br>    int x = sx, y = sy;<br>    int w = 80, h = 35;<br><br>    p-&gt;save();  // 儲存繪圖裝置狀態<br>   <br>    p-&gt;setPen(QPen(Qt::blue, 4, DotLine));  // 藍色、4pixel大的點狀畫筆<br>    p-&gt;drawLine(x, y, x+w, y); // 由(x, y)繪到(x+w, y)<br>    x += (w+10);<br><br>    p-&gt;setPen(SolidLine); // 實線<br>    p-&gt;setBrush(QBrush(Qt::green, DiagCrossPattern)); // 綠色的方格畫刷<br>    p-&gt;drawRect(x, y, w, h); // 畫方塊，左上座標(x, y)，寬高(w, h)<br>    x += (w+10);<br><br>    p-&gt;setBrush(Qt::yellow); // 實心黃色畫刷<br>    p-&gt;drawRoundRect(x, y, w, h, 20, 20); // 圓角方塊，圓角半徑20pixel<br>    x += (w+10);<br><br>    p-&gt;drawEllipse(x, y, w, h); // 以方塊為範圍的橢圓形<br>    x = sx;<br>    y += (h+10);<br>    p-&gt;drawPie(x, y, w, h, 45*16, 300*16); // 畫缺角的圓<br>    p-&gt;drawArc(x+3, y, w, h, 45*16, -60*16); // 畫弧<br>    x += (w+10);<br>    p-&gt;drawChord(x, y, w, h, -45, 160*16); // 畫圓切<br>    x += (w+10);<br><br>    p-&gt;drawPixmap(x, y, QPixmap("pengiun.xpm")); // 畫圖片<br>    x += (w+10);<br><br>    QBrush b(Qt::lightGray);<br>    qDrawWinButton(p, x, y, w, h, colorGroup(), false, &amp;b);  // 畫一個按鈕<br><br>    x = sx;<br>    y += (h+10);<br><br>    p-&gt;setPen(Qt::red);<br>    p-&gt;setBrush(NoBrush); // 無畫刷<br>    p-&gt;drawRect(x, y, 2*w-12 , 3*h);  // 所以是空心方塊<br>    // 填圖<br>    p-&gt;drawTiledPixmap(x+2, y+2, 2*w-16, 3*h-4, QPixmap("pengiun.xpm"));<br><br>    p-&gt;restore(); // 復原繪圖裝置狀態<br>}<br><br>// 在paintEvent事件函式中呼叫，就不怕圖形被覆蓋了<br>void DrawView::paintEvent(QPaintEvent*) {<br>    QPainter p(this);<br>    drawShapes(&amp;p, 10, 10);<br>}<br><br>int main(int argc, char **argv) {<br>    QApplication app(argc, argv);<br>    DrawView draw;<br>    app.setMainWidget(&amp;draw);<br>    draw.show();<br>    return app.exec();<br>} </pre>
+
+      <small><br>
+
+這個程式中示範了畫線、畫圓、畫方塊與畫圖片等各種QPainter所提供的繪圖方法，在繪圖時為了避免繪圖結果被其它視窗覆蓋而消失，我們在
+paintEvent事件函式中進行繪圖函式的呼叫，當發生視窗重繪（例如視窗覆蓋後又移開時就會發生），就會自動進行圖形的重繪。 <br>
+
+      <br>
+
+下圖為這個程式執行的畫面： <br>
+
+      </small><img style="width: 375px; height: 240px;" alt="" src="images/QPainter-1.jpg"><br>
+
+
+
+
+
+
+
+
+
+      <small></small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QPainter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:56 GMT -->
+</html>

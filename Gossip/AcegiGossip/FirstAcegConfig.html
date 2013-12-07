@@ -1,0 +1,1368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/AcegiGossip/FirstAcegConfig.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:28 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>第一個Acegi 程式 - 設定文件</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Acegi Gossip: 第一個Acegi 程式 - 設定文件</a></h1>
+
+<br><br>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript"
+ src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+<br><br>
+
+
+
+
+
+
+
+
+
+
+
+首先請先至<a href="http://www.acegisecurity.org/">Acegi官方網站</a>，下載Acegi程式庫，在撰寫這份教學文件之時，所使用的版本是1.0.3。<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Acegi相關類別之間的依賴關係，可以藉由IoC容器來協助建立，在這邊您可以使用 <a href="../SpringGossip/SpringGossip.html">Spring</a>
+的IoC容器功能，您可以在下載的Acegi檔案中，找到acegi-security-sample-tutorial.war，將之使用解壓縮軟體解
+開，可以在WEB-INF\lib下，找到所需的Spring程式庫，在Acegi
+1.0.3中的acegi-security-sample-tutorial.war所搭配的是Spring 1.2.8。<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+要完成您第一個Acegi程式，您需要以下的程式庫：<br>
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li>acegi-security-1.0.3.jar</li>
+
+
+
+
+
+
+
+  <li>spring-1.2.8.jar</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+為了在Web應用程式中，使用Acegi搭配Spring的Context資訊，來完成Acegi的依賴關係配置，您要在web.xml中設定
+org.springframework.web.context.ContextLoaderListener，並在Context參數中，指定設定檔
+案位置與名稱，而Acegi主要透過Filter Chain來達到請求的檢查、驗證、授權、登出等動作，您可以在web.xml中如下設定：<br>
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li>web.xml</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br><br>&lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"<br>	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"<br>	 version="2.4"&gt;<br><br>    &lt;display-name&gt;Acegi 範例&lt;/display-name&gt;<br>    <br>    &lt;!-- 指定Acegi資訊的設定檔--&gt;<br>    &lt;context-param&gt;<br>        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;<br>        &lt;param-value&gt;<span style="font-weight: bold;">/WEB-INF/acegi-config.xml</span>&lt;/param-value&gt;<br>    &lt;/context-param&gt;<br>    <br>    &lt;!-- Acegi 的 Filter Chain 代理 --&gt;<br>    &lt;filter&gt;<br>        &lt;filter-name&gt;Acegi Filter Chain Proxy&lt;/filter-name&gt;<br>        &lt;filter-class&gt;<br>            org.acegisecurity.util.FilterToBeanProxy<br>        &lt;/filter-class&gt;<br>        &lt;init-param&gt;<br>            &lt;param-name&gt;targetClass&lt;/param-name&gt;<br>                &lt;param-value&gt;<br>                    org.acegisecurity.util.FilterChainProxy<br>                &lt;/param-value&gt;<br>        &lt;/init-param&gt;<br>    &lt;/filter&gt;<br><br>    &lt;filter-mapping&gt;<br>        &lt;filter-name&gt;Acegi Filter Chain Proxy&lt;/filter-name&gt;<br>        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;<br>     &lt;/filter-mapping&gt;<br><br>     &lt;!-- 取得Spring的Context --&gt;<br>     &lt;listener&gt;<br>         &lt;listener-class&gt;<br>             org.springframework.web.context.ContextLoaderListener<br>         &lt;/listener-class&gt;<br>     &lt;/listener&gt;<br>&lt;/web-app&gt;</pre>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+org.acegisecurity.util.FilterToBeanProxy建立
+org.acegisecurity.util.FilterChainProxy實例，並將請求轉交給FilterChainProxy來處理，接下來
+就是配置acegi-config.xml的內容，在這邊先假設一個需求情境，您想要對Web應用程式中的/protected/下所有資源進行保護，如
+果使用者試圖存取/protected/下的資源，就先將其送至/acegilogin.jsp進行登入，登入成功後顯示使用者所請求的資源，使用者也可
+以直接連接/acegilogin.jsp，登入成功後，預設顯示/loginsuccess.jsp，您可以在acegi-config.xml中加入
+以下的設定：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;!-- 驗證處理，使用表單 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;bean id="authenticationProcessingFilter" <br>
+
+
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter"&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 驗證管理員，處理驗證資訊提供者&nbsp; --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="authenticationManager" ref="authenticationManager"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 驗證失敗URL --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="authenticationFailureUrl" value="/acegilogin.jsp"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 驗證成功預設URL --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="defaultTargetUrl" value="/protected/loginsuccess.jsp"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 驗證處理的提交位址 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="filterProcessesUrl" value="<span style="color: rgb(255, 0, 0);">/j_acegi_security_check</span>"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+可以看到在這邊使用了AuthenticationProcessingFilter來處理驗證，實際對使用者的驗證是交給驗證管理員，也就是authenticationManager屬性中所設定的實例，可以在acegi-config.xml中加入：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;!-- 驗證管理員，管理驗證資訊提供者 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &lt;bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager"&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="providers"&gt;&lt;!-- 可有多個提供者,其中一個驗證通過即可以了 --&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;list&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;ref local="daoAuthenticationProvider"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/list&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &lt;/bean&gt;</span></div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+驗證管理員管理驗證提供者，也就是實際提供使用者名稱、密碼、角色資訊的物件，來源可以是資料庫或設定文件中的訊息，基於來源的不同，您可以使用
+org.acegisecurity.providers.dao.DaoAuthenticationProvider，並指定其
+userDetailsService屬性，設定驗證訊息來源：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &lt;!-- 驗證提供者，指定使用記憶體來源中的驗證資訊 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;
+&lt;bean id="daoAuthenticationProvider"
+class="org.acegisecurity.providers.dao.DaoAuthenticationProvider"&gt;&nbsp;
+</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="userDetailsService" ref="inMemoryDaoImpl"/&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &lt;/bean&gt;&nbsp;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &lt;bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl"&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="userMap"&gt;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caterpillar=123456,ROLE_SUPERVISOR</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1=user1pwd,ROLE_USER</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+user2=user2pwd,disabled,ROLE_USER&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/value&gt;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt;&nbsp; </span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+在這邊使用userMap屬性指定可以登入的使用者名稱、密碼、是否啟用、角色等資訊。<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+當驗證失敗會發生例外，這時需要將之送至/acegilogin.jsp，權限不符而試圖取得資源時則將之送至/accessDenied.jsp，這可以使用org.acegisecurity.ui.ExceptionTranslationFilter來達到：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;!-- 發生驗證錯誤或權限錯誤時的處理 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter"&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="authenticationEntryPoint"&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;bean
+class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint"&gt;&nbsp;
+</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;property name="loginFormUrl" value="/acegilogin.jsp"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;property name="forceHttps" value="false"/&gt;&nbsp;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/bean&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="accessDeniedHandler"&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;bean class="org.acegisecurity.ui.AccessDeniedHandlerImpl"&gt;&nbsp;
+</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;property name="errorPage" value="/protected/accessDenied.jsp"/&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/bean&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+接下來要定義可以存取的資源，由於在這邊是針對URL進行規範，可以使用org.acegisecurity.intercept.web.FilterSecurityInterceptor：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;!-- FilterSecurityInterceptor 對 URI 進行保護 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;bean id="filterSecurityInterceptor"</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; class="org.acegisecurity.intercept.web.FilterSecurityInterceptor"&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 驗證管理員 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="authenticationManager" ref="authenticationManager" /&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 授權管理員 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="accessDecisionManager" ref="accessDecisionManager" /&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="objectDefinitionSource"&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PATTERN_TYPE_APACHE_ANT</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/protected/**=ROLE_SUPERVISOR,ROLE_USER</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/value&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt;</span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+FilterSecurityInteceprot需要參考至驗證管理員取得驗證訊息，以對使用者進行驗證，而是否授權則必須以投票的方式來決定，Acegi的解決方案有幾種：<br>
+
+
+
+
+
+
+
+<ol>
+
+
+
+
+
+
+
+  <li>如果有一個同意就通過</li>
+
+
+
+
+
+
+
+  <li>如果都同意就通過</li>
+
+
+
+
+
+
+
+  <li>如果都不反對就通過</li>
+
+
+
+
+
+
+
+</ol>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+例如若希望/protected/下可以被使用者（USER）或管理者（SUPERVISOR）存取，採第一個方案的話則使用AffirmativeBased實作，只要有一票通過，就允許存取：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;!-- 授權管理員 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;bean id="accessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased"&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!-- 是否全部棄權時視為通過 --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="allowIfAllAbstainDecisions" value="false" /&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="decisionVoters"&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;list&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;bean class="org.acegisecurity.vote.RoleVoter" /&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/list&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt; </span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+RoleVoter對使用者群組中，有ROLE_作為前置文件的進投票，您也可以在設定RoleVoter實例時，使用其rolePrefix來改變前置文字；DecisionManager收集票數，然後決定結果。<br>
+
+
+
+
+<br>
+
+
+
+
+在所有的Filter被呼叫之前，通常會有個HttpSessionContextIntegrationFilter，它會建立Security Context物件，後續的Filter會將安全相關訊息儲存於其中，也可以取得當中的安全相關訊息：<br>
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;bean id="httpSessionContextIntegrationFilter"</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; class="org.acegisecurity.context.HttpSessionContextIntegrationFilter" /&gt;</span><br>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Acegi是基於Filter Chain來完成請求的檢查、驗證、授權等動作，所以要將以上的Filter串在一起了：<br>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;!-- Filter Chain --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; &lt;bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy"&gt;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="filterInvocationDefinitionSource"&gt;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PATTERN_TYPE_APACHE_ANT&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/**=</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">httpSessionContextIntegrationFilter,</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">authenticationProcessingFilter,<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;exceptionTranslationFilter,filterSecurityInterceptor</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/value&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt;</span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+<span style="color: rgb(255, 0, 0);">由於排版的關係，將Filter的串連作了換行，實際上</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">authenticationProcessingFilter,exceptionTranslationFilter</span><span style="font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">是連在一起不能換行的，請在設定時特別注意。</span><br>
+
+
+<br>
+
+
+
+
+
+
+
+所完成的acegi-config.xml完整檔案如下所示：<br>
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li>acegi-config.xml</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd"&gt;<br>&lt;beans&gt;<br>    &lt;!-- 驗證處理，使用表單 --&gt;<br>    &lt;bean id="authenticationProcessingFilter" class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter"&gt;  <br>        &lt;!-- 驗證管理員，處理驗證資訊提供者  --&gt;<br>        &lt;property name="authenticationManager" ref="authenticationManager"/&gt;  <br>        &lt;!-- 驗證失敗URL --&gt;<br>        &lt;property name="authenticationFailureUrl" value="/acegilogin.jsp"/&gt;  <br>        &lt;!-- 驗證成功預設URL --&gt;<br>        &lt;property name="defaultTargetUrl" value="/protected/loginsuccess.jsp"/&gt;  <br>        &lt;!-- 驗證處理的提交位址 --&gt;<br>        &lt;property name="filterProcessesUrl" value="/j_acegi_security_check"/&gt;  <br>    &lt;/bean&gt;<br><br>    &lt;!-- 驗證管理員，管理驗證資訊提供者 --&gt;<br>   &lt;bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager"&gt;  <br>      &lt;property name="providers"&gt;&lt;!-- 可有多個提供者,其中一個驗證通過即可以了 --&gt;  <br>         &lt;list&gt;  <br>            &lt;ref local="daoAuthenticationProvider"/&gt;  <br>         &lt;/list&gt;  <br>      &lt;/property&gt;  <br>   &lt;/bean&gt;<br><br>   &lt;!-- 驗證提供者，指定使用記憶體來源中的驗證資訊 --&gt;<br>   &lt;bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider"&gt;  <br>        &lt;property name="userDetailsService" ref="inMemoryDaoImpl"/&gt;<br>   &lt;/bean&gt; <br>     <br>   &lt;bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl"&gt;<br>        &lt;property name="userMap"&gt;    <br>            &lt;value&gt;    <br>                caterpillar=123456,ROLE_SUPERVISOR<br>                user1=user1pwd,ROLE_USER<br>                user2=user2pwd,disabled,ROLE_USER     <br>            &lt;/value&gt;    <br>        &lt;/property&gt;    <br>    &lt;/bean&gt;     <br>    <br>    &lt;!-- 發生驗證錯誤或權限錯誤時的處理 --&gt;<br>    &lt;bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter"&gt;  <br>        &lt;property name="authenticationEntryPoint"&gt;  <br>            &lt;bean class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint"&gt;  <br>                &lt;property name="loginFormUrl" value="/acegilogin.jsp"/&gt;  <br>                &lt;property name="forceHttps" value="false"/&gt;  <br>            &lt;/bean&gt;  <br>        &lt;/property&gt;  <br>        &lt;property name="accessDeniedHandler"&gt;  <br>            &lt;bean class="org.acegisecurity.ui.AccessDeniedHandlerImpl"&gt;  <br>                &lt;property name="errorPage" value="/protected/accessDenied.jsp"/&gt;  <br>            &lt;/bean&gt;  <br>        &lt;/property&gt;  <br>    &lt;/bean&gt;    <br><br>    &lt;!-- FilterSecurityInterceptor 對 URI 進行保護 --&gt;<br>    &lt;bean id="filterSecurityInterceptor"<br>          class="org.acegisecurity.intercept.web.FilterSecurityInterceptor"&gt;<br>        &lt;!-- 驗證管理員 --&gt;<br>        &lt;property name="authenticationManager" ref="authenticationManager" /&gt;<br>        &lt;!-- 授權管理員 --&gt;<br>        &lt;property name="accessDecisionManager" ref="accessDecisionManager" /&gt;<br>        &lt;property name="objectDefinitionSource"&gt;<br>            &lt;value&gt;<br>                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON<br>                PATTERN_TYPE_APACHE_ANT<br>                /protected/**=ROLE_SUPERVISOR,ROLE_USER<br>            &lt;/value&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>    <br>    &lt;!-- 授權管理員 --&gt;<br>    &lt;bean id="accessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased"&gt;<br>         &lt;!-- 是否全部棄權時視為通過 --&gt;<br>         &lt;property name="allowIfAllAbstainDecisions" value="false" /&gt;<br>         &lt;property name="decisionVoters"&gt;<br>             &lt;list&gt;<br>                 &lt;bean class="org.acegisecurity.vote.RoleVoter" /&gt;<br>             &lt;/list&gt;<br>         &lt;/property&gt;<br>    &lt;/bean&gt;        <br><br>    &lt;bean id="httpSessionContextIntegrationFilter"<br>	  class="org.acegisecurity.context.HttpSessionContextIntegrationFilter" /&gt;<br>&nbsp;<br>    &lt;!-- Filter Chain --&gt;<br>     &lt;bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy"&gt;  <br>       &lt;property name="filterInvocationDefinitionSource"&gt;  <br>          &lt;value&gt;  <br>            CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON <br>            PATTERN_TYPE_APACHE_ANT <br>            /**=httpSessionContextIntegrationFilter,authenticationProcessingFilter,<br>                 exceptionTranslationFilter,filterSecurityInterceptor<br>         &lt;/value&gt; <br>      &lt;/property&gt; <br>    &lt;/bean&gt;    <br>&lt;/beans&gt;   </pre>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/AcegiGossip/FirstAcegConfig.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:29 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

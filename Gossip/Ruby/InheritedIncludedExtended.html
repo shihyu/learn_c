@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/InheritedIncludedExtended.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>inherited、included、extended 方法</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: inherited、included、extended 方法<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small style="font-family: Courier New,Courier,monospace;">如果類別定義有inherited類別方法，被子類別繼承時，inherited會被呼叫，並傳入子類別作為引數。例如：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def self.inherited(clz)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "#{self} is inherited by #{clz}"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; class Other &lt; Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts self<br>
+&gt;&gt; end<br>
+            </span>Some is inherited by Other<br>
+Other<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">注意inherited被執行的時機，是在子類別本體執行之前。一個應用的例子，在<big> </big></small><small><big><a href="AbstractClassInterface.html"><small>抽象類別與介面</small></a></big> 中談過，模擬了Java中抽象類別的概念。<br>
+      <br>
+如果模組中定義有<span style="font-family: Courier New,Courier,monospace;">included</span>模組方法，在被其它類別含括時，<span style="font-family: Courier New,Courier,monospace;">included</span>方法會被呼叫，並傳入含括類別的模組作為引數。例如：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; module M1<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def self.included(clz)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "#{self} is included by #{clz}"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; include M1<br>
+&gt;&gt; end<br>
+            </span>M1 is included by Some<br>
+=&gt; Some<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">一個應用的例子，在<big> </big></small><small><big><a href="AbstractClassInterface.html"><small>抽象類別與介面</small></a></big> 中談過，用模組來模擬Java中<span style="font-family: Courier New,Courier,monospace;">interface</span>的概念。另一個常見應用，是讓模組可以定義各類別共用的類別方法。例如：<br>
+      </small>
+      <pre># encoding: Big5<br>module M1<br>    def self.included(clz)<br>        def clz.execute<br>            puts "共用的 execute 類別方法"<br>        end<br>    end<br>end<br><br>class Some<br>    include M1<br>end<br><br>class Other<br>    include M1<br>end<br><br>Some.execute    # 顯示 "共用的 execute 類別方法"<br>Other.execute   # 顯示 "共用的 execute 類別方法"
+      </pre>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">如果模組定義有extended方法，其它實例使用extend方法擴充模組時，extended方法會被呼叫，並傳入實例作為引數。例如：</span></small><br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; module M1<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def self.extended(o)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts o<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; o = Object.new<br>
+            </span>=&gt; #&lt;Object:0x27dfa28&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; o.extend(M1)<br>
+            </span>#&lt;Object:0x27dfa28&gt;<br>
+=&gt; #&lt;Object:0x27dfa28&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">就類別而言，開啟類別使用include來含括模組，與使用類別的extend來擴充模組，雖然作用是相同的，但會觸發的方法並不同，分別是included與extended，你也可以同時定義兩個方法，讓include與extend時，都呼叫同一個方法：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre># encoding: Big5<br>module M1<br>    def self.included(clz)<br>        self.set_execute_class_method(clz)<br>    end<br>    <br>    def self.extended(obj)<br>        self.set_execute_class_method(obj)<br>    end<br>    <br>    def self.set_execute_class_method(clz)<br>        def clz.execute<br>            puts "共用的 execute 類別方法"<br>        end<br>    end<br>end<br><br>class Some; end<br>class Other; end<br><br>Some.extend(M1)<br>Other.extend(M1)<br><br>Some.execute    # 顯示 "共用的 execute 類別方法"<br>Other.execute   # 顯示 "共用的 execute 類別方法"<br></pre>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/InheritedIncludedExtended.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

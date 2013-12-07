@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ObserverPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:34 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Observer 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Observer 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>您打算開發一個多人連線程式，其中每個連線後的客戶端，都會建立一個Client物件封裝客戶端的相關資訊，並且加入一個
+ClientQueue中集中管理。<br>
+      <br>
+假設現在程式中其它部份，可能對ClientQueue中Client的加入或移除有興趣，並且希望Client加入或移除時都可以收到通知，以便作一些
+處理，那麼您可以作類似以下的設計：<br>
+      </small>
+      <pre>import java.util.*;<br><br>class Client {<br>    private String ip;<br>    private String name;<br>    // ... 其它資料...<br>    public Client(String ip, String name) {<br>        this.ip = ip;<br>        this.name = name;<br>    }<br>    void setIp(String ip) { this.ip = ip; }<br>    void setName(String name) { this.name = name; }<br>    String getIp() { return ip; }<br>    String getName() { return name; }<br>    // ... 其它方法...<br>}<br><br>class ClientEvent {<br>    final String ip;<br>    final String name;<br>    ClientEvent(Client client) {<br>        this.ip = client.getIp();<br>        this.name = client.getName();<br>    }<br>}<br><br>interface ClientListener {<br>    void clientAdded(ClientEvent event);<br>    void clientRemoved(ClientEvent event);<br>}<br><br>class ClientQueue {<br>    private List&lt;Client&gt; clients = new LinkedList&lt;Client&gt;();<br>    private List&lt;ClientListener&gt; listeners = new LinkedList&lt;ClientListener&gt;();<br>            <br><span style="font-weight: bold;">    void addClientListener(ClientListener listener) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        listeners.add(listener);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    void removeClientListener(ClientListener listener) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        listeners.remove(listener);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>    <br><span style="font-weight: bold;">    void notifyAdded(Client client) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        ClientEvent event = new ClientEvent(client);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        for(ClientListener listener : listeners) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            listener.clientAdded(event);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    void notifyRemoved(Client client) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        ClientEvent event = new ClientEvent(client);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        for(ClientListener listener : listeners) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            listener.clientRemoved(event);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>    <br>    void add(Client client) {<br>        clients.add(client);<br><span style="font-weight: bold;">        notifyAdded(client);</span><br>    }<br>    void remove(Client client) {<br>        clients.remove(client);<br><span style="font-weight: bold;">        notifyRemoved(client);</span><br>    }<br>    <br>    // 還有一些客戶管理佇列的其它職責....<br>}</pre>
+      <small><br>
+對ClientQueue
+中Client物件加入、移除有興趣的，可以實作ClientListener介面，並且向ClientQueue註冊，也就是使用
+ClientQueue的addClientListener()來加入至ClientQueue之中（或使用removeClientListener
+()移除），每當有Client加入或移除時，會呼叫notifyAdded()或notifyRemoved()方法，方法中會以迴圈方式逐一取出當初
+訂閱ClientQueue的物件，並呼叫對應的clientAdded()或clientRemoved()方法。<br>
+      <br>
+一個使用的例子如下所示：<br>
+      </small>
+      <pre>class ClientLogger implements ClientListener {<br>    public void clientAdded(ClientEvent event) {<br>        System.out.println(event.ip + " added...");<br>    }<br>    public void clientRemoved(ClientEvent event) {<br>        System.out.println(event.ip + " removed...");<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        ClientQueue queue = new ClientQueue();<br>        queue.addClientListener(new ClientLogger());<br>        Client c1 = new Client("127.0.0.1", "caterpillar");<br>        Client c2 = new Client("192.168.0.2", "justin");<br>        queue.add(c1);<br>        queue.add(c2);<br>        queue.remove(c1);<br>        queue.remove(c2);<br>    }<br>}</pre>
+      <br>
+      <small>這是Observer模式的實現，在Observer模式中的主角為主題（subject）與觀察者（observer），主
+題可被多個觀
+察者訂閱，當主題的狀態發生變化時，它必須通知（notify）所有訂閱它的觀察者，觀察者檢視主題的狀態變化，並作出對應的動作。 <br>
+      <br>
+以Python來實現這個範例的話：<br>
+      </small>
+      <pre>class Client:<br>    def __init__(self, ip, name):<br>        self.ip = ip<br>        self.name = name<br>        <br>    # ... 其它方法...<br><br>class ClientEvent:<br>    pass<br><br>class ClientQueue:<br>    def __init__(self):<br>        self.clients = []<br>        self.listeners = []<br>            <br>    def addClientListener(self, listener):<br>        self.listeners.append(listener)<br>    <br>    def removeClientListener(self, listener):<br>        self.listeners.remove(listener)<br>   <br>    def notifyAdded(self, client):<br>        event = ClientEvent()<br>        event.ip = client.ip<br>        event.name = client.name<br>        for listener in self.listeners:<br>            listener.clientAdded(event)<br>    <br>    def notifyRemoved(self, client):<br>        event = ClientEvent()<br>        event.ip = client.ip<br>        event.name = client.name<br>        for listener in self.listeners:<br>            listener.clientRemoved(event)<br>          <br>    def add(self, client):<br>        self.clients.append(client)<br>        self.notifyAdded(client)<br>    <br>    def remove(self, client):<br>        self.clients.remove(client)<br>        self.notifyRemoved(client)    <br>        <br>    # 還有一些客戶管理佇列的其它職責....<br><br>class ClientLogger:<br>    def clientAdded(self, event):<br>        print(event.ip + " added...")<br>        <br>    def clientRemoved(self, event):<br>        print(event.ip + " removed...")<br>    <br>queue = ClientQueue()<br>queue.addClientListener(ClientLogger())<br>c1 = Client("127.0.0.1", "caterpillar")<br>c2 = Client("192.168.0.2", "justin")<br>queue.add(c1)<br>queue.add(c2)<br>queue.remove(c1)<br>queue.remove(c2)</pre>
+      <small> <br>
+以更一般的方式來表示Observer模式：<br>
+      </small><img style="width: 544px; height: 268px;" alt="" src="images/Observer-1.jpg"><br>
+      <small><br>
+Subject類中有一個notify()方法，通常是在Subject的狀態發生改變時呼叫它，notify()中會呼叫
+Observer的update()方法，通常會先取得Subject的新狀態，然後更新Observer的顯示或行為，這個過程我們可以透過順序圖來表
+達： <br>
+      <img style="width: 378px; height: 294px;" alt="" src="images/Observer-2.jpg"></small><small><br>
+      <br>
+在Java中支援觀察者模式，要成為觀察者的類必須實作Observer介面，這個介面中定義了一個update()方法，這個方法會被主題物件在通知狀
+態變化時呼叫，您必須在這個方法中實作您所想要的對應行為。主題物件會是Observable的子類，在這邊注意兩個重要的方法：setChanged
+()與notifyObserver()。setChanged()是用來設定主題物件的狀態已經被改變，而notifyObserver()方法會通知
+所要訂閱主題物件的觀察者，呼叫其
+update()方法。<br>
+      <br>
+      <br>
+      </small> </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ObserverPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:35 GMT -->
+</html>

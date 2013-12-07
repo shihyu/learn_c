@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/ActionMailer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>使用 ActionMailer</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror ActionMailer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 使用 ActionMailer<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>在Rails中，使用ActionMailer建立模型與郵件回應內容，在發送郵件之前，得先設定郵件伺服器，這主要是使用config.action_mailer.delivery_method設定，預設值為:smtp，表示使用SMTP協定傳送郵件，另外還可以設定的選項是:sendmail、:file與:test。</p>
+      <p>如果使用預設的SMTP，Gmail的設定為例：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>config.action_mailer.smtp_settings = {<br>
+          &nbsp;&nbsp;&nbsp; :address =&gt; "smtp.gmail.com",<br>
+          &nbsp;&nbsp;&nbsp; :port =&gt; "587",<br>
+          &nbsp;&nbsp;&nbsp; :domain =&gt; "gmail.com",<br>
+          &nbsp;&nbsp;&nbsp; :authentication =&gt; "plain",<br>
+          &nbsp;&nbsp;&nbsp; :user_name =&gt; "example@gmail.com", # 你的郵件<br>
+          &nbsp;&nbsp;&nbsp; :password =&gt; "123456",&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 你的密碼<br>
+          &nbsp;&nbsp;&nbsp; :enable_starttls_auto =&gt; true<br>
+          &nbsp;}</strong><br>
+      </p>
+      <p>接著可以產生郵件模型：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rails generate mailer UserMailer<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app/mailers/user_mailer.rb<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp; erb<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; app/views/user_mailer<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp; test_unit<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; test/functional/user_mailer_test.rb<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      接著可以編輯app/mailers/user_mailer.rb：<br>
+      <ul>
+        <li>user_mailer.rb</li>
+      </ul>
+      <pre>class UserMailer &lt; ActionMailer::Base
+    default :from =&gt; "example@gmail.com" # 你的郵件
+
+    def welcome(user)
+        @user = user
+        mail(:to =&gt; user.email, :subject =&gt; "Welcome to Openhome.cc")
+    end
+end<br></pre>
+      <br>
+      與控制器類似，實例變數在執行完<span class="courier">welcome</span>方法之後，可於郵件內容樣版中取用。<span
+        class="courier">default方法可設定mail方法中要用到的選項之預設值，:from表示郵件寄件者，:to表示收件者，:subject</span>是郵件主題。<br>
+      <br>
+      執行完<span class="courier">welcome</span>方法之後，郵件內容樣版會使用app/views/user_mailer/welcome.txt.erb或app/views/user_mailer/welcome.html.erb，如果兩者都存在，則Rails自動產生multiplepart/alternative郵件。例如想撰寫welcome.txt.erb，可以如下：<br>
+      <ul>
+        <li>welcome.txt.erb</li>
+      </ul>
+      <pre>Welcome to Openhome.cc, &lt;%= @user.name %&gt;
+Thanks for joining and have a great day!<br></pre>
+      <p>或想撰寫welcome.html.erb，可以如下：</p>
+      <ul>
+        <li>welcome.html.erb</li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Welcome to Openhome.cc, &lt;%= @user.name %&gt;&lt;/h1&gt;
+    &lt;p&gt;Thanks for joining and have a great day!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;<br></pre>
+      <p><span class="courier">如上定義之後，想要發送郵件，不需要自行實例化UserMailer，可以直接呼叫UserMailer.welcome並傳入所需的物件，UserMailer.welcome會處理郵件設定相關細節，實例化UserMailer，呼叫其welcome實例方法，然後傳回Mail::Message實例，呼叫Mail::Message實例的deliver方法，就會進行郵件傳送，也就是說，要傳送郵件只要如下就可以了：</span></p>
+      <p class="courier" style="margin-left: 40px;">UserMailer.welcome(user).deliver</p>
+      <p>例如在Rails console中測試一下以上程式：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ rails c<br>
+              Loading development environment (Rails 3.1.3)<br>
+              irb(main):001:0&gt; user = Class.new {<br>
+              irb(main):002:1*&nbsp;&nbsp;&nbsp;&nbsp; def email<br>
+              irb(main):003:2&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "some@gmail.com"<br>
+              irb(main):004:2&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+              irb(main):005:1&gt;&nbsp;&nbsp;&nbsp;&nbsp; def name<br>
+              irb(main):006:2&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "Some"<br>
+              irb(main):007:2&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+              irb(main):008:1&gt; }.new<br>
+              =&gt; #&lt;#&lt;Class:0x9f8f364&gt;:0x9f8f300&gt;<br>
+              irb(main):009:0&gt; UserMailer.welcome(user).deliver<br>
+              =&gt; #&lt;Mail::Message:91566930, Multipart: true, Headers: &lt;Date: Mon, 13 Feb 2012 10:29:42 +0800&gt;, &lt;From: example@gmail.com&gt;, &lt;To: some@gmail.com&gt;, &lt;Message-ID: &lt;4f3875967ca9a_878495a5fc403bd@caterpillar-VirtualBox.mail&gt;&gt;, &lt;Subject: Welcome to Openhome.cc&gt;, &lt;Mime-Version: 1.0&gt;, &lt;Content-Type: multipart/alternative; boundary="--==_mimepart_4f3875965413f_878495a5fc4004d"; charset=UTF-8&gt;, &lt;Content-Transfer-Encoding: 7bit&gt;&gt;<br>
+              irb(main):010:0&gt; <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>如果要附加檔案，可以使用<span class="courier">attachments</span>。例如：</p>
+      <ul>
+        <li>user_mailer.rb</li>
+      </ul>
+      <pre>class UserMailer &lt; ActionMailer::Base
+    default :from =&gt; "example@gmail.com" # 你的郵件
+
+    def welcome(user)
+        @user = user<br>        <strong>attachments["caterpillar.jpg"] = File.read("/path/to/caterpillar.jpg")</strong><br>        mail(:to =&gt; user.email, :subject =&gt; "Welcome to Openhome.cc")
+    end
+end<br></pre>
+      <p></p>
+      如果要將附件內嵌在郵件之中，例如圖檔，可以如下：<br>
+      <ul>
+        <li>user_mailer.rb</li>
+      </ul>
+      <pre>class UserMailer &lt; ActionMailer::Base
+    default :from =&gt; "example@gmail.com" # 你的郵件
+
+    def welcome(user)
+        @user = user<br>        <strong>attachments.inline["caterpillar.jpg"] = File.read("/path/to/caterpillar.jpg")</strong><br>        mail(:to =&gt; user.email, :subject =&gt; "Welcome to Openhome.cc")
+    end
+end</pre>
+      <br>
+      在HTML郵件內容中，可以使用<span class="courier">image_tag</span>輔助方法來顯示內嵌附件。例如：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;">&lt;%= image_tag attachments["caterpillar.jpg"].url %&gt;<br>
+      </div>
+      <p> </p>
+      <p></p>
+      更多有關ActionMailer的使用，可以參考 <a href="http://guides.rubyonrails.org/action_mailer_basics.html">Action Mailer Basics</a>，或者是 <a
+        href="http://api.rubyonrails.org/classes/ActionMailer/Base.html">ActionMailer::Base</a>。<br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/ActionMailer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+</html>

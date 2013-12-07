@@ -1,0 +1,531 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ClassABC.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>使用類別（Class）定義物件</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 使用類別（Class）定義物件</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>物件導向設計中，物件並不是憑空產生的，您必須先定義您的物件，您要一個規格書，這個規格書稱之為<span style="font-weight: bold;">類別（Class）</span>。<br>
+
+      <br>
+
+
+
+
+在Java中使用"class"關鍵字來書寫類別（規格書），您使用類別來定義一個物件（object）時，您考慮這個物件可能擁有的<span style="font-weight: bold;">「屬性」（Property，在Java中則是用Field）</span>與<span style="font-weight: bold;">「方法」（Method）</span>。屬性是參與物件內部運算的資料成員，而方法則是物件與外界互動的動態操作。<br>
+
+      <br>
+
+
+
+
+您使用類別定義出物件的規格書，之後根據這個規格書來建構物件，然後透過物件所提供的操作介面來與程式互動。<br>
+
+      <br>
+
+
+
+
+舉個例子來說，您可以定義一個物件：「球」。<br>
+
+      <br>
+
+
+
+
+考慮球有各種不同的顏色（或名稱），以及球最基本的球半徑資訊，您想到這些資訊應該可以取得，並可以進一步取得球的體積，當您在Java中要定義這些資訊時，您可以如下進行定義：</small>
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li> Ball.java </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>public class Ball { <br>    private double radius; // 半徑 <br>    private String name;  // 名稱<br> <br>    // 無參數建構方法 <br>    public Ball() { <br>        this(0.0, "no name");<br>    }<br> <br>    // 有參數建構方法 <br>    public Ball(double radius, String name) {  <br>        this.radius = radius; <br>        this.name = name; <br>    }<br><br>    public double getRadius() { <br>        return radius; <br>    }<br><br>    public String getName() { <br>        return name; <br>    }<br><br>    public void setRadius(double radius) {<br>        this.radius = radius;<br>    }<br>    <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>}  <br></pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+一個定義良好的類別，即使在不看程式碼實作的情況下，也可以從定義中所提供的公開（public）方法看出這個類別的大致功能。<br>
+
+      <br>
+
+
+
+
+"class"是Java中用來定義類別的關鍵字，Ball是您所取的類別名稱，記得一個類別的定義是這麼作的：<br>
+
+      </small>
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Ball { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 實作內容 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在類別中的運算參與資料（Field）及互動方法（Method），我們統稱其為 <a href="ClassMember.htm">類別成員（Class member）</a>。<br>
+
+      <br>
+
+
+
+
+上例中的radius、name成員是field成員，getRadius()與getName()是method成員。注意到"public"這個關鍵
+字，它表示所定義的成員可以使用宣告的物件名稱加上 '.'
+運算子直接呼叫，也稱之為「公用成員」或「公開成員」。而private這個關鍵字用來定義一個「私用成員」，它不可以透過參考名稱直接呼叫，又稱之為
+「私有成員」。<br>
+
+      <br>
+
+
+
+
+在定義類別時，有一個基本原則是：<span style="font-weight: bold;">資訊的最小化公開</span>。也就是說儘量透過方法來操作物件，而不是直接存取其內部運算參與資料（也就是field成員）。<br>
+
+      <br>
+
+
+
+
+資訊的最小化公開原則是基於安全性的考量，避免程式設計人員隨意操作field成員而造成程式的錯誤，您可以在日後的程式設計中慢慢來體會；在稍後的實作中，您將可以看到，我們將不會radius與name兩個私用成員直接進行存取，而是透過公開的方法來進行設定。<br>
+
+      <br>
+
+
+
+
+
+一個類別中的field成員，若宣告為"private"，則其可視範圍（Scope）為整個類別，由於外界無法直接存取私用成員，所以您使用兩個公開方法
+getRadius()與getName()分別傳回其這兩個成員的值。 <br>
+
+      <br>
+
+
+
+
+與類別名稱同名的方法稱之為 <a class="wikilink" href="ObjectConstructor.htm">建構方法 Cconstructor）</a>，也有人稱之為<span style="font-weight: bold;">「建構子」</span>，它沒有傳回值。顧名思義，建構方法的作用是讓您建構物件可以設定一些必要的建構資訊，它可
+以被<span style="font-weight: bold;">重載（Overload）</span>，以滿足物件生成時不同的設定條件。 <br>
+
+      <br>
+
+
+
+
+您在實作中重載了建構方法，在不指定參數的情況下，會將radius設定為0.0，而name設定為 "no
+name"，另一個建構方法則可以指定參數，<span style="font-weight: bold;">this()</span>方法用於物件內部，表示呼叫物件的建構方法，另一個就是<span style="font-weight: bold;">this</span>，它表示物件本身，您可以在 <a class="wikilink" href="AboutThis.htm">關於 this</a> 進一步瞭解其作用。<br>
+
+      <br>
+
+
+
+
+定義好類別之後，您就可根據這個類別（規格）來建構物件，建構物件時使用<span style="font-weight: bold;">new</span>關鍵字，顧名思義，就是根據所指定的類別（規格書）「新建」一個物件：
+      <br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Ball ball1 = new Ball(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Ball ball2 = new Ball(3.5, "red ball");</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在上例中配置了ball1與ball2兩個物件，ball1物件在建立時並不指定任何參數，所以根據之前對Ball類別的定義，ball1的radius
+將設定為0.0，name設定為"no
+name"；ball2則給定兩個參數，所以ball2的radius設定為3.5，而ball2的name設定為"red ball"。<br>
+
+      <br>
+
+
+
+
+您可以透過公開成員來操作物件或取得物件資訊，方法是使用<span style="font-weight: bold;">物件名稱加上「.」運算子</span>，例如：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ball1.getRadius(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ball1.setName("GBall");</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+以下先看個簡單的程式： </small><br>
+
+
+
+
+      
+      <ul>
+
+        <li> SimpleClass.java </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>public class SimpleClass { <br>    public static void main(String[] args) { <br>        Ball b1 = new Ball(18.4, "red ball");<br>        System.out.println("名稱: " + b1.getName()); <br>        System.out.println("半徑: " + b1.getRadius()); <br>    } <br>} <br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">名稱: red ball <br>
+
+
+
+
+半徑: 18.4</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+類別與物件這兩個名詞會經常混於書籍與文件之中，例如「您可以使用Scanner類別」、「您可以使用Scanner物件」，這兩句在某些場合其語義是相
+同的，不過要細究的話，兩句的意思通常都是「您可以使用根據Scanner類別所建構出來的物件」，不過寫這麼長很煩，難免就省略了一些字眼。<br>
+
+      <br>
+
+
+
+
+Java會將參與內部運算的資料命名為field，其實是蠻有道理的，field在英文中有事件的參與者的意義，有限定範圍的意思。基本上，在定義物件
+時，field成員其作用範圍要限定於物件之中，對物件內部資料的變更，都要透過公開方法來進行，避免field成員的作用範圍離開了物件之外。</small>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<small><br>
+
+<br>
+
+</small><br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ClassABC.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

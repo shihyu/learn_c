@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/BuildAjaxLibrary-4.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:21 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript" src="js/gossip-0.5.js"></script>
+        <script type="text/javascript">
+            XD.bind(window, 'load', function() {
+                XD('#search').click(function() {
+                    XD.jsonp({
+                        url      : 'http://api.flickr.com/services/' + 
+                                   'feeds/photos_public.gne',
+                        data     : {
+                            tagmode : 'any',
+                            format  : 'json',
+                            tags    : XD('#tags').val()
+                        },
+                        callback : function(data) {
+                            var imagesXD = XD('#images').removeChilds();
+                            XD.each(data.items, function(item) {
+                                XD('<img>').attr('src', item.media.m).appendTo(imagesXD);
+                            });
+                        }
+                    }, 'jsoncallback');
+                });
+            });
+        </script>        
+    </head>
+    <body>
+    	<input id="tags"><br>
+		<button id="search">搜尋</button>
+    	<div id="images"></div>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/BuildAjaxLibrary-4.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:21 GMT -->
+</html>

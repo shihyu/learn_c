@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  
+<!-- Mirrored from openhome.cc/Gossip/Scala/Inheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+    <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+    <link rel="stylesheet" href="css/print.css" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>繼承</title>
+  </head>
+  <body>
+    <h3><a href="../index.html">From
+        Gossip@Openhome</a></h3>
+    <h1><a href="index-2.html">Scala Gossip: 繼承</a></h1>
+    <table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0"
+      cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top; width: 250px; text-align: center;">
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+           <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+          </td>
+          <td style="vertical-align: top; width: 690px; text-align: left;"><small>你
+              建立了一個銀行帳戶類別：<br>
+            </small>
+            <pre>class Account(val id: String, val name: String) {<br>    <span
+style="font-weight: bold;">protected</span> var bal: Int = _<br><br>    def deposit(amount: Int) {<br>        require(amount &gt; 0)<br>        bal += amount<br>    }<br>    <br>    def withdraw(amount: Int) {<br>        require(amount &gt; 0)<br>        if(amount &lt;= bal) {<br>            bal -= amount<br>        }<br>        else {<br>            throw new RuntimeException("餘額不足")<br>        }<br>    }<br>    <br>    def balance = bal<br>    <br>    <span
+style="font-weight: bold;">override</span> def toString = "Id:\t\t" + id + <br>                            "\nName:\t\t" + name +<br>                            "\nBalance:\t" + bal<br>}<br></pre>
+            <br>
+            <small>在這個類別中，雖然沒有聲明，但你已經使用了繼承，在Scala中，<span style="font-weight: bold;">如
+                果你沒有指定繼承任何類別，預設就是繼承scala.AnyRef</span>（相當於Java的
+              java.lang.Object），在上面的例子中，你重新定義了AnyRef的toString方法，傳回帳戶資料的描述字串。<br>
+              <br>
+              在Scala中，如果你要重新定義父類別中的成員，</small><small><span style="font-weight: bold;">override
+                關鍵字是必要的</span>，如果沒有標明override，編譯器會告訴你，你正定義一個父類別中已經有的成員：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">error:
+                error overriding method toString in class Obj</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">ect
+                of type() java.lang.String;</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;method
+                toString needs `override' modifier</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+                def toString = "Id:\t\t" + id +</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                ^</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">one
+                error found</small><br>
+            </div>
+            <small><br>
+              這避免你在不知情的情況下，重新定義了某個父類別的成員，override的另一個作用是，如果你指定要override某個成員，但父類別
+              中根本不存在該成員（也許是你打錯字了），編譯器也會提出警訊：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">error: method tString overrides
+                  nothing</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+                  override def tString = "Id:\t\t" + id +</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  ^</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">one
+                  error found</span></small><br>
+            </div>
+            <small><br>
+              假設你為以上的類別建立了一個支票帳戶：<br>
+            </small>
+            <pre>class CheckingAccount(<span style="font-weight: bold;">override</span> val id: String, <span
+style="font-weight: bold;">override</span> val name: String) <br>                      <span
+style="font-weight: bold;"> extends Account(id, name)</span> { // 繼承並呼叫父類別建構式<br>    private var limit: Int = 30000<br>    <br>    def overdraftLimit = limit<br>    def overdraftLimit_=(amount: Int) {<br>        require(amount &gt; 0)<br>        limit = amount<br>    }<br>    <br>    <span
+style="font-weight: bold;">override</span> def withdraw(amount: Int) {<br>        require(amount &gt; 0)<br>        if(amount &lt;= bal + overdraftLimit) {<br>            bal -= amount<br>        }<br>        else {<br>            throw new RuntimeException("超出信用")<br>        }<br>    }<br>    <br>    <span
+style="font-weight: bold;">override</span> def toString = <span style="font-weight: bold;">super</span>.toString + <br>                            "\nOverdraft limit:" + overdraftLimit<br>}</pre>
+            <small><br>
+              在Scala中，使用extends來指定要繼承自哪個類別，<span style="font-weight: bold;">如果需要
+                呼叫父類別建構式，則只有主要建構式能夠呼叫，輔助建構式是不能呼叫父類別建構式的</span>。</small><small>由於
+              bal在父類別中是宣告為protected，所以可以（也僅能）在子類別中使用（跟Java不同的是，Scala的protected並沒
+              有package-private的含義）。如果在子類別中，打算呼叫父類別的方法，則可以如範例中，使用super來呼叫。</small><br>
+            <small><br>
+              上例中，由於id與name的定義，與父類別是一致的，所以必須使用override指明，你要定義的成員確實是與父類別相同的，如果你不使
+              用override：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">class CheckingAccount(val id:
+                  String, val name: String) <br>
+                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;extends Account(id,
+                  name) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+            </div>
+            <small><br>
+              則編譯器也會提醒你，你正試圖定義父類別已有的成員：<br>
+            </small>
+            <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">error:
+                  error overriding value id in class Account of</span></small><small><span
+                  style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+                  type String;</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;value
+                  id needs `override' modifier</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class
+                  CheckingAccount(val id: String, val name: String)</span></small><br
+                style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  ^</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">error:
+                  error overriding value name in class Account </span></small><small><span
+                  style="font-weight: bold; font-family: Courier New,Courier,monospace;">of
+                  type String;</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;value
+                  name needs `override' modifier</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class
+                  CheckingAccount(val id: String, val name: String)</span></small><br
+                style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  ^</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">two
+                  errors found</span></small><br>
+            </div>
+            <small><br>
+              如果你在定義類別時，加上final關鍵字，則該類別將不再能被繼承，例如：<br>
+            </small>
+            <pre><span style="font-weight: bold;">final</span> class SuperAccount   // 這個類別不能被繼承</pre>
+            <small><br>
+              如果在類別中定義方法時，加上final關鍵字，則子類別不可以重新定義該方法：<br>
+            </small>
+            <pre>class FakeAccount {<br>    <span style="font-weight: bold;">final</span> def withdraw(amount: Int) = 0 // 不能被重新定義<br>}</pre>
+            <small><br>
+              <br>
+            </small></td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+    <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+
+<!-- Mirrored from openhome.cc/Gossip/Scala/Inheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

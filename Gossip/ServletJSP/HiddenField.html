@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/HiddenField.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>隱藏欄位</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 隱藏欄位<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在HTTP協定中，伺服器是個健忘的傢伙，對每次的請求都一視同仁，根據請求中的資訊來執行程式並回應，每個請求對伺服器來說都是新的訪客請求。<br>
+      <br>
+如果你正在製作一個網路問卷，由於問卷內容很長，因此必須分作幾個頁面，上一頁面作答完後，必須請求伺服器顯示下一個頁面。但是在HTTP協定中，伺服器
+並不會記得上一次請求的狀態，那上一頁的問卷結果要如何保留（其實伺服器根本不會記得這次請求是之前的瀏覽器發送過來的）？<br>
+      <br>
+既然伺服器不會記得兩次請求間的關係，那就由瀏覽器在每次請求時<span style="font-weight: bold;">「主動告知」</span>伺服器多次請求間必要的資訊，伺服器只要單純地處理請求中的相關訊息即可。<br>
+      <br>
+隱藏欄位（Hidden field）就是主動告知伺服器多次請求間必要資訊的方式之一。以問卷作答的範例來說，上一頁的問卷答案，可以用隱藏欄位的方式放在下一頁的表單中，如此發送下一頁表單時，就可以一併發送這些隱藏欄位，每一頁的問卷答案就可以保留下來。<br>
+      <br>
+那麼上一次的結果如何成為下一頁的隱藏欄位呢？在客戶端可以直接在瀏覽器上使用JavaScript製作這個功能，或是將上一頁的結果發送至伺服器，由伺服器將上一頁結果以隱藏欄位的方式再回應給瀏覽器。<br>
+      <img style="width: 650px; height: 287px;" alt="" src="images/HiddenField-1.png"><br>
+      <br>
+以下這個範例是個簡單的示範，程式會有兩頁問卷，第一頁的結果會在第二頁成為隱藏欄位，當第二頁發送後，可以看到兩頁問卷的所有答案。<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="Questionnaire", urlPatterns={"/questionnaire"})<br>public class Questionnaire extends HttpServlet {<br>    protected void processRequest(HttpServletRequest req, <br>            HttpServletResponse resp) throws ServletException, IOException {<br>        req.setCharacterEncoding("UTF-8");<br>        resp.setContentType("text/html;charset=UTF-8");<br>        <br>        PrintWriter out = resp.getWriter();<br>        out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Questionnaire&lt;/title&gt;");<br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br><br><span style="font-weight: bold;">        String page = req.getParameter("page");</span><br>        out.println("&lt;form action=\"questionnaire\" method=\"post\"&gt;");<br><br>        if("page1".equals(page)) {          // 第一頁問卷<br>            out.println("問題一：&lt;input type=\"text\" name=\"p1q1\"&gt;&lt;br&gt;");<br>            out.println("問題二：&lt;input type=\"text\" name=\"p1q2\"&gt;&lt;br&gt;");<br>            out.println(<br>                    "&lt;input type=\"submit\" name=\"page\" value=\"page2\"&gt;");<br>        }<br>        else if("page2".equals(page)) {    // 第二頁問卷<br>            String p1q1 = req.getParameter("p1q1");<br>            String p1q2 = req.getParameter("p1q2");<br>            out.println("問題三：&lt;input type=\"text\" name=\"p2q1\"&gt;&lt;br&gt;");<br>            out.println("&lt;input type=\"hidden\" name=\"p1q1\" value=\"" +<br>                           p1q1 + "\"&gt;");<br>            out.println("&lt;input type=\"hidden\" name=\"p1q2\" value=\"" +<br>                           p1q2 + "\"&gt;");<br>            out.println(<br>                    "&lt;input type=\"submit\" name=\"page\" value=\"finish\"&gt;");<br>        }<br>        else if("finish".equals(page)) {    // 最後答案收集<br>            out.println(req.getParameter("p1q1") + "&lt;br&gt;");<br>            out.println(req.getParameter("p1q2") + "&lt;br&gt;");<br>            out.println(req.getParameter("p2q1") + "&lt;br&gt;");<br>        }<br>        out.println("&lt;/form&gt;");<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>        out.close();<br>    } <br><br>    @Override<br>    protected void doGet(HttpServletRequest req, HttpServletResponse resp)<br>    throws ServletException, IOException {<br>        processRequest(req, resp);<br>    } <br><br>    @Override<br>    protected void doPost(HttpServletRequest req, HttpServletResponse resp)<br>    throws ServletException, IOException {<br>        processRequest(req, resp);<br>    }<br>}<br></pre>
+      <small><br>
+由於程式只使用一個Servlet，所以利用一個<span style="font-family: Courier New,Courier,monospace;">page</span>請求參數來區別該顯示第幾頁問卷。<span style="font-family: Courier New,Courier,monospace;">page</span>請求參數的值為<span style="font-family: Courier New,Courier,monospace;">"page1"時，顯示第一頁問卷題目；為"page2"時，顯示第二頁問卷題目，並將前一頁的答案以隱藏欄位的方式回應給瀏覽器，以便下一次可以再發送給伺服器；page請求參數的值為"finish"時，應用程式將顯示問卷的所有答案。</span><br>
+      <br>
+在第二頁問卷顯示時，會傳回以下的HTML內容。<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;html&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;head&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;title&gt;Questionnaire&lt;/title&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/head&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;body&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;form action="questionnaire" method="post"&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 問題三：&lt;input type="text" name="p2q1"&gt;&lt;br&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input type="hidden" name="p1q1" value="測試一"&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input type="hidden" name="p1q2" value="測試二"&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input type="submit" name="page" value="finish"&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/form&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/body&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/html&gt;</small><br>
+      </div>
+      <small><br>
+使用隱藏欄位的方式，顯然地在關掉網頁後，就會遺失先前請求的資訊，所以僅適合用於一些簡單的狀態管理，像是線上問卷。由於在檢視網頁原始碼時，就可以看到隱藏欄位的值，因此這個方法不適合用於隱密性較高的資料。</small><br>
+      <br>
+      <small>隱藏欄位不是Servlet/JSP實際管理會話時的機制，在這邊實作隱藏欄位，只是為了說明，由瀏覽器主動告知必要的資訊，為實作Web應用程式會話管理的基本原理。<br>
+      </small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/HiddenField.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:58 GMT -->
+</html>

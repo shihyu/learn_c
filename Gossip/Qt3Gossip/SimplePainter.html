@@ -1,0 +1,803 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/SimplePainter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:24:10 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>簡單小畫家 - Qt 線上範例</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: 簡單小畫家 - Qt 線上範例</a></h1>
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在Qt的線上範例中，有一個scribble範例，這是一個簡單的小畫家，可以讓您在上面進行線段繪圖，並將繪圖結果儲存起來，當中還使用了一些緩衝區繪圖的概念，這邊將為您剖析這個範例如何進行。 <br>
+
+      <br>
+
+首先是編寫定義檔scribble.h： <br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>scribble.h</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#ifndef SCRIBBLE_H<br>#define SCRIBBLE_H<br><br>#include &lt;qmainwindow.h&gt;<br>#include &lt;qpen.h&gt;<br>#include &lt;qpoint.h&gt;<br>#include &lt;qpixmap.h&gt;<br>#include &lt;qwidget.h&gt;<br>#include &lt;qstring.h&gt;<br>#include &lt;qpointarray.h&gt;<br><br>class QMouseEvent;<br>class QResizeEvent;<br>class QPaintEvent;<br>class QToolButton;<br>class QSpinBox;<br><br>class Canvas : public QWidget<br>{<br>    Q_OBJECT<br><br>public:<br>    Canvas( QWidget *parent = 0, const char *name = 0 );<br><br>    void setPenColor( const QColor &amp;c )<br>    { pen.setColor( c ); }<br><br>    void setPenWidth( int w )<br>    { pen.setWidth( w ); }<br><br>    QColor penColor()<br>    { return pen.color(); }<br><br>    int penWidth()<br>    { return pen.width(); }<br><br>    void save( const QString &amp;filename, const QString &amp;format );<br><br>    void clearScreen();<br><br>protected:<br>    void mousePressEvent( QMouseEvent *e );<br>    void mouseReleaseEvent( QMouseEvent *e );<br>    void mouseMoveEvent( QMouseEvent *e );<br>    void resizeEvent( QResizeEvent *e );<br>    void paintEvent( QPaintEvent *e );<br><br>    QPen pen;<br>    QPointArray polyline;<br><br>    bool mousePressed;<br><br>    QPixmap buffer;<br><br>};<br><br>class Scribble : public QMainWindow<br>{<br>    Q_OBJECT<br><br>public:<br>    Scribble( QWidget *parent = 0, const char *name = 0 );<br><br>protected:<br>    Canvas* canvas;<br><br>    QSpinBox *bPWidth;<br>    QToolButton *bPColor, *bSave, *bClear;<br><br>protected slots:<br>    void slotSave();<br>    void slotColor();<br>    void slotWidth( int );<br>    void slotClear();<br><br>};<br><br>#endif </pre>
+
+      <small><br>
+
+其中QPointArray是用來定義一個點陣列，可以用於滑鼠拖曳繪圖，製作出連續繪圖的效果；我們使用QPixmap buffer製作出一個繪圖緩衝區，我們的圖形會先繪製在這上面，然後再貼到視窗畫面上。 <br>
+
+      <br>
+
+再來是scribble.cpp的實作，我們分區一段一段貼上來解說： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include "scribble.h" </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qapplication.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qevent.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qpainter.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qtoolbar.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qtoolbutton.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qspinbox.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qtooltip.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qrect.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qpoint.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qcolordialog.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qfiledialog.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qcursor.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qimage.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qstrlist.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qpopupmenu.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#include &lt;qintdict.h&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">const bool no_writing = FALSE; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Canvas::Canvas( QWidget *parent, const char *name ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; : QWidget( parent, name, WStaticContents ), pen( Qt::red, 3 ), polyline(3), </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mousePressed( FALSE ), buffer( width(), height() ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if ((qApp-&gt;argc() &gt; 0) &amp;&amp; !buffer.load(qApp-&gt;argv()[1])) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; buffer.fill( colorGroup().base() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; setBackgroundMode( QWidget::PaletteBase ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#ifndef QT_NO_CURSOR </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; setCursor( Qt::crossCursor ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#endif </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold;">
+
+      </div>
+
+      <small>這是建構函式，主要是設定外觀與決定是否載入圖片，這是由命令列引數來輸入圖片檔名，我們使用QPixmap的load()方法將圖片載入。 <br>
+
+      <br>
+
+      </small><small>QPixmap的save()方法可以讓您指定檔名與儲存格式來儲存圖檔：</small><br>
+
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Canvas::save( const QString &amp;filename, const QString &amp;format ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if ( !no_writing ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; buffer.save( filename, format.upper() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Canvas::clearScreen() </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; buffer.fill( colorGroup().base() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; repaint( FALSE ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Canvas::mousePressEvent( QMouseEvent *e ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; mousePressed = TRUE; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; polyline[2] = polyline[1] = polyline[0] = e-&gt;pos(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Canvas::mouseReleaseEvent( QMouseEvent * ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; mousePressed = FALSE; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+      </div>
+
+      <small><br>
+
+colorGroup().base()傳回QWidget的背景顏色，我們將緩衝區整個設定為該背景顏色，然後呼叫repaint()重繪視窗，作用相當於清除整個畫面。 <br>
+
+      <br>
+
+設定滑鼠按下與放開時的處理，按下滑鼠時，QPointArray的前三個元素都先設定為滑鼠按下時的位置。 <br>
+
+      <br>
+
+      </small><small>開始QPainter繪圖，繪製對象先設定為QPixmap物件buffer上，連續繪圖的程式碼您可以參考當中對QPointArray
+的設定，然後我們根據QPointArray來設定一個可包含它的QRect長方形範圍，normalize()方法校正使得QRect沒有負的寬與高，
+然後我們進一步對所選取的畫筆大小校正，最後使用bitBlt()方法將QPixmap物件buffer貼到QWidget主畫面上：</small><br>
+
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void Canvas::mouseMoveEvent( QMouseEvent *e ) </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">{ </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; if ( mousePressed ) { </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; QPainter painter; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; painter.begin( &amp;buffer ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; painter.setPen( pen ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; polyline[2] = polyline[1]; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; polyline[1] = polyline[0]; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; polyline[0] = e-&gt;pos(); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; painter.drawPolyline( polyline ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; painter.end(); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; QRect r = polyline.boundingRect(); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; r = r.normalize(); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; r.setLeft( r.left() - penWidth() ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; r.setTop( r.top() - penWidth() ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; r.setRight( r.right() + penWidth() ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; r.setBottom( r.bottom() + penWidth() ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; bitBlt( this, r.x(), r.y(), &amp;buffer, r.x(), r.y(), r.width(), r.height() ); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </small><br>
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+      </small><small>當重新將視窗置頂時，重置元件大小與重繪所有的畫面：</small><br>
+
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Canvas::resizeEvent( QResizeEvent *e ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QWidget::resizeEvent( e ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; int w = width() &gt; buffer.width() ? </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width() : buffer.width(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; int h = height() &gt; buffer.height() ? </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; height() : buffer.height(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QPixmap tmp( buffer ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; buffer.resize( w, h ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; buffer.fill( colorGroup().base() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bitBlt( &amp;buffer, 0, 0, &amp;tmp, 0, 0, tmp.width(), tmp.height() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+      </small><small>重繪畫面，我們可以利用QPaintEvent取得需要被更新的QRect物件，也就是需要被更新的區域（例如曾被其它視窗覆蓋的區域），然後將緩衝區上圖一個一個繪製上去（覺得麻煩的話，個人覺得就全部畫上去吧！）：</small><br>
+
+      <small></small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Canvas::paintEvent( QPaintEvent *e ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QWidget::paintEvent( e ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QMemArray&lt;QRect&gt; rects = e-&gt;region().rects(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; for ( uint i = 0; i &lt; rects.count(); i++ ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; QRect r = rects[(int)i]; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; bitBlt( this, r.x(), r.y(), &amp;buffer, r.x(), r.y(), r.width(), r.height() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+      </div>
+
+      <small></small><small><br>
+
+接下來這邊就都是一些版面配置與Signals - Slots連結，就不作太多說明了，有不懂的地方可以查詢看看Qt的線上範例：</small><br>
+
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Scribble::Scribble( QWidget *parent, const char *name ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; : QMainWindow( parent, name ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; canvas = new Canvas( this ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; setCentralWidget( canvas ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QToolBar *tools = new QToolBar( this ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bSave = new QToolButton( QPixmap(), "Save", "Save as PNG image", this, SLOT( slotSave() ), tools ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bSave-&gt;setText( "Save as..." ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; tools-&gt;addSeparator(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+bPColor = new QToolButton( QPixmap(), "Choose Pen Color", "Choose Pen
+Color", this, SLOT( slotColor() ), tools ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bPColor-&gt;setText( "Choose Pen Color..." ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; tools-&gt;addSeparator(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bPWidth = new QSpinBox( 1, 20, 1, tools ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QToolTip::add( bPWidth, "Choose Pen Width" ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; connect( bPWidth, SIGNAL( valueChanged( int ) ), this, SLOT( slotWidth( int ) ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bPWidth-&gt;setValue( 3 ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; tools-&gt;addSeparator(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bClear = new QToolButton( QPixmap(), "Clear Screen", "Clear Screen", this, SLOT( slotClear() ), tools ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bClear-&gt;setText( "Clear Screen" ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Scribble::slotSave() </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QPopupMenu *menu = new QPopupMenu( 0 ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QIntDict&lt;QString&gt; formats; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; formats.setAutoDelete( TRUE ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; for ( unsigned int i = 0; i &lt; QImageIO::outputFormats().count(); i++ ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; QString str = QString( QImageIO::outputFormats().at( i ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; formats.insert( menu-&gt;insertItem( QString( "%1..." ).arg( str ) ), new QString( str ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; menu-&gt;setMouseTracking( TRUE ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; int id = menu-&gt;exec( bSave-&gt;mapToGlobal( <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; QPoint( 0, bSave-&gt;height() + 1 ) ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if ( id != -1 ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; QString format = *formats[ id ]; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; QString filename = QFileDialog::getSaveFileName( QString::null, <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; QString( "*.%1" ).arg( format.lower() ), this ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; if ( !filename.isEmpty() ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; canvas-&gt;save( filename, format ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; delete menu; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Scribble::slotColor() </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QColor c = QColorDialog::getColor( canvas-&gt;penColor(), this ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if ( c.isValid() ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; canvas-&gt;setPenColor( c ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Scribble::slotWidth( int w ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; canvas-&gt;setPenWidth( w ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void Scribble::slotClear() </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; canvas-&gt;clearScreen(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold;">
+
+      </div>
+
+      <small>最後是main.cpp的內容： <br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>main.cpp</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include "scribble.h"<br>#include &lt;qapplication.h&gt;<br><br><br>int main( int argc, char **argv )<br>{<br>    QApplication a( argc, argv );<br><br>    Scribble scribble;<br><br>    scribble.resize( 500, 350 );<br>    scribble.setCaption("Qt Example - Scribble");<br>    a.setMainWidget( &amp;scribble );<br>    if ( QApplication::desktop()-&gt;width() &gt; 550<br>    &amp;&amp; QApplication::desktop()-&gt;height() &gt; 366 )<br>   scribble.show();<br>    else<br>   scribble.showMaximized();<br>    return a.exec();<br>}</pre>
+
+      <small><br>
+
+下圖為程式執行的畫面之一：<br>
+
+      <img style="width: 508px; height: 377px;" alt="" src="images/SimplePainter-1.jpg"><br>
+
+      </small>
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/SimplePainter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:24:12 GMT -->
+</html>

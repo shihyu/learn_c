@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/TagAPILifeCycle.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:59 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>了解生命週期與架構</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 了解生命週期與架構<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><span style="font-family: Courier New,Courier,monospace;">在實作Tag介面相關類別時，依不同的時機，要定義不同的doXxxTag()方法，並依需求傳回不同的值。doXxxTag()方法實際上是分別定義在<span style="font-weight: bold;">Tag</span>與<span style="font-weight: bold;">IterationTag</span>介面上的方法，它們的繼承與實作架構如下所示： <br>
+      <img style="width: 613px; height: 528px;" alt="" src="images/TagAPILifeCycle-1.png"><br>
+      <br>
+類似SimpleTag介面，Tag介面繼承自<span style="font-weight: bold;">JspTag</span>介面，它定義了基本的Tag行為，像是設定PageContext實例的setPageContext()、設定外層父標籤物件的<span style="font-weight: bold;">setParent()</span>方法、標籤物件銷毀前呼叫的<span style="font-weight: bold;">release()</span>方法等。<br>
+      <br>
+單是使用Tag介面的話，無法重複執行本體內容，而必須使用子介面IterationTag介面的<span style="font-weight: bold;">doAfterBody()</span>（之後會看到如何重複執行本體內容）。<span style="font-weight: bold;">TagSupport</span>類別實作了IteratorTag介面，對介面上所有方法作了基本實作，所以只需要在繼承TagSupport之後，針對必要的方法重新定義即可。<br>
+      <br>
+當</span>JSP<span style="font-family: Courier New,Courier,monospace;">中遇到TagSupport自訂標籤時，會進行以下的動作：<br>
+      </span></small>
+      <ol>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">嘗試從<span style="font-weight: bold;">標籤池（</span></span><span style="font-weight: bold;">Tag Pool</span><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">）</span>找到可用的標籤物件，如果找到就直接使用，如果沒找到就建立新的標籤物件。</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">呼叫標籤處理器的setPageContext()方法設定PageContext實例。</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">如果是巢狀標籤中的內層標籤，則還會呼叫標籤處理器的setParent()方法，並傳入外層標籤處理器的實例。</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">設定標籤處理器屬性（例如這邊是呼叫IfTag的setTest()方法來設定）。</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">呼叫標籤處理器的doStartTag()方法，並依不同的傳回值決定是否執行本體或呼叫doAfterBody()、doEndTag()方法（之後詳述）。</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">將標籤處理器實例置入標籤池中以便再度使用。</span></small></li>
+      </ol>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span>首先注意到第1點與第6點<span style="font-family: Courier New,Courier,monospace;">，沒錯！Tag實例是可以重複使用的（SimpleTag實例則是每次請求都建立新物件，用完就銷毀回收），所以自訂Tag類別時，要注意物件狀態是否會保留下來，必要的時候，在doStartTag()方法中，可以進行<span style="font-weight: bold;">狀態重置</span>的動作。別以為可以使用release()方法來作狀態重置，因為release()方法只會在標籤實例真正被銷毀回收前被呼叫。<br>
+      <br>
+接著來詳細說明第5點。</span>JSP<span style="font-family: Courier New,Courier,monospace;">頁面會根據標籤處理器各方法呼叫的不同傳回值，來決定要呼叫哪一個方法或進行哪一個動作，這個直接使用流程圖來說明會比較清楚：<br>
+      <img style="width: 455px; height: 450px;" alt="" src="images/TagAPILifeCycle-2.png"><br>
+      <br>
+      <span style="font-weight: bold;">doStartTag()</span>可以回傳<span style="font-weight: bold;">EVAL_BODY_INCLUDE</span>或<span style="font-weight: bold;">SKIP_BODY</span>。如果傳回EVAL_BODY_INCLUDE則會執行本體內容，而後呼叫doAfterBody()（就相當於SimpleTag的doTag()中呼叫了JspFragment的invoke()方法）。如果不想執行本體內容，則可傳回<span style="font-weight: bold;">SKIP_BODY</span>（就相當於SimpleTag的doTag()不呼叫JspFragment的invoke()方法），此時就會呼叫doEndTag()方法。<br>
+      <br>
+這邊暫時不討論doAfterBody()方法的傳回值，因為doAfterBody()預設傳回值是SKIP_BODY，如果不重新定義doAfterBody()方法，無論有無執行本體，流程最後都會來到doEndTag()。在doEndTag()中，可傳回<span style="font-weight: bold;">EVAL_PAGE</span>或<span style="font-weight: bold;">SKIP_PAGE</span>。如果傳回EVAL_PAGE，則自訂標籤後續的JSP頁面才會繼續執行，如果傳回SKIP_PAGE就不會執行後續的</span>JSP<span style="font-family: Courier New,Courier,monospace;">頁面（相當於SimpleTag的doTag()中丟出SkipPageException的作用）。<br>
+      <br>
+實際上，由於TagSupport類別對IterationTag介面作了基本實作，doStartTag()、doAfterBody()與
+doEndTag()都有預設的傳回值，依序分別是SKIP_BODY、SKIP_BODY及EVAL_PAGE，也就是預設不處理本體，標籤處理結束後
+會執行後續的</span>JSP<span style="font-family: Courier New,Courier,monospace;">頁面。<br>
+      <br>
+      </span>實際上在Tomcat中，如果觀看JSP轉譯後的Servlet原始碼會發現，<span style="font-family: Courier New,Courier,monospace;">只要doStartTag()的傳回值不是SKIP_BODY，就會執行本體內容並呼叫doAfterBody()方法。doEndTag()只要傳回值不是SKIP_PAGE，就會執行後續的</span>JSP<span style="font-family: Courier New,Courier,monospace;">頁面。<br>
+      <br style="font-family: Courier New,Courier,monospace;">
+      </span><br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/TagAPILifeCycle.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:03 GMT -->
+</html>

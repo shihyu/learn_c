@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/IterationTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:03 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>重複執行標籤本體</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 重複執行標籤本體<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+</td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果想繼承<span style="font-family: Courier New,Courier,monospace;">TagSupport</span>實作<big> </big></small><a href="SimpleTagAttrBody.html"><small>處理標籤屬性與本體</small></a> <small>的<span style="font-family: Courier New,Courier,monospace;">&lt;
+f:forEach&gt;標籤，可以根據所給定的Collection物件個數來決定重複執行標籤本體的次數，那麼你該在哪個方法中實作？
+doStartTag()？根據圖9.7，doStartTag()只會執行一次！doEndTag()？這時本體內容處理已經結束了！</span><br>
+      <br>
+根據 </small><a href="TagAPILifeCycle.html"><small>了解生命週期與架構</small></a><small>，<span style="font-family: Courier New,Courier,monospace;">在<span style="font-weight: bold;">doAfterBody()</span>方法執行過後，如果傳回<span style="font-weight: bold;">EVAL_BODY_AGAIN</span>，
+則會再重複執行一次本體內容，而後再度呼叫doAfterBody()方法，除非在doAfterBody()中傳回SKIP_BODY才會呼叫
+doEndTag()。顯然地，doAfterBody()是可以實作&lt;f:forEach&gt;標籤重複處理特性的地方。 <br>
+      <br>
+不過這邊有點小陷阱！當doStartTag()傳回EVAL_BODY_INCLUDE後，會先執行本體內容後再呼叫doAfterBody()方法，
+也就是說，實際上本體已經執行過一遍了！所以正確的作法應該是，doStartTag()與doAfterBody()都要實作，doStartTag
+()實作第一次的處理，doAfterBody()實作後續的重複處理。例如：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <pre>package cc.openhome;<br><br>import java.util.Collection;<br>import java.util.Iterator;<br>import javax.servlet.jsp.JspException;<br>import javax.servlet.jsp.tagext.TagSupport;<br><br>public class ForEachTag extends TagSupport {<br>    private String var;<br>    private Iterator iterator;<br><br>    @Override<br>    public int doStartTag() throws JspException {<br>        if(iterator.hasNext()) {<br>            this.pageContext.setAttribute(var, iterator.next());<br>            return EVAL_BODY_INCLUDE;<br>        }<br>        return SKIP_BODY;<br>    }<br><br>    @Override<br>    public int doAfterBody() throws JspException {<br>        if(iterator.hasNext()) {<br>            this.pageContext.setAttribute(var, iterator.next());<br>            return EVAL_BODY_AGAIN;<br>        }<br>        this.pageContext.removeAttribute(var);<br>        return SKIP_BODY;<br>    }<br><br>    public void setVar(String var) {<br>        this.var = var;<br>    }<br><br>    public void setItems(Collection items) {<br>        this.iterator = items.iterator();<br>    }<br>} <br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">在&lt;f:forEach&gt;
+的標籤處理器實作中，必須先為第一次的本體執行作屬性設定，如此傳回EVAL_BODY_INCLUDE後第一次執行本體內容時，才可以有var所設定的
+屬性名稱可以存取。接著呼叫doAfterBody()方法，其中再為第二次之後的本體處理作屬性設定，如果需要再執行一次本體，則傳回</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">EVAL_BODY_AGAIN</span><span style="font-family: Courier New,Courier,monospace;">，再度執行完本體後又會呼叫doAfterBody()方法，如果不想執行本體了，則傳回</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">SKIP_PAGE</span><span style="font-family: Courier New,Courier,monospace;">，則流程會來到doEndTag()的執行（在SimpleTag的doTag()中直接使用迴圈語法，顯然直覺多了）。</span><br>
+      <br>
+接著同樣在定義TLD檔案中定義標籤：<br>
+      </small>
+      <ul>
+        <li><small>f.tld</small></li>
+      </ul>
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"<br>   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee<br>   web-jsptaglibrary_2_0.xsd"&gt;<br>    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;<br>    &lt;short-name&gt;f&lt;/short-name&gt;<br>    &lt;uri&gt;http://openhome.cc/jstl/fake&lt;/uri&gt;<br>    // 略...<br>    &lt;tag&gt;<br>        &lt;name&gt;forEach&lt;/name&gt;<br>        &lt;tag-class&gt;cc.openhome.ForEachTag&lt;/tag-class&gt;<br>        &lt;body-content&gt;JSP&lt;/body-content&gt;<br>        &lt;attribute&gt;<br>            &lt;name&gt;var&lt;/name&gt;<br>            &lt;required&gt;true&lt;/required&gt;<br>            &lt;type&gt;java.lang.String&lt;/type&gt;<br>        &lt;/attribute&gt;<br>        &lt;attribute&gt;<br>            &lt;name&gt;items&lt;/name&gt;<br>            &lt;required&gt;true&lt;/required&gt;<br>            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;<br>            &lt;type&gt;java.util.Collection&lt;/type&gt;<br>        &lt;/attribute&gt;<br>    &lt;/tag&gt;<br>&lt;/taglib&gt; <br></pre>
+      <small><br>
+實際上在Tomcat中，如果觀看JSP轉譯後的Servlet原始碼會發現，<span style="font-family: Courier New,Courier,monospace;">只要doAfterBody()的傳回值不是EVAL_BODY_AGAIN，就不會再度執行本體內容並呼叫doAfterBody()方法。</span><br>
+      <br>
+      <br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/IterationTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:03 GMT -->
+</html>

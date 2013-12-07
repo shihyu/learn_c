@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/SortCollection.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:40 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>集合的排序</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip: <span class="Topic">集合的排序</span></a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+從資料庫的觀點來看，Set、Map、Bag是無序的，而List是有序的，這邊所謂的無序或有序，是指將集合中物件儲存至資料庫時，是否依集合物件中的
+順序來儲存。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+然而從資料庫取得資料之後，您也許會希望Set、Map等集合中的物件可以依一定的順序來排列，您可以從兩個層次來集合中的物件排序，一是在載入資料後於JVM中排序，另一是在資料庫中直接使用order by子句來排序。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+以 Set
+這篇文章中的範例來作說明，要在JVM中就資料進行排序，您可以在映射文件中使用sort屬性來定義集合的排序，這適用於Set與Map，例如：</small>
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" table="user"&gt; <br>        ....<br>        &lt;set name="emails" table="email" <span style="font-weight: bold;">sort="natural"</span>&gt; <br>            &lt;key column="id"/&gt; <br>            &lt;element type="string" <br>                     column="address"/&gt; <br>        &lt;/set&gt; <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+sort="natural"表示使用物件的comparaTo()方法來進行排序，集合中的物件上必須有實作java.lang.Comparable
+介面，例如String就有實作java.lang.Comparable介面，結果會使用字典順序來排列集合中的物件。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+您可以實現自己的排序方式，只要定義一個類別來實作java.util.Comparator介面，例如：</small>
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>CustomComparator.java</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Comparator;<br><br>public class CustomComparator implements Comparator {<br>    public int compare(Object o1, Object o2) {<br>        if (((String) o1).equals(o2)) <br>            return 0;<br>        return ((Comparable) o1).compareTo(o2) * -1;<br>    }<br>}</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+在自訂的Comparator中，如果兩個物件的順序相同會傳回0，而為了方便比較物件，要求傳入的物件必須實作Comparable介面（例如
+String物件就有實作Comparable介面），範例中只是簡單的將原來compareTo()傳回的值乘以負一，如此就可以簡單的讓排列順序相
+反，接著可以在映射文件中指定自訂的Comparator類別：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" table="user"&gt; <br>        ....<br>        &lt;set name="emails" table="email" <br>             <span style="font-weight: bold;">sort="onlyfun.caterpillar.CustomComparator"</span>&gt;<br>            &lt;key column="id"/&gt; <br>            &lt;element type="string" <br>                     column="address"/&gt; <br>        &lt;/set&gt; <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+Bag與List並不適用於這種方式，Bag或List本身是根據索引值來排列的。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+另一個排序的方式則是在資料庫中進行，直接使用order by子句來排序，這可以在映射文件中使用order-by屬性來指定，例如：</small>
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" table="user"&gt; <br>        ....<br>        &lt;set name="emails" table="email" <span style="font-weight: bold;">order-by="address desc"</span>&gt; <br>            &lt;key column="id"/&gt; <br>            &lt;element type="string" <br>                     column="address"/&gt; <br>        &lt;/set&gt; <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+觀察Hibernate所使用的SQL可以看到order by子句：<br>
+
+
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hibernate:
+select emails0_.id as id0_, emails0_.address as address0_ from email
+emails0_ where emails0_.id=? <span style="color: rgb(255, 0, 0);">order
+by</span> emails0_.address desc</span></small><br>
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></div>
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+      </span><span style="font-family: Courier New,Courier,monospace;">Hibernate在內部會使用LinkedHashMap或LinkedHashSet來作為集合物件，如果是Bag的話，則會在內部使用ArrayList作為集合物件。</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+      </span></small>
+ </td>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/SortCollection.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:40 GMT -->
+</html>

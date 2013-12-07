@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/RestrictingGenericsType.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>限制泛型可用類型</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 限制泛型可用類型</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在定義泛型類別時，預設您可以使用任何的型態來實例化泛型類別中的型態持有者，但假設您想要限制使用泛型類別時，只能用某個特定型態或其子類別才能實例化型態持有者的話呢？<br>
+
+      <br>
+
+
+
+您可以在定義型態持有者時，一併使用<span style="font-weight: bold;">"extends"</span>指定這個型態持有者必須是擴充某個類型，舉個實例來說：</small>
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> ListGenericFoo.java </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>import java.util.List;<br><br>public class ListGenericFoo&lt;T extends List&gt; {<br>    private T[] fooArray;<br><br>    public void setFooArray(T[] fooArray) {<br>        this.fooArray = fooArray;<br>    }<br><br>    public T[] getFooArray() {<br>        return fooArray;<br>    }<br>} <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+ListGenericFoo在宣告類型持有者時，一併指定這個持有者必須擴充自List介面（interface），在限定持有者時，無論是要限定的對
+象是介面或類別，都是使用"extends"關鍵字。<br>
+
+      <br>
+
+
+
+您使用"extends"限定型態持有者必須是實作List的類別或其子類別，例如LinkedList與ArrayList，下面的程式是合法的：<br>
+
+      </small>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ListGenericFoo&lt;LinkedList&gt; foo1 = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new ListGenericFoo&lt;LinkedList&gt;();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ListGenericFoo&lt;ArrayList&gt; foo2 = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new ListGenericFoo&lt;ArrayList&gt;();</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+&nbsp;<br>
+
+      <br>
+
+
+
+但是如果不是List的類別或是其子類別，就會發生編譯錯誤，例如下面的程式通不過編譯：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ListGenericFoo&lt;HashMap&gt; foo3 = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new ListGenericFoo&lt;HashMap&gt;();</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+&nbsp;<br>
+
+      <br>
+
+
+
+編譯器會回報以下錯誤訊息：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">type parameter java.util.HashMap is not within its bound</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">ListGenericFoo&lt;HashMap&gt; foo3 = new ListGenericFoo&lt;HashMap&gt;();</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+HashMap並沒有實作List介面，所以無法用來實例化型態持有者，事實上，當您沒有使用extends關鍵字限定型態持有者時，預設則是Object下的所有子類別都可以實例化型態持有者，即<span style="font-weight: bold;">只寫&lt;T&gt;時就相當於&lt;T extends Object&gt;</span>。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/RestrictingGenericsType.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+</html>

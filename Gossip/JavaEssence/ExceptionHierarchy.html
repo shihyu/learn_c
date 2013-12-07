@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/ExceptionHierarchy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:55 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>例外繼承架構</title></head>
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 例外繼承架構</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Java中如果應用程式發生錯誤，會將錯誤相關資訊以例外物件包裝後再丟出，例外可能是由JVM產生，或者是你自行丟出，無論如何，以例外物件的形式，給了你機會來面對與操作這個物件，也就是面對錯誤並進行改正的機會。<br><br>學習Java的人都知道的，例外處理的語法無非就是try..catch...finally，然而其實最重要的，並不在於語法，而在於例外的繼承架構：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">Throwable</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　<span style="color: red;">Error（嚴重的系統錯誤）</span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　LinkageError</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　ThreadDeath</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　VirtualMachineError</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　<span style="color: red;">Exception</span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　ClassNotFoundException<br style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span>
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　CloneNotSupportedException</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　IllegalAccessException<br></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">IOException<br></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　FileNotFoundException<br><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span>
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　<span style="color: red;">RuntimeException（執行時期例外）</span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　　　ArithmeticException</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　　　ArrayStoreException</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　　　ClassCastException</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">　　　　　　....</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>實際上所有錯誤發生時，包含錯誤資訊的物件，都是<span style="font-weight: bold;">一種（is a）</span>Throwable的物件，Throwable定義了錯誤訊息的取得、堆疊追蹤（Stack Trace）等方法。在其下有兩個子類別：Error與Exception。<br><br></small><small>Error的相關子類別代表</small><small>嚴
+重的系統錯誤，例如硬體錯誤、JVM錯誤或記憶體不足等問題，雖然基本上，也可以使用try...catch來處理Error物件，但並不建議，當發生嚴
+重系統錯誤時，都是Java應用程式所無力回復的，舉個例子來說，如果JVM所需記憶體不足，你如何直接要求作業系統給予JVM更多記憶體呢？所以
+Error物件丟出時，基本上不用處理，任由其傳播至JVM為止，或者是最多留下日誌（log）訊息。<br><br><span style="font-weight: bold;">如果一個Throwable物件沒有任何處理，最後傳播至JVM時，JVM只有一種處理方式，顯示堆疊追蹤後直接中斷程式。</span><br><br><span style="font-weight: bold;">Exception下的子類別代表Java應用程式「可能」處理的狀況，你可以使用try...catch語法嘗試將應用程式回復至可執行的狀態。</span><br><br>在Java程式碼中，如果某個操作會丟出Exception下的子物件，但非屬於RuntimeException的子物件，則你必須明確使用try...catch語法加以處理，或者至少在方法用throws</small><small>宣告這個方法會丟出例外，否則的話，編譯器不會讓程式碼通過編譯，例如：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">import java.io.*;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class Main {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Reader reader = new FileReader(args[1]);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ....</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br></div><small><br>如果你直接編譯這個程式，則編譯器會出現以下的編譯錯誤訊息：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Main.java:4: unreported exception java.io.FileNotFoundException; must be caught or declared to be thrown</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Reader reader = new FileReader(args[1]);</span></small><br></div><small><br>這是由於FileReader建構方法上，宣告會丟出FileNotFoundException：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public FileReader(String fileName) throws FileNotFoundException</span></small><br></div><small><br>FileNotFoundException
+是IOException的子類別，也就是Exception的子類別，編譯器發現你使用FileReader建構方法時，沒有明確使用try..
+catch加以處理，也沒有使用throws在main上宣告丟出，因此不讓你通過編譯。如果想要通過編譯，一個方式是：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import java.io.*;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Main {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Reader reader = new FileReader(args[1]);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; catch(FileNotFoundException ex) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ex.printStackTrace();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>另一個方法是：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">import java.io.*;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class Main {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) throws FileNotFoundException {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Reader reader = new FileReader(args[1]);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ....</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br></div><small><br>採用哪個方式，完全看你的需求而定。像這種</small><small>Exception下的子物件，但非屬於RuntimeException的子物件，有個名稱叫作<span style="font-weight: bold;">受檢例外（Checked Exception）</span>，受誰檢查？受編譯器檢查。受檢例外存在之目的，在於程式編寫者認定，你進行某個操作時，出錯的機會太高，因此要編譯器來協助（或提醒）你明確加以處理，你<span style="font-weight: bold;">無權選擇</span>要不要處理。<br><br></small><small>屬
+於RuntimeException衍生出來的類別，則是由JVM在在執行時期會自動丟出的例外，情況通常是你事先無法預測錯誤是否會發生，例如透過參考至null的變數來試圖操作，會丟出NullPointerExceptioon，或者是使用者輸
+入是否正確，這種並不是事先可以得知使用者如何輸入的。例外時期例外，不需要特別使用try-catch或是在函式上使用throws宣告也
+可以通過編譯，又稱為<span style="font-weight: bold;">非受檢例外（Unchecked Exception）</span>。例如您在使用陣列時，並不一定要處理ArrayIndexOutOfBoundsException例外也可以通過編譯，你<span style="font-weight: bold;">有權選擇</span>要不要處理，或是丟出去給別的呼叫者，甚至最後傳播至JVM。<br><br></small><small>瞭
+解例外處理的繼承架構是必須的，除了解Error與Exception的區別，以及Exception、RuntimeException的分別之外，在
+使用try..catch捕捉例外物件時，如果父類別例外物件撰寫在子類別例外物件之前被捕捉，則catch子類別例外物件的區塊將永遠不會被執行，事實
+上編譯器也會幫您檢查這個錯誤。例如： <br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.io.*; </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Main { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throw new ArithmeticException("例外測試"); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; catch(Exception e) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println(e.toString()); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; catch(ArithmeticException e) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println(e.toString()); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span></small><br></div><small><br></small>
+
+
+
+<small>這個程式若在編譯時將會產生以下的錯誤訊息：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Main.java:11: exception java.lang.ArithmeticException has already been caught</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">catch(ArithmeticException e) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">^</span></small><br style="font-weight: bold;"></div><br><small>要完成這個程式的編譯，你必須更改例外物件捕捉的順序，例如：</small><br><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.io.*; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Main { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throw new ArithmeticException("例外測試"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; catch(ArithmeticException e) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println(e.toString()); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; catch(Exception e) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println(e.toString()); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span></small><br></div><br><small>在撰寫程式時，也可以如上將Exception例外物件的捕捉撰寫在最後，以便捕捉到所有尚未考慮到的例外，並進一步改進程式。</small><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/ExceptionHierarchy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:55 GMT -->
+</html>

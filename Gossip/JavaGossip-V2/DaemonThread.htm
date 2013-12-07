@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/DaemonThread.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>Daemon 執行緒</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: Daemon 執行緒</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>您想要設計一個程式，除了主執行緒之外，其運用了一個執行緒於背景進行相關運算工作，您的程式可能像是這樣： </small><br>
+
+
+
+      
+      <ul>
+
+        <li> SimpleThread.java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>public class SimpleThread { <br>    public static void main(String[] args) { <br>        Thread thread = new Thread(new Runnable() {<br>            public void run() { <br>                while(true) { <br>                    System.out.print("T"); <br>                } <br>            }        <br>        }); <br> <br>        thread.start(); <br><br>        // 主執行緒繼續進行其它工作........ <br>        <br>        // such...such.... <br><br>        // 現在主執行緒執行到這邊了，工作應該結束了 <br>    }<br>}  <br></pre>
+
+
+
+      <br>
+
+      <small>
+您的執行緒已經運行到最後一個陳述了，這時應該是工作結束的時候，但您的另一個執行緒還在運作，您怎麼停止它？在最後加上一行使用System.exit
+()？這雖然也可以，但這只是強迫程式結束，而且這個方法並不是隨時可以適用！ <br>
+
+      </small>
+
+      
+      <p><small></small></p>
+
+      <small>
+
+一個<span style="font-weight: bold;">Daemon執行緒</span>是一個在背景執行服務的執行緒，例如網路伺服器傾聽連接埠的服務、隱藏的系統執行緒如垃圾收集執行緒或其它JVM
+建立的執行緒，如果所有的非Daemon的執行緒都結束了，則Daemon執行緒自動就會終止。 <br>
+
+      <br>
+
+
+從Main函式開始的是一個非Daemon執行緒，如果您希望某個執行緒在非Daemon執行緒都結束後也跟著終止，那麼您要將它設定為Daemon執行
+緒，下面這個程式是個簡單的示範：</small>
+
+ <br>
+
+
+
+      
+      <ul>
+
+        <li> DaemonTest.java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>public class DaemonTest { <br>    public static void main(String[] args) { <br>        Thread thread = new Thread(new Runnable() {<br>            public void run() { <br>                while(true) { <br>                    System.out.print("T"); <br>                } <br>            }        <br>        }); <br>        thread.setDaemon(true); <br>        thread.start(); <br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+這個程式在主執行緒結束之後，Daemon也就跟著結束了，所以它不會像上面這個程式，不斷的列印T字元；您可以使用<span style="font-weight: bold;">setDaemon()</span>方法來設定一
+個執行緒是否為Daemon執行緒，使用<span style="font-weight: bold;">isDaemon()</span>方法則可以判斷該執行緒是否為Daemon執行緒。 <br>
+
+      <br>
+
+
+基本上，Java預設所有從Daemon執行緒產生的執行緒也是Daemon執行緒，這很直覺，由一個背景服務執行緒衍生出來的執行緒，也應該是為了在背
+景服務而產生的，所以在該停止時也應該停止。</small>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/DaemonThread.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

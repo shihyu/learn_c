@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/ThreeDimTurtle.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:27 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>三維海龜繪圖法</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics:&nbsp;三維海龜繪圖法</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+
+
+3D海龜繪圖法是2D海龜繪圖法的延伸，2D海龜繪圖法侷限於一個平面上的移動，而3D海龜繪圖法則是在立體的空間中移動，就如同海龜在海洋中游動一樣：<br>
+
+      <img style="width: 266px; height: 219px;" alt="" src="images/threeDimTurtle-1.jpg"><br>
+
+      <br>
+
+      <br>
+
+
+由於在立體的空間中移動，所以海龜的轉動並不像在2D平面上，則有360度的差別，在3D海龜繪圖法中，海龜的轉動有可能是720度任一方向的轉動，為了
+方便掌握海龜的轉動，讓海龜擁有自己的座標系統，所以在3D的海龜縮圖法中同時存在兩種座標系統，即 <a class="wikilink" href="ThreeDimension.htm">直角座標系統</a> 與 <a class="wikilink" href="ShuttleDimension.htm">太空船座標旋轉</a>，如下所示： <br>
+
+      <img style="width: 202px; height: 211px;" alt="" src="images/threeDimTurtle-2.jpg"><br>
+
+      <br>
+
+
+海龜所使用的座標，是以頭朝向的方向為x'正方向，背面為y'正方向，而右肢為z'正方向，當海龜要旋轉時，是對x'、y'或z'軸來旋轉，而不是對系統座標的X、Y、Z軸旋轉：<br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li><small>對x'軸旋轉</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>對x'軸旋轉時，x'軸的向量不變的，而改變y'與z'軸的向量，如下圖所示： <br>
+
+
+      <img style="width: 245px; height: 108px;" alt="" src="images/threeDimTurtle-3.jpg"><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>對y'軸旋轉</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>對y'軸旋轉時，y'軸的向量不變的，而改變x'與z'軸的向量，如下圖所示： <br>
+
+
+      <img style="width: 224px; height: 100px;" alt="" src="images/threeDimTurtle-4.jpg"><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>對z'軸旋轉</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>對z'軸旋轉時，z'軸的向量不變的，而改變x'與y'軸的向量，如下圖所示： <br>
+
+
+      <img style="width: 244px; height: 101px;" alt="" src="images/threeDimTurtle-5.jpg"><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+在旋轉海龜時，x'、y'、z'向量的改變計算，您可以參考之前提過的太空船座標系統的轉換，綜合以上的描述，可以訂出3D海龜繪圖法的幾個基本方法：<br>
+
+      </small>
+      
+      <ol>
+
+        <li><small>設定海龜的位置(X, Y, Z)</small></li>
+
+        <li><small>設定海龜的座標系統(x', y', z')</small></li>
+
+        <li><small>讓海龜對x'軸旋轉</small></li>
+
+        <li><small>讓海龜對y'軸旋轉</small></li>
+
+        <li><small>讓海龜對z'軸旋轉</small></li>
+
+      
+      </ol>
+
+
+      <small><br>
+
+
+以上五個方法是3D海龜繪圖法所必備的，至於其它的方法如移動繪直線、繪點等方法，其繪圖方向即是海龜面向x'軸的方向，但必須配合所使用的2D轉3D投影方法來製作，使用平行投影或透視投影的不同，就要使用不同的繪直線、繪點等方法。<br>
+
+      <br>
+
+
+關於3D海龜繪圖法的參考原始碼，建議看看 <a href="http://www.drmaster.com.tw/info.asp?no=PG20135">JAVA 2D/3D繪圖程式設計實例應用</a> 書附光碟中的3D海龜繪圖原始碼，由於原碼很長，加上使用到其它的數學類別，這邊不便列出。<br>
+
+      <span class="postbody"></span></small>
+
+
+
+
+
+
+
+
+      <br>
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/ThreeDimTurtle.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:29 GMT -->
+</html>

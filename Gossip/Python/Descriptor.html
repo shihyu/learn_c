@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/Descriptor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>描述器</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: 描述器<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>當一個物件擁有<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">__get__()</span>方法（必要），以及選擇性的__set__()、__delete__()</span>方法時，它可以作為<span style="font-weight: bold;">描述器（Descriptor）</span>：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def __get__(self, instance, owner)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def __set__(self, instance, value)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def __delete__(self, instance)</span></small><br>
+      </div>
+      <br>
+      <small>在Python中，所謂描述器，是用來描述特性的取得、設定、刪除該如何處理的物件，也就是說，當描述器實際是某個類別的特性成員時，對於類別特性的取得、設定或刪除，將會交由描述器來決定如何處理（除了那些內建特性，如<span style="font-family: Courier New,Courier,monospace;">__class__</span>等特性之外）。例如：<br>
+      </small>
+      <pre>class Descriptor:<br>    def __get__(self, instance, owner):<br>        print(self, instance, owner)<br>    def __set__(self, instance, value):<br>        print(self, instance, value)<br>    def __delete__(self, instance):<br>        print(self, instance)<br><br>class Some:<br>    x = Descriptor()<br></pre>
+      <small><br>
+在上例中，如果這麼執行：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">s = Some()<br>
+s.x</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">s.x = 10</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">del s.x</small><br>
+      </div>
+      <small><br>
+其實相當於這麼作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">s = Some()<br>
+Some.__dict__['x'].__get__(s,&nbsp; Some);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Some.__dict__['x'].__set__(s,&nbsp; 10);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Some.__dict__['x'].__delete__(s);</small><br>
+      </div>
+      <small><br>
+      如果這麼作的話：<br>
+</small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some.x</span></small><br>
+      </div>
+      <small><br>
+      則相當於這麼作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some.__dict__['x'].__get__(None, Some)</span></small><br>
+      </div>
+      <small>
+      </small><br>
+      <small>在</small> <a href="PropertyNameSpace.html"><small>特性名稱空間</small></a> <small>中談過特性搜尋的順序，依其中描述整理一下的話，特性的尋找順序是：</small><br>
+      <ol style="font-family: Courier New,Courier,monospace;">
+        <li><small>在實例的__dict__中尋找是否有相符的特性名稱</small></li>
+        <li><small>在產生實例的類別__dict__中尋找是否有相符的特性名稱</small></li>
+        <li><small>如果實例有定義__getattr__()，則看__getattr__()如何處理</small></li>
+        <li><small>如果實例沒有定義__getattr__()，則丟出AttributeError</small></li>
+      </ol>
+      <br>
+      <small>如果加上描述器，則尋找的順序是：<br>
+      </small>
+      <ol style="font-family: Courier New,Courier,monospace;">
+<li><small style="font-weight: bold;">在產生實例的類別__dict__中尋找是否有相符的特性名稱。如果找到
+且實際是個描述器實例（也就是具有__get__()方法），且具有__set__()或__delete__()方法，若為取值，則傳回__get__
+()方法的值，若為設值，則呼叫__set__()（沒有這個方法則丟出AttributeError），若為刪除特性，則呼叫__delete__()</small><small style="font-weight: bold;">（沒有這個方法則丟出AttributeError）</small><small style="font-weight: bold;">，如果描述器僅具有__get__()，則先進行第2步</small><small></small></li>
+        <li><small>在實例的__dict__中尋找是否有相符的特性名稱</small></li>
+<li><small>在產生實例的類別__dict__中尋找是否有相符的特性名稱。如果不是描述器則直接傳回特性值。<span style="font-weight: bold;">如果是個描述器（此時一定是僅具有__get__()方法），則傳回__get__()的值</span></small></li><li><small>如果實例有定義__getattr__()，則看__getattr__()如何處理</small></li><li><small>如果實例沒有定義__getattr__()，則丟出AttributeError</small></li>
+      </ol>
+
+      <br>
+      <small>以上的流程可以作個簡單的驗證：</small><br>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; class Desc:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __get__(self, instance, owner):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print('instance', instance, 'owner', owner)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __set__(self, instance, value):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print('instance', instance, 'value', value)<br>
+...<br>
+&gt;&gt;&gt; class X:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = Desc()<br>
+...<br>
+&gt;&gt;&gt; x = X()<br>
+&gt;&gt;&gt; x.x<br>
+            </span>instance &lt;__main__.X object at 0x01E01C10&gt; owner &lt;class '__main__.X'&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; x.x = 10<br>
+            </span>instance &lt;__main__.X object at 0x01E01C10&gt; value 10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; x.__dict__['x'] = 10<br>
+&gt;&gt;&gt; x.x<br>
+            </span>instance &lt;__main__.X object at 0x01E01C10&gt; owner &lt;class '__main__.X'&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; x.__dict__['x']<br>
+            </span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; del x.x<br>
+            </span>Traceback (most recent call last):<br>
+&nbsp; File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>
+AttributeError: __delete__<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>除了</small><small><span style="font-family: Courier New,Courier,monospace;">__get__()方法之外，還具有</span></small><small><span style="font-family: Courier New,Courier,monospace;">__set__()或__delete__()方法或兩者兼具</span>的描述器，稱之為<span style="font-weight: bold;">資料描述器（Data descriptor）</span>，其行為與僅有<span style="font-family: Courier New,Courier,monospace;">__get__()</span>方法的<span style="font-weight: bold;">非資料描述器（Non-data descriptor）</span>不同。例如以下為非資料描述器的行為：</small><br>
+
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; class Desc:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __get__(self, instance, owner):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print('instance', instance, 'owner', owner)<br>
+...<br>
+&gt;&gt;&gt; class X:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = Desc()<br>
+...<br>
+&gt;&gt;&gt; x = X()<br>
+&gt;&gt;&gt; x.x<br>
+            </span>instance &lt;__main__.X object at 0x01E01FD0&gt; owner &lt;class '__main__.X'&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; x.x = 10<br>
+&gt;&gt;&gt; x.x<br>
+            </span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; del x.x<br>
+&gt;&gt;&gt; x.x<br>
+            </span>instance &lt;__main__.X object at 0x01E01FD0&gt; owner &lt;class '__main__.X'&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+      <br>
+      <span style="font-weight: bold;">簡而言之，資料描述器可以讓你攔截對實例作特性的取得、設定與刪除行為，而非資料描述器可以讓你在攔截透過實例取得類別特性時的行為。</span><br>
+
+      <br>
+回顧 <small><big><a href="Property.html"><small>property() 函式</small></a></big> </small>的內容，對於實例作特性的取得、設定與刪除，都會被轉呼叫為所指定的函式，可想而知的，這是一種資料描述器的行為，若要自行實作<span style="font-family: Courier New,Courier,monospace;">property()</span>函式的行為，則可以如下：<br>
+      <pre>def prop(getter, setter, deleter):<br>    class PropDesc:<br>        def __get__(self, instance, owner):<br>            return getter(instance)<br>        def __set__(self, instance, value):<br>            setter(instance, value)<br>        def __delete__(self, instance):<br>            deleter(instance)<br>            <br>    return PropDesc()<br></pre>
+      <br>
+如此，<small><big><a href="Property.html"><small>property() 函式</small></a> 中使用<span style="font-family: Courier New,Courier,monospace;">property()函式的例子，就可以改用以上的prop()函式</span></big></small>，<br>
+      <pre>class Ball:<br>    def __init__(self, radius):<br>        if radius &lt;= 0:<br>            raise ValueError('必須是正數')<br>        self.__radius = radius<br>    <br>    def getRadius(self):<br>        return self.__radius<br>        <br>    def setRadius(self, radius):<br>        self.__radius = radius<br>        <br>    def delRadius(self):<br>        del self.__radius<br>        <br><span style="font-weight: bold;">    radius = prop(getRadius, setRadius, delRadius)</span><br></pre>
+      <br>
+      <small>在</small> <small><big><a href="StaticClassMethod.html"><small>靜態方法、類別方法</small></a></big> 中討論過，類別的實例在操作類別所定義的方法時，方法的第一個參數都會被綁定為實例，透過實例所操作的這些方法稱之為綁定方法（Bound method）。例如：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; class Some:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def doSome(self):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print('something...', self)<br>
+...<br>
+&gt;&gt;&gt; s = Some()<br>
+&gt;&gt;&gt; s.doSome()<br>
+</span>something... &lt;__main__.Some object at 0x01DA1C50&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; s.doSome<br>
+            </span>&lt;bound method Some.doSome of &lt;__main__.Some object at 0x01DA1C50&gt;&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; Some.doSome('arguments')<br>
+            </span>something... arguments<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; Some.doSome<br>
+            </span>&lt;function doSome at 0x01D303D8&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+      <small>很顯然地，透過實例所操作的方法，與原先定義在<span style="font-family: Courier New,Courier,monospace;">Some</span>類別上的函式是不同的。事實上，你可以這麼操作：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; Some.__dict__['doSome'].__get__(s, Some)()<br>
+</span>something... &lt;__main__.Some object at 0x01DA1C50&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; Some.__dict__['doSome'].__get__(s, Some)<br>
+            </span>&lt;bound method Some.doSome of &lt;__main__.Some object at 0x01DA1C50&gt;&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; Some.__dict__['doSome'].__get__(None, Some)()</span><br>
+Traceback (most recent call last):<br>
+&nbsp; File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>
+TypeError: doSome() takes exactly 1 positional argument (0 given)<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; Some.__dict__['doSome'].__get__(None, Some)('arguments')<br>
+            </span>something... arguments<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; Some.__dict__['doSome'].__get__(None, Some)<br>
+            </span>&lt;function doSome at 0x01D303D8&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+      <br><small style="font-family: Courier New,Courier,monospace;">顯然地，Some類別上的doSome特性所參考的物件，具有__get__()方法，也就是說doSome特性實際上是個描述器，在</small><small>Python</small><small style="font-family: Courier New,Courier,monospace;">類別中定義的函式，實際上是個特性名稱參考至一個非資料描述器。<br>
+      <br>
+假設你有個類別如下：<br>
+      </small>
+      
+      <pre>class Some:<br>    def doSome(self, arg):<br>        print(self, arg)<br><br>s = Some()<br>s.doSome(10)<br>Some.doSome(10, 20)<br></pre>
+
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+可以嘗試自行使用描述器來「模擬」上面的Some類別doSome的行為，以</small><small>大致可以了解Python中對於綁定方法的原理</small><small style="font-family: Courier New,Courier,monospace;">：<br>
+      </small>
+      
+      <pre>class DoSomeDesc:<br>    def doSome(self, arg):<br>        print(self, arg)<br>        <br>    def __get__(self, instance, owner):<br>        if instance:<br>            return lambda arg: DoSomeDesc.doSome(instance, arg)<br>        else:<br>            return DoSomeDesc.doSome       <br>    <br>class Some:<br>    doSome = DoSomeDesc()<br>    <br>s = Some()<br>s.doSome(10)<br>Some.doSome(10, 20)<br></pre>
+
+      <br>
+<br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/Descriptor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/Curry.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>鞣製（Curry）</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 鞣製（Curry）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>來看到Scala中以下的函式定義與使用：</small><small><br></small><pre>def sum(a: Int, b: Int) = a + b<br>println(sum(1, 2))    // 顯示 3</pre><small><br>如果改為以下的函式定義與使用，其結果也相同：</small><br><pre>def sum(a: Int)(b: Int) = a + b<br>println(sum(1)(2))    // 顯示 3</pre><small><br>第二個範例其實是使用了</small><small><span style="font-weight: bold;">鞣製（Curry）</span>的特性。</small><small>所謂鞣製，是指將接受多個參數的函式（例如第一個範例的sum接受兩個參數），改為接受單一參數的函式（也就是第二個範例的sum(a: Int)），在函式執行過後傳回一個函式物件再套用剩下的參數（也就是第二個範例的(b: Int)），就像是將兩個函式鞣製在一起。<br><br>所以第二個範例，相當於以下的作用：<br></small><pre>def sum(a: Int) = (b: Int) =&gt; a + b<br>println(sum(1)(2))    // 顯示 3</pre><small><br>不過這只是個比喻，實際上你要取得呼叫鞣製函式的傳回函式物件，並不能像以下的範例：<br></small><pre>def sum(a: Int)(b: Int) = a + b<br>val s = sum(1)        // 這是錯的 missing arguments for method sum</pre><small><br>若你真的要取得</small><small>鞣製函式的傳回函式物件，可以使用 </small><small><big><a href="PartiallyAppliedFunction.html"><small>部份套用函式（Partially applied function）</small></a> </big>的方式：<br></small><pre>def sum(a: Int)(b: Int) = a + b<br>val s = sum(1)_<br>println(s(2))       // 顯示 3</pre><small><br>在Scala中，結合</small><small>鞣製函式的特性，可以讓你定義出一些函式，在呼叫使用時，感覺像是內建語法的一部份。要真正體驗這個特性之前，你還得先了解一件事，就是在Scala中，如果函式只接受一個引數，則引數列可以撰寫()或{}，例如以下的範例都會顯示"XD"：<br></small><pre>println("XD")<br>println{"XD"}</pre><small><br>了解這個特性之後，你可以知道，先前的sum範例也可以：<br></small><pre>def sum(a: Int)(b: Int) = a + b<br>println(sum(1)(2))    // 顯示 3<br>println(sum(1)<span style="font-weight: bold;">{2}</span>))    // 顯示 3</pre><br><small>因為sum(1)傳回函式物件後馬上套用第二個引數，而引數值只有一個，所以可以也使用{}來傳入引數。接著來看到 </small><small><big><a href="ByNameParameter.html"><small>以名呼叫參數（By-name parameter）</small></a></big> 中的這個範例：<br></small><pre>def unless(cond: Boolean, expr: =&gt; Any) = {<br>    if(!cond) {<br>        expr<br>    }<br>}</pre><br><small>如果你使用鞣製的特性，把它改為以下的定義：<br></small><pre>def unless(cond: Boolean)(expr: =&gt; Any) = {<br>    if(!cond) {<br>        expr<br>    }<br>}</pre><br><small>那麼，你可以如下使用unless函式：</small><br><pre>val flag = false<br>unless(flag) {<br>    println("XD")<br>    println("Orz")<br>}</pre><br><small>單看以上這個語法，你會感覺unless就像是內建的語法之一。另一個 </small><small> </small><small><big><a href="ByNameParameter.html"><small>以名呼叫參數（By-name parameter）</small></a></big> 中的這個範例：<br></small><pre>def until(cond: =&gt; Boolean, expr: =&gt; Unit) {<br>    if(!cond) {<br>        expr<br>        until(cond, expr)<br>    }<br>}</pre><br><small>如果你使用鞣製的特性，把它改為以下的定義：<br></small><pre>def until(cond: =&gt; Boolean)(expr: =&gt; Unit) {<br>    if(!cond) {<br>        expr<br>        until(cond)(expr)<br>    }<br>}</pre><br><small>那麼你就可以如下使用until函式：<br></small><pre>var count = 10<br>until(count == 0) {<br>    println(count)<br>    count -= 1<br>}</pre><br><small>單看以上這個語法，你會感覺until就像是內建的語法之一。你可以再回憶一下<big> </big></small><small><big><a href="OverloadLocalRepeat.html"><small>函
+式重載、區域函式、重複參數</small></a> </big>中，最後一個</small><small>使用foldLeft別名方法/:的範例，這是因為/:也使用了鞣製的特性：<br></small><pre>def sum(numbers: Int*) = (0 /: numbers) {_ + _}<br>println(sum(1, 2))         // 顯示 3</pre><small><br></small><small></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/Curry.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/TestRunner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>自訂 TestRunner</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 自訂 TestRunner<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>事實上，在<a href="TestCase.html"><small> <big>關於 TestCase</big></small></a> 的後半段介紹中，已經有點自訂<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>的意味，所謂的<span style="font-family: Courier New,Courier,monospace;">TestRunner，無非就是呼叫Test介面實作物件上的run()方法，傳入TestResult實例收集測試的結果。<br>
+      <br>
+在 </span></small><small><big><a href="TestSuite.html"><small>使用 TestSuite</small></a></big> 最後的範例中，你也可以這麼作：<br>
+      </small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp; public static Test suite() {</small><br style="font-family: 'Courier New',Courier,monospace; font-weight: bold;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TestSuite suite = new TestSuite();<br></small><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.addTest(new XXXTest("testABC"));&nbsp; // 執行testABC()方法<br></small><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+suite.addTest(YYYTest.suite());&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// suite() 傳回 TestSuite實例</small><br style="font-family: 'Courier New',Courier,monospace; font-weight: bold;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite.addTestSuite(OOOTest.class);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 自動找出所有testXXX()方法</small><br style="font-family: 'Courier New',Courier,monospace; font-weight: bold;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return suite;</small><br style="font-family: 'Courier New',Courier,monospace; font-weight: bold;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; public static void main(String[] args) {<br>
+</small></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TestResult result = new TestResult();</small></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suite().run(result);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 接著就看你取得TestResult如何呈現測試報告了<br>
+      <br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+      </small><small style="font-family: 'Courier New',Courier,monospace;">觀察文字模式的TestRunner，其run()方法無非也只是代你作了這些事：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; static public TestResult run(Test test) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestRunner runner= new TestRunner();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return runner.doRun(test);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public TestResult doRun(Test test) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return doRun(test, false);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      </small></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: bold; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-family: 'Courier New',Courier,monospace;"><br>
+&nbsp;&nbsp;&nbsp; protected TestResult createTestResult() {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return new TestResult();<br>
+&nbsp;&nbsp;&nbsp; }<br>
+</small></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-family: 'Courier New',Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;  </span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public TestResult doRun(Test suite, boolean wait) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; TestResult result= createTestResult();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; result.addListener(fPrinter);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; long startTime= System.currentTimeMillis();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; suite.run(result);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; long endTime= System.currentTimeMillis();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; long runTime= endTime-startTime;</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; fPrinter.print(result, runTime);</span><br style="font-weight: bold;">
+      <br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; pause(wait);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return result;</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br>
+      </small><small style="font-family: 'Courier New',Courier,monospace; font-weight: bold;"><br>
+      </small><small style="font-family: 'Courier New',Courier,monospace;">上例中，資訊的收集，其實是由ResultPrinter負責（fPrinter參考的實例），其為<span style="font-weight: bold;">TestListener</span>的實作物件。<br>
+      <br>
+      </small></span></span><small>只不過，對於自訂<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>，JUnit提供了一個基礎類別<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">BaseTestRunner</span>，在這個類別中提供了一些讀取組態設定、指定名稱取得某個<span style="font-family: Courier New,Courier,monospace;">TestSuite</span>實例的方便方法，讓你不用從頭開始撰寫這些方法。事實上，文字版本的<span style="font-family: Courier New,Courier,monospace;">TestRunner，就是繼承BaseTestRunner實作而來：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class TestRunner extends BaseTestRunner {</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ...</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+觀察BaseTestRunner文字版的TestRunner之原始碼，你可以很快地學會自訂TestRunner，或者發現目前已有的TestRunner更多的使用方式。例如文字版的TestRunner，可以如下將測試結果存在檔案之中：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <ul>
+        <li><small>CalculatorTest.java</small></li>
+      </ul>
+      <pre>package cc.openhome;<br><br>import junit.framework.TestCase;<br>import junit.framework.TestSuite;<br>import junit.textui.TestRunner;<br>import java.io.*;<br><br>public class CalculatorTest extends TestCase {<br>    private Calculator calculator;<br>    public CalculatorTest() {}<br>    public CalculatorTest(String name) {<br>        super(name);<br>    }<br>    <br>    @Override<br>    protected void setUp() {<br>        calculator = new Calculator();<br>    }<br><br>    @Override<br>    protected void tearDown() {<br>        calculator = null;<br>    }<br><br>    public void testPlus() {<br>        int expected = 5;<br>        int result = calculator.plus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>    <br>    public void testMinus() {<br>        int expected = 1;<br>        int result = calculator.minus(3, 2);<br>        assertEquals(expected, result);<br>    }<br><br>    public static void main(String[] args) throws IOException {<br><span style="font-weight: bold;">        TestRunner runner = new TestRunner(</span><br style="font-weight: bold;"><span style="font-weight: bold;">        	    new PrintStream(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        new FileOutputStream("calculator.test.log")));</span><br style="font-weight: bold;"><span style="font-weight: bold;">        runner.doRun(new TestSuite(CalculatorTest.class));</span><br>    }<br>}<br></pre>
+      <small><br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/TestRunner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:23 GMT -->
+</html>

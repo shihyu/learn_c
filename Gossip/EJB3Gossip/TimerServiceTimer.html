@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/TimerServiceTimer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>TimerService 與 Timer 回呼</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: TimerService 與 Timer 回呼</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+      <br>
+
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>以下使用一個簡單的範例，示範如何在Stateless Session Bean上使用Timer服務，客戶端可以指定時間啟動Timer，排定在某個時間送訊息給Message-Driven Bean。<br>
+      <br>
+首先定義一個簡單的介面：<br>
+      </small>
+      <ul>
+        <li><small>IMaintain.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Date;<br>import javax.ejb.Local;<br><br>@Local<br>public interface IMaintain {<br>    public void scheduleMessage(Date expiration, String message);<br>}</pre>
+      <small><br>
+在Stateless Session Bean實作部份，使用@Resource注入TimerService、ConnectionFactory與Destination：<br>
+      </small>
+      <ul>
+        <li><small>MaintainBean.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Date;<br>import javax.annotation.Resource;<br>import java.util.logging.*;<br>import javax.ejb.*;<br>import javax.jms.*;<br><br>@Stateless<br>public class MaintainBean implements IMaintain {<br>    @Resource(name="jms/HelloQueueFactory")<br>    private ConnectionFactory connectionFactory;<br>    <br>    @Resource(name="jms/HelloQueue")<br>    private Destination queue;<br>    <br><span style="font-weight: bold;">    @Resource </span><br style="font-weight: bold;"><span style="font-weight: bold;">    private TimerService timerService;</span><br><br>    public void scheduleMessage(Date expiration, String message) {<br>        <span style="font-weight: bold;">timerService.createTimer(expiration, message);</span><br>    }<br><br><span style="font-weight: bold;">    @Timeout</span><br><span style="font-weight: bold;">    public void sendMessage(Timer timer) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        try {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            String message = (String) timer.getInfo();</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">            Connection connection = connectionFactory.createConnection();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            Session session = connection.createSession(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    false, Session.AUTO_ACKNOWLEDGE);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            MessageProducer producer = session.createProducer(queue);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            TextMessage textMessage = session.createTextMessage();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            textMessage.setText(message);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            producer.send(textMessage);</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">            producer.close();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            session.close();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            connection.close();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        } catch (JMSException ex) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            Logger.getLogger(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    MaintainBean.class.getName()).log(Level.SEVERE, null, ex);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>}</pre>
+      <small><br>
+如果您想要從EJBContext中取得TimerService，則可以如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Resource</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">private SessionContext context;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public void scheduleMessage(Date expiration, String message) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; TimerService timerService = context.getTimerService();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; timerService.createTimer(expiration, message);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">....</span></small><br>
+      </div>
+      <small><br>
+若不使用@Timeout標註，則您要實作TimedObject介面，實作其void ejbTimeout(Timer timer)方法。<br>
+      <br>
+為了配合這個範例，改寫一下 </small><a href="MessageDrivenBean.html"><small>第
+一個 </small><small>Message-Driven Bean</small></a><small> 中的Message-Driven Bean範例：<br>
+      </small>
+      <ul>
+        <li><small>HelloMessageBean.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.logging.Level;<br>import java.util.logging.Logger;<br>import javax.ejb.ActivationConfigProperty;<br>import javax.ejb.MessageDriven;<br>import javax.jms.JMSException;<br>import javax.jms.Message;<br>import javax.jms.MessageListener;<br>import javax.jms.TextMessage;<br><br>@MessageDriven(mappedName = "jms/HelloQueue",<br>   activationConfig =  {<br>        @ActivationConfigProperty(propertyName = "acknowledgeMode",<br>                                  propertyValue = "Auto-acknowledge"),<br>        @ActivationConfigProperty(propertyName = "destinationType", <br>                                  propertyValue = "javax.jms.Queue")<br>    })<br>public class HelloMessageBean implements MessageListener {<br>    <br>    public void onMessage(Message message) {<br>        try {<br>            TextMessage txtMessage = (TextMessage) message;<br>            System.out.println(txtMessage.getText() + " processed....Orz");<br>        } catch (JMSException ex) {<br>            Logger.getLogger(HelloMessageBean.class.getName())<br>                    .log(Level.SEVERE, null, ex);<br>        }<br>    }<br>}</pre>
+      <br>
+      <small>以下是個簡單的Servlet客戶端測試，排定在呼叫後的10秒鐘執行</small>：<br>
+      <ul>
+        <li><small>HelloServlet.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import java.util.*;<br>import javax.ejb.EJB;<br><br>public class HelloServlet extends HttpServlet {<br>    @EJB<br>    private IMaintain maintain;<br>   <br>    protected void processRequest(HttpServletRequest request, <br>                                HttpServletResponse response)<br>                        throws ServletException, IOException {<br><span style="font-weight: bold;">        Calendar calendar = Calendar.getInstance();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        calendar.add(Calendar.MILLISECOND, 10000);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        maintain.scheduleMessage(calendar.getTime(), "save me....XD");</span><br>    } <br><br>    protected void doGet(HttpServletRequest request, <br>                         HttpServletResponse response)<br>                       throws ServletException, IOException {<br>        processRequest(request, response);<br>    } <br><br>    protected void doPost(HttpServletRequest request,<br>                          HttpServletResponse response)<br>                       throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br><br>    public String getServletInfo() {<br>        return "Short description";<br>    }<br>}</pre>
+      <small><br>
+      </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/TimerServiceTimer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+</html>

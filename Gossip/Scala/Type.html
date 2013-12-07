@@ -1,0 +1,839 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/Type.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>資料型態</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 資料型態</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Scala中，一切都是物件，即使是一個整數也是物件：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; 1<br>res0: Int = 1<br><br>scala&gt; "Hello"<br>res1: java.lang.String = Hello<br><br>scala&gt;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<small><small><big><br>Int實際上是scala套件（package）中的類別，Scala會自動import該套件下的類
+別，Byte、Short、Int、Long、Char、Float、Double、Boolean等都位於scala套件中，在JVM上運行時，它們對
+應於Java中的byte、short、int、long、char、float、double、boolean等基本型態（Primitive
+type），有著與Java中基本資料型態相同的範圍。<br><br>Scala也重用一些Java中的類別，例如字串，在上面的示範中可以看到，Scala直接重用了java.lang.String類別（Scala也會自動import套件java.lang）。<br><br></big></small></small><small><small><big>如果你在程式中直接寫一個整數，則預設是十進位的Int整數，你可以用0開頭表示這是個八進位整數，用0x開頭表示這是個十六進位整數，以L或l結尾時，表示這會是個Long整數：</big></small></small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; 010<br>res2: Int = 8<br><br>scala&gt; 0xA<br>res3: Int = 10<br><br>scala&gt; 123L<br>res4: Long = 123<br><br></span></small><small><span style="color: rgb(255, 255, 255);">scala&gt;</span></small><br><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<small><small><big><small><br><big>如果你直接撰寫一個浮點數，則預設會是個Double，加上F或f可以指定其為Float，你也可以使用特學記號來表示浮點數：</big></small></big></small></small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; 3.14<br>res5: Double = 3.14<br><br>scala&gt; 3.14F<br>res6: Float = 3.14<br><br>scala&gt; 3.14e10<br>res7: Double = 3.14E10<br><br>scala&gt; 3.14e2<br>res8: Double = 314.0<br><br>scala&gt;</span></small><small><span style="color: rgb(255, 255, 255);"></span></small><br><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<small><small><big><small><br></small></big></small>字元是以單引號包裹住，也可以指定Unicode編碼：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; 'A'<br>res9: Char = A<br><br>scala&gt; '\u0041'<br>res10: Char = A<br><br>scala&gt;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<small><small><big><br>以\作開頭為跳脫字元，如以上指定Unicode編碼是其中一例，你還可以有以下的字元指定方式：</big></small></small><table align="left" border="1" width="100%">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\\
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>反斜線
+            </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\'
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>單引號
+' </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\"
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>雙引號
+" </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\uxxxx
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>以16
+進位數指定Unicode字元輸出 </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\b
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>倒退一
+個字元 </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\f
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>換頁
+            </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\n
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>換行
+            </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\r
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>游標移
+至行首 </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top"><small>\t
+            </small></td>
+
+
+
+
+            <td align="left" valign="top"><small>跳格
+(一個Tab鍵) </small></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      
+      
+      
+      <p></p>
+
+
+
+
+      <br clear="all">
+
+
+
+
+<br><small>在Scala中，若要取得整數、浮點數等的數值範圍，則可以使用<span style="font-weight: bold;">scala.Math</span>（這是一個object定義）中所定義的值（在Java中則是定義在各自的包裹物件上，如Integer、Double等），例如：<br></small><pre>println("Int: " + Math.MIN_INT + " ~ " + Math.MAX_INT)<br>println("Long: " + Math.MIN_LONG + " ~ " + Math.MAX_LONG)<br>println("Float: " + Math.MIN_FLOAT + " ~ " + Math.MAX_FLOAT)<br>println("Double: " + Math.MIN_DOUBLE + " ~ " + Math.MAX_DOUBLE)</pre><br><small>這個程式會顯示以下結果：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Int: -2147483648 ~ 2147483647<br>Long: -9223372036854775808 ~ 9223372036854775807<br>Float: -3.4028235E38 ~ 3.4028235E38<br>Double: -1.7976931348623157E308 ~ 1.7976931348623157E308</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<small><small><big><br>在Scala中，如整數、浮點數等基本的型態，可以直接作一些操作，例如：</big></small></small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; -13 abs<br>res5: Int = 13<br><br>scala&gt; 1 max 2<br>res6: Int = 2<br><br>scala&gt; 3.14 round<br>res7: Long = 3<br><br>scala&gt;<br></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<small><small><big><br></big></small>事實上，abs、max、round等都是物件上的方法（在Scala中，
+方法如果不帶引數或只帶一個引數，則括號可以省略），但並非Int、Double上的方法，在Scala中，如果發現某個方法不屬於某物件，則會嘗試看看
+是否有定義的<span style="font-weight: bold;">隱式轉換（Implicit conversion）</span>，在這邊的例子中，由於Scala為這些基本的資料型態定義了一些<span style="font-weight: bold;">富包裹器（Rich
+Wrapper）</span>，當必要時，會嘗試將數值以富包裹器包裹，看看是否可以執行所指定的方法，例如abs、max其實是
+scala.runtime.RichInt上的方法，round其實是scala.runtime.RichDouble上的方法。<br><br>下表列出了基本型態與富包裹器的對應：<br></small><table align="left" border="1" width="100%">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Byte</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichByte</td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Char</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichChar</td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Int</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichInt</td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Long</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichLong</td>
+
+
+
+
+          </tr>
+
+
+
+
+          
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Float</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichFloat</td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Double</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichDouble</td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">scala.Boolean</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichBoolean</td>
+
+
+
+
+          </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td align="left" valign="top">java.lang.String</td>
+
+
+
+
+            <td align="left" valign="top">scala.runtime.RichString</td>
+
+
+
+
+          </tr>
+
+
+
+
+          
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      
+      
+      
+      <p></p>
+
+
+
+
+      <br clear="all">
+
+
+
+<br><br><br><small><small><big><br></big></small></small><small><small><big><br></big><br></small></small><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/Type.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

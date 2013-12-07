@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/ManyToMany.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:16 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>多對多關聯</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror many-to-many has_and_belongs_to_many"
+      name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 多對多關聯<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>接續 <a href="OneToMany.html">一對多關聯</a> 的內容，如果一個客戶擁有多個訂單，訂單是關於某項產品，如果設計上，想讓讓客戶與產品間形成多對多雙向關聯，可以如下定義：</p>
+      <p class="courier" style="margin-left: 40px;"><strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;"># app/models/customer.rb<br>
+          class Customer &lt; ActiveRecord::Base<br>
+          &nbsp;&nbsp;&nbsp; has_many :orders<br>
+          &nbsp;&nbsp;&nbsp; has_many :products, :through =&gt; :orders<br>
+          end<br>
+          <br>
+        </strong><strong style="color: rgb(0, 0, 0); font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: -webkit-auto; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-size-adjust: auto; -webkit-text-stroke-width: 0px; font-size: small; "># app/models/order.rb<br>
+          class Order &lt; ActiveRecord::Base<br>
+          &nbsp;&nbsp;&nbsp; belongs_to :user<br>
+          &nbsp;&nbsp;&nbsp; belongs_to :products<br>
+          end</strong><br>
+        <br>
+        <strong style="color: rgb(0, 0, 0); font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: -webkit-auto; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-size-adjust: auto; -webkit-text-stroke-width: 0px; font-size: small; "># app/models/product.rb<br>
+          class Product &lt; ActiveRecord::Base<br>
+          &nbsp;&nbsp;&nbsp; has_many :orders<br>
+          &nbsp;&nbsp;&nbsp; has_many :customers, :through =&gt; :orders<br>
+          end</strong><br>
+      </p>
+      <p>此時表格上必須有以下的關係：</p>
+      <p><img alt="ManyToMany" src="images/ManyToMany-1.PNG"><br>
+      </p>
+      以上的情況，設計需求上也許本來就包括了<span class="courier">Order</span>模型，另一種多對多關係，是不需要中介模型存在的情況，例如一個使用者會使用多台電腦，而一台電腦會有多個使用者，模型設計上也許只需要：<br>
+      <br>
+      <div style="margin-left: 40px;"><strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;"># app/models/user.rb</strong><br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;">class User &lt; ActiveRecord::Base</strong><br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;">&nbsp;&nbsp;&nbsp; has_and_belongs_to_many :servers</strong><br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;">end</strong><br>
+        <br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;"># app/models/server.rb</strong><br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;">class Server &lt; ActiveRecord::Base</strong><br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;">&nbsp;&nbsp;&nbsp; has_and_belongs_to_many :users</strong><br>
+        <strong style="color: black; font-family: 'Courier New'; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: small;">end</strong><br>
+      </div>
+      <br>
+      此時表格上必須有以下關係：<br>
+      <br>
+      <img alt="ManyToMany" src="images/ManyToMany-2.PNG"><br>
+      <br>
+      可以先產生遷移檔：<br>
+      <br>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>$ rails g migration create_user_server_join_table<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      然後如下撰寫：<br>
+      <div class="courier" style="margin-left: 40px;"><strong>class CreateUserServerJoinTable &lt; ActiveRecord::Migration<br>
+          &nbsp; def change<br>
+          &nbsp;&nbsp;&nbsp; create_table :users_servers, :id =&gt; false do |t|<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.integer :user_id<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.integer :server_id<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          &nbsp; end<br>
+          end</strong><br>
+      </div>
+      <p> </p>
+      <p></p>
+      <span class="courier">has_and_belongs_to_many</span>會為模型加入以下的方法：<br>
+      <ul class="courier">
+        <li><strong>collection(force_reload = false)</strong></li>
+        <li><strong>collection&lt;&lt;(object, …)</strong></li>
+        <li><strong>collection.delete(object, …)</strong></li>
+        <li><strong>collection=objects</strong></li>
+        <li><strong>collection_singular_ids</strong></li>
+        <li><strong>collection_singular_ids=ids</strong></li>
+        <li><strong>collection.clear</strong></li>
+        <li><strong>collection.empty?</strong></li>
+        <li><strong>collection.size</strong></li>
+        <li><strong>collection.find(…)</strong></li>
+        <li><strong>collection.where(…)</strong></li>
+        <li><strong>collection.exists?(…)</strong></li>
+        <li><strong>collection.build(attributes = {})</strong></li>
+        <li><strong>collection.create(attributes = {})</strong></li>
+      </ul>
+      有關<span class="courier">has_and_belongs_to_many</span><span class="courier"></span>，還有一些可設置的選項，可參考 <a
+        href="http://guides.rubyonrails.org/association_basics.html">A Guide to Active Record Associations</a> 中 <a
+        href="http://guides.rubyonrails.org/association_basics.html#has_and_belongs_to_many-association-reference">4.4 has_and_belongs_to_many Association Reference</a> 的內容，關聯時查詢的相關進階議題，可參考 <a
+        href="http://guides.rubyonrails.org/active_record_querying.html">Active Record Query Interface</a>。<br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/ManyToMany.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:18 GMT -->
+</html>

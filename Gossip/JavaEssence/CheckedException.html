@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/CheckedException.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:55 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>貼心還是造成麻煩？</title></head>
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 貼心還是造成麻煩？</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Java
+將例外區分為受檢例外與非受檢例外，在例外繼承架構中，Exception子類但非RuntimeException子類，就是受檢例外，這類例外必須明
+確在程式碼中聲明使用try..catch處理，或者在方法上使用throws宣告此方法會丟出的受檢例外。RuntimeException子類的例
+外，則通常是JVM會自行丟出的例外，不用特別使用程式碼處理，編譯器也會讓你通過編譯。<br><br>例外處理的本意是，錯誤發生時，上下文環境並沒
+有足夠的資訊讓你處理例外，如果你呼叫某個聲明丟出受檢例外的方法，就表示該方法內部實作時，當時的資訊沒有足夠的資訊處理例外，而必須由使用該方法的你
+來處理。如果你也不知道該怎麼處理這個例外，那最後是不要捕捉（catch），以免誤判撰寫了錯的處理流程，而將例外給暗自處理掉。<br><br>這個原則很重要，有些程式設計人員在剛開始使用例外處理語法時，很容易寫下這種東西：<br></small><div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">try {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">} catch(SomeException ex) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; // 什麼也沒作</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br></div><small><br>這有可能是不習慣使用throws使然，有可能是因為很自然的使用IDE的提示與程式碼補完功能，或者是根本不知道該如何處理就空白在那邊，<span style="font-weight: bold;">這是非常嚴重的錯誤寫法</span>，這樣的程式碼如果層層疊疊呼叫，會導致錯誤幾乎難以發現。<br><br>另一個問題是，有些錯誤發生而引發例外時，你根本無力回復，例如SQLExceptiion是一種受檢例外，如果例外的發生原因是</small><small>資料庫連線異常，而連線異常的原因是由於實體線路問題，那麼無論如何你都不可能使用try..catch回復到正常可運作的情況。<br><br>當無法處理例外或資訊不足以處理例外時，最好的方法就是往外丟出例外，例如你也許會這麼寫：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public Customer getCustomer(String id) throws SQLException {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br></div><small><br>看起來似乎沒有問題，但假設這個方法是在整個應用程式非常底層被呼叫，在某個SQLException發生時，最好的方法是將例外浮現至呈現層，例如網頁技術，將錯誤訊息於網頁上顯示出來給管理人員。<br><br>為
+了讓例外往上浮現，你也許會選擇在每個方法呼叫上都宣告throws
+SQLException，但前面假設，這個方法的呼叫是在整個應用程式的底層，這樣的作法也許會造成許多程式碼的修改（更別說要重新編譯了）。另一個問
+題是，如果你根本無權修改應用程式的其它部份，這樣的作法顯示行不通。<br><br>受檢例外原本目的其實是好的，它有助於程式設計人員注意到例外的可能性並加以處理，但在應用程式規模增大時，會對逐漸對維護造成困難。<br><br><span style="font-weight: bold;">無論如何，在可以處理的時候加以處理，在無法處理的時候再往外丟，這個原則是不變的，問題在於怎麼丟才好？</span>一個基本的例子是這樣的：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">try {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} catch(SomeException ex) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; // 作些可行的處理</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; // 也許是 Logging 之類的</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; throw new RuntimeException(e)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>這是個大致的示意，<span style="font-weight: bold;">簡單地說，當你要往外丟出例外時，可以考慮包裝為RuntimeException，也就是取出必要的資訊，重新包裝為非受檢例外，由於是非受檢例外，你不用在方法上使用throws加以宣告，也可以通過編譯，呼叫者也有權決定是否捕捉或放任其繼續往上傳播。</span><br style="font-weight: bold;"><br><span style="font-weight: bold;">你可以繼承某個例外來建立自己的例外體系，如果你繼承Exception，則那就是種受檢例外，如果你繼承RuntimeException，那就是種非受檢例外。</span>當你定義的是受檢例外時，就要謹慎思考，這個例外由編譯器執行例外處理的語法檢查真有其必要性嗎？是否留給呼叫者有權決定處理或往外傳播比較好？<br><br>一
+些會封裝應用程式底層行為的框架，如Spring或Hibernate，選擇讓例外體系是非受檢例外，例如Spring中的
+DataAccessException，或者是Hibernate 3中的HibernateException（Hibernate
+2中的HibernateException是受檢例外），它們選擇給予開發人員較大的彈性來面對例外（也許也需要開發人員更多的經驗）。<br><br><span style="font-weight: bold;">一切都使用RuntimeException處理是另一個極端，這也不是個建議的方式。基本原則是，在可以處理的時候加以處理，不能處理的時候往外丟，在處理例外開始讓架構變得難以處理與維護時，考慮取出例外資訊包裝為非受檢例外，重構程式，甚至考慮建立非受檢例外體系。</span><br></small></td></tr></tbody></table><br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/CheckedException.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:55 GMT -->
+</html>

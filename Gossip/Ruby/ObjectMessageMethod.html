@@ -1,0 +1,391 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/ObjectMessageMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>淺談物件、訊息與方法</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 淺談物件、訊息與方法<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ruby中，都是透過<span style="font-weight: bold;">物件（Object）</span>來處理資料，字串是物件，陣列是物件，即使整數也是物件。例如，你可以叫整數作些事情，像是作四次重複的動作：</small><br>
+
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; 4.times do</span><br style="font-weight: bold;"><span style="font-weight: bold;">
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "Orz"</span><br style="font-weight: bold;"><span style="font-weight: bold;">
+&gt;&gt; end</span><br>
+Orz<br>
+Orz<br>
+Orz<br>
+Orz<br>
+=&gt; 4<br><span style="font-weight: bold;">
+&gt;&gt;</span></span></small></td></tr></tbody>
+      </table>
+      <br>
+      <small>在其它支援物件導向的程式語言中，會說這執行了<span style="font-family: Courier New,Courier,monospace;">4</span>這個物件上的<span style="font-family: Courier New,Courier,monospace;">times</span><span style="font-weight: bold;">方法（Method）</span>，不過Ruby的說法是，點運算子將<span style="font-family: Courier New,Courier,monospace;">times</span><span style="font-weight: bold;">訊息（Message）</span>傳送給4這個物件，4這個物件執行了對應的<span style="font-family: Courier New,Courier,monospace;">times</span>方法，4稱為訊息<span style="font-family: Courier New,Courier,monospace;">times</span>的<span style="font-weight: bold;">接受者（Receiver）</span>。類似地：</small><br>
+
+
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; "abc".upcase</span><br>
+=&gt; "ABC"<br><span style="font-weight: bold;">
+&gt;&gt;</span></span></small></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>在Ruby中，物件可以理解某些訊息集合，並將之對應至可執行的方法，上例中，</small><small><span style="font-family: Courier New,Courier,monospace;">點運算子右邊的upcase訊息，會傳送給點運算子左邊的"abc"字串（String）物件，而"abc"字串物件執行了對應的upcase方法</span>，"abc"稱為<span style="font-family: Courier New,Courier,monospace;">upcase</span>訊息的接受者。<br>
+      <br>
+每個物件都是某個類別（Class）的實例（Instance），可以執行<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class</span>方法，得知物件是哪個類別的實例：</small><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; 1.class</span><br>
+=&gt; Fixnum<br><span style="font-weight: bold;">
+&gt;&gt; "abc".class</span><br>
+=&gt; String<br><span style="font-weight: bold;">
+&gt;&gt;</span></span></small></td></tr></tbody>
+      
+      </table>
+
+
+      <br>
+      <small>從上例可以得知，整數1是<span style="font-family: Courier New,Courier,monospace;">Fixnum</span>類別的實例，<span style="font-family: Courier New,Courier,monospace;">"abc"字串是String</span>類別的實例，關於類別的說明，之後還會詳介。物件會有可執行的方法，可以透過<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">methods</span>方法得知有哪些物件有哪些公開方法可以使用：</small><br>
+
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; "abc".methods</span><br>
+=&gt; [:&lt;=&gt;, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :le<br>
+ngth, :size, ...略, :__s<br>
+end__]<br><span style="font-weight: bold;">
+&gt;&gt;</span></span></small></td></tr></tbody>
+      
+      </table>
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">舉個例子來說，以下建立一個Object實例，並在其上定義了some方法：</span></small><br>
+
+
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">&gt;&gt; <span style="font-weight: bold;">obj = Object.new</span><br>
+=&gt; #&lt;Object:0x22155a0&gt;<br><span style="font-weight: bold;">
+&gt;&gt; obj.methods</span><br>
+=&gt; [:nil?, :===, :=~, :!~, :eql?, :class, :clone, :dup, :taint, :tainted?, :unta<br>
+int, :untrust, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods<br>
+, :singleton_methods, :protected_methods, :private_methods, :public_methods, :in<br>
+stance_variables, :instance_variable_get, :instance_variable_set, :instance_vari<br>
+able_defined?, :instance_of?, :kind_of?, :is_a?, :tap, <span style="font-weight: bold;">:send</span>, <span style="font-weight: bold;">:public_send</span>, <span style="font-weight: bold;">:res</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">pond_to?</span>, :extend, :display, :method, :public_method, :define_singleton_method,<br>
+:hash, :__id__, :object_id, :to_enum, :enum_for, :gem, :==, :equal?, :!, :!=, :i<br>
+nstance_eval, :instance_exec, <span style="font-weight: bold;">:__send__</span>]<br>
+            <span style="font-weight: bold;">&gt;&gt; def obj.some</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; print "do something"</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">&gt;&gt; end</span><br>
+=&gt; nil<br><span style="font-weight: bold;">
+&gt;&gt; obj.methods</span><br>
+=&gt; [<span style="font-weight: bold;">:some</span>, :nil?, :===, :=~, :!~, :eql?, :class, :clone, :dup, :taint, :tainted?<br>
+, :untaint, ...略, :__send__]<br><span style="font-weight: bold;">
+&gt;&gt; obj.some</span><br>
+do something=&gt; nil<br><span style="font-weight: bold;">
+&gt;&gt;</span></span></small></td></tr></tbody>
+      
+      </table>
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">在第二次執行obj.methods時，可以看到obj上新增了some方法。</span>執行<span style="font-family: Courier New,Courier,monospace;">obj.some</span>時，<span style="font-family: Courier New,Courier,monospace;">some訊息傳送給obj參考的實例</span>，<span style="font-family: Courier New,Courier,monospace;">obj執行了some方法</span>。<br>
+      <br>
+每個物件建立時，都會有一些基本方法，在這邊先介紹<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">respond_to?</span>與<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">send</span>方法。<span style="font-family: Courier New,Courier,monospace;">respond_to?</span>可以用來詢問物件，是否能對指定訊息作出回應</small><small>（Ruby 慣例中，<span style="font-family: Courier New,Courier,monospace;">?結束的方法表示傳回true或false的結果</span>）</small><small>，<span style="font-family: Courier New,Courier,monospace;">send</span>方法則可以將指定訊息傳送給物件。例如：</small><br>
+
+
+
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; obj = Object.new</span><br>
+=&gt; #&lt;Object:0x2471a60&gt;<br>
+&gt;&gt; <span style="font-weight: bold;">obj.respond_to? "some"</span><br>
+=&gt; false<br><span style="font-weight: bold;">
+&gt;&gt; def obj.some</span><br style="font-weight: bold;"><span style="font-weight: bold;">
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; print "do some actions"</span><br style="font-weight: bold;"><span style="font-weight: bold;">
+&gt;&gt; end</span><br style="font-weight: bold;">
+=&gt; nil<br><span style="font-weight: bold;">
+&gt;&gt; obj.respond_to? "some"</span><br>
+=&gt; true<br><span style="font-weight: bold;">
+&gt;&gt; obj.some</span><br>
+do some actions=&gt; nil<br><span style="font-weight: bold;">
+&gt;&gt; obj.send "some"</span><br>
+do some actions=&gt; nil<br><span style="font-weight: bold;">
+&gt;&gt;</span></span></small></td></tr></tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">如果物件可以回應訊息，接收到訊息後，就可以執行對應方法，因此上例中，obj.some與obj.send "some"，都是執行obj上的some方法作為回應。</small><br>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">以下是個使用respond_to?與send的實際例子：<br>
+      </span></small>
+      <ul>
+        <li>main.rb</li>
+      </ul>
+      <pre>obj = Object.new<br><br>def obj.some<br>    print "do some actions"<br>end<br><br>def obj.other<br>    print "do other actions"<br>end<br><br>if obj.respond_to? ARGV[0]<br>    obj.send ARGV[0]<br>end<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;"></span>這個範例可以從命令列引數指定要執行物件上的哪個方法。例如：</small><br>
+
+
+
+
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt; ruby main.rb other</span><br>
+do other actions<br><span style="font-weight: bold;">
+&gt; ruby main.rb some</span><br>
+do some actions<br>
+&gt;</span></small></td></tr></tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">如果不使用respond_to?與send方法，這個範例的if部份也許必須改寫得很冗長了：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">case </span></span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">ARGV[0]</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">when </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">"some"</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; obj.some</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">when "other"</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; obj.other</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">when ...</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; ...</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; # 條列所有可能呼叫的方法</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">end</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+先前談過，print、puts也是方法，執行print、puts沒有撰寫接收者，並不是這些方法不需要接受者，只是省略沒寫而已，<span style="font-weight: bold;">如果省略訊息的接收者，訊息接收者就是self</span>，</span></small><small><span style="font-family: Courier New,Courier,monospace;">不同環境下，self會參考至不同物件，這是個值得討論的進階議題，之後會再說明</span></small><small><span style="font-family: Courier New,Courier,monospace;">。<br>
+      <br>
+      </span></small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/ObjectMessageMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

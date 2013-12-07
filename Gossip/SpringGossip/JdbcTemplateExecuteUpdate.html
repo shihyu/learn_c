@@ -1,0 +1,670 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/JdbcTemplateExecuteUpdate.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>JdbcTemplate 執行與更新</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: JdbcTemplate 執行與更新</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>您可以使用JdbcTemplate的execute()方法執行SQL陳述，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">jdbcTemplate.execute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; "CREATE TABLE USER (user_id integer, name varchar(100))");</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+如果是UPDATE或INSERT，您可以使用update()方法，update()方法有數個重載（Overload）版本，例如接受實作
+org.springframework.jdbc.core.PreparedStatementCreator介面的物件，
+PreparedStatementCreator介面的定義如下：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">package org.springframework.jdbc.core;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import java.sql.Connection;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import java.sql.PreparedStatement;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import java.sql.SQLException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface PreparedStatementCreator {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; PreparedStatement createPreparedStatement(Connection con) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws SQLException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+例如您可以將</small> <a href="UseJdbcTemplate.html"><small>使用 JdbcTemplate</small></a><small> 中UserDAO的insert()方法改寫如下：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small>
+&nbsp;<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+public void insert(User user) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; final String name = user.getName();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; final int age = user.getAge().intValue();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; jdbcTemplate.update(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp; new PreparedStatementCreator() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public PreparedStatement createPreparedStatement(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con) throws SQLException {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String sql = </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "INSERT INTO user (name,age) VALUES(?,?)";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PreparedStatement ps =</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+con.prepareStatement(sql);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setString(1, name);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setInt(2, age);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return ps;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp; });</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+...</span></small><br>
+
+      </div>
+
+      <small>
+      <br>
+
+
+在這個例子中，可以使用PreparedStatement預先編譯SQL，JdbcTemplate上實現了Template-callback機制，在執行JDBC的流程中，必要時會呼叫callback方法。<br>
+
+
+      <br>
+
+
+與PreparedStatementCreator互補的介面是org.springframework.jdbc.core.PreparedStatementSetter介面：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+package org.springframework.jdbc.core;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small>
+      </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+import java.sql.PreparedStatement;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+import java.sql.SQLException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small>
+      </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+public interface PreparedStatementSetter {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; void setValues(PreparedStatement ps) throws SQLException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</span></small><br>
+
+      </div>
+
+      <small><br>
+
+例如您可以將&nbsp;</small><a href="UseJdbcTemplate.html"><small>使用 JdbcTemplate</small></a><small> </small><small> 中UserDAO的insert()方法改寫如下：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+public void insert(User user) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp; final String name = user.getName();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp; final int age = user.getAge().intValue();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp; jdbcTemplate.update(</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "INSERT INTO user (name,age) VALUES(?,?)",</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new PreparedStatementSetter() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public void setValues(PreparedStatement ps) </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws SQLException {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setString(1, name);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setInt(2, age);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; });</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</small><br>
+
+      </div>
+
+      <small>
+      <br>
+
+
+JdbcTemplate會自動建立PreparedStatementCreator的實例，以提供傳遞給setValues()方法的PreparedStatement物件。<br>
+
+
+      <br>
+
+
+您也可以直接提供SQL，就如 </small> <a href="UseJdbcTemplate.html"><small>使用 JdbcTemplate</small></a><small> </small><small>中所示範的UserDAO中的insert()方法：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+public void insert(User user) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; String name = user.getName();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; int age = user.getAge().intValue();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp; jdbcTemplate.update("INSERT INTO user (name,age) " </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + "VALUES('" + name + "'," + age + ")");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+...</span></small><br>
+
+      </div>
+
+      <small>
+      <br>
+
+
+在直接下SQL語句時，也可以使用"?"作為佔位字元，並使用物件陣列作為引數傳遞給JdbcTemplate的update()方法，例如改寫 </small> <a href="UseJdbcTemplate.html"><small>使用 JdbcTemplate</small></a><small> &nbsp;</small><small>中所示範的UserDAO中的insert()方法：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+public void insert(User user) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp; jdbcTemplate.update(</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "INSERT INTO user (name, age) VALUES(?,?)",</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Object[] {user.getName(), user.getAge()});</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</small><br>
+
+      </div>
+
+      <small>
+      <br>
+
+
+JdbcTemplate會自動建立PreparedStatementCreator與PreparedStatementSetter的實例，然而這些細節您不用理會，您只要提供SQL與引數就好了。<br>
+
+
+      <br>
+
+
+如果需要批次處理時，可以實作org.springframework.jdbc.core.BatchPreparedStatementSetter介面：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+package org.springframework.jdbc.core;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small>
+      </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+import java.sql.PreparedStatement;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+import java.sql.SQLException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small>
+      </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+public interface BatchPreparedStatementSetter {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; void setValues(PreparedStatement ps, </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+int i) throws SQLException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; int getBatchSize();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</span></small><br>
+
+      </div>
+
+      <small>
+      <br>
+
+
+例如您可以在 </small> <a href="UseJdbcTemplate.html"><small>使用 JdbcTemplate</small></a><small> &nbsp;</small><small>中的IUserDAO介面及UserDAO類別上增加一個insertUsers()方法的定義與實作，像是以下的內容：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+public int[] insertUsers(final List users) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; String sql = "INSERT INTO user (name,age) VALUES(?,?)";</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; BatchPreparedStatementSetter setter =</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new BatchPreparedStatementSetter() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public void setValues(</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PreparedStatement ps, int i) throws SQLException {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User user = (User) users.get(i);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setString(1, user.getName());</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ps.setInt(2, user.getAge().intValue());</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public int getBatchSize() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return users.size();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; };</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; return jdbcTemplate.batchUpdate(sql, setter);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</small><br>
+
+      </div>
+
+      <small>
+      <br>
+
+
+如果您的JDBC驅動程式支援批次處理的話，則直接使用它的功能，如果不支援，則Spring會自動一個一個處理更新以模擬批次處理。<br>
+
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/JdbcTemplateExecuteUpdate.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+</html>

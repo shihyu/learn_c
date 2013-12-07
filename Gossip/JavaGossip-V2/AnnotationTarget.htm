@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/AnnotationTarget.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:20 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>限定 annotation 使用對象 - Target</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 限定 annotation 使用對象 - Target</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <span style="font-weight: bold;"></span><small>在定義Annotation型態時，您使用<span style="font-weight: bold;">java.lang.annotation.Target</span>可以定義其適
+用之時機，在定義時可以指定<span style="font-weight: bold;">java.lang.annotation.ElementType</span>的列舉值：
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package java.lang.annotation;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public enum ElementType {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; TYPE, // 適用 class, interface, enum</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      FIELD, // 適用 field</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      METHOD, // 適用 method</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      PARAMETER, // 適用 method 上之 parameter</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      CONSTRUCTOR, // 適用 constructor</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      LOCAL_VARIABLE, // 適用區域變數</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      ANNOTATION_TYPE, // 適用 annotation 型態</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;      PACKAGE // 適用 package</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+      <br>
+
+
+
+
+舉個例子來說，假設您定義Annotation只能適用於constructor與method：</small>
+
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> Debug.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.lang.annotation.Target;<br>import java.lang.annotation.ElementType;<br><br>@Target({ElementType.CONSTRUCTOR, ElementType.METHOD})<br>public @interface Debug {} <br></pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+如果您嘗試將Debug用於class上：</small><br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> SomeObject.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>@Debug<br>public class SomeObject {<br>    public void doSomething() {  <br>        // ....      <br>    }<br>} <br></pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+則在編譯時會發生以下的錯誤：<br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">SomeObject.java:3: annotation type not applicable to this kind of declaration</span><br style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">@Debug</span><br style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">^</span><br style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: rgb(255, 0, 0);">1 error</span></small>
+
+
+      <br>
+
+
+      </div>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/AnnotationTarget.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:20 GMT -->
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/UseQuartz.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:28 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>使用 Quartz</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 使用 Quartz</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>JDK的標準API中所提供的Timer功能有限，只能指定任務與任務之間的期間（Period），無法指定某個時間點定時執行任務，您可以使用<a href="http://www.opensymphony.com/quartz/">Quartz</a>，它提供了更多的排程功能，而Spring則對Quartz進行了封裝，讓它在使用上更加方便。<br>
+
+
+      <br>
+
+
+您可以繼承org.springframework.scheduling.quartz.QuartzJobBean來實作一個Job類別，例如：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>DemoJob.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import org.quartz.JobExecutionContext;<br>import org.springframework.scheduling.<br>                           quartz.QuartzJobBean;<br><br>public class DemoJob extends QuartzJobBean {<br>    private JobData jobData;<br>    <br>    public void executeInternal(<br>                  JobExecutionContext context) {<br>        System.out.println(<br>                jobData.getData() + " is executed.");<br>    }<br>    <br>    public void setJobData(JobData jobData) {<br>        this.jobData = jobData;<br>    }<br>    <br>    public JobData getJobData() {<br>        return jobData;<br>    }<br>} </pre>
+
+
+      <small><br>
+
+
+JobData只是一個Job資料物件的示範類別，為了能看出排程Job被執行時的週期性，它會傳回一個Date物件表示執行Job時所需資料的傳回時間，例如：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>JobData.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Date;<br><br>public class JobData {<br>    public String getData() {<br>        return "Data from " <br>               + new Date().toString();<br>    }<br>}</pre>
+
+
+      <small><br>
+
+
+直接來看定義檔如何定義：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>beans-config.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt; <br>    &lt;bean id="someData" <br>          class="onlyfun.caterpillar.JobData"/&gt;<br><br>    &lt;bean id="jobDetailBean" <br>          class="org.springframework.scheduling.<br>                       &rarr; quartz.JobDetailBean"&gt;<br>        &lt;property name="jobClass"&gt;<br>            &lt;value&gt;onlyfun.caterpillar.DemoJob&lt;/value&gt;<br>        &lt;/property&gt; <br>        &lt;property name="jobDataAsMap"&gt;<br>            &lt;map&gt;<br>                &lt;entry key="jobData"&gt;<br>                    &lt;ref bean="someData"/&gt;<br>                &lt;/entry&gt;<br>            &lt;/map&gt;<br>        &lt;/property&gt;              <br>    &lt;/bean&gt;<br><br>    &lt;bean id="simpleTriggerBean" <br>          class="org.springframework.scheduling.<br>                       &rarr; quartz.SimpleTriggerBean"&gt;<br>        &lt;property name="jobDetail"&gt;<br>            &lt;ref bean="jobDetailBean"/&gt;<br>        &lt;/property&gt;<br>        &lt;property name="repeatInterval"&gt;<br>            &lt;value&gt;1000&lt;/value&gt;<br>        &lt;/property&gt;<br>        &lt;property name="startDelay"&gt;<br>            &lt;value&gt;1000&lt;/value&gt;<br>        &lt;/property&gt; <br>    &lt;/bean&gt;<br>    <br>    &lt;bean id="schedulerFactoryBean" <br>          class="org.springframework.scheduling.<br>                       &rarr; quartz.SchedulerFactoryBean"&gt;<br>        &lt;property name="triggers"&gt;<br>            &lt;list&gt;<br>                &lt;ref bean="simpleTriggerBean"/&gt;<br>            &lt;/list&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>&lt;/beans&gt; </pre>
+
+
+      <small>在以上設定中比較特別要注意的是，
+org.springframework.scheduling.quartz.JobDetailBean的"jobClass"屬性必須提供Job的
+類別名稱，而不是Job的Bean實例，而Job所需的資料可以在"jobDataAsMap"屬性中來提供。<br>
+
+
+      <br>
+
+
+在排程任務的週期指定上，使用org.springframework.scheduling.quartz.SimpleTriggerBean來指
+定，這點與 TimerTask
+排程中的指定方式類似，指定的時間同樣也是以毫秒作為單位，而排定Job時，所使用的是
+org.springframework.scheduling.quartz.SchedulerFactoryBean。<br>
+
+
+      <br>
+
+
+完成設定之後，只要啟動Spring並讀取定義檔完成後，排程任務就會進行，例如撰寫一個簡單的任務啟動類別：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>QuartzDemo.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.BufferedReader;<br>import java.io.IOException;<br>import java.io.InputStreamReader;<br>import org.springframework.context.<br>              support.FileSystemXmlApplicationContext;<br><br>public class QuartzDemo {<br>    public static void main(String[] args) throws IOException {<br>        new FileSystemXmlApplicationContext("beans-config.xml");<br>        System.out.println("啟動 Task..");<br>        System.out.println("請輸入 exit 關閉 Task: ");<br>        <br>        BufferedReader reader = <br>            new BufferedReader(<br>                    new InputStreamReader(System.in));<br>        <br>        while(true) {<br>            if(reader.readLine().equals("exit")) {<br>                System.exit(0);<br>            }<br>        }<br>    }<br>} </pre>
+
+
+      <small><br>
+
+
+      </small><small>使用SimpleTriggerBean只能作簡單的Job與Job之間執行的期間（Period）指定，如果要直接作時間點的指定，則可以使用org.springframework.scheduling.quartz.CronTriggerBean，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt; <br>    &lt;bean id="someData" <br>          class="onlyfun.caterpillar.JobData"/&gt;<br><br>    &lt;bean id="jobDetailBean" <br>          class="org.springframework.scheduling.<br>                    &rarr; quartz.JobDetailBean"&gt;<br>        &lt;property name="jobClass"&gt;<br>            &lt;value&gt;onlyfun.caterpillar.DemoJob&lt;/value&gt;<br>        &lt;/property&gt; <br>        &lt;property name="jobDataAsMap"&gt;<br>            &lt;map&gt;<br>                &lt;entry key="jobData"&gt;<br>                    &lt;ref bean="someData"/&gt;<br>                &lt;/entry&gt;<br>            &lt;/map&gt;<br>        &lt;/property&gt;              <br>    &lt;/bean&gt;<br><br>    &lt;bean id="cronTriggerBean" <br>          class="org.springframework.scheduling.<br>                    &rarr; quartz.CronTriggerBean"&gt;<br>        &lt;property name="jobDetail"&gt;<br>            &lt;ref bean="jobDetailBean"/&gt;<br>        &lt;/property&gt;<br>        &lt;property name="cronExpression"&gt;<br>            &lt;value&gt;0 0 19 * * ?&lt;/value&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>    <br>    &lt;bean id="schedulerFactoryBean" <br>          class="org.springframework.scheduling.<br>                    &rarr; quartz.SchedulerFactoryBean"&gt;<br>        &lt;property name="triggers"&gt;<br>            &lt;list&gt;<br>                &lt;ref bean="cronTriggerBean"/&gt;<br>            &lt;/list&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>&lt;/beans&gt; </pre>
+
+      <small><br>
+
+重點在於"cronExpression"屬性的指定，指定的格式是至少六個時間元素，最多七個時間元素，例如上面的指定是每天的19時要執行Job一次，"cronExpression"屬性指定的格式如下：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>秒（0-59）</small></li>
+
+        <li><small>分（0-59）</small></li>
+
+        <li><small>小時（0-23）</small></li>
+
+        <li><small>每月第幾天（1-31）</small></li>
+
+        <li><small>月（1-12或JAN-DEC）</small></li>
+
+        <li><small>每星期第幾天（1-7或SUN-SAT）</small></li>
+
+        <li><small>年（1970-2099）</small></li>
+
+      
+      </ul>
+
+      <small><br>
+
+其中「每月第幾天」與「每星期第幾天是互斥」的，兩個只能設定一個，不設定的以 ? 符號撰寫，如果有好幾個時間點，可以使用 , 符號，例如：「0
+0 10,12,14 * * ?」表示每天的10時、12時、14時要執行Job；對於連續的時間可以使用 - 符號，例如「0 0
+10,12,14 1-15 * ?」表示每月的1到15日每10時、12時、15時要執行Job，時間格式中的年指定可有可無，例如：「0 0
+10,12,14 ? * MON 2006」表示2006年每星期一的10時、12時、14時要執行Job。<br>
+
+      <br>
+
+      <br>
+
+
+      <br>
+
+
+
+
+      </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/UseQuartz.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:28 GMT -->
+</html>

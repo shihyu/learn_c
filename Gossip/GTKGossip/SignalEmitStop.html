@@ -1,0 +1,787 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/SignalEmitStop.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>內建 Signal 的發射與停止</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: 內建 Signal 的發射與停止</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>GTK的Signal不一定得由事件來發出，您可以主動發出Signal，利用g_signal_emit_by_name()，您可以指定一個物件已建立的Signal名稱來發出該Signal。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+下面這個程式利用POSIX執行緒（GLib 亦有提供 <a href="GThread.html">GThread</a> 來啟用多執行緒），改寫<big> </big></small><small><big><a href="CustomCallback.html"><small>自訂 callback 函式</small></a> </big>中的範例，</small><small>每秒發出一個GtkButton的"clicked" Signal，程式開始後即使您沒有按下按鈕，也會在終端機下顯示"按鈕按下：哈囉！按鈕！"的訊息：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+        <li><small>signal_emit_demo.c</small></li>
+
+
+
+
+
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      <small>
+      </small>
+      
+      
+      
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br>#include &lt;pthread.h&gt;<br><br><span style="font-weight: bold;">void *signal_thread(void *arg) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    int i;</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    for(i = 0; i &lt; 5; i++) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        sleep(1);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        g_signal_emit_by_name(arg, "clicked");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;"> </span><br style="font-weight: bold;"><span style="font-weight: bold;">    pthread_exit("Thread exit");</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>// 自訂Callback函式<br>void button_clicked(GtkWidget *button, gpointer data) {<br>    g_print("按鈕按下：%s\n", (char *) data);<br>}<br><br>int main(int argc, char *argv[]) {<br><span style="font-weight: bold;">    pthread_t a_thread;</span><br><br>    GtkWidget *window;<br>    GtkWidget *button;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br><br>    button = gtk_button_new_with_label("按我");<br>    gtk_container_add(GTK_CONTAINER(window), button);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br>    g_signal_connect(GTK_OBJECT(button), "clicked",<br>                     G_CALLBACK(button_clicked), "哈囉！按鈕！");<br><br>    gtk_widget_show(window);<br>    gtk_widget_show(button);<br><br><span style="font-weight: bold;">    pthread_create(&amp;a_thread, NULL, signal_thread, button);</span><br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+      <small>程式執行後，會使用另一個執行緒，每秒發出一個"clicked" Signal，為了使用POSIX執行緒，編譯這個程式時需要定義_REENTRANT及使用pthread程式庫：</small></span><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="color: rgb(255, 255, 255);">$ gcc signal_emit_demo.c -o signal_emit_demo -D_REENTRANT -lpthread `pkg-config --cflags --libs gtk+-2.0`</small><small style="color: rgb(255, 255, 255);"></small><br>
+
+
+
+
+
+
+
+
+            </td>
+
+
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>g_signal_emit_by_name()可以發出Signal，如果您想要中止Signal的傳播，則可以使用</small><small>g_signal_stop_by_name()，例如在某個Signal處理函式處理完畢後，若不想讓其它的Signal處理函式繼續處理了，則可以使用</small><small>g_signal_stop_by_name()來停止Signal。</small><br>
+
+
+
+
+
+      <span class="postbody">
+      <br>
+
+
+
+      <small>若不想使用pthread來撰寫這個程式，則可以考慮使用GLib的</small> </span><small><big><a href="TimeoutIdle.html"><small>Timeout </small></a></big>。</small><br>
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/SignalEmitStop.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+</html>

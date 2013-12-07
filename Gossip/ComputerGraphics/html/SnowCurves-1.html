@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/SnowCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:55 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript" src="js/turtle.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                function snow(rad, min, ks) {
+                    if (rad > min) {
+                        var r = rad * (1 - ks) / (1 + ks);
+                        snow(r, min, ks);
+                        var n = Math.ceil(
+                                  Math.log(min / rad) / Math.log(ks));
+                        for(var i = 0; i < 6; i++) {
+                            for(var j = 1; j < n; j++) {
+                                turtle.warp(rad * (1 - Math.pow(ks, j)));
+                                snow(r * Math.pow(ks, j), min, ks);
+                                turtle.warp(-rad * (1 - Math.pow(ks, j)));
+                            }
+                            turtle.turn(60.0);
+                        }
+                    } else {
+                        turtle.pset(turtle.currentX, turtle.currentY);
+                    }
+                }
+            
+                var canvas1 = document.getElementById('canvas1');
+                var context = canvas1.getContext('2d');
+                var turtle = new Turtle(context);
+                
+                turtle.window(0, 0, canvas1.width, canvas1.height);
+                
+                turtle.view(0, 0, canvas1.width, canvas1.height);
+                turtle.setPoint(300, 50);
+                turtle.setAngle(90);
+                
+                var d = canvas1.height / 8;
+                for(var i = 0; i < 20; i++) {
+                    var x = d + (canvas1.width - 2 * d) * Math.random();
+                    var y = d + 5 * d * Math.random();
+                    var r = 0.1 * d + 0.9 * d * Math.random();
+                    turtle.setPoint(x, y);
+                    turtle.setAngle(90);
+                    snow(r, 0.1, 0.5);
+                }
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="600" height="400"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/SnowCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:55 GMT -->
+</html>

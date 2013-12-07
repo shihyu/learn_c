@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/GetOutputStream.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>getOutputStream()</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: getOutputStream()<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small style="font-family: Courier New,Courier,monospace;">在大部份的情況下，你會從HttpServletResponse取得PrintWriter實例，使用println()對瀏覽器進行字元輸出。然而有時候，你需要直接對瀏覽器進行位元組輸出，這時你可以使用HttpServletResponse的<span style="font-weight: bold;">getOutputStream()</span>方法取得<span style="font-weight: bold;">ServletOutputStream</span>實例，它是OutputStream的子類別。<br>
+      <br>
+舉個例子來說，以下是個隨機產生數字圖片的</small><small>Servlet</small><small style="font-family: Courier New,Courier,monospace;">：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.awt.*;<br>import java.awt.image.*;<br>import java.io.*;<br>import javax.imageio.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="OTP", urlPatterns={"/otp"})<br>public class OTP extends HttpServlet {<br>    @Override<br>    public void doGet(HttpServletRequest request,<br>            HttpServletResponse response)<br>            throws ServletException, IOException {<br>        request.setCharacterEncoding("UTF-8");<br><span style="font-weight: bold;">        response.setContentType("image/jpeg");</span><br><br>        StringBuilder builder = new StringBuilder();<br>        for(int i = 0; i &lt; 4; i++) {<br>            int number = (int)(Math.random() * 10);<br>            builder.append(number);<br>        }<br>        <br>        String password = <span style="font-weight: bold;">getPasswdImage(builder.toString());<br><br>        // 將產生的驗證碼存在某個地方，以供之後比對<br><br></span><span style="font-weight: bold;">        OutputStream out = response.getOutputStream();</span><br><span style="font-weight: bold;">        ImageIO.write(password, "JPG", out);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        out.close();</span><br>    }<br><br>    // 一些 Java 2D 的東西，作用為依傳入的數字產生圖片<br>    public BufferedImage getPasswdImage(String password) throws IOException {<br>        BufferedImage bufferedImage =<br>                 new BufferedImage(60, 20, BufferedImage.TYPE_INT_RGB);<br>        Graphics g = bufferedImage.getGraphics();<br>        g.setColor(Color.WHITE);<br>        g.setFont(new Font("標楷體", Font.BOLD, 16));<br>        g.drawString(password, 10, 15);<br>        return bufferedImage;<br>    }<br>}<br></pre>
+      <small style="font-family: Courier New,Courier,monospace;">
+      <br>
+ImageIO類別的write()接受一個OutputStream物件，可以將你指定的BufferedImage寫入至指定的
+OutputStream，這邊使用HttpServletResponse的getOutputStream()所取得的ServletOutputStream，將圖片寫至客戶端。<br>
+      <br>
+瀏覽器必須知道所接收到的資料內容型態為何，這可以使用HttpServletResponse的<span style="font-weight: bold;">setContentType()</span>方法來設定，setContentType()方法會自動幫你設定content-type回應標頭，你只要指定MIME（</small><small>Multipurpose Internet Mail Extensions</small><small style="font-family: Courier New,Courier,monospace;">）類型就可以了，要注意的是，setContentType()方法必須在任何回應確認前執行，在回應確認後再執行setContentType()方法並沒有作用。。<br>
+      <br>
+常見的設定有text/html、application/pdf、application/jar、application/x-zip、image/jpeg等。你不用強記MIME形式，新的MIME形式也不斷地在增加，必要時再使用搜尋了解一下即可。<br>
+      <br>
+只要引用上面</small><small>Servlet</small><small style="font-family: Courier New,Courier,monospace;">網址就可以顯示圖片。例如寫一個表單：<br>
+      </small>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;title&gt;登入&lt;/title&gt;<br>        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;form action="pet.view" method="post"&gt;<br>            姓　名：&lt;input type="text" name="user" value=""&gt;&lt;br&gt;<br>            密　碼：&lt;input type="password" name="passwd" value=""&gt;&lt;br&gt;<br>            驗證碼：&lt;input type="text" name="check" value=""&gt; <span style="font-weight: bold;">&lt;img src="otp"/&gt;</span>&lt;br&gt;<br>            &lt;input type="submit" value="送出"/&gt;<br>        &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <small style="font-family: Courier New,Courier,monospace;">
+      <br>
+要注意的是，同一個請求週期中，HttpServletResponse的getWriter()與getOutputStream()只能擇一使用，否則會丟出IllegalStateException。<br>
+      <br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/GetOutputStream.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+</html>

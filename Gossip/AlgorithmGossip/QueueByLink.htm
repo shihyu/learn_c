@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/QueueByLink.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:05:18 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>佇列 - 使用鏈結實作（C語言動態記憶體宣告）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip:&nbsp;佇列 - 使用鏈結實作（C語言動態記憶體宣告）</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+      
+      
+      <h2>說明</h2>
+
+
+      <small>
+使用陣列來實作佇列，會有佇列空間的限制，如果使用鏈結配合動態記憶體宣告，就不會有長度的限制。</small><br>
+
+
+
+      
+      
+      <h2>解法</h2>
+
+
+      <small>
+在使用鏈結實作佇列時，為了方便，使用一個空的節點來指向佇列前端第一個元素，這個空節點的data欄位並不儲存資料，而next當作front的角色，如下圖所示：<br>
+
+
+      </small>
+      
+      
+      <div style="text-align: center;"><small><img style="width: 304px; height: 90px;" alt="Link" title="Link" src="images/queneByLink-1.jpg"><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+      <br>
+
+
+
+為了配合以上的空節點，將佇列是否為空的判斷方式，改為front-&gt;next是否指向下一個節點來完成，如果front-&gt;next指向NULL，表示鏈結中已無下一個資料，所以佇列為空。<br>
+
+
+      <br>
+
+
+
+由於必須同時維護front與rear兩個資訊，而C語言一次只能傳回一個值，為了簡化程式邏輯，我們將front與rear宣告為全域變數，有興趣的話，請自己試著不設為全域變數來撰寫，這會讓程式變得複雜一些。 </small>
+
+      <br>
+
+
+
+
+      
+      
+      <h2> 實作</h2>
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> C </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>struct node { <br>    int data; <br>    struct node *next; <br>}; <br><br>typedef struct node Node; <br><br>void createq(); <br>void showfront(); <br>void addq(int); <br>void delq(); <br>void showqueue(); <br><br>Node *front, *rear; <br><br>int main(void) { <br>    int input, select; <br><br>    createq(); <br><br>    while(1) { <br>        printf("\n\n請輸入選項(-1結束)："); <br>        printf("\n(1)插入值至佇列"); <br>        printf("\n(2)顯示佇列前端"); <br>        printf("\n(3)刪除前端值"); <br>        printf("\n(4)顯示所有內容"); <br>        printf("\n$c&gt;"); <br>        scanf("%d", &amp;select); <br>        <br>        if(select == -1) <br>            break; <br><br>        switch(select) { <br>            case 1: <br>                printf("\n輸入值："); <br>                scanf("%d", &amp;input); <br>                addq(input); <br>                break; <br>            case 2: <br>                showfront(); <br>                break; <br>            case 3: <br>                delq(); <br>                break; <br>            case 4: <br>                showqueue(); <br>                break; <br>            default: <br>                printf("\n選項錯誤！"); <br>        } <br>    } <br><br>    printf("\n"); <br><br>    return 0; <br>} <br><br>void createq() { <br>    front = rear = (Node*) malloc(sizeof(Node)); <br>    front-&gt;next = rear-&gt;next = NULL; <br>} <br><br>void showfront(){ <br>    if(front-&gt;next == NULL) <br>        printf("\n佇列為空！"); <br>    else <br>        printf("\n頂端值：%d", front-&gt;next-&gt;data); <br>} <br><br>void addq(int data) { <br>    Node *newnode; <br><br>    newnode = (Node*) malloc(sizeof(Node)); <br><br>    if(front-&gt;next == NULL)  <br>        front-&gt;next = newnode; <br>    <br>    newnode-&gt;data = data; <br>    newnode-&gt;next = NULL; <br>    rear-&gt;next = newnode; <br>    rear = newnode; <br>} <br><br>void delq() { <br>    Node* tmpnode; <br><br>    if(front-&gt;next == NULL) { <br>        printf("\n佇列已空！"); <br>        return; <br>    } <br><br>    tmpnode = front-&gt;next; <br>    front-&gt;next = tmpnode-&gt;next; <br>    free(tmpnode);    <br>} <br><br>void showqueue() { <br>    Node* tmpnode; <br><br>    tmpnode = front-&gt;next; <br><br>    printf("\n佇列內容："); <br>    while(tmpnode != NULL) { <br>        printf("%d ", tmpnode-&gt;data); <br>        tmpnode = tmpnode-&gt;next; <br>    } <br>} </pre>
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/QueueByLink.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:05:19 GMT -->
+</html>

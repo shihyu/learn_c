@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QMainWindow.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:38 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QMainWindow</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QMainWindow</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QMainWindow類別提供一個標準的應用程式視窗，當中可以包括選單（QMenuBar）、工具列（QToolBar）、狀態列（QStatusBar）、停駐元件（QDockWidget）等元件。 <br>
+
+      <br>
+
+      </small><small>直接以範例來說明如何使用QMainWindow類別，在當中會有一個文字編輯區、選單、工具列、狀態列與一個停駐元件：</small><br>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span>
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QMainWindow&gt;<br>#include &lt;QTextEdit&gt;<br>#include &lt;QMenuBar&gt;<br>#include &lt;QAction&gt;<br>#include &lt;QToolBar&gt;<br>#include &lt;QStatusBar&gt;<br>#include &lt;QDockWidget&gt;<br>#include &lt;QLabel&gt;<br>#include &lt;QPixmap&gt;<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br>    QMainWindow *mainWindow = new QMainWindow;<br>    mainWindow-&gt;setWindowTitle("QMainWindow");    <br>    <br>    // 文字編輯區 <br>    QTextEdit *textEdit = new QTextEdit;<br>    textEdit-&gt;setFocus();<br><br>    <span style="font-weight: bold;">mainWindow-&gt;setCentralWidget(textEdit);</span><br>    <br>    // 蹦現選單<br>    QMenu *fileMenu = new QMenu("&amp;File");<br>    QAction *fileAction = new QAction("Open..", fileMenu);<br>    // 快捷鍵 Ctrl+O <br>    fileAction-&gt;setShortcut(Qt::CTRL + Qt::Key_O);<br>    <br>    fileMenu-&gt;addAction(fileAction);<br>    fileMenu-&gt;addAction("Save");<br>    fileMenu-&gt;addAction("Save as...");<br>    // 分隔線<br>    fileMenu-&gt;addSeparator();<br>    // 快捷鍵 Ctrl+X，動作連接至 QApplication 的 quit() <br>    fileMenu-&gt;addAction("Close", &amp;app, SLOT(quit()), Qt::CTRL + Qt::Key_X);<br>    <br>    QMenu *editMenu = new QMenu("&amp;Edit");<br>    editMenu-&gt;addAction("Cut");<br>    editMenu-&gt;addAction("Copy");<br>    editMenu-&gt;addAction("Paste");<br>    <br>    QMenu *aboutMenu = new QMenu("&amp;About");<br>    aboutMenu-&gt;addAction("About");<br>                <br><span style="font-weight: bold;">    mainWindow-&gt;menuBar()-&gt;addMenu(fileMenu);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    mainWindow-&gt;menuBar()-&gt;addMenu(editMenu);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    mainWindow-&gt;menuBar()-&gt;addMenu(aboutMenu);    </span><br><br>    // 工具列<br>    QToolBar *toolBar = new QToolBar("QToolBar");<br>    toolBar-&gt;addAction(QIcon("caterpillar_head.jpg"), "caterpillar");<br>    toolBar-&gt;addAction(QIcon("momor_head.jpg"), "momor");<br>    toolBar-&gt;addSeparator();<br>    toolBar-&gt;addAction(QIcon("bush_head.jpg"), "bush");<br><br><span style="font-weight: bold;">    mainWindow-&gt;addToolBar(toolBar);</span><br><br>    // 狀態列 <br><span style="font-weight: bold;">    QStatusBar *statusBar = mainWindow-&gt;statusBar();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    statusBar-&gt;showMessage("Status here...");</span><br><br>    // 停駐元件<br>    QDockWidget *dockWidget = new QDockWidget("QDockWidget");<br>    QLabel *label = new QLabel;<br>    label-&gt;setPixmap(QPixmap("caterpillar.jpg"));<br>    dockWidget-&gt;setWidget(label);<br><br><span style="font-weight: bold;">    mainWindow-&gt;addDockWidget(Qt::RightDockWidgetArea, dockWidget);</span><br>     <br>    mainWindow-&gt;show();<br><br>    return app.exec();<br>}</pre>
+
+      <span class="postbody"><br>
+
+      <small>QMainWindow的setCentralWidget()用來設定主視窗的中央元件：<br>
+
+      </small></span>
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">mainWindow-&gt;setCentralWidget(textEdit);</span></small></span><br>
+
+      <span class="postbody"></span></div>
+
+      <span class="postbody"><small><br>
+
+      </small></span><span class="postbody"><small>每個QMenu實例中的選項為QAction的實例，QMenu的addAction()可以直接使用字串，當中會自動產生QAction並加入至QMenu中，而addSeparator()則可以加入分隔線，</small></span><span class="postbody"><small>比較特別的是：<br>
+
+      </small></span>
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">fileMenu-&gt;addAction("Close", &amp;app, SLOT(quit()), Qt::CTRL + Qt::Key_X);</span></small></span><br>
+
+      <span class="postbody"></span></div>
+
+      <span class="postbody"><br>
+
+      <small>這一個版本的addAction()可以直接將QAction的trigger()
+SIGNAL連接至接收SINGAL的物件之SLOT，並可以設定快捷鍵功能，在上面的程式碼中，按下選單中「Close」，則會使用
+QApplication的quit()來關閉應用程式。<br>
+
+      <br>
+
+      </small></span><span class="postbody"><small>每個QMainWindow會具備
+QMenuBar與QStatusBar，您可以分別使用menuBar()與statusBar()來取得，程式中使用QMenuBar的
+addMenu()加入QMenu實例，使用QStatusBar的showMessage()來設定狀態列文字。<br>
+
+      <br>
+
+QMainWindow的工具列，則使用addToolBar()來加入QToolBar的實例，至於停駐元件的部份，則是一個類似工具列的圖形元件，但
+您可以自行配置當中的元件與功能，Qt::RightDocuWidgetArea設定了元件預設的停駐位置為視窗的右邊，直接來看一下程式的執行畫面，
+就可以了解何謂停駐元件，並看看QMainWindow配置的各元件之畫面：<br>
+
+      <br>
+
+      </small></span><span class="postbody"><img style="width: 459px; height: 308px;" alt="" src="images/QMainWindow-1.jpg"><br>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QMainWindow.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:41 GMT -->
+</html>

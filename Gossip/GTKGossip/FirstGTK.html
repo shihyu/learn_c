@@ -1,0 +1,1057 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/FirstGTK.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:09 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>第一個 GTK 程式</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: 第一個 GTK 程式&nbsp;</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>不可免俗的，從最簡單的基本視窗產生開始介紹，視窗標題就叫作「哈囉！GTK+！」好了，請使用任一編輯器來編輯一個helloGtk.c的檔案，內容如下： <br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li><small>helloGtk.c</small></li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br>    gtk_widget_show(window);<br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+      <small>首先include必要的GTK標頭檔案，接著先看到gtk_init()，這個函式會先初始化函式庫，設定預設信號處理，並讓GTK有機會處理傳遞給程式的命令列引數，GTK會檢查是否有以下的引數並處理：<br>
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;gtk-module</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;g-fatal-warnings</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;gtk-debug</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;gtk-no-debug</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;gdk-debug</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;gdk-no-debug</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;display</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;sync</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;name</small></span></li>
+
+
+
+
+
+
+        <li><span class="postbody"><small>&ndash;class</small></span></li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+
+
+這些引數會從引數列中移除，剩下的部份留待您自己的程式邏輯來處理。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+GTK雖然使用C來撰寫，但是透過GObject函式庫，可以支援物件導向的物件封裝、繼承觀念，透過巨集還可以支援多型的觀念（至少概念上達到一些部份），一個GTK物件階層如下所示：<br>
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">GObject<br>
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;+--</span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">GInitiallyUnowned<br>
+
+
+
+
+
+
+&nbsp; &nbsp;&nbsp; +-- GtkObject<br>
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkWidget<br>
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkContainer<br>
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkBin<br>
+
+
+
+
+
+
+      </span></small></span><span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-- GtkWindow</span></small></span><br>
+
+
+
+
+
+
+      <span class="postbody"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br>
+
+
+
+
+
+
+gtk_window_new()會建立一個GtkWindow，這是一個基本的視窗物件，GtkWindow繼承自GtkBin，GtkBin繼承自
+GtkContainer，GtkContainer可以容納其它widget，所以在GtkWindow中可以置放其它的widget，而它們全都是
+GtkWidget的後代。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+在函式庫的組織上，<a href="http://library.gnome.org/devel/gtk/2.11/index.html">GTK+的參考手冊</a> 中，若要查詢與GtkWindow設定的相關函式，也就是gtk_window開頭的函式名稱，則直接查詢 <a href="http://library.gnome.org/devel/gtk/2.11/GtkWindow.html">GtkWindow 的說明文件</a>。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+在範例中，您使用gtk_window_new()在記憶體中產生一個GtkWindow（但還不是真正出現在螢幕畫面中），參數設定為GtkWindowType，有兩個可用的設定：<br>
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li><small>GTK_WINDOW_TOPLEVEL：一個有外框的</small><small>標準</small><small>GTK視窗。</small></li>
+
+
+
+
+
+
+        <li><small>GTK_WINDOW_POPUP：一個蹦現視窗，像是對話方塊、蹦現選單或提示文字。</small></li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+
+
+若要設定GtkWindow標題文字，則使用gtk_window_set_title()，GTK_WINDOW巨集用以將window物件轉型為GtkWindow型態。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+gtk_window_new()只是在記憶體中產生一個GtkWindow，若要真正在螢幕畫面中顯示GTK的widget，則使用
+gtk_widget_show()，最後呼叫gtk_main()，這會將程式的控制權交給GTK，由GTK來等待鍵盤、按鈕等事件或是檔案IO通知。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+您可以使用以下的指令來進行編譯與執行：<br>
+
+
+
+
+
+
+      </small></span><span class="postbody"></span>
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="color: rgb(255, 255, 255);">$ gcc helloGtk.c -o helloGtk `pkg-config --cflags --libs gtk+-2.0</small><small style="color: rgb(255, 255, 255);">`</small><br>
+
+
+
+
+
+            <small style="color: rgb(255, 255, 255);">$ ./helloGtk</small><br>
+
+
+
+
+
+            <small style="color: rgb(255, 255, 255);"></small>
+            </td>
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+
+pkg-config會先取得GTK的標頭檔位置與函式庫資訊，然後再供給gcc進行編譯，一個程式的執行畫面如下所示，這個程式的原始碼使用UTF8編碼，在編譯執行之後，可直接顯示中文：<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      <img style="width: 215px; height: 234px;" alt="" src="images/FirstGTK-1.jpg"><br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+由於gtk_main()會將控制權交給了GTK，直到呼叫gtk_main_quit()之前都不會返回，這個範例目前還沒有實作這個部份（之後還會介紹如何實作），因此這個視窗您按下右上 X 鈕也不會真正關閉，而必須在文字模式下先使用Ctrl+C強制中斷程式。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      有關gtk_main()、gtk_main_quit()等函式的說明，可以參考GTK+參考文件中的 <a href="http://library.gnome.org/devel/gtk/2.12/gtk-General.html">Main loop and Events</a>。<br>
+
+
+
+
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/FirstGTK.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:10 GMT -->
+</html>

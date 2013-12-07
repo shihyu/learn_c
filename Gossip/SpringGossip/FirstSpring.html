@@ -1,0 +1,414 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/FirstSpring.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:24 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>第一個 Spring 程式</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip:&nbsp;第一個 Spring 程式</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+首先要取得Spring的相關檔案，Spring的檔案放在 <a href="http://sourceforge.net/project/showfiles.php?group_id=73357">SourceForge</a>。<br>
+
+      <br>
+
+
+
+
+
+
+撰寫此文時，Spring最新的版本是1.2.5，有兩個下載版本，一個是spring-framework-1.2.5-with-
+dependencies.zip，一個是spring-framework-1.2.5.zip，with-dependencies的包括一些
+ant、jakarta-commons、struts、velocity等等其它開源Java專案的相依檔案，如果您也需要這些相關檔案，可以下載這個
+版本，如果您已經有這些相關檔案，則只需要下載spring-framework-1.2.5.zip這個檔案。 <br>
+
+      <br>
+
+
+
+下載zip檔案並解壓縮之後，在dist目錄下就是使用Spring所需要的相關檔案，如果下載的是with-dependencies版本，則在lib
+目錄中的是您可能會用到的相依檔案。在dist目錄下，spring-core.jar是Spring的核心，如果日後需要使用到Spring其它的子框
+架支援，再將其它的jar檔案加入即可，例如spring-aop.jar、spring-webmvc.jar等等。您也可以直接使用
+spring.jar這個檔案，它包括了所有Spring支援的功能所需要的所有類別，而不再需要加入個別的jar檔案。 <br>
+
+      <br>
+
+
+
+注意在Spring 1.2之後，原先於spring-core.jar中與Bean相關的一些套件，現在已移至spring-beans.jar中。<br>
+
+      <br>
+
+
+
+就這邊接下來要練習的第一個Spring程式，要將spring-core.jar、spring-beans.jar，以及相依的commons-
+logging.jar加至Classpath的路徑中，您可以在lib目錄的jakarta-commons目錄中找到。 <br>
+
+      <br>
+
+
+
+來撰寫您的第一個組件（Component），它只是一個簡單的JavaBean，用來向使用者打聲招呼：</small>
+
+
+
+
+
+
+
+
+
+ <br>
+
+
+
+      
+      <ul>
+
+        <li>HelloBean.java</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar; <br><br>public class HelloBean { <br>    private String helloWord; <br>    <br>    public void setHelloWord(String helloWord) { <br>        this.helloWord = helloWord; <br>    } <br>    public String getHelloWord() { <br>        return helloWord; <br>    } <br>}</pre>
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+稍後您可以透過setHelloWord()這個Setter來設定新的招呼語，不過並不是親自撰寫程式來作這些事，而是在組態檔案定義，由Spring
+來為您作設定的動作，接著可以撰寫Bean的定義檔案，定義檔案會告訴Spring容器，如何完成相依物件的關係注入等動作，Bean定義檔的名稱可以自
+由定義，例如這邊取名為beans-config.xml：</small><br>
+
+
+
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;"></span>
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt; <br>    &lt;bean id="helloBean" <br>          class="onlyfun.caterpillar.HelloBean"&gt; <br>        &lt;property name="helloWord"&gt;<br>            &lt;value&gt;Hello!Justin!&lt;/value&gt;<br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>&lt;/beans&gt;</pre>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      <span class="postbody"></span><small>定義檔中定義了JavaBean的別名與來源類別，&lt;property&gt;標籤中設定了希望注入至JavaBean的字串值，撰寫一個簡單的示範程式： </small><br>
+
+
+
+      
+      <ul>
+
+        <li>SpringDemo.java</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar; <br><br>import org.springframework.core.io.FileSystemResource;<br>import org.springframework.core.io.Resource;<br>import org.springframework.beans.factory.BeanFactory; <br>import org.springframework.beans.factory.xml.XmlBeanFactory; <br><br>public class SpringDemo { <br>    public static void main(String[] args) { <br>        Resource rs = <br>            new FileSystemResource("beans-config.xml"); <br>        BeanFactory factory = <br>            new XmlBeanFactory(rs); <br>        <br>        HelloBean hello = <br>            (HelloBean) factory.getBean("helloBean"); <br>        System.out.println(hello.getHelloWord()); <br>    } <br>}</pre>
+
+
+
+      <br>
+
+      <small>
+
+BeanFactory是 <a href="../DesignPattern/SimpleFactory.htm">Factory 模式</a>
+的一個實作例子，但用途更為一般，可以建立、管理不同型態的物件，由於這邊所使用的Bean定義檔是XML，所以使用實作BeanFactory介面的
+XmlBeanFactory來作為管理Bean的實際物件，在Spring
+1.2中，XmlBeanFactory只接受實作Resource介面的物件，像是ClassPathResource、
+FileSystemResource、InputStreamResource、ServletContextResource、
+UrlResource等，分別表示不同的檔案來源物件，這邊所使用的是FileSystemResource，表示指定相對路徑或絕對路徑來取得
+Bean定義檔， 同樣的，如果您的Bean定義檔是位於Classpath路徑中，您也可以使用ClasspPathResource來取得定義檔。<br>
+
+      <br>
+
+
+
+這是從比較低層次的角度來使用Spring的IoC容器功能，藉由BeanFactory來讀取組態檔案並完成依賴的關聯注入，這邊的依賴是什麼？指的是
+HelloBean相依於String物件，透過Setter所保留的介面，使用Setter
+injection來完成這個依賴注入，而不是將招呼語寫死在HelloBean，BeanFactory是整個Spring的重點所在，整個
+Spring的核心都圍繞著它，在這邊使用的是XmlBeanFactory，負責讀取XML組態檔案，您也可以使用properties檔案，這之後會
+再介紹。 <br>
+
+      <br>
+
+
+
+BeanFactory讀取Bean的組態設定並完成關係維護之後，可以藉由getBean()方法並指定Bean的別名來取得Bean實例，如果使用
+BeanFactory的話，只有在真正需要Bean物件時，才會實際建立Bean實例，而不是在一開始建立BeanFactory時就建立Bean實
+例，來看看實際運行之後的效果</small>
+
+
+
+：
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">2005/10/16 下午 07:14:03 org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions<br>
+
+
+
+資訊: Loading XML bean definitions from file [C:\workspace\SpringDemo\beans-config.xml]<br>
+
+
+
+Hello!Justin!</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+如果今天您要想改變招呼語，則只要更改beans-config.xml就可以了，不用修改主要的程式，從比較一般的角度來看，就意味著如果您想要改變一些物件之間的依賴關係，則只要修改組態檔即可，而不用修改組件的任何一行程式。 </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/FirstSpring.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:24 GMT -->
+</html>

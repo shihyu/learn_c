@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/SessionBeanServlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:21 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>第一個 Session Bean（Servlet 客戶端）</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 第一個 Session Bean（Servlet 客戶端）</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <center style="width: 247px;">
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>當Servlet與EJB不為同一個應用程式時（不為同一個JVM），其實與 </small><small><a href="FirstSessionBean.html">第一個 Session Bean（單機客戶端）</a>
+類似的，要使用JNDI查找以取得Bean，重點在於何時取得Bean，若為Stateless Session
+Bean，由於其沒有狀態，每個客戶端都可以使用同一個Stateless Session
+Bean，因此Servlet初始化時可以是取得Bean的時機，也就是定義在init()方法之中，例如：<br>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private HelloBean hello;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void init() throws ServletException {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; super.init();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitialContext context = new InitialContext();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Object obj = context.lookup("onlyfun.caterpillar.HelloBean");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+hello = (HelloBean) PortableRemoteObject.narrow(obj, HelloBean.class);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } catch (NamingException ex) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Logger.getLogger(HelloServlet.class.getName()).log(Level.SEVERE,
+null, ex);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</span><br>
+
+      <br>
+
+為了示範完整的範例，在這邊再次列出Session Bean的程式碼，首先是介面定義：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>HelloBean.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.ejb.Remote;<br><br>@Remote<br>public interface HelloBean {<br>    public String doHello(String message);<br>}</pre>
+
+      <small><br>
+
+再來是實作，在這邊不使用mappedName屬性，因此稍後可以透過查找介面名稱來取得Bean：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>HelloBeanImpl.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.ejb.Stateless;<br><br>@Stateless(name="ejb/HelloFacade")<br>public class HelloBeanImpl implements HelloBean {<br>    public String doHello(String message) {<br>        return message + "processed....";<br>    }<br>}</pre>
+
+      <small><br>
+
+而在Servlet客戶端，重新定義其init()方法以取得Stateless Session Bean：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>HelloServlet.java</li>
+
+      
+      </ul>
+
+      
+      <pre style="width: 767px;">package onlyfun.caterpillar;<br><br>import java.io.*;<br>import javax.naming.*;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import java.util.logging.*;<br>import javax.rmi.PortableRemoteObject;<br><br>public class HelloServlet extends HttpServlet {<br><span style="font-weight: bold;">    private HelloBean hello;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    public void init() throws ServletException {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        try {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            super.init();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            InitialContext context = new InitialContext();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            Object obj = context.lookup("onlyfun.caterpillar.HelloBean");</span><br style="font-weight: bold;"><span style="font-weight: bold;">            hello = (HelloBean) </span><br style="font-weight: bold;"><span style="font-weight: bold;">                    PortableRemoteObject.narrow(obj, HelloBean.class);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        } catch (NamingException ex) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            Logger.getLogger(HelloServlet.class.getName())</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    .log(Level.SEVERE, null, ex);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>   <br>    protected void processRequest(HttpServletRequest request, <br>                                HttpServletResponse response)<br>                        throws ServletException, IOException {<br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br>                    out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Servlet HelloServlet&lt;/title&gt;");  <br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br>        out.println("&lt;h1&gt;" + <span style="font-weight: bold;">hello.doHello("Orz...")</span> + "&lt;/h1&gt;");<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>        out.close();<br>    } <br><br>    protected void doGet(HttpServletRequest request, <br>                         HttpServletResponse response)<br>                       throws ServletException, IOException {<br>        processRequest(request, response);<br>    } <br><br>    protected void doPost(HttpServletRequest request,<br>                          HttpServletResponse response)<br>                       throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br><br>    public String getServletInfo() {<br>        return "Short description";<br>    }<br>}</pre>
+
+      <small><br>
+您需要準備jndi.properties，放在WEB-INF/classes中：<br>
+      </small>
+      <ul>
+        <li><small>jndi.properties</small></li>
+      </ul>
+      <pre>java.naming.factory.initial=com.sun.enterprise.naming.SerialInitContextFactory<br>java.naming.factory.url.pkgs=com.sun.enterprise.naming<br>java.naming.factory.state=com.sun.corba.ee.impl.presentation.rmi.JNDIStateFactoryImpl<br># 選用，如果伺服端不在本機的話<br>org.omg.CORBA.ORBInitialHost=localhost<br># 選用，如果伺服端不是使用3700埠的話<br>org.omg.CORBA.ORBInitialPort=3700</pre>
+      <small><br>
+
+若您請求該Servlet，則將得到以下的結果：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;html&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;head&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;title&gt;Servlet HelloServlet&lt;/title&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/head&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;body&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;h1&gt;Orz...processed....&lt;/h1&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/body&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/html&gt;</small><br>
+
+      </div>
+
+      <small><br>
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/SessionBeanServlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:21 GMT -->
+</html>

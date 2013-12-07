@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/SeleniumGrid.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:46 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>使用 Selenium Grid 並行測試</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 使用 Selenium Grid 並行測試<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你想要在多台機器上，同時啟動多個瀏覽器對Web應用程式作測試，那麼你可以試試 <a href="http://selenium-grid.seleniumhq.org/">Selenium Grid</a>，
+其原理是將一台機器作為Selenium hub，其它台機器對Selenium hub註冊Selenium RC，當你對Selenium
+hub發出測試請求時，由Selenium hub對已註冊的其它機器發出請求，由各台機器啟動瀏覽器進行測試，你可以參考Selenium
+Grid的 <a href="http://selenium-grid.seleniumhq.org/run_the_demo.html">Run the Demo</a> 說明。<br>
+      <br>
+以下作個簡單範例，想要使用Selenium Grid，在擔任Selenium hub的機器上，進入已下載解開的Selenium Grid目錄，執行ant指令：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ant launch-hub</span></small><br>
+      </div>
+      <small><br>
+啟動成功之後，你可以用瀏覽器連結：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">http://localhost:4444/console</span></small><br>
+      </div>
+      <small><br>
+這是個簡易控制台，可以看到接下來已註冊的Selenium RC，在擔任Selenium RC的其它台機器上，可以如下執行ant指令：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ant -Dport=&lt;rcPort&gt; <br>
+&nbsp;&nbsp;&nbsp; -Dhost=&lt;rcHost&gt; <br>
+&nbsp;&nbsp;&nbsp; -DhubURL=http://&lt;hubHost&gt;:4444 <br>
+&nbsp;&nbsp;&nbsp; -Denvironment="*firefox" <br>
+&nbsp;&nbsp;&nbsp; launch-remote-control</span></small><br>
+      </div>
+      <small><br>
+例如，假設你的Selenium hub是在ooo.com，而你要註冊的Selenium RC是在xxx.com，RC的port是5555，則可以如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ant -Dport=5555 </span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; -Dhost=xxx.com</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; -DhubURL=http://ooo.com:4444 </span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; -Denvironment="*firefox" </span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; launch-remote-control</span></small><br>
+      </div>
+      <small><br>
+如果你想在本機上同時運行Selenium hub與註冊Selenium RC，則可以省略host、hubURL，指定Selenium RC的埠號即可。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ant -Dport=5555 </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">-Denvironment="*firefox" </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">launch-remote-control</span></small><br>
+      </div>
+
+      <small><br>
+在註冊多個Selenium RC之後，Selenium hub的控制台會看到已註冊的RC：<br>
+      <img style="border: 1px solid ; width: 541px; height: 227px;" alt="" src="images/SeleniumGrid-1.png"><br>
+      <br>
+接著你可以使用<span style="font-family: Courier New,Courier,monospace;">ThreadSafeSeleniumSessionStorage</span>來進行測試，以</small>
+       <small><big><a href="SeleniumRC.html"><small>結合 Selenium RC</small></a></big> 中的例子，改用</small><small><span style="font-family: Courier New,Courier,monospace;">ThreadSafeSeleniumSessionStorage的話，如下所示：<br>
+</span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package test.cc.openhome;<br><br><span style="font-weight: bold;">import static com.thoughtworks.selenium.</span><br style="font-weight: bold;"><span style="font-weight: bold;">                  grid.tools.ThreadSafeSeleniumSessionStorage.*;</span><br style="font-weight: bold;"><br>import static org.junit.Assert.assertTrue;<br><br>import org.junit.AfterClass;<br>import org.junit.BeforeClass;<br>import org.junit.Test;<br><br>public class AddJSPTest {<br>    @BeforeClass<br>    public static void setUpClass() throws Exception {<br>        <span style="font-weight: bold;">startSeleniumSession("localhost", 4444, </span><br style="font-weight: bold;"><span style="font-weight: bold;">                "*firefox", "http://localhost:8080/BookmarkOnline/");</span><br style="font-weight: bold;"><span style="font-weight: bold;">        session().setTimeout("120000");</span><br>    }<br>    <br>    @AfterClass<br>    public static void tearDownClass() throws Exception {<br><span style="font-weight: bold;">        closeSeleniumSession();</span><br>    }<br>   <br>    @Test<br>    public void testAddJSP() throws Exception {<br>        session().open("/BookmarkOnline/add.jsp");<br>        session().click("//input[@value='送出']");<br>        session().waitForPageToLoad("30000");<br><br>        assertTrue(session().isTextPresent("新增書籤失敗"));<br>        assertTrue(session().isTextPresent("網址不能空白"));<br>        assertTrue(session().isTextPresent("請輸入網頁標題"));<br><br>        session().type("url", "www.javaworld.com.tw");<br>        session().click("//input[@value='送出']");<br>        session().waitForPageToLoad("30000");<br><br>        assertTrue(session().isTextPresent("新增書籤失敗"));<br>        assertTrue(session().isTextPresent("請輸入網頁標題"));<br><br>        session().type("url", "www.javaworld.com.tw");<br>        session().type("title", "JavaWorld@TW");<br>        session().type("category", "程式設計");<br>        session().click("//input[@value='送出']");<br>        session().waitForPageToLoad("30000");<br><br>        assertTrue(session().isTextPresent("新增書籤成功"));<br>        assertTrue(session().isTextPresent("http://www.javaworld.com.tw"));<br>        assertTrue(session().isTextPresent("JavaWorld@TW"));<br>        assertTrue(session().isTextPresent("程式設計"));<br>    }<br>}	<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/SeleniumGrid.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:48 GMT -->
+</html>

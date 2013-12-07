@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Class.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:10 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>.class 與 Class</title></head>
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: .class 與 Class</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><span style="font-weight: bold;">Java在真正需要使用一個類別時才會載入對應的.class檔案</span>，而非在程式啟動時就載入所有的類別，因為大多數的使用者都只使用到應用程式的部份資源，在需要某些功能時才載入某些資源，可以讓系統的資源運用更有效率（Java本來就是為了資源有限的小型設備而設計的，這樣的考量是必然的）。<br><br><span style="font-weight: bold;">java.lang.Class</span>的
+實例代表了Java應用程式在運行時所載入的類別或介面實例，也就是.class檔案在JVM中的具體物件代表，Class也用來表達enum（屬於類別
+的一種）、 annotation（屬於介面的一種）、陣列、原生型態（Primitive
+type）、void；Class類別沒有公開的（public）建構方法，Class物件是由JVM自動產生，每一個.class檔案被載入時，JVM
+就自動為其生成一個Class物件。<br><br>你可以透過Object的<span style="font-weight: bold;">getClass()</span>方法來取得每一個物件對應的Class物件，或者是透過<span style="font-weight: bold;">class常量（Class literal）</span>，在取得Class物件之後，就可以操作Class物件上的一些公開方法來取得類別的基本資訊，例如簡單的使用getClass()方法來取得String類別的Class實例，並從中得到String的一些基本資訊：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class Main {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String name = "caterpillar";</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class c = name.getClass();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("類別名稱：" + </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">c.getName()); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("是否為介面：" + </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">c.isInterface()); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("是否為基本型態：" + </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">c.isPrimitive()); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("是否為陣列物件：" + </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">c.isArray()); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("父類別名稱：" +</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;"> c.getSuperclass().getName());</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">} </small><br></div><small><br>也可以直接使用以下的方式來取得String類別的Class物件：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Class stringClass = String.class;</small><br></div><small><br>Java
+在真正需要類別時才會載入類別，所謂「真正需要」通常指的是要使用指定的類別生成物件時（或是使用者指定要載入類別時，例如使用
+Class.forName()載入類別，或是使用ClassLoader的loadClass()載入類別，稍後都會說明）。使用類別名稱來宣告參考名
+稱並不會導致類別的載入，可以設計一個測試類別的印證這個說法。<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; static {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("類別被載入");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>以
+上定義了一個靜態區塊，「預設」在類別第一次被載入時會執行靜態區塊（說預設的原因，是因為可以設定載入類別時不執行靜態區塊，使用Class生成物件時
+才執行靜態區塊，稍後會介紹），藉由在文字模式下顯示訊息，你可以瞭解類別何時被載入，可以使用以下程式來測試類別載入時機：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some s = null;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">System.out.println("宣告Some參考名稱");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">s&nbsp;= new Some();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">System.out.println("生成Some實例");</span></small><br></div><small><br>宣告參考名稱並不導致Some類別被載入，而是在使用new生成物件時才會載入類別，所以在執行new Some()時，才會發現static區塊被執行的訊息。<br><br>Class
+的訊息是在編譯時期就被加入至.class檔案中，這是Java支援執行時期型別辨識（RTTI，Run-Time Type
+Information或Run-Time Type
+Identification）的一種方式，在編譯時期編譯器會先檢查對應的.class檔案，而執行時期JVM在使用某類別時，會先檢查對應的
+Class物件是否已經載入，如果沒有載入，則會尋找對應的.class檔案並載入。<br><br><span style="font-weight: bold;">一個類別在JVM中只會有一個Class實例（其實是經由同一個類別載入器載入時，只會有一個Class實例）</span>，每個類別的實例都會記得自己是由哪個Class實例所生成，你可以使用getClass()或.class來取得Class實例。例如以下的範例將顯示true：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String s = "";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">System.out.println(s.getClass() == String.class);</span></small><br></div><small><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Class.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:10 GMT -->
+</html>

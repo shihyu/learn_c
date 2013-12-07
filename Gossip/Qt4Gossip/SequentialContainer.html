@@ -1,0 +1,1872 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/SequentialContainer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>循序容器（QVector、QLinkedList、QList...）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: 循序容器（QVector、QLinkedList、QList...）</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QVector、
+QLinkedList與QList是Qt所提供的幾個常用容器類別。QVector將項目（item）儲存在鄰接的記憶體空間之中，提供基於索引
+（index-based）存取方式的容器類別。QLinkedList以鏈結（Linked）的方式儲存項目，提供基於迭代器（iterator-
+based）存取方式的容器類別。QList提供基於</small><small>索引的</small><small>快速</small><small>存取容器類別，內部使用指標陣列，可提供快速插入及移除項目。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+首先來看看QVector的基本使用方式，建立一個可容納兩個元素的QVector，並使用索引方式存取元素值：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">QVector&lt;double&gt; vect(2);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">vect[0] = 1.0;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">vect[1] = 2.0;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">for (int i = 0; i &lt; vect.count(); ++i) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; vect[i] &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">for (int i = 0; i &lt; vect.count(); ++i) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; vect.at(i) &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+要使用索引方式設定元素，必須先配置好夠長的空間，否則會發生超出索引範圍的錯誤，</small><small>使用[]運算子指定索引存取的方式是比較方便，但在某些場合下，使用at()方法會較有效率一些，這涉及Qt的隱式共享機制，稍後再作介紹。<br>
+
+
+
+
+
+      </small><small></small><small><span class="postbody"><br>
+
+
+
+
+
+      </span></small><small>您也可以使用QVector的append()方法來加入元素，使用remove()方法來移除元素，使用insert()方法來插入元素，例如append()的使用如下：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">vect.append(3.0);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">vect.append(4.0);</span></small><br>
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+或者是使用&lt;&lt;運算子附加元素：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">vect &lt;&lt; 5.0 &lt;&lt; 6.0;</small><br>
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+QVector也重載了一些其它的運算子，以及提供了一些其它可用的方法，請查詢Qt線上文件有關於QVector的介紹。QVector提供的是鄰接的
+記憶體空間以存取物件，所以對於循序存取或使用索引，效率較高，但如果要插入或移除元素時，效率就會低落。QVector的子類別QStack提供了
+push()、pop()與top()等方法，方便您進行堆疊結構的物件管理。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+對於需要經常要在容器中插入或移除元件，您可以使用QLinkedList以提高存取效率，它不提供基於索引的存取方式，而是基於迭代器的存取方式，稍後會介紹迭代器的使用，以下先來看看QList。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+QList提供的是基於索引的存取方式，其內部實作使用了指標陣列，陣列中每個指標指向所要儲存的元素，結合了QVector與QLinkedList的
+優點，提供快速存取與插入、移除，其索引存取方式或可用的方法與QVector是類似的，也可以使用&lt;&lt;運算子來附加元素，例如：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">QList&lt;QString&gt; list;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush";<br>
+
+
+
+
+
+
+
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">for(int i = 0; i &lt; list.size(); ++i) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; list[i].toAscii().data() &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">cout &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">for(int i = 0; i &lt; list.size(); ++i) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; list.at(i).toAscii().data() &lt;&lt; endl;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}&nbsp;&nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">cout &lt;&lt; endl;</small><br>
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+QList的子類別QStringList為Qt中應用很廣的類別，可以讓您儲存QString物件，QList的子類別QQueue則提供了佇列結構的容器管理。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+以上先列出QVector、QLinkedList及QList的使用比較：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>如果想要有連續鄰接的記憶體空間來存放元件，則使用QVector。</small></li>
+
+
+
+
+
+
+
+        <li><small>如果需要真正的鏈結資料結構，並使用基於迭代器的存取方式，則使用QLinkedList。</small></li>
+
+
+
+
+
+
+
+        <li><small>在大部份情況下，QList可以滿足快速存取、插入、移除的需求，並可提供基於索引的存取方式。<br>
+
+
+
+
+
+
+
+          </small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+再來看看迭代器於容器類別的使用，對於容器類別，Qt提供兩種風格的迭代器：Java風格與STL風格。Java風格的迭代器使用上就如何Java的迭代器，使用這種迭代器對於</small><small>Java開發人員較為容易，然而STL風格的迭代器則提供更有彈性的操作。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+以下簡單示範在QList上使用Java風格迭代器：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QList&lt;QString&gt; list;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QListIterator&lt;QString&gt; iterator(list);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">while (iterator.hasNext()) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; iterator.next().toAscii().data() &lt;&lt; endl;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      </small>
+
+
+
+
+
+
+
+
+      <span class="postbody"><small>與Java
+迭代器類似的，hasNext()測試是否有下一個元素，next()傳回下一個元素，其它還有hasPrevious()、previous()等方法
+可以使用。Java風格的迭代器有兩種：唯讀與可讀寫。QListIterator是唯讀迭代器，對於可讀寫迭代器，命名上會加上Mutable，例
+如QMutableListIterator，除了next()、previous()等方法之外，還提供了insert()、remove()等方法可
+以使用，例如：<br>
+
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>QLinkedList&lt;QString&gt; list;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush";</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; </small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>QMutableLinkedListIterator&lt;QString&gt; rwIterator(list);</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>while (rwIterator.hasNext()) {</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; if(rwIterator.next() == "momor") {</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; rwIterator.insert("bee");</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; break;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; }</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>}</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; </small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>QLinkedListIterator&lt;QString&gt; rIterator(list);</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>while (rIterator.hasNext()) {</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; cout &lt;&lt; rIterator.next().toAscii().data() &lt;&lt; endl;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>}</small></span><br>
+
+
+
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+      <small>上面這個程式片段，使用可讀寫迭代器來於"momor"之後插入一個"bee"，之後使用唯讀迭代器讀出資料。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+您可以使用容器類別的begin()方法傳回</small></span><span class="postbody"><small>基於STL的迭代器，它指向容器的第一個元素位址，end()方法則傳回指向容器最後一個元素之後的位址。您可以如下使用基於STL的迭代器：<br>
+
+
+
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QList&lt;QString&gt; list;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush";</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QList&lt;QString&gt;::const_iterator i = list.begin();</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">while (i != list.end()) {</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; (*i).toAscii().data() &lt;&lt; endl;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ++i;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">}</span></small></span><br>
+
+
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+
+
+      <small><span class="postbody"><small>
+      <br>
+
+
+
+
+
+
+
+      </small></span><span class="postbody">STL風格的迭代器一樣有兩種，C&lt;T&gt;::const_iterator形式的迭代器宣告為唯讀，則可以讀取資料，不可修改資料，</span><span class="postbody">C&lt;T&gt;::const_iterator形式的迭代器則可以修改資料，例如：<br>
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush";</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt;::iterator i = list.begin();</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">while (i != list.end()) {</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; (*i) = (*i) + ".onlyfun";</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ++i;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">}</span></span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+對於簡單的循序存取，Qt提供了foreach虛擬關鍵字（pseudo-keyword），以標準的for迴圈</span></small><small><span class="postbody">實作</span></small><small><span class="postbody">，例如您可以如下循序取出QList中的元素：<br>
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">list &lt;&lt; "caterpillar" &lt;&lt; "momor" &lt;&lt; "bush";</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">foreach(QString str, list) {</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; cout &lt;&lt; str.toAscii().data() &lt;&lt; endl;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">}</span></span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+      </span></small><small><span class="postbody">接下來進一步說明前面所提及，Qt的容器類別有個稱之為隱式共享（</span><span class="docEmphasis">implicit sharing</span></small><small><span class="postbody">）的機制，又稱之為copy on write，顧名思義，就是在資料有變動的情況下，才進行容器內資料結構物件之複製，否則容器內資料結構物件是共享的。<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+舉個例子來說，如果您使用[]運算子方式，則會進行容器內資料結構物件之複製：<br>
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list1;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">list1 &lt;&lt; "x";</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list2 = list1;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">cout &lt;&lt; &amp;list1[0] &lt;&lt; endl;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">cout &lt;&lt; &amp;list2[0] &lt;&lt; endl;</span></span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+在上例中，使用了[]運算子，list1與list2內部的資料結構物件經過複製，並不是共享的，所以顯示出來的兩個記憶體位址並不相同，但使用at()時的情況則是相同的：<br>
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span class="postbody"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">QList&lt;QString&gt; list1;</span></span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">list1 &lt;&lt; "x";</span></span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">QList&lt;QString&gt; list2 = list1;</span></span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">cout &lt;&lt; &amp;(list1.at(0)) &lt;&lt; endl;</span></span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">cout &lt;&lt; &amp;(list2.at(0)) &lt;&lt; endl;</span></span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+      </span></small><small><span class="postbody">所以在唯讀的情況下，建議使用at()方法而不是[]運算子的方法，以避免容器內部資料結構物件複製的成本，藉以獲得較好的效率。</span></small><br>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+隱式共享又稱之為copy on write，是因為在容器中的資料有變動時，就不再共享內部資料結構物件，可以從下面的程式碼看出：<br style="font-weight: bold;">
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list1;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">list1 &lt;&lt; "x";</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list2 = list1;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;"><br>
+
+
+
+
+
+// 以下兩行顯示相同的記憶體位址<br>
+
+
+
+
+
+cout &lt;&lt; &amp;(list1.at(0)) &lt;&lt; endl;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">cout &lt;&lt; &amp;(list2.at(0)) &lt;&lt; endl;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;"><br>
+
+
+
+
+
+// 對 list2 作變動 &nbsp;&nbsp; </span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">list2 &lt;&lt; "y";<br>
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">// 以下兩行顯示不同的記憶體位址</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; </span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">cout &lt;&lt; &amp;(list1.at(0)) &lt;&lt; endl;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">cout &lt;&lt; &amp;(list2.at(0)) &lt;&lt; endl;</span></span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+      </span></small><small><span class="postbody">Qt容器的隱式共享機制之一，讓您可以用較簡明的方式來撰寫程式，例如您可以如下撰寫一個函式：<br>
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span class="postbody">QList&lt;QString&gt; doSomething() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span class="postbody">&nbsp;&nbsp;&nbsp; QList&lt;QString&gt; list;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span class="postbody">&nbsp; &nbsp; // ...blah..blah<br>
+
+
+
+
+
+&nbsp; &nbsp; cout &lt;&lt; &amp;list &lt;&lt; endl;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span class="postbody">&nbsp;&nbsp;&nbsp; return list;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span class="postbody">}</span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+然後就直接如下撰寫程式以利用這個函式，但不會進行物件複製：<br>
+
+
+
+
+
+      </span></small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span class="postbody"><span style="font-weight: bold;">QList&lt;QString&gt; list = doSomething();<br>
+
+
+
+
+
+      </span></span></small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span class="postbody">cout &lt;&lt; &amp;list &lt;&lt; endl;</span></small><br>
+
+
+
+
+
+      <small><span class="postbody"></span></small></div>
+
+
+
+
+
+      <small><small><br>
+
+
+
+
+
+
+
+      </small>上面的程式碼片段，在doSomething()中的list位址與呼叫doSomething()中list的位址會是相同的。無論是Java風格或STL風格的迭代器，使用唯讀迭代器時，背後也都會使用到隱式分享機制，以增加循序讀取的效率。</small><br>
+
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+容器類別的值可以是基本資料型態、指標或物件，物件必須有預設建構子、複製建構子與指定運算子（C++預設的複製及指定運算亦可）。<br>
+
+
+
+
+
+      </span></small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/SequentialContainer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:42 GMT -->
+</html>

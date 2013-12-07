@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Model2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:49 GMT -->
+<head>
+    <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+    <link rel="stylesheet" href="css/print.css" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>關於 MVC/Model 2</title>
+  </head>
+  <body>
+    <h3><a href="../index.html">From
+        Gossip@Openhome</a></h3>
+    <h1><a href="index-2.html">Servlet/JSP Gossip: 關於 MVC/Model 2<br>
+      </a></h1>
+    <table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0"
+      cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top; width: 250px; text-align: center;"> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <center>
+               </center>
+          </td>
+          <td style="vertical-align: top; width: 690px; text-align: left;"><small>在
+              Web
+              應用程式的領域中，包括了網頁的呈現與程式碼的行為，網頁的呈現可交由網頁美術人員執行，程式碼的撰寫則由程式設計人員負責，各司其職，為了
+              不在網頁中添
+              加不必要的程式碼來干擾網頁美術人員的設計，也為了不在程式碼中安插麻煩的字串來輸出HTML等內容，Web應用程式世界常使用的架構是 <span
+                style="font-weight: bold;">MVC/Model 2</span>。<br>
+              <br>
+              MVC指的是<span style="font-weight: bold;">Model/View/Controller</span>，
+              也就是將Web應用程式的組成劃分為<span style="font-weight: bold;">模型、畫面與控制器</span>三
+              個角色，最原始的MVC定義是指桌面應用程式上的架構，這邊不予探討，Web應用程式借鏡桌面應用程式MVC架構，取其
+              Model/View/Controller的職責劃分，並修改流程為適用於HTTP請求/回應特性，基本上你也可以稱這個修改後的架構為
+              MVC，或者是
+              Model 2（是的！還有一個架構稱之為Model 1，之後會看到），或併稱為MVC/Model 2。<br>
+              <br>
+              在MVC/Model 2中，將Web應用程式劃分為模型、畫面與控制器：<br>
+            </small>
+            <ul style="font-weight: bold;">
+              <li><small>控制器（Controller）的職責</small></li>
+              <ul>
+                <li><small>接受請求</small></li>
+                <li><small>驗證請求</small></li>
+                <li><small>判斷要轉發請求給哪個模型</small></li>
+                <li><small>判斷要轉發請求給哪個畫面<br>
+                  </small></li>
+              </ul>
+              <li><small>模型（Model）的職責</small></li>
+              <ul>
+                <li><small>保存應用程式狀態</small><br>
+                </li>
+                <li><small>執行應用程式商務邏輯（Business logic）</small></li>
+              </ul>
+              <li><small>畫面（View）的職責</small></li>
+              <ul>
+                <li><small>提取模型狀態</small></li>
+                <li><small>執行呈現邏輯（Presentation logic）組織回應畫面<br>
+                  </small></li>
+              </ul>
+            </ul>
+            <small><br>
+              一個大致的流程示意如下所示：<br>
+              <img style="width: 609px; height: 275px;" alt="" src="images/Model2-1.png"><br>
+              <br>
+              如果使用基於Java技術的Servlet/JSP來實現以上的架構，控制器通常是由Servlet來擔任，模型則是個Java物件，而畫面
+              則由JSP來實現。<br>
+              <br>
+              舉個例子來說，如果你想要依使用者發送的名稱來提取個別訊息顯示，以下是個簡單的MVC/Model 2實現：<br>
+            </small>
+            <ul>
+              <li><small>HelloServlet.java</small></li>
+            </ul>
+            <pre>package cc.openhome;<br><br>import java.io.IOException;<br>import javax.servlet.ServletException;<br>import javax.servlet.annotation.WebServlet;<br>import javax.servlet.http.HttpServlet;<br>import javax.servlet.http.HttpServletRequest;<br>import javax.servlet.http.HttpServletResponse;<br><br>@WebServlet(name="Hello", urlPatterns={"/hello.do"})<br>public class HelloServlet extends HttpServlet {<br>    private Hello hello = new Hello();<br><br>    @Override<br>    protected void doGet(HttpServletRequest req, HttpServletResponse resp)<br>            throws ServletException, IOException {<br>        String name = req.getParameter("user");<br>        String message = hello.doHello(name);<br>        req.setAttribute("message", message);<br>        req.getRequestDispatcher("hello.jsp").forward(req, resp);<br>    }<br>}<br></pre>
+            <small><br>
+              <span style="font-family: Courier New,Courier,monospace;">其中Hello的
+                職責劃分是模型，根據使用者的user請求參數不同，會取得不同的訊息給message參考：</span><br>
+            </small>
+            <ul>
+              <li><small>Hello.java</small></li>
+            </ul>
+            <pre>package cc.openhome;<br><br>import java.util.*;<br><br>public class Hello {<br>    private Map&lt;String, String&gt; messages;<br>    <br>    public Hello() {<br>        messages = new HashMap&lt;String, String&gt;();<br>        messages.put("caterpillar", "Hello");<br>        messages.put("Justin", "Welcome");<br>        messages.put("momor", "Hi");<br>    }<br><br>    public String doHello(String user) {<br>        String message = messages.get(user);<br>        return message + ", " + user + "!";<br>    }<br>}<br></pre>
+            <br>
+            <small>依上，如果<span style="font-family: Courier New,Courier,monospace;">user
+                請求參數是caterpillar就會取得"Hello"字串，如果是caterpillar，就會取得"Welcome"字串</span>，
+              在取得訊息之後，先前擔任控制器的Servlet會轉發給畫面：<br>
+            </small>
+            <ul>
+              <li>hello.jsp</li>
+            </ul>
+            <pre>&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;${param.user}&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;h1&gt;${message}&lt;/h1&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+            <br>
+            <small>畫面會取得使用者的訊息，並使用HTML來顯示，所以，如果你的請求是：<br>
+            </small>
+            <div style="margin-left: 40px;"><small><span style="font-weight: bold;">http://localhost:8080/ServletDemo/hello.do?user=caterpillar</span></small><br>
+            </div>
+            <br>
+            <small>則你會得到以下的HTML畫面：</small><br>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">&lt;html&gt;</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;head&gt;</span><br
+                  style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  &lt;meta http-equiv="Content-Type"</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  content="text/html; charset=UTF-8"&gt;</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  &lt;title&gt;caterpillar&lt;/title&gt;</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+                  &lt;/head&gt;</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;body&gt;</span><br
+                  style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  &lt;h1&gt;Hello, caterpillar!&lt;/h1&gt;</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+                  &lt;/body&gt;</span><br style="font-weight: bold;">
+                <span style="font-weight: bold;">&lt;/html&gt;</span></small><br>
+            </div>
+            <small><br>
+              上面的範例有一些還沒有介紹的特性，不過重點在於，經由適當的職責劃分，控制器與模型不用處理HTML的輸出，而JSP也不會被Java程式
+              碼干擾，當
+              然，切割呈現邏輯與商務邏輯並非僅是MVC/Model
+              2的作用，在更複雜的情境時，控制器、模型、畫面會各司其責，將會使得程式更易於維護、更不會因為需求變更而作出過大的變動。</small><br>
+            <br>
+            <br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+    <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Model2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+</html>

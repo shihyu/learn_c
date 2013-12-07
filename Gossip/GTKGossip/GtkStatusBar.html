@@ -1,0 +1,666 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkStatusBar.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:10 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkStatusBar</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkStatusBar</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>狀態列通常位於視窗的底部，用以顯示目前視窗操作狀況的一些簡單訊息，在GTK中的狀態列元件是GtkStatusBar，您可以使用gtk_statusbar_new()來建立。<br>
+
+
+
+      <br>
+
+
+
+視窗中各個元件或操作都可以有相對應的狀態訊息，為了讓狀態列區別哪個訊息屬於哪個元件或操作，GtkStatusBar使用Context
+ID來加以識別，您可以使用gtk_statusbar_get_context_id()並給定一個名稱以取得對應的Context ID，例如：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">GtkWidget *statusbar;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">gint contextId;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">statusbar = gtk_statusbar_new();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">contextId = </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">gtk_statusbar_get_context_id(<br>
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GTK_STATUSBAR(statusbar), "Editor Messages");</small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+      </small><small>取得Context ID之後，若要向GtkStatusBar加入或移除狀態訊息，可以使用以下的幾個函式：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">guint gtk_statusbar_push(GtkStatusbar *statusbar,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint context_id,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+const gchar *text);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+
+
+
+void&nbsp;gtk_statusbar_pop(GtkStatusbar *statusbar,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;guint context_id);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+
+
+
+void gtk_statusbar_remove(GtkStatusbar *statusbar,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint context_id,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint message_id);</span></small><br style="font-weight: bold;">
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+GtkStatusBar的訊息採堆疊（Stack）儲存，採後進先出的方式，若要加入訊息，則使用gtk_statusbar_push()，這會傳回
+一個message_id，您可以根據message_id與context_id使用gtk_statusbar_remove()函式指定刪除該訊
+息，而gtk_statusbar_pop()則是直接刪除Context ID所對應的堆疊訊息中最上面的訊息。<br>
+
+
+
+      <br>
+
+
+
+下面的程式以 </small><small><big><a href="GtkToolBar.html"><small>GtkToolBar</small></a> </big>為基礎，增加一個<big> </big></small><small><big><a href="GtkTextView.html"><small>GtkTextView</small></a> </big>與 GtkStatusBar，讓執行後的外觀更像一個視窗程式文字編輯器：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>gtk_statusbar_demo.c</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>void itemPressed(GtkMenuItem *menuItem, gpointer data) {<br>    g_print("%s\n", data);<br>}<br><br>GtkWidget* createFileMenuItem() {<br>    GtkWidget *rootFileItem;<br>    GtkWidget *fileMenu;<br>    GtkWidget *openMenuItem;<br>    GtkWidget *saveMenuItem;<br>    GtkWidget *closeMenuItem;<br>    <br>    rootFileItem = gtk_menu_item_new_with_mnemonic("_File");<br>    fileMenu = gtk_menu_new();<br>    openMenuItem = gtk_menu_item_new_with_label("Open");<br>    saveMenuItem = gtk_menu_item_new_with_label("Save");<br>    closeMenuItem = gtk_menu_item_new_with_label("Close");<br><br>    gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), openMenuItem);<br>    gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), saveMenuItem);<br>    gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), <br>                          gtk_separator_menu_item_new());<br>    gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), closeMenuItem);<br>    <br>    gtk_menu_item_set_submenu(GTK_MENU_ITEM(rootFileItem), fileMenu);<br><br>    g_signal_connect(GTK_OBJECT(openMenuItem), "activate",<br>                     G_CALLBACK(itemPressed), "Open ....");<br>    g_signal_connect(GTK_OBJECT(saveMenuItem), "activate",<br>                     G_CALLBACK(itemPressed), "Save ....");<br>    g_signal_connect(GTK_OBJECT(closeMenuItem), "activate",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    return rootFileItem;<br>}<br><br>// 建立一個內含按鈕、文字與圖片的GtkToolItem<br>GtkToolItem* createToolItem(gchar *stock_id, gchar *text) {<br>    GtkToolItem *open;<br>    GtkWidget *box;<br>    GtkWidget *label;<br>    GtkWidget *image;<br>    GtkWidget *button;<br><br>    open =  gtk_tool_item_new();<br>    gtk_tool_item_set_tooltip_text(open, "Open File..");<br>    <br>    box = gtk_vbox_new(FALSE, 0);<br><br>    image = gtk_image_new_from_stock(stock_id, GTK_ICON_SIZE_SMALL_TOOLBAR);<br>    label = gtk_label_new(text);<br><br>    gtk_box_pack_start(GTK_BOX(box), image, FALSE, FALSE, 0);<br>    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);<br>    <br>    button = gtk_button_new();<br><br>    gtk_container_add(GTK_CONTAINER(button), box);<br>    gtk_container_add(GTK_CONTAINER(open), button);<br>    <br>    return open;<br>}<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *menubarBox;<br>    GtkWidget *toolbarBox;<br>    GtkWidget *vbox;<br>    GtkWidget *menubar;<br>    GtkWidget *toolbar;<br><span style="font-weight: bold;">    GtkWidget *statusbar;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gint contextId;</span><br style="font-weight: bold;"><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkStatusBar");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);<br><br>    menubar = gtk_menu_bar_new();<br><br>    gtk_menu_bar_append(menubar, createFileMenuItem());<br>    gtk_menu_bar_append(menubar, gtk_menu_item_new_with_mnemonic("_Edit"));<br>    gtk_menu_bar_append(menubar, gtk_menu_item_new_with_mnemonic("_Help"));<br><br>    vbox = gtk_vbox_new(FALSE, 0);<br><br>    menubarBox = gtk_handle_box_new();<br>    gtk_container_add(GTK_CONTAINER(menubarBox), menubar);<br>    gtk_box_pack_start(GTK_BOX(vbox), menubarBox, FALSE, FALSE, 0);<br><br>    toolbar = gtk_toolbar_new();<br>    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), <br>                       createToolItem(GTK_STOCK_OPEN, "Open"), 0);<br>    gtk_toolbar_insert(GTK_TOOLBAR(toolbar),<br>                       createToolItem(GTK_STOCK_SAVE, "Save"), 1);<br><br>    toolbarBox = gtk_handle_box_new();<br>    gtk_container_add(GTK_CONTAINER(toolbarBox), toolbar);<br>    gtk_box_pack_start(GTK_BOX(vbox), toolbarBox, FALSE, FALSE, 0);<br><br>    gtk_box_pack_start(GTK_BOX(vbox), gtk_text_view_new(), TRUE, TRUE, 0);<br><br><span style="font-weight: bold;">    statusbar = gtk_statusbar_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    contextId = gtk_statusbar_get_context_id(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   GTK_STATUSBAR(statusbar), "Editor Messages");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_statusbar_push(GTK_STATUSBAR(statusbar), </span><br style="font-weight: bold;"><span style="font-weight: bold;">                         contextId, "GtkStatusBar Example");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);</span><br style="font-weight: bold;"><br>    gtk_container_add(GTK_CONTAINER(window), vbox);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><small>執行的結果畫面如下所示：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 416px; height: 336px;" alt="" src="images/GtkStatusBar-1.jpg"><br>
+
+
+
+      </small><br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkStatusBar.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:11 GMT -->
+</html>

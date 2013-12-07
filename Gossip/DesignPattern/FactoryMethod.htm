@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/FactoryMethod.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:03 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Factory Method 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Factory Method 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br>     
+ <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>Factory
+Method模式在一個抽象類別中留下某個建立元件的抽象方法沒有實作，其它與元件操作相關聯的方法都先依賴於元件所定義的介面，而不是依賴於元件的實
+現，
+當您的成品中有一個或多個元件無法確定時，您先確定與這些元件的操作介面，然後用元件的抽象操作介面先完成其它的工作，元件的實作（實現）則推遲至實現元
+件介面的子類完成，一旦元件加入，即可完成您的成品。<br>
+      <br>
+簡單地說，如果您希望</small><small>如何建立</small><small>父類別中用到的物件這件事，是由子類別來決定，可以使用
+Factory Method。<br>
+      <br>
+舉一個例子，假設您要完成一個文件編輯器，您希望這個編輯器可以適用於所有類型的檔案編輯，例如RTF、DOC、TXT等等，儘管這些文件有著不同的格
+式，您先確定的是這些文件必然具備的一些操作介面，例如儲存、開啟、關閉等，您用一個Document類型來進行操作，這麼一來這個框架就無需考慮實
+際的儲存、開啟等細節是如何進行的。</small>
+      <pre>import java.util.*;<br><br>abstract class Document {<br>    private String title;<br>    String getTitle() {<br>        return title;<br>    }<br>    void setTitle(String title) {<br>        this.title = title;<br>    }<br>    abstract void open();<br>    abstract void save();<br>    abstract void close();<br>}<br><br>abstract class Editor {<br>    private List&lt;Document&gt; docs = new ArrayList&lt;Document&gt;();<br>    <br>    void open(String file) {<br>        Document doc = createDocument();<br>        doc.setTitle(file);<br>        doc.open();<br>        docs.add(doc);<br>    }<br>   <br>    void save(Document doc) {<br>        doc.save();<br>    }<br>    <br>    void close(Document doc) {<br>        doc.close();<br>        docs.remove(doc);<br>    }<br>    <br>    void close() {<br>        for(Document doc : docs) {<br>            close(doc);<br>        }<br>    }<br>    <br>    // ... 其它的方法定義<br>    abstract Document createDocument(); // Factory method<br>}</pre>
+      <small> <br>
+雖然這邊先以Java實作，但Document為abstract
+class或interface定義並不重要，重要的是Editor中，流程中所操作的都是Document的公開方法，實際上如何建立具體的
+Document，則由子類別來完成，例如：<br>
+      </small>
+      <pre>class TextEditor extends Editor {<br>    Document createDocument() {<br>        return new Document() {<br>            void open() {<br>                System.out.println("開啟文字檔案 " + this.getTitle());<br>            }<br>            void save() {<br>                System.out.println("儲存文字檔案 " + this.getTitle());<br>            }<br>            void close() {<br>                System.out.println("關閉文字檔案 " + this.getTitle());<br>            }            <br>        };<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        Editor editor = new TextEditor();<br>        editor.open("Main.java");<br>        editor.open("Editor.java");<br>        editor.close();<br>    }<br>}<br></pre>
+      <br>
+      <small>以UML圖來表示Factory method類別結構如下所示：<br>
+      <img style="width: 577px; height: 271px;" alt="" src="images/FactoryMethod-1.jpg"><br>
+      <br>
+      </small><small>圖中Product指的是，物件必須具有</small><small>Product所定義之公開協定，而
+非專指Java中的interface定義。</small><small>對於靜態語言來說，例如Java，必須使用型態來宣告變數，因此根據需求，可
+以使用interfact或abstract class來定義Product</small><small>所定義之公開協定。對於動態語言來說，例如
+Python，真正的型態資訊是在物件之上（而非變數），因此要求的是物件必須具有Product</small><small>之公開方法（無論是「哪
+一種」物件），例如以下是Python的實現範例：</small><br>
+      <pre>class Editor:<br>    def __init__(self):<br>        self.docs = []<br>    def open(self, file):<br>        doc = self.createDocument()<br>        doc.title = file<br>        doc.open()<br>        self.docs.append(doc)<br>    def save(self, doc):<br>        doc.save()<br>    def close(self, doc=None):<br>        if doc:<br>            doc.close()<br>            self.docs.remove(doc)<br>        else:<br>            for doc in self.docs:<br>                self.close(doc)<br><br>class TextDoc:<br>    def open(self):<br>        print("開啟文字檔案 " + self.title)<br>    def save(self):<br>        print("儲存文字檔案 " + self.title)<br>    def close(self):<br>        print("關閉文字檔案 " + self.title)<br> <br>class TextEditor(Editor):<br>    def createDocument(self):<br>        doc = TextDoc()<br>        # ...<br>        return doc<br><br>editor = TextEditor()<br>editor.open("app.py")<br>editor.open("editor.py")<br>editor.close()</pre>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();</script><br>
+
+<br>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/FactoryMethod.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:03 GMT -->
+</html>

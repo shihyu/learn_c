@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/UserDefinedException.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>自訂例外</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: 自訂例外<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>到目前你所看到的例外類別，都是Python預先定義的類別，它們都位於<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">builtins</span>模組之中。</small><br>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt;
+ import builtins<br>
+&gt;&gt;&gt; dir(builtins)<br>
+</span>['ArithmeticError', 'AssertionError', 'AttributeError', 
+'BaseException', 'Buffer<br>
+Error', 'BytesWarning', 'DeprecationWarning', 'EOFError', 'Ellipsis', 
+'Environme<br>
+ntError', 'Exception', 'False', 'FloatingPointError', 'FutureWarning', 
+'Generato<br>
+rExit', 'IOError', 'ImportError', 'ImportWarning', 'IndentationError', 
+'IndexErr<br>
+or', 'KeyError', 'KeyboardInterrupt', 'LookupError', 'MemoryError', 
+'NameError',<br>
+&nbsp;'None', 'NotImplemented', 'NotImplementedError', 'OSError', 
+'OverflowError', 'P<br>
+endingDeprecationWarning', 'ReferenceError', 'RuntimeError', 
+'RuntimeWarning', '<br>
+StopIteration', 'SyntaxError', 'SyntaxWarning', 'SystemError', 
+'SystemExit', 'Ta<br>
+bError', 'True', 'TypeError', 'UnboundLocalError', 'UnicodeDecodeError',
+ 'Unicod<br>
+eEncodeError', 'UnicodeError', 'UnicodeTranslateError', 
+'UnicodeWarning', 'UserW<br>
+arning', 'ValueError', 'Warning', 'WindowsError', 'ZeroDivisionError', 略...]<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+      <br>
+      <small>在Python 3中，所有的例外類別，其頂層父類別都是<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">BaseException</span>類別，然而直接繼承BaseException的有SystemExit、KeyboardInterrupt、GeneratorExit與Exception</span>，前三者是有關於系統終止、鍵盤中斷以及產生器關閉的事件，在Python中，並非所有的例外都是錯誤，有些例外其實是事件通知的方式，像是</small><small style="font-family: Courier New,Courier,monospace;">KeyboardInterrupt、GeneratorExit與Exception。<br>
+      <br>
+如果你要自訂例外，並不是繼承BaseException，而是繼承BaseException的子類別<span style="font-weight: bold;">Exception</span>，非系統終止的事件都是繼承這個類別。例如：</small><br>
+
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; class SomeError(Exception):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; pass<br>
+...<br>
+&gt;&gt;&gt; try:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; raise SomeError('some errors occured')<br>
+... except SomeError as e:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(e.args)<br>
+...<br>
+</span>('some errors occured',)<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; try:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; raise SomeError('some errors occured', 'more ....')<br>
+... except SomeError as e:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(e.args)<br>
+...<br>
+            </span>('some errors occured', 'more ....')<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+      <br>
+      <small>如果你沒有重新定義<span style="font-family: Courier New,Courier,monospace;">__init__()方法，則會使用從Exception繼承下來的__init__()</span>方法，你建立類別實例時所傳入的引數，則會收集為 </small><small><a href="TupleType.html"><small>Tuple </small></a></small><small>設定給<span style="font-family: Courier New,Courier,monospace;">Exception的args，又或者你可以定義自己的__init__()</span>方法。例如：</small><br>
+
+
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; class OtherError(Exception):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __init__(self, cause, message):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.cause = cause<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.message = message<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __str__(self):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return self.cause + ': ' + self.message<br>
+...<br>
+&gt;&gt;&gt; try:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; raise OtherError('raise actively', 'user-defined exception example')<br>
+... except OtherError as e:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(e)<br>
+...<br>
+</span>raise actively: user-defined exception example<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+      <br>
+      <small>如果想要自訂定義類別，也可以在<span style="font-family: Courier New,Courier,monospace;">args</span>中尋得建構實例時的訊息，則可以如下：</small><br>
+
+
+
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; class OtherError(Exception):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __init__(self, cause, message):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; super(Exception, self).__init__(cause, message)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.cause = cause<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.message = message<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def __str__(self):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return self.cause + ': ' + self.message<br>
+...<br>
+&gt;&gt;&gt; try:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; raise OtherError('raise actively', 'user-defined exception example')<br>
+... except OtherError as e:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(e)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(e.cause + "&gt; " + e.message)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(e.args[0] + "&gt;&gt; " + e.args[1])<br>
+...<br>
+</span>raise actively: user-defined exception example<br>
+raise actively&gt; user-defined exception example<br>
+raise actively&gt;&gt; user-defined exception example<br>
+            <span style="font-weight: bold;">&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>在</small> <small><big><a href="TryRaise.html"><small>再看 try、raise</small></a></big> 中提過，</small><small><span style="font-family: Courier New,Courier,monospace;">except</span>後
+若不接上任何例外型態，則表示捕捉所有例外，這包括了所有的系統終止事件例外，如果你想要捕捉的是應用程式的錯誤所引發的例外，則可以在<span style="font-family: Courier New,Courier,monospace;">except上接上Exception。例如：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">try:</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; # some...</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">except Exception:</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; # exception handler</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><br>
+你可以在 <a href="http://docs.python.org/py3k/library/exceptions.html">Built-in Exception</a> 找到Python 3的例外類別相關說明，當中也列出了如下的例外繼承架構：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">BaseException</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;+-- SystemExit</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;+-- KeyboardInterrupt</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;+-- GeneratorExit</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;+-- <span style="color: red;">Exception</span></span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- StopIteration</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- ArithmeticError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- FloatingPointError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- OverflowError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- ZeroDivisionError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- AssertionError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- AttributeError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- BufferError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- EnvironmentError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- IOError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- OSError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- WindowsError (Windows)</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- VMSError (VMS)</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- EOFError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- ImportError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- LookupError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- IndexError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- KeyError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- MemoryError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- NameError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- UnboundLocalError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- ReferenceError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- RuntimeError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- NotImplementedError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- SyntaxError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- IndentationError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- TabError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- SystemError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- TypeError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- ValueError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; +-- UnicodeError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- UnicodeDecodeError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- UnicodeEncodeError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- UnicodeTranslateError</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- Warning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- DeprecationWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- PendingDeprecationWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- RuntimeWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- SyntaxWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- UserWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- FutureWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- ImportWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- UnicodeWarning</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- BytesWarning</span></small><br>
+      </div>
+      <small><br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/UserDefinedException.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

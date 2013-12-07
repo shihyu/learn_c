@@ -1,0 +1,612 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/GetPutPointer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>get 指標與 put 指標</title>
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index.html">C++ Gossip: get 指標與 put 指標&nbsp;</a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"><small>在C+
++中使用兩個指標來操作檔案，一個是 get 指標，它會指向檔案中下一個輸入讀取的位置，另一個是 put
+指標，它會指向檔案中下一個輸出寫入的位置，這兩個指標在每一次讀取或寫入時，都會循序的往下一個位置移動，我們可以使用seekg()來操作 get
+指標，使用seekp()來操作 put 指標，令檔案作非循序的存取。 <br>
+
+
+      <br>
+
+
+seekg()與seekp()的函式雛型如下： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">istream &amp;seekg(off_type type, seekdir origin); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">ostream &amp;seekg(off_type, seekdir origin); </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+其中off_type是ios所定義的整數型態，通常是一個long整數，而seekdir則是由ios所定義的列舉值，如下： </small><br>
+
+
+      
+      
+      <table style="text-align: left; width: 682px; height: 32px;" border="1" cellpadding="2" cellspacing="2">
+
+
+        <tbody>
+
+
+          <tr>
+
+
+            <td style="width: 163px;"><small>ios::beg</small></td>
+
+
+            <td style="width: 499px;"><small>由檔案首seek </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 163px;"><small>ios::cur</small></td>
+
+
+            <td style="width: 499px;"><small>由目前的位置seek </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 163px;"><small>ios::end</small></td>
+
+
+            <td style="width: 499px;"><small>由檔案尾端seek </small></td>
+
+
+          </tr>
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+      <small><br>
+
+
+seekg()與seekp()若不指定seekdir，則由目前的位置開始，我們也可以由tellg()或tellp()來得到目前 get 指標與 put 指標的位置： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">pos_type tellg() </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">pos_type tellp() </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+要進行非循序的檔案存取，通常會使用二進位模式，並且將資料以一定大小的資料結構包裝起來，下一個主題就會看到，但操作 get
+指標對循序性的檔案也有其好處，例如我們可以在文字檔案中儲存學生的資料並進行查詢，查詢的動作並不一定經過一次，所以我們可以在每次查詢後，將get指
+標移至檔案首，以便再次查詢，下面這個程式是個簡單的示範： <br>
+
+
+      </small>
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;fstream&gt; <br>using namespace std; <br><br>int main() { <br>    ifstream fin("data.txt"); <br>    if(!fin) { <br>        cout &lt;&lt; "無法讀取檔案\n"; <br>        return 1; <br>    } <br><br>    char name[30]; <br>    int request, account, score; <br><br>    cout &lt;&lt; "輸入選項:" &lt;&lt; endl<br>         &lt;&lt; "1) 顯示所有學生與分數" &lt;&lt; endl<br>         &lt;&lt; "2) 顯示及格學生與分數" &lt;&lt; endl<br>         &lt;&lt; "3) 顯示不及格學生與分數" &lt;&lt; endl<br>         &lt;&lt; "4) 離開" &lt;&lt; endl;<br><br>    while(true) { <br>        cout &lt;&lt; "\n選項? "; <br>        cin &gt;&gt; request; <br>        if(request == 4) <br>            break; <br><br>        switch(request) { <br>            case 1: <br>                cout &lt;&lt; "\n所有學生與分數:" &lt;&lt; endl;<br>                break; <br>            case 2: <br>                cout &lt;&lt; "\n及格學生與分數:" &lt;&lt; endl;<br>                break; <br>            case 3: <br>                cout &lt;&lt; "\n不及格學生與分數:" &lt;&lt; endl;<br>                break; <br>        } <br><br>        fin &gt;&gt; account &gt;&gt; name &gt;&gt; score; <br>        while(!fin.eof()) { <br>            if((request == 1) || (request == 2 &amp;&amp; score &gt;= 60) || <br>               (request == 3 &amp;&amp; score &lt; 60)) <br>                cout &lt;&lt; account &lt;&lt; "\t" &lt;&lt; name &lt;&lt; "\t" &lt;&lt; score &lt;&lt; endl; <br><br>            fin &gt;&gt; account &gt;&gt; name &gt;&gt; score; <br>        } <br><br>        fin.clear();  // 重置 eof <br>        fin.seekg(0);  // get 指標移至檔案首 <br>    } <br><br>    fin.close(); <br><br>    return 0; <br>}</pre>
+
+
+      <br>
+
+
+      <small>如果data.txt的檔案內容如下： <br>
+
+
+      </small>
+      
+      
+      <pre>1       Justin  90 <br>2       Momor   90 <br>3       Bush    75 <br>4       John    50 <br>5       Bob     65 <br>6       Rich    53 <br>7       Doe     41 <br>8       Bill    85 <br>9       Jason   67 <br>10      Jones   88</pre>
+
+
+      <br>
+
+
+      <small>執行結果：</small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">輸入選項: <br>
+
+
+1) 顯示所有學生與分數 <br>
+
+
+2) 顯示及格學生與分數 <br>
+
+
+3) 顯示不及格學生與分數 <br>
+
+
+4) 離開<br>
+
+
+            <br>
+
+
+選項? 1 <br>
+
+
+            <br>
+
+
+所有學生與分數: <br>
+
+
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Justin&nbsp; 90 <br>
+
+
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Momor&nbsp;&nbsp; 90 <br>
+
+
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bush&nbsp;&nbsp;&nbsp; 75 <br>
+
+
+4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; John&nbsp;&nbsp;&nbsp; 50 <br>
+
+
+5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bob&nbsp;&nbsp;&nbsp;&nbsp; 65 <br>
+
+
+6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rich&nbsp;&nbsp;&nbsp; 53 <br>
+
+
+7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Doe&nbsp;&nbsp;&nbsp;&nbsp; 41 <br>
+
+
+8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bill&nbsp;&nbsp;&nbsp; 85 <br>
+
+
+9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Jason&nbsp;&nbsp; 67 <br>
+
+
+10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Jones&nbsp;&nbsp; 88 <br>
+
+
+            <br>
+
+
+選項? 2 <br>
+
+
+            <br>
+
+
+及格學生與分數: <br>
+
+
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Justin&nbsp; 90 <br>
+
+
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Momor&nbsp;&nbsp; 90 <br>
+
+
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bush&nbsp;&nbsp;&nbsp; 75 <br>
+
+
+5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bob&nbsp;&nbsp;&nbsp;&nbsp; 65 <br>
+
+
+8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bill&nbsp;&nbsp;&nbsp; 85 <br>
+
+
+9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Jason&nbsp;&nbsp; 67 <br>
+
+
+10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Jones&nbsp;&nbsp; 88 <br>
+
+
+            <br>
+
+
+選項? 4</span></small></td>
+
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+
+
+      <small>為何文字檔案不適合非循序存取，理由很簡單，文字檔案的內容都經過字元轉換，假設現在有個檔案中有兩筆資料如下，其中空白為'\t'： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Justin&nbsp; 90 </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Momor&nbsp;&nbsp; 90 </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+如果現在我更改了第一筆資料如下： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caterpillar&nbsp; 90 </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+則第二筆資料會被覆蓋，如果是在Linux下，換行為'\n'，則結果會如下： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caterpillar&nbsp; 90or&nbsp;&nbsp; 90 </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+由於字元轉換後的資料長度並不固定，所以文字檔案並不適合非循序存取。 <br>
+
+
+      </small></td>
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/GetPutPointer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

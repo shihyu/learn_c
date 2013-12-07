@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/EventFilter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:31 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>事件過濾器</title>
+
+
+</head>
+
+
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Qt4 Gossip: 事件過濾器</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 676px; vertical-align: top;"> <small>Qt
+將事件封裝為QEvent實例之後，會呼叫QObject的event()方法並將QEvent實例傳送給它，在某些情況下，您希望物件在執行event
+()處理事件之前，先對一些事件進行處理或</small><small>過濾，然後再決定是否呼叫event()方法，這個時
+候您就可以使用事件過濾器。<br>
+
+      <br>
+
+以 </small><small><a href="IsAccepted.html">事件接
+受與否、event() 方法</a>
+中所談及的，對QWidget按鍵事件的Tab鍵處理而言，如果您的圖形介面中有很多的元件，每個圖型元件都要如當中的範例重新定義event()方法，
+顯然是非常沒有效率且沒什麼維護性的方法。<br>
+
+      <br>
+
+您可以自定義一個物件繼承QObject（或其子類別），重新定義它的eventFilter()方法，例如您自定義了一個FilterObject，</small><small>您
+希望Tab鍵可以用來將焦點轉移至下一個子元件：<br>
+
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">bool
+FilterObject::eventFilter(QObject *object, QEvent *event) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;if(</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">event-&gt;type() ==
+QEvent::KeyPress) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;QKeyEvent *keyEvent =
+static_cast&lt;QKeyEvent *&gt;(event);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if
+(keyEvent-&gt;key() == Qt::Key_Tab) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp; // 處理Tab鍵</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return true;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;}</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;return
+false;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br>
+
+      </div>
+
+      <span class="postbody"><br>
+
+      <small>eventFilter()的object參數表示事件發生的來源物件，eventFilter()</small></span><span class="postbody"><small>若傳回false，則安裝該事件過濾器的物件之event()就會
+繼續執行，</small></span><span class="postbody"><small>若
+傳回true，則安裝該事件過濾器的物件之event()方法就不會被執行，由此進行事件的攔截處理。</small><br>
+
+      <br>
+
+      <small>要為指定的物件安裝事件過濾器，可以使用物件的installEventFilter()方法，例如：<br>
+
+      </small></span>
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QLineEdit *nameEdit = new </span></small></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>QLineEdit;</small></span><br style="font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>QLineEdit *addressEdit = </small><small>new
+QLineEdit;</small></span><br>
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+FilterObject filter = new FilterObject;<br>
+
+...<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">nameEdit-&gt;installEventFilter(filter);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">addressEdit-&gt;installEventFilter(filter);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">....</span></small><br>
+
+      </div>
+
+      <span class="postbody"> <br>
+
+      <small>您也可以將事件過濾器安裝在QApplication，在任何的事件發生後呼叫每個物件的event()方法之
+前，會先經過事件過濾器，這給您更多控制應用程式事件的能力。<br>
+
+      <br>
+
+      </small></span><span class="postbody"><small>Qt
+的事件迴圈與sendEvent()方法會呼叫QCoreApplication（QApplication的父類別）的notify()以分派事件，</small></span><span class="postbody"><small>如果您想要完全控制Qt應用程式的事件，則可以重新定義
+notify()方法</small></span><span class="postbody"><small>。</small></span><span class="postbody"><small><br>
+
+      <br>
+
+到這邊，可以看出Qt事件處理的五個層次：重新定義事件處理者、重新定義event()方法、為個別物件安裝事件過濾器、為QApplication安裝
+事件過濾器，重新定義QCoreApplication的notify()方法。<br>
+
+      </small> <br>
+
+      </span> </td>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+      </td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<span class="postbody"><br>
+
+<br>
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/EventFilter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:31 GMT -->
+</html>

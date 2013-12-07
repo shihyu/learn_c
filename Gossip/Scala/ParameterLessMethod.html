@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ParameterLessMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>無參數方法</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 無參數方法</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>你定義了一個Ball類別：<br></small><pre>class Ball(r: Double) {<br>    def radius = r<br>}<br></pre><br><small>類別中，radius方法不接受任何參數。在Scala中，不接受任何參數的方法，可以省略()的撰寫，這稱之為<span style="font-weight: bold;">無參數方法（Parameterless method）</span>，對於僅讀取而不改變物件狀態、且不接受任何參數的方法，在Scala中的慣例會省略括號，表示該方法不會有任何邊際效應（Side effect），相對地，如果</small><small>不接受任何參數的方法</small><small>會產生邊際效應，則保留括號的撰寫，稱之為空括號方法（Empty-paren method）。<br><br>今天假設有個客戶端使用了你的Ball類別：<br></small><pre>val ball = new Ball(10.0)<br>println(ball.radius)       // 顯示 10.0</pre><small><br>同樣地，如果操作方法時，該方法如果不會產生邊際效應，則呼叫方法時慣例上也是省略括號。如果哪天你改變了Ball類別之撰寫：<br></small><pre>class Ball(val radius: Double)</pre><small><br>就剛才那個客戶端的程式碼並不會受到影響，這是 <a href="http://en.wikipedia.org/wiki/Uniform_access_principle">固定存取原則（Uniform access principle）</a> 的簡單例子。<span style="font-weight: bold;">固定存取原則指的是，提供客戶端服務時所使用的名稱必須固定，無論該服務是透過計算或</span></small><small><span style="font-weight: bold;">既有的結果。</span>就如同上例，客戶端要取得球的半徑，都是透過radius這個名稱來取得，無論是你將radius實作為方法或者是變數。<br><br><span style="font-weight: bold;">要注意的是</span></small><small style="font-weight: bold;">在Scala中，只有值（Value）與型態（Type）兩個名稱空間</small><small style="font-weight: bold;">（Namespace）</small><small>，其中：<br></small><ul><li><small>資料成員（Field）、方法（Method）、套件（Package）與單例</small><small>（Singleton）</small><small>物件屬於值（Value）名稱空間。</small></li><li><small>類別（Class）與特徵（Trait）屬於型態屬於型態（Type）名稱空間。<br></small></li></ul><small><br>（由於單例物件與類別分屬於值與型態名稱空間，所以才可以相同的名稱形成伴侶。）<br><br></small><small>由於方法與資料成員屬於同一個名稱空間，所以<span style="font-weight: bold;">同一個類別中，資料成員不可以與方法是相同的名稱</span>。例如：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Ball { &nbsp;// 這個類別會編譯錯誤</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; private val radius = 10</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def radius = 20</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>即使是繼承，如果子類別中有與父類別中的成員相同名稱的成員也不行。如果子類別中的方法名稱與父類別的方法名稱相同，則是重新定義方法，你必須使用override關鍵字指定。例如：<br></small><pre>class Ball(r: Double) {<br>    def volume = 4 * Math.Pi * Math.pow(r, 3) / 3<br>    <span style="font-weight: bold;">override</span> def toString = "radius: " + r +<br>                            "\nvolume: " + volume<br>}<br><br>class IronBall(r: Double) extends Ball(r)</pre><small><br>上例中還定義了一個IronBall，如果有客戶使用這個IronBall類別：<br></small><pre>val ball = new IronBall(10.0)<br>println(ball.volume)          </pre><small><br>今天基於某個理由，你改寫了IronBall：<br></small><pre>class IronBall(r: Double) extends Ball(r) {<br><span style="font-weight: bold;">    override val volume = 4 * Math.Pi * Math.pow(r, 3) / 3</span><br>}</pre><small><br></small><small>在IronBall中使用val定義了volume這個名稱，</small><small>由於方法與資料成員屬於同一個名稱空間，如果你確定在子類別中要這麼作，必須</small><small>重新定義，也就是使用override關鍵字指定，<span style="font-weight: bold;">在Scala中，允許你將無參數方法重新定義為val資料成員</span>。對於先前使用IronBall的客戶端而言，並沒有差別，這是固定存取原則的另一個簡單例子。<br><br><span style="font-weight: bold;">注意！你可以將父類別的無參數方法在子類別中重新定義為val資料成員，但不能將</span></small><small><span style="font-weight: bold;">父類別的val資料成員在子類別中重新定義為無參數方法。</span>例如以下會編譯錯誤：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class Ball(r: Double) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; val volume = 4 * Math.Pi * Math.pow(r, 3) / 3</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; override def toString = "radius: " + r +</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"\nvolume: " + volume</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class IronBall(r: Double) extends Ball(r) {<br>&nbsp; &nbsp; // error, method volume is not stable<br style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; override def volume = 4 * Math.Pi * Math.pow(r, 3) / 3</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br></div><small><br></small><small>不穩定的理由在於，原先volume是個val，也就是值固定不變，若能重新定義為方法，則方法的傳回值可能會因計算而不同，如果這個修改允許，你的客戶端在IronBall修改之後，執行的結果就會受到影響（如果IronBall的狀態是可變的話）。<br></small><small><br><br></small><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ParameterLessMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

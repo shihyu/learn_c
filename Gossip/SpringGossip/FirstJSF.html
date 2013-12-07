@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/FirstJSF.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:15 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>第一個 JSF 程式</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 第一個 JSF 程式</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>JSF的實作參考檔案可以至http://java.sun.com/j2ee/javaserverfaces/download.html進行下載。<br>
+
+      <br>
+
+JSF是一個技術標準，各個廠商可以根據標準的規範來進行自己的實作版本，Sun網站上提供的是Sun公司的實作參考版本。<br>
+
+      <br>
+
+對於要實作的第一個JSF程式，將使用到您下載回來的jsf-impl.jar與jsf-api.jar，另外JSF需要使用到JSTL的API，因而您
+需要JSTL的jstl.jar與standard.jar，除此之外，您還需要commons-digester.jar、commons-
+collections.jar、commons-beanutils.jar等檔案，總計您所需要的.jar如下所示：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>jsf-impl.jar</small></li>
+
+        <li><small>jsf-api.jar</small></li>
+
+        <li><small>jstl.jar</small></li>
+
+        <li><small>standard.jar</small></li>
+
+        <li><small>commons-digester.jar</small></li>
+
+        <li><small>commons-collections.jar</small></li>
+
+        <li><small>commons-beanutils.jar</small></li>
+
+      
+      </ul>
+
+      <small><br>
+
+JSF基本上也是採用Web MVC架構，使用JSF時擔任前端控制器（Front controller）的是javax.faces.webapp.FacesServlet類別，您要在web.xml定義它，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>web.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br><br>&lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"<br> xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br> xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee <br>	&rarr; http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"<br>	 version="2.4"&gt;<br>    &lt;session-config&gt;<br>        &lt;session-timeout&gt;<br>            30<br>        &lt;/session-timeout&gt;<br>    &lt;/session-config&gt;<br>    <br>    &lt;servlet&gt;<br>        &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;<br>        &lt;servlet-class&gt;<br>            javax.faces.webapp.FacesServlet<br>        &lt;/servlet-class&gt;<br>        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;<br>    &lt;/servlet&gt;<br>   <br>    &lt;servlet-mapping&gt;<br>        &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;<br>        &lt;url-pattern&gt;*.faces&lt;/url-pattern&gt;<br>    &lt;/servlet-mapping&gt;<br>&lt;/web-app&gt;</pre>
+
+      <small><br>
+
+在上面的定義中，將所有的".faces"的請求交由FaceServlet來處理，FaceServlet會喚起相對於請求網址的.jsp網頁，例如請
+求是/index.faces的話，則實際上會喚起/index.jsp網頁，完成以上的配置，您就可以開始使用JSF了，先來撰寫一個簡單的Bean類
+別：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>User.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class User {<br>    private String name;<br>   <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>   <br>    public String getName() {<br>        return name;<br>    }<br>}</pre>
+
+      <small><br>
+
+這個User類別只是個簡單的JavaBean，用以儲存使用者的請求參數值。JSF與Struts雖然都是Web
+MVC架構的實現，但兩者所偏重的並不相同，Struts著重的是控制物件的設計；JSF則著重於頁面流程的設計，也就是定義在何種條件成立下，上一個頁
+面與下一個頁面之間是如何連結，您可以在faces-config.xml中定義頁面流程，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>faces-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE faces-config PUBLIC<br> "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"<br> "http://java.sun.com/dtd/web-facesconfig_1_0.dtd"&gt;<br><br>&lt;faces-config&gt;<br>    &lt;navigation-rule&gt;<br>        &lt;from-view-id&gt;/pages/index.jsp&lt;/from-view-id&gt;<br>        &lt;navigation-case&gt;<br>            &lt;from-outcome&gt;login&lt;/from-outcome&gt;<br>            &lt;to-view-id&gt;/pages/welcome.jsp&lt;/to-view-id&gt;<br>        &lt;/navigation-case&gt;<br>    &lt;/navigation-rule&gt;<br>       <br>    &lt;managed-bean&gt;<br>        &lt;managed-bean-name&gt;user&lt;/managed-bean-name&gt;<br>            &lt;managed-bean-class&gt;<br>                onlyfun.caterpillar.User<br>             &lt;/managed-bean-class&gt;<br>        &lt;managed-bean-scope&gt;session&lt;/managed-bean-scope&gt;<br>    &lt;/managed-bean&gt;<br>&lt;/faces-config&gt; </pre>
+
+      <small><br>
+
+在&lt;navigation-rule&gt;標籤中定義了頁面流程，當頁面流程上一個頁面是來自&lt;from-view-id&gt;標籤中指
+定的頁面，並且請求中包括了&lt;navigation-case&gt;標籤中的&lt;from-outcome&gt;標籤指定的"login"
+值時，則會將請求導向至&lt;to-view-id&gt;標籤中所指定的頁面。<br>
+
+      <br>
+
+在上面的定義中也可以看到，JSF也協助Bean物件的管理，只是功能上比Spring容器少了許多；在&lt;managed-bean&gt;標籤中
+可以管理Bean物件，可設定Bean物件的存活範圍為"session"，也就是使用者開啟瀏覽器與Web程式互動的會話階段期間，Bean都可以存在
+作用。<br>
+
+      <br>
+
+接下來要告訴網頁設計人員的資訊是，他們可以使用的Bean名稱，也就是&lt;managed-bean-name&gt;標籤中設定的"user"名稱，以及上面所定義的頁面流程，在使用頁面元件時需要設定這些值，例如網頁設計人員會撰寫以下的JSP網頁：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>index.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib uri="http://java.sun.com/jsf/core" prefix="f" %&gt;<br>&lt;%@taglib uri="http://java.sun.com/jsf/html" prefix="h" %&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;第一個JSF程式&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;f:view&gt;<br>        &lt;h:form&gt;<br>            &lt;h3&gt;請輸入您的名稱&lt;/h3&gt;<br>            名稱: &lt;h:inputText value="#{user.name}"/&gt;&lt;p&gt;<br>            &lt;h:commandButton value="送出" action="login"/&gt;<br>        &lt;/h:form&gt;<br>    &lt;/f:view&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+      <small><br>
+
+在上面的網頁中使用了JSF的"core"與"html"標籤庫，"core"是有關於UI元件的處理，而"html"則是有關於HTML的進階標籤。<br>
+
+      <br>
+
+當您要開始使用JSF元件時，這些元件一定要在&lt;f:view&gt;與&lt;/f:view&gt;標籤之間；"html"標籤庫中幾乎都是與
+HTML標籤相關的進階標籤，&lt;h:form&gt;會產生一個表單，使用&lt;h:inputText&gt;來顯示faces-
+config.xml定義檔中"user"這個Bean物件的"name"屬性，而&lt;h:commandButton&gt;會產生一個提交按鈕，
+在"action"屬性中之指定將根據faces-config.xml中定義的"login"頁面流程中前往welcome.jsp頁面，其設計如下：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>welcome.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %&gt;<br>&lt;%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;第一個JSF程式&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;f:view&gt;<br>        &lt;h:outputText value="#{user.name}"/&gt; 您好！<br>        &lt;h3&gt;歡迎使用 JavaServer Faces！&lt;/h3&gt;<br>    &lt;/f:view&gt;    <br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+      <small><br>
+
+&lt;h:outputText&gt;標籤可以取得"user"這個Bean物件的"name"屬性，這個屬性將包括先前index.jsp中所送出的請求參數值，而在這個網頁中則將之顯示出來。<br>
+
+      <br>
+
+有興趣的話，您可以在<a href="../JSF/JavaServerFaces.htm"> JSF 學習筆記 </a>找到更多有關於JSF的介紹。<br>
+
+      <br>
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/FirstJSF.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:15 GMT -->
+</html>

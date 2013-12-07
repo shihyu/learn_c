@@ -1,0 +1,581 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/JPQLABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>JPQL 語法簡介</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: JPQL 語法簡介</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>JPQL所提供的查詢語法主要分為三類：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>查詢用的 SELECT 語法</small></li>
+
+
+
+        <li><small>更新用的 UPDATE 語法</small></li>
+
+
+
+        <li><small>刪除用的 DELETE 語法</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+SELECT 語法結構由幾個部份組成：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">SELECT 子句 FROM 字句 [WHERE 子句] [GROUP BY 子句] [HAVING 子句] [ORDER BY 子句]</small><br>
+
+
+
+      </div>
+
+
+
+      <br>
+
+
+
+      <small>一個基本的 SELECT 語句如下所示：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">SELECT u.id, u.name FROM User u WHERE u.age &gt; 10 AND u.age &lt; 20</span></small></div>
+
+
+
+      <small><br>
+
+
+
+其中User u是個路徑表示（path expression），路徑表示有三種：範圍變數（Range
+variable）路徑表示、群集成員（Collection member）路徑表示與關聯導覽（Association
+traversing）表示。User u是範圍變數路徑表示的一個例子，指定查詢的實體為User與別名為u。<br>
+
+
+
+      <br>
+
+
+
+一個</small><small>群集成員路徑表示用來指定物件中的群集成員，例如：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">SELECT u FROM User u, IN(u.emails) e WHERE e.address LIKE '%.%@openhome.cc'</span></small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+其中IN中指定的，就是</small><small>群集成員路徑表示</small><small>，而&gt;、&lt;、AND、IN、LIKE等都是WHERE子句中條件表示式，簡單列出一些條件表示式如下：</small><br>
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 622px;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>比較陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>=、&gt;、&gt;=、&lt;、&lt;=、&lt;&gt;</small></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>BETWEEN 陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>[NOT BETWEEN</small></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>LIKE 陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>[NOT] LIKE</small></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>IN 陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>[</small><small>NOT</small><small>] IN</small></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>NULL 陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>IS [</small><small>NOT</small><small>] NULL</small></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>EMPTY 陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>IS [</small><small>NOT</small><small>] EMPTY</small></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td style="width: 179px;"><small>EXISTS 陳述</small></td>
+
+
+
+            <td style="width: 200px;"><small>[</small><small>NOT</small><small>] EXISTS</small></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+
+      <small>LIKE中，可以用_表示比對單一字元，用%表示比對任意數目字元。<br>
+
+
+      <br>
+
+
+      </small><small>關聯導覽表示則提供SQL語法中JOIN的功能，包括了INNER JOIN、LEFT OUTER JOIN、</small><small>FETCH</small><small>等，以下為INNER JOIN的實際例子：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">SELECT u FROM User u INNER JOIN&nbsp;u.emails e WHERE e.address LIKE '%.%@openhome.cc'</span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"><br>
+
+
+      </span></small></div>
+
+
+      <small>
+      <br>
+
+
+JOIN關鍵字可以省略，上式等同於：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold;">SELECT u FROM User u JOIN&nbsp;u.emails e WHERE e.address LIKE '%.%@openhome.cc'</small></div>
+
+
+      <small style="font-family: Courier New,Courier,monospace;"></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"><br>
+
+
+      </span></small><small>LEFT OUTER JOIN的OUTER關鍵字可以省略，一個例子如下：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u FROM User u LEFT JOIN u.emails e WHERE e.address LIKE </span></small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">'%.%@openhome.cc'</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+在作</small><small>INNER JOIN、LEFT OUTER JOIN可以加上FETCH關鍵字，以預先擷取相關資料，例如：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u FROM User u LEFT JOIN FETCH u.emails e WHERE e.address LIKE </span></small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">'%.%@openhome.cc'</small><br>
+
+
+      </div>
+
+
+      <small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+      </small>SELECT中可以使用聚集函式，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT AVG(u.age) FROM User u</span></small><br>
+      </div>
+      <small><br>
+SELECT中可以使用建構表示，直接將一些資料封裝為指定的物件，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT NEW SomeObject(u.id, u.name, o.number) FROM User u JOIN Order o WHERE u.id = 1975</span></small><br>
+      </div>
+      <small><br>
+WHERE子句中可以使用LENGTH()、LOWER()、UPPER()、SUBSTRING()等JPQL函式。<br>
+      <br>
+可以對查詢結果使用ORDER BY進行排序：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u FROM User u ORDER BY u.age</span></small><br>
+      </div>
+      <small><br>
+ORDER預設是ASC昇冪排序，可使用DESC降冪排序：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u FROM User u ORDER BY u.age DESC</span></small><br>
+      </div>
+      <small><br>
+可同時指定兩個以上的排序方式，例如先按照"age"降冪排序，如果"age"相同，則按照"name"昇冪排列：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u FROM User u ORDER BY u.age DESC, u.name</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small><br>
+可以配合GROUP BY子句，自動將指定的欄位依相同的內容群組，例如依欄位"sex"分組並作平均：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u.sex, AVG(u.age) FROM User u GROUP BY u.sex</span></small><br>
+      </div>
+      <br>
+      <small>GROUP BY通常搭配HAVING來使用，例如：</small><br>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SELECT u.sex, avg(u.age) FROM User u GROUP BY u.sex HAVING AVG(u.age) &gt; 20</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+      </span>可以使用UPDATE語法來更新資料，例如：</small><br>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">UPDATE User u SET u.name='momor' WHERE
+u.name='bbb'</span></small><br>
+      </div>
+
+
+      <br>
+      <small>可以透過DELETE來刪除資料，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">DELETE User u WHERE u.name='bush'</span></small><br>
+      </div>
+
+
+      <br>
+
+
+      <small>更多JPQL的介紹，可以參考 <a href="http://java.sun.com/javaee/5/docs/tutorial/doc/bnbtg.html">The Java Persistence Query Language</a>。</small><br>
+
+
+      <br>
+
+
+      <br>
+
+
+      <small><br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/JPQLABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+</html>

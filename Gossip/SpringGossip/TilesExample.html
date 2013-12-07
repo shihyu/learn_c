@@ -1,0 +1,510 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/TilesExample.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>以 Tiles 為例</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 以 Tiles 為例</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>Tiles
+是一個模版引擎（Template
+Engine），它可以讓網頁的配置（Layout）（像是使用&lt;table&gt;標籤）與實際要呈現資料的內容分離，Tiles提供一個版面管
+理機制，您可以在Spring的View層使用Tiles來管理網頁的版面配置，這有兩個基本動作必須設定，一是設定
+org.springframework.web.servlet.view.tiles.TilesView，二是設定
+org.springframework.web.servlet.view.tiles.TilesConfigurer，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>mvc-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN"<br> "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;   <br>    &lt;bean id="viewResolver"<br>          class="org.springframework.web.servlet.<br>                   &rarr; view.InternalResourceViewResolver"&gt;            <br>        &lt;property name="viewClass"&gt;<br>            &lt;value&gt;<br>          org.springframework.web.servlet.view.tiles.TilesView<br>            &lt;/value&gt;<br>        &lt;/property&gt;          <br>    &lt;/bean&gt;<br>    <br>    &lt;bean id="tilesConfigurer"<br>          class="org.springframework.web.servlet.view.<br>                   &rarr; tiles.TilesConfigurer"&gt;<br>        &lt;property name="definitions"&gt;<br>           &lt;list&gt;<br>               &lt;value&gt;/WEB-INF/tiles-defs.xml&lt;/value&gt;<br>           &lt;/list&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>        <br>    &lt;bean name="/welcome.do"<br>          class="org.springframework.web.servlet.<br>                       &rarr; mvc.ParameterizableViewController"&gt;<br>        &lt;property name="viewName"&gt;<br>            &lt;value&gt;welcome&lt;/value&gt;<br>        &lt;/property&gt;     <br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+      <small><br>
+
+注意到設定TilesView之後，您傳回的ModelAndView中設定的"view"名稱並不是指向真正的資源URL位置，而是在Tiles定義檔
+中所定義的名稱，以上面的設定為例，ParameterizableViewController的"viewName"設定為"welcome"，則它
+會到Tiles設定檔中找相關的"welcome"設定，Tiles定義檔的讀取位置可以由TilesConfigurer的"definitions"
+屬性來設定，假設您的Tiles定義檔是這麼設定的：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>tiles-defs.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;<br>&lt;!DOCTYPE tiles-definitions PUBLIC <br> "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" <br> "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd"&gt; <br> <br>&lt;tiles-definitions&gt; <br>    &lt;definition name=".myLayout"<br>                  path="/WEB-INF/jsp/tiles/myLayout.jsp"&gt; <br>      &lt;put name="title" value="Sample Page Title"/&gt; <br>      &lt;put name="header" value="/WEB-INF/jsp/tiles/header.jsp"/&gt; <br>      &lt;put name="menu" value="/WEB-INF/jsp/tiles/menu.jsp"/&gt; <br>      &lt;put name="footer" value="/WEB-INF/jsp/tiles/footer.jsp"/&gt; <br>      &lt;put name="body" value="/WEB-INF/jsp/tiles/body.jsp"/&gt; <br>    &lt;/definition&gt; <br><br>    &lt;definition name="welcome" extends=".myLayout"&gt;<br>      &lt;put name="title" value="Tiles 測試頁面"/&gt;<br>    &lt;/definition&gt;<br>&lt;/tiles-definitions&gt; </pre>
+
+      <small><br>
+
+在定義檔中，首先定義一個".myLayout"，名稱開頭有個逗點在命名慣例上通常表示這是一個版面定義，而不是一個真正要呈現畫面資料的定義，
+"welcome"定義可以繼承".myLayout"的定義，並針對該頁面的需求重新定義了"title"項目，在傳回view的名稱若為
+"welcome"時，實際上會讀取的是以上的定義檔中"welcome"中的設定。<br>
+
+      <br>
+
+假設您的myLaout.jsp是這麼撰寫的，當中使用表格來設計版面的配置：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>myLayout.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="tiles" <br>            uri="http://jakarta.apache.org/struts/tags-tiles"%&gt; <br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;&lt;tiles:getAsString name="title"/&gt;&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;table border="0" width="100%" cellspacing="5"&gt; <br>        &lt;tr&gt; <br>            &lt;td colspan="2"&gt;<br>            &lt;tiles:insert attribute="header"/&gt;<br>            &lt;/td&gt; <br>        &lt;/tr&gt; <br>        &lt;tr&gt; <br>            &lt;td width="140" valign="top"&gt;<br>            &lt;tiles:insert attribute="menu"/&gt;<br>            &lt;/td&gt; <br>            &lt;td valign="top" align="left"&gt;<br>            &lt;tiles:insert attribute="body"/&gt;<br>            &lt;/td&gt; <br>        &lt;/tr&gt; <br>        &lt;tr&gt; <br>            &lt;td colspan="2"&gt;<br>            &lt;tiles:insert attribute="footer"/&gt;<br>            &lt;/td&gt; <br>        &lt;/tr&gt; <br>    &lt;/table&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; </pre>
+
+      <small><br>
+
+header、menu、body、footer等JSP頁面簡單的如下撰寫：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>header.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;center&gt;&lt;h1&gt;Tiles View 示範&lt;h1&gt; &lt;/center&gt;<br><br>TilesViewDemo  menu.jsp<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;li&gt;教學文件&lt;/li&gt; <br>&lt;li&gt;討論區&lt;/li&gt;<br>&lt;li&gt;我的Blog&lt;/li&gt;<br>&lt;li&gt;推薦網站&lt;/li&gt;</pre>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li>body.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page pageEncoding="UTF-8"%&gt;<br>第一個Hello World的出現是在Brian Kernighan寫的"A Tutorial Introduction to <br>the Language B"書籍中（B語言是C語言的前身），它用來將Hello World文字顯示在電腦<br>螢幕上，自此之後，很多的程式語言教學文件或書籍上，已經無數次的將它當作第一個範例程式。</pre>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li>footer.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page pageEncoding="UTF-8"%&gt;&lt;br&gt;<br>&lt;center&gt;版權所有(c)http://openhome.cc/&lt;/center&gt;</pre>
+
+      <small><br>
+
+要使用Tiles的話，您必須要有commons-beanutils.jar、commons-logging.jar、commons-
+collections.jar、commons-digester.jar、struts.jar四個.jar檔案，這些.jar檔案都可以在
+Spring下載檔案中lib目錄的jakarta-commons目錄及struts目錄下找到。<br>
+
+      <br>
+
+按照以上的設定，如果您連接到/welcome.do，則會取得Tiles定義檔中的welcome的定義，結果是顯示以下的內容：<br>
+
+      <img style="width: 514px; height: 316px;" alt="" src="images/tilesExample.jpg"><br>
+
+      <br>
+
+如果您有一些資料是在每一個頁面（例如在Header處）都要出現的，您可以在header.jsp中這麼撰寫：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;%@page pageEncoding="UTF-8"%&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;center&gt;&lt;h1&gt;Tiles View 示範&lt;h1&gt; &lt;/center&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;H1&gt;${someData}&lt;/H1&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      </div>
+
+      <small><br>
+
+為了要能顯示${someData}資料，則您必須在每一個Controller中設定屬性值，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Map model = new HashMap();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">model.put("someData", data);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+      <small><br>
+
+接著在ModelAndView傳回時，設定model物件，每一個Controller中都必須加入這些描述，才會在每一個有Tiles設定的頁面都能顯示${someData}。<br>
+
+      <br>
+
+不過還有個更簡單的方法，您可以繼承
+org.springframework.web.servlet.view.tiles.ComponentControllerSupport這個類
+別，它繼承自Tiles的ControllerSupport類別，您可以重新定義ComponentControllerSupport的
+doPerform()方法，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class HeaderControllerSupport </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+extends ComponentControllerSupport {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; protected void doPerform(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ComponentContext componentContext,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletRequest request,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletResponse response) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws Exception {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ApplicationContext context = getApplicationContext();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SomeData someData = </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(SomeData) context.getBean("someData");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; componentContext.putAttribute("someData", someData);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+
+      </div>
+
+      <small><br>
+
+在您的Tiles定義檔中可以這麼設定，就可以每一個頁面都取得someData的值了：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;!DOCTYPE tiles-definitions PUBLIC </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;"-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;"http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd"&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;tiles-definitions&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;definition name=".header"</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+path="/WEB-INF/jsp/tiles/header.jsp" </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+controllerClass="onlyfun.caterpillar.</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&rarr; HeaderControllerSupport"/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;definition name=".myLayout" </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+path="/WEB-INF/jsp/tiles/myLayout.jsp"&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;put name="title" value="Sample Page Title"/&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;put name="header" value=".header"/&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;put name="menu" value="/WEB-INF/jsp/tiles/menu.jsp"/&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;put name="footer" value="/WEB-INF/jsp/tiles/footer.jsp"/&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;put name="body" value="/WEB-INF/jsp/tiles/body.jsp" /&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/definition&gt; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;definition name="welcome" extends=".myLayout"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;put name="title" value="Tiles 測試頁面"/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/definition&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/tiles-definitions&gt;</small><br>
+
+      </div>
+
+      <small><br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/TilesExample.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:14 GMT -->
+</html>

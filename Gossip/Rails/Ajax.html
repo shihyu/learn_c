@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Ajax.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>結合 Ajax</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror ajax" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 結合 Ajax<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>Rails 3.1預設的JavaScript程式庫是jQuery，在 <a href="Layout.html">版型（Layout）</a> 中看過，預設會包括jquery.js，而一些頁面的「神奇魔法」，則是由jquery_ujs.js來處理與銜接jQuery，例如 <a
+          href="Layout.html">版型（Layout）</a>中介紹過，以<span class="courier">link_to</span>輔助方法為例，在按下其產生的鏈結時，會執行jquery_ujs.js中的程式碼，動態建立表單並使用<span
+          class="courier">表單物件的submit</span>發送：</p>
+      <p class="courier"><strong>&nbsp;&nbsp;&nbsp; </strong>// Handles "data-method" on links such as:<br>
+        &nbsp;&nbsp;&nbsp; // &lt;a href="/users/5" data-method="delete" rel="nofollow" data-confirm="Are you sure?"&gt;Delete&lt;/a&gt;<br>
+        &nbsp;&nbsp;&nbsp; handleMethod: function(link) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var href = link.attr('href'),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method = link.data('method'),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; target = link.attr('target'),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; csrf_token = $('meta[name=csrf-token]').attr('content'),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; csrf_param = $('meta[name=csrf-param]').attr('content'),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; form = $('&lt;form method="post" action="' + href + '"&gt;&lt;/form&gt;'),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; metadata_input = '&lt;input name="_method" value="' + method + '" type="hidden" /&gt;';<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (csrf_param !== undefined &amp;&amp; csrf_token !== undefined) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; metadata_input += '&lt;input name="' + csrf_param + '" value="' + csrf_token + '" type="hidden" /&gt;';<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (target) { form.attr('target', target); }<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; form.hide().append(metadata_input).appendTo('body');<strong><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; form.submit();<br>
+          &nbsp;&nbsp;&nbsp;</strong> },<br>
+      </p>
+      <p><span class="courier">handleMethod</span>是以<span class="courier">submit</span>發送表單，也就是所謂同步表單或非Ajax表單，有些輔助方法可以設定<span
+          class="courier">:remote =&gt; true</span>，此時就會以非同步方式來發送，也就是所謂Ajax方式，以<span
+          class="courier">link_to</span>輔助方法為例，若加上<span class="courier">:remote =&gt; true</span>，則產生的超鏈結會加上<span
+          class="courier">data-remote="true"</span>（<span class="courier">form_for、button_to等也有:remote可以設定</span>）。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;a href="/messages/1" data-remote="true"&gt;Show&lt;/a&gt;</strong><br>
+      </p>
+      <p>標記為<span class="courier">data-remote="true"</span>的鏈結，會使用<span
+          class="courier">handleRemote</span>方法處理，簡單來說，就是以非同步物件發送：<br>
+      </p>
+      <p class="courier">&nbsp;&nbsp;&nbsp; // Submits "remote" forms and links with ajax<br>
+        &nbsp;&nbsp;&nbsp; handleRemote: function(element) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var method, url, data,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; crossDomain = element.data('cross-domain') || null,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dataType = element.data('type') || ($.ajaxSettings &amp;&amp; $.ajaxSettings.dataType),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options = {&nbsp; <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....略<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; };<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Only pass url to `ajax` options if not blank<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (url) { options.url = url; }<br>
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return rails.ajax(options);</strong><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+        &nbsp;&nbsp;&nbsp; },<br>
+      </p>
+      <p>按下鏈結之後，由於是非同步回應，所以不會換頁，你要根據回應自行處理畫面，預設收到的回應是JavaScript，也可以指定JSON等其它格式。</p>
+      <p>舉例來說，可修改 <a href="Scaffold.html">觀摩 Scaffold</a> 中的index.html.erb如下：</p>
+      <ul>
+        <li>index.html.erb</li>
+      </ul>
+      <pre>&lt;h1&gt;Listing messages&lt;/h1&gt;
+
+<strong>&lt;div id="message"&gt;&lt;/div&gt;</strong>
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @messages.each do |message| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= message.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= message.title %&gt;&lt;/td&gt;
+<strong>    &lt;td&gt;&lt;%= link_to 'Show', message, :remote =&gt; true %&gt;&lt;/td&gt;</strong>
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_message_path(message) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', message, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Message', new_message_path %&gt;<br></pre>
+      <p>如此按下Show鏈結就不會換頁，而會以非同步方式發送請求，接著可以修改messages_controller.rb：</p>
+      <ul>
+        <li>messages_controller.rb</li>
+      </ul>
+      <pre>class MessagesController &lt; ApplicationController
+  ...
+
+  def show
+    @message = Message.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+<strong>      format.js   # show.js.erb</strong>
+      format.json { render json: @message }
+    end
+  end<br>  ...<br>end<br></pre>
+      <p>非同步請求預設希望取得JavaScript回應，否則取得HTML回應，如上設定之後，若有個show.js.erb：</p>
+      <ul>
+        <li>show.js.erb</li>
+      </ul>
+      <pre>$('#message').html("&lt;p&gt;&lt;b&gt;Content:&lt;/b&gt;&lt;%= @message.content %&gt;&lt;/p&gt;")
+             .css({ backgroundColor: '#ffff99' });<br></pre>
+      <br>
+      接下來如果按下Show鏈結，就會在同頁面中<span class="courier">&lt;div id="message"&gt;&lt;/div&gt;</span>載入訊息內容。<br>
+      <br>
+      如果想取得的回應是JSON格式，例如：<br>
+      <ul>
+        <li>index.html.erb</li>
+      </ul>
+      <pre>&lt;h1&gt;Listing messages&lt;/h1&gt;
+
+<strong>&lt;div id="message"&gt;&lt;/div&gt;</strong>
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @messages.each do |message| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= message.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= message.title %&gt;&lt;/td&gt;
+<strong>    &lt;td&gt;&lt;%= link_to 'Show', message_path(:id =&gt; message, :format =&gt; :json), :remote =&gt; true %&gt;&lt;/td&gt;</strong>
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_message_path(message) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', message, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Message', new_message_path %&gt;
+
+<strong>&lt;script&gt;
+  $(function() {
+    $('a[data-remote]').bind("ajax:success", function(event, data) {            
+      $('#message').html('&lt;p&gt;&lt;b&gt;Content:&lt;/b&gt;' + data.content + '&lt;/p&gt;')
+                   .css({ backgroundColor: '#ffff99' });
+      });
+  });
+&lt;/script&gt;</strong><br></pre>
+      <br>
+      按下Show鏈結，就會在同頁面中<span class="courier">&lt;div id="message"&gt;&lt;/div&gt;</span>載入訊息內容。
+      <p> </p>
+      <p></p>
+      Rails 3中基本上對Ajax沒有提供太多神奇的魔法，DHH建議自己要親自撰寫JavaScript來處理一些事，這意謂著你對Ajax必須有更多的瞭解，你要嘛將JavaScript放在伺服端，結合Erb之類的來輔助產生內容，要嘛將JavaScript放在客戶端，並與伺服端協定好資料格式，或必要時撰寫一些頁面輔助方法來簡化頁面與伺服端的溝通。<br>
+      <br>
+      如果要提供JSONP，<span class="courier">只要在render時指定:json與:callback即可</span>。例如：<br>
+      <ul>
+        <li>messages_controller.rb</li>
+      </ul>
+      <pre>class MessagesController &lt; ApplicationController
+  ...
+
+  def show
+    @message = Message.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.js   # show.js.erb
+<strong>      format.json { render json: @message, :callback =&gt; params[:callback] }</strong>
+    end
+  end<br>  ...<br>end<br></pre>
+      <br>
+      如果使用者指定請求參數callback=process_message，則一個回應範例如下：<br>
+      <br>
+      <div style="margin-left: 40px;">process_message({"content":"TEST!!!","created_at":"2012-02-09T06:31:37Z","id":1,"name":"Justin","title":"TEST","updated_at":"2012-02-09T06:31:37Z"})<br>
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Ajax.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+</html>

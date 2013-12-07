@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ObjectOrientedProgramming.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <title>程式語言的特性本質（三）從消弭重複性看封裝、繼承、多型</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 程式語言的特性本質（三）從消弭重複性看封裝、繼承、多型<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=73584">程式語言的特性本質（三）從消弭重複性看封裝、繼承、多型<br>
+      </a><br>
+      程式設計在某種程度上都是在消弭重複性，以提高程式可維護性來控制軟體複雜度。若從消弭重複性來瞭解物件導向中封裝、繼承、多型，就可具體瞭解這些基本原則的作用。<br>
+      <br>
+      <dl>
+        <dt>封裝消弭了物件的重複行為</dt>
+      </dl>
+      <br>
+      假設你用類別基礎的Java設計僅具有<span class="courier">name</span>與<span class="courier">balance</span>的<span
+        class="courier">Account</span>類別，同事拿來建立多個物件，像是建立<span class="courier">acct1</span>並為<span
+        class="courier">acct1.name</span>與<span class="courier">acct1.balance</span>指定值，建立<span
+        class="courier">acct2</span>並為<span class="courier">acct2.name</span>與<span
+        class="courier">acct2.balance</span>指定值...<span><strong><br>
+        </strong></span>
+      <div class="courier" style="margin-left: 40px;"><span><strong>Account acct1 = new Account();</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>acct1.name = "Justin";</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>acct1.balance = 200; // 請自行想像以上流程重複多次</strong></span></div>
+      <br>
+      你立刻發現同事建立物件後都作了重複初始流程。對程式設計者而言，「重複」並不是美德。例如同事若初始10個物件，假以時日若初始流程更改了，他就必須修改10個地方，毫無可維護性可言。你觀察同事初始物件的流程，在<span
+        class="courier">Account</span>類別定義建構式將初始流程予以「封裝」：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>Account(String name, double balance) {</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; this.name = name; <br>
+            &nbsp;&nbsp;&nbsp; this.balance = balance;</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>}</strong></span></div>
+      <br>
+      同事只要<span class="courier">new Account("Justin", 200)</span>，就可以得到初始過的物件，就目前而言，你就為他節省20行程式碼的撰寫，假以時日初始流程更改，你只要修改建構式，同事無須作任何修改，大大地提昇可維護性。<br>
+      <br>
+      類似地，假設同事想為多個<span class="courier">Account</span>實例進行存款：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>Account acct1 = new Account("Justin", 200);</strong></span><span><strong><br>
+          </strong></span><span><strong>if(amt &gt; 0) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; </strong></span><span><strong>acct1.balance += amt; </strong></span><span><strong><br>
+          </strong></span><span><strong>} //請自行想像以上流程重複多次</strong></span><strong><br>
+        </strong></div>
+      <br>
+      又發現重複流程了！如果同事要為10個物件存款，假以時日存款要求單筆至少要100元，那麼同事就得修改10個地方，於是你修改<span
+        class="courier">Account</span>類別定義如下：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>void deposit(double amt) {</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; if(amt &gt; 0) { </strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong></span><span><strong>this.balance += amt; </strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; </strong></span><span><strong>}</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>}</strong></span></div>
+      <br>
+      現在同事只要<span class="courier">acct1.deposit(100)</span>，就可以完成存款動作，假以時日存款流程更改了，也只要修改<span
+        class="courier">deposit()</span>方法，同事無須作任何修改。<br>
+      <br>
+      <dl>
+        <dt>繼承消弭了類別間的重複定義</dt>
+      </dl>
+      <br>
+      若觀察到多個類別間的出現重複定義時，可透過繼承來消弭重複定義的問題。例如設計角色扮演遊戲時，先定義<span class="courier">SwordsMan</span>擁有<span
+        class="courier">name</span>、<span class="courier">blood</span>等屬性，並為其定義了取值式（Getter）與設值式（Setter），再定義<span
+        class="courier">Magician</span>擁有<span class="courier">name</span>、<span
+        class="courier">blood</span>等屬性、取值式與設值式時，立即觀察到重複的程式碼出現了。若有<span>10個角色類別，倘若這些角色日後</span><span
+        class="courier">blood</span><span>屬性要修改為</span><span class="courier">hp</span><span>，那得修改10個類別，這會有可維護性嗎？透過繼承，你可以定義</span><span
+        class="courier">Sprite</span><span>擁有</span><span class="courier">name</span><span>、</span><span
+        class="courier">blood</span><span>等屬性與方法，讓</span><span class="courier">SwordsMan</span><span>、</span><span
+        class="courier">Magician</span>等繼承，日後這些角色<span class="courier">blood</span>屬性要修改為<span
+        class="courier">hp</span>，也只需要修改<span class="courier">Sprite</span>類別。<br>
+      <br>
+      在物件導向中，繼承不單是為了避免類別間的重複定義，還有「是一種（is a）」的關係，例如<span class="courier">SwordsMan</span>是一種<span
+        class="courier">Sprite</span>，<span class="courier">Magician</span>是一種<span
+        class="courier">Sprite</span>，這是判斷繼承是否適當的一個思考方向。除此之外，也可用「是一種」來瞭解多型的應用。<br>
+      <br>
+      <dl>
+        <dt>多型消弭了參考間的重複操作</dt>
+      </dl>
+      <br>
+      假設你要設計方法顯示角色資訊，在不瞭解多型的運用前，也許會運用重載特性如下撰寫：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>void show(SwordsMan s) {</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; out.print("(%s, %d)", s.getName(), s.getBlood());</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>}</strong></span><span><strong></strong></span><span><br>
+          <br>
+        </span><span><strong></strong></span><span><strong>void show(Magician m) {</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; out.print("(%s, %d)", m.getName(), m.getBlood());</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>} // 請自行想像以上操作重複多次</strong></span></div>
+      <br>
+      雖然參考的型態不同，但操作方式是重複的。若有100個角色怎麼辦？重載出100個方法？重載顯然不適合解決這個需求。如果<span class="courier">Sprite</span>與<span
+        class="courier">SwordsMan</span>有繼承關係，可以撰寫<span class="courier">Sprite s = new SwordsMan()</span>，從右往左看的話，<span
+        class="courier">SwordsMan</span>是一種<span class="courier">Sprite</span>，這是合法語句，也可以透過參考s對實例進行操作。將此觀念套用到方法參數上就是：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>void show(Sprite s) {</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; out.print("(%s, %d)", s.getName(), s.getBlood());</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>}</strong></span></div>
+      <br>
+      這個方法可傳入<span class="courier">SwordsMan</span>實例，也可傳入<span class="courier">Magician</span>實例，因為<span
+        class="courier">Magician</span>是一種<span class="courier">Sprite</span>。沒有多型前，若有100個角色，你要重載100個方法來解決需求，有了多型，只要繼承<span
+        class="courier">Sprite</span>的類別，100個角色也只要運用這個方法就可以了。<br>
+      <br>
+      <dl>
+        <dt>從消弭重複性出發思考不同語言的實作方式</dt>
+      </dl>
+      <br>
+      不同物件導向語言會有不同語法特性與模型，以原型基礎的JavaScript為例，雖然沒有類別概念，然而前一篇專欄談過，若有兩個物件有著同樣的能力指導過程，可使用函式對該流程予以封裝。如果兩個函式定義了重複的指導流程又當如何？得看你想依哪種方式消弭這個重複性。若要利用JavaScript的原型鏈（Prototype chain）特性，就是準備一個已由該流程指導完畢的物件作為原型。例如：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>function Sprite() {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; this.getName = function() { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong></span><span><strong>return this.name; </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; </strong></span><span><strong>};</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; this.setName = function(name) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong></span><span><strong>this.name = name; </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; </strong></span><span><strong>};</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; ...其它重複的指導流程</strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span><span><strong><br>
+            <br>
+          </strong></span><span><strong>function SwordsMan() {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; ...SwordsMan特定的指導流程</strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span><span><strong><br>
+            <br>
+          </strong></span><span><strong>SwordsMan.prototype = new Sprite(); // 以指導完畢的物件作為原型</strong></span><span><strong><br>
+          </strong></span><span><strong>var s = new SwordsMan();</strong></span><span><strong><br>
+          </strong></span><span><strong>s.setName('Justin');&nbsp; // 實例沒有setName()，就從原型物件借用</strong></span><strong><br>
+        </strong></div>
+      <br>
+      實例上沒有的行為，就從原型上借來用，就消除重複的訓練過程定義而言，可算是繼承概念的實現。至於多型概念的實現，前一篇專欄也談過動態語言由於變數沒有型態問題，只要思考參考的物件有哪些重複操作即可。<br>
+      <br>
+      DRY（Don't Repeat Yourself）原則就是將重複出現的現象集中管理。從這個出發點出發，不僅較易理解物件導向中封裝、繼承、多型的基本原則，在語法或模型不支援物件導向的語言上，也可實現出封裝、繼承、多型的類似概念。<br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ObjectOrientedProgramming.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

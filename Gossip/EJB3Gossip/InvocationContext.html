@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/InvocationContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:49 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>InvocationContext</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: InvocationContext</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+      </td>
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>&nbsp;攔截器必須有一個</small><small>InvocationContext型態的參數，它可以讓您取得Bean呼叫</small><small>過程的相關資訊、設定或取得攔截器鏈（Interceptor Chain）所要共用的相關資料、決定是否繼續執行下一個攔截器，InvocationContext</small><small>介面</small><small>的定義如下：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface InvocationContext {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Object getTarget();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Method getMethod();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Object[] getParameters();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public void setParameters(Object[]);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public java.util.Map&lt;String,Object&gt; getContextData();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Object proceed() throws Exception;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+
+      </div>
+
+      <small><br>
+
+getTarget()方法傳回的Object即為攔截器所作用的Bean實例。getMethod()則為目前所呼叫的Bean服務方法，若服務方法有
+參數，getParameters()可取得傳遞給服務方法的參數物件，因為參數可能不只一個，所以會以陣列方式傳回，setParameters()則
+可以讓您設定傳遞給方法的參數，所以，您可以使用getParameters()取得參數物件，加以修改後再利用setParameters()設定給服
+務方法，若必要，也可以傳遞一個完全與原客戶端所給參數無關的物件給服務方法。<br>
+
+      <br>
+
+getContextData()將取得一個Map物件，在整個攔截器鏈中需要共用的資料，可以設定到這個Map物件中，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">context.getContextData().put("someData", "data...XD");</span></small><br>
+
+      </div>
+
+      <small><br>
+
+若需要取得共用資料時，則如下：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String data = (String) context.getContextData().get("someData");</span></small><br>
+
+      </div>
+
+      <small><br>
+
+      </small><small>InvocationContext的proceed()執行時，</small><small>若下一個攔截器，則執行流程是交給下一個攔截器，若無下一個攔截器，則</small><small>InvocationContext的proceed()執行時，是交給目標（Target）方法。<br>
+
+      <br>
+
+      </small><small>
+InvocationContext的proceed()會傳回一個物件，代表所呼叫方法的傳回值，若必要，您也可以處理這個傳回值，甚至替代傳回另一個不相關的物件。<br>
+
+      <br>
+攔截器可以丟出例外，要注意的是若是在</small><small>
+InvocationContext的proceed()丟出例外，proceed()不被執行，則流程不會交給下一個攔截器，攔截器鏈將被中斷。</small><br>
+      <small><br>
+
+      <br>
+
+      </small><small></small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/InvocationContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:49 GMT -->
+</html>

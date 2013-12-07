@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/AbstractClass.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>抽象類別（Abstract class）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 抽象類別（Abstract class）</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>當您定義類別時，可以僅宣告方法名稱而不實作當中的邏輯，這樣的方法稱之為<span style="font-weight: bold;">「抽象方法」（Abstract method）</span>，如果一個類別中包括了抽象方法，則該類別稱之為<span style="font-weight: bold;">「抽象類別」（Abstract class）</span>，抽象類別是個未定義完全的類別，所以它不能被用來生成物件，它只能被擴充，並於擴充後完成未完成的抽象方法定義。<br>
+
+
+      <br>
+
+
+
+
+在Java中要宣告抽象方法與抽象類別，您使用<span style="font-weight: bold;">"abstract"關鍵字</span>，直接來看個應用的例子，下面定義一個簡單的比大小遊戲抽象類別：</small>
+
+      <br>
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> AbstractGuessGame.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      <pre>public abstract class AbstractGuessGame {<br>    private int number;<br> <br>    public void setNumber(int number) {<br>        this.number = number;<br>    }<br> <br>    public void start() {<br>        showMessage("Welcome");<br> <br>        int guess;<br>        do {<br>            guess = getUserInput();<br>            if(guess &gt; number) {<br>                showMessage("bigger than the goal number");<br>            }<br>            else if(guess &lt; number) {<br>                showMessage("smaller than the goal number");<br>            }<br>            else<br>                showMessage("you win");<br>        } while(guess != number);<br>    }<br><br>    protected abstract void showMessage(String message);<br>    protected abstract int getUserInput();<br>} </pre>
+
+
+
+
+      <br>
+
+
+      <small>
+
+在宣告類別時使用"abstract"關鍵字，表示這是一個抽象類別，在這個類別中，您定義了start()方法，當中先實作比大小遊戲的基本規則，然而
+您不實作與使用者互動及訊息是如何顯示的，這您分別定義為抽象方法showMessage()與
+getUserInput()，在方法上使用"abstract"關鍵字，可以僅定義方法而不實作其內容。<br>
+
+
+      <br>
+
+
+
+
+使用這個類別的辦法是擴充它，並完成當中未定義完全的抽象方法showMessage()與getUserInput()，例如實作一個簡單的文字介面遊戲類別：</small>
+
+      <br>
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> ConcreteGuessGame.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      <pre>import java.util.Scanner;<br> <br>public class ConcreteGuessGame extends AbstractGuessGame {<br>    private Scanner scanner;<br> <br>    public ConcreteGuessGame() {<br>        scanner = new Scanner(System.in);<br>    }<br> <br>    protected void showMessage(String message) {<br>        System.out.println(message + "!");<br>    }<br>  <br>    protected int getUserInput() {<br>        System.out.print("input a number: ");<br>        return scanner.nextInt();<br>    }<br>} <br></pre>
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+接下來寫個簡單的測試程式，看看這個文字介面比大小遊戲類別是不是可以運作：</small><br>
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> Test.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      <pre>public class Test {<br>    public static void main(String[] args) {<br>        AbstractGuessGame guessGame = <br>                    new ConcreteGuessGame();<br>        guessGame.setNumber(50);<br>        guessGame.start();<br>    }<br>}</pre>
+
+
+
+
+      <br>
+
+
+      <small>
+
+這邊必須知道，一個基底類別的物件參考名稱，可以用來指向其衍生類別的物件而不會發生錯誤，所以上面的這個指定是可以接受的：<br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">AbstractGuessGame guessGame = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new ConcreteGuessGame();</span><br style="font-weight: bold; font-style: italic;">
+
+
+
+
+      <span style="font-weight: bold; font-style: italic;">&nbsp;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+由於guessGame仍是AbstractGuessGame類型的參考名稱，它可以操作子類別
+ConcreteGuessGame的實例中名稱相同的公開操作介面（方法），簡單的說，透過guessGame參考名稱，您可以操作
+ConcreteGuessGame的實例之setNumber()與start()方法，這是<span style="font-weight: bold;">多型（Polymorphism）操作</span>的一個實際例子。<br>
+
+
+      <br>
+
+
+      <span class="postbody">
+執行結果：</span></small>
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Welcome!<br>
+
+
+
+
+input a number: 10<br>
+
+
+
+
+smaller than the goal number!<br>
+
+
+
+
+input a number: 60<br>
+
+
+
+
+bigger than the goal number!<br>
+
+
+
+
+input a number: 50<br>
+
+
+
+
+you win!</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+
+今天如果您想要實作一個有視窗介面的比大小遊戲，則您可以擴充AbstractGuessGame並實作您的抽象方法showMessage()與
+getUserInput()，事實上，上面的例子是 <a class="wikilink" href="../DesignPattern/TemplateMethod.htm">Template
+Method 模式</a> 的一個實際例子，使用抽象類別與方法來實作Template Method 模式，在很多應用場合都可以見到。</small><br>
+
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/AbstractClass.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

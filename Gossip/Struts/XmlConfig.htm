@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/XmlConfig.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>使用XML管理模版資源</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 使用XML管理模版資源</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+在Tiles中，您可以使用XML或是JSP來管理版面配置的相關資源，這邊先介紹使用XML定義檔的方式，如之前主題所定義的，定義檔是tiles-defs.xml，在當中如下撰寫：</small><br>
+
+
+
+      
+      <ul>
+
+        <li>tiles-defs.xml</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;<br>&lt;!DOCTYPE tiles-definitions PUBLIC <br> "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" <br> "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd"&gt; <br>&lt;tiles-definitions&gt; <br><br>    &lt;definition name=".myLayout" path="/tiles/myLayout.jsp"&gt; <br>        &lt;put name="title"  value="Sample Page Title" /&gt; <br>        &lt;put name="header" value="/tiles/header.jsp" /&gt; <br>        &lt;put name="menu"   value="/tiles/menu.jsp" /&gt; <br>        &lt;put name="footer" value="/tiles/footer.jsp" /&gt; <br>        &lt;put name="body"   value="/tiles/body.jsp" /&gt; <br>    &lt;/definition&gt; <br><br>&lt;/tiles-definitions&gt;<br></pre>
+
+
+
+      <br>
+
+      <small>
+
+在&lt;definition&gt;標籤中，我們指定了版面配置的JSP頁面，也就是path屬性所指定的
+myLayout.jsp，name屬性表明這個版面配置的名稱，而在接下來的&lt;put&gt;標籤中，我們指定了內容頁面的名稱與JSP頁面實際
+的位置。<br>
+
+      <br>
+
+
+
+Tiles的定義檔可以支援國際化，您可以複製以上的內容，撰寫在tiles-defs_zh.xml中，並將encoding改為Big5，就可以在定義檔中使用中文，例如： </small>
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li>tiles-defs_zh.xml</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="Big5" ?&gt;<br>&lt;!DOCTYPE tiles-definitions PUBLIC <br> "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" <br> "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd"&gt; <br>&lt;tiles-definitions&gt; <br>    &lt;definition name=".myLayout" path="/tiles/myLayout.jsp"&gt; <br>        &lt;put name="title"  value="Tiles範例" /&gt; <br>        &lt;put name="header" value="/tiles/header.jsp" /&gt; <br>        &lt;put name="menu"   value="/tiles/menu.jsp" /&gt; <br>        &lt;put name="footer" value="/tiles/footer.jsp" /&gt; <br>        &lt;put name="body"   value="/tiles/body.jsp" /&gt; <br>    &lt;/definition&gt; <br>&lt;/tiles-definitions&gt;</pre>
+
+
+
+      <br>
+
+      <small>
+
+其中myLayout.jsp的內容如下：</small><br>
+
+
+
+      
+      <ul>
+
+        <li> myLayout.jsp
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>&lt;%@taglib prefix="tiles" uri="/tags/struts-tiles"%&gt; <br>&lt;html&gt; <br> &lt;head&gt;<br> &lt;title&gt;&lt;tiles:getAsString name="title"/&gt;&lt;/title&gt;<br> &lt;/head&gt; <br> &lt;body&gt;<br><br> &lt;table border="0" width="100%" cellspacing="5"&gt; <br> &lt;tr&gt; <br>    &lt;td colspan="2"&gt;<br>        &lt;tiles:insert attribute="header"/&gt;<br>    &lt;/td&gt; <br> &lt;tr&gt; <br> &lt;tr&gt; <br>    &lt;td width="140" valign="top"&gt;<br>        &lt;tiles:insert attribute="menu"/&gt;<br>     &lt;/td&gt; <br>    &lt;td valign="top" align="left"&gt;<br>        &lt;tiles:insert attribute="body"/&gt;<br>    &lt;/td&gt; <br> &lt;/tr&gt; <br> &lt;tr&gt; <br>    &lt;td colspan="2"&gt;<br>        &lt;tiles:insert attribute="footer"/&gt;<br>    &lt;/td&gt; <br> &lt;/tr&gt; <br> &lt;/table&gt;<br><br> &lt;/body&gt; <br>&lt;/html&gt;</pre>
+
+
+
+      <br>
+
+      <small>
+
+
+這個版面配置網頁中主要使用表格來切割版面，Tiles標籤可以從attribute屬性得知對應於XML定義檔的真正JSP頁面，例如header將被
+實際取代為header.jsp的內容，您可以自行完成其它的JSP頁面內容。 <br>
+
+      <br>
+
+
+
+接下可以開始使用定義好的版面配置，例如在welcome.jsp中如下撰寫： </small>
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li> welcome.jsp
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>&lt;%@page contentType="text/html; charset=big5"%&gt; <br>&lt;%@taglib prefix="tiles" uri="/tags/struts-tiles"%&gt; <br>&lt;tiles:insert definition=".myLayout" flush="true"/&gt; <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+在&lt;tiles:insert&gt;標籤中指定我們將使用.myLayout的版面配置定義，如果您連上welcome.jsp，則實際上您
+會看到以下的內容：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">&nbsp;<span style="font-family: Courier New,Courier,monospace;">&lt;html&gt; </span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;head&gt;&lt;title&gt;Tiles範例&lt;/title&gt;&lt;/head&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;body&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;table border="0" width="100%" cellspacing="5"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;tr&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;td colspan="2"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;center&gt;&lt;h1&gt;Tiles測試範例&lt;h1&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/td&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;tr&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;tr&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;td width="140" valign="top"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;選單一&lt;br&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;選單二&lt;br&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;選單三&lt;br&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/td&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;td valign="top" align="left"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;Tiles提供一個類似於視窗程式版面管理的機制，透過定義檔，您可</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">以定義版面配置，以及當中所要置入的內容網頁，內容與版面配置的</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">標籤可以分離，您可以隨時抽換每一個內容網頁，也可以重用每一個</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">版面配置。 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/td&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;/tr&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;tr&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;td colspan="2"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;center&gt;版權所有(c)http://openhome.cc/</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/td&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;/tr&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;/table&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;/body&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      </small></div>
+
+
+
+      
+      <div style="margin-left: 40px; font-family: Times New Roman,Times,serif;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;/html&gt;</span><br>
+
+
+
+      </small></div>
+
+
+      <small><span style="font-family: Times New Roman,Times,serif;">
+&nbsp;</span><br>
+
+
+
+如果您將來要改變版面配置的方式，您可以直接修改tiles-defs.xml中path所指向的Layout頁面，就如同您在視窗程式中改變版面管理員
+一樣，如果您要修改指向的內容網頁，也只要更改tiles-defs.xml中相對應的設定，所有的更改集中於Tiles設定檔中加以管理，達到將版面配
+置與內容分離的目的。<br>
+
+      <br>
+
+
+
+您可以擴充某個定義，重新定義當中所管理的頁面資源，一個例子如下： </small>
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li> tiles-defs_zh.xml
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="big5" ?&gt;<br>&lt;!DOCTYPE tiles-definitions PUBLIC <br> "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" <br> "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd"&gt; <br> <br>&lt;tiles-definitions&gt; <br>     &lt;definition name=".myLayout" path="/tiles/myLayout.jsp"&gt; <br>        &lt;put name="title"  value="Tiles範例" /&gt; <br>        &lt;put name="header" value="/tiles/header.jsp" /&gt; <br>        &lt;put name="menu"   value="/tiles/menu.jsp" /&gt; <br>        &lt;put name="footer" value="/tiles/footer.jsp" /&gt; <br>        &lt;put name="body"   value="/tiles/body.jsp" /&gt; <br>     &lt;/definition&gt; <br>     &lt;definition name=".myLayout2" extends=".myLayout"&gt; <br>        &lt;put name="title"  value="Tiles範例二" /&gt; <br>        &lt;put name="header" value="/tiles/header2.jsp" /&gt; <br>     &lt;/definition&gt; <br>&lt;/tiles-definitions&gt; <br></pre>
+
+
+
+
+      <br>
+
+      <small>
+
+在上面的定義中，.myLayout2擴充自.myLayout，並重新定義了title與header兩個屬性，其它未重新定義的屬性將直接繼承自.
+myLayout。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/XmlConfig.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

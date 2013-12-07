@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  
+<!-- Mirrored from openhome.cc/Gossip/Scala/Class.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+    <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+    <link rel="stylesheet" href="css/print.css" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>簡單的類別</title>
+  </head>
+  <body>
+    <h3><a href="../index.html">From
+        Gossip@Openhome</a></h3>
+    <h1><a href="index-2.html">Scala Gossip:&nbsp;<small>簡單的類別</small></a></h1>
+    <table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0"
+      cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <center>
+               </center>
+          </td>
+          <td style="vertical-align: top; width: 690px; text-align: left;"><small>在
+              Scala中要定義類別非常的簡單，例如你可以定義一個帳戶（Account）類別：<br>
+            </small>
+            <pre>class Account<br>val acct = new Account</pre>
+            <small><br>
+              上例中，class用來定義一個類別，在上例中，Account是個公開（Public）類別，在Scala中定義類別時，沒有指定存取權限
+              的話，預設就是公開類別。<br>
+              <br>
+              new
+              則根據類別定義來建立實例（Instance），由於建立物件時不需給定引數作為建構之用，所以括號可以省略。在Scala中，你可以在同一
+              個.scala檔案中定義多個類別，這方便你在開發時撰寫一些簡單的指令稿
+              （Script），不過建議為每個類別撰寫一個.scala，主檔名為類別名稱相同，如此別的開發人員要檢視你的相關類別時，可以很快地找到
+              相對應的原始
+              碼。<br>
+              <br>
+              上面這個例子不並不能作什麼，一個帳戶基本上要有帳號、名稱、餘額，也要有存款、提款的功能，來看看下面這個例子：<br>
+            </small>
+            <pre>class Account(acctNumber: String, acctName: String) {<br>    val id = acctNumber<br>    val name = acctName<br>    private var bal = 0<br>    <br>    def deposit(amount: Int) {<br>        require(amount &gt; 0) // 不能存負數<br>        bal += amount<br>    }<br>    <br>    def withdraw(amount: Int) {<br>        require(amount &gt; 0)     // 不能提負數<br>        if(amount &lt;= bal) {<br>            bal -= amount<br>        }<br>        else {<br>            throw new RuntimeException("餘額不足")<br>        }<br>    }<br>    <br>    def balance = bal<br>}</pre>
+            <small><br>
+              這個類別已包含幾個Scala中定義類別的觀念。首先是：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">class Account(acctNumber: String,
+                  acctName: String)&nbsp;</span></small><br>
+            </div>
+            <small><br>
+              這定義了一個類別，接受兩個引數作為建構之用，所以你可以用以下方式來建構物件：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">val acct = new
+                  Account("123-456-789", "Justin Lin")</span></small><br>
+            </div>
+            <small><br>
+              雖然語法上沒有指出，不過acctNumber與acctName都是<span style="font-weight: bold;">private
+                val</span>宣告的，所以在類別中不能改變它的值，acctNumber與acctName實際上會成為類別中的private
+              成員，所以無法直接透過物件實例存取acctNumber與acctName</small><small>（更精確地說，其實是
+              private[this]
+              val，也就是所謂物件私有（object-private）權限修飾，在Account類別中也無法透過另一Account實例來存取其</small><small>acctNumber
+              與acctName，之後還會詳談</small><small>）</small><small>。如果你熟悉Java，上面這個程式片
+              段，相當於Java的：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">// 這是 Java</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public
+                  class Account {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; private final String acctNumber;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; private final String acctName;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; public Account(String acctNumber, String acctName) {</span></small><br
+                style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; &nbsp; &nbsp; this.acctNumber = acctNumber;</span></small><br
+                style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+                &nbsp; &nbsp; &nbsp; this.acctName = acctName;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+            </div>
+            <small><br>
+              再來繼續看：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">class Account(acctNumber: String,
+                  acctName: String) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+                  val id = acctNumber</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+                  val name = acctName</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+                  private var bal = 0</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+            </div>
+            <small><br>
+              類別上的參數與本體定義了一個<span style="font-weight: bold;">主要建構式（Primary
+                constructor）</span>，id與name沒有使用任何存取修飾，預設為公開（Public），bal則使用
+              private宣告為私用。上面的片段若要以Java來類比，相當於以下的Java程式：</small><small><br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">// 這是 Java</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public
+                  class Account {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; private final String acctNumber;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; private final String acctName;<br>
+                  &nbsp; &nbsp; public final String id;<br>
+                  &nbsp; &nbsp; public final String name;<br>
+                  &nbsp; &nbsp; private int bal;<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+                </span></small><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">&nbsp; &nbsp; public Account(String
+                  acctNumber, String acctName) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; &nbsp; &nbsp; this.acctNumber = acctNumber;</span></small><br
+                style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+                &nbsp; &nbsp; &nbsp; this.acctName = acctName;<br>
+                &nbsp; &nbsp; &nbsp; &nbsp; this.id = acctNumber;<br>
+                &nbsp; &nbsp; &nbsp; &nbsp; this.name = acctName;<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              </small><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+            </div>
+            <small><br>
+              接下來在類別本體中，還定義了一些函式，在類別中的函式，物件導向上通常稱之為方法（Method），由於定義方法時沒有任何存取修飾，所以
+              預設就是公開（Public），剩下的觀念，在 </small><small><big><a href="Function.html"><small>簡
+                    單的函式</small></a> </big>中都有提到。同樣地，在類別中使用val宣告了資料成員（Field），沒有
+              指定任何存取修飾的話，預設就是公開。<br>
+              <br>
+              require函式給依你給定的條件進行判斷，如果運算是true則什麼事都不會發生，如果運算是false，則丟出
+              java.lang.IllegalArgumentException。<br>
+              <br>
+              每個建構出來的Account實例，都會擁有自己的資料狀態，以下是個建構與使用物件的範例：<br>
+            </small>
+            <pre>val acct = new Account("123-456-789", "Justin Lin")<br>acct.deposit(1000)<br>acct.withdraw(400)<br>println(acct.name)<br>println(acct.balance)</pre>
+            <br>
+            <small>在Scala中，如果函式或方法不帶參數，則括號可以省略。實際上，上面的Account類別在定義上還可以再簡化一些，先前說
+              過，雖然沒有表明，不過</small><small>acctNumber與acctName都是private
+              val宣告的，所以在類別中不能改變它的值，但如果你直接在上頭宣告val的話，若沒有指定存取修飾，則預設就是公開。例如：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">class Some(val name: String) { //
+                  name 預設是公開<br>
+                  &nbsp; &nbsp; ...<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+                </span></small><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">}</span></small><br>
+            </div>
+            <small><br>
+              其實像是你這麼宣告：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span
+                  style="font-weight: bold;">class Some(x: String) {</span></small><br>
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+                  &nbsp; val name = x</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small
+                style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+            </div>
+            <small><br>
+              所以，上面的Account也可以定義為：<br>
+            </small>
+            <pre>class Account(<span style="font-weight: bold;">val id: String, val name: String</span>) {<br><span
+style="font-weight: bold;">    private var bal: Int = _</span><br>    <br>    def deposit(amount: Int) {<br>        require(amount &gt; 0) // 不能存負數<br>        bal += amount<br>    }<br>    <br>    def withdraw(amount: Int) {<br>        require(amount &gt; 0)     // 不能提負數<br>        if(amount &lt;= bal) {<br>            bal -= amount<br>        }<br>        else {<br>            throw new RuntimeException("餘額不足")<br>        }<br>    }<br>    <br>    def balance = bal<br>}</pre>
+            <small><br>
+              在bal的撰寫上，預設值寫為_，這代表著依型態自動給出預設值，如果是整數則設定為0，如果是浮點數則設定為0.0，如果是布林值則設定為
+              false，如果是其它物件型態則設定為null。<br>
+              <br>
+            </small></td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+    <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+
+<!-- Mirrored from openhome.cc/Gossip/Scala/Class.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/AbstractFormController.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>AbstractFormController</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: AbstractFormController</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script></td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>對
+於簡單的表單需求，通常透過繼承org.springframework.web.servlet.mvc.SimpleFormController來
+定義Controller，並重新定義其onSubmit()或doSubmitAction()方法來完成表單功能，而實際上真正的表單處理流程定義在
+org.springframework.web.servlet.mvc.AbstractFormController，在API文件中，有說明其一
+連串的方法之作用，這邊整理一下當中的說明：<br>
+      </small>
+      <ol>
+        <li><small>呼叫formBackingObject()方法，要返回一個commandClass的實例。</small></li>
+        <li><small>呼叫initBinder()方法，允許您對Command特定的Field作格式化等動作，例如日期格式、金錢格式等，提供非基本型態或String的設定。</small></li>
+        <li><small>呼叫showForm()方法，返回一個View物件，用於表單的展現。</small></li>
+        <li><small>如果"bindOnNewForm"屬性被設定為true，則應用ServletRequestDataBinder根據初始請求參數來填入一個新的表單物件，並且呼叫onBindOnNewForm()方法。</small></li>
+        <li><small>showForm()方法會呼叫referenceData()方法，如果在展現表單的過程中，需要一些相關資料，可以回傳一個Map物件，例如：</small></li>
+      </ol>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">protected Map referenceData(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HttpServletRequest request) throws Exception {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; Map ref = new HashMap();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ref.put("defalutUser", "guest");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; return ref;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+      <br>
+      <small>這樣一來，您就可以在JSP網頁中使用如${defaultUser}的寫法來呈現資料，例如所取得的值會是"guest"。</small><br>
+      </div>
+      <ol start="6">
+        <li><small>Model物件被展現，使用者可以看到表單並進行填寫。</small></li>
+      </ol>
+      <small><br>
+使用者填寫完表單之後送出表單，將會依以下的流程進行：<br>
+      </small>
+      <ol>
+        <li><small>接受使用者的表單送出，通常使用POST，如果不想用POST這樣的方式來判斷使用者是否送出表單，可以重新定義isFormSubmission()方法。</small></li>
+        <li><small>如果"sessionForm"屬性沒有設定，則會呼叫formBackingObject()方法以取得表單物
+件，否則嘗試從session中取得表單物件，如果沒有找到則呼叫handleInvalidSubmit()方法，預設的動作是嘗試建立新的表單物件並
+重新填寫表單。</small></li>
+        <li><small>ServletRequestDataBinder根據目前的請求參數填入表單物件。</small></li>
+        <li><small>呼叫onBind()方法，在綁定資料之後，驗證資料之前您可以對表單物件進行一些自訂的修改動作。</small></li>
+        <li><small>如果"validateOnBinding"屬性被設定，則使用驗證器。</small></li>
+        <li><small>呼叫onBindAndValidate()方法，允許您在驗證資料之後對表單物件作一些處理。</small></li>
+        <li><small>表單物件處理完畢，最後呼叫processFormSubmission()方法，子類別要重新定義這個方法，以完成使用者的請求。</small></li>
+      </ol>
+      <small><br>
+
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/AbstractFormController.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

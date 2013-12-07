@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/GenericAgain.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:01 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>再來看看角括號</title></head>
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 再來看看角括號</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在 </small><small><big><a href="Generic.html"><small>那些角括號是什麼東西</small></a></big> 看過泛型</small><small>（Generic）</small><small>的基礎，接下來再深入探討一下。</small><small>考慮你要製作一個節點物件，節點可內含的物件可以指定其型態（就如同List、Set等內含元素可指定型態），你可以使用泛型語法如下進行定義：<br></small><pre>class Node<span style="font-weight: bold;">&lt;T&gt;</span> {<br>    Node&lt;<span style="font-weight: bold;">T</span>&gt; next;<br>    private <span style="font-weight: bold;">T</span> value;<br>    <span style="font-weight: bold;">T</span> getValue() {  <br>        return value;<br>    }<br>    <br>    void setValue(<span style="font-weight: bold;">T</span> value) {<br>        this.value = value;<br>    }<br>}</pre><small><br>你使用&lt;&gt;括住一個代表型態的名稱，之後就可以先使用該名稱來宣告變數，名稱所代表的型態是未定的，你要在建立物件時指定型態，例如指定型態為String：</small><br><pre>public class Main {<br>    public static void main(String[] args) {<br>        Node&lt;<span style="font-weight: bold;">String</span>&gt; first = new Node&lt;<span style="font-weight: bold;">String</span>&gt;();<br>        first.setValue("Justin");<br>        first.next = new Node&lt;<span style="font-weight: bold;">String</span>&gt;();<br>        first.next.setValue("momor");<br>    }<br>}  </pre><small><br>在上例中，將Node定義中的T指定為String，所以getValue()傳回String，而setValue()方法可以接受String，value的型態也是String。你也可以指定別的型態：</small><br><pre>public class Main {<br>    public static void main(String[] args) {<br>        Node&lt;<span style="font-weight: bold;">Integer</span>&gt; first = new Node&lt;<span style="font-weight: bold;">Integer</span>&gt;();<br>        first.setValue(100);<br>        first.next = new Node&lt;<span style="font-weight: bold;">Integer</span>&gt;();<br>        first.next.setValue(200);<br>    }<br>}</pre><small><br>在上例中，將Node定義中的T指定為Integer，所以getValue()傳回Integer，而setValue()方法可以接受Integer，value的型態也是Integer。泛型也可以用在方法定義上，例如在 <a href="../AlgorithmGossip/MultiToOneDim.htm#Scala">多維矩陣轉一維矩陣</a> 的例子中，若想讓方法更一般化，則可以如下撰寫：</small><br><pre>class ArrayUtil {<br>    @SuppressWarnings(value={"unchecked"})<br>    public static <span style="font-weight: bold;">&lt;T&gt;</span> <span style="font-weight: bold;">T</span>[] toOneByColumn(<span style="font-weight: bold;">T</span>[][] array) {<br>        <span style="font-weight: bold;">T</span>[] arr = (<span style="font-weight: bold;">T</span>[]) Array.newInstance(<br>                           array[0].getClass().getComponentType(), <br>                           array.length * array[0].length);<br>        for(int row = 0; row &lt; array.length; row++) { <br>            for(int column = 0; column &lt; array[0].length; column++) { <br>                arr[row + column * array.length] = array[row][column]; <br>            } <br>        }<br>        return arr;<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        Integer[][] arr1 = {<br>                               {1, 2, 3},<br>                               {4, 5, 6}<br>                           };<br>        for(Integer i : ArrayUtil.<span style="font-weight: bold;">&lt;Integer&gt;</span>toOneByColumn(arr1)) {<br>            System.out.println(i);<br>        }<br>        <br>        String[][] arr2 = {<br>                              {"one",  "two",  "three"},<br>                              {"four", "five", "six"}<br>                          };<br>        for(String s : ArrayUtil.<span style="font-weight: bold;">&lt;String&gt;</span>toOneByColumn(arr2)) {<br>            System.out.println(s);<br>        }<br>    }<br>}</pre><small><br>泛型也可以用來宣告不定長度引數，例如：</small><br><pre>public class Main {<br>    public static void main(String[] args) {<br>        Main.&lt;Integer&gt;show(1, 2);<br>        Main.&lt;String&gt;show("one", "two", "three");<br>    }<br>    <br>    static &lt;T&gt; void show(<span style="font-weight: bold;">T...</span> values) {<br>        for(T v : values) {<br>            System.out.println(v);<br>        }<br>    }<br>}</pre><small><br>在定義介面時，也可以使用泛型，例如在</small><small><a href="Foreach.html"><small> <big>神奇的 foreach</big></small></a></small> <small>看過的</small> <a href="http://java.sun.com/javase/6/docs/api/java/util/Iterator.html">java.util.Iterator<small>[E]</small></a>：<br><pre>package java.util;<br><br>public interface Iterator&lt;E&gt; {<br>    boolean hasNext();<br>    E next();<br>    void remove();<br>}</pre><small><br>Iterator[E]可以在使用時宣告A的型態，一個在</small><small><big><small><a href="Foreach.html"><small><big> 神奇的 foreach</big></small></a></small></big></small><small>&nbsp;</small><small><big> <small>看過的例子如下：</small></big> </small><br><pre>import java.util.*;<br>public class Some <span style="font-weight: bold;">implements Iterable&lt;String&gt;</span>{<br>    private String[] strs;<br>    private int index;<br>    public Some(int length) {<br>        strs = new String[length];<br>    }<br>    public void add(String element) {<br>        strs[index++] = element;<br>    }<br><span style="font-weight: bold;">    public Iterator&lt;String&gt; iterator() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        return new Iterator&lt;String&gt;() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   private int index;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   public boolean hasNext() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                       return index &lt; strs.length;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   public String next() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                       return strs[index++];</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   public void remove() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                       strs[index] = null;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   }</span><br style="font-weight: bold;"><span style="font-weight: bold;">               };</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>}</pre><br><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/GenericAgain.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:01 GMT -->
+</html>

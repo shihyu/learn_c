@@ -1,0 +1,502 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ServerSideValidate.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>伺服端表單驗證</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 伺服端表單驗證</a></h1>
+
+
+
+
+
+
+
+
+
+
+&nbsp;
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>驗證使用者的資料是否正確，對於Web應用程式來說是相當重要的，尤其是對一些私密資源的保護，只允許通過驗證的使用者觀看，這種需求對Web應用程式來說處處可見。<br>
+
+      <br>
+
+
+驗證有很多形式，這邊針對兩個部份，一個是<span style="font-weight: bold;">資料完整性驗證</span>，一個是<span style="font-weight: bold;">資料正確性驗證</span>。<br>
+
+      <br>
+
+      </small>
+
+
+      
+      <ul>
+
+        <li><small>資料完整性</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>指的是驗證使用者是否輸入了應用程式所要求的所有訊息，以及訊息的格式是否符合程式要求等等，例如應用程式可能要求使用者同時提供使用者名稱與密碼，並且密碼長度不得少於6個字元。<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>資料正確性驗證</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>是在通過完整性驗證之後的檢查，例如應用程式檢查使用者提供的使用者名稱與密碼是否符合資料庫中的資料。<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+另外，驗證的地點可以是在<span style="font-weight: bold;">伺服端</span>，也可以是在<span style="font-weight: bold;">客戶端</span>。<br>
+
+      <br>
+
+      </small>
+
+      
+      <ul>
+
+        <li><small>客戶端</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>通常是透過JavaScript來完成，驗證工作直接在客戶端進行，不用傳回給伺服端，可以節省網路與伺服器資源。<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>伺服端</small></li>
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>只依賴客戶端驗證是不夠的，畢竟客戶端可能跳過它，所以伺服端也必須驗證資料，這邊要介紹的就是如何使用Struts的表單物件進行伺服端資料驗證。<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+其實很簡單，只要在繼承 <a href="ActionForm.htm">ActionForm</a> 之後，重新定義其validate()方法即可，不過這邊要繞個彎，在不使用Struts標籤的情況下要如何進行這項工作，這麼作的目的，在於讓您更瞭解Struts的運作流程。<br>
+
+      <br>
+
+
+如果您不想繞彎，記得下面的設定若配合Struts <a href="ActionMessage.htm">&lt;html:messages&gt;</a> 標籤的話會很方便的達成。<br>
+
+      <br>
+
+
+首先來看看表單物件如何撰寫：</small>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>UserForm.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar; <br> <br>import java.util.*;<br>import javax.servlet.http.*; <br>import org.apache.struts.action.*;<br>import org.apache.struts.Globals;<br>import org.apache.struts.util.MessageResources;<br><br>public class UserForm extends ActionForm {<br>    private String username;<br>    private String password;<br>    <br>    public void setUsername(String username) { <br>        this.username = username; <br>    } <br>    <br>    public void setPassword(String password) { <br>        this.password = password; <br>    } <br>    <br>    public String getUsername() { <br>        return username; <br>    }<br>    <br>    public String getPassword() {<br>        return password;<br>    } <br>    <br>    public void reset(ActionMapping mapping, <br>                      HttpServletRequest req) {<br>        username = null;<br>        password = null;<br>    }<br>    <br>    public ActionErrors validate(ActionMapping mapping, <br>            HttpServletRequest request) {<br>        <br>        Map errModel = new HashMap();<br>        MessageResources messageResources =<br>            (MessageResources) request.getAttribute(<br>                                    Globals.MESSAGES_KEY);<br>        <br>        if(getUsername() == null || <br>                getUsername().length() &lt; 1) {<br>            String msg = <br>               messageResources.getMessage(<br>                                "error.invalidUsername");<br>            errModel.put("invalidUsername", msg);<br>        }<br>        <br>        if(getPassword() == null || <br>                getPassword().length() &lt; 1) { <br>            String msg = <br>               messageResources.getMessage(<br>                               "error.invalidPassword");<br>            errModel.put("invalidPassword", msg);<br>        }<br>        <br>        if(errModel.get("invalidUsername") == null &amp;&amp;<br>           errModel.get("invalidPassword") == null) {<br>            // no error happened<br>            // return null to proceed the Action<br>            return null;<br>        }<br>        else { <br>            request.setAttribute("errors", errModel);<br>            <br>            // fake codes, just tell RequestProcessor<br>            // not to invoke Action<br>            ActionErrors errors = new ActionErrors(); <br>            errors.add(ActionMessages.GLOBAL_MESSAGE, <br>                    new ActionMessage(""));<br>            return errors;<br>        }<br>    }<br>}</pre>
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span><small>主要看看validate()方法，在這邊從request中取得了 <a href="MessageResources.htm">MessageResources</a> ，這是為了能取得訊息資源檔中的訊息設定，程式中使用一個Map物件來記錄我們所發現的錯誤訊息，最後將之設定給request。<br>
+
+      <br>
+
+
+validate()方法要傳回一個ActionErrors物件，它是ActionMesssage的子類別，如果想直接使用它們，搭配 Struts &lt;html:messages&gt;標籤會比較方便，但這邊先不打算使用。<br>
+
+      <br>
+
+
+RequestProcessor
+根據validate()傳回的ActionErrors是否為null或其中是否包括有ActionMessage物件，以判斷是不是要進一步呼叫
+Action
+物件，如果發現傳回的不是null或是包括有ActionMessage，中斷接下來呼叫Action的流程，而直接跳到您所設定好的驗證錯誤頁面。<br>
+
+      <br>
+
+
+雖然這邊不打算使用&lt;html:messages&gt;標籤，但希望上面的流程可以正常運作，所以當發現有錯誤時，仍然回傳一個 ActionErrors物件，這只是用來滿足RequestProcessor完成上述流程運作所需要的條件。。<br>
+
+      <br>
+
+
+當傳回的ActionErrors不為null，則會跳至您所設定的驗證錯誤頁面，這是在struts-config.xml中設定：</small>
+
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>struts-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;<br><br>&lt;!DOCTYPE struts-config PUBLIC<br>"-//Apache Software Foundation//DTD Struts Configuration 1.2//EN"<br>"http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd"&gt;<br><br>&lt;struts-config&gt;<br>    &lt;form-beans&gt; <br>        &lt;form-bean <br>            name="userForm" <br>            type="onlyfun.caterpillar.UserForm"/&gt; <br>    &lt;/form-beans&gt;<br><br>    &lt;action-mappings&gt; <br>        &lt;action <br>            path="/login" <br>            type="onlyfun.caterpillar.LoginAction"<br>            name="userForm"<br>            validate="true"<br>            input="/WEB-INF/pages/fail.jsp"&gt;<br>             <br>            &lt;forward<br>                name="helloUser" <br>                path="/WEB-INF/pages/hello.jsp"/&gt;<br>            &lt;forward<br>                name="loginFail" <br>                path="/WEB-INF/pages/fail.jsp"/&gt;<br>        &lt;/action&gt;         <br>    &lt;/action-mappings&gt; <br>    <br>    &lt;message-resources parameter="resources/messages"/&gt;<br>&lt;/struts-config&gt;</pre>
+
+
+      <br>
+
+      <small>
+您必須設定&lt;action&gt;的validate屬性為true，這樣RequestProcessor才會執行validate()方法， &lt;action&gt;的input屬性則是讓您設定當驗證錯誤時，應該導向的頁面。<br>
+
+      <br>
+
+
+進一步的，看看LoginAction中要作的正確性驗證，它檢查使用者名稱與密碼是否符合設定：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li>LoginAction.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br>import javax.servlet.http.*; <br>import org.apache.struts.action.*; <br>import org.apache.struts.util.MessageResources;<br>import org.apache.commons.beanutils.PropertyUtils;<br><br>public class LoginAction extends Action {<br>    public ActionForward execute(ActionMapping mapping,<br>                             ActionForm form,<br>                             HttpServletRequest request, <br>                             HttpServletResponse response) <br>                                throws Exception { <br>        <br>        String username = (String) <br>                  PropertyUtils.getSimpleProperty(<br>                                     form, "username"); <br>        String password = (String) <br>                  PropertyUtils.getSimpleProperty(<br>                                     form, "password"); <br>        <br>        request.setAttribute("username", username);<br>        <br>        if(username.equals("caterpillar") &amp;&amp; <br>                  password.equals("1234")) {<br>            return mapping.findForward("helloUser"); <br>        }<br>        <br>        Map msgModel = new HashMap();<br>        <br>        MessageResources messageResources = <br>            (MessageResources) getResources(request);<br>        <br>        msgModel.put("namePasswordMismatched", <br>                messageResources.getMessage(<br>                        "message.namePasswordMismatched"));<br>        <br>        request.setAttribute("messages", msgModel);<br>        <br>        return mapping.findForward("loginFail"); <br>    }<br>}</pre>
+
+
+      <br>
+
+      <small>
+這邊使用了PropertyUtils輔助類別，這可以很方便的幫您取出表單物件中的屬性。這邊還需要一個訊息檔案來管理訊息：</small><br>
+
+
+      
+      <ul>
+
+        <li>message_zh_TW.properties</li>
+
+      
+      </ul>
+
+
+      
+      <pre># errors<br>error.invalidUsername=使用者名稱不得為空！<br>error.invalidPassword=密碼不得為空！<br> <br># messages<br>message.namePasswordMismatched=使用者名稱或密碼輸入錯誤！</pre>
+
+
+      <br>
+
+      <small>
+來看看fail.jsp，這邊並沒有使用Struts標籤，所以只要如下取出訊息即可：</small><br>
+
+
+      
+      <ul>
+
+        <li>fail.jsp</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;html&gt;<br>&lt;head&gt; <br>&lt;title&gt;Sorry!&lt;/title&gt; <br>&lt;/head&gt; <br>&lt;body&gt;<br>    &lt;H1&gt;<br><br>    ${errors["invalidUsername"]}&lt;br&gt;<br>    ${errors["invalidPassword"]}&lt;br&gt;<br>    ${messages["namePasswordMismatched"]}<br>    <br>    &lt;/H1&gt;<br>    &lt;p&gt;<br>    &lt;a href='/strutsapp/html/form.htm'&gt;Login&lt;/a&gt;<br>&lt;/body&gt; <br><br>&lt;/html&gt;</pre>
+
+
+      <br>
+
+      <small>
+form.htm與hello.jsp就使用 使用 <a href="ActionForm.htm">ActionForm</a> 中介紹過的即可。<br>
+
+      <br>
+
+
+在不使用ActionMessage與Struts標籤的情況下，撰寫這樣的程式好像複雜了一些，如果您想省點功夫，您可以考慮搭配 <a href="ActionMessage.htm">&lt;html:messages&gt;</a> 來撰寫這個程式。</small>
+      <br>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ServerSideValidate.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

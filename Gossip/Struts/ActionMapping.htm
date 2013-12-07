@@ -1,0 +1,472 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ActionMapping.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>簡介 ActionMapping</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 簡介 ActionMapping</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+在Struts 1.1之後，很多的請求分配職責都落入了RequestProcessor的手上，ActionServlet則專責於組態配置及應用程式模組的設定。<br>
+
+      <br>
+
+
+
+RequestProcessor採取 Command
+模式，根據客戶端的請求呼叫Action物件，其分配的依據是客戶端請求的URI及Action物件的對應，這些都設定在struts-
+config.xml的&lt;action-mappings&gt;標籤中。<br>
+
+      <br>
+
+
+
+&lt;action-mappings&gt;用來描述一組ActionMapping物件，當中的每一個&lt;action&gt;
+標籤都對應一個ActionMapping物件，當客戶端發出請求至RequestProcessor時，請求的URI對應於&lt;
+action&gt;標籤中設定的path屬性，而要呼叫的Action物件則是type屬性所設定的物件，RequestProcessor會將請求的
+執行工作交給該Action物件來執行。<br>
+
+      <br>
+
+
+
+舉個例子來說，如果&lt;action-mappings&gt;設定如下的話：<br>
+
+      </small>
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">...</span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&lt;action-mappings&gt;</span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;action </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; path="/hello" </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="onlyfun.caterpillar.HelloAction"&gt; </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/action&gt; </span><br style="font-weight: bold;">
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;action </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; path="/login" </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="onlyfun.caterpillar.LoginAction"&gt; </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/action&gt; </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;&lt;/action-mappings&gt;</span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp;...</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+則當請求的URL是http://localhost:8080/strutsapp/hello.do時，
+RequestProcessor會使用/hello.do來確認對應的ActionMapping物件（實際上即找出path設定為/hello的
+&lt;action&gt;標籤），該ActionMapping物件告知RequestProcessor要使用
+onlyfun.caterpillar.HelloAction，而後RequestProcessor會將呼叫HelloAction的
+execute()方法，並將ActionMapping物件當作參數傳遞給它。<br>
+
+      <br>
+
+
+
+RequestProcessor實際上將工作交給Action物件，Action物件在第一次被呼叫時產生，之後一直使用它。
+Action物件的運作必須提供一些參數來描述工作的細節，諸如使用哪一個ActionForm、forward對象的查找、錯誤發生時的頁面對象等等，
+Struts將這些資訊包裝在ActionMapping中，並作為參數傳送給Action物件，以使得Action在需要相關的資訊時可以從
+ActionMapping中取得。<br>
+
+      <br>
+
+
+
+如果客戶端請求了struts-config.xml中沒有定義的資源，Struts會丟出 404 Invalid path 的訊息，您可以撰寫匿名的ActionMapping來提供自己的錯誤訊息：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;action&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; name="error" </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; unknown="true" </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; forward="/WEB-INF/pages/error.jsp"/&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;...</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+如果RequestProcessor遇到沒有定義的Action請求，則會交由匿名的ActionMapping來處理。<br>
+
+      <br>
+
+
+
+在&lt;action&gt;標籤中會使用&lt;forward&gt;標籤，用於查找與指定Action物件完成之後，要轉發請求回應的去向，您使
+用ActionMapping的findForward()方法來查找對應的forward對象，另外，您也可以提供一個&lt;
+global-forward&gt;設定，如果ActionMapping的findForward()方法找不到指定的forward對象，則會查找
+&lt;global-forward&gt;所設定的對象，一個設定例子如下：</small>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>struts-config.xml</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>... <br> &lt;struts-config&gt; <br>    &lt;global-forwards&gt; <br>        &lt;forward <br>            name="welcome" <br>            path="/welcome.do"/&gt; <br>    &lt;/global-forwards&gt;<br><br>    &lt;action-mappings&gt;<br>        &lt;action<br>             path="/welcome <br>             type="onlyfun.caterpillar.WelcomeAction"&gt; <br>             &lt;forward<br>                 name="welcomeUser" <br>                 path="/WEB-INF/pages/welcome.jsp"/&gt; <br>         &lt;/action&gt;<br>        &lt;action<br>             path="/hello" <br>             type="onlyfun.caterpillar.HelloAction"&gt; <br>             &lt;forward<br>                 name="helloUser" <br>                 path="/WEB-INF/pages/hello.jsp"/&gt; <br>         &lt;/action&gt;<br>     &lt;action-mappings&gt;<br> &lt;/struts-config&gt; <br>... </pre>
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span><br>
+
+      <small>
+
+&lt;global-forward&gt;提供一個全局可查找的forward對象，在Struts的組態中，可以為每一個&lt;
+action&gt;標籤指定forward對象，如果在&lt;action&gt;中查找不到，就會至&lt;global-
+forward&gt;中查找。對於一些共同使用的forward對象，您可以集中於&lt;global-forward&gt;中管理。<br>
+
+      <br>
+
+
+
+在Struts中，ActionMapping繼承自ActionConfig，大部份的屬性定義實際上都已經在ActionConfig
+中完成，在將來ActionMapping有可能會被AutoConfig所取代，不過在目前ActionMapping仍舊存在，根據線上API的說
+明，存在的事實基於它仍是現存應用程式所使用到的類別</small>
+
+。 </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ActionMapping.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

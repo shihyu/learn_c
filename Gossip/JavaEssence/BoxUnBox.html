@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/BoxUnBox.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:25 GMT -->
+<head>
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>要裝箱還是拆封</title></head>
+<body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 要裝箱還是拆封</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>有
+個事實是，Java中有些型態不是物件。像是int、double、boolean等基本資料型態不是物件，而有些時候，你希望它們以物件的方式存在，例
+如當你需要在Collection中放些整數時，但Collection要持有的都是物件，不是基本型態，這時候你必須將基本型態包裝為物件。<br><br>最基本的作法就是透過包裹類別，例如：<br></small><div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i = new Integer(300);</small><br></div><small><br>你也可以透過包裹類別的<span style="font-weight: bold;">valueOf()</span>方法來傳回包裝了基本型態資料的物件，例如：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Integer i = Integer.valueOf(1);</span></small><br></div><small><br>如果打算包裹的資料動作頻繁，而且是在某個小範圍之內，建議使用valueOf()方法，例如Integer的valueOf()方法，在JDK5之前，是這麼寫的：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public static Integer valueOf(int i) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; final int offset = 128;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; if (i &gt;= -128 &amp;&amp; i &lt;= 127) { // must cache </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return IntegerCache.cache[i + offset];</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return new Integer(i);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+
+      </div>
+
+      <small><br><br><span style="font-weight: bold;">也就是在-128到127之間所產生的包裹物件，將會放到快取中重複使用</span>，而在JDK6之後，則是這麼寫的：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public static Integer valueOf(int i) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; if(i &gt;= -128 &amp;&amp; i &lt;= IntegerCache.high)</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return IntegerCache.cache[i + 128];</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; else</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return new Integer(i);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br></div><small><br><span style="font-weight: bold;">IntegerCache.high預設是127，所以預設是</span></small><small><span style="font-weight: bold;">在-128到127之間所產生的包裹物件，將會放到快取中重複使用（可以透過設置屬性java.lang.Integer.IntegerCache.high來設定IntegerCache.high的值）</span>。<br><br>在JDK5之後，增加了自動裝箱語法，</small><small>您可以這麼寫：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i = 10;</span></small></div><small><br></small><small>自動裝箱運用的方法還可以如下：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int i = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer j = i;</span></small></div><br><small>可以自動裝箱，也可以<span style="font-weight: bold;">自動拆箱（Unboxing）</span>，例如下面這樣寫是可以的：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer foo1 = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int foo2 = foo1;</span></small></div><br><small>在運算時，也可以自動裝箱與拆箱，例如：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(i + 10);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(i++);</span></small></div><br><small>編譯器會自動幫您進行自動裝箱與拆箱，即10會先被裝箱，然後在i + 10時會先拆箱，進行加法運算；i++該行也是先拆箱再進行遞增運算，反組譯以上的程式，就可以看到，<span style="font-weight: bold;">所謂的裝箱，就是透過valueOf()方法，所謂的拆箱，就是透過intValue()</span>：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Integer integer = Integer.valueOf(10);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">System.out.println(integer.intValue() + 10);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Integer integer1 = integer;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Integer integer2 = integer = Integer.valueOf(integer.intValue() + 1);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">System.out.println(integer1);</span></small><br></div><small><br></small><small>自動裝箱與拆箱語法很方便，但在運行階段您還是瞭解Java的語義，例如下面的程式是可以通過編譯的：<br>
+
+
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i = null;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int j = i;</span><br>
+
+
+
+
+      </small></div>
+
+
+      <small>
+
+&nbsp;<br>
+
+
+
+
+語法是在編譯時期是合法的，但是在運行時期會有錯誤，因為null表示 i 沒有參考至任何的物件實體，它可以合法的指定給物件參考名稱，但null值對於基本型態 j 的指定是不合法的，上面的寫法在運行時會出現NullPointerException的錯誤。<br>
+
+
+
+
+      <br>
+
+
+
+
+再來看一個，先看看程式，你以為結果是如何？<br>
+
+
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i1 = 100;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i2 = 100;</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">if (i1 == i2) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("i1 == i2");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">else </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("i1 != i2");</span><br>
+
+
+
+
+      </small></div>
+
+
+      <small>
+
+&nbsp;<br>
+
+
+
+
+以自動裝箱與拆箱的機制來看，我想你會覺得結果是顯示"i1 == i2"，您是對的！那麼下面這個你覺得結果是什麼？<br>
+
+
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i1 = 200;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i2 = 200;</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">if (i1 == i2) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("i1 == i2");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">else </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("i1 != i2");</span><br>
+
+
+
+
+      </small></div>
+
+
+      <small>
+
+&nbsp;<br>
+
+
+
+
+      預設結果是顯示"i1 != i2"，這有些令人訝異，語法完全一樣，只不過改個數值而已，結果卻相反。<br>
+
+
+
+
+      <br>
+
+
+
+
+這與<span style="font-weight: bold;">'=='運算子</span>的比較有關，'=='可用來比較兩個基本型態的變數值是否相等，事實上'=='也用於判斷兩個物件變數名稱是否參考至同一個物件。所以'=='可以比較兩個基本型態的變數值是否相等，也可以判斷兩個物件變數的參考物件是否相同。先前說過，對於值從<span style="font-weight: bold;">-128到127</span>之間的值，它們被裝箱為Integer物件後，預設會存在記憶體之中被重用，所以當值在100，使用'=='進行比較時，i1 與 i2實際上參考至同一個物件。<br>
+
+
+
+
+      <br>
+如果超過了從-128到127之間的值，預設被裝箱後的Integer物件並不會被重用，即相當於每次都新建一個Integer物件，所以當值在
+200，使用'=='進行比較時，i1與i2參考的是不同的物件。但是如果你啟動程式時，設定了
+java.lang.Integer.IntegerCache.high屬性的話，結果又不同了：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">java -Djava.lang.Integer.IntegerCache.high=300 Main</span></small><br></div><small><br>這次又顯示i1 == i2了，因為你藉由</small><small>java.lang.Integer.IntegerCache.high屬性設定要快取的範圍。</small><br><small>
+
+
+
+
+      <br>
+
+
+
+
+所以不要過份依賴自動裝箱與拆箱，您還是必須知道基本型態與物件的差異，上面的程式最好還是依正規的方式來寫，而不是依賴編譯蜜糖（Compiler sugar），例如當值為200時，必須改寫為以下才是正確的。<br>
+
+
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i1 = 200;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i2 = 200;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">if (i1.equals(i2)) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("i1 == i2");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">else </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("i1 != i2");</span><br>
+
+
+
+
+      </small></div>
+
+
+      <small>
+
+&nbsp;<br>
+
+
+
+
+      <br>
+
+
+
+
+結果這次是顯示"i1 == i2"了，使用這樣的寫法，相信您也會比較放心一些。</small><br><small><br><br></small><small><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/BoxUnBox.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:25 GMT -->
+</html>

@@ -1,0 +1,704 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ProxyServer.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>代理伺服器</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 代理伺服器</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>代理伺服器的作用，就是作為連線來源端與連線目的端之間的橋樑，代理伺服器的功能有很多種，有作為網頁快取的代理伺服器，有作為防火牆功能的代理伺服器，有作為訊息過濾的代理伺服器等等。 <br>
+
+
+
+      <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">客戶端 &lt;----&gt;&nbsp; 代理伺服器&nbsp; &lt;----&gt;&nbsp; 目的伺服器 </span></small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+其實將代理伺服器的功能簡化至最基本時，其功能就是將連線來源端的訊息轉接至連線目的端，而連線目的端的訊息轉接至連線來源端，對連線來源端而言，代理伺服器像是伺服端，對連線目的端而言，代理伺服器像是客戶端。 <br>
+
+
+
+      <br>
+
+
+
+訊息在代理伺服器時所作的處理，決定了代理伺服器的種類，如果它將網頁暫存在伺服器本身的儲存裝置，並供客戶端直接比對下載，它的作用就是網頁代理伺服
+器，如果它的作用在過濾進出代理伺服器的訊息，它的作用就有些像是防火牆的功能（當然必須實作低階的封包過濾才算真正是），您也可以設計一個代理伺服器，
+專門過濾掉網頁上的廣告部份。 <br>
+
+
+
+      <br>
+
+
+
+下面這個程式即實作一個最簡單的代理伺服器功能，它將連線來源端的訊息轉接至連線目的端，而連線目的端的訊息轉接至連線來源端，為了簡化程式邏輯，這個程式一次只能服務一個連線： <br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>SimpleProxyServer.java</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*; <br>import java.net.*; <br><br>public class SimpleProxyServer { <br>    public static void main(String[] args) { <br>        String host;      // 代理的對象主機 <br>        int remotePort;   // 代理對象連接埠 <br>        int localPort;    // 本機連接埠 <br>        BufferedReader reader; <br><br>        try { <br>            reader = new BufferedReader(<br>                    new InputStreamReader(System.in)); <br><br>            System.out.println("SimpleProxyServer v0.1"); <br>            System.out.print("代理的對象主機: "); <br>            host = reader.readLine(); <br>            System.out.print("代理對象連接埠: "); <br>            remotePort = Integer.parseInt(reader.readLine()); <br>            System.out.print("本機連接埠: "); <br>            localPort = Integer.parseInt(reader.readLine()); <br><br>            runServer(host, remotePort, localPort); <br>        } <br>        catch(IOException e) { <br>            System.err.println(e.toString()); <br>        } <br>    } <br><br>    public static void runServer(String host, int remotePort, int localPort) { <br>        try { <br>            System.out.printf("Proxy伺服器啟動...Port %d%n", localPort); <br>            ServerSocket proxyServerSkt = new ServerSocket(localPort); <br>            System.out.println("OK!"); <br><br>            while(true) { <br>                System.out.println("傾聽客戶端....."); <br>                Socket clientSkt = proxyServerSkt.accept(); <br>                System.out.printf("%s 連線..%n", <br>                        clientSkt.getInetAddress().toString()); <br><br>                // 客戶端的來往訊息 <br>                final BufferedInputStream clientInputStream = <br>                    new BufferedInputStream(clientSkt.getInputStream()); <br>                PrintStream clientPrintStream = <br>                    new PrintStream(clientSkt.getOutputStream()); <br><br>                // 伺服端的來往訊息 <br>                final Socket serverSkt = new Socket(host, remotePort); <br>                BufferedInputStream fromServerMsg = new BufferedInputStream( <br>                                  serverSkt.getInputStream()); <br>                final PrintStream serverPrintStream = new <br>                              PrintStream(serverSkt.getOutputStream()); <br><br>                // 由客戶端至伺服器的訊息溝通執行緒 <br>                Thread client = new Thread() { <br>                    public void run() { <br>                        int read; <br>                        try { <br>                            while((read = clientInputStream.read()) != -1) { <br>                                serverPrintStream.write(read); <br>                                serverPrintStream.flush(); <br>                            } <br>                        } <br>                        catch(IOException e) {} <br><br>                        // 中斷至伺服器的連線 <br>                        try { <br>                            serverSkt.close(); <br>                        } <br>                        catch(IOException e) { <br>                            System.err.println(e.toString()); <br>                        } <br>                    } <br>                }; <br><br>                client.start(); <br><br>                // 主執行緒為由伺服器至客戶端的訊息 <br>                int read; <br>                try { <br>                    while((read = fromServerMsg.read()) != -1) { <br>                        clientPrintStream.write(read); <br>                        clientPrintStream.flush(); <br>                    } <br>                } <br>                catch(IOException e) {<br>                    e.printStackTrace();<br>                }; <br><br>                // 中斷與客戶端的連線 <br>                try { <br>                    clientSkt.close(); <br>                } <br>                catch(IOException e) { <br>                    e.printStackTrace(); <br>                } <br>            } <br>        } <br>        catch(UnknownHostException e) { <br>            e.printStackTrace(); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    } <br>}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>您有幾個方法可以測試這個程式，首先啟動程式： <br>
+
+
+
+      </small></span><span class="postbody"></span><span class="postbody"></span><small><span class="postbody"></span></small><span class="postbody"></span>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">SimpleProxyServer v0.1 <br>
+
+
+代理的對象主機: ptt.cc<br>
+
+
+代理對象連接埠: 23 <br>
+
+
+本機連接埠: 23<br>
+
+
+Proxy伺服器啟動...Port 23..OK! <br>
+
+
+傾聽客戶端.....<br>
+
+
+
+
+
+
+
+
+
+            </span></small><span style="color: rgb(255, 255, 255);"></span></td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span><small>範例在本機8888連接埠啟動了代理伺服器，代理的對象是ptt.cc，接下來您可以直接telnet localhost 23，本機所啟動的代理伺服器會幫您連線至ptt.cc，接下來的一切操作就與BBS操作相同了。 <br>
+
+
+      <br>
+
+
+您也可以讓它代理一個Web伺服器，假設本機代理伺服器連接埠也設定為8080，當使用瀏覽器鍵入http://localhost:8080/時，您會發現瀏覽器自動連接至代理的網頁伺服器。 <br>
+
+
+      </small><span class="postbody"></span><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ProxyServer.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+</html>

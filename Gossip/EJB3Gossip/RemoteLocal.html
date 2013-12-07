@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/RemoteLocal.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:25 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>@Remote 與 @Local</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: @Remote 與 @Local</a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>當
+客戶端要使用Session
+Bean，而客戶端位於容器以外的JVM時，則必須定義其服務介面為遠端介面，即使用@Remote標示，容器會在部署之後，在Bytecode上加入繼
+承java.rmi.Remote的動作，你也可以直接自行繼承java.rmi.Remote，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Remote</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface HelloBean extends java.rmi.Remote {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+不在程式上直接撰寫繼承java.rmi.Remote的好處之一，是不需要撰寫丟出java.rmi.RemoteException，由於實際上
+Bean的取得會是透過RMI機制，因此你的方法呼叫若有參數或傳回值，它們都必須實作java.io.Serializable介面。<br>
+
+
+      <br>
+
+
+由於@Remote底層會使用RMI，所以會有RMI呼叫的負擔，若可以的話，應避免使用@Remote而使用@Local，當客戶端使用Session
+Bean，而客戶端與Session Bean是位於同一個容器（同一個JVM）時，則可以標示Session Bean為@Local。<br>
+
+
+      <br>
+
+
+一個Session Bean的服務介面不能同時是遠端及本地介面，也就是不能同時標示為@Remote及@Local，即以下是不允許的：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; text-decoration: line-through;"><span style="font-weight: bold;">@Local<br>
+
+
+      </span></small><small style="font-family: Courier New,Courier,monospace; text-decoration: line-through;"><span style="font-weight: bold;">@Remote</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; text-decoration: line-through;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; text-decoration: line-through;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace; text-decoration: line-through;"><span style="font-weight: bold;">public interface HelloBean {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; text-decoration: line-through;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; text-decoration: line-through;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; text-decoration: line-through;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; text-decoration: line-through;"><span style="font-weight: bold;">}</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+若要讓一個Session Bean實作同時是遠端及本地，則你要分別定義遠端介面及本地介面，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Local</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface HelloBeanLocal {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; String doHello(String message);<br>
+
+
+&nbsp; &nbsp; ....<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+
+
+      <br>
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Remote</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface HelloBeanRemote {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; String doHello(String message);</span></small><br>
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+然後讓Session Bean同時實作這兩個介面，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">@Stateless(name="ejb/HelloFacade")</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class HelloBeanImpl implements <span style="color: rgb(255, 0, 0);">HelloBeanLocal, HelloBeanRemote</span> {</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public String doHello(String message) {</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return message + "processed....";</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+本地介面取用時可以使用HelloBeanLocal介面，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@EJB</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">private <span style="color: rgb(255, 0, 0);">HelloBeanLocal</span> hello;</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+而遠端介面取用時可以使用HelloBeanRemote介面：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">InitialContext context = new InitialContext();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Object obj = context.lookup("onlyfun.caterpillar.<span style="color: rgb(255, 0, 0);">HelloBeanRemote</span>");</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 0, 0);">HelloBeanRemote</span> hello = (HelloBeanRemote) <br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PortableRemoteObject.narrow(</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">obj, <span style="color: rgb(255, 0, 0);">HelloBeanRemote.class</span>);</small><br>
+
+
+      </div>
+
+
+      <small><br>
+您也可以在定義介面時，不使用@Local、@Remote，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface HelloBeanLocal {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; String doHello(String message);</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+
+&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface HelloBeanRemote {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; String doHello(String message);</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <small><br>
+而在實作Session Bean時再加以指定@Local、@Remote：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Local({HelloBeanLocal.class})<br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Remote({HelloBeanRemote.class})</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@Stateless(name="ejb/HelloFacade")</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class HelloBeanImpl implements HelloBean {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public String doHello(String message) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return message + "processed....";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+      <br>
+      <br>
+      <br>
+
+
+      </small></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/RemoteLocal.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:25 GMT -->
+</html>

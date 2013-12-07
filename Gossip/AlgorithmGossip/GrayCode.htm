@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/GrayCode.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>格雷碼（Gray Code）</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 格雷碼（Gray Code）</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+
+      
+      <h2>說明</h2>
+
+      <small>
+
+Gray Code是數列集合，每個數使用二進位來表示，假設使用n位元來表示每個數好了，任兩數間只有一個位元不同。例如以下為3位元的Gray Code：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">000 001 011 010 110 111 101 100</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+由定義可以知道，Gray Code的順序並非唯一。例如將以上數列反過來寫，也是一組Gray Code：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">100 101 111 110 010 011 001 000</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+Gray Code是由貝爾實驗室的Frank Gray在1940年代提出的，用來在使用PCM（Pusle Code Modulation）方法傳送訊號時避免出錯，並於1953年三月十七日取得美國專利。</small><br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+由於Gray Code相鄰兩數間只改變一個位元，所以可觀察Gray Code從1變0或從0變1時的位置。假設有4位元的Gray Code如下：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">0000 0001 0011 0010 0110 0111 0101 0100</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">1100 1101 1111 1110 1010 1011 1001 1000</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+觀察奇數項的下個數變化時，發現無論是第幾個奇數項Gray Code，下個數永遠只改變最右邊的位元。如果是1就改為0，如果是0就改為1。例如第一項0000變為0001，第三項0011變為0010，第五項0110變為0111，依此類推。<br>
+
+      <br>
+
+
+
+觀察偶數項的下個數變化時，發現所改變的位元，是由右邊算來首個1的左邊位元。例如第二項0001下個數變為0011，第四項0010下個變為0110，第六項0111變為0101，依此類推。<br>
+
+      <br>
+
+
+
+以上兩個變化規則是固定的，無論位元數為何；所以只要判斷是奇數項還是偶數項Gray Code，就可以決定要改變哪個位元值。<br>
+
+      <br>
+
+
+
+將2位元的Gray Code當作平面座標來看，可以構成一個四邊形。可以發現從任一頂點出發，繞四邊形周長繞一圈，所經過的頂點座標就是一組Gray Code，所以可得到四組Gray Code。<br>
+
+      <br>
+
+
+
+同樣地，將3位元Gray Code當作立體座標來看的話，可以構成一個正立方體。可以從任一頂點出發，將所有邊走過，並不重複經過頂點的話，所經過的頂點座標順序組合也是一組Gray Code。 </small>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>void doGray(int, void (*)(int*, int));<br>void init(int*, int);<br>int firstOneOf(int*, int);<br>void next(int*, int, int);<br>int isLast(int*, int);<br>void print(int*, int);<br><br>int main(void) { <br>    int length;<br>    printf("輸入位元數："); <br>    scanf("%d", &amp;length); <br><br>    doGray(length, print);<br>    <br>    return 0; <br>} <br><br>void doGray(int length, void (*take)(int*, int)) {<br>    int* gray = malloc(length * sizeof(int));<br>    init(gray, length);<br>    take(gray, length);<br>    int isOdd = 1; <br>    while(!isLast(gray, length)) { <br>        next(gray, length, isOdd);<br>        isOdd = 1 - isOdd;<br>        take(gray, length);<br>    }<br>    free(gray);<br>}<br><br>void init(int* gray, int length) {<br>    int i;<br>    for(i = 0; i &lt; length; i++) { gray[i] = 0; } <br>}<br><br>int firstOneOf(int* gray, int length) {<br>    int j;<br>    for(j = 0; gray[j] == 0; j++);<br>    return j;<br>}<br><br>void next(int* gray, int length, int isOdd) {<br>    int i = isOdd ? 0 : firstOneOf(gray, length) + 1;<br>    gray[i] = !gray[i];<br>}<br><br>int isLast(int* gray, int length) {<br>    int i;<br>    for(i = 0; i &lt; length - 1; i++) if(gray[i]) { return 0; }<br>    return gray[i];<br>}<br><br>void print(int* gray, int length) {<br>    int j;<br>    for(j = length - 1; j &gt;= 0; j--) { printf("%d", gray[j]); }<br>    printf("\n"); <br>}<br></pre>
+
+
+
+
+
+      
+      <br><ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>import java.util.*;<br><br>public class Gray {<br>    private int[] code;<br>    private boolean isOdd;<br>    public Gray(int[] code, boolean isOdd) {<br>        this.code = code; <br>        this.isOdd = isOdd;<br>    }<br>    <br>    public int lastIndexOf(int elem) {<br>        int i;<br>        for(i = code.length - 1; code[i] != elem; i--);<br>        return i;<br>    }<br>    <br>    public Gray next() {<br>        int[] next = new int[0];<br>        int i = (isOdd ? code.length : lastIndexOf(1)) - 1;<br>        if(i != -1) {<br>            next = Arrays.copyOf(code, code.length);<br>            next[i] = 1 - next[i];<br>        }<br>        return new Gray(next, !isOdd);<br>    }<br>    <br>    public boolean isEmpty() { return code.length == 0; }<br><br>    public String toString() {<br>        return Arrays.toString(code) + (isOdd ? " odd" : " even");<br>    }<br>    <br>    public static List&lt;Gray&gt; gray(int length) {<br>        List&lt;Gray&gt; grays = new ArrayList&lt;&gt;();<br>        Gray gray = new Gray(new int[4], true);<br>        do { grays.add(gray); } while(!(gray = gray.next()).isEmpty());<br>        return grays;<br>    }<br><br>    public static void main(String[] args) {<br>        for(Gray gray : gray(4)) { System.out.println(gray); }<br>    }<br>}</pre>
+
+
+
+      <br><ul><li><a name="Python"></a>Python</li></ul><pre>class Gray:<br>    def __init__(self, code, isOdd):<br>        self.code = code<br>        self.isOdd = isOdd<br>        <br>    def lastIndexOf(self, elem):<br>        return len(self.code) - 1 - self.code[::-1].index(elem)<br>    <br>    def next(self):<br>        i = (len(self.code) if self.isOdd <br>                            else self.lastIndexOf(1)) - 1<br>        return Gray(<br>            [] if i == -1 \<br>               else self.code[0:i] + [1 - self.code[i]] + self.code[i + 1:],<br>               not self.isOdd)<br>    <br>    def isEmpty(self):<br>        return len(self.code) == 0<br>               <br>    def __str__(self):<br>        return str(self.code) + (' odd' if self.isOdd else ' even')<br>        <br>def gray(length):<br>    def successors(gray):<br>        nx = gray.next()<br>        return [] if nx.isEmpty() else [nx] + successors(nx)<br>            <br>    init = Gray([0] * length, True)<br>    return [init] + successors(init)<br>    <br>for code in gray(4):<br>    print(code</pre>
+
+
+
+      <br><ul><li><a name="Scala"></a>Scala</li></ul><pre>class Gray(code: List[Int], isOdd: Boolean) {<br>    def next = {<br>        val i = (if(isOdd) code.size else code.lastIndexOf(1)) - 1<br>        new Gray(<br>            if(i == -1) Nil<br>            else code.take(i) ++ <br>             ((1 - code(i)) :: code.drop(i + 1)), !isOdd)<br>    }<br>    def isEmpty = code.isEmpty<br>    override def toString = <br>        code.toString.replace("List", if(isOdd) "Odd  " else "Even ")<br>}<br><br>def gray(length: Int) = {<br>    def successors(gray: Gray): List[Gray] = {<br>        val nx = gray.next<br>        if(nx.isEmpty) Nil else nx :: successors(nx)<br>    }<br>    <br>    val init = new Gray((for(i &lt;- 0 until length) yield 0).toList, true)<br>    init :: successors(init)<br>}<br><br>gray(4).foreach(println)<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>class Gray<br>    def initialize(code, isOdd)<br>        @code = code<br>        @isOdd = isOdd<br>    end<br>    <br>    def next<br>        i = @isOdd ? @code.size - 1 : @code.rindex(1) - 1<br>        Gray.new(i == -1 ? [] : <br>            @code.take(i) + [1 - @code[i]] + @code.drop(i + 1), !@isOdd)<br>    end<br>    <br>    def empty?<br>        @code.empty?<br>    end<br>    <br>    def to_s<br>        "#{@code.to_s + (@isOdd ? ' odd' : ' even')}"<br>    end<br>end<br>        <br>def gray(length)<br>    successors = -&gt;(gray) {<br>        nx = gray.next<br>        nx.empty? ? [] : [nx] + successors.call(nx)<br>    }<br>            <br>    init = Gray.new([0] * length, true)<br>    [init] + successors.call(init)<br>end<br>    <br>gray(4).each do |code|<br>    print("#{code}\n")<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript<br>
+        </li>
+      </ul>
+      <pre>function Gray(code, isOdd) {<br>    this.code = code;<br>    this.isOdd = isOdd;<br>}<br><br>Gray.prototype.toString = function() {<br>    return this.code + (this.isOdd ? ' odd' : ' even');<br>};<br><br>Gray.prototype.next = function() {<br>    var i = (this.isOdd ? this.code.length : this.code.lastIndexOf(1)) - 1;<br>    return new Gray(i === -1 ? [] : <br>               this.code.slice(0, i)<br>                        .concat([1 - this.code[i]])<br>                        .concat(this.code.slice(<br>                            i + 1, this.code.length)), <br>           !this.isOdd);<br>};<br><br>function gray(length) {<br>    function successors(gray) {<br>        var nx = gray.next();<br>        return nx.code.length === 0 ? [] : [nx].concat(successors(nx));<br>    }<br>    var init = new Gray(new Array(length + 1)<br>                                .join(0)<br>                                .split('')<br>                                .map(function() {return 0;}), <br>               true);<br>    return [init].concat(successors(init));<br>}<br><br>gray(4).forEach(function(code) {<br>    alert(code);<br>});<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>data Code = Gray [Int] Bool<br><br>instance Show Code where<br>    show (Gray code isOdd) = <br>        show code ++ if isOdd then " odd" else " even"<br><br>lastIndexOfOne code =<br>    if last code == 1 then length code - 1<br>    else lastIndexOfOne $ init code<br>    <br>succ' (Gray digits isOdd) =<br>    let i = if isOdd then length digits - 1<br>            else lastIndexOfOne digits - 1<br>    in Gray (next digits i) (not isOdd)<br>    where <br>        next digits i =<br>            if i == -1 then []<br>            else take i digits ++ <br>                 ((1 - digits !! i) : drop (i + 1) digits)<br><br>gray length =<br>    let hd = Gray (replicate length 0) (True)<br>    in hd : successors hd<br>    where<br>        successors gray@(Gray digits isOdd) =<br>            let nx@(Gray code _) = succ' gray<br>            in if code == [] then []<br>               else nx : (successors nx)<br>               <br>main = sequence [print code | code &lt;- gray 4]<br></pre>
+<br>
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>     
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/GrayCode.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+</html>

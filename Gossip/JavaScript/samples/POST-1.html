@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/POST-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:19 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                var xhr = window.XMLHttpRequest && 
+                      (window.location.protocol !== 'file:' 
+                          || !window.ActiveXObject) ?
+                       function() {
+                           return new XMLHttpRequest();
+                       } :
+                       function() {
+                          try {
+                             return new ActiveXObject('Microsoft.XMLHTTP');
+                          } catch(e) {
+                             throw new Error('XMLHttpRequest not supported');
+                          }
+                       };
+                
+                function param(obj) {
+                    var pairs = [];
+                    for(var name in obj) {
+                        var pair = encodeURIComponent(name) + '=' + 
+                                   encodeURIComponent(obj[name]);
+                        pairs.push(pair.replace('/%20/g', '+'));
+                    }
+                    return pairs.join('&');
+                }
+                
+                function ajax(option) {
+                    option.type = option.type || 'GET';
+                    option.header = option.header || {
+                      'Content-Type':'application/x-www-form-urlencoded'};
+                    option.callback = option.callback || function() {};
+                    
+                    if(!option.url) {
+                        return;
+                    }
+                    
+                    var request = xhr();
+                    request.onreadystatechange = function() {
+                        option.callback.call(request, request);
+                    };
+                    
+                    var body = null;
+                    var url = option.url;
+                    if(option.data) {
+                        if(option.type === 'POST') {
+                            body = param(option.data);
+                        }
+                        else {
+                            url = option.url + '?' + param(option.data) 
+                                     + '&time=' + new Date().getTime();
+                        }
+                    }
+                    
+                    request.open(option.type, url);
+                    for(var name in option.header) {
+                        request.setRequestHeader(
+                                name, option.header[name]);
+                    }
+                    request.send(body);
+                }
+                
+                document.getElementById('url').onblur = function() {
+                    ajax({
+                        type: 'POST',
+                        url : 'POST-1.php',
+                        data: {url : document.getElementById('url').value},
+                        callback: function(request) {
+                            if(request.readyState === 4) {
+                                if(request.status === 200) {
+                                    var message = '';
+                                    if(request.responseText 
+                                         === 'urlExisted') {
+                                        message = 'URL 已存在';
+                                    }
+                                    document.getElementById('message')
+                                        .innerHTML = message;
+                                }
+                            }
+                        }
+                    });
+                };
+            };
+        </script>        
+    </head>
+    <body>
+        新增書籤：<br>
+        網址：<input id="url" type="text">
+        <span id="message" style="color:red"></span><br>
+        名稱：<input type="text">
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/POST-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:19 GMT -->
+</html>

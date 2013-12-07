@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/ModelTest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:20 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>模型測試</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror model unit test" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 模型測試<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>Rails預設有三個執行環境，即development、test與production，有幾個檔案與這三個執行環境有關，config/database.yml中預設定義了三個執行環境所使用的資料庫設定：</p>
+      <ul>
+        <li>database.yml</li>
+      </ul>
+      <pre>development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000<br></pre>
+      <p>建立新專案時，預設就會產生development.sqlite3與test.sqlite3，後者是作為測試時的資料庫，其中的資料在每次測試時都會根據相關設定重建，確保每次測試的資料來源一致。config/environments中也分別有development.rb、production.rb、test.rb，分別作為三個環境的組態檔案。<br>
+      </p>
+      <p>Rails的應用程式通常與資料庫有密切互動，所以實際上進行測試時若存在相關模型測試檔案，就必須在資料庫中有對應的表格定義。例如 <a
+          href="Test.html">認識 Rails 測試</a> 中的例子，如果已像 <a href="Scaffold.html">觀摩 Scaffold</a> 中產生了<span
+          class="courier">Message</span>模型，即使你指定執行rational_number_test.rb，也會發生以下錯誤，告訴你沒有對應的表格：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ ruby -Itest test/unit/rational_number_test.rb<br>
+              Loaded suite test/unit/rational_number_test<br>
+              Started<br>
+              <br>
+              RationaNumberlTest:<br>
+              &nbsp;&nbsp;&nbsp; ERROR rational number addition (0.00s) <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ActiveRecord::StatementInvalid: Could not find table 'messages'<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /usr/local/lib/ruby/gems/1.9.1/gems/activerecord-3.1.3/lib/active_record/connection_adapters/sqlite_adapter.rb:439:in `table_structure'<br>
+              <br>
+              &nbsp;&nbsp;&nbsp; ERROR rational number subtraction (0.00s) <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ActiveRecord::StatementInvalid: Could not find table 'messages'<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /usr/local/lib/ruby/gems/1.9.1/gems/activerecord-3.1.3/lib/active_record/connection_adapters/sqlite_adapter.rb:439:in `table_structure'<br>
+              <br>
+              <br>
+              Finished in 0.007304 seconds.<br>
+              <br>
+              2 tests, 0 assertions, 0 failures, 2 errors, 0 skips<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      在執行測試之前，得執行過rake db:migrate，產生schema.rb之後，再執行rake db:test:load，將schema.rb中的結構記錄載入測試資料庫，之後若有任何遷移變更，可執行rake db:test:prepare，將遷移變更載入測試資料庫，再執行相關測試。<br>
+      <br>
+      來看看一個測試<span class="courier">Message</span>的例子：<br>
+      <ul>
+        <li>message_test.rb</li>
+      </ul>
+      <pre>require 'test_helper'
+
+class MessageTest &lt; ActiveSupport::TestCase
+    test "should not save message without name" do
+        assert !Message.new.save, "Saved the message without name"
+    end
+end<br></pre>
+      <br>
+      <span class="courier">這測試了Message儲存時，必須驗證name是否設定，接著修改Message定義</span>：<br>
+      <ul>
+        <li>message.rb</li>
+      </ul>
+      <pre>class Message &lt; ActiveRecord::Base
+    validates :name, :presence =&gt; true
+end<br></pre>
+      &nbsp;<br>
+      如果在測試之前，資料庫中必須有某些既存的資料，那麼你可以定義fixtures，也就是範例資料，這是test/fixtures資料夾中定義YAML，例如：<br>
+      <ul>
+        <li>messages.yml</li>
+      </ul>
+      <pre>justin:
+  name: Justin Lin
+  title: About Java TWO 2012
+  content: When will it be?
+ 
+momor:
+  name: Momor Huang
+  title: Kindle DX Arrived
+  content: As title<br></pre>
+      <br>
+      Rails預設會載入test/fixtures中的YAML，原因在於 <a href="Test.html">認識 Rails 測試</a> 中看過的，test_helper.rb中定義了<span
+        class="courier">fixtures :all</span>（如果只想指定載入特定YAML，可以指定如<span class="courier">fixtures :messages</span>），以便進行單元測試與功能測試，載入的過程有：<br>
+      <ol>
+        <li>移除資料庫表格中對應fixtures的資料</li>
+        <li>將fixtures中的資料重新載入表格</li>
+        <li>將fixtures中的資料載入對應變數</li>
+      </ol>
+      <p>以上例而言，可以透過messages方法來取得對應的fixture，例如messages(:justin)可取得YAML中定義的資料，取得的物件是模型的型態，例如messages(:justin)就是取得Message物件。</p>
+      <p>fixture定義檔中，也可以使用Erb，內嵌的Ruby程式碼會先被處理。例如：</p>
+      <ul>
+        <li>messages.yml</li>
+      </ul>
+      <pre>&lt;% sample_content = "blah..blah" %&gt;<br>justin:
+  name: Justin Lin
+  title: About Java TWO 2012
+  content: &lt;%= sample_content %&gt;
+ 
+momor:
+  name: Momor Huang
+  title: Kindle DX Arrived
+  content: &lt;%= sample_content %&gt;
+</pre>
+      <p></p>
+      <p>實際上除了如上使用ruby指令逐一執行測試之外，也可以使用rake test執行所有已定義的測試，如果僅想執行單元測試，可以執行rake test:units，這會執行test/unit中定義的單元測試，類似地，執行rake test:functionals可執行test/functional中定義的功能測試，執行rake test:integration可執行test/integration中定義的功能測試。</p>
+      <p><br>
+      </p>
+      <p><br>
+      </p>
+      <p><br>
+      </p>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/ModelTest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:20 GMT -->
+</html>

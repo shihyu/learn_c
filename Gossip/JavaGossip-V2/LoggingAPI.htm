@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/LoggingAPI.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:57 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>簡介 Logging</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 簡介 Logging</a></h1>
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>程式中不免會出現錯誤，當錯誤發生時，您可以使用System.err.println()或是
+System.out.println()在主控台
+（Console）顯示訊息給使用者，如果是在視窗程式中，可能是使用訊息方塊，如果是在網頁程式中，則顯示一個錯誤訊息頁面，除了提供錯誤訊息之外，您還可能想將錯誤訊息以某種方式儲存下來，以供使用者或是程式人員debug時使用。<br>
+
+      <br>
+
+
+
+
+在Java中的<span style="font-weight: bold;">java.util.logging</span>套件提供了一系列的logging工具，如果您只是要簡單的記錄一些訊息，就可以使用
+它，這些logging工具<span style="font-weight: bold;">在J2SE 1.4之後加入了Java標準中</span>，不必額外配備logging元件就可以運行於標準的Java平台上是它的好處。<br>
+
+      <br>
+
+
+像是簡單的主控台訊息顯示或是記錄檔案的輸出，java.util.logging下都提供了一些預設的工具，您不必親自撰寫這些工具。<br>
+
+      <br>
+
+
+來看一個簡單的例子，假設您的程式在啟動時必須提供參數，如果使用者沒有提供參數，則必須顯示警示訊息：</small>
+
+
+
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li> LoggingDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.util.logging.*; <br><br>public class LoggingDemo {<br>    public static void main(String[] args) {<br>        Logger logger = Logger.getLogger("LoggingDemo");<br>        <br>        try {<br>            System.out.println(args[0]);<br>        }<br>        catch(ArrayIndexOutOfBoundsException e) {<br>            logger.warning("沒有提供執行時的引數！");<br>        }                <br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+執行結果：</small><span style="font-family: &quot;Courier New&quot;,Courier,monospace;"></span><br>
+
+
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">2005/2/3 上午 10:50:54 onlyfun.caterpillar.LoggingDemo main<br>
+
+
+警告: 沒有提供執行時的引數！&nbsp;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+
+
+如上所示的，您簡單的透過<span style="font-weight: bold;">Logger的靜態方法getLogger()</span>取得Logger物件，之後就可以運用它的方法進行訊
+息輸出，預設是從主控台輸出訊息，除了您提供的訊息之外，Logger還自動幫您收集了相關的訊息，像是類別與套件名稱，執行該段程式的執行緒名稱以及訊
+息產生的時間等，這比下面這個程式所提供的訊息豐富的多了。</small><br>
+
+
+
+      
+      <ul>
+
+        <li> LoggingDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>public class LoggingDemo {<br>    public static void main(String[] args) {<br>        try {<br>            System.out.println(args[0]);<br>        }<br>        catch(ArrayIndexOutOfBoundsException e) {<br>            System.err.println("沒有提供執行時的引數！");<br>        }                <br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+您不用親自實作，直接使用 java.util.logging
+工具，就可以擁有一些預設的記錄功能，作為中大型系統來說，java.util.logging
+工具可能不足，但作為一個簡單的記錄工具，java.util.logging 是個可以考慮的對象。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/LoggingAPI.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:57 GMT -->
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/ConstructorDestructor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>建構函式、解構函式</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip:&nbsp;建構函式、解構函式</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+在定義類別時，您可以使用建構函式（Constructor）來進行物件的初始化，而在物件釋放資源之前，您也可以使用「解構函式」
+（Destructor）來進行一些善後的工作，例如清除動態配置的記憶體，或像是檔案的儲存、記錄檔的撰寫等等。 <br>
+
+
+      <br>
+
+
+
+在C++中建構函式是與類別名稱相同的方法成員，且沒有傳回值，而解構函式則是在與類別名稱同的方法成員前加上~，不具有參數，也不具有傳回值，例如：
+      </small>
+      <br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>SafeArray.h</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>class SafeArray { <br>public: <br>    // 建構函式 <br>    SafeArray(int); <br>    // 解構函式 <br>    ~SafeArray();<br> <br>    int get(int); <br>    void set(int, int);<br> <br>    int length; <br>private:<br>    int *_array; <br><br>    bool isSafe(int i); <br>};</pre>
+
+
+
+      <br>
+
+
+      <small>
+在這個類別定義中，您定義了一個「安全陣列」類別，並定義有一個建構函式可以指定陣列長度，可依長度來動態產生陣列，而解構函式中則要負責清除動態產生的
+陣列資源，以釋放動態配置時所配置的資源。在定義類別時如果沒有定義任何的建構函式，則會自動產生一個沒有參數、沒有實作內容的建構函式，以下是對
+SafeArray定義的一個實現：</small><br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>SafeArray.cpp</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>#include "SafeArray.h"<br><br>// 動態配置陣列<br>SafeArray::SafeArray(int len) {<br>    length = len;<br>    _array = new int[length];<br>}<br><br>// 測試是否超出陣列長度<br>bool SafeArray::isSafe(int i) {<br>    if(i &gt;= length || i &lt; 0) {<br>        return false;<br>    } <br>    else {<br>        return true;<br>    }<br>}<br><br>// 取得陣列元素值<br>int SafeArray::get(int i) {<br>    if(isSafe(i)) {<br>        return _array[i];<br>    }<br> <br>    return 0;<br>}<br><br>// 設定陣列元素值<br>void SafeArray::set(int i, int value) {<br>    if(isSafe(i)) {<br>        _array[i] = value;<br>    }<br>}<br><br>// 刪除動態配置的資源<br>SafeArray::~SafeArray() {<br>    delete [] _array;<br>}</pre>
+
+
+
+      <span class="postbody"></span> <small><span style="color: rgb(255, 255, 255);">&nbsp;0 1 2 3 4 5 6 7
+8 9</span></small><br>
+
+
+      <small>
+下面的程式示範如何使用這個SafeArray類別：</small><br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>main.cpp</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include "SafeArray.h"<br>using namespace std; <br><br>int main() {<br>    SafeArray safeArray(10);<br> <br>    for(int i = 0; i &lt; safeArray.length; i++) {<br>        safeArray.set(i, (i + 1) * 10);<br>    }<br> <br>    for(int i = 0; i &lt; safeArray.length; i++) {<br>        cout &lt;&lt; safeArray.get(i) &lt;&lt; " ";<br>    }<br>    cout &lt;&lt; endl;<br> <br>    return 0; <br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>
+執行結果：</small></span><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">10 20 30 40 50 60 70 80
+90 100</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+      <small>
+在建構函式的初始化設定語法中，您還可以使用成員初始化列表（Member initialization list），例如：</small><br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>SafeArray.cpp</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>#include "SafeArray.h"<br><br>SafeArray::SafeArray(int len) : length(len) {<br>    _array = new int[length];<br>}<br><br>...略</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>
+要被初始化的成員跟在參數列之後，要被設定給成員的引數被放在括號中，如果有多個成員要初始化，則以逗號分隔。<br>
+
+
+      </small>
+      </span><small><br>
+
+
+
+關於解構函式還有一個問題，如果沒有定義解構函式時，程式如何結束物件？答案是程式會自動建立一個沒有實作內容的解構函式並自動於適當的時機執行。</small>  </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+      <br>
+
+
+
+<br>
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/ConstructorDestructor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ApplyUnApply.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>apply() 與 unapply() 方法</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: apply() 與 unapply() 方法</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你可以定義 </small><small><big><a href="CaseClass.html"><small>案例類別（Case class）</small></a></big></small><small>，那麼你可以運用模式比對的特性，完成如下的變數指定動作：<br></small><pre>case class Apple(price: Int, weight: Int)<br><br>val apple = Apple(10, 20)<br>val Apple(p, w) = apple<br>println(p)    // 10<br>println(w)    // 20</pre><small><br></small><small>定義案例類別的問題之一，在於你必須實際定義出暴露出成員資訊的</small><small>類別，有時這並不是你想要的，或者你沒辦法定義出這樣的類別。舉個例子來說，字串就是一個例子，如果你有一些學生資料，每筆是"B123456,Justin,Kaohsiung"的格式，你希望分別取得學號、名稱與出生地資訊，基本的作法是：<br></small><pre>def separate(s: String) = {<br>    val parts = s.split(",")<br>    if(parts.length == 3) (parts(0), parts(1), parts(2)) else None<br>}<br><br>val (number, name, addr) = separate("B123456,Justin,Kaohsiung")<br>println(number)   // B123456<br>println(name)     // Justin<br>println(addr)     // Kaohsiung</pre><small><br>&nbsp;separate()函式傳回三個元素的Tuple，你運用了Tuple模式比對的特性傳回分割後的個別字串。然而，如果你可以這麼作的話，程式看起來會更清楚：<br></small><pre>// 這有可能嗎？<br>val Student(number, name, addr) = "B123456,Justin,Kaohsiung"</pre><small><br>這看起來像是上面案例類別的模式比對，問題是字串根本不是案例類別，怎麼可能這麼作？事實上是可行的，你可以定義一個單例物件如下，就可以執行這樣的模式比對功能：<br></small><pre><span style="font-weight: bold;">object Student {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def unapply(str: String): Option[(String, String, String)] = {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        val parts = str.split(",")</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if (</span><span style="font-weight: bold;">parts</span><span style="font-weight: bold;">.length == 3) Some(</span><span style="font-weight: bold;">parts</span><span style="font-weight: bold;">(0), </span><span style="font-weight: bold;">parts</span><span style="font-weight: bold;">(1), </span><span style="font-weight: bold;">parts</span><span style="font-weight: bold;">(2)) else None</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>val <span style="font-weight: bold;">Student(number, name, addr)</span> = "B123456,Justin,Kaohsiung"<br>println(number)   // B123456<br>println(name)     // Justin<br>println(addr)     // Kaohsiung</pre><small><br>unapply()方法可以接受你所提供的物件（在這邊是以字串為例，事實上可以是任何類型），經用你所定義的unapply()方法內容處理後傳回Option物件，事實上，在上例的例子中，編譯器會作如下的處理：<br></small><pre>val Some((number, name, addr)) = Student.unapply("B123456,Justin,Kaohsiung")</pre><small><br>unapply()方法稱之為<span style="font-weight: bold;">提取方法（Extraction method）</span>，而像Student這樣只具備提取方法的物件稱之為<span style="font-weight: bold;">提取器（Extractor）</span>，提取器讓你對非案例類別的實例，也</small><small>可以</small><small>進行模式比對，例如搭配match運算式的一個例子如下：<br></small><pre>val students = List(<br>                   "B123456,Justin,Kaohsiung",<br>                   "B98765,Monica,Kaohsiung",<br>                   "B246819,Bush,Taipei"<br>               )<br><br>students.foreach(_ match {<br>    case Student(nb, name, addr) =&gt; println(nb + ", " + name + ", " + addr)<br>})</pre><small><br>也可以進一步使用模式比對的各種特性，例如使用 </small><small><a href="VariableBindingPatternGuard.html">模式防護（Pattern guard）</a>，找出住在高雄的學生姓名：<br></small><pre>val students = List(<br>                   "B123456,Justin,Kaohsiung",<br>                   "B98765,Monica,Kaohsiung",<br>                   "B246819,Bush,Taipei"<br>               )<br>               <br>students.foreach(_ match {<br>    case Student(_, name, addr) if addr == "Kaohsiung" =&gt; println(name)<br>    case _ =&gt;<br>})</pre><small><br>相對於unapply()方法，apply()方法則稱之為<span style="font-weight: bold;">注入方法（Injection method）</span>，提取方法與注入方法通常同時存在（但非必要），apply()方法與unapply()方法的作用通常是相反的，例如：<br></small><pre>object Student {<br>    def apply(number: String, name: String, addr: String) = {<br>        number + "," + name + "," + addr<br>    }<br>    <br>    def unapply(str: String) = {<br>        val parts = str.split(",")<br>        if (parts.length == 3) Some(parts(0), parts(1), parts(2)) else None<br>    }<br>}</pre><small><br>例如，你可以讀入文字檔案，使用提取方法來取出每筆資料的學號、名稱、出生地，反過來，如果輸入學生資料的</small><small>學號、名稱、出生地，利用注入方法組合字串，再寫出至檔案中：<br></small><pre>val number = readLine<br>val name = readLine<br>val addr = readLine<br><br>val data = Student(number, name, addr)<br>println(data)   // 實際也許是寫入文字檔案</pre><small><br></small><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ApplyUnApply.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

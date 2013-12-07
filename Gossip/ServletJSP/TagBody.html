@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/TagBody.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:03 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>處理本體執行結果</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 處理本體執行結果<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果想要在本體執行過後，取得執行的結果並作適當處理該如何進行？例如實作一個<big> </big></small><a href="SimpleTagAttrBody.html"><small>處理標籤屬性與本體</small></a> <small>的<span style="font-family: Courier New,Courier,monospace;">&lt;f:toUpperCase&gt;</span>標籤？只是繼承<span style="font-family: Courier New,Courier,monospace;">TagSupport的話沒辦法達到這個目的！你可以繼承<span style="font-weight: bold;">javax.servlet.jsp.tagext.BodyTagSupport</span>類別來實作，先來看看其類別架構：<br>
+      <img style="width: 547px; height: 627px;" alt="" src="images/TagBody-1.png"><br>
+      <br>
+在上圖中多了BodyTag介面，其繼承自IterationTag介面，新增了<span style="font-weight: bold;">setBodyContent()</span>與<span style="font-weight: bold;">doInitBody()</span>兩個方法，而BodyTagSupport則繼承自TagSupport類別，將<span style="font-weight: bold;">doStartTag()</span>的預設傳回值改為<span style="font-weight: bold;">EVAL_BODY_BUFFERED</span>，並針對BodyTag介面作了簡單的實作。<br>
+      <br>
+在繼承BodyTagSupport類別實作自訂標籤時，如果doStartTag()傳回了EVAL_BODY_BUFFERED，則會呼叫setBodyContent()方法而後呼叫doInitBody()方法，接著再執行標籤本體，也就是流程將變成以下：<br>
+      <img style="width: 612px; height: 451px;" alt="" src="images/TagBody-2.png"><br>
+      <br>
+基本上，在使用BodyTagSupport實作自訂標籤時，並不需要去重新定義setBodyContent()與doInitBody()方法，只需要知道這兩個方法執行過後，在doAfterBody()或doEndTag()方法中，就可以透過<span style="font-weight: bold;">getBodyContent()</span>取得一個<span style="font-weight: bold;">BodyContent</span>物件（Writer的子物件），這個物件中包括本體內容執行後的結果，例如透過BodyContent的<span style="font-weight: bold;">getString()</span>方法，就可以字串的方式傳回執行後的本體內容。<br>
+      <br>
+如果要將加工後的本體內容輸出使用者的瀏覽器，通常會在doEndTag()中使用pageContext的getOut()取得JspWriter物
+件，然後利用它來輸出內容至使用者的瀏覽器。如果在doAfterBody()中使用pageContext的getOut()方法所取得的物件，與
+getBodyContent()所取得的其實是相同的物件。如果在doAfterBody()中，要取得與doEndTag()中透過
+pageContext的getOut()取得的JspWriter物件，則必須透過BodyContent的<span style="font-weight: bold;">getEnclosingWriter()</span>方法。<br>
+      <br>
+原因可以在</span>JSP<span style="font-family: Courier New,Courier,monospace;">轉
+譯後的Servlet程式碼中找到。如果doStartTag()傳回EVAL_BODY_BUFFERED，則會使用PageContext的
+pushBody()將目前的JspWriter置入堆疊中，並傳回一個BodyContent物件，而後呼叫setBodyContent()並傳入這
+個BodyContent物件，然後呼叫doInitBody()方法，而在呼叫doEndTag()方法前，如果先前doStartTag()傳回
+EVAL_BODY_BUFFERED，則會呼叫PageContext的popBody()，將原本的JspWriter從堆疊中取出。<br>
+      <br>
+以下使用BodyTagSupport類別來實作出 </span></small><a href="SimpleTagAttrBody.html"><small>處理標籤屬性與本體</small></a> <small><span style="font-family: Courier New,Courier,monospace;">的&lt;f:toUpperCase&gt;標籤處理器作為示範：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package cc.openhome;<br><br>import java.io.IOException;<br>import java.util.logging.Level;<br>import java.util.logging.Logger;<br>import javax.servlet.jsp.JspException;<br>import javax.servlet.jsp.tagext.BodyTagSupport;<br><br>public class ToUpperCaseTag extends BodyTagSupport {<br>    @Override<br>    public int doEndTag() throws JspException {<br>        String upper = this.getBodyContent().getString().toUpperCase();<br>        try {<br>            pageContext.getOut().write(upper);<br>        } catch (IOException ex) {<br>            Logger.getLogger(ToUpperCaseTag.class.getName())<br>                    .log(Level.SEVERE, null, ex);<br>        }<br>        return EVAL_PAGE;<br>    }<br>} <br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+在這邊於doEndTag()中透過getBodyContent()取得BodyContent物件，並呼叫其getString()取得執行過後的標
+籤本體內容，再進行轉字母為大寫的動作。轉換後的本體內容，則透過pageContext的getOut()取得JspWriter進行輸出。<br>
+      <br>
+      </span>記得在TLD檔案中定義標籤：<span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small>
+      <ul>
+        <li><small>f.tld</small></li>
+      </ul>
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"<br>   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee<br>   web-jsptaglibrary_2_0.xsd"&gt;<br>    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;<br>    &lt;short-name&gt;f&lt;/short-name&gt;<br>    &lt;uri&gt;http://openhome.cc/jstl/fake&lt;/uri&gt;<br>    // 略...<br>    &lt;tag&gt;<br>        &lt;name&gt;toUpperCase&lt;/name&gt;<br>        &lt;tag-class&gt;cc.openhome.ToUpperCaseTag&lt;/tag-class&gt;<br>        &lt;body-content&gt;JSP&lt;/body-content&gt;<br>    &lt;/tag&gt;<br>&lt;/taglib&gt; <br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+接著就如同 </span></small><a href="SimpleTagAttrBody.html"><small>處理標籤屬性與本體</small></a> <small><span style="font-family: Courier New,Courier,monospace;">的示範，可以如下使用這個標籤：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;f:toUpperCase&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;f:forEach var="name" items="${names}"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${name} &lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/f:forEach&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/f:toUpperCase&gt;</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      <br>
+      <br>
+      </span>
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/TagBody.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:10 GMT -->
+</html>

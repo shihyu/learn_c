@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/Class.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>定義類別</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: 定義類別<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Python中要定義類別非常的簡單，例如你可以定義一個帳戶（Account）類別：<br>
+      </small>
+      <pre><span style="font-weight: bold;">class Account:</span><br style="font-weight: bold;"><span style="font-weight: bold;">    pass</span><br><br>def deposit(acct, amount):<br>    if amount &lt;= 0:<br>        raise ValueError('must be positive')<br>    acct.balance += amount<br>       <br>def withdraw(acct, amount):<br>    if amount &lt;= acct.balance:<br>        acct.balance -= amount<br>    else:<br>        raise RuntimeError('balance not enough')<br>        <br><span style="font-weight: bold;">acct = Account()</span><br style="font-weight: bold;"><span style="font-weight: bold;">acct.number = '123-456-789'</span><br style="font-weight: bold;"><span style="font-weight: bold;">acct.name = 'Justin'</span><br style="font-weight: bold;"><span style="font-weight: bold;">acct.balance = 0</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">print(acct.number)    # 123-456-789</span><br style="font-weight: bold;"><span style="font-weight: bold;">print(acct.name)      # Justin</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">deposit(acct, 100)</span><br style="font-weight: bold;"><span style="font-weight: bold;">print(acct.balance)   # 100</span><br style="font-weight: bold;"><span style="font-weight: bold;">withdraw(acct, 50)</span><br style="font-weight: bold;"><span style="font-weight: bold;">print(acct.balance)   # 50</span><br style="font-weight: bold;"></pre>
+      <small><br>
+      </small><small>上例中，<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">class</span>用來定義一個類別，現在還沒有要定義類別特性（Property）等，所以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">pass</span>先略過。要建立類別的實例（Instance），直接呼叫<span style="font-family: Courier New,Courier,monospace;">Account()</span>來建立。建立物件之後，你可以直接在物件上添增特性，透過<span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> . </span>來存取特性。<br>
+      <br>
+      </small><small>上面這個例子的帳號、名稱、餘額是在程式碼中自行建立，並透過函式來作存提款的動作。事實上，你可以將物件建立後的初始化動作，以及會用到的相關操作定義在類別之中。來看看下面這個例子：<br>
+      </small>
+      <pre>class Account:<br>    def __init__(self, number, name):<br>        self.number = number<br>        self.name = name<br>        self.balance = 0<br>        <br>    def deposit(self, amount):<br>        if amount &lt;= 0:<br>            raise ValueError('must be positive')<br>        self.balance += amount<br>        <br>    def withdraw(self, amount):<br>        if amount &lt;= self.balance:<br>            self.balance -= amount<br>        else:<br>            raise RuntimeError('balance not enough')</pre>
+      <small><br>
+      </small><small>這個類別已包含幾個Python中定義類別的觀念。首先是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def __init__(self, number, name):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; self.number = number</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; self.name = name</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; self.balance = 0</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">__init__</span>這個特定的名稱，用來定義類別的實例建立之後，要進行的初始化動作。第一個<span style="font-weight: bold;">self</span></span>參數代表建立的類別實例，在Python中，實例可操作的方法，<span style="font-family: Courier New,Courier,monospace;">第一個參數必須明確作為接受實例之用，慣例上取名為self名稱。__init__之後則可指定初始化時所必須給定的資料。在上面的例子中，會在建立的實例上增加number、name與balance特性。</span></small><small>你可以用以下方式來建構物件：<br></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">acct = Account('123-456-789', 'Justin')</span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span><br>
+      </small><small>每個建構出來的<span style="font-family: Courier New,Courier,monospace;">Account</span>實例，都會擁有自己的資料狀態，可以直接透過物件及<span style="font-weight: bold;"> . </span>來存取特性：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">print(acct.number)&nbsp;&nbsp;&nbsp; # 123-456-789</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">print(acct.name)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # Justin</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;"></small><br>
+      </div>
+      <small><br>
+再來看到方法（Method）定義：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">def deposit(self, amount):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; if amount &lt;= 0:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; raise ValueError('must be positive')</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; self.balance += amount</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">def withdraw(self, amount):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; if amount &lt;= self.balance:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.balance -= amount</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; else:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; raise RuntimeError('balance not enough')</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </div>
+      <small><br>
+同樣的道理，</small><small>在Python中，實例可操作的方法，<span style="font-family: Courier New,Courier,monospace;">第一個參數必須明確作為接受實例之用，之後若要在方法中存取物件特性或呼叫物件方法，則必須明確以傳入的物件搭配.運算，例如self.balance這樣的方式。以下則是呼叫方法的幾個例子：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">acct.deposit(100)</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">print(acct.balance)&nbsp;&nbsp; # 100</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">acct.withdraw(50)</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">print(acct.balance)&nbsp;&nbsp; # 50</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span>在Python中，函式是物件，對於定義在類別中的方法也是一種函式，自然你也可以將之指定給別的變數。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">acct1 = Account('123-456-789', 'Justin')<br>
+      <span style="color: red;">deposit1 = acct1.deposit</span><br style="color: red;">
+      <span style="color: red;">withdraw1 = acct1.withdraw</span><br>
+deposit1(100)<br>
+withdraw1(50)<br>
+print(acct1.balance)<br>
+      <br>
+acct2 = Account('987-654-321', 'Momor')<br>
+      <span style="color: red;">deposit2 = acct2.deposit</span><br style="color: red;">
+      <span style="color: red;">withdraw2 = acct2.withdraw</span><br>
+deposit2(200)<br>
+withdraw2(100)<br>
+print(acct2.balance)<br>
+      <br>
+      <span style="color: red;">acct1.deposit = acct2.deposit</span><br>
+acct1.deposit(1000)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 你其實是將錢存到 acct2 去<br>
+print(acct1.balance)&nbsp;&nbsp;&nbsp;&nbsp; # 50<br>
+print(acct2.balance)&nbsp;&nbsp;&nbsp;&nbsp; # 1100<br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small><small>上面這個例子其實也指出了，在Python中，方法總是跟隨著物件而建立，而<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">self</span>是綁定為所建立的物件，別以為將方法指定給另一個物件可以欺騙Python，就如上面的例子中，倒數第三行的結果，其實是將錢存到<span style="font-family: Courier New,Courier,monospace;">acct2</span>所參考的物件。<br>
+      <br>
+      <br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/Class.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

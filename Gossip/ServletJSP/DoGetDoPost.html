@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/DoGetDoPost.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>doGet()、doPost()...</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: doGet()、doPost()...</a></h1><table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+</td><td style="vertical-align: top; width: 690px; text-align: left;"><small>HTTP定義了GET、POST、PUT、DELETE、HEAD、OPTIONS、TRACE等請求方式，如果要使用Servlet處理對應的請求，則要在繼承<span style="font-family: Courier New,Courier,monospace;">HttpServlet</span>之後，重新定義對應的<span style="font-family: Courier New,Courier,monospace;">doXXX()</span>方法：<br>
+      </small>
+      <ul>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doGet()</span> 處理 HTTP GET 請求</small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doPost()</span> </small><small>處理</small><small> HTTP POST 請求</small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doPut()</span> 處理 HTTP PUT 請求</small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doDelete()</span> 處理 HTTP DELETE 請求</small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doHead()</span> 處理 HTTP HEAD 請求</small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doOptions()</span> 處理 HTTP OPTIONS 請求</small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">doTrace()</span> 處理 HTTP TRACE 請求</small></li>
+      </ul>
+      <br>
+      <small>當請求來到容器之後，容器會剖析請求，產生<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest、HttpServletResponse</span>，分別代表該次求在JVM中的請求物件與回應物件，之後呼叫Servlet的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">service()</span>方法，將</small><small><span style="font-family: Courier New,Courier,monospace;">HttpServletRequest、HttpServletResponse物件傳入，而HttpServlet的service()方法實作是（以</span>Tomcat 7<span style="font-family: Courier New,Courier,monospace;">為例）：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; protected void service(HttpServletRequest req, HttpServletResponse resp)</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String method = req.getMethod();</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (<span style="color: red;">method.equals(METHOD_GET)</span>) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; long lastModified = <span style="color: red;">getLastModified(req)</span>;</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (lastModified == -1) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; doGet(req, resp);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+long ifModifiedSince = req.getDateHeader(HEADER_IFMODSINCE);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if (ifModifiedSince &lt; (lastModified / 1000 * 1000)) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+maybeSetLastModified(resp, lastModified);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">doGet(req, resp);</span></span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      <br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else if (<span style="color: red;">method.equals(METHOD_HEAD)</span>) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; long lastModified = getLastModified(req);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; maybeSetLastModified(resp, lastModified);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; doHead(req, resp);</span><br style="font-weight: bold;">
+      <br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else if (<span style="color: red;">method.equals(METHOD_POST)</span>) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; doPost(req, resp);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else if (method.equals(METHOD_PUT)) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 略...<br style="font-weight: bold;">
+      </span><span style="font-weight: bold;"></span><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br>
+      </span></small><br>
+      <small>這也是為何你在繼承<span style="font-family: Courier New,Courier,monospace;">HttpServlet</span>之後，必須實作與HTTP方法對應的<span style="font-family: Courier New,Courier,monospace;">doXXX()</span>方法來處理請求（這是 </small><small><a href="../DesignPattern/TemplateMethod.htm">Template
+
+Method
+模式</a></small><small> 的實現）。如果客戶端發出了你沒有實作的請求又會如何？這必須看<span style="font-family: Courier New,Courier,monospace;">HttpServlet的doXXX()方法如何實作。例如，HttpServlet的doXXX()等方法僅實作以下內容（以doGet()為例）：</span><br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; protected void doGet(HttpServletRequest req, HttpServletResponse resp)</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String protocol = req.getProtocol();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String msg = lStrings.getString("http.method_get_not_supported");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (protocol.endsWith("1.1")) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br>
+      </small><br>
+      <small>舉例來說，如果你在繼承<span style="font-family: Courier New,Courier,monospace;">HttpServlet</span>之後，沒有重新定義<span style="font-family: Courier New,Courier,monospace;">doGet()</span>方法，而客戶端對該Servlet發出了GET請求，則會收到錯誤訊息。</small><br>
+      <br>
+      <small>而在上面<span style="font-family: Courier New,Courier,monospace;">HttpServlet的service()</span>方法中，你可以看到，對於GET請求，你可以實作<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">getLastModified()</span>方法（預設傳回<span style="font-family: Courier New,Courier,monospace;">-1，也就是預設不支援if-modified-since標頭），來決定是否呼叫doGet()方法，getLastModified()</span>方法傳回自1970年1月1日午夜至資源最後一次更新期間所經過的毫秒數。</small><br>
+      <br>
+      <small>在大多數的情境中，Web應用程多只需處理GET與POST請求，至於客戶端發出GET或POST？則可以由以下幾個原則來決定：<br>
+      </small>
+      <ul>
+        <li><small>GET的請求參數會出現在網址列上，所以...</small></li>
+        <ul>
+          <li><small>不適用於敏感資訊的發送，例如密碼資料</small></li>
+          <li><small>網址列可容納的資料有限，所以</small><small>不適合</small><small>太長的資料發送<br>
+            </small></li>
+          <li><small>適用於想要設定為書籤內容的參數，方便使用者直接透過書籤找到想要的內容，例如論譠或搜尋頁面</small></li>
+        </ul>
+      </ul>
+      <ul>
+        <li><small>POST的請求參數放在本體（Body），不會出現在網址列，所以...</small></li>
+        <ul>
+          <li><small>適用於不想要在網址列上看到的敏感資料發送</small></li>
+          <li><small>POST的本體長度不受限，所以適用於檔案上傳等較長資料之發送</small></li>
+          <li><small>由於請求參數不出現在網址列，所以不適用於書籤場合</small></li>
+        </ul>
+      </ul>
+      <br>
+      <small>另外，GET與POST還有一個可以考慮的判斷原則：<br>
+      </small>
+      <ul>
+        <li><small>GET是<span style="font-weight: bold;">等冪（idempotent）</span>操作，也就是多次GET操作，都必須傳回相同的結果，GET請求顧名思義，原則上不影響伺服端的狀態。</small></li>
+        <li><small>POST適用於非等冪操作，POST有可能會改變伺服端的狀態，像是修改資料庫的內容。<br>
+          </small></li>
+      </ul>
+      <br>
+      <small>在GET與POST都需要相同處理的情境下，通常可以在繼承<span style="font-family: Courier New,Courier,monospace;">HttpServlet</span>之後這麼撰寫，在<span style="font-family: Courier New,Courier,monospace;">doGet()、doPost()中都呼叫一個自定義的processRequest()</span>：</small><br>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">protected void doGet(HttpServletRequest req, HttpServletResponse resp)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small>
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException {</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; processRequest(req, resp);</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">protected void doPost(HttpServletRequest req, HttpServletResponse resp)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small>
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException {</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; processRequest(req, resp);</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">protected void processRequest(HttpServletRequest req, HttpServletResponse resp)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small>
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException {</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 處理請求...</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</span></small><br>
+      </div>
+      <br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/DoGetDoPost.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/CustomInsertUpdateDelete.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>自定義 insert、update、delete</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">Hibernate Gossip:
+自定義 insert、update、delete</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>Hibernate
+3的映射文件中新增了&lt;sql-insert&gt;、&lt;sql-update&gt;與&lt;
+sql-delete&gt;三個標籤，您
+可以在這三個標籤中使用SQL自定義您的INSERT、UPDATE、DELETE，也就是儲存、更新、刪除資料時的行為，例如：</small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br>    &lt;class name="onlyfun.caterpillar.User" table="user"&gt; <br><br>        &lt;id name="id" column="id"&gt; <br>            &lt;generator class="native"/&gt; <br>        &lt;/id&gt; <br><br>        &lt;property name="name" column="name"/&gt; <br>        &lt;property name="age" column="age"/&gt; <br><br>        <span style="font-weight: bold;">&lt;sql-insert&gt;</span><br style="font-weight: bold;">            <span style="font-weight: bold;">INSERT INTO user (name, age) VALUES (?, ?)</span><br style="font-weight: bold;">        <span style="font-weight: bold;">&lt;/sql-insert&gt;</span><br style="font-weight: bold;">        <span style="font-weight: bold;">&lt;sql-update&gt;</span><br style="font-weight: bold;">            <span style="font-weight: bold;">UPDATE user SET name=?, age=?, WHERE id=?</span><br style="font-weight: bold;">        <span style="font-weight: bold;">&lt;/sql-update&gt;</span><br style="font-weight: bold;">        <span style="font-weight: bold;">&lt;sql-delete&gt;</span><br style="font-weight: bold;">            <span style="font-weight: bold;">DELETE FROM user WHERE id=?</span><br style="font-weight: bold;">        <span style="font-weight: bold;">&lt;/sql-delete&gt;</span><br> <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+      <br>
+
+
+
+
+      <small>? 對應的順序是映射文件中屬性出現的順序，假設您儲存物件：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session
+= sessionFactory.openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">tx
+= session.beginTransaction();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.save(user);
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">tx.commit();
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+      <span class="postbody">則執行結果中顯示的SQL語句會是您自定義的語句，而不是由
+Hibernate自動生成的語句：</span></small>
+      <br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Hibernate: <br>
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+INSERT INTO user (name, age) VALUES (?, ?)</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+ </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/CustomInsertUpdateDelete.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+</html>

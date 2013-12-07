@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QStackedLayout.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:31 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QStackedLayout</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QStackedLayout</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QStackedLayout可以讓您將元件分成一層一層的堆疊，每一層元件有索引，可以指定索引來表示該顯示哪一層的元件，您也可以直接使用QStackedWidget，它繼承自QWidget，內建的版面配置是QStackedLayout。<br>
+
+      <br>
+
+下面的程式使用QListWidget在視窗左邊提供選項，在視窗右邊使用QStackedLayout放置三層元件，使用者在左邊選取右邊要顯示哪一層元件：<br>
+
+      </small>
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QStackedLayout&gt;<br>#include &lt;QListWidget&gt;<br>#include &lt;QIcon&gt;<br>#include &lt;QLabel&gt;<br>#include &lt;QPushButton&gt;<br>#include &lt;QTextEdit&gt;<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br>    QWidget *window = new QWidget;<br>    window-&gt;setWindowTitle("QStackLayout");<br>    window-&gt;resize(400, 300);<br>    <br>    QHBoxLayout *hBoxLayout = new QHBoxLayout;<br>    <br>    QListWidget *listWidget = new QListWidget;<br>    listWidget-&gt;setFixedWidth(150);<br>    listWidget-&gt;insertItem(0, new QListWidgetItem(<br>                   QIcon("caterpillar_head.jpg"), "caterpillar"));<br>    listWidget-&gt;insertItem(1, new QListWidgetItem(<br>                   QIcon("momor_head.jpg"), "momor"));<br>    listWidget-&gt;insertItem(2, new QListWidgetItem(<br>                   QIcon("bush_head.jpg"), "bush"));<br>                   <br><span style="font-weight: bold;">    hBoxLayout-&gt;addWidget(listWidget);</span><br>    <br><span style="font-weight: bold;">    QStackedLayout *stackedLayout = new QStackedLayout;</span><br><span style="font-weight: bold;">    hBoxLayout-&gt;addLayout(stackedLayout);</span><br>    <br><span style="font-weight: bold;">    stackedLayout-&gt;addWidget(</span><br style="font-weight: bold;"><span style="font-weight: bold;">        new QLabel("&lt;h1&gt;&lt;font color=blue&gt;caterpillar&lt;/font&gt;&lt;/h1&gt;"));</span><br style="font-weight: bold;"><span style="font-weight: bold;">    stackedLayout-&gt;addWidget(new QPushButton("momor"));</span><br style="font-weight: bold;"><span style="font-weight: bold;">    stackedLayout-&gt;addWidget(new QTextEdit);</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    QObject::connect(listWidget, SIGNAL(currentRowChanged(int)),</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     stackedLayout, SLOT(setCurrentIndex(int)));</span><br>                    <br>    window-&gt;setLayout(hBoxLayout);<br>    window-&gt;show();<br>        <br>    return app.exec();<br>}</pre>
+
+      <small><br>
+
+程式中將QListWidget的currentRowChanged() </small><small>Signal</small><small>連接至setCurrentIndex() Slot，currentRowChanged()會傳送目前選取的選項索引，setCurrentIndex()根據所傳送的索引值設定目前QStackedLayout要顯示哪一層元件。<br>
+
+      <br>
+
+程式執行時的畫面如下所示：<br>
+
+      <br>
+
+      <img style="width: 416px; height: 338px;" alt="" src="images/QStackedLayout-1.jpg"><br>
+
+      </small>
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QStackedLayout.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:33 GMT -->
+</html>

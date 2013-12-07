@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/SessionManagement.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>Session 管理</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;Session 管理</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+Session是Hibernate運作的中心，物件的生命週期、事務的管理、資料庫的存取，都與Session息息相關，就如同在編寫JDBC時需關心
+Connection的管理，以有效的方法創建、利用與回收Connection，以減少資源的消耗，增加系統執行效能一樣，有效的Session管理，
+也是Hibernate應用時需關注的焦點。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+Session是由SessionFactory所創建，SessionFactory是執行緒安全的（Thread-safe），您可以讓多個執行緒同
+時存取SessionFactory而不會有資料共用的問題，然而Session則不是設計為執行緒安全的，所以試圖讓多個執行緒共用一個
+Session，將會發生資料共用而發生混亂的問題。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+在Hibernate參考手冊中的 <a href="http://www.hibernate.org/hib_docs/v3/reference/en/html/quickstart.html">Quickstart
+with Tomcat</a>
+中，示範了一個HibernateUtil，它使用了ThreadLocal類別來建立一個Session管理的輔助類，這是Hibernate的
+Session管理一個廣為應用的解決方案，ThreadLocal是 <a href="../DesignPattern/ThreadSpecificStorage.htm">Thread-Specific
+Storage 模式</a> 的一個運作實例。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+由於Thread-Specific
+Stroage模式可以有效隔離執行緒所使用的資料，所以避開Session的多執行緒之間的資料共用問題，以下列出Hibernate參考手冊中的
+HibernateUtil類，事實上它就是 </small><small><a href="FirstHibernate.html">第
+一個 Hibernate</a> 中所使用的 HibernateUtil</small><small>：</small>
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>HibernateUtil.java</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>import org.apache.commons.logging.Log;<br>import org.apache.commons.logging.LogFactory;<br>import org.hibernate.*;<br>import org.hibernate.cfg.*;<br><br>public class HibernateUtil {<br>    private static Log log = LogFactory.getLog(HibernateUtil.class);<br><br>    private static final SessionFactory sessionFactory;<br><br>    static {<br>        try {<br>            // Create the SessionFactory<br>            sessionFactory = <br>                 new Configuration().configure().buildSessionFactory();<br>        } catch (Throwable ex) {<br>            // Make sure you log the exception, as it might be swallowed<br>            log.error("Initial SessionFactory creation failed.", ex);<br>            throw new ExceptionInInitializerError(ex);<br>        }<br>    }<br><br>    public static final ThreadLocal session = new ThreadLocal();<br><br>    public static Session currentSession() {<br>        Session s = (Session) session.get();<br>        // Open a new Session, if this Thread has none yet<br>        if (s == null) {<br>            s = sessionFactory.openSession();<br>            session.set(s);<br>        }<br>        return s;<br>    }<br><br>    public static void closeSession() {<br>        Session s = (Session) session.get();<br>        if (s != null)<br>            s.close();<br>        session.set(null);<br>    }<br>}</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+在同一個執行緒中，Session被暫存下來了，但無須擔心資料庫連結Connection持續占用問題，Hibernate會在真正需要資料庫操作時才
+（從連接池中）取得Connection。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+在程式中可以這麼使用HibernateUtil：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = HibernateUtil.currentSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user.getName());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">HibernateUtil.closeSession();</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+在Web應用程式中，可以藉助Filter來進行Session管理，在需要的時候開啟Session，並在Request結束之後關閉Session，
+這個部份，在 <a href="http://www.javaworld.com.tw/">JavaWorld
+技術論壇</a> 的 <a href="http://www.javaworld.com.tw/confluence/homepage.action">Wiki</a>
+上有篇 <a href="http://www.javaworld.com.tw/confluence/pages/viewpage.action?pageId=805">在filter
+中關閉session 可以參考</a>。<br>
+
+      <br>
+
+      <br>
+
+      </small>
+
+
+ </td>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/SessionManagement.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+</html>

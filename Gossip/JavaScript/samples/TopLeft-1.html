@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/TopLeft-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:42:52 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <style type="text/css">
+            #message1 {
+                color: #ffffff;
+                background-color: #ff0000;
+                border-width: 10px;
+                border-color: black;
+                border-style: solid;
+                width: 100px;
+                height: 50px;
+                padding: 50px;
+                margin: 10px;
+                position: absolute;
+                top: 50px;
+                left: 50px;
+                z-index: 0;                
+            }
+            #message2 {
+                color: #ffffff;
+                background-color: #ff0000;
+                border-width: 10px;
+                border-color: black;
+                border-style: solid;
+                width: 100px;
+                height: 50px;
+                padding: 50px;
+                margin: 10px;
+                position: absolute;
+                top: 150px;
+                left: 150px;
+                z-index: 0;                
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function(event) {
+                var message1 = document.getElementById('message1');
+                var message2 = document.getElementById('message2');
+                
+                document.onclick = function(event) {
+                    event = event || window.event;
+                    message1.style.left = event.clientX + 'px';
+                    message1.style.top = event.clientY + 'px';
+                };
+                
+                function stopPropagation(event) {
+                    if(event) {
+                        event.stopPropagation();
+                    }
+                    else {
+                        window.event.cancelBubble = true;
+                    }
+                }
+                
+                message1.onclick = function(event) {
+                    this.style.zIndex = 1;
+                    message2.style.zIndex = 0;
+                    stopPropagation(event);
+                };
+                
+                message2.onclick = function(event) {
+                    this.style.zIndex = 1;
+                    message1.style.zIndex = 0;
+                    stopPropagation(event);
+                };
+            };
+        </script>        
+    </head>
+    <body>
+        <div id="message1">這是訊息一</div>
+        <div id="message2">這是訊息二</div>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/TopLeft-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:42:52 GMT -->
+</html>

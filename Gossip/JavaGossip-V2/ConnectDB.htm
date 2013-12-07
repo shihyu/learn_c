@@ -1,0 +1,683 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ConnectDB.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>連接資料庫</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 連接資料庫</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <span style="font-weight: bold;"></span><small>為了要連線MySQL資料庫，您必須要有MySQL JDBC驅動程式，請將下載的<span style="font-weight: bold;">mysql-connector-java-*.jar</span>加入至CLASSPATH中，這邊先以Java Class來示範如何連線MySQL，Java類別中與資料庫操作相關的類別都位於<span style="font-weight: bold;">java.sql</span>套件中。<br>
+
+      <br>
+
+
+
+
+要連線MySQL，必須經由幾個動作：<br>
+
+      </small>
+
+
+
+
+
+      
+      <ul>
+
+        <li><small>載入與註冊JDBC驅動程式</small></li>
+
+      
+      </ul>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small>透過java.lang.Class類別的forName()來載入並向<span style="font-weight: bold;">DriverManager</span>註冊JDBC驅動程式（驅動程式會自動透過DriverManager.registerDriver()方法註冊）， MySQL的驅動程式類別是<span style="font-weight: bold;">com.mysql.jdbc.Driver</span>，您如下載入與註冊JDBC驅動程式：<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">try { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; Class.forName("com.mysql.jdbc.Driver"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">catch(ClassNotFoundException e) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.println("找不到驅動程式類別"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small>如果找不到com.mysql.jdbc.Driver類別，就會丟出 <span style="font-weight: bold;">ClassNotFoundException</span>，這時請確定您的CLASSPATH中是否包括了mysql-connector-java-*.jar的位置。<br>
+
+
+
+
+      <br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <ul>
+
+        <li><small>提供JDBC URL</small></li>
+
+      
+      </ul>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small>JDBC URL定義了連接資料庫時的協定、子協定、資料來源職別：<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">協定:子協定:資料來源識別</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small>協定在JDBC中總是<span style="font-weight: bold;">jdbc</span>開始；子協定是橋接的驅動程式或是資料庫管理系統名稱，使用MySQL的話是 mysql；資料來源識別標出找出資料庫來源的位址；MySQL的JDBC URL撰寫方式如下：<br>
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">jdbc:mysql://主機名稱:連接埠/資料庫名稱?參數1=值1&amp;參數2=值2</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small>主機名稱可以是本機localhost或是其它連線主機，連接埠為3306，假如我們要連線GUESTBOOK 資料庫，並指明使用者名稱與密碼，可以如下指定：<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">jdbc:mysql://localhost:3306/GUESTBOOK?user=caterpillar&amp;password=123456</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small>如果要使用中文存取的話，還必須給定參數<span style="font-weight: bold;">userUnicode</span>及<span style="font-weight: bold;">characterEncoding</span>，表明是否使用Unicode，並指定字元編碼方式，例如：<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">jdbc:mysql://localhost:3306/GUESTBOOK?user=caterpillar&amp;password=123456 &amp;useUnicode=true&amp;characterEncoding=Big5</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small>中文的編碼方式除了Big5之外，還可以使用UTF8，這可以避免Big5中文字「許」、「功」、「蓋」等存入 MySQL所發生的問題。<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+      </small>
+
+
+      
+      <ul>
+
+        <li><small>從DriverManager取得Connection</small></li>
+
+      
+      </ul>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small>要連線資料庫，我們可以從DriverManager要求並取得<span style="font-weight: bold;">Connection</span>物件，它代表資料庫連線物件，您可以直接給它JDBC URL作為參數並取回Connection物件：<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">try { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; String url =&nbsp; "jdbc:mysql://localhost:3306/GUESTBOOK?" + </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user=caterpillar&amp;password=123456"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; Connection conn = DriverManager.getConnection(url); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; if(!conn.isClosed()) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("資料庫連線成功"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; conn.close(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">catch(SQLException e) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small>取得Connection物件之後，您可以測試與資料庫的連線是否關閉，即使用<span style="font-weight: bold;">isClosed()</span>，在操作完資料庫之後，必須使用<span style="font-weight: bold;">close()</span>來關閉與資料庫的連線。<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small>getConnection()方法也提供給定使用者名稱與密碼的方式來給定參數，例如：<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String url = "jdbc:mysql://localhost:3306/GUESTBOOK"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String user = "caterpillar"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String password = "123456"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Connection conn = DriverManager.getConnection(url, </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+user, password); </span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+下面這個程式是用來測試與資料庫的連線是否成功的一個完整範例： </small>
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li> DBConnectionDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.sql.*; <br> <br>public class DBConnectionDemo { <br>    public static void main(String[] args) { <br>        String driver = "com.mysql.jdbc.Driver"; <br>        String url = "jdbc:mysql://localhost:3306/GUESTBOOK"; <br>        String user = "caterpillar"; <br>        String password = "123456"; <br>        try { <br>            Class.forName(driver); <br>            Connection conn = <br>               DriverManager.getConnection(url, <br>                                  user, password);<br> <br>            if(conn != null &amp;&amp; !conn.isClosed()) {<br>                System.out.println("資料庫連線測試成功！"); <br>                conn.close();<br>            }<br>            <br>        } <br>        catch(ClassNotFoundException e) { <br>            System.out.println("找不到驅動程式類別"); <br>            e.printStackTrace(); <br>        } <br>        catch(SQLException e) { <br>            e.printStackTrace(); <br>        } <br>    } <br>} <br></pre>
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ConnectDB.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+</html>

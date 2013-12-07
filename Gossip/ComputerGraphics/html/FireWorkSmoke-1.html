@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/FireWorkSmoke-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:56 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                function Color(r, g, b) {
+                    this.r = r;
+                    this.g = g;
+                    this.b = b;
+                    this.toString = function() {
+                        return 'rgb(' + 
+                           [this.r, this.g, this.b].join() + ')';
+                    };
+                }
+                
+                function Point(x, y) {
+                    this.x = x || 0;
+                    this.y = y || 0;
+                    this.setLocation = function(x, y) {
+                        this.x = x;
+                        this.y = y;
+                    };
+                }
+                
+                function FireworkParticle() {
+                    var LIFE_LESS_5 = new Color(255, 0, 0);
+                    var LIFE_LESS_2 = new Color(0, 0, 255);
+                    var position = new Point();  // 粒子的位置
+                    var vx = vy = 0;             // 粒子的速度
+                    var color = null;            // 粒子的顏色
+                    var time = 0;                // 粒子存活至今的時間
+                    this.life = 0;               // 粒子的生命值
+
+                    this.resume = function(x, y, max) {
+                        position.setLocation(x, y);
+                        vx = Math.random() * max - Math.random() * max;
+                        vy = Math.random() * max - Math.random() * max;
+                        color = new Color(parseInt(Math.random() * 255),
+                                          parseInt(Math.random() * 255),
+                                          parseInt(Math.random() * 255));
+                        time = 0;
+                    };
+
+                    this.isAlive = function() {
+                        return this.life > 0;
+                    };
+
+                    this.getPoint = function() {
+                        return position;
+                    };
+
+                    this.getColor = function() {
+                        return color;
+                    };
+
+                    this.nextState = function() {
+                         vy += 9.8 * time;
+                         position.setLocation(
+                             position.x + vx * 0.1,
+                             position.y + vy * 0.01);
+                         this.life--;
+                         time++;
+                         if (this.life < 2) {
+                             color = LIFE_LESS_2;
+                         } else if(this.life < 5) {
+                             color = LIFE_LESS_5;
+                         }
+                    };
+                }
+
+                function SmokeParticle() {
+                    var position = new Point();  // 位置
+                    var vx = vy = 0;             // 水平與垂直速度
+                    this.weight = 0;              // 重量 
+                    this.life = 0;                // 生命週期
+
+                    this.resume = function(x, y) {
+                        position.setLocation(x, y);
+                        vx = 0;
+                        vy = -1;
+                        this.weight = 10 * Math.random() + 1;
+                    };
+
+                    this.getPoint = function() {
+                        return position;
+                    };
+
+                    this.getColor = function() {
+                        return new Color(this.life, this.life, this.life);
+                    };
+
+                    this.isAlive = function() {
+                        return this.life > 0;
+                    };
+
+                    this.nextState = function() {
+                        position.setLocation(position.x, position.y + vy);
+                        this.life--;
+                    };
+                }
+
+                var canvas1 = document.getElementById('canvas1');
+                var canvas2 = document.getElementById('canvas2');
+                var context1 = canvas1.getContext('2d');
+                var context2 = canvas2.getContext('2d');
+                
+                
+                var FIREWORK_MAX = 200;
+                var SMOKE_MAX = FIREWORK_MAX * 10;
+                
+                var fireworks = []; // 建立粒子
+                                  
+                for(var i = 0; i < FIREWORK_MAX; i++) {
+                    fireworks[i] = new FireworkParticle();
+                }
+                
+                var smokes = [];
+                for(var i = 0; i < SMOKE_MAX; i++) {
+                    smokes[i] = new SmokeParticle();
+                }
+
+                var context = context2;
+                setTimeout(function() {
+                    var replay = true;
+                    for(var i in fireworks) {
+                       var firework = fireworks[i];
+                       if(firework.isAlive()) {
+                           replay = false;
+                           break;
+                       }
+                    }
+                    
+                    // 是否重新施放
+                    if(replay) {
+                        for(var i in fireworks) {
+                            // 煙火初始位置
+                            var xCenter = canvas1.width / 2 + 
+                                  Math.random() * 150 - 150;
+                            var yCenter = canvas1.height / 2.5 + 
+                                  Math.random() * 150 - 150;
+                            var firework = fireworks[i];
+                            firework.resume(xCenter, yCenter, FIREWORK_MAX);
+                            firework.life = 
+                                  parseInt(Math.random() * 20);
+                        }
+                    }
+                    
+                    context.fillStyle = 'rgb(0, 0, 0)';
+                    context.fillRect(0, 0, canvas1.width, canvas1.height);
+
+                    for(var i in smokes) {
+                        var smoke = smokes[i];
+                        if(smoke.isAlive()) {
+                            var sx = smoke.getPoint().x;
+                            var sy = smoke.getPoint().y;
+                            context.fillStyle = smoke.getColor().toString();
+                            context.beginPath();
+                            context.arc(sx, sy, 2, 0, 2 * Math.PI, true);
+                            context.closePath();
+                            context.fill();
+                            smoke.nextState();
+                        }
+                    }
+                    
+                    for(var i in fireworks) {
+                        var firework = fireworks[i];
+                        if(firework.isAlive()) {
+                            var x = firework.getPoint().x;
+                            var y = firework.getPoint().y;
+                           
+                            context.fillStyle = 
+                                firework.getColor().toString();
+                            context.beginPath();
+                            context.arc(x, y, 2, 0, 2 * Math.PI, true);
+                            context.closePath();
+                            context.fill();        
+                            
+                            firework.nextState();
+                        }
+                    }          
+
+                    // 為煙火加上煙
+                    for(var i in fireworks) {
+                        var firework = fireworks[i];
+                        if(firework.isAlive()) {       
+                            var x = firework.getPoint().x;
+                            var y = firework.getPoint().y;
+                            for(var j in smokes) {
+                                var smoke = smokes[j];
+                                if (!smoke.isAlive()) {
+                                    smoke.life = 
+                                        parseInt(50 * Math.random());
+                                    smoke.resume(x, y);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                                                            
+                    if(context === context2) {
+                        document.body.replaceChild(canvas2, canvas1);
+                        context = context1;
+                    }
+                    else {
+                        document.body.replaceChild(canvas1, canvas2);
+                        context = context2;
+                    }
+                    
+                    setTimeout(arguments.callee, 200);
+                }, 200);
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="640" height="480"></canvas>
+        <canvas id="canvas2" width="640" height="480"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/FireWorkSmoke-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:56 GMT -->
+</html>

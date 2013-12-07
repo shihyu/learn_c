@@ -1,0 +1,636 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/friendOverLoadOperator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>使用 friend 函式重載運算子</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index.html">C++
+Gossip:&nbsp;使用 friend 函式重載運算子</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+使用類別成員來超載二元運算子時，會有一個限制，就是運算子的左邊一定要是原物件，您可以使用類別成員重載運算子具有以下的功能： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Point2D
+p1(10, 10);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Point2D
+p2; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">p2
+= p1 + 10;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+但是使用類別成員重載，您就無法使用這個方法讓運算子重載有以下的功能： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Point2D
+p1(10, 10);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Point2D
+p2; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">p2
+= 1 + p1;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+您可以規避這個問題，但每次都要讓其它型態的運算元置於運算子右邊也是蠻麻煩的，而且有時會容易出錯，這時您可以使用friend函式來重載運算子，使用
+friend函式重載二元運算子時，您要指定兩個參數型態，分別表式運算子左右邊的運算元型態，您可以藉由安排這兩個參數來解決以上的問題，例如先如下定
+義Point2D.h：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class
+Point2D { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public:
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+friend Point2D operator+(const Point2D&amp;, int); // 例如p+10 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+friend Point2D operator+(int, const Point2D&amp;); // 例如10+p </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">private:</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+int _x;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+int
+_y;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">};
+      </span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+再實作Ball.cpp：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>#include
+"Point2D.h"<br>
+
+
+
+
+....<br>
+
+
+
+
+Point2D operator+(const Point2D &amp;p, int i) { <br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; Point2D tmp(p._x + i, p._y + i); <br>
+
+
+
+
+      <br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; return tmp; <br>
+
+
+
+
+} <br>
+
+
+
+
+      <br>
+
+
+
+
+Point2D operator+(int i, const Point2D &amp;p) { <br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; Point2D tmp(i + p._x, i + p._y); <br>
+
+
+
+
+      <br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; return tmp; <br>
+
+
+
+
+}<br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+接著您就可以直接如下進行運算：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">Point2D p1(5, 5);</span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">Point2D p2; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">p2 = 10 + p1;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+您也可以使用friend函式來重載++或--這類的一元運算子，但要注意的是，friend不會有this指標，所以為了讓它具有++或--的遞增遞減
+原意，您要使用傳參考的方式，將物件的位址告訴函式，例如： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class
+Point2D { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public:
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp;
+friend Point2D operator++(Point2D&amp;);&nbsp; // 前置 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp;
+friend Point2D operator++(Point2D&amp;, int); // 後置 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">private:</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+int _x;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+int
+_y;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">};
+      </span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+實作時如下：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">#include "Point2D.h"</span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">....</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">Point2D
+operator++(Point2D &amp;p) { </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+p._x++; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+p._y++; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+return p; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">} </span><br style="font-weight: bold;">
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">Point2D
+operator++(Point2D &amp;p, int) { </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+Point2D tmp(p._x, p._y); </span><br style="font-weight: bold;">
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+p._x++; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+p._y++; </span><br style="font-weight: bold;">
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+return tmp; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">} </span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/friendOverLoadOperator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

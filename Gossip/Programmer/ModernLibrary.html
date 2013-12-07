@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ModernLibrary.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <title>現代程式庫的多重角色</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 現代程式庫的多重角色<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=74270">現代程式庫的多重角色</a><br>
+      <br>
+      對於應用程式開發產能的影響，程式語言只是個出發點，現代程式庫不僅是可重用功能的中心，還扮演了規範架構流程、限制語言功能、擴充程式語義、模擬典範（Paradiam）等多重角色，有時體質不良的程式語言，因為有良好的程式庫約束了先天不良元素，反而使得原本不被看好的語言廣為接受而獲得重用。<br>
+      <br>
+      <dl>
+        <dt>可重用功能的集中處</dt>
+      </dl>
+      <br>
+      基於開發程式時的可維護性與彈性，程式開發過程會不斷消弭重複性。傳統程式庫的角色，就是將重複出現的通用演算片段封裝為函式，日後若有相同需求就可直接引用，節省開發人力與時間。<br>
+      <br>
+      有時可重用對象並非演算片段，而是為類似商務需求而撰寫的重複流程。設計模式中的樣版方法（Template method）可作為此現象的縮影，父類別根據抽象方法撰寫樣版流程，抽象方法則由子類別根據實際需求實作。樣版方法重複流程中未完成的抽象是以方法為單位，如果重複流程中未完成的抽象是以物件或整個模組為單位，這樣的程式庫就形成所謂框架（Framework）。<br>
+      <br>
+      舉例來說，現代Web應用程式普遍採用的MVC/Model2流程，基本上就是由控制器接受請求、處理請求參數，接著轉發給模型物件進行商務處理，之後轉發給畫面元件呈現結果。也許可花費半年親手撰寫程式控制這樣的流程，然而有些框架以通用方式實作了流程，開發者只需根據實際需求實作抽象元件，就可組裝出完整應用程式，足可減少半年開發時間。<br>
+      <br>
+      傳統程式庫與框架的不同在於，以傳統程式庫開發程式，開發者可以完全控制應用程式流程，以框架開發程式，流程反而是由框架控制，這就是框架之所以稱為框架的原因。每個框架實作背後必然支持某個架構與流程，使用框架必先檢視商務邏輯是否符合框架設定的架構流程，否則反會被框架框住，失去使用框架的真正意義。例如採用IoC框架時，應先思考應用程式中是否有眾多相依物件，相依物件間是否需要適時地抽換更動，才不會被繁複功能與設定細節迷惑。<br>
+      <br>
+      程式庫也扮演著標準化的角色。現代程式語言都會伴隨核心程式庫，提供基本字串處理、群集物件、輸入輸出、網路連線、並行處理等通用功能，希望開發者儘量基於核心程式庫開發，增加應用程式流通性。有些語言透過實質的標準化過程，推動程式庫、框架或平台的標準化，有些程式庫或框架雖然沒有實質的標準化過程，然而由於設計良好而廣為使用，亦形成所謂產業標準，為開發者提供更多通用的選擇。<br>
+      <br>
+      <dl>
+        <dt>限制或避免語言特性</dt>
+      </dl>
+      <br>
+      程式庫可視為程式語言的延伸，延伸方向之一可以是限制語言本身的特性。例如物件導向語言可定義某種形式的建構式作為建構物件之用，然而在某些場合會想限制物件的建構方式，此時也許採用如設計模式中的單例（Singleton）模式來設計程式庫。<br>
+      <br>
+      有時語言本身功能過於強大或設計不良，開發者因而難以掌控，也常見採用程式庫來進行約束。例如JavaScript具備了動態語言、原型語言特性，且遍向弱型態語言，加上語言本身制訂倉促而有許多令人難以理解之處，許多開發者隨意用JavaScript對物件進行擴充，造成了許多各瀏覽器獨有特性，使得JavaScript開發者至今仍在為跨瀏覽器問題而奮戰。<br>
+      <br>
+      採用程式庫限制語言特性的方式之一，可以jQuery為例，其不採用傳統隨處對元素新增方法或特性的方式，而採用選擇器選取元素至包裹器，開發者操作包裹器上定義的方法修改被選取元素的特性，目的是形式上避免開發者直接更動元素，而造成更多非標準特性，並嘗試將複雜的跨瀏覽器問題封裝在包裹器中解決。<br>
+      <br>
+      有時開發者不熟悉語言設定的模型或其應用平台，因而不會使用或誤用語言、平台某些特性時有所聞，此時可以程式庫模擬開發者熟悉的模型，從而避免開發者誤用語言原本的某些特性。例如ExtJS以模擬類別系統方式，讓不熟悉原型系統的開發者易於使用，其亦使用GUI元件架構，讓開發者不用觸及DOM元素相關議題。<br>
+      <br>
+      <dl>
+        <dt>擴充語法或語義</dt>
+      </dl>
+      <br>
+      程式庫可視為程式語言的延伸，延伸方向之一可以是擴充語言的語法或語義。語言會在演化過程中考慮納入新的語法，越是廣為流行的語言在納入新語法時，考量因素就越多，以免對既有的程式造成過大衝擊（像是昇級不易）。語言納入新語法的過程曠日費時，程式庫的制訂與擴充相對來說有彈性許多，因而有些程式庫是以擴充語言的語法或語義為目標。<br>
+      <br>
+      以Harmcrest程式庫為例，其目的在於改進斷言測試時的可讀性。例如若想斷言名單中有某些名稱：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>assertTrue(names.contains("Justin") &amp;&amp; names.contains("Monica") &amp;&amp; names.contains("Irene"));</strong></span><strong><br>
+        </strong></div>
+      <br>
+      這是以&amp;&amp;語法來判斷所有條件是否成立，如果要判斷的名稱眾多，可想而知地程式可讀性會迅速變差。如果使用Harmcrest程式庫撰寫：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>assertThat(names, hasItems("Justin", "Monica", "Irene"));</strong></span><strong><br>
+        </strong></div>
+      <br>
+      程式碼看來就像是「斷言：名單中有某些名稱」，類似將原有需求以程式碼進行宣告。Harmcrest程式庫用來輔助測試，允許宣告式地定義測試規則，看來就像擴充了語言，不過儘管看來像，還是可以很清楚地分辨這是API呼叫，而非語法的一部份。<br>
+      <br>
+      有些語言本身的語法規則，允許程式庫更適切地融入原語言中，外觀就像是語法的一部份。例如Scala本身並沒有<span class="courier">until</span>語法，但透過定義<span
+        class="courier">until</span>函式，結合Curry、Partially applied function與By-name parameter等特性，可讓<span
+        class="courier">until</span>函式呼叫像是內建語法。程式庫若可更適切地融入原語言中，甚至可建立一整套方言（Dialect），作為原本通用型語言（General Purpose Language）的子集或特定領域語言（Domain-specific language）。<br>
+      <br>
+      有時語義擴充會達到框架層次，例如Rails善用了Ruby的區塊、Mixin、method_missing等特性，創造了專屬的MVC/Model2框架，雖說本質上是框架，但實際使用上更像是另一套語言。<br>
+      <br>
+      <dl>
+        <dt>封裝複雜操作進行典範模擬</dt>
+      </dl>
+      <br>
+      使用程式庫來擴充語法或語義的進一步，就是進行典範模擬，讓原本依A模型而制訂的語言，可融入B模型的特色。這與先前談到以程式庫模擬某模型來限制語言特性的方向不同，程式庫用來進行典範模擬時，目的是模擬出語言本身不支援的特性，而非限制語言特性。<br>
+      <br>
+      舉例來說，由於函數式語言近來重新受到曙目，許多開發者開始思考如何使用不具備函數式完整條件的語言，進行函數式風格的設計，然而實作細節往往過於複雜，因而有開發者嘗試從程式庫的角度來模擬函數式特性，像是將延遲（Lazy）、不可變動（Immutable）資料的結構共用等複雜操作，封裝在API實作中，留下函數式的API外觀，讓開發者得以專心使用函數式風格進行程式撰寫。具體實例像是Functional Java程式庫，嘗試讓依物件導向模型而生的Java，也可透過程式庫直接取用有別於物件導向的資料結構、無副作用方法等函數式風格的特性與好處。<br>
+      <br>
+      在取用程式庫時，首要在認清程式庫的的目標與角色，程式庫對於程式開發才有正面幫助。程式庫若定位在框架層次，就應確認是否遵守其架構流程；若是在限制語言本身特性，就應該遵守程式庫約束，在自訂或擴充程式庫時，也應依程式庫設定的慣例或方向進行擴充，以免衍生出其它風格或破壞程式庫本身架構；程式庫若旨在擴充語法、語義甚至典範，就要瞭解擴充後的語法、語義甚至典範其本質文化為何，方可將擴充後的功能運用在適切之處，而不是隨處強行套用。<br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ModernLibrary.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

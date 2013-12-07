@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QMatrix.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:48 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QMatrix</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QMatrix</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 676px; vertical-align: top;"><small>QPainter預設的座標系統是繪圖裝置的座標系統，也就是左上角為原點，向右為正X，向下為正Y的座標系統，</small><small>座標系統的轉換常使用矩陣的方式來表現及進行運算，</small><small>QMatrix的作用，正是讓您可以利用其內建的矩陣，設定好相關的參數，然後讓QPainter根據QMatrix的設定，來進行一些二維座標系統的轉換動作。 <br>
+
+      <br>
+
+QMatrix的內部使用一個3x3的矩陣：<br>
+
+      </small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span>
+      
+      <table style="text-align: left; height: 88px; width: 148px;" border="1" cellpadding="2" cellspacing="2">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 40px; font-weight: bold;">m11</td>
+
+            <td style="width: 40px; font-weight: bold;">m12</td>
+
+            <td style="width: 42px; font-weight: bold;">0</td>
+
+          </tr>
+
+          <tr>
+
+            <td style="width: 40px; font-weight: bold;">m21</td>
+
+            <td style="width: 40px; font-weight: bold;">m22</td>
+
+            <td style="width: 42px; font-weight: bold;">0</td>
+
+          </tr>
+
+          <tr>
+
+            <td style="width: 40px; font-weight: bold;">dx</td>
+
+            <td style="width: 40px; font-weight: bold;">dy</td>
+
+            <td style="width: 42px; font-weight: bold;">1</td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span><small>
+dx與dy定義了水平與垂直移動，m11與m22定義了水平與垂直縮放（scaling），m12與m21定義了垂直與水平扭曲（shearing），</small><small>想像您是坐在太空船中，在太空船從左上原點開到某個點之後，（x, y）是以您為中心所看到的座標，但實際上太空船相對於左上角為原點的座標為（x', y'），QMatrix的</small><small>矩陣可以如以下的公式，將（x, y）轉換為（x', y'）：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">x' = m11*x + m21*y + dx</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">y' = m22*y + m12*x + dy</span></small><br>
+
+      </div>
+
+      <small><br>
+
+當您使用QPainter要進行繪圖時，可以您為中心所看到的座標系統(x,
+y)，使用QPainter的相關API來進行相關圖形的繪製，這就像您在太空船中畫圖一樣的方便，若有設定QMatrix，則會自動轉換為電腦繪圖時所
+看到的座標系統（x', y'），如此就不用親自進行一些複雜的轉換動作，進行繪圖時也較為直覺。<br>
+
+      <br>
+
+您可以藉由QMatrix的setMatrix()方法設定m11、m12、m21、m22、dx、dy，或者是直接使用translate()、rotate()、scale()與shear()等方法來直接進行移動、旋轉、縮放、扭曲等座標轉換。<br>
+
+      </small>
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+      <small>以下的範例為色彩輪的繪製，藉由設定HSV（Brightness,Hue, Saturation）中的「色相」來完成彩虹般的效果，</small></span><small>
+HSV中的「色相」（Hue）是錂鏡分光，主要有紅、橙、黃、綠、藍、紫...等八個主要色相。「亮度」（Brightness）是明暗表現，由白至黑的
+表現，在P.C.C.S（Practical Color Coordinate
+System）配色系統中，將之分為白、淺灰（淺，深）、淺中灰、中灰、暗中灰、暗灰（淺，深）、黑等。「彩度」(Saturation)也就是色彩的飽
+和程度，彩度最高的稱之為「純色」，最低為「無顏色」。 <br>
+
+      </small>
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QWidget&gt;<br>#include &lt;QPainter&gt;<br>#include &lt;QMatrix&gt;<br><br>class PainterWidget : public QWidget {<br>protected:<br>    void paintEvent(QPaintEvent*);<br>};<br><br>void PainterWidget::paintEvent(QPaintEvent *event) {<br>    QPainter painter(this);<br>    QFont font("times", 18, QFont::Bold);<br>    painter.setFont(font);<br>    painter.setPen(Qt::black);<br><br>    for (int i = 0; i &lt; 36; i++) {                // 進行 36 次旋轉<br>        QMatrix matrix;<br>        matrix.translate(250, 250);               // 移動中心至 (250, 250)<br>        matrix.shear(0.0, 0.3);                   // 扭曲<br>        matrix.rotate((float) i * 10);            // 每次旋轉 10 度<br>        painter.setWorldMatrix(matrix);           // 使用這個 QMatrix<br><br>        QColor color;<br>        color.setHsv(i * 10, 255, 255);           // 設定彩虹效果<br>        painter.setBrush(color);                  // 設定筆刷顏色<br>        painter.drawRect(70, -10, 80, 10);        // 畫矩形<br><br>        QString str;<br>        str.sprintf("H=%d", i*10);<br>        painter.drawText(80 + 70 + 5, 0, str);    // 繪製角度文字<br>    }<br>}<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br>    PainterWidget pWidget;<br>    pWidget.setWindowTitle("QMatrix");<br>    pWidget.resize(500, 500);<br>    pWidget.show();<br>    <br>    return app.exec();<br>}</pre>
+
+      <span class="postbody"><small> </small><br>
+
+      <small>下圖為執行時的參考畫面：<br>
+
+      <br>
+
+      <img style="width: 516px; height: 538px;" alt="" src="images/QMatrix-1.jpg"></small><br>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"></span><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QMatrix.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:49 GMT -->
+</html>

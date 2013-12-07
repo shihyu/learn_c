@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Decorator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>辨識物件的可修飾行為</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 辨識物件的可修飾行為<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=77750">辨識物件的可修飾行為</a><br>
+      <br>
+      沒有程式庫可以預測使用者的所有需求，對於某些物件，開發者會希望動態地添增它的行為，基於彈性考量，設計上一般建議使用組合（Composite）而少用繼承，然而若想要在擴充物件的同時又保留原有介面，此時必須必須增加的考量是，所謂的擴充是想要重新定義（Override）物件的行為，還是基於原有行為作些加工的動作。<br>
+      <br>
+      <dl>
+        <dt>動態添增功能但保留原有介面</dt>
+      </dl>
+      <br>
+      程式設計上所謂的動態，通常是指運行期間依實際情境決定某些行為。舉例而言，程式語言兩大分野就是靜態語言與動態語言，靜態語言中變數型態必須在編譯時期指定，參考的物件必須與變數型態一致，動態語言的變數本身沒有型態，可在運行時操作實際參考的物件而不論其型態為何。<br>
+      <br>
+      如果談到為物件添增功能但保留原有介面，繼承可以是一種選擇，例如想對父類別的某方法進行擴充，可建立子類別並重新定義方法，重新定義本來就要求方法簽署（Method signature）必須一致，因而可滿足添增功能但保留原有介面的需求，然而若在需求前加上「動態」兩字，採用類別繼承就不適合，因為繼承是在編譯時期就確認要擴充的行為。<br>
+      <br>
+      在《Design Patterns: Elements of Reusable Object-Oriented Software》書中定義了裝飾器（Decorator）模式：「動態地對物件添增功能但保留原有介面。裝飾器模式是使用繼承擴充功能外的替代方案。」具體實例可在Java的I/O程式庫中找到，<span
+        class="courier">像是BufferedInputStream為InputStream的子類別，呼叫BufferedInputStream物件的read方法時，實際上會委託內部InputStream物件進行讀取，並對讀取結果進行緩衝動作，BufferedInputStream結構上可包裹任何InputStream實例，因此基本上可於程式運行期間，動態地為InputStream的任何子類別實例進行緩衝，避免靜態地為InputStream分別定義各種具緩衝功能的子類別</span>。<br>
+      <br>
+      <dl>
+        <dt>動態對原有行為進行功能擴充</dt>
+      </dl>
+      <br>
+      在《JavaScript Patterns》書中提到：「Decroator模式有一種方便的特質是，對於我們所希望的行為可以很容易地設定和客製化。」易於設計與客製化是程式設計時經常面對的需求，對於某些語言來說，或許並不需要特別實現裝飾器，JavaScript本身就是個例子，因為它是個基於原型（Prototype-based）的語言，可以隨時為JavaScript物件增減功能，<span
+        class="courier">像是將某個新的Function實例指定給原物件的toString特性，願意的話，也可以修改prototype物件，達到改變整個執行環境相關物件行為的目的</span>。<br>
+      <br>
+      然而裝飾器是為了滿足進一步的設定與客製化限制，在《JavaScript Patterns》書中接著提到：「你可以從一個簡樸的物件開始，它只有一些基本的功能。接著你可以從可用的decorators池中挑選出你想要的，用它們來強化你的物件...」所謂decorators池就像是Java中<span
+        class="courier">BufferedInputStream、ObjectInputStream、DataInputStream等，在不改變底層包裹的InputStream實例行為下</span>，動態對原有行為進行擴充。<br>
+      <br>
+      如果發現在繼承類別並重新定義某方法時，呼叫了被重新定義前的方法，也許是取得父類別方法結果後作進一步處理，或是作了某些預先處理後再委託父類別方法進行後續料理，其實這是基於父類別方法的原有行為進行擴充，而非整個重新定義，這就可視為應該將繼承定義改為裝飾器模式的一個訊號。<br>
+      <br>
+      <dl>
+        <dt>形式多樣化的裝飾器</dt>
+      </dl>
+      <br>
+      正因為易於設計與客製化物件功能，是程式設計時經常面對的需求，裝飾器模式也就成為極為常見的模式，只是以不同形式出現在不同的語言技術中。Java中對裝飾器的實現以物件為單位，方式是在某方法前後進行擴充，不需要擴充行為的方法就直接委託原物件的方法。有些語言可以函式為單位進行裝飾，有些可以針對類別進行裝飾，有些則可針對方法進行裝飾。<br>
+      <br>
+      以JavaScript為例，函式本身是一級（First-class）物件，因此可直接將傳入的函式用另一函式包裹來實現裝飾器模式，例如我先前文章《函式的鞣製化》中談到的currying函式，可接受某函式作為引數，並傳回另一具備鞣製操作外觀的函式，就是裝飾器模式的實現概念。<br>
+      <br>
+      另一個可看出裝飾器模式普及與重要性的實際案例就是Python，它為裝飾器的實現提供了特別語法，並依被裝飾的對象不同細分了函式裝飾器、類別裝飾器、方法裝飾器。以函式裝飾器為例，只要可接受函式並傳回函式的函式，都可作為函式裝飾器。舉例來說，若有個<span
+        class="courier">authenticate函式作為函式裝飾器，傳統用法可以是post = authenticate(post)，如此可在post呼叫前進行身份驗證動作</span>，然而更方便的語法會是：<br>
+      <div class="courier" style="margin-left: 40px;">@authenticate<br>
+        def post(body):<br>
+        &nbsp;&nbsp;&nbsp; # 作些事 ...</div>
+      <br>
+      裝飾器既然可以動態對原有行為進行擴充，那麼當然也可以對裝飾器進行擴充，畢竟裝飾器與被擴充物件具有相同介面。在《JavaScript Patterns》書中亦提到：「...如果順序重要的話，你也可以選擇功能附加的順序。」這形成一種可堆疊的（Stackable）擴充結構，書中舉的例子是為一個銷售物件裝飾上稅款與金額格式化功能，實作形式為<span
+        class="courier">sale.decorate('fedtax').decorate('quebec').decorate('money')</span>；Java中可堆疊的（Stackable）擴充會像是<span
+        class="courier">new BufferedReader(new InputStreamReader(System.in))</span>的形式；如果是Python的話則是：<br>
+      <div class="courier" style="margin-left: 40px;">@decorator2<br>
+        @decorator1<br>
+        def func():<br>
+        &nbsp;&nbsp;&nbsp; # 作些事...</div>
+      <br>
+      進一步地延伸的話，只要是基於物件原本能力進行擴充，都可視為裝飾器模式的一種形式。例如在Python中，若類別本身定義有<span class="courier">__lt__方法，就可使用total_ordering類別裝飾器</span>，讓類別實例具有完整的物件比較功能。從這個角度來看，Scala中的<span
+        class="courier">Trait</span>、Ruby中的<span class="courier">Module</span>，或是JDK8中的<span
+        class="courier">interface</span>，都可以用來作為實現廣義的裝飾器模式。實際上Scala中的<span
+        class="courier">Trait就可使用with寫出meal = new FriedChicken with SideDishOne with SideDishTwo的可堆疊擴充</span>，Ruby可搭配<span
+        class="courier">extend方法來指定要擴充Module，寫出meal = FriedChicken.new.extend(SideDishOne).extend(SideDishTwo)的堆疊擴充形式</span>。<br>
+      <br>
+      <dl>
+        <dt>物件可擴充的基本能力為何？</dt>
+      </dl>
+      <br>
+      文章在一開始談到，繼承是在編譯時期就確認要擴充的行為，而裝飾器可實現執行時期動態擴充行為的需求；前一段最後談到，只要是基於物件原本能力進行擴充，都可視為裝飾器模式的一種實現，這就看出了一個思考重點：面對物件想要實現的功能集合，必須確認哪些是彼此重疊的基礎能力，哪些是未重疊而可對基礎能力動態附加上的功能。<br>
+      <br>
+      對於物件想要實現的功能集合中重疊的部份，表示這是個較不易變動的通用需求，可以靜態方式加以定義，這對基於類別（Class-based）的語言尤其重要，因為實現裝飾模式會用到繼承機制（介面實作亦視為廣義的多重繼承），辨識出物件可擴充的基本能力之後，日後就可以彈性地附加額外功能，而被附加的額外功能，也會具有較高的可重用性。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Decorator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

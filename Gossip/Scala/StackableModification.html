@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/StackableModification.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>堆疊修飾（Stackable modification）</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 堆疊修飾（Stackable modification）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>特徵（Trait）可以讓你定義沒有實作的抽象方法，也可以讓你定義有實作的具體方法，</small><small>事實上，抽象類別可以作的事，特徵幾乎都可以作（特徵也可以定義資料成員以持有狀態），</small><small>你可能會想，特徵跟抽象類別有何不同？<br><br></small><small>就語法上來看，除了<span style="font-weight: bold;">類別可以繼承或具有多個特徵</span>，但只能繼承一個抽象類別之外，特徵與抽象類別間的不同點，就是<span style="font-weight: bold;">特徵不能定義主要建構式的參數</span>，還有就是<span style="font-weight: bold;">特徵中定義方法時，super呼叫是動態綁定的</span>（類別中的super是靜態綁定的，也就是你在類別中寫下super.somMethod()時，你知道所呼叫的是哪個類別的方法）。<br><br>特
+徵中定義方法時，super呼叫是動態綁定的，也就是當你在特徵的方法中寫下super.someMethod()時，你並不知道真正呼叫的是哪個類別的
+方法，只有在某個類別具有該特徵時，才能決定super.someMethod()所呼叫的是哪個類別的方法，也由於這個特性，在類別具有這類特徵時，得以在呼
+叫super.someMethod()方法前後作些處理，執行所謂<span style="font-weight: bold;">堆疊修飾（Stackable modification）</span>的功能。<br><br>舉個例子來說，</small><small>你打算設計一個點餐程式，目前主餐有炸雞、漢堡，你打算讓點了主餐的客入選擇附餐時可以有優惠，如果您使用繼承的方式來達到這個目的，例如：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class FriedChicken {<br>&nbsp; &nbsp; def content = "不黑心炸雞"<br>&nbsp; &nbsp; def price = 49.0<br>}<br><br>class SideDishOne extends FriedChicken {<br>&nbsp; &nbsp; override def content = super.content + " | 可樂 | 薯條"<br>&nbsp; &nbsp; override def price = super.price + 30.0<br>}</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><br></div><small><br>這個需求直接使用繼承並不適當，你繼承父類別之後，只是取得父類別的price結果再進一步加以處理，另一方面，如果漢堡也想要搭配附餐一，目前的SideDishOne顯然無法給漢堡重用，你還得為漢堡建立有附餐一的子類別。<br><br>為了讓附餐設計可以重複使用，你可以將附餐的行為特徵抽出：<br></small><pre>trait Meal {<br>    def content: String<br>    def price: Double<br>}<br><br>trait SideDishOne extends Meal { // 附餐一<br><span style="font-weight: bold;">    abstract override</span> def content = <span style="font-weight: bold;">super.content</span> + " | 可樂 | 薯條"<br><span style="font-weight: bold;">    abstract override</span> def price = <span style="font-weight: bold;">super.price</span> + 30.0<br>}<br><br>trait SideDishTwo extends Meal {  // 附餐二<br><span style="font-weight: bold;">    abstract override</span> def content = <span style="font-weight: bold;">super.content</span> + " | 玉米濃湯 | 咖啡"<br><span style="font-weight: bold;">    abstract override</span> def price = <span style="font-weight: bold;">super.price</span> + 50.0<br>}<br><br>class FriedChicken extends Meal {<br>    def content = "不黑心炸雞"<br>    def price = 49.0<br>}</pre><small><br></small><small>附
+餐也是一種餐點，所以抽出Meal特徵規範共同的介面content與price，而附餐一與附餐二重新定義了content與price，也就是原來特
+徵定義是抽象方法，現有定義為有實作內容的方法，不過由於其中用到了super呼叫，目前並無法知道這個呼叫到底是呼叫哪個方法，因此加上了
+abstract關鍵字。<br><br>現在如何搭配附餐呢？為了詳細示範，先中規中矩地寫的話，可以這麼用：<br></small><pre>class FriedChickenSideDishOne extends FriedChicken with SideDishOne<br>val meal = new FriedChickenSideDishOne<br>println(meal.content)   // 顯示 不黑心炸雞 | 可樂 | 薯條<br>println(meal.price)     // 顯示 79.0</pre><small><br>你的類別繼承FriedChicken類別並具有SideDishOne特徵，FriedChickenSideDishOne類別中，</small><small>SideDishOne特徵</small><small>的content
+與price方法重新定義了FriedChicken類別中content與price方法，你呼叫meal.content時，根據特徵中的定義，就是
+先呼叫父類別FriedChicken的content取得結果，再附加上字串後傳回，呼叫meal.price時也是同樣的道理。<br><br>實際上，你可以這麼使用：<br></small><pre>val meal1 = new FriedChicken with SideDishOne<br>println(meal1.content)    // 顯示 不黑心炸雞 | 可樂 | 薯條<br>println(meal1.price)      // 顯示 79.0</pre><small><br>第一行其實是匿名類別的寫法，你打算建立一個物件，該物件實例化自一個類別繼承自FriedChicken類別並具有SideDishOne特徵，不過你沒有定義出類別的名稱。<br><br>你可以隨意地組合套餐：<br></small><pre>val meal1 = new FriedChicken with SideDishOne<br>val meal2 = new FriedChicken with SideDishTwo<br>val meal3 = new FriedChicken with SideDishOne with SideDishTwo<br>val meal4 = new FriedChicken with SideDishTwo with SideDishOne<br>println(meal1.content)   // 不黑心炸雞 | 可樂 | 薯條<br>println(meal1.price)     // 79.0<br>println(meal2.content)   // 不黑心炸雞 | 玉米濃湯 | 咖啡<br>println(meal2.price)     // 99.0<br>println(meal3.content)   // 不黑心炸雞 | 可樂 | 薯條 | 玉米濃湯 | 咖啡<br>println(meal3.price)     // 129.0<br>println(meal4.content)   // 不黑心炸雞 | 玉米濃湯 | 咖啡 | 可樂 | 薯條<br>println(meal4.price)     // 129.0</pre><small><br>注
+意meal3與meal4，這也是為什麼這個特性被稱為堆疊修飾的原因，你讓物件具有兩個以上的特徵時，最右邊的特徵若使用super.content呼叫，其
+實是在呼叫左邊特徵的content方法，而左邊特徵的super.content則呼叫父類別的content，呼叫的結果就像是將最左邊的類別看作是
+堆疊底部，最右邊的特徵看作是堆疊頂端。<br><br>同時也注意到，meal3是先繼承SideDishOne特徵再具有SideDishTwo，而meal4則是先繼承SideDishTwo再具有SideDishOne，具有特徵的順序不同，則呼叫的順序不同，則結果就有所不同。<br><br>事實上，這是Scala版本的 </small><small><a href="../DesignPattern/DecoratorPattern.htm">Decorator
+模式</a> 之實現，雖然語法不同，不過其在不改變被修飾物件功能的情況下，動態地為物件的操作結果作修飾，這樣的精神是相同的。<br><br></small><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/StackableModification.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

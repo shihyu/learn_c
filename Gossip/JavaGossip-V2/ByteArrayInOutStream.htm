@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ByteArrayInOutStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>ByteArrayInputStream、ByteArrayOutputStream</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: ByteArrayInputStream、ByteArrayOutputStream</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>串流的來源或目的地不一定是檔案，也可以是記憶體中的一個空間，例如一個位元陣列， ByteArrayInputStream、ByteArrayOutputStream即是將位元陣列當作串流輸入來源、輸出目的地的工具類別。<br>
+
+      <br>
+
+
+ByteArrayInputStream可以將一個陣列當作串流輸入的來源，而ByteArrayOutputStream則可以將一個位元陣列當作串流輸出的目的地，這兩個類別基本上比較少使用，在這邊舉一個簡單的檔案位元編輯程式作為例子。<br>
+
+      <br>
+
+
+您開啟一個簡單的文字檔案，當中有簡單的ABCDEFG等字元，在讀取檔案之後，您可以直接以程式來指定檔案的位元位置，以修改您所指定的字元，程式的作法是將檔案讀入陣列中，修改位置的指定被用作陣列的指針，在修改完陣列內容之後，您重新將陣列存回檔案，範例如下： </small>
+
+      <br>
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> ByteArrayStreamDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*;<br>import java.util.*;<br> <br>public class ByteArrayStreamDemo {<br>    public static void main(String[] args) {<br>        try { <br>            File file = new File(args[0]); <br>            BufferedInputStream bufferedInputStream = <br>                new BufferedInputStream( <br>                     new FileInputStream(file)); <br><br>            // 將檔案讀入位元陣列 <br>            ByteArrayOutputStream arrayOutputStream = <br>                new ByteArrayOutputStream(); <br>            byte[] bytes = new byte[1]; <br>            <br>            while(bufferedInputStream.read(bytes) != -1) {<br>                arrayOutputStream.write(bytes);<br>            }<br>            arrayOutputStream.close(); <br>            bufferedInputStream.close(); <br><br>            // 顯示位元陣列內容 <br>            bytes = arrayOutputStream.toByteArray(); <br>            for(byte b : bytes) {<br>                System.out.print((char) b);<br>            }<br>            System.out.println(); <br><br>            // 讓使用者輸入位置與字元修改位元陣列內容 <br>            Scanner scanner = new Scanner(System.in);<br>            <br>            System.out.print("輸入修改位置："); <br>            int pos = scanner.nextInt();<br>            System.out.print("輸入修改字元："); <br>            bytes[pos-1] = (byte) scanner.next().charAt(0);<br><br>            // 將位元陣列內容存回檔案 <br>            ByteArrayInputStream byteArrayInputStream = <br>                new ByteArrayInputStream(bytes); <br>            BufferedOutputStream bufOutputStream = <br>                new BufferedOutputStream( <br>                     new FileOutputStream(file)); <br>            byte[] tmp = new byte[1]; <br>            while(byteArrayInputStream.read(tmp) != -1) <br>                bufOutputStream.write(tmp); <br>            byteArrayInputStream.close(); <br>            bufOutputStream.flush(); <br>            bufOutputStream.close(); <br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            e.printStackTrace(); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    }<br>} <br></pre>
+
+
+      <span style="font-family: &quot;Courier New&quot;,Courier,monospace;"><br>
+
+
+      </span>
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">&nbsp;java onlyfun.caterpillar.ByteArrayStreamDemo test.txt<br>
+
+
+ABCDEFG<br>
+
+
+輸入修改位置：2<br>
+
+
+輸入修改字元：K</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+      <small>
+再開啟test.txt，您會發現B已經被覆蓋為K。</small><br>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/ByteArrayInOutStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

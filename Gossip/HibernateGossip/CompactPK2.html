@@ -1,0 +1,400 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/CompactPK2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>複合主鍵（二）</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;複合主鍵（二）</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+可以將主鍵的資訊獨立為一個類別，例如：</small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>UserPK.java</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.Serializable;<br><br>import org.apache.commons.lang.builder.EqualsBuilder;<br>import org.apache.commons.lang.builder.HashCodeBuilder;<br><br>public class UserPK implements Serializable {<br>    private String name;<br>    private String phone;<br><br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br><br>    public String getPhone() {<br>        return phone;<br>    }<br><br>    public void setPhone(String phone) {<br>        this.phone = phone;<br>    }<br> <br>    public boolean equals(Object obj) {<br>        if(obj == this) {<br>            return true;<br>        }<br> <br>        if(!(obj instanceof User)) {<br>            return false;<br>        }<br> <br>        UserPK pk = (UserPK) obj;<br>        return new EqualsBuilder()<br>                    .append(this.name, pk.getName())<br>                    .append(this.phone, pk.getPhone())<br>                    .isEquals();<br>    }<br> <br>    public int hashCode() {<br>        return new HashCodeBuilder()<br>                    .append(this.name)<br>                    .append(this.phone)<br>                    .toHashCode();<br>    }<br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+現在User類別的主鍵資訊被分離出來了，例如：</small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>User.java</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.Serializable;<br><br>public class User implements Serializable {<br>    private UserPK userPK; // 主鍵<br>    private Integer age;<br> <br>    public User() {}<br><br>    public UserPK getUserPK() {<br>        return userPK;<br>    }<br><br>    public void setUserPK(UserPK userPK) {<br>        this.userPK = userPK;<br>    }<br><br>    public Integer getAge() {<br>        return age;<br>    }<br><br>    public void setAge(Integer age) {<br>        this.age = age;<br>    }<br>}</pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+在映射文件方面，需要指定主鍵類的資訊，例如：</small><br>
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" table="user"&gt; <br>        &lt;composite-id name="userPK"<br>                      class="onlyfun.caterpillar.UserPK"<br>                      unsaved-value="any"&gt;<br>            &lt;key-property name="name" <br>                          column="name"/&gt;<br>            &lt;key-property name="phone" <br>                          column="phone"/&gt;<br>        &lt;/composite-id&gt;<br> <br>        &lt;property name="age" column="age"/&gt;<br> <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>
+在查詢資料時，必須指定主鍵資訊，例如：<br>
+
+
+
+      </small>
+      </span>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">UserPK pk = new UserPK();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">pk.setName("bush");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">pk.setPhone("0970123456");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">Session session =
+sessionFactory.openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">// 以主鍵類實例設定複合主鍵並載入對應的資料</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">User user = (User) session.load(User.class,
+pk);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">System.out.println(user.getAge() + "\t" + </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">&nbsp;
+&nbsp; &nbsp;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+user.getUserPK().getName() + "\t" +</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+user.getUserPK().getPhone());</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span></small>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span> </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<span class="postbody"><br>
+
+
+
+
+<br>
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/CompactPK2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+</html>

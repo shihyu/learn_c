@@ -1,0 +1,1219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/SignalConnect.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>使用 Signal 關閉視窗</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: 使用 Signal 關閉視窗</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在</small> <small><big><a href="FirstGTK.html"><small>第一個 GTK 程式</small></a></big> 中，當您按下視窗右上X鈕時，</small><small>在GTK視窗的預設處理中，</small><span class="postbody"></span><small>只
+會隱藏視窗，而不會直接關閉程式，GTK有一套Signal與Callback函式的處理機制，在某個動作發生時，GTK會發出特定Signal，若您想
+要進行某些處理，則需定義Callback函式，並透過g_signal_connect()等函式，將Signal與Callback函式加以連結。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+以按下視窗右上X鈕為例，按下X鈕後，GTK預設會發出"destroy"的Signal，您可以使用g_signal_connect()將之連結至gtk_main_quit()函式，這個函式會結束gtk_main()的迴圈處理因而結束GTK程式：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br><br><span style="font-weight: bold;">    g_signal_connect(GTK_OBJECT(window), "destroy",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     G_CALLBACK(gtk_main_quit), NULL);</span><br><br>    gtk_widget_show(window);<br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+從g_、G_開頭的函式名稱可以知道，它們是GLib所提供的函式與巨集（在GTK+
+2.0中，Signal處理已由GTK移至GLib），g_signal_connect()第一個參數，必須是GtkObject或其衍生的類別實例，
+代表Signal發出的來源物件，第二個參數是感興趣的信號，第三個參數是Callback函式，G_CALLBACK巨集強制會轉換函式型態為無參數無傳回值的<a href="http://library.gnome.org/devel/gobject/unstable/gobject-Closures.html#GCallback">GCallback</a>函式型態：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">#define G_CALLBACK(f) ((GCallback) (f))</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+在這邊使用GTK的gtk_main_quit()函式，第四個參數是可以傳遞給Callback函式的相關資料，在這邊不需
+要，設定為NULL即可。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+g_signal_connect()實際上是巨集</small><small>（定義在/usr/include/glib-2.0/gobject/gsignal.h）</small><small>，方便使用g_signal_connect_data()函式：</small><small><br style="font-weight: bold;">
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#define g_signal_connect(instance, detailed_signal, c_handler, data) \</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">g_signal_connect_data</span> ((instance), (detailed_signal), (c_handler), (data), NULL, (GConnectFlags) 0)</span></small><br style="font-weight: bold;">
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+      </small><small>g_signal_connect_data()</small><small>會傳回gulong型態的handler id，</small><small>函式的定義如下：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gulong&nbsp;g_signal_connect_data(gpointer instance,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;const gchar *detailed_signal,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;GCallback c_handler,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;gpointer data,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;GClosureNotify destroy_data,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;GConnectFlags connect_flags);</span></small><br>
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      <small>如果您打算將Signal與Callback斷開連結，可以根據傳回的handler
+id來使用g_signal_handler_disconnect()函式，也可以根據handler
+id來使用g_signal_handler_is_connected()函式，測試Signal的連接狀態：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void g_signal_handler_disconnect(gpointer object, gulong id);<br>
+
+
+
+
+
+
+gboolean g_signal_handler_is_connected(gpointer instance, gulong handler_id);<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      </span></small></div>
+
+
+
+
+
+
+      <small>例如一個連接Signal與斷開Signal的程式片段如下：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gulong handler_id = g_signal_connect(GTK_OBJECT(window), "destroy",</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+G_CALLBACK(gtk_main_quit), NULL);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">....<br>
+
+
+
+
+
+
+if (g_signal_handler_is_connected(window, id)) {<br>
+
+
+
+
+
+
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; g_signal_handler_disconnect(GTK_OBJECTS(window), handler_id);<br>
+
+
+
+
+
+
+}<br>
+
+
+
+
+
+
+      </span></small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+若只是想暫停（block）某Signal處理，則可以使用g_signal_handler_block()，想恢復被暫停的Signal處理，則可以使用g_signal_handler_unblock()：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void g_signal_handler_block(gpointer object, gulong id);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void g_signal_handler_unblock(gpointer object, gulong id);</span></small><br>
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+一個被</small><small>g_signal_handler_block()函式呼叫</small><small>n次的Signal處理，也必須被</small><small>g_signal_handler_unblock()相對應的次數，才可以恢復原本來未暫停的狀態。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+若在未知handler id的情況下，想要中斷、暫停或恢復信號連結，則可以嘗試使用</small><small>g_signal_handlers_disconnect_by_func()、</small><small>g_signal_handlers_block_by_func()、</small><small>g_signal_handlers_unblock_by_func()，這三者其實都是巨集：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">#define g_signal_handlers_disconnect_by_func(instance, func, data)&nbsp;\</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">g_signal_handlers_disconnect_matched</span> ((instance),&nbsp;\</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;(GSignalMatchType) (G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA), \</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; 0, 0, NULL, (func), (data))<br>
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">#define g_signal_handlers_block_by_func(instance, func, data) \</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">g_signal_handlers_block_matched</span> ((instance),&nbsp;\</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; (GSignalMatchType) (G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA), \</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0, 0, NULL, (func), (data))<br>
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">#define g_signal_handlers_unblock_by_func(instance, func, data)&nbsp;\</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">g_signal_handlers_unblock_matched</span>&nbsp;((instance), \</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; (GSignalMatchType) (G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA),&nbsp;\</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; 0, 0, NULL, (func), (data))</small><br>
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+g_signal_handlers_disconnect_matched()、g_signal_handlers_block_matched
+()、g_signal_handlers_unblock_matched()會傳回guint的數值，表示符合的handler數目：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">guint g_signal_handlers_disconnect_matched</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">(gpointer instance,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;GSignalMatchType mask,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint signal_id,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GQuark
+detail,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GClosure
+*closure,<br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;gpointer func,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gpointer
+data);<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">guint g_signal_handlers_block_matched(gpointer instance,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GSignalMatchType
+mask,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;guint
+signal_id,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GQuark
+detail,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GClosure
+*closure,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gpointer
+func,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gpointer
+data);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+
+
+guint g_signal_handlers_unblock_matched(gpointer instance,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GSignalMatchType mask,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint signal_id,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GQuark detail,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GClosure *closure,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gpointer func,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gpointer data);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>更多有關Signal函式的說明，可以參考GObject參考文件的<a href="http://library.gnome.org/devel/gobject/unstable/gobject-Signals.html"> Signals</a>。<br>
+
+
+
+
+
+
+      </small><small><br>
+
+
+
+
+
+
+      </small><span class="postbody">
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/SignalConnect.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+</html>

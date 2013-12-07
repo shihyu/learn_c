@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/AcegiGossip/FirstAcegLogoutCookies.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:29 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>第一個Acegi 程式 - 登出、自動Cookies登入</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Acegi Gossip:&nbsp;第一個Acegi 程式 -&nbsp;登出、自動Cookies登入</a></h1>
+
+
+<br><br>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript"
+ src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+<br><br>
+
+
+
+
+
+在完成 <a href="FirstAcegPage.html">第一個Acegi 程式 - 表單網頁</a> 之後，您已經可以使用Acegi來保護您所設定的資源，為了方便起見，您應該提供一個登出的鏈結，讓使用者可以登出，讓目前的對話失效。<br>
+
+
+<br>
+
+
+這可以在/WEB-INF/loginsuccess.jsp上加上一個登出的鏈結，動作的目的地是j_acegi_logout：<br>
+
+
+<ul>
+
+
+  <li>loginsuccess.jsp</li>
+
+
+</ul>
+
+
+<pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;%@ page import="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter"%&gt;<br><br><br>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"<br>   "http://www.w3.org/TR/html4/loose.dtd"&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;登入成功&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        <br>    &lt;h1&gt;歡迎 &lt;%= session.getAttribute(AuthenticationProcessingFilter.ACEGI_SECURITY_LAST_USERNAME_KEY) %&gt;<br>    &lt;/h1&gt;<br>    &lt;br&gt;&lt;a href="<span style="font-weight: bold;">../j_acegi_logout</span>"&gt;登出&lt;/a&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+<br>
+
+
+
+
+
+要進行登出，可以設定org.acegisecurity.ui.logout.LogoutFilter，指定登出後的顯示頁面，以及執行登出動作的處理者：<br>
+
+
+<ul>
+
+
+  <li>acegi-config.xml</li>
+
+
+</ul>
+
+
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd"&gt;<br>&lt;beans&gt;<br>    ... 先前設定相同 <br><br><span style="font-weight: bold;">    &lt;!-- 登出處理 --&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;bean id="logoutFilter" class="org.acegisecurity.ui.logout.LogoutFilter"&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;constructor-arg value="/acegilogin.jsp"/&gt; &lt;!-- 登出後的顯示頁面 --&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;constructor-arg&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">               &lt;list&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">                   &lt;bean class="org.acegisecurity.ui.logout.SecurityContextLogoutHandler"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">               &lt;/list&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;/constructor-arg&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/bean&gt; </span><br>    <br>    &lt;!-- Filter Chain --&gt;<br>     &lt;bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy"&gt;  <br>       &lt;property name="filterInvocationDefinitionSource"&gt;  <br>          &lt;value&gt;  <br>            CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON <br>            PATTERN_TYPE_APACHE_ANT <br>            /**=authenticationProcessingFilter,exceptionTranslationFilter,filterSecurityInterceptor,<span style="font-weight: bold;">logoutFilter</span><br>         &lt;/value&gt; <br>      &lt;/property&gt; <br>    &lt;/bean&gt;    <br>&lt;/beans&gt;   </pre>
+
+
+<br>
+
+
+這樣就OK了，登入之後，您就可以看到登出的鏈結，按下該鏈結後就可自動進行登出。<br>
+
+
+<br>
+
+
+如果要執行Cookies自動登入，則可以使用org.acegisecurity.ui.rememberme.RememberMeProcessingFilter，您要提供驗證管理員與RememberMeServices，並指定Cookie名稱，例如：<br>
+
+
+<ul>
+
+
+  <li>acegi-config.xml</li>
+
+
+</ul>
+
+
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd"&gt;<br>&lt;beans&gt;<br>    ....<br><br>    &lt;!-- 驗證管理員，管理驗證資訊提供者 --&gt;<br>   &lt;bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager"&gt;  <br>      &lt;property name="providers"&gt;&lt;!-- 可有多個提供者,其中一個驗證通過即可以了 --&gt;  <br>         &lt;list&gt;  <br>            &lt;ref local="daoAuthenticationProvider"/&gt; <br><span style="font-weight: bold;">            &lt;ref local="rememberMeAuthenticationProvider"/&gt;</span><br>         &lt;/list&gt;  <br>      &lt;/property&gt;  <br>   &lt;/bean&gt;<br><br>    .....<br><br><span style="font-weight: bold;">    &lt;!-- 利用cookie自動登入 --&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;bean id="rememberMeProcessingFilter"  </span><br style="font-weight: bold;"><span style="font-weight: bold;">           class="org.acegisecurity.ui.rememberme.RememberMeProcessingFilter"&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;property name="authenticationManager"  ref="authenticationManager"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;property name="rememberMeServices" ref="rememberMeServices"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/bean&gt;      </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;bean id="rememberMeServices"  </span><br style="font-weight: bold;"><span style="font-weight: bold;">           class="org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices"&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;property name="userDetailsService" ref="inMemoryDaoImpl"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;property name="key" value="javauser"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/bean&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;bean id="rememberMeAuthenticationProvider"  </span><br style="font-weight: bold;"><span style="font-weight: bold;">           class="org.acegisecurity.providers.rememberme.RememberMeAuthenticationProvider"&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;property name="key" value="javauser"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/bean&gt;   </span><br>    <br>    &lt;!-- 登出處理 --&gt;  <br>    &lt;bean id="logoutFilter" class="org.acegisecurity.ui.logout.LogoutFilter"&gt;  <br>        &lt;constructor-arg value="/acegilogin.jsp"/&gt; &lt;!-- 登出後的顯示頁面 --&gt;  <br>            &lt;constructor-arg&gt;  <br>               &lt;list&gt;  <br>                   &lt;bean class="org.acegisecurity.ui.logout.SecurityContextLogoutHandler"/&gt;  <br>               &lt;/list&gt;  <br>        &lt;/constructor-arg&gt;  <br>    &lt;/bean&gt; <br>    <br>    ...<br><br>    &lt;!-- Filter Chain --&gt;<br>     &lt;bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy"&gt;  <br>       &lt;property name="filterInvocationDefinitionSource"&gt;  <br>          &lt;value&gt;  <br>            CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON <br>            PATTERN_TYPE_APACHE_ANT <br>            /**=httpSessionContextIntegrationFilter,authenticationProcessingFilter,exceptionTranslationFilter,<br>                 filterSecurityInterceptor,logoutFilter,<span style="font-weight: bold;">rememberMeProcessingFilter</span><br>         &lt;/value&gt; <br>      &lt;/property&gt; <br>    &lt;/bean&gt;    <br>&lt;/beans&gt;   </pre>
+
+
+<br>
+
+
+要進行自動登入，您必須在登入時發送_acegi_security_remember_me請求參數，例如修改acegilogin.jsp：<br>
+
+
+<ul>
+
+
+  <li>acegilogin.jsp</li>
+
+
+</ul>
+
+
+<pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;Acegi 範例網頁 - 登入&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>&lt;h2&gt;登入範例應用程式！&lt;/h2&gt;<br>&lt;br /&gt;<br>&lt;form action="j_acegi_security_check" method="POST"&gt;<br>&lt;table&gt;<br>	&lt;tr&gt;<br>		&lt;td&gt;名稱：&lt;/td&gt;<br>		&lt;td&gt;&lt;input type='text' name='j_username' value=''&gt;&lt;/td&gt;<br>	&lt;/tr&gt;<br>	&lt;tr&gt;<br>		&lt;td&gt;密碼：&lt;/td&gt;<br>		&lt;td&gt;&lt;input type='password' name='j_password'&gt;&lt;/td&gt;<br>	&lt;/tr&gt;<br>        &lt;tr&gt;<br>                &lt;td&gt;<br><span style="font-weight: bold;">                    &lt;input type="checkbox" name="_acegi_security_remember_me"&gt;</span><br>                &lt;/td&gt;<br>                &lt;td&gt;2周&#20869;記得我&lt;/td&gt;<br>        &lt;/tr&gt;  <br>	&lt;tr&gt;<br>		&lt;td&gt;&lt;input name="reset" type="reset"&gt;&lt;/td&gt;<br>		&lt;td&gt;&lt;input name="submit" type="submit"&gt;&lt;/td&gt;<br>	&lt;/tr&gt;        <br>&lt;/table&gt;<br>&lt;/form&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+<br>
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/AcegiGossip/FirstAcegLogoutCookies.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:29 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

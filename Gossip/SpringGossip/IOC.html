@@ -1,0 +1,590 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/IOC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:24 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>Inversion of Control</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: Inversion of Control</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+Spring 的核心概念是 IoC，IoC 的抽象概念是「依賴關係的轉移」，像是「高層模組不應該依賴低層模組，而是模組都必須依賴於抽象」是
+IoC 的一種表現，「實現必須依賴抽象，而不是抽象依賴實現」也是 IoC 的一種表現，「應用程式不應依賴於容器，而是容器服務於應用程式」也是
+IoC 的一種表現。 <br>
+
+      <br>
+
+
+
+IoC 全名 Inversion of Control，如果中文硬要翻譯過來的話，就是「控制反轉」。初看 IoC，從字面上不容易瞭解其意義，我覺得要瞭解 IoC，要先從 Dependency Inversion 開始瞭解，也就是依賴關係的反轉。 <br>
+
+      <br>
+
+
+
+
+Dependency Inversion <a href="../../../www.objectmentor.com/resources/articles/dip.pdf">The Dependency Inversion Principle</a> 有清楚的解釋。<br>
+
+      <br>
+
+
+
+
+簡單的說，在模組設計時，高層的抽象模組通常是與業務相關的模組，它應該具有重用性，而不依賴於低層的實作模組，例如如果低層模組原先是軟碟存取模式，而高層模組是個存檔備份的需求，如果高層模組直接叫用低層模組的函式，則就對低層模組產生了依賴關係。 <br>
+
+      <br>
+
+
+
+
+舉個例子，例如下面這個程式： <br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">#include &lt;floppy.h&gt; </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">.... </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">void save() { </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .... </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; saveToFloppy() </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+由於save()程式依賴於依賴於saveToFloppy()，如果今天要更換低層的存儲模組為Usb碟，則這個程式沒有辦法重用，必須加以修改才行，
+低層模組的更動造成了高層模組也必須跟著更動，這不是一個好的設計方式，在設計上希望模組都依賴於模組的抽象，這樣才可以重用高層的業務設計。 <br>
+
+      <br>
+
+
+
+
+如果以物件導向的方式來設計，依賴反轉（Dependency Inversion）的解釋變為程式不應依賴實作，而是依賴於抽象，實作必須依賴於抽象。來看看下面這個 Java 程式： <br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class BusinessObject { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private FloppyWriter writer = new FloppyWriter(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void save() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; writer.saveToFloppy(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br style="font-weight: bold;">
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在這個程式中，BusinessObject 的存檔依賴於實際的 FloppyWriter，如果今天想要將存檔改為存至 Usb 碟，則必須修改或繼承 BusinessObject 進行擴展，而無法直接使用BusinessObject。 <br>
+
+      <br>
+
+
+
+
+如果透過介面的宣告，可以改進此一情況，例如： <br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public interface IDeviceWriter { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void saveToDevice(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class BusinessObject { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private IDeviceWriter writer; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void setDeviceWriter(IDeviceWriter writer) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.writer = writer; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void save() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; writer.saveToDevice(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+這樣一來，BusinessObject 就是可重用的，如果今天有存儲至 Floppy 或 Usb 碟的需求，只要實作 IDeviceWriter 即可，而不用修改 BusinessObject： <br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class FloppyWriter implement IDeviceWriter { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void saveToDevice() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 實際儲存至Floppy的程式碼 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class UsbDiskWriter implement IDeviceWriter { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void saveToDevice() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 實際儲存至UsbDisk的程式碼 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+從這個角度來看，Dependency Inversion 的意思即是程式不依賴於實作，而是程式與實作都要依賴於抽象。 <br>
+
+      <br>
+
+
+
+
+IoC 的 Control
+是控制的意思，其實其背後的意義也是一種依賴關係的轉移，如果A依賴於B，其意義即是B擁有控制權，您想要轉移這種關係，所以依賴關係的反轉即是控制關係
+的反轉，藉由控制關係的轉移，可以獲得元件的可重用性，在上面的 Java 程式中，整個控制權從實際的 FloppyWriter 轉移至抽象的
+IDeviceWriter 介面上，使得BusinessObject、FloppyWriter、UsbDiskWriter
+這幾個實現依賴於抽象的 IDeviceWriter 介面。 <br>
+
+      <br>
+
+
+
+
+程式的業務邏輯部份應是可以重用的，不應受到所使用框架或容器的影響，因為可能轉移整個業務邏輯至其它的框架或容器，如果業務邏輯過於依賴容器，則轉移至其它的框架或容器時，就會發生困難。 <br>
+
+      <br>
+
+
+
+
+IoC 在容器的角度，可以用這麼一句好萊塢名言來代表：<span style="font-weight: bold;">"Don't call me, I'll call you."</span>
+以程式的術語來說的話，就是「不要向容器要求您所需要的（物件）資源，容器會自動將這些物件給您！」。IoC
+要求的是容器不侵入應用程式本身，應用程式本身提供好介面，容器可以透過這些介面將所需的資源注至至程式中，應用程式不向容器主動要求資源，故而不會依賴
+於容器的元件，應用程式本身不會意識到正被容器使用，可以隨時從容器中脫離轉移而不用作任何的修改，而這個特性正是一些業務邏輯中間件最需要的。 </small>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/IOC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:24 GMT -->
+</html>

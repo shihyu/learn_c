@@ -1,0 +1,806 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/CriteriaBasic.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>Criteria 基本查詢</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;Criteria 基本查詢</a></h1>
+
+
+
+
+
+<small>
+  </small><small>
+    </small><small>
+      </small><small>
+      </small><small>
+      </small><small>
+    </small>
+  <small>
+  </small>
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"><small>要對資料庫管理系
+統進行操作，最基本的就是使用SQL（Standard Query
+Language）語句，大部份的資料庫都支援標準的SQL語句，然而也有一些特定於資料庫的SQL語句，應用程式配合SQL語句進行資料庫查詢時，若使
+用到特定於資料庫的SQL語句，程式本身會有相依於特定資料庫的問題。<br>
+
+
+      <br>
+
+
+使用Hibernate時，即使您不了解SQL的使用與撰寫，也可以使用它所提供的API來進行SQL語句查詢，
+org.hibernate.Criteria對SQL進行封裝，您可以從Java物件的觀點來組合各種查詢條件，由Hibernate自動為您產生
+SQL語句，而不用特別管理SQL與資料庫相依的問題，就某個程度的意涵來看，這就像是在編譯時期也可以得到對SQL語法的檢查與驗證。<br>
+
+
+      <br>
+
+
+以最基本的查詢來說，如果您想要查詢某個物件所對應的資料表中所有的內容，您可以如下進行查詢：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Criteria criteria = session.createCriteria(User.class);</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">List users = criteria.list();</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">for(Iterator it = users.iterator(); it.hasNext(); ) {</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; User user = (User) it.next();</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.println(user.getId() +</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+" \t " + user.getName() +</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/" + user.getAge());&nbsp;&nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">} </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+Criteria建立後，若不給予任何的條件，預設是查詢物件所對應表格之所有資料，如果您執行以上的程式片段，並於設定檔中設定了了Hibernate的&rdquo;show_sql&rdquo;屬性，則可以在主控下看到以下的SQL語句之產生：<br>
+
+
+      <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;">Hibernate: </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">select</span><span style="font-family: Courier New,Courier,monospace;"> this_.id as id0_0_, this_.name as name0_0_, this_.age as age0_0_ </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">from</span><span style="font-family: Courier New,Courier,monospace;"> T_USER this_</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>org.hibernate.Criteria實際上是個條件附加的容器，如果想要設定查詢條件，則要使用
+org.hibernate.criterion.Restrictions的各種靜態方法傳回
+org.hibernate.criterion.Criteria實例，傳回的每個org.hibernate.criterion.Criteria
+實例代表著一個條件，您要使用org.hibernate.Criteria的add()方法加入這些條件實例，例如查詢&rdquo;
+age&rdquo;大於20且小於40的資料：<br style="font-weight: bold;">
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;">Criteria criteria = session.createCriteria(User.class);</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">criteria.add(Restrictions.gt("age", new Integer(20)));</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">criteria.add(Restrictions.lt("age", new Integer(40)));</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">List users = criteria.list();</span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; </span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">for(Iterator it = users.iterator(); it.hasNext(); ) {</span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; User user = (User) it.next();</span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.println(user.getId() +</span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+" \t " + user.getName() +</span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/" + user.getAge());&nbsp;&nbsp;&nbsp; </span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;">}</span></small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+Restrictions的gt()方法表示大於（great than）的條件，而lt表示小於（less than）的條件，執行以上程式片段，觀察所產生的SQL語句，將使用where與and子句產來完成SQL的條件查詢：<br>
+
+
+      <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;">Hibernate: select this_.id as id0_0_, this_.name as name0_0_, this_.age as age0_0_ from T_USER this_ </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">where this_.age&gt;? and this_.age&lt;?</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+使用add()方法加入條件時，預設是使用and來組合條件，如果要用or的方式來組合條件，則可以使用Restrictions.or()方法，例如結合age等於（eq）20或（or）age為空（isNull）的條件：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;">Criteria criteria = session.createCriteria(User.class);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">criteria.add(Restrictions.or(</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Restrictions.eq("age", new Integer(20)),</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Restrictions.isNull("age")</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ));</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">List users = criteria.list();</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+觀察所產生的SQL語句，將使用where與or子句完成SQL的條件查詢：<br>
+
+
+      <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;">Hibernate: select this_.id as id0_0_, this_.name as name0_0_, this_.age as age0_0_ from T_USER this_ <span style="font-weight: bold;">where (this_.age=? or this_.age is null)</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+您也可以使用Restrictions.like()方法來進行SQL中like子句的功能，例如查詢&rdquo;name&rdquo;中名稱為&rdquo;just&rdquo;開頭的資料：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;">Criteria criteria = session.createCriteria(User.class);</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">criteria.add(<span style="font-weight: bold;">Restrictions.like("name", "just%")</span>);</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">List users = criteria.list();</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+觀察所產生的SQL語句如下：<br>
+
+
+      <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small>Hibernate: select this_.id as id0_0_, this_.name as name0_0_, this_.age as age0_0_ from T_USER this_ <span style="font-weight: bold;">where this_.name like ?</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+
+
+
+Restrictions的幾個常用限定查詢方法如下表所示：<br>
+
+
+
+
+
+      </small>
+      <small>
+        </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small><small>
+            </small><small>
+            </small><small>
+            </small><small>
+          </small>
+        <small>
+        </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(204, 204, 204);"><small>方
+法</small></td>
+
+
+
+
+            <td style="background-color: rgb(204, 204, 204);"><small>說
+明</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.eq</small></td>
+
+
+
+
+            <td><small>等於</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.allEq</small></td>
+
+
+
+
+            <td><small>使用Map，使用key/value進行多個等於的比對</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.gt</small></td>
+
+
+
+
+            <td><small>大於 &gt;</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.ge</small></td>
+
+
+
+
+            <td><small>大於等於 &gt;=</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.lt</small></td>
+
+
+
+
+            <td><small>小於 &lt;</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.le</small></td>
+
+
+
+
+            <td><small>小於等於 &lt;=</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.between</small></td>
+
+
+
+
+            <td><small>對應SQL的BETWEEN子句</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.like</small></td>
+
+
+
+
+            <td><small>對應SQL的LIKE子句</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.in</small></td>
+
+
+
+
+            <td><small>對應SQL的in子句</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.and</small></td>
+
+
+
+
+            <td><small>and關係</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.or</small></td>
+
+
+
+
+            <td><small>or關係</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          <tr>
+
+
+
+
+            <td><small>Restrictions.sqlRestriction</small></td>
+
+
+
+
+            <td><small>SQL限定查詢</small></td>
+
+
+
+
+            </tr>
+
+
+
+
+          
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <small>
+      <br>
+
+
+
+
+ </small></td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+      </tr>
+
+
+
+
+    
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/CriteriaBasic.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+</html>

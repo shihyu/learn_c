@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/BlockJUnit4ClassRunner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:28 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>擴充 BlockJUnit4ClassRunner</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 擴充 BlockJUnit4ClassRunner<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>JUnit
+4的預設<span style="font-family: Courier New,Courier,monospace;">Runner是<span style="font-weight: bold;">org.junit.runners.JUnit4</span>，實際上</span>JUnit4<span style="font-family: Courier New,Courier,monospace;">繼承<span style="font-weight: bold;">BlockJUnit4ClassRunner</span>（</span>JUnit
+4.7<span style="font-family: Courier New,Courier,monospace;">引進）之後，並沒有定義
+任何新的方法：</span><br>
+      </small>
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>...</small><br>
+      <small>public final class JUnit4 extends BlockJUnit4ClassRunner {</small><br>
+      <small>&nbsp;&nbsp;&nbsp; public JUnit4(Class&lt;?&gt; klass)
+throws InitializationError {</small><br>
+      <small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; super(klass);</small><br>
+      <small>&nbsp;&nbsp;&nbsp; }</small><br>
+      <small>}</small><br>
+      </div>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">BlockJUnit4ClassRunner</span>
+執行測試的方式是以<span style="font-weight: bold;">Statement block</span>為單位，是將測試
+分為數種職責，由每個Statement負責，每個Statement各負責自己的執行目的，執行完轉交下一個Statement，一路執行下去，直到所
+有Statement執行完畢為止，具體而言，是實現了</small> <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><a href="../DesignPattern/ChainofResponsibility.htm" style="color: rgb(68, 68, 68); font-weight: bold; text-decoration: none;">Chain
+of Responsibility 模式</a> </span></span><small>的設計方式。</small><br>
+      <br>
+      <small>具體而言，如果你想在執行測試時，加入額外的職責，你可以繼承<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Statement</span>類
+別，定義其<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">evaluate()</span>方
+法，實現你在測試中想要加入的動作。例如，雖然JUnit 4本身提供有<span style="font-family: Courier New,Courier,monospace;">@Before、@After</span>，
+在每個測試方法前、後執行，但也許你有些測試方法執行前、後，想要單獨指定某幾個方法執行，而這幾個方法並非其它測試方法所需要，你可以如下實作<span style="font-family: Courier New,Courier,monospace;">Statement</span>：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import org.junit.runners.model.Statement;<br><br>import java.lang.reflect.Method;<br>import java.util.List;<br>import java.util.ArrayList;<br><br>public class PrePostTestStatement <span style="font-weight: bold;">extends Statement</span> {<br>    private Statement invoker;<br>    private Object target;<br>    private List&lt;Method&gt; preMethods = new ArrayList&lt;Method&gt;();<br>    private List&lt;Method&gt; postMethods = new ArrayList&lt;Method&gt;();<br>    <br>    public PrePostTestStatement(Statement invoker, Object target) {<br>        this.invoker = invoker;<br>        this.target = target;<br>    }<br>    <br>    @Override<br>    <span style="font-weight: bold;">public void evaluate() throws Throwable {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        for(Method method : preMethods) {</span><span style="font-weight: bold;"></span><br style="font-weight: bold;"><span style="font-weight: bold;">            method.invoke(target, null);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }<br><br style="font-weight: bold;"></span><span style="font-weight: bold;">        Throwable throwable = null;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        try {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            invoker.evaluate(); // 記得呼叫下一個Statement</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        catch(Throwable t) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            throwable = t;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }<br><br style="font-weight: bold;"></span><span style="font-weight: bold;">        for(Method method : postMethods) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            method.invoke(target, null);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if(throwable != null) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            throw throwable;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>    <br>    public void addPre(Method method) {<br>        preMethods.add(method);<br>    }<br>    <br>    public void addPost(Method method) {<br>        postMethods.add(method);<br>    }<br>}<br><br></pre>
+      <br>
+      <small>在這邊，你定義了兩個標註（Annotation）：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.lang.annotation.Retention;<br>import java.lang.annotation.RetentionPolicy;<br>import java.lang.annotation.Target;<br>import java.lang.annotation.ElementType;<br><br>@Retention(RetentionPolicy.RUNTIME)<br>@Target(ElementType.METHOD)<br>public @interface PreTest {<br>    String[] value();<br>}<br></pre>
+      <br>
+      <pre>package cc.openhome;<br><br>import java.lang.annotation.Retention;<br>import java.lang.annotation.RetentionPolicy;<br>import java.lang.annotation.Target;<br>import java.lang.annotation.ElementType;<br><br>@Retention(RetentionPolicy.RUNTIME)<br>@Target(ElementType.METHOD)<br>public @interface PostTest {<br>    String[] value();<br>}<br></pre>
+      <br>
+      <small>你希望可以如下使用這兩個新標註：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import static org.junit.Assert.assertEquals;<br><br>import org.junit.After;<br>import org.junit.Before;<br>import org.junit.Test;<br>import org.junit.runner.RunWith;<br>import test.cc.openhome.TestCase;<br><br><span style="font-weight: bold;">@RunWith(value = BlockGossipClassRunner.class)</span><br>public class CalculatorTest {<br>    private Calculator calculator;<br>    <br>    @Before<br>    public void setUp() {<br>        calculator = new Calculator();<br>    }<br><br>    @After<br>    public void tearDown() {<br>        calculator = null;<br>    }<br><br>    public void preTestPlus() {<br>    	System.out.println("preTestPlus");<br>    }<br>    <br>    public void postTestPlus() {<br>    	System.out.println("postTestPlus");<br>    }<br>    <br><span style="font-weight: bold;">    @PreTest("preTestPlus")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    @PostTest("postTestPlus")</span><br>    @Test<br>    public void testPlus() {<br>        int expected = 1;<br>        int result = calculator.plus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>    <br>    @Test<br>    public void testMinus() {<br>        int expected = 1;<br>        int result = calculator.minus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>}<br></pre>
+      <br>
+      <small>該如何自訂Runner來讓這兩個標註生效？你可以檢視<span style="font-family: Courier New,Courier,monospace;">BlockJUnit4ClassRunner</span>的
+原始碼，可發現在測試運行開始<span style="font-family: Courier New,Courier,monospace;">時，
+會依序呼叫run()、classBlock()方法，其中<span style="font-weight: bold;">classBlock()</span>方
+法為：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; protected
+Statement classBlock(final RunNotifier notifier) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; Statement statement= childrenInvoker(notifier);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= withBeforeClasses(statement);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= withAfterClasses(statement);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; return statement;</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br>
+      </span><br>
+      <span style="font-family: Courier New,Courier,monospace;">childrenInvoker()</span>是
+實例範圍的Statement block，之後套用<span style="font-family: Courier New,Courier,monospace;">@BeforeClass與
+@AfterClass</span>的Statement Block。換言之，<span style="font-weight: bold; color: red;">如果你想要在Class
+block層級介入某些Statement block，可以重新定義</span><span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">classBlock</span></small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">()</span><span style="font-weight: bold; color: red;">方法。</span><br>
+      <br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">childrenInvoker
+()的呼叫中，會呼叫到getChildren()方法，其透過computeTestMethods()傳回一個List，當中會有一些
+FrameworkMethod實例，每個FrameworkMethod實例，是標註有@Test的方法之包裹物件：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; protected
+List&lt;FrameworkMethod&gt; computeTestMethods() {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; return
+getTestClass().getAnnotatedMethods(Test.class);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      </span></small><small><br>
+      <span style="font-family: Courier New,Courier,monospace;">getTestClass
+()會取得TestClass實例，這是一開始傳入測試類別Class實例給BlockJUnit4ClassRunner</span>建構時就產生的
+物件，是一個輔助類別，用來取得一些反射（Reflection）的相關資訊。 <br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">在取得
+FrameworkMethod的List後，會再呼叫到</span></small><small style="font-family: Courier New,Courier,monospace;">BlockJUnit4ClassRunner
+的</small><small><span style="font-family: Courier New,Courier,monospace;">runChild()方法：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; protected
+void runChild(FrameworkMethod method, RunNotifier notifier) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; EachTestNotifier eachNotifier= makeNotifier(method,
+notifier);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; if (method.getAnnotation(Ignore.class) != null) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; runIgnored(eachNotifier);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; } else {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; runNotIgnored(method,
+eachNotifier);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br>
+      </span><br>
+      <span style="font-family: Courier New,Courier,monospace;">對於標註有
+@Ignore的方法並不執行，直接發出一個忽略的通知給RunNotifier，否則就呼叫runNotIgnored()：</span><br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+private void runNotIgnored(FrameworkMethod method,</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; EachTestNotifier eachNotifier) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; eachNotifier.fireTestStarted();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; try {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; methodBlock(method).evaluate();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; } catch (AssumptionViolatedException e) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+eachNotifier.addFailedAssumption(e);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; } catch (Throwable e) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; eachNotifier.addFailure(e);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; } finally {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; eachNotifier.fireTestFinished();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+}</span><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">methodBlock
+()會為每個FrameworkMethod</span>建立測試類別的實例：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+protected Statement methodBlock(FrameworkMethod method) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; Object test;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; try {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; test= new ReflectiveCallable() {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; @Override</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; protected
+Object runReflectiveCall() throws Throwable {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; return createTest();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }.run();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; } catch (Throwable e) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return new Fail(e);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; Statement statement= methodInvoker(method, test);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= possiblyExpectingExceptions(method, test,
+statement);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= withPotentialTimeout(method, test,
+statement);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= withBefores(method, test, statement);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= withAfters(method, test, statement);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; statement= withRules(method, test, statement);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; return statement;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+}</span><br>
+      </small><br>
+      <small>所以，<span style="font-weight: bold; color: red;">如果你想在Method
+block的層次，作一些額外的執行，則可以重新定義<span style="font-family: Courier New,Courier,monospace;">methodBlock()</span>方
+法。</span><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">在<span style="font-weight: bold;">methodInvoker()</span>中，會建立InvokeMethod實例：<br>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; protected
+Statement methodInvoker(FrameworkMethod method, Object test) {</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; return new InvokeMethod(method, test);</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br>
+      </span><br>
+      <span style="font-family: Courier New,Courier,monospace;">InvokeMethod
+包裹了FrameworkMethod，在它的evaluate()中，實現了被標註為@Test的方法之執行。所以，<span style="color: red; font-weight: bold;">如果你想在</span></span></small><small style="color: red; font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">被標註為@Test的方法執行之前後，作
+一些Statement的介入，則可以重新定義methodInvoker()方法。</span></small><small><span style="font-family: Courier New,Courier,monospace;"></span><br>
+      <br>
+對於我們的需求，則需定義<span style="font-family: Courier New,Courier,monospace;">methodInvoker()</span>方
+法：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.lang.reflect.Method;<br><br>import org.junit.runners.BlockJUnit4ClassRunner;<br>import org.junit.runners.model.FrameworkMethod;<br>import org.junit.runners.model.InitializationError;<br>import org.junit.runners.model.Statement;<br><br>public class BlockGossipClassRunner extends BlockJUnit4ClassRunner {<br><span style="font-weight: bold;">	public BlockGossipClassRunner(Class&lt;?&gt; clz) </span><br style="font-weight: bold;"><span style="font-weight: bold;">	                      throws InitializationError {</span><br style="font-weight: bold;"><span style="font-weight: bold;">		super(clz);</span><br style="font-weight: bold;"><span style="font-weight: bold;">	}</span><br><br style="font-weight: bold;"><span style="font-weight: bold;">	@Override</span><br style="font-weight: bold;"><span style="font-weight: bold;">	protected Statement methodInvoker(FrameworkMethod method, </span><br style="font-weight: bold;"><span style="font-weight: bold;">			                          Object test) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        PrePostTestStatement statement = </span><br style="font-weight: bold;"><span style="font-weight: bold;">            new PrePostTestStatement(</span><br style="font-weight: bold;"><span style="font-weight: bold;">            		super.methodInvoker(method, test), test);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        PreTest preTest = method.getAnnotation(PreTest.class);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if(preTest != null) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            addMethod(test, statement, preTest.value(), true);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        PostTest postTest = method.getAnnotation(PostTest.class);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if(postTest != null) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            addMethod(test, statement, postTest.value(), false);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        return statement;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br><br>    private void addMethod(Object test, PrePostTestStatement statement,<br>            String[] methodNames, boolean isPre) {<br>        for(String methodName : methodNames) {<br>            Method[] methods = test.getClass().getMethods();<br>            for(Method method : methods) {<br>                if(method.getName().equals(methodName)) {<br>                    if(isPre) {<br>                        statement.addPre(method);<br>                    }<br>                    else {<br>                        statement.addPost(method);<br>                    }<br>                }<br>            }<br>        }<br>    }<br>}<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">現在，你可以直接
+運行先前定義的CalculatorTest，看看指定的@PreTest、@PostTest是否有作用了。</span><br>
+      </small><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/BlockJUnit4ClassRunner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:28 GMT -->
+</html>

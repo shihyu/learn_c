@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Container.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:46 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>何謂容器</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 何謂容器<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>對於Java程式而言，<span style="font-weight: bold;">JVM（Java Virtual Machine）</span>是其作業系統，.java編譯為.class檔案，.class對於JVM而言，就是其可執行檔，你的Java程式基本上只認得一種作業系統，就是JVM。<br>
+      <br>
+當你開始撰寫Servlet/JSP程式時，你必須開始接觸<span style="font-weight: bold;">容器（Container）</span>的概念，容器這個名詞也用在如<span style="font-family: Courier New,Courier,monospace;">List、Set這類的Collection</span>上，也就是用來持有、保存物件的群集（Collection）物件，不過，對於撰寫Servlet/JSP來說，容器的概念更為廣泛，在最基本的功能上，它不僅持有物件，還負責物件的生命周期與相關服務的連結。<br>
+      <br>
+在具體層面，容器說穿了，其實就是一個用Java寫的程式，運行於JVM之上，不同類型的容器會負責不同的工作，若以Servlet/JSP所運行的<span style="font-weight: bold;">Web容器（Web Container）</span>來說，也是一個Java寫的程式，想想看，HTTP那些文字性的通訊協定，如何變成你寫的Servlet/JSP中可用的Java物件（如<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest、HttpServletResponse</span>等），其實就是容器為你剖析與轉換。<br>
+      <br>
+在抽象層面，可以將Web容器視為你寫的Servlet/JSP的運行伺服器，是的！就如同Java程式僅認得JVM這個作業系統，<span style="font-weight: bold;">Servlet/JSP程式在抽象層面上，也僅認得Web容器這個概念上的Web伺服器</span>，只要你寫的Servlet/JSP是符合Web容器的標準規範，你的Servlet/JSP就可以在各種不同廠商實作的Web容器上運行，而不用理會底層真正的Web伺服器。<br>
+      <br>
+當然，實際上還是要有個Web伺服器，所以回到實際層面，Web容器是個Java寫的應用程式，可以成為實體Web伺服器程式的一部份，</small><small>管理Servlet物件的生命週期，</small><small>提供基於HTTP請求、回應的網路服務。<br>
+      <br>
+若以Tomcat為例，容器的角色位置可以用下圖來表示：<br>
+      </small><small><img style="width: 679px; height: 124px;" alt="" src="images/Container-1.png"><br>
+      <br>
+就如同JVM介於Java程式與實體作業系統之間，Web容器是介於實體Web伺服器與Servlet之間，也正如你撰寫Java程式必須了解
+JVM/JRE與你的應用程式之間如何互動，<span style="font-weight: bold;">你撰寫Servlet/JSP也必須知道容器如何與你的Servlet/JSP互動，如何管理Servlet
+等事實</span>（JSP最後也是轉譯、編譯、載入為Servlet，在容器的世界中，真正負責請求、回應的是Servlet）。<br>
+      <br>
+      </small><small>一個請求/回應的基本例子是：</small>
+      <ol>
+        <li><small>客戶端（大部份情況下是瀏覽器）對Web伺服器發出HTTP請求。</small></li>
+        <li><small>Web伺服器收到HTTP請求，將請求轉由Web容器處理，Web容器會剖析HTTP請求內容，建立各種物件（像是<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest、HttpServletResponse、HttpSession等</span>）。</small></li>
+        <li><small>Web容器由請求的URL決定要使用哪個Servlet來處理請求（事先由開發人員定義）。</small></li>
+        <li><small>Servlet根據請求物件（<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest</span>）的資訊決定如何處理，透過回應物件（<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse</span>）來建立回應。</small></li>
+        <li><small>Web容器與Web伺服器溝通，Web伺服器將回應轉換為HTTP回應並傳回客戶端。<br>
+          </small></li>
+      </ol>
+      <small><br>
+不僅是寫Servet/JSP需要理解</small><small>Web</small><small>容器，在Java EE的領域無論是哪個技術，都與容器息息相關，寫Servlet/JSP需要理解Web容器，寫EJB需要了解EJB容器，寫應用程式客戶端需要了解應用程式客戶端容器，即使是寫個Applet，也會有個Applet容器的特性需要了解。<br>
+      <br>
+下圖是摘自 <a href="http://download.oracle.com/docs/cd/E17410_01/javaee/6/tutorial/doc/">Java EE 6 Tutorial </a>中 <a href="http://download.oracle.com/docs/cd/E17410_01/javaee/6/tutorial/doc/bnacj.html">Java EE 6 APIs</a> 文件的容器示意：<br>
+      <img style="width: 475px; height: 324px;" alt="" src="images/Container-2.png"><br>
+      <br>
+      </small><small>對於Java EE 6規範中Servlet 3.0/JSP
+2.2等，你可以使用的實際容器可以是Tomcat 7，或者是Glassfish v3，Tomcat 7專注在Web容器的部份，Glassfish
+v3是個完整的應用程式伺服器，當然也包括了Web容器的功能（當然，也還有其它廠商的實現）。<br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Container.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:47 GMT -->
+</html>

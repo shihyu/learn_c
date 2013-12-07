@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/PossibleSet2.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>產生可能的集合（字典順序）</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 產生可能的清單（字典順序）</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+
+      
+      <h2>說明</h2>
+
+      <small>接續 <a href="PossibleSet.htm">產生可能的清單</a>。
+現在要考慮產生的清單必須具備字典順序。例如給定1 2 3 4，必須產生[]、[1]、[1, 2]、[1, 2, 3]、[1, 2, 3,
+4]、[1, 2, 4]、[1, 3]、[1, 3, 4]、[1, 4]、[2]、[2, 3]、[2, 3, 4]、[2,
+4]、[3]、[3, 4]、[4]。</small><br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small></small><small>如果要產生字典順序，例如有4個元素，則觀察後可發現：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[] =&gt; [1] =&gt; [1, 2] =&gt; [1, 2, 3] =&gt; [1, 2, 3, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[1, 2, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[1, 3] =&gt; [1, 3, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[1, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[2] =&gt; [2, 3] =&gt; [2, 3, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[2, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[3] =&gt; [3, 4] =&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[4]</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+簡單地說，如果有n個元素的清單要從中產生可能的清單，當依序產生清單時：<br>
+</small>
+      <ol>
+        <li><small>從空清單開始，依序加入後續元素，直到清單最後一個數為n。</small></li>
+        <li><small>若此時倒數第二個元素是m，則下個清單就是去掉n，而最後一個元素是 m + 1。</small></li>
+        <li><small>然後加入m + 1的後續元素，直到清單最後一個數為n，重複1到3。</small></li>
+      </ol>
+      <small><br>
+例如：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">{1, 2, 3, 4, ..., m, n}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+則下一個清單就是[1, 2, 3, 4, ..., m + 1]，再依序加入後續的元素。<br>
+
+      <br>
+
+
+
+例如有四個元素的清單，從中產生[1, 2, 3, 4]集合時，則下一個清單就是[1, 2, 3 + 1]，也就是[1, 2,
+4]，由於最後一個元素還是4，所以下一個清單就是[1, 2 + 1]，也就是[1, 3]，接下來再加入後續元素4，也就是[1, 3,
+4]，由於又遇到元素4，所以下一個清單是[1, 3 + 1]，也就是[1, 4]。</small>&nbsp;<h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2><br><ul><li><a name="C"></a> C
+  </li></ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>#define MAXSIZE 20 <br><br>void print(int*);<br>int getPosition(int*);<br>int hasNext(int*, int);<br>void next(int*, int);<br><br>int main(void) { <br>    int list[MAXSIZE] = {0}; <br><br>    int n;<br>    printf("輸入清單個數："); <br>    scanf("%d", &amp;n);     <br><br>    print(list);<br>    while(hasNext(list, n)) {<br>        next(list, n);<br>        print(list);<br>    }<br><br>    return 0; <br>}<br><br>void print(int* list) {<br>    printf("[");<br>    int i, position;<br>    for(i = 0, position = getPosition(list); i &lt; position; i++) {<br>        printf("%d, ", list[i]); <br>    }<br>    printf(position == -1 ? "]\n" : "%d]\n", list[i]);<br>}<br><br>int getPosition(int* list) {<br>    int i;<br>    for(i = 0; list[i] != 0; i++);<br>    return i - 1;<br>}<br><br>int hasNext(int* list, int n) {<br>    int position = getPosition(list);<br>    return position == -1 || list[position] &lt; n || position != 0;<br>}<br><br>void next(int* list, int n) {<br>    int position = getPosition(list);<br>    if(position == -1) {           // 第一個非空清單<br>        list[0] = 1;<br>    }<br>    else if(list[position] &lt; n) {  // 遞增清單個數 <br>        list[position + 1] = list[position] + 1; <br>    } <br>    else if(position != 0) {       // 如果不是第一個位置 <br>        list[position] = 0;<br>        list[position - 1]++;      // 下一個清單尾數 <br>    } <br>}<br></pre>
+
+
+
+
+<br>
+
+
+
+
+      
+      <ul><li><a name="Java"></a> Java
+  </li></ul>
+
+
+
+
+      
+      <pre>import java.util.*;<br><br>public class PossibleList2 {<br>    public static class IdxList&lt;T&gt; {<br>        private List&lt;Integer&gt; idxLt;<br>        private int n;<br>        <br>        public IdxList(int n) { <br>            this(n, new ArrayList&lt;&gt;());<br>        }<br>        <br>        private IdxList(int n, List&lt;Integer&gt; idxLt) {<br>            this.n = n;<br>            this.idxLt = idxLt;<br>        }<br>        <br>        public boolean hasNext() {<br>            return idxLt.isEmpty() || <br>                   getLast(idxLt) &lt; n - 1 || idxLt.size() != 1;<br>        }<br>        <br>        public IdxList&lt;T&gt; next() {<br>            List&lt;Integer&gt; newIdxLt = new ArrayList&lt;&gt;();<br>            if(idxLt.isEmpty()) { newIdxLt.add(0); }<br>            else if(getLast(idxLt) &lt; n - 1) {<br>                newIdxLt.addAll(idxLt);<br>                newIdxLt.add(getLast(idxLt) + 1);<br>            }<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else if(idxLt.size() != 1) {<br>                newIdxLt.addAll(idxLt.subList(0, idxLt.size() - 2));<br>                newIdxLt.add(idxLt.get(idxLt.size() - 2) + 1);<br>            }<br>            return new IdxList&lt;&gt;(n, newIdxLt);<br>        }<br>        <br>        public List&lt;T&gt; toList(List&lt;T&gt; src) {<br>            List&lt;T&gt; lt = new ArrayList&lt;&gt;();<br>            for(Integer idx : idxLt) { lt.add(src.get(idx)); }<br>            return lt;<br>        }<br>        <br>        private static Integer getLast(List&lt;Integer&gt; idxList) {<br>            return idxList.get(idxList.size() - 1);<br>        }<br>    }<br>    <br>    public static &lt;T&gt; List&lt;List&lt;T&gt;&gt; from(List&lt;T&gt; src) {<br>        IdxList&lt;T&gt; idxList = new IdxList&lt;&gt;(src.size());<br>        List&lt;List&lt;T&gt;&gt; all = new ArrayList&lt;&gt;();<br>        all.add(idxList.toList(src));<br>        while(idxList.hasNext()) {<br>            idxList = idxList.next();<br>            all.add(idxList.toList(src));<br>        }<br>        return all;<br>    }<br><br>    public static void main(String[] args) {<br>        for(List&lt;Integer&gt; lt : from(Arrays.asList(1, 2, 3, 4))) {<br>            System.out.println(lt);<br>        }<br>    }<br>}</pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>class IdxList:<br>    def __init__(self, n, idxLt = []):<br>        self.n = n<br>        self.idxLt = idxLt<br><br>    def hasNext(self):<br>        return len(self.idxLt) == 0 or \<br>               self.idxLt[-1] &lt; self.n - 1 or \<br>               len(self.idxLt) != 1<br><br>    def next(self):<br>        idxLt = self.idxLt<br>        return IdxList(self.n, <br>            [0] if len(idxLt) == 0 else <br>            (idxLt + [idxLt[-1] + 1] if idxLt[-1] &lt; self.n - 1 else (<br>            idxLt[0 : len(idxLt) - 2] + [idxLt[-2] + 1] if len(idxLt) != 1<br>                                                        else []))<br>        )<br>&nbsp;<br>    def toList(self, src):<br>        return [src[idx] for idx in self.idxLt]<br>                <br>def possibleLts(src):<br>    def iter(idxList):<br>        return [idxList.toList(src)] + \<br>            (iter(idxList.next()) if idxList.hasNext() else [])<br>    return iter(IdxList(len(src)))<br>    <br>for lt in possibleLts([1, 2, 3, 4]):<br>    print(lt)<br></pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>class IdxList[T](n: Int, idxLt: List[Int]) {<br>    def this(n: Int) = this(n, Nil);<br><br>    def hasNext =<br>        idxLt.size == 0 || idxLt.head &lt; n - 1 || idxLt.size != 1<br>    <br>    def next = new IdxList[T](n, <br>        if(idxLt.size == 0) List(0)<br>        else if(idxLt.head &lt; n - 1) (idxLt.head + 1) :: idxLt<br>        else if(idxLt.size != 1) (idxLt.tail.head + 1) :: idxLt.tail.tail<br>        else Nil<br>    )<br>    <br>    def toList(src: List[T]) = <br>        (for(idx &lt;- idxLt.reverse) yield src(idx)).toList<br>}<br><br>def from[T](src: List[T]) = {<br>    def iterate(idxList: IdxList[T]): List[List[T]] = {<br>        idxList.toList(src) :: (<br>            if(idxList.hasNext) iterate(idxList.next) else Nil)<br>    }<br>    iterate(new IdxList[T](src.size))<br>}<br><br>from(List(1, 2, 3, 4)).foreach(println)</pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>class IdxList<br>    def initialize(n, idxLt = [])<br>        @n = n<br>        @idxLt = idxLt<br>    end<br>        <br>    def hasNext<br>        @idxLt.empty? || @idxLt.last &lt; @n - 1 || @idxLt.size != 1<br>    end<br>    <br>    def next<br>        IdxList.new(@n, <br>            if @idxLt.empty?<br>                [0]<br>            elsif @idxLt.last &lt; @n - 1<br>                @idxLt + [@idxLt.last + 1]<br>            elsif @idxLt.size != 1<br>                @idxLt.take(@idxLt.size - 2) + [@idxLt[-2] + 1]<br>            else<br>                []<br>            end<br>        )<br>    end<br>                <br>    def toList(src)<br>        @idxLt.map {|idx| src[idx]}<br>    end<br>end<br>                <br>def possibleLts(src)<br>    iter = -&gt;(idxList) {<br>        [idxList.toList(src)] + <br>            (idxList.hasNext ? iter.call(idxList.next) : [])<br>    }<br>    iter.call(IdxList.new(src.size))<br>end<br>    <br>possibleLts([1, 2, 3, 4]).each do |lt|<br>    print("#{lt}\n")<br>end<br></pre><span style="font-family: &quot;Courier New&quot;,Courier,monospace;"><br>
+      </span>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>Array.prototype.getLast = function() { return this[this.length - 1]; };<br><br>Array.prototype.isEmpty = function() { return this.length == 0; };<br><br>function IdxList(n, idxLt) {<br>    this.n = n;<br>    this.idxLt = idxLt;<br>}<br><br>IdxList.prototype.hasNext = function() {<br>    var idxLt = this.idxLt;<br>    return idxLt.isEmpty() || idxLt.getLast() &lt; this.n - 1 <br>                           || idxLt.length != 1;<br>};<br><br>IdxList.prototype.next = function() {<br>    var newIdxLt = [];<br>    var idxLt = this.idxLt;<br>    if(idxLt.isEmpty()) {<br>        newIdxLt.push(0);<br>    }<br>    else if(idxLt.getLast() &lt; this.n - 1) {<br>        idxLt.forEach(function(idx) { newIdxLt.push(idx); });<br>        newIdxLt.push(idxLt.getLast() + 1);<br>    }<br>    else if(idxLt.length != 1) {<br>        idxLt.slice(0, idxLt.length - 2).forEach(function(idx) <br>            { newIdxLt.push(idx); }<br>        );<br>        newIdxLt.push(idxLt[idxLt.length - 2] + 1);<br>    }<br>    return new IdxList(this.n, newIdxLt);<br>};<br><br>IdxList.prototype.toList = function(src) {<br>    return this.idxLt.map(function(idx) { return src[idx]; });<br>};<br><br>function from(src) {<br>    var idxList = new IdxList(src.length, []);<br>    var all = [];<br>    all.push(idxList.toList(src));<br>    while(idxList.hasNext()) {<br>        idxList = idxList.next();<br>        all.push(idxList.toList(src));<br>    }<br>    return all;<br>}<br><br>from([1, 2, 3, 4]).forEach(function(lt) { print(lt); });<br></pre>
+      <span style="font-family: &quot;Courier New&quot;,Courier,monospace;"><br>
+      </span>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>data IdxList = IdxList Int [Int] deriving (Show)<br><br>hasNext (IdxList n idxLt) =<br>    null idxLt || head idxLt &lt; n - 1 || length idxLt /= 1<br><br>next (IdxList n idxLt) = <br>    IdxList n (<br>        if null idxLt then [0]<br>        else if head idxLt &lt; n - 1 <br>             then head idxLt + 1 : idxLt<br>        else if length idxLt /= 1 <br>             then (head $ tail idxLt) + 1 : (tail $ tail idxLt)<br>        else [])<br>    <br>toList (IdxList _ idxLt) src = [src !! idx | idx &lt;- idxLt]<br><br>possibleLts src = iter $ IdxList (length src) []<br>    where<br>        iter idxList = <br>            toList idxList src : if hasNext idxList <br>                                    then iter $ next idxList<br>                                    else []<br>                                    <br>main = sequence [print lt | lt &lt;- possibleLts [1, 2, 3, 4]]<br></pre>
+      <span style="font-family: &quot;Courier New&quot;,Courier,monospace;"><br>
+      </span></td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/PossibleSet2.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+</html>

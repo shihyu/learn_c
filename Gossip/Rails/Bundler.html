@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Bundler.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>簡介 Bundler</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror bundler" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 簡介 Bundler<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p><a href="http://rubygems.org/">RubyGem</a> 是包裝、散佈Ruby程式庫的標準方式，相關文件可以參考 <a
+          href="http://guides.rubygems.org/">RubyGems Guides</a> 的說明，或是 <a
+          href="Plugins.html">簡介 plugins</a> 中的第二個例子。在使用rails new建立新專案時，會執行bundle install安裝應用程式使用到的Gem，例如在 <a
+          href="Installation.html">安裝 Rails</a> 中看到的例子：</p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rails new hello<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; README<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; Rakefile<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; config.ru<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; .gitignore<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; Gemfile<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app/assets/images/rails.png<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app/assets/javascripts/application.js<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...略<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; vendor/plugins/.gitkeep<br>
+              <span style="font-weight: bold;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; run&nbsp; bundle install</span><br>
+              Fetching source index for http://rubygems.org/<br>
+              Using rake (0.9.2.2) <br>
+              Using multi_json (1.0.4) <br>
+              Using activesupport (3.1.3) <br>
+              ...略<br>
+              Installing turn (0.8.2) <br>
+              Installing uglifier (1.1.0) <br>
+              Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p><a href="http://gembundler.com/">Bundler</a> 是管理Gem相依性的工具，執行bundle install時，會根據應用程式目錄中Gemfile的設定，檢查指定的Gem與相依套件是否已安裝，如果已安裝了Gem，就會顯示Using，如果是新下載安裝的Gem，就會顯示Installing，想知道已安裝的Gem裝到哪，可以使用bundle show gemname來得知。</p>
+      <p>預設Gem會安裝至Ruby安裝目錄中gems目錄中，例如在我的Ubuntu中是安裝至/usr/local/lib/ruby/gems/1.9.1/gem中，如果有設置BUNDLE_PATH環境變數，則會將Gem安裝至指定的目錄中。</p>
+      <p>bundle install會連至伺服器檢查Gem相依性，預設是連線http://rubygems.org，如果有缺少的Gem，會自動下載安裝，然而每次執行bundle install都要連線會耗費時間，如果你需要的Gem先前都下載安裝過了，在執行rails new建立新專案時，可以先略過連線：</p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rails new gossip --skip-bundle<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <a href="http://gembundler.com/"></a>
+      <p>之後執行bundle install時指定--local選項：</p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ bundle install --local<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <a href="http://gembundler.com/"></a>
+      <p>加上--local選項就不會連至 Server，只會檢查本地端有無安裝，但如果有缺少的Gem，不會自動下載安裝。<br>
+      </p>
+      <p>要注意的是，在Rails 3中使用Gemfile來管理Gem，應用程式會使用的Gem，一定要在Gemfile中設定，不然即使本地端有安裝，應用程式也無法使用，一個新建的專案中，預設的Gemfile如下：</p>
+      <ul>
+        <li>Gemfile</li>
+      </ul>
+      <pre>source 'http://rubygems.org'
+
+gem 'rails', '3.1.3'
+
+# Bundle edge Rails instead:
+# gem 'rails',     :git =&gt; 'git://github.com/rails/rails.git'
+
+gem 'sqlite3'
+
+
+# Gems used only for assets and not required
+# in production environments by default.
+group :assets do
+  gem 'sass-rails',   '~&gt; 3.1.5'
+  gem 'coffee-rails', '~&gt; 3.1.1'
+  gem 'uglifier', '&gt;= 1.0.3'
+end
+
+gem 'jquery-rails'
+
+# To use ActiveModel has_secure_password
+# gem 'bcrypt-ruby', '~&gt; 3.0.0'
+
+# Use unicorn as the web server
+# gem 'unicorn'
+
+# Deploy with Capistrano
+# gem 'capistrano'
+
+# To use debugger
+# gem 'ruby-debug19', :require =&gt; 'ruby-debug'
+
+group :test do
+  # Pretty printed test output
+  gem 'turn', '0.8.2', :require =&gt; false
+end<br></pre>
+      <br>
+      第一行<span class="createlink courier">source</span>指定了連線的伺服器，<span class="courier">gem</span>後的第一個參數指定Gem的名稱，第二個參數指定版本，如果不指定版本，會安裝最新的穩定版本，Gem名稱與版本，可至<a
+        href="http://rubygems.org/">http://rubygems.org</a>搜尋確認，版本還可以指定大於等於某個版本，例如<span
+        class="courier">'&gt;=3.1.3'</span>，或是指定'~&gt;x.y.z'，x是主（major）版本號，通常在API發生重大變動時才會更改、y是次（minor）版本號，通常是在新增功能時修改，z是小（tiny）版本號，通常在修正bug後修改，這種指定表示版本號x.y不變，但可以大於等於z。<br>
+      <br>
+      預設Gem名稱就會是<span class="courier">require的名稱，如果不同，可以使用:require指定要require的名稱</span>。如果你的Gem不在預設gems目錄中，<span
+        class="courier">也可以使用:path指定，也可以使用:git指定Git作為來源。group</span>則可以指定特定環境載入執求的Gem，例如上例中<span
+        class="courier">:test</span>指定測試環境使用turn這個Gem。<br>
+      <br>
+      執行bundle install連線伺服器，會檢查Gem更新與相依性，必要時下載安裝，最後應用程式使用了哪些Gem與版本，會記錄在Gemfile.lock之中，如果Gemfile有變動，執行bundle install會查看Gemfile.lock，瞭解已安裝了哪些Gem，僅安裝更新的Gem，並將新使用到的Gem資訊記錄至Gemfile.lock<span
+        style="font-weight: bold;"></span><strong><span style="font-weight: bold;"></span></strong>。可以執行bundle update gemname指定更新Gem，如果僅執行bundle update，就會重新確認Gem更新與相依性，重新產生Gemfile.lock。<br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Bundler.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/CurriedFunction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>函式的鞣製化</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 函式的鞣製化<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=76371">函式的鞣製化</a><br>
+      <br>
+      由於具一級函式的語言漸受重用，函式的鞣製化（Currying）應用時有所見，從多數命令式語言看鞣製函式（Curried function），容易令人有摸不著邊際的感覺，其實在函數式語言中，鞣製函式是很自然的特性。當看不清楚特性的本質時，尋找特性的起源點，往往令人驚訝特性本質如此單純。<br>
+      <br>
+      <dl>
+        <dt>函數式語言中的鞣製函式</dt>
+      </dl>
+      <br>
+      在我先前的專欄 <a href="FirstClassFunction.html">物件導向語言中的一級函式</a> 談過，在lambda演算中，每個表達式（Expression）代表具單一參數的函數，多參數函數可使用單參數函數傳回單參數函數連續套用來表示，這樣的轉換稱為鞣製化，每次對單參數函數套用引數稱為部份套用（Partially application）或部分求值（Partial Evaluation）。<br>
+      <br>
+      以純函數式語言Haskell為例，相加兩數的函式可定義為<span class="courier">plus a b = a + b，若plus 1 2可得到3的結果，就函式外觀來看，plus似乎具備兩個參數</span>，實際上Haskell的函式天生就是鞣製函式，<span
+        class="courier">plus的型態是Num a =&gt; a -&gt; a -&gt; a，將a -&gt; a -&gt; a寫為a -&gt; (a -&gt; a)會更為清楚，也就是表示套用參數a之後傳回a -&gt; a的函式，具體來說，plus 1 2其實是plus 1傳回單參數函式\b -&gt; 1 + b，再對傳回函式套用2而得到3的結果，將plus 1 2寫為(plus 1) 2就可更清楚表示出套用的過程</span>。<br>
+      <br>
+      由於對鞣製函式進行部份套用會傳回函式，只要對鞣製函式套用不同值或不同個數的引數，就好似從既有函式產生新的函式定義。舉例來說，若要對數列<span
+        class="courier">[1, 2, 3]都加3而產生新的數列，可以使用map函式結合匿名函式撰寫為map (\elem -&gt; elem + 3) [1, 2, 3]，若早已定義先前的plus函式，可無需定義匿名函式直接撰寫為map (plus 3) [1, 2, 3]</span>，事實上Haskell中<span
+        class="courier">+也是函式，所以就算沒有定義plus函式，也可以直接寫為map (+3) [1, 2, 3]</span>，不僅避免自行定義匿名函式，程式撰寫上也簡潔許多。<br>
+      <br>
+      <dl>
+        <dt>實現命令式語言中的鞣製函式</dt>
+      </dl>
+      <br>
+      多數命令式語言並不直接支援鞣製函式，想要得到類似鞣製函式的優點，往往必須自行實作。以JavaScript為例，若定義function plus(a, b) { return a + b; }，只能用plus(1, 2)的方式來呼叫，呼叫plus(1)部份套用只會得到NaN的結果。若要實現鞣製函式概念，可簡單地將function plus(a, b)的函式本體撰寫為return function(b) { return a + b; }，如此呼叫plus(1)會傳回具單參數b而傳回值為1 + b的函式。<br>
+      <br>
+      Currying名稱由來是為了紀念美國數學家暨邏輯學家Haskell Brooks Curry，然而就本身不支援此特性的語言來說，Currying過程好比將數個函式鞣製在一起，然而以上使用JavaScript實現<span
+        class="courier">plus</span>函式的鞣製化，對於全套用（Fully applied）的情況，必須使用<span
+        class="courier">plus(1)(3)</span>方式呼叫，有異於JavaScript本身的函式呼叫方式。Haskell中由於函式定義與呼叫時都不使用括號與逗號，定義鞣製函式與進行部份套用時都很自然。如果考慮JavaScript中全套用時可使用<span
+        class="courier">plus(1, 3)，部份套用時可使用plus(1)傳回新函式</span>，則必須額外下些功夫。例如可如下簡單地實現：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>function plus(a, b)</strong></span><span><strong> {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; if(arguments.length == 2) return a + b;</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; else return function(b) { return a + b; };</strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <span class="courier">如此一來，若想對[1, 2, 3]進行加3而產生新的數列，只要[1, 2, 3].map(plus(3))，相較於自行定義匿名函式的寫法[1, 2, 3].map(function(elem) {return elem + 3})，著實簡潔許多。若語言的特性支援，亦可定義通用的currying函式，針對未鞣製化的函式進行鞣製，如此開發者可以傳統方式定義函式，在必要時明確以currying函式進行鞣製化。例如如下定義的plus函式，既可以plus(1, 2)呼叫，也可以plus(3)傳回新函式：</span><br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>var plus = currying(function(a, b) {</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp; return a + b;</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>});</strong></span></div>
+      <br>
+      <dl>
+        <dt>鞣製化概念的延伸</dt>
+      </dl>
+      <br>
+      有些開發者在不強求部份套用能力的情況下，將鞣製函式的概念延伸為可傳回函式的函式，這類函式在接受引數進行運算後，傳回的函式會保留運算結果，之後就可使用傳回的函式，基於前次運算基礎進行進一步操作。例如計算費式數（Fibonacci Number）的JavaScript函式可如下定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>var fibonacci = function() {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; var fib = [0, 1]; // 用來快取已計算的費式數</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return function(n) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // ... 基於既有的fib計算新費式數，並存入fib陣列</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return fib[n];</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; };</strong></span><span><strong><br>
+          </strong></span><span><strong>}();</strong></span><strong><br>
+        </strong></div>
+      <br>
+      上例的匿名函式執行過後會傳回另一匿名函式，<span class="courier">該函式保留了fib，如此fibonacci(6)後，fib就會保有6個費式數，下次再呼叫fibonacci(7)，就可基於原有fib中的費式數進行運算</span>，節省重複運算的成本。將這種保有前次運算狀態並傳回可執行值的特點再加以延伸，就是使用傳回物件來保有前次操作成果，以便開發者進一步作後續方法呼叫，而形成所謂方法鏈（Method chain）。例如JavaScript著名程式庫jQuery，使用特色之一就是簡明的jQuery chain風格：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>$('img').addClass('seeThrough')</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .filter('[title*=dog]')</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .addClass('thickBorder');</strong></span><strong><br>
+        </strong></div>
+      <br>
+      由於每次傳回物件都會記得前次運算結果，也常見應用於參數收集與設定。例如Hibernate的Criteria API，就可撰寫為以下風格：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>session.createCriteria(User.class)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .setFirstResult(51)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .setMaxResults(50)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .list()</strong></span></div>
+      <br>
+      由於每次傳回物件都會記得前次設定，亦可用於記憶參數接受的運算式，達到延遲求值（Lazy Evaluation）或捷徑（short-circuiting）效果。例如JDK8中可撰寫<span
+        class="courier">blocks.filter(b -&gt; b.getColor() == BLUE).getFirst()，blocks長度若為1000，實際上filter</span>時並不會真的就傳入的lambda運算式求值1000次，而會在<span
+        class="courier">getFirst</span>時才運用，並在第一個lambda運算式結果為<span class="courier">true</span>時就終止運算並傳回結果。<br>
+      <br>
+      <dl>
+        <dt>思考傳回值為最終結果或需具備可執行性</dt>
+      </dl>
+      <br>
+      如果語言本身支援鞣製函式，部份套用看似可從既有函式產生新的函式定義，事實上是傳回事先定義好的單參數函式，在全套用情況下，實際運算是連續單參數函式逐一套用引數的結果。部份套用的意義在於取得最後運算結果所需資訊不足，因而保留運算狀態或甚至傳入的運算式，傳回具有可執行能力的函式，以在後續取得剩餘資訊並完成最後運算結果。<br>
+      <br>
+      因此無論語言本身是否支援鞣製函式，都可思考函式或方法執行過後傳回值是否應具備可執行性。函式套用參數後是否應傳回函式，以便處理下一個參數，物件方法套用參數之後，是否應傳回物件以便呼叫某方法處理下一個參數。在某些情況下，與其預測參數的個數與型態，不如採用鞣製化概念，讓傳回值具有處理參數的能力，如此處理參數時將擁有更自由或更高階抽象的組合方式，讓問題得以更優雅地解決。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/CurriedFunction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

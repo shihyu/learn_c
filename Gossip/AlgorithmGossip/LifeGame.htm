@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/LifeGame.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:41 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>生命遊戲</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 生命遊戲</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+      
+      <h2>&nbsp;說明</h2>
+
+      <small>
+
+生命遊戲（Game of life）為1970年由英國數學家J. H. Conway提出，某細胞的鄰居包括上、下、左、右、左上、左下、右上與右下相鄰之細胞，遊戲規則如下：<br>
+
+      </small>
+
+      
+      <ol>
+
+        <li><small>孤單死亡：如果細胞的鄰居小於一個，則該細胞在下次狀態將死亡。</small></li>
+
+        <li><small>擁擠死亡：如果細胞的鄰居在四個以上，則該細胞在下次狀態將死亡。</small></li>
+
+        <li><small>穩定：如果細胞的鄰居為二個或三個，則下一次狀態為穩定存活。</small></li>
+
+        <li><small>復活：如果某位置原無細胞存活，而該位置的鄰居為三個，則該位置將復活一細胞。</small></li>
+
+      
+      </ol>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+生命遊戲的規則可簡化為某位置有無細胞：<br>
+
+      </small>
+
+      
+      <ol>
+
+        <li><small>某</small><small>位置</small><small>之</small><small>細胞</small><small>鄰居數為0、1、4、5、6、7、8時，則該</small><small>位置</small><small>下次狀態必無細胞存活。</small></li>
+
+        <li><small>某</small><small>位置</small><small>之</small><small>細胞</small><small>鄰居數為2時，則該</small><small>位置</small><small>下次狀態保持不變（有細胞就有細胞，無細胞就無細胞）。</small></li>
+
+        <li><small>某</small><small>位置</small><small>之細胞鄰居數為3時，則該</small><small>位置</small><small>下次狀態必有細胞存活。</small></li>
+
+      
+      </ol>
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#define ROW 10 <br>#define COLUMN 10<br><br>void produce(int[][COLUMN], int[][COLUMN]);<br>void print(int[][COLUMN]);<br>void copy(int[][COLUMN], int[][COLUMN]);<br>int neighbors(int[][COLUMN], int, int);<br>int isDifferent(int[][COLUMN], int[][COLUMN]);<br><br>int main() { <br>    int current[ROW][COLUMN] = {<br>       {0, 1, 0, 1, 0, 0, 0, 0, 1, 1},<br>       {0, 1, 0, 1, 0, 0, 0, 0, 1, 1},<br>       {0, 1, 0, 1, 0, 0, 0, 0, 1, 1},<br>       {0, 1, 1, 1, 0, 0, 1, 0, 1, 1},<br>       {0, 1, 1, 1, 0, 1, 0, 0, 1, 1},<br>       {0, 1, 0, 1, 1, 0, 0, 1, 1, 1},<br>       {0, 1, 0, 1, 0, 1, 0, 0, 1, 1},<br>       {0, 1, 0, 1, 0, 0, 1, 0, 1, 1},<br>       {0, 1, 0, 1, 0, 1, 0, 1, 1, 1},<br>       {0, 1, 0, 1, 1, 0, 0, 0, 1, 1}<br>    };<br>    int next[ROW][COLUMN] = {0};<br><br>    print(current);<br>    produce(current, next);<br>    while(isDifferent(current, next)) {<br>        copy(next, current);<br>        print(current);<br>        produce(current, next);<br>    }<br>   <br>    return 0; <br>} <br><br><br>void produce(int current[][COLUMN], int next[][COLUMN]) {<br>    int row; <br>    for(row = 0; row &lt; ROW; row++) {<br>        int column;<br>        for(column = 0; column &lt; COLUMN; column++) {<br>            switch (neighbors(current, row, column)) {<br>               case 0: case 1: case 4:<br>                  next[row][column] = 0; break; <br>               case 2: <br>                  next[row][column] = current[row][column]; break; <br>               case 3: <br>                  next[row][column] = 1;<br>            } <br>        }<br>    }<br>}<br><br>int neighbors(int current[][COLUMN], int row, int column) {<br>    int dirs[8][2] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1},<br>                      {1, 0}, {1, -1}, {0, -1}, {-1, -1}};<br>    int count, i;<br>    for(count = 0, i = 0; i &lt; 8 &amp;&amp; count &lt; 4; i++) {<br>        int r = row + dirs[i][0];<br>        int c = column + dirs[i][1];<br>        if(r &gt; -1 &amp;&amp; r &lt; ROW &amp;&amp; c &gt; -1 &amp;&amp; c &lt; COLUMN &amp;&amp; current[r][c]) {<br>             count++;<br>        }<br>    }<br>    return count;<br>} <br><br>void print(int current[][COLUMN]) {<br>    printf("Status...\n");<br>    int row;    <br>    for(row = 0; row &lt; ROW; row++) { <br>        int column;<br>        for(column = 0; column &lt; COLUMN; column++) {<br>            putchar(current[row][column] ? '*' : '~');<br>        }<br>        puts("");<br>    } <br>} <br><br>void copy(int from[][COLUMN], int to[][COLUMN]) {<br>    int row;<br>    for(row = 0; row &lt; ROW; row++) {<br>        int column;<br>        for(column = 0; column &lt; COLUMN; column++) {<br>            to[row][column] = from[row][column];<br>            from[row][column] = 0;<br>        }<br>    }<br>}  <br><br>int isDifferent(int current[][COLUMN], int next[][COLUMN]) {<br>    int row;<br>    for(row = 0; row &lt; ROW; row++) {<br>        int column;<br>        for(column = 0; column &lt; COLUMN; column++) {<br>            if(current[row][column] != next[row][column]) {<br>                return 1;<br>            }<br>        }<br>    }<br>    return 0;<br>}  <br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>import java.util.*;<br>import static java.lang.System.out;<br><br>class Cell {<br>    final int i, j;<br>    public Cell(int i, int j) {<br>        this.i = i;<br>        this.j = j;<br>    }<br>    <br>    public Cell seekToSurvive(Cell[][] current) {<br>        return isLivable(current) ? this : null;<br>    }<br>    <br>    public boolean isLivable(Cell[][] cells) {<br>        switch(neighbors(cells)) {<br>            case 0: case 1: case 4: return false;<br>            case 2: return this == cells[i][j];<br>        }<br>        return true;<br>    }<br>    <br>    public int neighbors(Cell[][] cells) {<br>        int dirs[][] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1},<br>                        {1, 0}, {1, -1}, {0, -1}, {-1, -1}};<br>        int count = 0;<br>        for(int i = 0; i &lt; 8 &amp;&amp; count &lt; 4; i++) {<br>            int r = this.i + dirs[i][0];<br>            int c = this.j + dirs[i][1];<br>            if(r &gt; -1 &amp;&amp; r &lt; cells.length &amp;&amp; c &gt; -1 &amp;&amp; c &lt; <br>               cells[0].length &amp;&amp; cells[r][c] != null) {<br>                count++;<br>            }<br>        }<br>        return count; <br>    }<br>    <br>    public boolean equals(Object obj) {<br>        if (obj == null || getClass() != obj.getClass()) {<br>            return false;<br>        }<br>        final Cell that = (Cell) obj;<br>        return this.i == that.i &amp;&amp; this.j == that.j;<br>    }<br><br>    public int hashCode() {<br>        int hash = 7;<br>        hash = 59 * hash + this.i;<br>        hash = 59 * hash + this.j;<br>        return hash;<br>    }<br><br>}<br><br>public class LifeGame {<br>    public static Cell[][] asCells(int[][] rowData) {<br>        Cell[][] cells = new Cell[rowData.length][rowData[0].length];<br>        for(int i = 0; i &lt; rowData.length; i++) {<br>            for(int j = 0; j &lt; rowData[i].length; j++) {<br>                if(rowData[i][j] == 1) {<br>                    cells[i][j] = new Cell(i, j);<br>                }<br>            }<br>        }<br>        return cells;<br>    }<br>    <br>    public static Cell getOrNew(Cell[][] cells, int i, int j) {<br>        return cells[i][j] == null ? new Cell(i, j) : cells[i][j];<br>    }<br>    <br>    public static Cell[][] produce(Cell[][] current) {<br>        Cell[][] next = new Cell[current.length][current[0].length];<br>        for(int i = 0; i &lt; current.length; i++) {<br>            for(int j = 0; j &lt; current.length; j++) {<br>                next[i][j] = getOrNew(current, i, j).seekToSurvive(current);<br>            }<br>        }<br>        return next;<br>    }<br>    <br>    public static void print(Cell[][] cells) {<br>        out.println("Status...");<br>        for(Cell[] row : cells) {<br>            for(Cell cell : row) {<br>                out.print(cell == null ? '~' : '*');<br>            }<br>            out.println();<br>        }<br>    }<br>    <br>    public static void main(String[] args) {<br>        Cell[][] current = asCells(new int[][] {<br>                   {0, 1, 0, 1, 0, 0, 0, 0, 1, 1},<br>                   {0, 1, 0, 1, 0, 0, 0, 0, 1, 1},<br>                   {0, 1, 0, 1, 0, 0, 0, 0, 1, 1},<br>                   {0, 1, 1, 1, 0, 0, 1, 0, 1, 1},<br>                   {0, 1, 1, 1, 0, 1, 0, 0, 1, 1},<br>                   {0, 1, 0, 1, 1, 0, 0, 1, 1, 1},<br>                   {0, 1, 0, 1, 0, 1, 0, 0, 1, 1},<br>                   {0, 1, 0, 1, 0, 0, 1, 0, 1, 1},<br>                   {0, 1, 0, 1, 0, 1, 0, 1, 1, 1},<br>                   {0, 1, 0, 1, 1, 0, 0, 0, 1, 1}});<br>                   <br>        print(current);<br>        Cell[][] next = produce(current);<br>        while(!Arrays.deepEquals(current, next)) {<br>            current = next;<br>            print(current);<br>            next = produce(current);<br>        }<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>class Cell:<br>    def __init__(self, i, j):<br>        self.position = (i, j)<br>    <br>    def seekToSurvive(self, cells):<br>        return self if self.isLivable(cells) else None<br>    <br>    def isLivable(self, cells):<br>        n = self.neighbors(cells) <br>        return False if n in [0, 1, 4] else (True if n == 3 else <br>                id(self) == id(cells[self.position[0]][self.position[1]]))<br><br>    def neighbors(self, cells):<br>        dirs  = [[-1, 0], [-1, 1], [0, 1], [1, 1],<br>                 [1, 0], [1, -1], [0, -1], [-1, -1]]<br>        count = 0;<br>        for i in range(8):<br>            if count == 4:<br>                break<br>            r = self.position[0] + dirs[i][0]<br>            c = self.position[1] + dirs[i][1]<br>            if r &gt; -1 and r &lt; len(cells) and c &gt; -1 and c &lt; len(cells[0]) \<br>                      and cells[r][c] != None:<br>                count += 1<br>        return count<br>        <br>    def __eq__(self, that):<br>        return False if that == None else self.position == that.position<br><br>    def __hash__(self):<br>        return hash(self.position)<br><br>def asCells(rowData):<br>    return [[Cell(i, j) if rowData[i][j] == 1 else None <br>        for j in range(len(rowData[i]))] for i in range(len(rowData))]<br><br>def getOrNew(cells, i, j):<br>    return Cell(i, j) if cells[i][j] == None else cells[i][j]<br><br>def produce(current):<br>    return [[getOrNew(current, i, j).seekToSurvive(current) <br>      for j in range(len(current[i]))] for i in range(len(current))]<br>    <br>def draw(cells):<br>    print('Status...')<br>    for row in cells:<br>        for cell in row:<br>            print('~' if cell == None else '*', end='')<br>        print()<br>    <br>current = asCells([[0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                   [0, 1, 1, 1, 0, 0, 1, 0, 1, 1],<br>                   [0, 1, 1, 1, 0, 1, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 1, 0, 0, 1, 1, 1],<br>                   [0, 1, 0, 1, 0, 1, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 0, 1, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 1, 0, 1, 1, 1],<br>                   [0, 1, 0, 1, 1, 0, 0, 0, 1, 1]])<br><br>draw(current)<br>next = produce(current)<br>while(current != next):<br>    current = next<br>    draw(current);<br>    next = produce(current)</pre><br><ul><li><a name="Scala"></a>Scala</li></ul>
+      <pre>case class Cell(i: Int, j: Int) {<br>    private val dirs = List(<br>                         List(-1, 0), List(-1, 1), List(0, 1), List(1, 1),<br>                         List(1, 0), List(1, -1), List(0, -1), List(-1, -1)<br>                       )<br><br>    private val deathCounts = List(0, 1, 4)<br>    <br>    def seekToSurvive(cells: List[List[Cell]]) = if(isLivable(cells)) this <br>                                                 else null<br>    <br>    def isLivable(cells: List[List[Cell]]) = {<br>        val n = neighbors(cells)<br>        if(deathCounts.contains(n)) false <br>        else if(n == 3) true <br>        else this eq cells(i)(j)<br>    }<br><br>    def increment(index: Int, count: Int, cells: List[List[Cell]]): Int = {<br>        if(index == 8 || count == 4) count<br>        else {<br>            val r = i + dirs(index)(0)<br>            val c = j + dirs(index)(1)<br>            if(r &gt; -1 &amp;&amp; r &lt; cells.length &amp;&amp; <br>               c &gt; -1 &amp;&amp; c &lt; cells(0).length &amp;&amp;<br>               cells(r)(c) != null) increment(index + 1, count + 1, cells)<br>            else increment(index + 1, count, cells)<br>        }<br>    }<br>    <br>    def neighbors(cells: List[List[Cell]]) = increment(0, 0, cells)<br>}<br><br>def asCells(rowData: List[List[Int]]) = {<br>    (for(i &lt;- 0 until rowData.length) yield <br>        (for(j &lt;- 0 until rowData(i).length) yield <br>            if(rowData(i)(j) == 1) Cell(i, j) else null).toList).toList<br>}<br><br>def getOrNew(cells: List[List[Cell]], i: Int, j: Int) = {<br>    if(cells(i)(j) == null) Cell(i, j) else cells(i)(j)<br>}<br><br>def produce(current: List[List[Cell]]) = {<br>    (for(i &lt;- 0 until current.length) yield <br>        (for(j &lt;- 0 until current(i).length) yield <br>            getOrNew(current, i, j).seekToSurvive(current)).toList).toList<br>}<br><br>def showUntilSteady(cells: List[List[Cell]]) {<br>    println("Status...")<br>    for(row &lt;- cells) {<br>        for(cell &lt;- row) {<br>            print(if(cell == null) '~' else '*')<br>        }<br>        println<br>    }<br>    val next = produce(cells)<br>    if(next != cells) showUntilSteady(next)<br>}<br><br>showUntilSteady(asCells(<br>        List(<br>            List(0, 1, 0, 1, 0, 0, 0, 0, 1, 1),<br>            List(0, 1, 0, 1, 0, 0, 0, 0, 1, 1),<br>            List(0, 1, 0, 1, 0, 0, 0, 0, 1, 1),<br>            List(0, 1, 1, 1, 0, 0, 1, 0, 1, 1),<br>            List(0, 1, 1, 1, 0, 1, 0, 0, 1, 1),<br>            List(0, 1, 0, 1, 1, 0, 0, 1, 1, 1),<br>            List(0, 1, 0, 1, 0, 1, 0, 0, 1, 1),<br>            List(0, 1, 0, 1, 0, 0, 1, 0, 1, 1),<br>            List(0, 1, 0, 1, 0, 1, 0, 1, 1, 1),<br>            List(0, 1, 0, 1, 1, 0, 0, 0, 1, 1)<br>        )<br>    )<br>}<br></pre>
+<br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>class Cell<br>    def initialize(r, c)<br>        @position = {i: r, j: c}<br>    end<br>    <br>    def seekToSurvive(cells)<br>        if isLivable(cells); self else nil end<br>    end<br>    <br>    def isLivable(cells)<br>        n = neighbors(cells) <br>        if [0, 1, 4].include? n; false<br>        elsif n == 3; true<br>        else self.object_id == cells[@position[:i]][@position[:j]].object_id<br>        end<br>    end<br><br>    def neighbors(cells)<br>        dirs  = [[-1, 0], [-1, 1], [0, 1], [1, 1],<br>                 [1, 0], [1, -1], [0, -1], [-1, -1]]<br>        count = 0;<br>        (0...8).each do |i|<br>            if count == 4<br>                break<br>            end<br>            r = @position[:i] + dirs[i][0]<br>            c = @position[:j] + dirs[i][1]<br>            if r &gt; -1 &amp;&amp; r &lt; cells.size &amp;&amp; <br>               c &gt; -1 &amp;&amp; c &lt; cells[0].size &amp;&amp; cells[r][c] != nil<br>                count += 1<br>            end                      <br>        end<br>        count<br>    end<br>    <br>    def eq?(that)<br>        @positon == that.position<br>    end<br><br>    def hash<br>        @position.hash<br>    end<br>end<br><br>def asCells(rowData)<br>    (0...rowData.size).map { |i|<br>        (0...rowData[i].size).map { |j|<br>            if rowData[i][j] == 1; Cell.new(i, j) else nil end<br>        }<br>    }<br>end<br><br>def getOrNew(cells, i, j)<br>    if cells[i][j] == nil; Cell.new(i, j) else cells[i][j] end<br>end<br><br>def produce(current)<br>    (0...current.size).map { |i|<br>        (0...current[i].size).map { |j|<br>            getOrNew(current, i, j).seekToSurvive(current)<br>        }<br>    }<br>end<br>      <br>def draw(cells)<br>    puts('Status...')<br>    cells.each do |row|<br>        row.each do |cell|<br>            print(if cell == nil; '~' else '*' end)<br>        end<br>        puts<br>    end<br>end<br>    <br>current = asCells([[0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                   [0, 1, 1, 1, 0, 0, 1, 0, 1, 1],<br>                   [0, 1, 1, 1, 0, 1, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 1, 0, 0, 1, 1, 1],<br>                   [0, 1, 0, 1, 0, 1, 0, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 0, 1, 0, 1, 1],<br>                   [0, 1, 0, 1, 0, 1, 0, 1, 1, 1],<br>                   [0, 1, 0, 1, 1, 0, 0, 0, 1, 1]])<br><br>draw(current)<br>newGen = produce(current)<br>while(current != newGen)<br>    current = newGen<br>    draw(current);<br>    newGen = produce(current)<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>var produce = function() {<br>    function range(start, end) {<br>        var r = [];<br>        for(var i = start; i &lt; end; i++) {<br>            r.push(i);<br>        }<br>        return r;<br>    }<br>    <br>    function liveOrDie(current, row, column) {<br>        switch(neighbors(current, row, column)) {<br>            case 0: case 1: case 4: return 0;<br>            case 2: return current[row][column];<br>        }<br>        return 1;<br>    }<br>    <br>    function neighbors(current, row, column) {<br>        var dirs = [[-1, 0], [-1, 1], [0, 1], [1, 1],<br>                    [1, 0], [1, -1], [0, -1], [-1, -1]];<br>        var count = 0;<br>        for(var i = 0; i &lt; 8 &amp;&amp; count &lt; 4; i++) {<br>            var r = row + dirs[i][0];<br>            var c = column + dirs[i][1];<br>            if(r &gt; -1 &amp;&amp; r &lt; current.length &amp;&amp; <br>               c &gt; -1 &amp;&amp; c &lt; current[0].length &amp;&amp; current[r][c]) {<br>                count++;<br>            }<br>        }<br>        return count;<br>    }<br>    <br>    return function(current) {<br>        return range(0, current.length).map(function(row) {<br>            return range(0, current[0].length).map(function(column) {<br>                return liveOrDie(current, row, column);<br>            });<br>        });<br>    };<br>}();<br><br>var draw = function(cells) {<br>    print('Status...\n');<br>    for(var row = 0; row &lt; cells.length; row++) {<br>        for(var column = 0; column &lt; cells[0].length; column++) {<br>            print(cells[row][column] ? '*' : '~');<br>        }<br>        print('\n');<br>    }<br>};<br><br>var isDifferent = function(current, next) {<br>    for(var row = 0; row &lt; current.length; row++) {<br>        for(var column = 0; column &lt; current[0].length; column++) {<br>            if(current[row][column] !== next[row][column]) {<br>                return true;<br>            }<br>        }<br>    }<br>    return false;<br>};<br><br>var current = [[0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>               [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>               [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>               [0, 1, 1, 1, 0, 0, 1, 0, 1, 1],<br>               [0, 1, 1, 1, 0, 1, 0, 0, 1, 1],<br>               [0, 1, 0, 1, 1, 0, 0, 1, 1, 1],<br>               [0, 1, 0, 1, 0, 1, 0, 0, 1, 1],<br>               [0, 1, 0, 1, 0, 0, 1, 0, 1, 1],<br>               [0, 1, 0, 1, 0, 1, 0, 1, 1, 1],<br>               [0, 1, 0, 1, 1, 0, 0, 0, 1, 1]];<br><br>draw(current);<br>var next = produce(current)<br>while(isDifferent(current, next)) {<br>    current = next;<br>    draw(current);<br>    next = produce(next);<br>}<br></pre>
+<br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>import Control.Monad<br><br>produce current = [[liveOrDie current row column | <br>    column &lt;- [0..columnLength - 1]] | row &lt;- [0..rowLength - 1]]<br>    where rowLength = length current<br>          columnLength = length $ current !! 0<br><br>liveOrDie current row column = <br>    if n `elem` [0, 1, 4] then 0<br>    else if n == 2 then current !! row !! column<br>         else 1<br>    where n = neighbors current row column<br>    <br>neighbors cells row column = increment cells 0 0<br>    where increment cells index count =<br>              if index == 8 || count == 4 then count<br>              else if r &gt; -1 &amp;&amp; r &lt; rowLength &amp;&amp; <br>                      c &gt; -1 &amp;&amp; c &lt; columnLength &amp;&amp; cells !! r !! c /= 0 <br>                      then increment cells (index + 1) (count + 1)<br>                   else increment cells (index + 1) count<br>              where rowLength = length cells<br>                    columnLength = length $ cells !! 0<br>                    dirs = [[-1, 0], [-1, 1], [0, 1], [1, 1], <br>                            [1, 0], [1, -1], [0, -1], [-1, -1]]<br>                    r = row + dirs !! index !! 0<br>                    c = column + dirs !! index !! 1<br>                    <br>showUntilSteady cells = do<br>    putStrLn "Status..."<br>    forM [0..rowLength - 1] (\row -&gt; do<br>        forM [0..columnLength - 1] (\column -&gt; do<br>            putChar (if cells !! row !! column == 0 then '~' else '*'))<br>        putStrLn "")<br>    when (next /= cells) $ do<br>        showUntilSteady next<br>    where next = produce cells<br>          rowLength = length cells<br>          columnLength = length $ cells !! 0<br><br>main = showUntilSteady [[0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                        [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                        [0, 1, 0, 1, 0, 0, 0, 0, 1, 1],<br>                        [0, 1, 1, 1, 0, 0, 1, 0, 1, 1],<br>                        [0, 1, 1, 1, 0, 1, 0, 0, 1, 1],<br>                        [0, 1, 0, 1, 1, 0, 0, 1, 1, 1],<br>                        [0, 1, 0, 1, 0, 1, 0, 0, 1, 1],<br>                        [0, 1, 0, 1, 0, 0, 1, 0, 1, 1],<br>                        [0, 1, 0, 1, 0, 1, 0, 1, 1, 1],<br>                        [0, 1, 0, 1, 1, 0, 0, 0, 1, 1]]<br></pre>
+<br>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/LifeGame.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:41 GMT -->
+</html>

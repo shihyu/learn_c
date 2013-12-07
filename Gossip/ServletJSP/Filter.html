@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Filter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>關於過濾器</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 關於過濾器<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>過濾器是個可重用的（Resuable）元件，可以轉換對資源的請求，也可以轉換回應的內容（過濾器並不負責建立回應內容）。<br>
+      <br>
+過濾器通常作為一個服務（Service）加入至應用程式之中，即時地為應用程式增加功能，但不用修改原有的應用程式，在不需要使用服務時，可以直接將過濾器從應用程式抽離，而不用修改原應用程式。過濾器可以實現的服務以下有幾個例子：<br>
+      </small>
+      <ul>
+        <li><small>效能量測</small></li>
+        <ul>
+          <li><small>例如請求與回應之間的時間差。<br>
+            </small></li>
+        </ul>
+        <li><small>請求內容的過濾、轉換</small></li>
+        <ul>
+          <li><small>特定字元的過濾、標頭、請求參數的轉換等。<br>
+            </small></li>
+        </ul>
+        <li><small>使用者的驗證</small></li>
+        <ul>
+          <li><small>驗證使用者是否登入、是否具備某種身份、是否來目某些區域。<br>
+            </small></li>
+        </ul>
+        <li><small>資源存取限制</small></li>
+        <ul>
+          <li><small>根據使用者等資訊，確認其是否可存取某些資源。<br>
+            </small></li>
+        </ul>
+        <li><small>回應的加工</small></li>
+        <ul>
+          <li><small>針對回應作字元轉換、資料壓縮等動作。</small></li>
+        </ul>
+      </ul>
+      <br>
+      <small>Servlet／JSP提供了過濾器機制讓你實作這些元件服務，而就如下圖所示的，你可以視需求抽換過濾器或調整過濾器的順序，也可以針對不同的URL套用不同的過濾器。甚至在不同的Servlet間請求轉發或包括時套用過濾器。<br>
+      <img style="width: 664px; height: 259px;" alt="" src="images/Filter-1.png"><br>
+      <br>
+正如其名稱所示，過濾器概念上就像個濾網，需要時在某些資源存取前、回應前加上濾網，不需要時可直接將濾網拿掉。<br>
+      <br>
+      </small><small>在Servlet／JSP中要實作過濾器，必須實作<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Filter</span>介面。Filter介面有三個要實作的方法：<span style="font-weight: bold;">init()</span>、<span style="font-weight: bold;">doFilter()</span>與<span style="font-weight: bold;">destroy()</span></span>。</small><small><br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package javax.servlet;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.io.IOException;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public interface Filter {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void init(FilterConfig filterConfig) throws ServletException;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void doFilter (ServletRequest request, ServletResponse response,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; FilterChain chain) throws IOException, ServletException;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void destroy();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">Filter介面在定義上與Servlet介面很類似，同樣都有init()與destroy()方法，除了Filter介面的init()方法上的參數是<span style="font-weight: bold;">FilterConfig</span>，而doFilter()多了一個<span style="font-weight: bold;">FilterChain</span>參數。</span><br style="font-family: Courier New,Courier,monospace;">
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">FilterConfig類似於Servlet介面init()方法參數上的ServletConfig</span>，<span style="font-family: Courier New,Courier,monospace;">FilterConfig為實作Filter</span>介面的類別上標註或web.xml中過濾器定義的代表物件。如果你在定義過濾器時有設定初始參數，則可以透過<span style="font-family: Courier New,Courier,monospace;">FilterConfig</span>的<span style="font-family: Courier New,Courier,monospace;">getInitParameter()</span>方法來取得初始參數。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">Filter介面的doFilter()方法則類似於Servlet介面的service()方法</span>。當請求來到容器，而容器發現呼叫Servlet的<span style="font-family: Courier New,Courier,monospace;">service()</span>方法前，可以套用某過濾器時，就會呼叫該過濾器的<span style="font-family: Courier New,Courier,monospace;">doFilter()方法。你就是在doFilter()方法中，進行service()方法的前置處理，而後決定是否呼叫FilterChain的<span style="font-weight: bold;">doFilter()</span>方法。</span><br>
+      <br>
+&nbsp;如果呼叫了<span style="font-family: Courier New,Courier,monospace;">FilterChain的doFilter()</span>方法，就會執行下一個過濾器，如果沒有下一個過濾器了，就呼叫請求目標Servlet的<span style="font-family: Courier New,Courier,monospace;">service()</span>方法。如果因為某個情況（例如使用者沒有通過驗證）而沒有呼叫<span style="font-family: Courier New,Courier,monospace;">FilterChain的doFilter()</span>，則請求就不會繼續交給接下來的過濾器或目標Servlet，這時就是所謂的攔截請求（從Servlet的觀點來看，它根本不知道瀏覽器有發出請求）。<span style="font-family: Courier New,Courier,monospace;">FilterChain的doFilter()</span>實作，概念上類似以下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Filter filter = filterIterator.next();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">if(filter != null) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; filter.doFilter(request, response, this);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">else {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; targetServlet.service(request, response);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+在陸續呼叫完<span style="font-family: Courier New,Courier,monospace;">Filter實例的doFilter()</span>仍至Servlet的<span style="font-family: Courier New,Courier,monospace;">service()</span>之後，流程會以堆疊順序返回，所以在<span style="font-family: Courier New,Courier,monospace;">FilterChain的doFilter()執行完畢後，就是你可以針對service()方法作後續處理的時機。</span><br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">// service()前置處理</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">chain.doFilter(request, response);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">// service()後置處理</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+你只需要知道<span style="font-family: Courier New,Courier,monospace;">FilterChain執行後會以堆疊順序返回即可。在實作Filter介面時，不用理會這個Filter前後是否有其它Filter</span>，應該將之作為一個獨立的元件設計。<br>
+      <img style="width: 659px; height: 582px;" alt="" src="images/Filter-2.png"><br>
+      <br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">如果在呼叫Filter的doFilter()期間，因故丟出<span style="font-weight: bold;">UnavailableException</span>，此時不會繼續下一個Filter，容器可以檢驗例外的<span style="font-weight: bold;">isPermanent()</span>，如果不是true，則可以在稍後重試Filter。</span><br>
+      <br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Filter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:23 GMT -->
+</html>

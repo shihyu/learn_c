@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/EncodeURL.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:11 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>encodeURL()</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: encodeURL()<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><span style="font-family: Courier New,Courier,monospace;">HttpSession</span>預設使用Cookie來儲存Session ID，如果使用者關掉瀏覽器接受Cookie的功能，那就無法使用Cookie在瀏覽器儲存Session ID。如果在使用者禁用Cookie的情況下，仍打算運用<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>來進行會話管理，那麼可以搭配 <a href="URLRewriting.html">URL 重寫</a> 的方式，向瀏覽器回應一段超鏈結，超鏈結URL後附加Session ID，當使用者按下超鏈結，將Session ID以GET請求發送給Web應用程式。<br>
+      </small><br>
+      <small>如果你要使用URL重寫的方式來發送Session ID，則可以使用<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse的<span style="font-weight: bold;">encodeURL()</span></span>協助產生所需的URL重寫。當容器嘗試取得<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>實例時，若可以從HTTP請求中取得帶有Session ID的Cookie時，<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>會將設定給它的URL原原本本地輸出。如果容器嘗試取得<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>實例時，無法從HTTP請求中取得帶有Session ID的Cookie時（通常是瀏覽器禁用Cookie的情況），<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>會自動產生帶有Session ID的URL重寫。例如：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name = "Counter", urlPatterns = {"/counter"})<br>public class Counter extends HttpServlet {<br><br>    @Override<br>    protected void doGet(HttpServletRequest req, HttpServletResponse resp)<br>            throws ServletException, IOException {<br>        resp.setContentType("text/html; charset=UTF-8");<br>        PrintWriter out = resp.getWriter();<br>        int count = 0;<br>        HttpSession session = req.getSession();<br>        if (session.getAttribute("count") != null) {<br>            Integer c = (Integer) session.getAttribute("count");<br>            count = c.intValue() + 1;<br>        }<br>        session.setAttribute("count", count);<br>        out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Servlet Count&lt;/title&gt;");<br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br>        out.println("&lt;h1&gt;Servlet Count " + count + "&lt;/h1&gt;");<br>        out.println("&lt;a href=\"" + <span style="font-weight: bold;">resp.encodeURL("counter")</span> + "\"&gt;遞增&lt;/a&gt;");<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>        out.close();<br>    }<br>}<br></pre>
+      <small><br>
+這個程式會顯示一個超鏈結，如果你按下超鏈結，則會造訪同一個URL，在關閉瀏覽器前，每按下超鏈結都會遞增數字。如果你的瀏覽器沒有禁用Cookie，則<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>產生的超鏈結網址就是原本的counter，如果你的瀏覽器禁用Cookie，則在超鏈結網址上編上Session ID。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;a href="counter;jsessionid=d2fabcf71de8d0825e8aa9311da6"&gt;遞增&lt;/a&gt;</small><br>
+      </div>
+      <small><br>
+如果你不使用<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>來產生超鏈結的URL，在瀏覽器禁用Cookie的情況下，這個程式將會失效，也就是你重複按遞增鏈結，計數也不會遞增。<br>
+      <br>
+如果你有執行<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>，在瀏覽器第一次請求網站時，容器並不知道瀏覽器是否禁用Cookie，所以容器的作法是Cookie（發送<span style="font-family: Courier New,Courier,monospace;">set-cookie</span>標頭）與URL重寫都作，因此若你的Servlet有以下陳述，無論瀏覽器有無禁用Cookie，第一次請求時，都會顯示編上Session ID的URL：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">request.getSession();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">out.println(response.encodeURL("index.jsp"));</small><br>
+      </div>
+      <small><br>
+當再次請求時，如果瀏覽器沒有禁用Cookie，則容器可以從Cookie（從<span style="font-family: Courier New,Courier,monospace;">cookie</span>標頭）中取得Session ID，則<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>就只會輸出index.jsp。如果瀏覽器禁用Cookie，由於無法從Cookie中得Session ID，此時<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>就會在URL編上Session ID。<br>
+      <br>
+總而言之，當容器嘗試取得<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>物件時，無法從Cookie中取得Session ID，使用<span style="font-family: Courier New,Courier,monospace;">encodeURL()</span>就會為你產生有Session ID的URL，以便於下次點選超鏈結時再度發送Session ID。另一個<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse上的<span style="font-weight: bold;">encodeRedirectURL()</span></span>方法，則可以在你要求瀏覽器重新導向時，在URL上編上Session ID。<br>
+      <br>
+注意！小心保管Session ID。在<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>存活期間，只要有人取得你當次的Session ID，在另一瀏覽器相同的URL附上Session ID，就可以取得同一個<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>物件。建議加密敏感資訊，並在不使用<span style="font-family: Courier New,Courier,monospace;">HttpSession時執行invalidate()</span>明確使之失效。會話階段重要的操作，最後再作一次身份確認（例如線上轉帳前再輸入一次轉帳密碼）。</small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/EncodeURL.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:11 GMT -->
+</html>

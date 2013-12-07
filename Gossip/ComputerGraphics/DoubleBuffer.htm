@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/DoubleBuffer.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:37 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>雙緩衝區繪圖</title></head><body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics:&nbsp;雙緩衝區繪圖</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+
+
+如果我們要繪製的圖形很多時，在動畫製作時，如果直接畫在前景上，可能會發生圖形一個一個顯現出來的畫面，讓整個畫面不完整呈現。<br>
+
+      <br>
+
+
+這時候可使用雙緩衝區（double-buffer）的方法，要準備兩個繪圖物件，其中一個是前景區，也就是您所看到的畫面，另一個繪圖物件您看不到，在
+畫面準備好之前，所有的圖形先繪製在您看不到的畫面，當所有的圖形都繪製完畢，再將所有的圖形繪製到前景，此時前景會整個被後繪圖區所覆蓋，完成一次畫面
+的播放，下圖為簡單的示意圖： <br>
+
+      <img style="width: 474px; height: 239px;" alt="" src="images/doubleBuffer-1.jpg"><br>
+
+      <br>
+
+
+實作雙緩衝區的方法依所使用的API而有所不同，在Java中可以用Image物件來完成，而在使用DirectDraw時，可以使用
+Surface來建立，下面這個程式是使用Java來製作，這個程式是至今所有文件內容驗收，包括了頂點配置、索引陣列、動畫、雙緩衝區等等，您可以先觀
+看結果：<a href="applet/DoubleBuffer.html">一個繞Y軸旋轉的空心立方塊</a>。 </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li> DoubleBuffer.java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package cc.openhome;<br><br>import javax.swing.JApplet;<br>import java.awt.*;<br><br><br>// 立方體類別<br>class Point {<br>    public final double x, y, z;<br>    public Point(double x, double y, double z) {<br>        this.x = x;<br>        this.y = y;<br>        this.z = z;<br>    }<br>}<br>class Cubic {<br>    public final static int NFC = 6;        // 平面數量<br>    public final static int NVT = 8;        // 頂點的數量<br>    public final static int NVT_F = 4;        // 1個平面的頂點數<br>    <br>    public Point[] vt;   // 頂點的座標<br>    public int[][] ord;    // 頂點索引<br><br>    public Cubic(int r) {<br>        vt = new Point[NVT];<br>        double sq3 = Math.sqrt(3.0);<br>        vt[0] = new Point(r / sq3, r / sq3, r / sq3);<br>        vt[1] = new Point(r / sq3, r / sq3, -r / sq3);<br>        vt[2] = new Point(-r / sq3, r / sq3, -r / sq3);<br>        vt[3] = new Point(-r / sq3, r / sq3, r / sq3);<br><br>        for (int i = 0; i &lt; NVT / 2; i++) {<br>            vt[NVT / 2 + i] = new Point(-vt[i].x, -vt[i].y, -vt[i].z);<br>        }<br><br>        int[][] initOrd = {{0, 1, 2, 3}, {0, 3, 5, 6}, {0, 6, 7, 1},<br>            {4, 7, 6, 5}, {4, 2, 1, 7}, {4, 5, 3, 2}};<br><br>        ord = new int[NFC][NVT_F];<br>        for (int i = 0; i &lt; NFC; i++) {<br>            for (int j = 0; j &lt; NVT_F; j++) {<br>                ord[i][j] = initOrd[i][j];<br>            }<br>        }<br>    }<br>}<br><br>public class DoubleBuffer extends JApplet implements Runnable {<br><br>    private Image offScreen;<br>    private Graphics gOffScreen;<br>    private int orgX, orgY;<br>    private Cubic cubic = new Cubic(100);<br><br>    public void init() {<br>        setBackground(Color.black);<br>        orgX = getWidth() / 2;<br>        orgY = getHeight() / 2;<br>        offScreen = createImage(getWidth(), getHeight());<br>        gOffScreen = offScreen.getGraphics();<br>        gOffScreen.setColor(Color.yellow);<br>    }<br><br>    public void start() {<br>        (new Thread(this)).start();<br>    }<br><br>    public void run() {<br>        // 旋轉以斜角繪製圖形<br>        double sinAx = Math.sin(Math.toRadians(30));<br>        double cosAx = Math.cos(Math.toRadians(30));<br><br>        double[] cosAys = new double[360];<br>        double[] sinAys = new double[360];<br>        for (int i = 0; i &lt; 360; i++) {<br>            cosAys[i] = Math.cos(Math.toRadians(i));<br>            sinAys[i] = Math.sin(Math.toRadians(i));<br>        }<br><br>        int angle = 330;<br>        double sinAy = sinAys[angle];<br>        double cosAy = cosAys[angle];<br><br>        Point[] tp = new Point[4];<br>        int[] px = new int[4];<br>        int[] py = new int[4];<br>        // 動畫迴圈<br>        while (true) {<br>            gOffScreen.clearRect(0, 0, getWidth(), getHeight());<br>            for (int i = 0; i &lt; Cubic.NFC; i++) {<br>                for (int j = 0; j &lt; Cubic.NVT_F; j++) {<br>                    // 利用索引array取出正確的頂點<br>                    tp[j] = cubic.vt[cubic.ord[i][j]];<br><br>                    // 旋轉以斜角繪製圖形<br>                    px[j] = (int) (tp[j].x * cosAy + tp[j].z * sinAy);<br>                    py[j] = (int) (tp[j].y * cosAx -<br>                            (-tp[j].x * sinAy + tp[j].z * cosAy) * sinAx);<br>                    px[j] = px[j] + orgX;<br>                    py[j] = -py[j] + orgY;<br>                }<br><br>                // 在緩衝區上縮圖<br>                gOffScreen.drawPolyline(px, py, 4);<br>            }<br>            repaint();  // 重繪畫面<br>            // 暫停 20 毫秒<br>            try {<br>                Thread.sleep(20);<br>            } catch (InterruptedException e) {<br>                e.printStackTrace();<br>            }<br>            // 繞 y 軸轉動<br>            angle = (angle + 1) % 360;<br>            sinAy = sinAys[angle];<br>            cosAy = cosAys[angle];<br>        }<br>    }<br><br>    // 重新定義update()<br>    public void update(Graphics g) {<br>        paint(g);<br>    }<br><br>    public void paint(Graphics g) {<br>        // 將緩衝區畫面繪到前景<br>        g.drawImage(offScreen, 0, 0, this);<br>    }<br>}</pre>
+
+
+      <br>
+      <small>如果是HTML 5 Canvas的話，視所使用的API而定，可以有各種方式來實現雙緩衝區效果。例如，可以用兩個Canvas互換來達到雙緩衝區的效果。</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+      <br>
+</span></span>
+      <small>以下是使用HTML5 Canvas的方式（如果瀏覽器支援HTML5 Canvas，例如最新版的Firexfox、Chrome、IE9等，可以直接將下面的內容存為HTML或按下檔名連結，直接載入瀏覽器執行觀看結果：</small><br>
+<span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">
+      </span></span>
+      <ul>
+        <li><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><a href="html/DoubleBuffer-1.html">DoubleBuffer-1.html</a></span></span></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function toRadians(angle) {<br>                    return angle * Math.PI / 180;<br>                }<br>                <br>                var sin = Math.sin;<br>                var cos = Math.cos;<br>                var sqrt = Math.sqrt;<br>                <br>                function Point(x, y, z) {<br>                    this.x = x;<br>                    this.y = y;<br>                    this.z = z;<br>                }<br>                <br>                var V_INDEX = [<br>                    [0, 1, 2, 3], [0, 7, 6, 1], [4, 5, 6, 7],<br>                    [2, 5, 4, 3], [0, 3, 4, 7], [1, 6, 5, 2]<br>                ];<br>                <br>                var L = 100;<br>                var VETEX = [<br>                    new Point(L, L, L), new Point(L, -L, L),<br>                    new Point(L, -L, -L), new Point(L, L, -L),<br>                    new Point(-L, L, -L), new Point(-L, -L, -L),<br>                    new Point(-L, -L, L), new Point(-L, L, L)<br>                ];<br><br>                // 旋轉以斜角繪製圖形<br>                var ax = toRadians(30);<br>                var ay = toRadians(30);<br>        <br>                var sinAx = sin(ax);<br>                var cosAx = cos(ax);<br>                //var sinAy = sin(ay);<br>                //var cosAy = cos(ay);<br>                <br>                var cosAys = [];<br>                var sinAys = [];<br>                for(var i = 0; i &lt; 360; i++) {<br>                    cosAys[i] = cos(toRadians(i));<br>                    sinAys[i] = sin(toRadians(i));<br>                }                <br>        <br>                var angle = 330;<br>                var sinAy = sinAys[angle];<br>                var cosAy = cosAys[angle];<br>                <br>                var px = [];<br>                var py = [];<br>                <br>                var canvas1 = document.getElementById('canvas1');<br>                var canvas2 = document.getElementById('canvas2');<br>                <br>                var orgX = canvas1.width / 2;<br>                var orgY = canvas1.height / 2;<br>                <br>                var context1 = canvas1.getContext('2d');<br>                var context2 = canvas2.getContext('2d');<br><br>                // 先繪製背景<br>                var context = context2;<br>                setTimeout(function() {<br>                    context.beginPath();<br>                    for(var i = 0; i &lt; 6; i++) {<br>                        for (var j = 0; j &lt; 4; j++) {<br>                            // 利用索引陣列取出正確的頂點<br>                            var v = VETEX[V_INDEX[i][j]];<br>                            // 旋轉以斜角繪製圖形<br>                            px[j] = parseInt(<br>                                      v.x * cosAy + v.z * sinAy + orgX);<br>                            py[j] = parseInt(v.y * cosAx -<br>                              (-v.x * sinAy + v.z * cosAy) * sinAx + orgY);<br>                        }<br>                        context.moveTo(px[0], py[0]);<br>                        for(var k = 1; k &lt; 4; k++) {<br>                            context.lineTo(px[k], py[k]);<br>                        }<br>                    }<br>                    context.clearRect(0, 0, canvas1.width, canvas1.height);<br>                    context.stroke();<br>                    <br>                    // 置換Canvas與Context<br>                    if(context === context2) {<br>                        document.body.replaceChild(canvas1, canvas2);<br>                        context = context1;<br>                    }<br>                    else {<br>                        document.body.replaceChild(canvas2, canvas1);<br>                        context = context2;                    <br>                    }<br>                    <br>                    // 繞 y 軸轉動<br>                    angle = (angle + 1) % 360;<br>                    sinAy = sinAys[angle];<br>                    cosAy = cosAys[angle];                <br>                    <br>                    setTimeout(arguments.callee, 20);<br>                }, 20);<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;       <br>        &lt;canvas id="canvas1" width="640" height="480"&gt;&lt;/canvas&gt;<br>        &lt;canvas id="canvas2" width="640" height="480"&gt;&lt;/canvas&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;</pre></td></tr></tbody></table><br>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/DoubleBuffer.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:47 GMT -->
+</html>

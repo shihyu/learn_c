@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/OperatorPrecedenceAssociativity.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+<link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+<link rel="stylesheet" href="css/print.css" type="text/css">
+<meta content="text/html; charset=Big5" http-equiv="content-type"><title>操作順序與關聯</title>
+
+</head>
+<body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+<h1><a href="index-2.html">Scala Gossip: 操作順序與關聯</a></h1>
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td style="vertical-align: top; width: 250px; text-align: center;">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+</td>
+<td style="vertical-align: top; width: 690px; text-align: left;"><small>+、
+-、*、/...這些一般語言所謂的運算子，在Scala中其實是方法定義，如果一個運算式中混合了多個「運算子」，那麼該如何決定其優先順序呢？又或者
+說，如何決定該呼叫哪個物件的哪個方法？例如 1 + 2 * 3，如何能決定為
+(1).+((2).*(3))？而不是((1).+(2)).*(3)？<br>
+<br>
+Scala主要是由方法名稱的第一個字元來決定運算的順序，如果方法名稱的第一個字元是*，則它比+有更高的優先順序，以下是方法第一個字元的優先順序
+（由高而低），同一列表示優先順序相同：<br>
+</small>
+<ul>
+<li><small>除了以下字元外的其它特殊字元</small></li>
+<li><small>*、/、%</small></li>
+<li><small>+、:</small></li>
+<li><small>=、!</small></li>
+<li><small>&lt;、&gt;</small></li>
+<li><small>&amp;</small></li>
+<li><small>ふ</small></li>
+<li><small>|</small></li>
+<li><small>字母</small></li>
+<li><small>指定運算（非=、&lt;=、&gt;=、==，且以=結尾方法）</small></li>
+</ul>
+<small><br>
+所以運算符號一定優先於字母名稱的方法，例如 1 + 2 equals 3，結果就是 (1 + 2) equals
+3。指定運算是+=、-=、*= 、/=等以=結尾，但又不是</small><small>=、&lt;=、
+&gt;=、==的運算方法，指定運算優先順序最低，所以 a *= 1 + 4，結果會是 a *= (1 +
+4)。當然，最簡單的方式，還是使用括號來釐清優先順序。<br>
+<br>
+</small><small>當優先順序相同時，基本上由左至右進行運算，所以若1 + 2 +
+3時，運算的順序是(1 + 2) + 3，+號是左邊物件的方法，運算方法到底屬於哪個物件，這稱之為「關聯性」（Associativity）。<span style="font-weight: bold;">一般情況下，運算方法都是屬於左邊物件，不過，當方法名稱是以:結尾時，
+則該名稱會是右運算元的方法。</span></small><small>在Scala中的例子是List
+的::，它用來在List「前端」附加物件，例如：<br>
+</small>
+<pre>val x = List(1, 2)<br>println(0 :: x)</pre>
+<small><br>
+這會顯示List(0, 1,
+2)，但0是個Int，並沒有定義::方法（就算是隱式轉換後的RichInt類別也沒有定義::方法），這個操作是如何完成的？答案是::是右邊物件的
+方法，也就是x所參考的List物件上的方法，所以上面這個程式，等同於：</small><small><br>
+</small>
+<pre>val x = List(1, 2)<br>println(x.::(0))</pre>
+<small><br>
+這個程式顯示的結果也是List(0, 1, 2)。如果你這麼寫，則程式會出錯：<br>
+</small>
+<pre>val x = List(1, 2)<br>println(x :: 3)</pre>
+<small><br>
+由於::以:結尾，所以Scala會認為要由右邊物件來呼叫::方法，但3是個Int，不會有::方法，所以會出現「value :: is not
+a member of Int」的錯誤訊息。<br>
+<br>
+由於:結尾的方法會被Scala視為右邊物件的方法，所以如果是-1 :: 0 :: x，實際上的運算順序會是反過來從右至左，也就是(</small><small>-1
+:: (0 :: x))。<br>
+<br>
+由於在Scala中，任何的方法都可以撰寫運算子的形式，當你嘗試定義自己的「運算子」時，就必須注意操作的優先順序與關聯性（也許像是Array的/:
+這樣的方法）。<br>
+<br>
+</small><small><br>
+<br>
+</small></td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+<br>
+<br>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/OperatorPrecedenceAssociativity.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

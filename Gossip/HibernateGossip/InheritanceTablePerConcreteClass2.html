@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/InheritanceTablePerConcreteClass2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:38 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>繼承 - Table per concrete class with unions</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate Gossip: 繼承 - Table per concrete class with unions</a></h1>
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"><small>續</small> <small><a href="InheritanceTablePerConcreteClass.html">繼
+承 - Table per concrete class with implicit polymorphism</a>，除了分別為兩個子類別撰寫個別的HBM檔案之外，您可以在一個HBM檔案中，將父類別與子類別的屬性對應撰寫在一起，直接以實例來說明：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>User.hbm.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping package="onlyfun.caterpillar"&gt; <br>    &lt;!-- abstract 表明User是抽象的，無需對應至任何表格 --&gt;<br>    &lt;class name="User" <span style="font-weight: bold;">abstract="true"</span>&gt; <br>        &lt;id name="id"&gt; <br>            &lt;generator class="increment"/&gt; <br>        &lt;/id&gt; <br>	<br>        &lt;!-- 從父類別繼承下來的共同屬性 --&gt;<br>        &lt;property name="name"/&gt;<br>	<br>        &lt;!-- 子類別的新增屬性 --&gt;<br>        &lt;union-subclass name="DefaultUser" table="defaultuser"&gt;<br>	    &lt;property name="someProperty"/&gt; <br>	&lt;/union-subclass&gt;<br><br>        &lt;!-- 子類別的新增屬性 --&gt;<br>	&lt;union-subclass name="PowerUser" table="poweruser"&gt;<br>	    &lt;property name="otherProperty"/&gt; <br>	&lt;/union-subclass&gt;<br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+      <small><br>
+
+
+可以看到，現在您不用在兩個HBM檔中，針對相同的屬性撰寫重複的定義內容，而hibernate.cfg.xml中，只要設定User.hbm.xml即可：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>hibernate.cfg.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-configuration PUBLIC<br>	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"<br>	"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"&gt;<br>	<br>&lt;hibernate-configuration&gt; <br>    &lt;session-factory&gt; <br>        ....<br>        <span style="font-weight: bold;">&lt;mapping resource="onlyfun/caterpillar/User.hbm.xml"/&gt; </span><br>	<br>    &lt;/session-factory&gt; <br><br>&lt;/hibernate-configuration&gt;</pre>
+
+
+      <small><br>
+
+
+除了設定檔上的簡化之外，觀察 </small><small><a href="InheritanceTablePerConcreteClass.html">繼
+承 - Table per concrete class with implicit polymorphism</a> 中同一程式新增資料時的SQL：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; select</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; max(ids_.id) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; from</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( select</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defaultuser </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; union</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; poweruser </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ) ids_</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; insert </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; into</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; poweruser</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (name, otherProperty, id) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; values</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (?, ?, ?)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; insert </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; into</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defaultuser</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (name, someProperty, id) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; values</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (?, ?, ?)</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+由於generator設定為increment，在新增資料之前，先確定了兩個表格的id值最大為何，再分別遞增id並儲存物件至表格之中，所以您直接查詢資料庫中的表格，會發現id值有前後遞增的關係：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">mysql&gt; select * from defaultuser;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">+----+------+--------------+</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">| id | name | someProperty |</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">+----+------+--------------+</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">|&nbsp; 2 | Bush | hu....hu...&nbsp; |</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">+----+------+--------------+</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">1 row in set (0.00 sec)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">mysql&gt; select * from poweruser;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">+----+-------------+---------------+</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">| id | name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | otherProperty |</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">+----+-------------+---------------+</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">|&nbsp; 1 | caterpillar | Bla...Bla...&nbsp; |</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">+----+-------------+---------------+</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">1 row in set (0.00 sec)</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+而觀察利用多型特性查詢時的SQL，可以看到</small><small>利用了子查詢</small><small>在一個SQL語句中完成查詢動作：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hibernate: </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; select</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id as id0_,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.name as name0_,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.someProperty as someProp1_1_,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.otherProperty as otherPro1_2_,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.clazz_ as clazz_ </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; from</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( select</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; null as otherProperty,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; someProperty,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 as clazz_ </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defaultuser </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; union</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; otherProperty,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; null as someProperty,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 as clazz_ </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; poweruser </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ) user0_</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+相對於兩次的SQL進入資料庫，利用子查詢在同一個SQL語句中完成所有的資料查詢，會有可能有效能上的改進，而使用此方法，對往後若有多型查詢的需求時，修改上會比較方便。<br>
+
+
+      </small></td>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/InheritanceTablePerConcreteClass2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:38 GMT -->
+</html>

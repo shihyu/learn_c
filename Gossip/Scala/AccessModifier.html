@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/AccessModifier.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>存取修飾</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 存取修飾</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Scala沒有public關鍵字，</small><small>在Scala中，沒有使用任何存取修飾的類別成員（不加private也不加protected），就是公開成員（不包括類別參數，類別參數預設是private[this] val），例如：<br></small><pre>class Some {<br>    val x = 10          // 預設是公開<br>    def plus = x + 1    // 預設是公開<br>}</pre><small><br>如果定義成員時，使用protected，則表示該成員僅讓繼承後的子類別內部來使用（</small><small>如果你熟悉Java，請注意，protected在Scala中沒有套件存取的權限</small><small>）：<br></small><pre>class Some {<br>    <span style="font-weight: bold;">protected</span> val x = 10   // protected 成員<br>}<br><br>class Other extends Some {<br>    def plus = x + 1       // 可在子類別中使用<br>}</pre><small><br>如果定義成員時，使用private，就僅可在類別內部</small><small>使用，或者同一類別的實例，在類別內部可以透過實例來使用（如果你熟悉Java，請注意，Java中，外部類別可以直接存取內部類別的private成員，但Scala不行），例如：<br></small><pre>class Outer {<br>    class Inner {<br>        <span style="font-weight: bold;">private</span> val x = 10<br>        def plus = x + 1<br>    }<br>    // 下面這行移除註解會編譯錯誤<br>    // (new Inner).x <br><br>    private val y = 10<br>    def doMe(o: Outer) = <span style="font-weight: bold;">o.y</span> + y  // o 在 Outer 中可以直接存取 y<br>}</pre><small><br><span style="font-weight: bold;">protected或private存取修飾可以加上量詞（Qualifier），語法為private[X]或protected[X]，X可以是類別、套件或單例物件，這表示權限修飾到X的範圍。</span><br><br>舉個例子來說，下面這個可以通過編譯：<br></small><pre>class Some {<br>    private val x = 10<br>    def doSome(s: Some) = s.x + x<br>}</pre><small><br>如果你要更嚴格的修飾，讓x完全無法透過實例存取，則可以使用private[this]，這表示私有化至this實例本身才可以存取，也就是所謂<span style="font-weight: bold;">物件私有（Object-private）</span>，例如以下就通不過編譯了：<br></small><pre>class Some {<br>    private<span style="font-weight: bold;">[this]</span> val x = 10<br>    def doSome(s: Some) = s.x + x  // 編譯錯誤<br>}</pre><small><br>私有化至this實例本身才可以存取，就是說，該成員完全僅可在類別內部使用，所以編譯錯誤的訊息為：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">error: value x is not a member of this.Some</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def doSome(s: Some) = s.x + x</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+^</span></small><br style="font-weight: bold;"></div><small><br></small><small>伴侶類別與伴侶物件預設彼此可以互相存取私有成員，例如：<br></small><pre>class Some {<br>    private val x = 10<br>    def minus = Some.y - 1<br>}<br><br>object Some {<br>    private val y = 10<br>    val s = new Some<br>    def plus = s.x + 1<br>}</pre><small><br>但下面這個會編譯錯誤：<br></small><pre>class Some {<br>    <span style="font-weight: bold;">private[this]</span> val x = 10<br>    def minus = Some.y - 1<br>}<br><br>object Some {<br>    private val y = 10<br>    val s = new Some<br>    def plus = s.x + 1   // 編譯錯誤<br>}</pre><br><small>錯誤訊息如下：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">error: value x is not a member of this.Some</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def doSome(s: Some) = s.x + x</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+^</span></small><br></div><small><br>下面這個也會編譯錯誤：<br></small><pre>class Some {<br>    private val x = 10<br>    def minus = Some.y - 1  // 編譯錯誤<br>}<br><br>object Some {<br><span style="font-weight: bold;">    private[this] val y = 10</span><br>    val s = new Some<br>    def plus = s.x + 1<br>}</pre><small><br></small><small>錯誤訊息如下：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">error: value y is not a member of object this.Some<br>&nbsp;&nbsp; def minus = Some.y - 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br></div><small><br></small><small>在Scala中，protected並沒有套件範圍存取權限，這是因為你可以使用量詞修飾，達到套件存取權限的作用，例如，以下通不過編譯：<br></small><pre>package cc.openhome<br>class Some {<br>    protected val x = 10<br>}<br><br>class Other {<br>    val s = new Some<br>    def get = s.x        // 編譯錯誤<br>}</pre><small><br>由於protected沒有套件存取權限，所以編譯錯誤的訊息為：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">error: value x cannot be accessed in cc.openhome.Some</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; def get = s.x</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^</small><br></div><small><br>但以下就可以編譯成功，因為你使用量詞修飾protected範圍至指定的套件層級，也就是所謂<span style="font-weight: bold;">套件私有（Package-private）</span>：<br></small><pre>package cc.openhome<br>class Some {<br><span style="font-weight: bold;">    protected[openhome]</span> val x = 10<br>}<br><br>class Other {<br>    val s = new Some<br>    def get = s.x<br>}</pre><small><br>你不僅可以指定至openhome套件，你可以指定任何一層套件，例如：</small><small><br></small><pre>package cc.openhome<br>class Some {<br><span style="font-weight: bold;">    protected[cc]</span> val x = 10<br>}<br><br>class Other {<br>    val s = new Some<br>    def get = s.x<br>}</pre><small><br>再看看先前的例子，原先通不過編譯：<br></small><pre>class Outer {<br>    class Inner {<br>        private val x = 10<br>        def plus = x + 1<br>    }<br>    (new Inner).x  // 編譯錯誤<br>}</pre><small><br>編譯錯誤的訊息為：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">error: value x cannot be accessed in Outer.this.Inner</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; (new Inner).x</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^</span></small><br></div><small><br>你可以指定private防護層級至外部類別，也就是所謂<span style="font-weight: bold;">類別私有（Class-private）</span>（讓外部類別可以存取內部類別的private成員，也就是如同Java的作法），例如以下可以通過編譯：<br></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small><pre>class Outer {<br>    class Inner {<br>        <span style="font-weight: bold;">private[Outer]</span> val x = 10<br>        def plus = x + 1<br>    }<br>    (new Inner).x <br>}</pre><small><br>總而言之，private、protected看似可修飾的權限很少，但加上</small><small>private[X]、protected[X]，就可以讓你指定更細部的權限控制。</small><br><small><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/AccessModifier.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ByNameParameter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>以名呼叫參數（By-name parameter）</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 以名呼叫參數（By-name parameter）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>到目前為止，所定義函式若有參數，則呼叫時必須先運算出引數值方可呼叫函式。例如：<br></small><pre>def sum(a: Int, b: Int) = a + b<br>println(sum(1 + 2, 3 + 4))       // 顯示 10<br></pre><br><small>在呼叫sum函式之前，1+2與3+4都會先運算出結果，然後以sum(3, 7)來呼叫函式，a與b參數稱之為<span style="font-weight: bold;">以值呼叫參數（By-value paramenter）</span>。<br><br>來考慮一種情況，你想開發一個函式如下：<br></small><pre>def unless(cond: Boolean, func: () =&gt; Any) = {<br>    if(!cond) {<br>        func()<br>    }<br>}<br><br>unless(false, () =&gt; println("XD"))<br>unless(true, () =&gt; println("Orz"))</pre><small><br>這個函式的作用是，除非cond條件成立（也就是true），否則就執行所傳入的函式物件（也就是if的相反）。所傳入的函式物件，並沒有定義參數，不過() =&gt;仍不能省略，也就是你不可以寫成：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">unless(false, </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">println("XD")</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">)</span></small><br></div><small><br>如果你想要省略()=&gt;的撰寫，則可以這麼宣告：<br></small><pre>def unless(cond: Boolean, <span style="font-weight: bold;">expr: =&gt; Any</span>) = {<br>    if(!cond) {<br>        <span style="font-weight: bold;">expr</span><br>    }<br>}<br><br>unless(false, println("XD"))<br>unless(true, println("Orz"))</pre><small><br>在上例中，expr的型態是<span style="font-weight: bold;">=&gt;Any</span>，稱之為<span style="font-weight: bold;">以名呼叫參數（By-name parameter）</span>，注意到在呼叫unless函式時，直接寫下了println("XD")這樣的運算式，省略了()=&gt;的撰寫。事實上，省略()=&gt;並不是這個範例的重點，<span style="font-weight: bold;">重點是在於println("XD")不會被馬上執行</span>，真正的執行是在cond為false，也就是unless中if結果為true時。<br><br>以名呼叫參數正如其名，給予所指定的運算式一個名稱，以這個名稱代替運算式的執行結果來呼叫函式，真正的運算式執行，則是在你所定義的函式之中。<br><br>注意！以名呼叫參數並不是函式物件，它是運算式的代表名稱，所以你不可以這麼寫：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def unless(cond: Boolean, expr: =&gt; Any) = {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if(!cond) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; expr() &nbsp; // 不能有括號</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>在說明 </small><small><big><a href="OperatorExample.html"><small>數
+值操作</small></a></big> 時，曾經說明過，&amp;&amp;與||有捷徑運算的作用，但是在Scala中，&amp;&amp;與||其實是方法名稱，如何能實現捷徑運算，就是使用以名呼叫參數來實現。以下是個模擬&amp;&amp;捷徑運算的and函式：<br></small><pre>def and(c1: Boolean, c2: =&gt; Boolean) = {<br>    if(c1) c2 else c1<br>}<br><br>println(and(5 &gt; 3, 10 &gt; 3))  // true<br>println(and(5 &gt; 3, 10 &lt; 3))  // false<br>println(and(1 &gt; 3, 10 &gt; 3))  // false</pre><small><br>以下這個範例可以證明上面的and函式確實有捷徑運算的作用：<br></small><pre>def and(c1: Boolean, c2: =&gt; Boolean) = {<br>    if(c1) c2 else c1<br>}<br><br>println(and(5 &gt; 3, {print("run.. "); 10 &gt; 3}))  // 顯示 run.. false<br>println(and(1 &gt; 3, {print("run.. "); 10 &gt; 3}))  // 顯示 false</pre><small><br>由於第一個and函式呼叫時，5&gt;3成立，所以必須測試第二個運算式，因而會顯示run...訊息，而第二個and函式呼叫時，由於1&gt;3為false，不用再測試第二個運算式，直接傳回false，所以不會顯示run...訊息。<br><br>在Scala中，沒有until的功能，也就是除非條件式成立，否則不斷執行迴圈的功能，以下是個模擬until功能的函式：<br></small><pre>def until(cond: =&gt; Boolean, expr: =&gt; Unit) {<br>    if(!cond) {<br>        expr<br>        until(cond, expr)<br>    }<br>}<br><br>var count = 10<br>until(count == 0, {<br>    println(count)<br>    count -= 1<br>})</pre><br><small>如果將第一個參數改為cond: Boolean，until將永遠不會停止，因為count == 0會先運算為false再用以呼叫until函式，所以until中!cond將永遠為true，所以會一直遞迴呼叫下去，直到遞迴堆疊溢值為止。<br><br>事實上，如果搭配Scala中</small><small> <a href="Curry.html">鞣製（Curry）</a> 的特性，可以讓這邊的unless與until</small><small> 看起來就像是語言內建的語法，這也是Scala支援擴充性的一個方式。<br></small><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ByNameParameter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

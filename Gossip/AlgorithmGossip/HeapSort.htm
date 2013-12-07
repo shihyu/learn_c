@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/HeapSort.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:57 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Heap 排序法 - 改良的選擇排序</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip:&nbsp;Heap 排序法 - 改良的選擇排序</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+
+      
+      <h2>說明</h2>
+
+      <small>
+選擇排序法的概念簡單，以降冪為例，每次從未排序部份選一最小值，插入已排序部份的後端，其時間主要花費於在整個未排序部份尋找最小值，如果能讓搜尋最小值的方式加
+快，選擇排序法的速率也就可以加快，Heap排序法讓搜尋的路徑由樹根至最後一個樹葉，而不是整個未排序部份，因而稱之為改良的選擇排序法。</small><br>
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+Heap排序法使用堆積樹（Heap tree），樹是一種資料結構，而堆積樹是一個二元樹，每個父節點最多只有兩個子節點，堆積樹的
+父節點若小於子節點，則稱之為最小堆積（Min heap），父節點若大於子節點，則稱之為最大堆積（Max heap），而同一層的子節點則無需理會其大小關係，例如下面就是一個堆積樹：</small> <br>
+
+
+
+
+      
+      <div style="text-align: center;"><img style="width: 284px; height: 152px;" alt="Heap 排序" title="Heap 排序" src="images/heapSort-1.jpg"></div>
+
+
+      <br>
+
+      <small>
+可以使用一維陣列來儲存堆積樹的所有元素與其順序，為了計算方便，使用的起始索引是1而不是0，索引1是樹根位置，如果左子節點儲存在陣列中的索引為s，則其父節點的索引為s/2，而右子節點為s+1，就如上圖所示，將上圖的堆積樹轉換為一維陣列之後如下所示： </small><br>
+
+
+      
+      <div style="text-align: center;"><img style="width: 286px; height: 55px;" alt="Heap 排序" title="Heap 排序" src="images/heapSort-2.jpg"></div>
+
+
+      <br>
+
+      <small>
+首先必須知道如何建立堆積樹，以最小堆積為例，加至堆積樹的元素會先放置在最後一個樹葉節點位置，然後檢查父節點是否小於子節點，將小的元素不斷與父節點交換，直到滿足堆積樹的條件為止，例如在上圖的堆積加入一個元素12，則堆積樹的調整方式如下所示：</small><br>
+
+
+      
+      <div style="text-align: center;"><img style="width: 574px; height: 154px;" alt="Heap 排序" title="Heap 排序" src="images/heapSort-3.jpg"></div>
+
+
+      <br>
+
+      <small>
+建立好堆積樹之後，樹根一定是所有元素的最小值，排序應用時：<br>
+
+      </small>
+      
+      <ol>
+
+        <li><small>將最小值取出</small></li>
+
+        <li><small>調整樹為最小堆積樹</small></li>
+
+      
+      </ol>
+
+
+      <small><br>
+
+
+不斷重複以上的步驟，就可以達到排序的效果，最小值取出方式是將樹根與最後一個樹葉節點交換，然後切下樹葉節點，重新調整樹為堆積樹，調整過程中，找出父節點兩子節點中較小的一個進行交換，如下所示： </small><br>
+
+
+      
+      <div style="text-align: center;"><img style="width: 591px; height: 199px;" alt="Heap 排序" title="Heap 排序" src="images/heapSort-4.jpg"></div>
+
+
+      <br>
+
+      <small>
+
+調整完畢後，樹根節點又是最小值了，於是可以重覆這個步驟，再取出最小值，並調整樹為堆積樹，如下所示：</small><br>
+
+
+      
+      <div style="text-align: center;"><img style="width: 564px; height: 197px;" alt="Heap 排序" title="Heap 排序" src="images/heapSort-5.jpg"></div>
+
+
+      <br>
+
+      <small>
+
+如此重覆步驟之後，由於使用一維陣列來儲存堆積樹，每次將樹葉與樹根交換的動作就是將最小值放至後端的陣列，所以最後陣列就是變為已排序的狀態。
+      <br>
+
+      <br>堆積樹在建立時，就樹葉到樹根的路徑來看，是氣泡排序。堆積排序</small><small>若看每次選出最小值樹根與最後一個樹葉交換，是選擇排序，後續</small><small>進行調整的過程中，</small><small>就樹根到樹葉的路徑來看，實際上也在進行氣泡排序。</small><small></small><small>如果以視覺化來看排序過程，</small><small>已排序部份的出現</small><small>可很明顯地看出像是選擇排序（參考維基百科上的 <a href="../../../zh.wikipedia.org/wiki/File_Sorting_heapsort_anim.html">動畫圖片</a>），調整過程則沒那麼明顯的視覺效果，因此</small><small>Heap排序法被稱為改良的選擇排序法。 </small>
+
+      <br>
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+      
+      <ul>
+
+        <li> <a name="C"></a>C
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br>#define LEN 10<br>#define OFFSET 1<br>#define SWAP(x,y) {int t; t = x; x = y; y = t;} <br><br>void heapSort(int*, int len, int(*)(int, int));<br>void heapTree(int*, int, int(*)(int, int)); <br>void selectFromHeap(int*, int, int(*)(int, int)); <br><br>void bubbleLeaf(int*, int, int(*)(int, int));<br>int isBubbleable(int*, int, int, int(*)(int, int));<br><br>void bubbleRoot(int*, int, int(*)(int, int));<br>int idxFromChilds(int*, int, int, int(*)(int, int));<br>int isRightLeafSuitable(int*, int, int, int(*)(int, int));<br><br>void print(int*, int len);<br>int ascending(int, int);<br>int descending(int, int);<br><br>int main(void) { <br>    int num[LEN] = {10, 9, 1, 2, 5, 3, 8, 7, 12, 11};<br><br>    heapSort(num, LEN, descending); <br>    print(num, LEN);<br>    <br>    heapSort(num, LEN, ascending); <br>    print(num, LEN);<br>    <br>    system("PAUSE");<br><br>    return 0; <br>}<br><br>void heapSort(int* num, int len, int(*compar)(int, int)) {<br>    heapTree(num, len, compar);<br>    selectFromHeap(num, len, compar); <br>}<br><br>void heapTree(int* num, int len, int(*compar)(int, int)) { <br>    int i, end;<br>    for(i = 1, end = len + 1; i &lt; end; i++) { bubbleLeaf(num, i, compar); }<br>}<br><br>void selectFromHeap(int* num, int len, int(*comp)(int, int)) {<br>    int end;<br>    for(end = len; end &gt; OFFSET; end--) {<br>        SWAP(num[1 - OFFSET], num[end - OFFSET]);<br>        bubbleRoot(num, end, comp);<br>    }<br>}<br><br>void bubbleLeaf(int* num, int eleIdx, int(*compar)(int, int)) {<br>    int childIdx, parentIdx;<br>    for(childIdx = eleIdx, parentIdx = eleIdx / 2;<br>        isBubbleable(num, childIdx, parentIdx, compar);<br>        childIdx = parentIdx, parentIdx = childIdx / 2) {<br>         SWAP(num[parentIdx - OFFSET], num[childIdx - OFFSET]); <br>    }<br>}<br><br>int isBubbleable(int* num, int childIdx, <br>                 int parentIdx, int(*compar)(int, int)) {<br>    return childIdx &gt; OFFSET &amp;&amp; <br>           compar(num[parentIdx - OFFSET], num[childIdx - OFFSET]) &lt; 0;<br>}<br><br>void bubbleRoot(int* num, int end, int(*comp)(int, int)) {<br>    int parentIdx, childIdx;<br>    for(parentIdx = 0 + OFFSET, <br>        childIdx = idxFromChilds(num, parentIdx, end, comp);<br>        childIdx &lt; end &amp;&amp; <br>        comp(num[childIdx - OFFSET], num[parentIdx - OFFSET]) &gt; 0; <br>        parentIdx = childIdx, <br>        childIdx = idxFromChilds(num, parentIdx, end, comp)) {<br>        SWAP(num[parentIdx - OFFSET], num[childIdx - OFFSET]); <br>    }    <br>}<br><br>int idxFromChilds(int* num, int parentIdx, int end, int(*comp)(int, int)) {<br>   int childIdx = parentIdx * 2;<br>   return isRightLeafSuitable(num, childIdx, end, comp) ? <br>              childIdx + 1 : childIdx;<br>}<br><br>int isRightLeafSuitable(int* num, int childIdx, <br>                        int end, int(*comp)(int, int)) {<br>    return childIdx &lt; end - 1 &amp;&amp; <br>           comp(num[childIdx + 1 - OFFSET], num[childIdx - OFFSET]) &gt; 0;<br>}<br><br>void print(int* arr, int len) {<br>    int i;<br>    for(i = 0; i &lt; len; i++) { printf("%d ", arr[i]); } <br>    printf("\n");<br>}<br><br>int ascending(int a, int b) { return a - b; }<br>int descending(int a, int b) { return -ascending(a, b); }<br></pre>
+
+
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>import java.util.*;<br>import static java.lang.System.out;<br>import static java.util.Collections.swap;<br><br>public class Sort {<br>    public static &lt;T extends Comparable&lt;? super T&gt;&gt; <br>        int ascending(T t1, T t2) {  return t1.compareTo(t2); }<br><br>    public static &lt;T extends Comparable&lt;? super T&gt;&gt; <br>        int descending(T t1, T t2) { return -ascending(t1, t2); }<br>    <br>    public static &lt;T extends Comparable&lt;? super T&gt;&gt; <br>        void heapSort(List&lt;T&gt; list) { heapSort(list, Sort::ascending); }<br>        <br>    private static final int OFFSET = 1;<br>        <br>    public static &lt;T&gt; void heapSort(<br>        List&lt;T&gt; list, Comparator&lt;? super T&gt; c) {<br>        heapTree(list, c);<br>        selectFromHeap(list, c);<br>    }<br>    <br>    private static &lt;T&gt; void heapTree(List&lt;T&gt; list, Comparator&lt;? super T&gt; c) {<br>        for(int i = 1, end = list.size() + 1; i &lt; end; i++) { <br>            bubbleLeaf(list, i, c); <br>        }<br>    }<br>    <br>    private static &lt;T&gt; void selectFromHeap(List&lt;T&gt; list, <br>                                Comparator&lt;? super T&gt; c) {<br>        for(int end = list.size(); end &gt; OFFSET; end--) {<br>            swap(list, 1 - OFFSET, end - OFFSET);<br>            bubbleRoot(list, end, c);<br>        }<br>    }<br>    <br>    private static &lt;T&gt; void bubbleLeaf(List&lt;T&gt; list, <br>                                int eleIdx, Comparator&lt;? super T&gt; c) {<br>        for(int childIdx = eleIdx, parentIdx = eleIdx / 2;<br>            isBubbleable(list, childIdx, parentIdx, c);<br>            childIdx = parentIdx, parentIdx = childIdx / 2) {<br>             swap(list, parentIdx - OFFSET, childIdx - OFFSET); <br>        }<br>    }<br>    <br>    private static &lt;T&gt; boolean isBubbleable(List&lt;T&gt; list, int childIdx, <br>                 int parentIdx, Comparator&lt;? super T&gt; c) {<br>        return childIdx &gt; OFFSET &amp;&amp; c.compare(<br>           list.get(parentIdx - OFFSET), list.get(childIdx - OFFSET)) &lt; 0;<br>    }<br>    <br>    private static &lt;T&gt; void bubbleRoot(List&lt;T&gt; list, <br>                                int end, Comparator&lt;? super T&gt; c) {<br>        for(int parentIdx = 0 + OFFSET, <br>                childIdx = idxFromChilds(list, parentIdx, end, c);<br>            childIdx &lt; end &amp;&amp; <br>            c.compare(list.get(childIdx - OFFSET), <br>                      list.get(parentIdx - OFFSET)) &gt; 0; <br>            parentIdx = childIdx, <br>            childIdx = idxFromChilds(list, parentIdx, end, c)) {<br>            swap(list, parentIdx - OFFSET, childIdx - OFFSET); <br>        }<br>    }<br><br>    private static &lt;T&gt; int idxFromChilds(List&lt;T&gt; list, <br>                         int parentIdx, int end, Comparator&lt;? super T&gt; c) {<br>        int childIdx = parentIdx * 2;<br><br>        return isRightLeafSuitable(list, childIdx, end, c) ? <br>              childIdx + 1 : childIdx;<br>    }<br><br>    private static &lt;T&gt; boolean isRightLeafSuitable(List&lt;T&gt; list, <br>                          int childIdx, int end, Comparator&lt;? super T&gt; c) {<br>        return childIdx &lt; end - 1 &amp;&amp; <br>               c.compare(list.get(childIdx + 1 - OFFSET), <br>                         list.get(childIdx - OFFSET)) &gt; 0;<br>    }<br><br>    public static void main(String[] args) {<br>        List&lt;Integer&gt; list = <br>            new ArrayList&lt;&gt;(Arrays.asList(10, 9, 1, 2, 5, 3, 8, 7, 12, 11));<br>        <br>        heapSort(list);<br>        out.println(list);<br>        <br>        heapSort(list, Sort::descending);<br>        out.println(list);<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>def ascending(a, b): return a - b<br>def descending(a, b): return -ascending(a, b)<br><br>__OFFSET = 1<br>    <br>def heapSort(xs, comp = ascending):<br>    if not xs:<br>        return []<br>    else:<br>        heapped = heapTree([], xs, comp)<br>        return selectFromHeap(heapped, [], comp)<br><br>def heapTree(heapped, xs, comp):<br>    if not xs:<br>        return heapped<br>    else:<br>        return heapTree(bubbleLeaf(heapped, xs[0], comp), xs[1:], comp)<br><br>def bubbleLeaf(heapped, child, comp):<br>    if not heapped:<br>        return [child]<br>    else:<br>        parentIdx = (len(heapped) + 1) // 2<br>        if comp(heapped[parentIdx - __OFFSET], child) &lt; 0:<br>            heappedChilds = (heapped[parentIdx - __OFFSET + 1:] + <br>                             [heapped[parentIdx - __OFFSET]])<br>            heappedParents = heapped[0:parentIdx - __OFFSET]<br>            return bubbleLeaf(heappedParents, child, comp) + heappedChilds<br>        else:<br>            return heapped + [child]<br>        <br>def selectFromHeap(heapped, sorted, comp):<br>    if len(heapped) == 1:<br>        return heapped + sorted<br>    else:<br>        rootSorted = [heapped[0]] + sorted<br>        unheapped = [heapped[-1]] + heapped[1:-1]<br>        leftHeapped = bubbleRoot(unheapped, 1, 0, comp)<br>        return selectFromHeap(leftHeapped, rootSorted, comp)<br>        <br>def bubbleRoot(unheapped, parentIdx, heappedLen, comp):<br>    childLIdx = (parentIdx * 2) - heappedLen<br>    if len(unheapped) == 1 or childLIdx &gt; len(unheapped):<br>        return unheapped<br>    else:<br>        childIdx = idxFromChilds(childLIdx, unheapped, comp)<br>        if comp(unheapped[childIdx - __OFFSET], unheapped[0]) &gt; 0:<br>            heapped = ([unheapped[childIdx - __OFFSET]] + <br>                        unheapped[1:childIdx - __OFFSET])<br>            rightUnheapped = ([unheapped[0]] + <br>                               unheapped[childIdx + 1 - __OFFSET:])<br>            return heapped + bubbleRoot(rightUnheapped, <br>                                        heappedLen + childIdx, <br>                                        heappedLen + childIdx - 1, comp)<br>        else:<br>            return unheapped<br><br>def idxFromChilds(childLIdx, unheapped, comp):<br>    return (childLIdx + 1 if childLIdx &lt; len(unheapped) and <br>                             comp(unheapped[childLIdx + 1 - __OFFSET], <br>                                  unheapped[childLIdx - __OFFSET]) &gt; 0 <br>                          else childLIdx)<br><br>list = [10, 9, 1, 2, 5, 3, 8, 7, 12, 11]<br><br>print(heapSort(list))<br>print(heapSort(list, descending))<br></pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>object Sort {<br>    private val OFFSET = 1<br>    <br>    def heap[T](xs: List[T], compare: (T, T) =&gt; Boolean):List[T] = {<br>        if(xs.isEmpty) Nil<br>        else {<br>            val heapped = heapTree(Nil, xs, compare)<br>            selectFromHeap(heapped, Nil, compare)<br>        }<br>    }<br>    <br>    private def heapTree[T](heapped: List[T], xs: List[T],<br>                   compare: (T, T) =&gt; Boolean): List[T] = {<br>        if(xs.isEmpty) heapped<br>        else {<br>            heapTree(bubbleLeaf(heapped, xs(0), compare), xs.tail, compare)<br>        }<br>    }<br>            <br>    private def bubbleLeaf[T](heapped: List[T], child: T,<br>                   compare: (T, T) =&gt; Boolean): List[T] = {<br>        if(heapped.isEmpty) List(child)<br>        else {<br>            val parentIdx = (heapped.size + 1) / 2<br>            if(compare(child, heapped(parentIdx - OFFSET))) {<br>                val heappedChilds = <br>                      heapped.slice(parentIdx - OFFSET + 1, heapped.size) <br>                      ++ List(heapped(parentIdx - OFFSET))<br>                val heappedParents = heapped.slice(0, parentIdx - OFFSET)<br>                bubbleLeaf(heappedParents, child, compare) ++ heappedChilds<br>            }<br>            else heapped ++ List(child)<br>        }<br>    }<br>    <br>    private def selectFromHeap[T](heapped: List[T], sorted: List[T], <br>                   compare: (T, T) =&gt; Boolean): List[T] = {<br>        if(heapped.size == 1) heapped ++ sorted<br>        else {<br>            val rootSorted = heapped.head :: sorted<br>            val unheapped = heapped.last :: <br>                            heapped.slice(1, heapped.size - 1)<br>            val leftHeapped = bubbleRoot(unheapped, 1, 0, compare)<br>            selectFromHeap(leftHeapped, rootSorted, compare)<br>        }<br>    }<br>    <br>    private def bubbleRoot[T](unheapped: List[T], parentIdx: Int, <br>                   heappedLen: Int, compare: (T, T) =&gt; Boolean): List[T] = {<br>        val childLIdx = (parentIdx * 2) - heappedLen<br>        if(unheapped.size == 1 || childLIdx &gt; unheapped.size) unheapped<br>        else {<br>            val childIdx = idxFromChilds(childLIdx, unheapped, compare)<br>            if(compare(unheapped(childIdx - OFFSET), unheapped.head)) {<br>                val heapped = unheapped(childIdx - OFFSET) :: <br>                              unheapped.slice(1, childIdx - OFFSET)<br>                val rightUnheapped = unheapped.head :: <br>                      unheapped.slice(childIdx + 1 - OFFSET, unheapped.size)<br>                heapped ++ bubbleRoot(rightUnheapped, heappedLen + childIdx, <br>                                      heappedLen + childIdx - 1, compare)<br>            }<br>            else unheapped<br>        }<br>    }<br>    <br>    private def idxFromChilds[T](childLIdx: Int, <br>                    unheapped: List[T], compare: (T, T) =&gt; Boolean) = {<br>        if(childLIdx &lt; unheapped.size &amp;&amp;<br>           compare(unheapped(childLIdx + 1 - OFFSET), <br>                   unheapped(childLIdx - OFFSET))) {<br>             childLIdx + 1<br>        } <br>        else childLIdx<br>    }<br>}<br><br>val list = List(10, 9, 1, 2, 5, 3, 8, 7, 12, 11)<br><br>println(Sort.heap[Int](list, _ &gt; _))<br>println(Sort.heap[Int](list, _ &lt; _))</pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>class Sort<br>    @@ascending = -&gt;(a, b) { a - b }<br>    @@descending = -&gt;(a, b) { -@@ascending.call(a, b) }<br>    <br>    def self.ascending; @@ascending end<br>    def self.descending; @@descending end<br>    <br>    OFFSET = 1<br>    <br>    def self.heap(xs, comp)<br>        if xs.empty?<br>            []<br>        else<br>            heapped = heapTree([], xs, comp)<br>            selectFromHeap(heapped, [], comp)<br>        end<br>    end<br>    <br>    def self.heapTree(heapped, xs, comp)<br>        if xs.empty?<br>            heapped<br>        else<br>            heapTree(bubbleLeaf(heapped, xs[0], comp), xs[1..-1], comp)<br>        end<br>    end<br>    private_class_method :heapTree<br><br>    def self.bubbleLeaf(heapped, child, comp)<br>        if heapped.empty?<br>            [child]<br>        else<br>            parentIdx = (heapped.size + 1) / 2<br>            if comp.call(heapped[parentIdx - OFFSET], child) &lt; 0<br>                heappedChilds = (heapped[parentIdx - OFFSET + 1..-1] + <br>                                 [heapped[parentIdx - OFFSET]])<br>                heappedParents = heapped[0...parentIdx - OFFSET]<br>                bubbleLeaf(heappedParents, child, comp) + heappedChilds<br>            else<br>                heapped + [child]<br>            end<br>        end<br>    end<br>    private_class_method :bubbleLeaf    <br>            <br>    def self.selectFromHeap(heapped, sorted, comp)<br>        if heapped.size == 1<br>            heapped + sorted<br>        else<br>            rootSorted = [heapped[0]] + sorted<br>            unheapped = [heapped.last] + heapped[1...-1]<br>            leftHeapped = bubbleRoot(unheapped, 1, 0, comp)<br>            selectFromHeap(leftHeapped, rootSorted, comp)<br>        end<br>    end<br>    private_class_method :selectFromHeap<br>    <br>    def self.bubbleRoot(unheapped, parentIdx, heappedLen, comp)<br>        childLIdx = (parentIdx * 2) - heappedLen<br>        if unheapped.size == 1 or childLIdx &gt; unheapped.size<br>            unheapped<br>        else<br>            childIdx = idxFromChilds(childLIdx, unheapped, comp)<br>            if comp.call(unheapped[childIdx - OFFSET], unheapped[0]) &gt; 0<br>                heapped = ([unheapped[childIdx - OFFSET]] + <br>                            unheapped[1...childIdx - OFFSET])<br>                rightUnheapped = ([unheapped[0]] + <br>                                   unheapped[childIdx + 1 - OFFSET..-1])<br>                heapped + bubbleRoot(rightUnheapped, <br>                                       heappedLen + childIdx, <br>                                       heappedLen + childIdx - 1, comp)<br>            else<br>                unheapped<br>            end<br>        end<br>    end<br>    private_class_method :bubbleRoot<br>    <br>    def self.idxFromChilds(childLIdx, unheapped, comp)<br>        (childLIdx &lt; unheapped.size and <br>         comp.call(unheapped[childLIdx + 1 - OFFSET], <br>                   unheapped[childLIdx - OFFSET]) &gt; 0) ? <br>         childLIdx + 1 : childLIdx<br>    end<br>    private_class_method :idxFromChilds<br>end<br><br>list = [10, 9, 1, 2, 5, 3, 8, 7, 12, 11]<br><br>print(Sort.heap(list, Sort.ascending).to_s + "\n")<br>print(Sort.heap(list, Sort.descending).to_s + "\n")<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>function ascending(a, b) {return a - b;}<br>function descending(a, b) {return -ascending(a, b);}<br><br>var heapSort = function() {<br>    function swap(list, i, j) {<br>        var ele = list[i];<br>        list[i] = list[j];<br>        list[j] = ele;<br>    }<br><br>    var OFFSET = 1;<br>   <br>    function sort(list, c) {<br>        heapTree(list, c);<br>        selectFromHeap(list, c);<br>    }<br>    <br>    function heapTree(list, c) {<br>        for(var i = 1, end = list.length + 1; i &lt; end; i++) { <br>            bubbleLeaf(list, i, c); <br>        }<br>    }<br>    <br>    function selectFromHeap(list, c) {<br>        for(var end = list.length; end &gt; OFFSET; end--) {<br>            swap(list, 1 - OFFSET, end - OFFSET);<br>            bubbleRoot(list, end, c);<br>        }<br>    }<br>    <br>    function bubbleLeaf(list, eleIdx, c) {<br>        for(var childIdx = eleIdx, parentIdx = parseInt(eleIdx / 2);<br>            isBubbleable(list, childIdx, parentIdx, c);<br>            childIdx = parentIdx, parentIdx = parseInt(childIdx / 2)) {<br>             swap(list, parentIdx - OFFSET, childIdx - OFFSET); <br>        }<br>    }<br>    <br>    function isBubbleable(list, childIdx, parentIdx, c) {<br>        return childIdx &gt; OFFSET &amp;&amp; c(<br>           list[parentIdx - OFFSET], list[childIdx - OFFSET]) &lt; 0;<br>    }<br>    <br>    function bubbleRoot(list, end, c) {<br>        for(var parentIdx = 0 + OFFSET, <br>                childIdx = idxFromChilds(list, parentIdx, end, c);<br>            childIdx &lt; end &amp;&amp; <br>            c(list[childIdx - OFFSET], list[parentIdx - OFFSET]) &gt; 0; <br>            parentIdx = childIdx, <br>            childIdx = idxFromChilds(list, parentIdx, end, c)) {<br>            swap(list, parentIdx - OFFSET, childIdx - OFFSET); <br>        }<br>    }<br><br>    function idxFromChilds(list, parentIdx, end, c) {<br>        var childIdx = parentIdx * 2;<br>        return isRightLeafSuitable(list, childIdx, end, c) ? <br>              childIdx + 1 : childIdx;<br>    }<br><br>    function isRightLeafSuitable(list, childIdx, end, c) {<br>        return childIdx &lt; end - 1 &amp;&amp; <br>               c(list[childIdx + 1 - OFFSET], list[childIdx - OFFSET]) &gt; 0;<br>    }<br>    <br>    return sort;<br>}();<br><br>var list = [10, 9, 1, 2, 5, 3, 8, 7, 12, 11];<br><br>heapSort(list, ascending);<br>print(list);<br><br>heapSort(list, descending);<br>print(list);<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>ascending a b = a - b<br>descending a b = -ascending a b<br><br>slice from to xs = take (to - from) (drop from xs)<br>tailFrom from xs = slice from (length xs) xs<br>initUntil until xs = slice 0 until xs<br><br>offset = 1<br><br>heapSort xs comp =<br>    if xs == [] then []<br>    else<br>        let heapped = heapTree [] xs comp<br>        in selectFromHeap heapped [] comp<br><br>heapTree heapped xs comp =<br>    if xs == [] <br>        then heapped<br>        else heapTree (bubbleLeaf heapped (head xs) comp) (tail xs) comp<br><br>bubbleLeaf heapped child comp =<br>    if heapped == [] then [child]<br>    else<br>        let parentIdx = (length heapped + 1) `div` 2<br>        in<br>            if (comp (heapped !! (parentIdx - offset)) child) &lt; 0 then<br>                let heappedChilds = <br>                        (tailFrom (parentIdx - offset + 1) heapped) ++ <br>                            [heapped !! (parentIdx - offset)]<br>                    heappedParents = initUntil (parentIdx - offset) heapped<br>                in (bubbleLeaf heappedParents child comp) ++ heappedChilds<br>            else<br>                heapped ++ [child]<br>                <br>selectFromHeap heapped sorted comp =<br>    if (length heapped == 1) then heapped ++ sorted<br>    else<br>        let rootSorted = (head heapped) : sorted<br>            unheapped = (last heapped) : (init $ tail heapped)<br>            leftHeapped = bubbleRoot unheapped 1 0 comp<br>        in selectFromHeap leftHeapped rootSorted comp<br>        <br>bubbleRoot unheapped parentIdx heappedLen comp =<br>    if (length unheapped == 1) || (childLIdx &gt; length unheapped) <br>    then unheapped<br>    else<br>        let childIdx = idxFromChilds childLIdx unheapped comp<br>        in<br>            if comp (unheapped !! (childIdx - offset)) (head unheapped) &gt; 0<br>            then<br>                let heapped = (unheapped !! (childIdx - offset)) :<br>                              (slice 1 (childIdx - offset) unheapped)<br>                    rightUnheapped = <br>                        (head unheapped) : <br>                        (tailFrom (childIdx + 1 - offset) unheapped)<br>                in heapped ++ <br>                    (bubbleRoot rightUnheapped (heappedLen + childIdx) <br>                    (heappedLen + childIdx - 1) comp)<br>            else unheapped<br>    where childLIdx = (parentIdx * 2) - heappedLen<br>            <br>idxFromChilds childLIdx unheapped comp =<br>    if childLIdx &lt; (length unheapped) &amp;&amp; <br>       (comp (unheapped !! (childLIdx + 1 - offset)) <br>             (unheapped !! (childLIdx - offset))) &gt; 0<br>        then childLIdx + 1<br>        else childLIdx<br>        <br>main = sequence [print $ heapSort list ascending, <br>                 print $ heapSort list descending]<br>    where list = [10, 9, 1, 2, 5, 3, 8, 7, 12, 11]<br></pre>
+<br>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/HeapSort.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:05:01 GMT -->
+</html>

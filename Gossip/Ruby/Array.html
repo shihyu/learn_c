@@ -1,0 +1,1043 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Array.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>陣列型態</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 陣列型態<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在</small><small>Ruby中，陣列為有序的物件集合，具有索引特性，長度可以變動。要建立陣列，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">[]</span>實字，串列中每個元素，使用逗號<span style="font-family: Courier New,Courier,monospace;"> <span style="font-weight: bold;">,</span> </span>區隔。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array1 = []<br>
+</span>=&gt; []<span style="font-weight: bold;"><br>
+&gt;&gt; array1 &lt;&lt; 1<br>
+            </span>=&gt; [1]<span style="font-weight: bold;"><br>
+&gt;&gt; array1 &lt;&lt; "two"<br>
+            </span>=&gt; [1, "two"]<span style="font-weight: bold;"><br>
+&gt;&gt; array1 &lt;&lt; true<br>
+            </span>=&gt; [1, "two", true]<span style="font-weight: bold;"><br>
+&gt;&gt; array1.pop<br>
+            </span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt; array1<br>
+            </span>=&gt; [1, "two"]<span style="font-weight: bold;"><br>
+&gt;&gt; array1.delete("two")<br>
+            </span>=&gt; "two"<span style="font-weight: bold;"><br>
+&gt;&gt; array1<br>
+            </span>=&gt; [1]<span style="font-weight: bold;"><br>
+&gt;&gt; array1.insert(0, "three")<br>
+            </span>=&gt; ["three", 1]<span style="font-weight: bold;"><br>
+&gt;&gt; array2 = [1, "two", true]<br>
+            </span>=&gt; [1, "two", true]<span style="font-weight: bold;"><br>
+&gt;&gt; array2.reverse<br>
+=&gt; [true, "two", 1]<br>
+&gt;&gt; array2.include? "two" <br>
+</span>=&gt; true <span style="font-weight: bold;"><br>
+&gt;&gt; array2.length<br>
+            </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">=&gt; 3 <br>
+</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; </span></span></small><br>
+</td></tr></tbody>
+      
+      </table>
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">使用[]建立陣列物件，為<span style="font-weight: bold;">Array</span>的實例，若沒有指定任何元素，長度為0。你可以對陣列使用<span style="font-weight: bold;">push</span>（相當於使用&lt;&lt;操作）、<span style="font-weight: bold;">pop</span>、<span style="font-weight: bold;">last</span>方法對末端進行附加、取出、讀取元素，也就是進行堆疊</small><small style="font-family: Courier New,Courier,monospace;">（</small><small>Stack</small><small style="font-family: Courier New,Courier,monospace;">）</small><small style="font-family: Courier New,Courier,monospace;">操作。使用<span style="font-weight: bold;">unshift</span>、<span style="font-weight: bold;">shift</span>、<span style="font-weight: bold;">first</span>對前端進行加入、取出、讀取元素，也就是進行佇列（</small><small>Queue</small><small style="font-family: Courier New,Courier,monospace;">）操作。可以使用<span style="font-weight: bold;">insert</span>、<span style="font-weight: bold;">delete</span>、<span style="font-weight: bold;">reverse</span><span style="font-weight: bold;"></span>等方法進行安插、刪除、反轉等動作，使用<span style="font-weight: bold;">include?</span>測試元素是否在陣列中，使用<span style="font-weight: bold;">length</span>取得陣列長度。<br>
+      <br>
+如果要對陣列中的元素進行排序，可以使用<span style="font-weight: bold;">sort</span>方法。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array = [3, 1, 4, 5, 2, 7]<br>
+</span>=&gt; [3, 1, 4, 5, 2, 7]<span style="font-weight: bold;"><br>
+&gt;&gt; array.sort<br>
+            </span>=&gt; [1, 2, 3, 4, 5, 7]<span style="font-weight: bold;"><br>
+&gt;&gt; array.sort { |a, b| b &lt;=&gt; a }<br>
+            </span>=&gt; [7, 5, 4, 3, 2, 1]<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">sort方法可以自行指定排序方式，上例中第二個sort範例，{} 區塊中會傳入陣列中兩元素給</small><small style="font-family: Courier New,Courier,monospace;">a、b參考，你要傳回0、大於0或小於0，表示順序上a等於b、a大於b及a小於b，<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;=&gt;</span>操作左邊若大於右邊會傳回1，等於右邊會傳回0，小於右邊會傳回-1，在Ruby區塊中，最後一個運算的結果會作為傳回值，因此第二個sort範例就完成陣列中反序排列。<br>
+      <br>
+      </small><small style="font-family: Courier New,Courier,monospace;">如果要附加多個元素，則可以使用+操作，注意與&lt;&lt;操作的不同。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array1 = [1, 2, 3]<br>
+</span>=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; array1 &lt;&lt; [4, 5, 6]<br>
+            </span>=&gt; [1, 2, 3, [4, 5, 6]]<span style="font-weight: bold;"><br>
+&gt;&gt; array2 = [1, 2, 3]<br>
+            </span>=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; array2 + [4, 5, 6]<br>
+            </span>=&gt; [1, 2, 3, 4, 5, 6]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+      <br>
+      <small>可以對陣列使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">*</span>，指定加倍陣列的內容，注意對每個元素是進行<span style="font-weight: bold;">淺層複製（Shallow copy）</span>：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array1 = [[1, 2, 3], [4, 5, 6]]<br>
+</span>=&gt; [[1, 2, 3], [4, 5, 6]]<span style="font-weight: bold;"><br>
+&gt;&gt; array2 = array1 * 2<br>
+            </span>=&gt; [[1, 2, 3], [4, 5, 6], [1, 2, 3], [4, 5, 6]]<span style="font-weight: bold;"><br>
+&gt;&gt; array2[0][0] = 100<br>
+            </span>=&gt; 100<span style="font-weight: bold;"><br>
+&gt;&gt; array2<br>
+            </span>=&gt; [[100, 2, 3], [4, 5, 6], [100, 2, 3], [4, 5, 6]]<span style="font-weight: bold;"><br>
+&gt;&gt; array1<br>
+            </span>=&gt; [[100, 2, 3], [4, 5, 6]]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">*</span>也可以用來拆解陣列，如果你要將陣列中的元素一次指定給數個變數時會很方便：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x, y, z = *[10, 20, 30]<br>
+</span>=&gt; [10, 20, 30]<span style="font-weight: bold;"><br>
+&gt;&gt; x<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; y<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; z<br>
+            </span>=&gt; 30<span style="font-weight: bold;"><br>
+&gt;&gt; </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">x, y, z = [40, 50, 60]<br>
+</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">=&gt; [40, 50, 60]<span style="font-weight: bold;"><br>
+&gt;&gt; x<br>
+            </span>=&gt; 40<span style="font-weight: bold;"><br>
+&gt;&gt; y<br>
+            </span>=&gt; 50<span style="font-weight: bold;"><br>
+&gt;&gt; z<br>
+            </span>=&gt; 60<br>
+            <span style="font-weight: bold;">&gt;&gt;</span><br>
+</span></small></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>實際上可以看到，如果只是指定給變數，並不需要特別加上*，之後會看到，如果要將陣列指定給 <a href="DefMethod.html">方法</a> 上的參數，才需要特別指定*。</small><br>
+<br>
+      <small><span style="font-family: Courier New,Courier,monospace;">*</span>也可以用來收集資料為陣列，例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; *a = 1, 2, 3<br>
+</span>=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; a = [1, 2, 3]<br>
+            </span>=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; a = 1, 2, 3<br>
+</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small>可以看到，實際上要收集資料為陣列，只要在等號右邊以逗號區隔就可以了，結合以上說明，在Ruby中要交換變數，只要這麼作：</small><small><br></small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x = 10<br>
+</span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; y = 20<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; x, y = y, x<br>
+            </span>=&gt; [20, 10]<span style="font-weight: bold;"><br>
+&gt;&gt; x<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; y<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span></span></small></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small>因為=右邊若有逗號區隔的資料，會收集為陣列，陣列若指定給右邊變數，會拆解並分配給各個變數，因而組成了簡單的交換變數語法。</small><br>
+<br>
+      <small>
+      在Ruby中，陣列可以進行集合（Set）運算，使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&amp;</span>可作交集運算，使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">|</span>可作聯集運算，使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">-</span>作減集運算。例如：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; admins = ["Justin", "caterpillar"]<br>
+</span>=&gt; ["Justin", "caterpillar"]<span style="font-weight: bold;"><br>
+&gt;&gt; users = ["momor", "hamini", "Justin"]<br>
+            </span>=&gt; ["momor", "hamini", "Justin"]<span style="font-weight: bold;"><br>
+&gt;&gt; admins &amp; users<br>
+            </span>=&gt; ["Justin"]<span style="font-weight: bold;"><br>
+&gt;&gt; admins | users<br>
+            </span>=&gt; ["Justin", "caterpillar", "momor", "hamini"]<span style="font-weight: bold;"><br>
+&gt;&gt; admins - users<br>
+            </span>=&gt; ["caterpillar"]<span style="font-weight: bold;"><br>
+&gt;&gt; </span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>陣列不提供XOR運算，不過可以自己製作一個：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Array<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def ^(that)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self + that - (self &amp; that)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; admins = ["Justin", "caterpillar"]<br>
+=&gt; ["Justin", "caterpillar"]<br>
+&gt;&gt; users = ["momor", "hamini", "Justin"]<br>
+      =&gt; ["momor", "hamini", "Justin"]<br></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; admins ^ users<br></span>
+=&gt; ["caterpillar", "momor", "hamini"]<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;">&nbsp;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small>在上面兩個範例中，亦示範了陣列於集合的應用方式之一，利用集合依序測試，同時是站長也是使用者的有誰（<span style="font-family: Courier New,Courier,monospace;">admins &amp; users</span>）？站長與使用者有哪些人（<span style="font-family: Courier New,Courier,monospace;">admins | users</span>）？站長中不是使用者的有誰（<span style="font-family: Courier New,Courier,monospace;">admins - users</span>）？沒有同時具備站長與使用者身份的有誰（<span style="font-family: Courier New,Courier,monospace;">admins ^ users</span>）？</small><br>
+<small style="font-family: Courier New,Courier,monospace;">
+      <br>
+你也可以直接使用[]指定索引來取得元素、修改元素甚至安插元素，索引可以是負數，也可以進行切片</small><small>（Slice）</small><small style="font-family: Courier New,Courier,monospace;">運算。例如：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array = ["one", "two", "three", "four"]<br>
+</span>=&gt; ["one", "two", "three", "four"]<span style="font-weight: bold;"><br>
+&gt;&gt; array[0]<br>
+            </span>=&gt; "one"<span style="font-weight: bold;"><br>
+&gt;&gt; array[0] = 1<br>
+            </span>=&gt; 1<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [1, "two", "three", "four"]<span style="font-weight: bold;"><br>&gt;&gt; array[1..3]<br>
+</span>=&gt; ["two", "three", "four"]<span style="font-weight: bold;"><br>
+&gt;&gt; array[1...3]<br>
+            </span>=&gt; ["two", "three"]<br>
+<span style="font-weight: bold;">&gt;&gt; array[1..2] = [2, 3]<br>
+            </span>=&gt; [2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [1, 2, 3, "four"]<span style="font-weight: bold;"><br>
+&gt;&gt; array[-1]<br>
+            </span>=&gt; "four"<span style="font-weight: bold;"><br>
+&gt;&gt; array[-2]<br>
+            </span>=&gt; 3<span style="font-weight: bold;"><br>
+&gt;&gt; array[1, 3]<br>
+            </span>=&gt; [2, 3, "four"]<span style="font-weight: bold;"><br>
+&gt;&gt; array[1, 9]<br>
+            </span>=&gt; [2, 3, "four"]<br>
+</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">
+&gt;&gt; array[1, -1]<br>
+            </span>=&gt; [2, 3, "four"]</span></small><br>
+            <small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">
+&gt;&gt; array[1..9]<br>
+            </span>=&gt; [2, 3, "four"]<span style="font-weight: bold;"><br>
+&gt;&gt; array[1, 3] = ["two", "three", 4]<br>
+            </span>=&gt; ["two", "three", 4]<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [1, "two", "three", 4]<span style="font-weight: bold;"><br>
+&gt;&gt; array[1, 0] = [2, 3]<br>
+            </span>=&gt; [2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [1, 2, 3, "two", "three", 4]<span style="font-weight: bold;"><br>
+&gt;&gt; array[1..0] = ["two", "three"]<br>
+            </span>=&gt; ["two", "three"]<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [1, "two", "three", 2, 3, "two", "three", 4]<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">[n..m]可
+指定起始索引與結束索引，且包括結束索引以取得元素，如果結束索引超出了陣列範圍，就是直接取到最後一個索引元素，</small>
+      <small style="font-family: Courier New,Courier,monospace;">[n...m]可
+指定起始索引與結束索引，但包括結束索引以取得元素</small><small style="font-family: Courier New,Courier,monospace;">（實際上n..m或n...m建立了Range實例，之後會再說明）</small><small style="font-family: Courier New,Courier,monospace;">。</small><small style="font-family: Courier New,Courier,monospace;">[n,
+length]可指定起始索引與長度取得元素，如果長度超出了剩餘長度，就是直接取到最後一個元素。[n..m]、[n...m]或[n,
+length]右邊接上=，表示作取代的動作，如果指定了[n..0]、[n...0]或[n, 0]，則是技巧性地作了安插的動作。</small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+你也可以使用<span style="font-weight: bold;">Array.new</span>方式建立陣列。例如：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array = Array.new(5)<br>
+</span>=&gt; [nil, nil, nil, nil, nil]<span style="font-weight: bold;"><br>
+&gt;&gt; array = Array.new(5, 10)<br>
+            </span>=&gt; [10, 10, 10, 10, 10]<span style="font-weight: bold;"><br>
+&gt;&gt; array = Array.new(5, [1, 2, 3])<br>
+            </span>=&gt; [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]<span style="font-weight: bold;"><br>
+&gt;&gt; array[0][0] = "one"<br>
+            </span>=&gt; "one"<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [["one", 2, 3], ["one", 2, 3], ["one", 2, 3], ["one", 2, 3], ["one", 2, 3]]<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+
+      <small style="font-family: Courier New,Courier,monospace;">Array.new第一個參數為陣列長度，第二個為每個索引預設元素，如果沒有指定則預設為nil，注意Array.new(5, [1, 2, 3])的陷阱，實際上五個索引都會參考至同一個[1, 2, 3]物件，如果你希望五個索引參考至不同的陣列物件，必須如下：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array = Array.new(5) {<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; [1, 2, 3]<br>
+&gt;&gt; }<br>
+</span>=&gt; [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]<span style="font-weight: bold;"><br>
+&gt;&gt; array[0][0] = "one"<br>
+            </span>=&gt; "one"<span style="font-weight: bold;"><br>
+&gt;&gt; array<br>
+            </span>=&gt; [["one", 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">使用Array.new時，區塊中最後一個運算的結果會作為傳回值，上例中，會執行五次區塊內容，每次依</small><small>陣列實字（Array literal</small><small style="font-family: Courier New,Courier,monospace;">）產生一個新的[1, 2, 3]陣列，因此五個索引就會參考不同的陣列物件。<br>
+      <br>
+如果想得知目前是要建立第幾個索引的元素，可以如下：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array = Array.new(5) { |index|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; index<br>
+&gt;&gt; }<br>
+</span>=&gt; [0, 1, 2, 3, 4]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">如果想循序走訪元素，可以有幾個方式：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; array = [1, 2, 3, 4, 5]<br>
+=&gt; [1, 2, 3, 4, 5]<br>
+&gt;&gt; array.each do |element|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts element<br>
+&gt;&gt; end<br>
+</span>1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+=&gt; [1, 2, 3, 4, 5]<span style="font-weight: bold;"><br>
+&gt;&gt; for element in array<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts element<br>
+&gt;&gt; end</span><br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+=&gt; [1, 2, 3, 4, 5]<span style="font-weight: bold;"><br>
+&gt;&gt; for index in 0..4<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts array[index]<br>
+&gt;&gt; end<br>
+            </span>1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+=&gt; 0..4<span style="font-weight: bold;"><br>
+&gt;&gt; array.each_with_index do |element, index|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "(%d, %d)" % [element, index]<br>
+&gt;&gt; end<br>
+            </span>(1, 0)<br>
+(2, 1)<br>
+(3, 2)<br>
+(4, 3)<br>
+(5, 4)<br>
+=&gt; [1, 2, 3, 4, 5]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>如果要建立字串陣列，有個方便的<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">%w</span>可以使用。例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; %w[Python JavaScript Ruby]<br>
+</span>=&gt; ["Python", "JavaScript", "Ruby"]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <small style="font-family: Courier New,Courier,monospace;">用來包括元素內容的符號，不一定要用<span style="font-weight: bold;">[]</span>，也可以使用自己想用的符號，以不與字串中字元重複為原則。例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; %w&lt;Python JavaScript Ruby&gt;<br>
+</span>=&gt; ["Python", "JavaScript", "Ruby"]<span style="font-weight: bold;"><br></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; %w|Python JavaScript Ruby|<br>
+</span>=&gt; ["Python", "JavaScript", "Ruby"]<br>
+            <span style="font-weight: bold;">&gt;&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+<br>
+
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Array.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/RTTI.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>執行時期型態資訊（RTTI）</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip: 執行時期型態資訊（RTTI）</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+在C++這種可以進行多型機制的語言中，您可以將基底類別指標指向衍生類別物件，這種指定通常在執行時期後發生，您並無法在編譯時期即得知指標所指向的物
+件型態，而必須在執行時期取得物件的執行時期資訊。<br>
+
+
+      <br>
+
+
+
+RTTI 全名為Run-Time Type Information，也有人作Run-Time Type
+Identification，C++中用來取得指標或參考所實際代表的物件，您可以使用typeid()來取得物件於執行時期的資訊，要使用
+typeid()，您必須包括&lt;typeinfo&gt;標頭檔，typeid()使用時傳入一個物件： <br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">typeid(object);</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+typeid()會傳回一個type_info物件，其擁有幾個成員可以描述或進行物件的比較：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">const
+char *name(); // 取得物件型態名稱 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">bool
+before(const type_info &amp;ob);&nbsp; //
+當物件的名稱順序位於ob之前時，傳回true </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">bool
+operator==(const type_info &amp;ob);&nbsp; // 比較物件型態是否相同 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">bool
+operator!=(const type_info &amp;ob); // 比較物件型態是否不同</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+==與!=運算子在這邊被重載為可以比較兩個物件的型態是否相同；typeid()也可以使用型態名稱作為引數，這通常是用來取得一個type-info
+物件，並與一個物件作比較時使用： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">typeid(type-name);</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+用範例來說明typeid()與其成員的使用方法與應用，下面這個程式只是使用name()取得物件的型態名稱： </small><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;typeinfo&gt; <br>using namespace std; <br><br>class Base { <br>public: <br>    virtual void foo() { <br>        cout &lt;&lt; "Base" &lt;&lt; endl; <br>    } <br>}; <br><br>class Derived1 : public Base { <br>public: <br>    void foo() { <br>        cout &lt;&lt; "Derived1" &lt;&lt; endl; <br>    } <br>}; <br><br>class Derived2 : public Base { <br>public: <br>    void foo() { <br>        cout &lt;&lt; "Derived2" &lt;&lt; endl; <br>    } <br>}; <br><br>int main() { <br>    Base *ptr; // 基底類別指標 <br>    Base base; <br>    Derived1 derived1;<br>    Derived2 derived2; <br><br>    ptr = &amp;base;<br>    cout &lt;&lt; "ptr 指向 " <br>         &lt;&lt; typeid(*ptr).name() <br>         &lt;&lt; endl; <br><br>    ptr = &amp;derived1; <br>    cout &lt;&lt; "ptr 指向 " <br>         &lt;&lt; typeid(*ptr).name() <br>         &lt;&lt; endl; <br><br>    ptr = &amp;derived2; <br>    cout &lt;&lt; "ptr 指向 " <br>         &lt;&lt; typeid(*ptr).name() <br>         &lt;&lt; endl;<br> <br>    return 0;<br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>
+執行結果：</small></span><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">ptr 指向 4Base<br>
+
+
+
+ptr 指向 8Derived1<br>
+
+
+
+ptr 指向 8Derived2</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+      <small>
+您使用共同的基底類別指標來指向基底類別物件與衍生類別物件，雖然如此，還是利用typeid()取回的type-info物件仍可以得知物件的型態名
+稱。 <br>
+
+
+      <br>
+
+
+
+RTTI的使用時機之一，就是當您將物件以參考方式傳遞給函式時，函式的參數使用共同的基底類別指標或參考，但在函式中有必須操作衍生類別中的某個方法，
+由於函式事先並不知道您傳入的物件型態名稱，所以您必須利用RTTI來進行判斷，下面的程式是個簡單的例子：</small>
+ <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;typeinfo&gt; <br>using namespace std; <br><br>class Base { <br>public: <br>    virtual void foo() = 0;<br>}; <br><br>class Derived1 : public Base { <br>public: <br>    void foo() { <br>        cout &lt;&lt; "Derived1" &lt;&lt; endl; <br>    } <br> <br>    void showOne() {<br>        cout &lt;&lt; "Yes! It's Derived1." &lt;&lt; endl;<br>    }<br>}; <br><br>class Derived2 : public Base { <br>public: <br>    void foo() { <br>        cout &lt;&lt; "Derived2" &lt;&lt; endl; <br>    } <br> <br>    void showTwo() {<br>        cout &lt;&lt; "Yes! It's Derived2." &lt;&lt; endl;<br>    }<br>}; <br><br>void showWho(Base *base) {<br>    base-&gt;foo();<br> <br>    if(typeid(*base) == typeid(Derived1)) {<br>        Derived1 *derived1 = static_cast&lt;Derived1*&gt;(base);<br>        derived1-&gt;showOne();<br>    }<br>    else if(typeid(*base) == typeid(Derived2)) {<br>        Derived2 *derived2 = static_cast&lt;Derived2*&gt;(base);<br>        derived2-&gt;showTwo(); <br>    } <br>}<br><br>int main() { <br>    Derived1 derived1;<br>    Derived2 derived2; <br><br>    showWho(&amp;derived1);<br>    showWho(&amp;derived2);<br> <br>    return 0;<br>}</pre>
+
+
+
+      <br>
+
+
+
+      <small><span class="postbody">執行結果：</span></small><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Derived1<br>
+
+
+
+Yes! It's Derived1.<br>
+
+
+
+Derived2<br>
+
+
+
+Yes! It's Derived2.</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+      <small>
+傳統的C風格轉型語法也是可以使用的，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Derived1
+*derived1 = (Derived1*) base;</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+當然不建議使用這種方式強制轉型，事實上使用static_cast也不是很適合，C++為了支援RTTI還提供有dynamic_cast，這在下一個
+主題中介紹。</small><br>
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+       <br>
+
+      </center>
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/RTTI.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

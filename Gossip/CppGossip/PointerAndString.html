@@ -1,0 +1,641 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/PointerAndString.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>指標與字串</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index.html">C++
+Gossip:&nbsp;指標與字串</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+字元指標可以參考至一個字串常數，這使得字串的指定相當的方便，例如下面的程式片段宣告一個字串指標，並指向一個字串常數：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">char
+*str = "hello";</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+使用字元指標的好處是，您可以直接使用指定運算子將一個字串常數指定給字元指標，例如：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">str
+= "world";</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+下面這段程式是個簡單的示範：</small><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    char *str = "hello"; <br>    cout &lt;&lt; str &lt;&lt; endl; <br><br>    str = "world"; <br>    cout &lt;&lt; str &lt;&lt; endl; <br><br>    return 0; <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">hello<br>
+
+
+
+
+world</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      <small>
+在程式中使用一個字串常數時，該字串常數會佔有一個記憶體空間，例如"hello"與"world"都各佔有一塊記憶體空間，所以上面的程式str前後所
+指向的記憶體位址並不相同，下面這個程式可以印證：</small> <br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    char *str = "hello"; <br>    void *add = 0; <br><br>    add = str; <br>    cout &lt;&lt; str &lt;&lt; "\t" <br>         &lt;&lt; add &lt;&lt; endl; <br><br>    str = "world"; <br>    add = str; <br>    cout &lt;&lt; str &lt;&lt; "\t" <br>         &lt;&lt; add &lt;&lt; endl; <br> <br>    return 0; <br>}</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>
+執行結果：</small></span><br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">hello&nbsp;
+&nbsp; 0x440000<br>
+
+
+
+
+world&nbsp;&nbsp; 0x440008</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      <small>
+如上面的程式所示，"hello"字串常數的位址是在0x8048770，而"world"字串常數的位址是在0x804877a，兩個的位址並不相同。
+      <br>
+
+
+
+      <br>
+
+
+
+
+要注意的是，如果使用陣列的方式宣告字串，則不可以直接使用=指定運算子另外指定字串，例如下面的程式是錯誤的示範： <br>
+
+
+
+      </small>
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">char
+str[] = "hello"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">str
+=
+"world";&nbsp; // error, ISO C++ forbids assignment of arrays </span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在字元指標中使用指標陣列，可以更方便的處理字串陣列，例如：</small><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    char *str[] = {"professor", "teacher", <br>                   "student", "etc."}; <br><br>    for(int i = 0; i &lt; 4; i++) <br>        cout &lt;&lt; str[i] &lt;&lt; endl; <br> <br>    return 0; <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">professor<br>
+
+
+
+
+teacher<br>
+
+
+
+
+student<br>
+
+
+
+
+etc.</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      <small>
+str中的每個元素都是字元指標，也各自指向一個字串常數，進一步擴充這個觀念，就可以使用二維以上的字串陣列，例如： </small><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    char *str[][2] = {"professor", "Justin", <br>                      "teacher", "Momor", <br>                      "student", "Caterpillar"}; <br><br>    for(int i = 0; i &lt; 3; i++) {<br>        cout &lt;&lt; str[i][0] &lt;&lt; ": " <br>             &lt;&lt; str[i][1] &lt;&lt; endl; <br>    }<br><br>    return 0; <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">professor: Justin<br>
+
+
+
+
+teacher: Momor<br>
+
+
+
+
+student: Caterpillar</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      <small>
+額外補充一點，下面兩個宣告的作用雖然類似，但其實意義不同： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">char *str1[] =
+{"professor", "Justin", "etc."}; </span><br style="font-weight: bold;">
+
+
+
+
+      <span style="font-weight: bold;">char str2[3][10] =
+{"professor", "Justin", "etc."};</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+第一個宣告是使用指標陣列，每一個指標元素指向一個字串常數，只要另外指定字串常數給某個指標，該指標指向的記憶體位址就不同了，而第二個宣告則是配置連
+續的3x10的字元陣列空間，字串是直接儲存在這個空間，每個字串的位址是固定的，而使用的空間也是固定的（也就是含空字元會是10個字元）。 </small> </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/PointerAndString.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

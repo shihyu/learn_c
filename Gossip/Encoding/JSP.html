@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/JSP.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:58 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>JSP 的轉譯</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: JSP 的轉譯<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>這是一個簡單的JSP：</small><br>
+      <pre>&lt;%@ page contentType="text/html" pageEncoding="Big5"%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>"http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;<br>&lt;title&gt;JSP 網頁&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    &lt;%= new java.util.Date() %&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br><small>
+大多數的JSP入門書，都會提示JSP最後會轉譯為Servlet，可以參考<big> </big></small><a href="../ServletJSP/JSPLifeCycle.html"><small>JSP 生命週期</small></a>，<small>這邊則介紹有關編碼方面的設定，最主要的是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%@ page contentType="text/html" pageEncoding="Big5"%&gt;</span></small><br>
+      </div>
+      <br>
+      <small>在Tomcat中，容器會將JSP轉譯為.java，<span style="font-weight: bold;">.java以UTF-8儲存</span>，並以UTF-8編譯.java<span style="font-family: Courier New,Courier,monospace;">，pageEncoding</span>主要是告知容器，這個JSP檔案的文字編碼為何，以正確地將字元轉譯至.java，<span style="font-family: Courier New,Courier,monospace;">pageEncoding</span>也會影響內容類型（Content type），在沒有設定<span style="font-family: Courier New,Courier,monospace;">contentType屬性時，僅設定pageEncoding</span>為<span style="font-family: Courier New,Courier,monospace;">Big5</span>，產生的.java則會有以下內容：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">response.setContentType("text/html; charset=Big5");</span></small><br>
+      </div>
+      <small><br>
+如果你的JSP設定<span style="font-family: Courier New,Courier,monospace;">contentType時，沒有指定charset，如上面那個簡單的JSP僅設定text/html，那pageEncoding設定為Big5</span>時，也會產生：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">response.setContentType("text/html;charset=Big5");</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+      </span>如果你故意這麼設定：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="Big5"%&gt;</span></small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+      </span>那產生的</small><small>Servlet中會包括：</small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="font-weight: bold;"><br>
+      </span></span></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">response.setContentType("text/html;charset=UTF-8");</span></small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="font-weight: bold;"><br>
+      </span></span></small><small>這些是在Tomcat上的情況，</small><small style="font-family: Courier New,Courier,monospace;">為了避免困擾，通常在設定contentType屬性時，charset會設定為與pageEncoding一致：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%@ page contentType="text/html; charset=Big5" pageEncoding="Big5"%&gt;</span></small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+      </span>response的setContentType()，會在</small><small>HTTP</small><small style="font-family: Courier New,Courier,monospace;">回應中產生Content-Type標頭，告知瀏覽器所使用的內容類型與編碼，瀏覽器會根據其中的編碼指示來解譯傳回的</small><small>HTML</small><small style="font-family: Courier New,Courier,monospace;">，</small><small>HTML</small><small style="font-family: Courier New,Courier,monospace;">中的提示：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;</span></small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small><br>
+也是給瀏覽器參考用的，通常瀏覽器會以</small><small style="font-family: Courier New,Courier,monospace;">Content-Type標頭指示優先，meta指示次之。<br>
+      <br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">你可以在</span>web.xml<span style="font-family: Courier New,Courier,monospace;">中統一預設的網頁編碼、內容類型、緩衝區大小等，例如：<br>
+</span></small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&lt;web-app …&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; …</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;jsp-config&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;jsp-property-group&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;url-pattern&gt;*.jsp&lt;/url-pattern&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;page-encoding&gt;UTF8&lt;/page-encoding&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;default-content-type&gt;text/html&lt;/default-content-type&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;buffer&gt;16kb&lt;/buffer&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/jsp-property-group&gt;</span></small><br>
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; &lt;/jsp-config&gt;</span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&lt;/web-app&gt;</span></small><br>
+      </div>
+
+
+
+      <small><br>
+如此一來，JSP中<span style="font-family: Courier New,Courier,monospace;">若沒有明確用page指示元素指定contentType或pageEncoding屬性</span>，則會使用web.xml中的設定。</small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/JSP.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:58 GMT -->
+</html>

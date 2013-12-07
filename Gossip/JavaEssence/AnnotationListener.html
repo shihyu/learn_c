@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/AnnotationListener.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:15 GMT -->
+<head>
+
+
+
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>使用小老鼠處理傾聽器</title></head><body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 使用小老鼠處理傾聽器</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>了解</small> <small><big><a href="Proxy.html"><small>動態代理</small></a> </big>的使用後，接著以一個實際的例子來示範讀取標註資訊並應用的例子。首先，請你看這篇 </small><small><a href="../DesignPattern/ObserverPattern.htm">Observer
+模式</a>。<br>
+      <br>
+假設你希望讓使用者無需實作ClientListener介面就能定義傾聽器，方法名稱也可由使用者自行定義，只要使用者在方法上標註@ClientAdded及@ClientRemoved就可以了。那該如何進行？<br>
+      <br>
+為了清楚說明，先將該篇文件的相關API再最於此處：<br>
+      </small>
+      <ul>
+        <li>Client.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>public class Client {<br>    private String ip;<br>    private String name;<br>    // ... 其它資料...<br>    public Client(String ip, String name) {<br>        this.ip = ip;<br>        this.name = name;<br>    }<br>    public void setIp(String ip) { this.ip = ip; }<br>    public void setName(String name) { this.name = name; }<br>    public String getIp() { return ip; }<br>    public String getName() { return name; }<br>    // ... 其它方法...<br>}<br></pre>
+      <br>
+      <ul>
+        <li>ClientEvent.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>public class ClientEvent {<br>    public final String ip;<br>    public final String name;<br>    public ClientEvent(Client client) {<br>        this.ip = client.getIp();<br>        this.name = client.getName();<br>    }<br>}<br></pre>
+      <br>
+      <ul>
+        <li>ClientListener.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>public interface ClientListener {<br>    void clientAdded(ClientEvent event);<br>    void clientRemoved(ClientEvent event);<br>}<br></pre>
+      <br>
+      <ul>
+        <li>ClientQueue.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>import java.util.LinkedList;<br>import java.util.List;<br><br>public class ClientQueue {<br>    private List&lt;Client&gt; clients = new LinkedList&lt;Client&gt;();<br>    private List&lt;ClientListener&gt; listeners = new LinkedList&lt;ClientListener&gt;();<br>            <br>    public void addClientListener(ClientListener listener) {<br>        listeners.add(listener);<br>    }<br>    public void removeClientListener(ClientListener listener) {<br>        listeners.remove(listener);<br>    }<br>    <br>    public void notifyAdded(Client client) {<br>        ClientEvent event = new ClientEvent(client);<br>        for(ClientListener listener : listeners) {<br>            listener.clientAdded(event);<br>        }<br>    }<br>    public void notifyRemoved(Client client) {<br>        ClientEvent event = new ClientEvent(client);<br>        for(ClientListener listener : listeners) {<br>            listener.clientRemoved(event);<br>        }<br>    }<br>    <br>    public void add(Client client) {<br>        clients.add(client);<br>        notifyAdded(client);<br>    }<br>    public void remove(Client client) {<br>        clients.remove(client);<br>        notifyRemoved(client);<br>    }<br>    <br>    // 還有一些客戶管理佇列的其它職責....<br>}<br></pre>
+      <br>
+      <small>接著定義</small><small>@ClientAdded及@ClientRemoved：<br>
+      </small>
+      <ul>
+        <li>ClientAdded.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>import java.lang.annotation.*;<br>@Retention(RetentionPolicy.RUNTIME)<br>public @interface ClientAdded {}<br></pre>
+      <small><br>
+      </small>
+      <ul>
+        <li>ClientRemoved.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>import java.lang.annotation.*;<br>@Retention(RetentionPolicy.RUNTIME)<br>public @interface ClientRemoved {}<br></pre>
+      <br>
+      <small>你希望的作用是使用者可以這麼標註：<br>
+      </small>
+      <ul>
+        <li>ClientLogger.java<br>
+        </li>
+      </ul>
+      <pre>package cc.openhome;<br>public class ClientLogger {<br>    <span style="font-weight: bold;">@ClientAdded</span><br>    public void clientAdded(ClientEvent event) {<br>        System.out.println(event.ip + " added...");<br>    }<br>	<br>    <span style="font-weight: bold;">@ClientRemoved</span><br>    public void clientRemoved(ClientEvent event) {<br>        System.out.println(event.ip + " removed...");<br>    }<br>}<br></pre>
+      <br>
+      <small>這需要一個專門處理標註並安裝為傾聽器的物件，如下：<br>
+      </small>
+      <ul>
+        <li>ListenerInstaller.java</li>
+      </ul>
+      <pre>package cc.openhome;<br><br>import java.lang.reflect.InvocationHandler;<br>import java.lang.reflect.Method;<br>import java.lang.reflect.Proxy;<br>import java.util.HashMap;<br>import java.util.Map;<br><br>public class ClientListenerInstaller {<br>    private ClientQueue queue;<br>    private Map&lt;String, Method&gt; methods = new HashMap&lt;String, Method&gt;();    <br><br>    public ClientListenerInstaller(ClientQueue queue) throws Exception {<br>        this.queue = queue;<br>    }<br>    <br>    public void install(Class&lt;?&gt; clz) throws Exception {<br>        // 找出標註的方法<br>        for(Method method : clz.getMethods()) {<br>            ClientAdded clientAdded = <br>            	method.getAnnotation(ClientAdded.class);<br>            if(clientAdded != null) {<br>                methods.put("clientAdded", method);<br>            }<br>            ClientRemoved clientRemoved = <br>            	method.getAnnotation(ClientRemoved.class);<br>            if(clientRemoved != null) {<br>                methods.put("clientRemoved", method);<br>            }<br>        }<br>        <br>        final Object listener = clz.newInstance();<br>        // 建立代理物件<br>        InvocationHandler handler = new InvocationHandler() {<br>            @Override<br>            public Object invoke(Object proxy, Method method, Object[] args)<br>                    throws Throwable {<br>                // 代理物件的方法被呼叫時<br>                // 呼叫實際的傾聽器方法<br>                Method mth = methods.get(method.getName());<br>                return mth.invoke(listener, args);<br>            }<br>        };<br>        <br>        Object listenerProxy = Proxy.newProxyInstance(<br>        		ClientListener.class.getClassLoader(),<br>                new Class[] { ClientListener.class },<br>                handler);<br>        <br>        // 用代理物件作註冊<br>        Method addclientListener = <br>            queue.getClass().getMethod(<br>            		"addClientListener", ClientListener.class);<br>        addclientListener.invoke(queue, listenerProxy);<br>    }<br>}<br></pre>
+      <br>
+      <small>客戶端現在可以這麼使用：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ClientQueue queue = new ClientQueue();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ClientListenerInstaller installer = new ClientListenerInstaller(queue);<br>
+&nbsp;&nbsp;&nbsp; installer.install(ClientLogger.class);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; Client c1 = new Client("127.0.0.1", "caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; Client c2 = new Client("192.168.0.2", "justin");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; queue.add(c1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; queue.add(c2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; queue.remove(c1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; queue.remove(c2);<br>
+      <br>
+      </span></small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/AnnotationListener.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:15 GMT -->
+</html>

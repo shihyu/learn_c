@@ -1,0 +1,843 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/Component.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>Component</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;Component</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+假設您設計了這麼一個user表格：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">create table T_USER (<br>
+
+
+
+&nbsp;&nbsp;&nbsp; id integer not null auto_increment,<br>
+
+
+
+&nbsp;&nbsp;&nbsp; name varchar(255),<br>
+
+
+
+&nbsp;&nbsp;&nbsp; age integer,<br>
+
+
+
+&nbsp;&nbsp;&nbsp; email varchar(255) not null,<br>
+
+
+
+&nbsp;&nbsp;&nbsp; primary key (id)<br>
+
+
+
+)</span><span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+最基本的映射策略中，您可以設計一個如下的User類別與之對應：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package
+onlyfun.caterpillar; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public
+class User { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; private Long id; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; private String name; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; private int age; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; private String email; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; ........ </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+現在假設您基於業務上的設計需求，您需要將email資訊提昇為一個MailAddress物件，讓它攜帶更多資訊或負有特定職責，例如：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+        <li>MailAddress.java</li>
+
+
+
+
+
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class MailAddress {<br>    private String email;<br><br>    public MailAddress() {}<br> <br>    public String getEmail() {<br>        return email;<br>    }<br><br>    public void setEmail(String email) {<br>        this.email = email;<br>    }<br> <br>    public void sendMail() {<br>        System.out.println("Send mail to " + email);<br>    }<br>}</pre>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>而User類別中有（has a）MailAddress，例如：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+        <li>User.java</li>
+
+
+
+
+
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class User {<br>    private Long id;<br>    private String name;<br>    private Long age;<br>    private MailAddress mailAddress;<br> <br>    // 必須要有一個預設的建構方法<br>    // 以使得Hibernate可以使用Constructor.newInstance()建立物件<br>    public User() {}<br><br>    public Long getId() {<br>        return id;<br>    }<br><br>    public void setId(Long id) {<br>        this.id = id;<br>    }<br><br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br> <br>    public Long getAge() {<br>        return age;<br>    }<br><br>    public void setAge(Long age) {<br>        this.age = age;<br>    }<br><br>    public MailAddress getMailAddress() {<br>        return mailAddress;<br>    }<br><br>    public void setMailAddress(MailAddress mailAddress) {<br>        this.mailAddress = mailAddress;<br>    }<br>}</pre>
+
+
+
+
+
+
+      <br>
+
+
+      <small>像MailAddress這樣的物件稱之為值類型（value type）物件，它沒有自己的識別（identity），通常隸屬於一個實體物件，其生命週期跟隨著所隸屬的實體物件，值類型物件通常不會共用。</small><br>
+
+
+      <br>
+
+
+
+
+
+      <small>
+在資料庫表格方面並沒有任何的改變，這是基於程式設計上的考量，增加物件設計上的粒度，MailAddress為User的一個Component，在映
+射文件上，您可以使用&lt;component&gt;標籤來完成這樣的映射：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping package="onlyfun.caterpillar"&gt; <br><br>    &lt;class name="User" table="T_USER"&gt; <br>        &lt;id name="id" column="id"&gt; <br>            &lt;generator class="native"/&gt; <br>        &lt;/id&gt; <br><br>        &lt;property name="name" column="name" /&gt; <br>        &lt;property name="age" column="age" /&gt; <br><br><span style="font-weight: bold;">        &lt;component name="mailAddress" </span><span style="font-weight: bold;">class="MailAddress"&gt;    </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;property name="email" </span><span style="font-weight: bold;">column="email" </span><span style="font-weight: bold;">not-null="true"/&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;/component&gt; </span><br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;<br></pre>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>
+在物件儲存時的一個示範如下：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">MailAddress
+mailAddress = new MailAddress();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">mailAddress.setEmail("caterpillar.onlyfun@gmail.com");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user = new User();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user.setName("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user.setAge(new Long(30));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user.setMailAddress(mailAddress);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = HibernateUtil.getSessionFactory().openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Transaction
+tx =
+session.beginTransaction();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.save(user);
+      </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">tx.commit();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+在物件查詢與使用上的一個例子如下：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = HibernateUtil.getSessionFactory().openSession();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user = (User) session.load(User.class, new Long(1));</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user.getAge()
++ "\t" +</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;user.getName() + "\t" +</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;
+user.getMailAddress().getEmail());</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user.getMailAddress().sendMail();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span></small><br>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></div>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+      </span><span style="font-family: Courier New,Courier,monospace;">以上所建立的是單向的關係，只能從User到MailAddress的關係，Hibernate允許您建立雙向關係，也就是從MailAddress的關係，您可以在MailAddress上新增User類型的屬性，然後在映射檔案中設定&lt;parent&gt;：<br>
+
+
+
+      </span></small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;component name="mailAddress" class="MailAddress"&gt;&nbsp;&nbsp;&nbsp; </span></span></small><br style="font-weight: bold;">
+
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &lt;parent name="user"/&gt;</span></span></small><br style="font-weight: bold;">
+
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;property name="email" column="email" not-null="true"/&gt; </span></span></small><br style="font-weight: bold;">
+
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/component&gt; </span></span></small><br>
+
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+      </span><span style="font-family: Courier New,Courier,monospace;">如此一來，當透過user查詢到MailAddress時，Hibernate會自動加上user實例的參考，也就是您可以如下取得user實例：<br>
+
+
+
+      </span></small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">mailAddress.getUser();</span></span></small><br>
+
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+      </span><span style="font-family: Courier New,Courier,monospace;">必要的話，可以再將粒度細化，也就是&lt;component&gt;中還可以再設定&lt;component&gt;。</span></small><small><span style="font-family: Courier New,Courier,monospace;"><br>
+
+
+
+      </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+
+      </span></small>
+
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/Component.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:34 GMT -->
+</html>

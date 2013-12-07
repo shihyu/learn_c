@@ -1,0 +1,545 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkPaned.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkPaned</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkPaned</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>GtkPaned</small><small>是個版面分割元件，可以將視窗版面進行水平切割或垂直切割，您可以使用以下的函式來建立水平或垂直切割的GtkPaned：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkWidget *gtk_hpaned_new(void);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkWidget *gtk_vpaned_new(void);</span></small><br>
+
+      </div>
+
+      <small><br>
+
+一個GtkPaned有左右或上下兩個區域可以加入子元件，您可以使用gtk_paned_pack1()將元件加入左邊或上面，使用gtk_paned_pack2()將元件加入右邊或下面：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void gtk_paned_pack1(GtkPaned *paned,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkWidget *child,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gboolean resize,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gboolean shrink);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void gtk_paned_pack2(GtkPaned *paned,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkWidget *child,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gboolean resize,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gboolean shrink);</small><br>
+
+      </div>
+
+      <small><br>
+
+一個最簡單的範例如下所示：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>gtk_paned_demo.c</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *hPaned;</span><br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkPaned");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 300, 200);<br><br><span style="font-weight: bold;">    hPaned = gtk_hpaned_new();</span><br><br><span style="font-weight: bold;">    gtk_paned_pack1(GTK_PANED(hPaned), </span><br style="font-weight: bold;"><span style="font-weight: bold;">                    gtk_frame_new("GtkPaned Add1 Here"), FALSE, FALSE);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_paned_pack2(GTK_PANED(hPaned), </span><br style="font-weight: bold;"><span style="font-weight: bold;">                    gtk_text_view_new(), TRUE, FALSE);</span><br style="font-weight: bold;"><br><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(window), hPaned);</span><br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+      </span><span class="postbody"><small>直接來看執行畫面：<br>
+
+      <br>
+
+      <img style="width: 441px; height: 239px;" alt="" src="images/GtkPaned-1.jpg"><br>
+
+      <br>
+
+gtk_paned_pack1()與gtk_paned_pack2()可以使用有預設參數的gtk_paned_add1()及gtk_paned_add2()來簡化。若要作較複雜的版面切割，則可以搭配垂直與水平的切割組合，例如：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li><span class="postbody"><small>gtk_hv_paned_demo.c</small></span></li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>enum {<br>    PIXBUF_COL,<br>    TEXT_COL<br>};<br><br>GtkTreeModel* createModel() {<br>    const gchar *files[] = {"caterpillar.jpg", "momor.jpg",<br>                            "hamimi.jpg", "bush.jpg"};<br>    GdkPixbuf *pixbuf;<br>    GtkTreeIter iter;<br>    GtkListStore *store;<br>    gint i;<br><br>    store = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);<br><br>    for(i = 0; i &lt; 4; i++) {<br>        pixbuf = gdk_pixbuf_new_from_file(files[i], NULL);<br>        gtk_list_store_append(store, &amp;iter);<br>        gtk_list_store_set(store, &amp;iter,<br>                           PIXBUF_COL, pixbuf,<br>                           TEXT_COL, files[i],<br>		           -1);       <br>        gdk_pixbuf_unref(pixbuf);<br>    }<br><br>    return GTK_TREE_MODEL(store);<br>}<br><br>GtkWidget* createTreeView() {<br>    GtkWidget *treeView;<br>    GtkTreeViewColumn *column;<br>    GtkCellRenderer *renderer;<br><br>    treeView = gtk_tree_view_new_with_model(createModel());<br><br>    renderer = gtk_cell_renderer_pixbuf_new();<br>    column = gtk_tree_view_column_new_with_attributes(<br>                     "Icon", renderer,<br>                     "pixbuf", PIXBUF_COL,<br>                      NULL);<br>    gtk_tree_view_append_column(GTK_TREE_VIEW (treeView), column);<br><br>    renderer = gtk_cell_renderer_text_new();<br>    column = gtk_tree_view_column_new_with_attributes(<br>                     "Filename", renderer,<br>                     "text", TEXT_COL,<br>                      NULL);<br>    gtk_tree_view_append_column(GTK_TREE_VIEW (treeView), column);<br><br>    return treeView;<br>}<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *hPaned, *vPaned;</span><br>    GtkWidget *treeView;<br>    GtkWidget *label;<br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkPaned");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 320, 200);<br><br><span style="font-weight: bold;">    hPaned = gtk_hpaned_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    vPaned = gtk_vpaned_new();</span><br style="font-weight: bold;"><br>    treeView = createTreeView();<br><br><span style="font-weight: bold;">    gtk_paned_add1(GTK_PANED(hPaned), treeView);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_paned_add2(GTK_PANED(hPaned), vPaned);</span><br><br>    label = gtk_label_new(NULL);<br>    gtk_label_set_markup(GTK_LABEL(label), <br>       "&lt;span foreground='blue' size='x-large'&gt;Hello!World!&lt;/span&gt;");<br><br><span style="font-weight: bold;">    gtk_paned_add1(GTK_PANED(vPaned), label);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_paned_add2(GTK_PANED(vPaned), gtk_text_view_new());</span><br><br><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(window), hPaned);</span><br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+      <span class="postbody"><small><br>
+
+程式主要專注在元件的加入位置即可，所完成的畫面如下所示：<br>
+
+      <br>
+
+      <img style="width: 440px; height: 314px;" alt="" src="images/GtkPaned-2.jpg"><br>
+
+      <br>
+
+      <br>
+
+      <br>
+
+      </small></span><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkPaned.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:00 GMT -->
+</html>

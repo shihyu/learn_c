@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/BuildLifeCycle.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:33 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>建構生命週期</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 建構生命週期<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在</small> <small><big><a href="Maven.html"><small>使用 Maven</small></a></big> 中略為提到了<span style="font-weight: bold;">建構生命週期（Build lifecycle）</span>。在Ant中，你可以有自訂建構過程的彈性，哪個目標要相依在哪個目標上，該目標有相依於另一個目標，這些都可以自行定義。在Maven中，則明確定義了專案建構的過程。<br>
+      <br>
+      <span style="font-weight: bold;">在Maven中，有三個內建的建構生命週期：Default、Clean與Site。</span>Default處理專案部署，Clean處理專案資源清除，Site處理專案文件。<br>
+      <br>
+每個建構生命週期中會再分為數個<span style="font-weight: bold;">階段（Phase）</span>，階段就好似Ant中的目標（Target），代表著建構生命週期中的一個步驟，只不過在Maven中，階段與階段間的順序是明確定義的，以Default建構生命週期來說，當中有著以下的階段順序（完整順序可參考 <a href="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference">Lifecycle Reference</a>）：<br>
+      </small>
+      <ul>
+        <li><small><span style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">validate</span></span><span style="font-family: Courier New,Courier,monospace;">：驗證專案正確性以及所有必要資訊已備妥。</span></small></li>
+        <li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">compil：</span>編譯專案原始碼。</small></li>
+        <li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">test</span>：進行單元測試。</small></li>
+        <li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">package</span>：將相關檔案進行封裝，例如產生JAR檔案。</small></li>
+        
+        <li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">integration-test：</span>進行整合測試。</small></li><li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">verify：</span>驗證檔案封裝是否正確。</small></li>
+        <li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">install</span>：將封裝的檔案安裝至本地貯藏室（Local repository）。</small></li>
+        <li style="font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">deploy</span>：部署檔案。</small></li>
+      </ul><br>
+      <small>每個階段可以使用mvn指令搭配階段名稱呼叫，這些階段必須按照順序進行，例如在</small> <small><big><a href="Maven.html"><small>使用 Maven</small></a> <small>你就看過，如果你執行了：<br>
+      </small></big></small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><big><small>mvn package</small></big></small><br>
+      </div>
+      <br>
+      <small>那麼也會先進行validate、compile、test</small><small>等階段</small><small>，再執行package階段，所以如果想完成以上所有階段，就是執行：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">mvn deploy</span></small><br>
+      </div>
+
+      <small><br>
+你可以指定執行多個階段，例如：<br>
+</small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">mvn clean package</small><br>
+      </div>
+      <small><br>
+在上面，會先執行clean（與先前必要的階段），而後再執行package（與先前必要的階段）。<br>
+      <br>
+實際上，比階段還細的是目的（Goal），階段是相關特定目的組合而成。例如Default週期中各階段可能的目的有：<br>
+      </small>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small><span style="font-weight: bold;">process-resources - </span>resources:resources</small></li>
+        <li><small><span style="font-weight: bold;">compile - </span>compiler:compile</small></li>
+        <li><small><span style="font-weight: bold;">process-test-resources - </span>resources:testResources</small></li>
+        <li><small><span style="font-weight: bold;">test-compile - </span>compiler:testCompile</small></li>
+        <li><small><span style="font-weight: bold;">test - </span>surefire:test</small></li>
+        <li><small><span style="font-weight: bold;">package - </span>jar:jar</small></li>
+        <li><small><span style="font-weight: bold;">install - </span>install:install</small></li>
+        <li><small><span style="font-weight: bold;">deploy - </span>deploy:deploy</small></li>
+      </ul>
+      <small><br>
+你可以在階段與階段間指定目的，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">mvn clean dependency:copy-dependencies package</span></small><br>
+      </div>
+      <small><br>
+在上例中，clean與package兩個階段間指定了目的dependency:copy-dependencies，這會將相關的程式複製至target/dependency資料夾中。<br>
+      </small><small><br>
+先列出一些常用的階段與目的指令如下：<br style="font-weight: bold;">
+      </small>
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small><span style="font-weight: bold;">mvn compile</span></small></li>
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>編譯專案</small></div>
+
+      <br>
+
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small style="font-weight: bold;">mvn clean</small></li>
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>清除專案</small></div>
+
+      <br>
+
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small style="font-weight: bold;">mvn dependency:copy-dependencies</small></li>
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>將相依程式庫（JAR）複製至target/dependency目錄</small></div>
+
+      <br>
+
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small style="font-weight: bold;">mvn package</small></li>
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>包裝專案為JAR，放在target目錄</small><br>
+      </div>
+
+      <small style="font-weight: bold;"><br>
+      </small>
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small><span style="font-weight: bold;">mvn exec:java -Dexec.mainClass=packageName.className</span></small></li>
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>指定</small><small>主類別</small><small>執行程式</small><br>
+      <small><span style="font-weight: bold;"></span></small></div>
+
+      <small><span style="font-weight: bold;"><br>
+      </span></small>
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small><span style="font-weight: bold;">mvn dependency:purge-local-repository</span></small></li>
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>刪除已下載的plugin並重新下載plugin</small><br>
+      <small><span style="font-weight: bold;"></span></small></div>
+
+      <br>
+
+      
+      <ul>
+        <li><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">mvn install</span></small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>將專案產生的JAR檔，安裝至</small><small>本地貯藏室。如果想將其它位置JAR檔安裝至</small><small>本地貯藏室，可以如下：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">mvn install:install-file </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;-Dfile=/exampleDir/lib/example.jar </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;-DgroupId=cc.openhome</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;-DartifactId=example </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;-Dversion=1.0.0</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;-Dpackaging=jar</span><br>
+      </small></div>
+      <small>
+      </small><br>
+<br>
+      <small>
+有關建構生命週期，你可以再參考這篇文章：<br>
+</small>
+      <ul>
+        <li><small><a href="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html">Introduction to the Build Lifecycle</a></small></li>
+      </ul>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/BuildLifeCycle.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:33 GMT -->
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/PlaneMap-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:48 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                function Sprite(x, y, maze) {
+                    var i = y;
+                    var j = x;
+                    
+                    function isMovable(i, j) {
+                        if (i < 0 || j < 0 ||
+                            j >= maze[0].length || i >= maze.length) {
+                            return false;
+                        }
+
+                        if (maze[i][j] === 0) {
+                            return true;
+                        }
+                        
+                        return false;
+                    }
+                    
+                    this.moveUp = function() {
+                        if(isMovable(i - 1, j)) {
+                            i--;
+                        }
+                    };
+                    
+                    this.moveDown = function() {
+                        if(isMovable(i + 1, j)) {
+                            i++;
+                        }
+                    };
+                    
+                    this.moveRight = function() {
+                        if(isMovable(i, j + 1)) {
+                            j++;
+                        }
+                    };
+                    
+                    this.moveLeft = function() {
+                        if(isMovable(i, j - 1)) {
+                            j--;
+                        }
+                    };
+                    
+                    this.getX = function() {
+                        return j;
+                    };
+                    
+                    this.getY = function() {
+                        return i;
+                    };
+                }
+                
+                var maze = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 2, 2],
+        [2, 0, 1, 0, 1, 0, 0, 0, 2, 0, 1, 0, 0, 1, 1, 0, 2, 2],
+        [2, 0, 0, 0, 0, 0, 1, 1, 2, 0, 1, 0, 1, 0, 0, 0, 0, 2],
+        [2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 2],
+        [2, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 2],
+        [2, 1, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 2, 0, 2, 2],
+        [2, 1, 0, 0, 2, 0, 1, 1, 1, 2, 0, 1, 0, 0, 2, 0, 1, 2],
+        [2, 1, 1, 1, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 0, 2],
+        [2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 2, 1, 0, 2],
+        [2, 0, 2, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 2],
+        [2, 1, 2, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 2, 1, 0, 2],
+        [2, 0, 0, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
+            
+                var sprite = new Sprite(0, 1, maze);
+                
+                var character = document.getElementById('character');
+                var floor = document.getElementById('floor');
+                var block1 = document.getElementById('block1');
+                var block2 = document.getElementById('block2');
+                document.body.removeChild(character);
+                document.body.removeChild(floor);
+                document.body.removeChild(block1);
+                document.body.removeChild(block2);
+                
+                var canvas1 = document.getElementById('canvas1');
+                var canvas2 = document.getElementById('canvas2');
+                var context1 = canvas1.getContext('2d');
+                var context2 = canvas2.getContext('2d');
+                
+                document.body.removeChild(canvas2);
+                
+                var blockWidth = canvas1.width / maze[0].length;
+                var blockHeight = canvas1.height / maze.length;
+                var characterWidth = 108 / 3;  // 人物圖片寬
+                var characterHeight = 186 / 4; // 人物圖片高
+                var characterStartX = 0;
+                var characterStartY = characterHeight;
+                
+                var context = context1;
+                
+                // 繪地版
+                function drawFloor() {
+                    for(var i = 0; i < maze.length; i++) {
+                        for(var j = 0; j < maze[0].length; j++) {
+                            context.drawImage(
+                             floor, j * blockWidth, i * blockHeight, 
+                             blockWidth, blockHeight);
+                        }
+                    }
+                }
+                
+                // 繪障礙物
+                function drawBlock() {
+                    for(var i = 0; i < maze.length; i++) {
+                        for(var j = 0; j < maze[0].length; j++) {
+                            switch (maze[i][j]) {
+                                case 1:
+                                    context.drawImage(
+                                     block1, j * blockWidth, i * blockHeight,
+                                     blockWidth, blockHeight);
+                                    break;
+                                case 2:
+                                    context.drawImage(
+                                     block2, j * blockWidth, i * blockHeight,
+                                     blockWidth, blockHeight);
+                                    break;
+                                default:
+                                     context.drawImage(
+                                      floor, j * blockWidth, i * blockHeight,
+                                      blockWidth, blockHeight);
+                            }
+                        }
+                    }                
+                }
+      
+                // 繪人物
+                function drawCharacter() {
+                    context.drawImage(character, 
+                            characterStartX, 
+                            characterStartY,
+                            characterWidth,
+                            characterHeight,
+                            sprite.getX() * blockWidth,
+                            sprite.getY() * blockHeight,
+                            blockWidth,
+                            blockHeight);
+                }
+                
+                drawFloor();
+                drawBlock();
+                drawCharacter();
+                
+                context = context2;
+                drawFloor();
+                drawBlock();
+                
+                document.onkeydown = function(event) {
+                    characterStartX = characterStartX + characterWidth;
+                    switch (event.which) {
+                        case 39: // 右
+                            sprite.moveRight();
+                            characterStartY = characterHeight;
+                            break;
+                        case 37: // 左    
+                            sprite.moveLeft();
+                            characterStartY = characterHeight * 3;
+                            break;
+                       case 38: // 上
+                            sprite.moveUp();
+                            characterStartY = 0;
+                            break;
+                       case 40: // 下
+                            sprite.moveDown();
+                            characterStartY = characterHeight * 2;
+                            break;
+                    }
+
+                    if (characterStartX >= character.width) {
+                        characterStartX = 0;
+                    }
+                    
+                    drawCharacter();
+                    
+                    if(context === context2) {
+                        document.body.replaceChild(canvas2, canvas1);
+                        context = context1;
+                    }
+                    else {
+                        document.body.replaceChild(canvas1, canvas2);
+                        context = context2;
+                    }
+                    
+                    context.clearRect(0, 0, canvas1.width, canvas1.height);
+                    drawFloor();
+                    drawBlock();
+                };
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="900" height="600"></canvas>
+        <canvas id="canvas2" width="900" height="600"></canvas>
+        <img id="character" src="images/character.gif"
+                            style="visibility: hidden"/>
+        <img id="floor" src="images/floor.jpg" 
+                            style="visibility: hidden"/>
+        <img id="block1" src="images/block1.gif" 
+                            style="visibility: hidden"/>
+        <img id="block2" src="images/block2.gif"
+                            style="visibility: hidden"/>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/PlaneMap-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:51 GMT -->
+</html>

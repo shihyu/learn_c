@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ThreadPerMessage.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:46 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Thread-Per-Message 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern: Thread-Per-Message 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如
+果您現在設計一個Service元件，可以接受客戶端的資料並交給一個Helper元件處理，假設資料處理很複雜，也就是Helper處理會需要一段時
+間，如果您這麼設計：<br>
+      </small>
+      <pre>class Helper {<br>    void process(int data) {<br>        System.out.println("開始處理 " + data);<br>        try {<br>            Thread.sleep(3000); // 處理過程很費時<br>        }<br>        catch(InterruptedException e) {<br>            e.printStackTrace();<br>        }<br>        System.out.println("處理完成");<br>    }<br>}<br><br>class Service {<br>    private Helper helper = new Helper();<br>    void accept(int data) {<br>        helper.process(data);<br>    }<br>}<br><br>public class Main { // 客戶端角色<br>    public static void main(String[] args) {<br>        Service service = new Service();<br>        for(int i = 0; i &lt; 10; i++) { <br>            System.out.println("傳送資料");<br>            service.accept(i);<br>            System.out.println("資料送出");<br>        }<br>    }<br>}</pre>
+      <small><br>
+那麼客戶端每次都必須等Service元件處理完畢後，才可以進行下一次資料傳送，也就是Service對客戶端的回應性會很差。<br>
+      <br>
+您可以改用這樣的設計：<br>
+      </small>
+      <pre>class Helper {<br>    void process(int data) {<br>        System.out.println("開始處理 " + data);<br>        try {<br>            Thread.sleep(3000); // 處理過程很費時<br>        }<br>        catch(InterruptedException e) {<br>            e.printStackTrace();<br>        }<br>        System.out.println("處理完成");<br>    }<br>}<br><br>class Service {<br>    private Helper helper = new Helper();<br>    void accept(final int data) {<br><span style="font-weight: bold;">        new Thread() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            public void run() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                helper.process(data);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }.start();</span><br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        Service service = new Service();<br>        for(int i = 0; i &lt; 10; i++) { <br>            System.out.println("傳送資料");<br>            service.accept(i);<br>            System.out.println("資料送出");<br>        }<br>    }<br>}</pre>
+      <small><br>
+Service對於每個資料接收之後，馬上使用一個執行緒來處理，因此accept()方法會很快的返回，Service對於客戶端可以有很高的回應性。<br>
+      <br>
+以UML順序圖來表示以上範例的話：<br>
+      <img style="width: 568px; height: 385px;" alt="" src="images/ThreadPerMessage-1.jpg"><br>
+      <br>
+      </small><small><span style="font-weight: bold;">Thread-Per-Message
+模式可應用在Service需要有高回應性的場合</span>。服務端對每個請求使用一個執行緒來</small><small>處理（從這些執行緒角
+度看，它們是 <a href="WorkerThread.htm">Worker Thread</a>），如果服務端在乎建立新執行緒的負擔，則
+可以考慮結合使用 <a href="ThreadPool.htm">Thread pool 模式</a>。</small><small>這個模
+式常用於多人網路連線程式，伺服端接受連線後，使用一個執行緒來處理該次連線，伺服端可馬上傾聽下一個客戶端連線。</small><br>
+      <small><br>
+      </small><small>使用Python來實現以上範例的話：<br>
+      </small>
+      <pre>import _thread<br>import time<br><br>class Helper:<br>    def process(self, data):<br>        print("開始處理 %d" % data)<br>        time.sleep(3) # 處理過程很費時<br>        print("處理完成")<br><br>class Service:<br>    def __init__(self):<br>        self.helper = Helper()<br><br>    def accept(self, data):<br>        _thread.start_new_thread(lambda: self.helper.process(data), ())<br><br>service = Service()<br>for i in range(10):<br>    print("傳送資料")<br>    service.accept(i)<br>    print("資料送出")</pre>
+      <small><br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ThreadPerMessage.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:46 GMT -->
+</html>

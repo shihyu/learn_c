@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ProgrammaticSecurity.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:37 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>程設式安全管理</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 程設式安全管理<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Web容器的宣告式安全管理，僅能針對URL來設定哪些資源必須受到保護，如果打算依不同的角色在同一個頁面中設定可存取的資源，例如只有站長或版面管理員可以看到刪除整個討論串的功能，一般使用者不行，那麼顯然地無法單純使用宣告式安全管理來達成。<br>
+      </small><br>
+      <small>在Servlet 3.0中，<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest新增了三個與安全有關的方法：<span style="font-weight: bold;">authenticate()</span>、<span style="font-weight: bold;">login()</span>、<span style="font-weight: bold;">logout()</span>。<br>
+      <br>首先來看到authenticate()方法，搭配先前宣告式管理web.xml的設定，你可以決定程式中哪一段邏輯，只能是通過驗證的使用者才可以觀看：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import java.security.AccessControlException;<br><br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="SecurityServlet", urlPatterns={"/security"})<br>public class SecurityServlet extends HttpServlet {<br>    @Override<br>    protected void doGet(HttpServletRequest request,<br>                        HttpServletResponse response)<br>    throws ServletException, IOException {<br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br>        out.println("其它使用者就可以看到的資料一");<br>        try {<br>            request.authenticate(response);<br>            out.println("必須驗證過使用者才可以看到的資料");<br>        }<br>        catch(AccessControlException ex) {<br>            ex.printStackTrace();<br>        }<br>        out.println("其它使用者就可以看到的資料二");<br>        <br>    } <br>}<br></pre>
+      <br><small><span style="font-family: Courier New,Courier,monospace;">authenticate()會檢查使用者是否已通過容器驗證，若否則依</span>web.xml中<span style="font-family: Courier New,Courier,monospace;">的設定，要求進行身份驗證，若通過驗證，則可顯示接下來的內容。</span><br>
+      <br>
+login()在呼叫時則可以提供使用者名稱、密碼，其將利用容器所設定的身份資訊來進行驗證。例如，以下的Servlet只有在提供的請求參數正確時，才可以看到資料：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import java.security.AccessControlException;<br><br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="SecurityServlet2", urlPatterns={"/security2"})<br>public class SecurityServlet2 extends HttpServlet {<br>    @Override<br>    protected void doGet(HttpServletRequest request,<br>                        HttpServletResponse response)<br>    throws ServletException, IOException {<br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br>        out.println("其它使用者就可以看到的資料一");<br>        try {<br>            String user = request.getParameter("user");<br>            String passwd = request.getParameter("passwd");<br>            request.login(user, passwd);<br>            out.println("必須驗證過使用者才可以看到的資料");<br>        }<br>        catch(AccessControlException ex) {<br>            ex.printStackTrace();<br>        }<br>        finally {<br>            request.logout();<br>        }<br>        out.println("其它使用者就可以看到的資料二");<br>        <br>    } <br>}<br></pre>
+      <br>
+      <small>在Servlet 3.0之前，<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest</span>上就已存在三個與安全相關的方法：<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">getUserPrincipal()</span>、<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">getRemoteUser()</span>及<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">isUserInRole()</span>。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">getUserPrincipal()</span>與EJB元件的溝通有關，這邊不加以討論。<span style="font-family: Courier New,Courier,monospace;">getRemoteUser()</span>可以取得登入使用者的名稱（如果驗證成功的話）或是傳回<span style="font-family: Courier New,Courier,monospace;">null</span>（如果沒有驗證成功的使用者），不過並不常用。<br>
+&nbsp;&nbsp;&nbsp; <br>
+比較常用的是<span style="font-family: Courier New,Courier,monospace;">isUserInRole()</span>方法，可以傳給它一個角色名稱，如果登入的使用者屬於該角色則傳回<span style="font-family: Courier New,Courier,monospace;">true</span>，否則傳回<span style="font-family: Courier New,Courier,monospace;">false（沒有登入就呼叫也會傳回false</span>）。一個基本的使用方式像是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">if(request.isUserInRole("admin") || request.isUserInRole("manager")) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 進行站長或版面管理員才可以作的事，例如呼叫刪除討論串的方法之類的</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+      </div>
+      <small><br>
+上面的程式碼中，將角色名稱直接寫死了。如果不想在程式碼中寫死角色的名稱，則有兩個方式可以解決。第一個方式是透過Servlet初始參數的設定。第二個方式，則可以在<span style="font-family: Courier New,Courier,monospace;">&lt;servlet&gt;標籤中設定<span style="font-weight: bold;">&lt;security-role-ref&gt;</span>，透過<span style="font-weight: bold;">&lt;role-link&gt;</span>與<span style="font-weight: bold;">&lt;role-name&gt;</span></span>將程式碼中的名稱跟實際角色名稱對應起來。例如若web.xml的定義如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;web-app…&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;servlet&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;security-role-ref&gt;<br>
+</small>
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;role-name&gt;administrator&lt;/role-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;role-link&gt;admin&lt;/role-link&gt;</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;"></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/security-role-ref&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ..</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/servlet&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 略…</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;security-role&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;role-name&gt;admin&lt;/role-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;role-name&gt;manager&lt;/role-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/security-role&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/web-app&gt;</small><br>
+      </div>
+      <small><br>
+      <br>
+如果Servlet程式碼中是這麼寫的：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">if(request.isUserInRole("administrator")) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; // 略...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+則根據web.xml中<span style="font-family: Courier New,Courier,monospace;">&lt;security-role-ref&gt;的設定，administrator名稱將對應至實際的角色名稱為admin</span>。<br>
+      <br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ProgrammaticSecurity.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:37 GMT -->
+</html>

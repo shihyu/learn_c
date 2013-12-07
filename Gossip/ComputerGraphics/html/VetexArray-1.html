@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/VetexArray-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:50 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                function toRadians(angle) {
+                    return angle * Math.PI / 180;
+                }
+                
+                var sin = Math.sin;
+                var cos = Math.cos;
+                var sqrt = Math.sqrt;
+                
+                function Point(x, y, z) {
+                    this.x = x;
+                    this.y = y;
+                    this.z = z;
+                }
+                
+                var V_INDEX = [
+                    [0, 1, 2, 3], [0, 7, 6, 1], [4, 5, 6, 7],
+                    [2, 5, 4, 3], [0, 3, 4, 7], [1, 6, 5, 2]
+                ];
+                
+                var L = 100;
+                var VETEX = [
+                    new Point(L, L, L), new Point(L, -L, L),
+                    new Point(L, -L, -L), new Point(L, L, -L),
+                    new Point(-L, L, -L), new Point(-L, -L, -L),
+                    new Point(-L, -L, L), new Point(-L, L, L)
+                ];
+
+                // 旋轉以斜角繪製圖形
+                var ax = toRadians(30);
+                var ay = toRadians(-30);
+        
+                var sinAx = sin(ax);
+                var cosAx = cos(ax);
+                var sinAy = sin(ay);
+                var cosAy = cos(ay);
+        
+                var px = [];
+                var py = [];
+                
+                var canvas1 = document.getElementById('canvas1');
+                
+                var orgX = canvas1.width / 2;
+                var orgY = canvas1.height / 2;
+                
+                var context = canvas1.getContext('2d');
+                context.beginPath();
+                for(var i = 0; i < 6; i++) {
+                    for (var j = 0; j < 4; j++) {
+                        // 利用索引陣列取出正確的頂點
+                        var v = VETEX[V_INDEX[i][j]];
+                        // 旋轉以斜角繪製圖形
+                        px[j] = parseInt(v.x * cosAy + v.z * sinAy + orgX);
+                        py[j] = parseInt(v.y * cosAx -
+                              (-v.x * sinAy + v.z * cosAy) * sinAx + orgY);
+                    }
+                    context.moveTo(px[0], py[0]);
+                    for(var k = 1; k < 4; k++) {
+                        context.lineTo(px[k], py[k]);
+                    }
+                }
+                context.stroke();
+                context.closePath();
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="640" height="480"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/VetexArray-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:50 GMT -->
+</html>

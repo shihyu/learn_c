@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QFileDialog.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:19 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QFileDialog 類別</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: QFileDialog 類別</a></h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在視窗程式中開啟檔案或另存檔案的動作，會使用檔案話方塊來讓使用者方便的選取或決定檔案名稱，在Qt中，這則是由QFileDialog類別負責，在這邊我們將示範一些簡單的使用方式。 <br>
+
+
+      <br>
+
+
+QFileDialog最簡單的使用方法就是利用它所提供的靜態方法，例如下面這個程式會顯示一個開啟檔案的對話方塊，選取檔案會使用QMessageBox顯示所選取的檔案路徑與名稱： <br>
+
+
+      </small>
+      
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qfiledialog.h&gt;<br>#include &lt;qmessagebox.h&gt;<br><br>int main(int argc, char** argv) {<br>    QApplication app(argc, argv);<br><br>    QString s = QFileDialog::getOpenFileName(<br>                "/home", "Images (*.png *.xpm *.jpg)",<br>                    0, "open file dialog Choose a file" );<br><br>    if(s != NULL)<br>        QMessageBox::information(0, "Get Selected File",<br>             s, "OK", "", "", 0, 1);<br><br>    return 0;<br>} </pre>
+
+
+      <small><br>
+
+
+getOpenFileName()方法會顯示一個檔案開啟的對話方塊，如果要顯示儲存檔案的對話方塊，就使用getSaveFileName()方法，
+在參數的指定上，"/home"指定開啟時的工作目錄，而"Images (*.png *.xpm
+*.jpg)"指定開啟檔案時的副檔名過濾，如果還要使用其它的過濾方式，可以使用分號，如下所示： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)" </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+下圖與Qt的檔案對話方塊執行畫面： <br>
+
+
+      </small><img style="width: 428px; height: 263px;" alt="" src="images/QFileDialog-1.jpg"><br>
+
+
+      <br>
+
+
+      <small>我們也可以新增物件的方式來使用QFileDialog類別，這可以讓我們設定更多的選項，下面這個程式示範一些常用的方法：<br>
+
+
+      </small>
+      
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qfiledialog.h&gt;<br>#include &lt;qmessagebox.h&gt;<br><br>int main(int argc, char **argv) {<br>    QApplication app(argc, argv);<br><br>    QFileDialog* fd = new QFileDialog(0, "file dialog", TRUE);<br><br>    fd-&gt;setDir("~/");     // 工作目錄<br>    fd-&gt;setShowHiddenFiles(true);  // 顯示隱藏檔案<br>    fd-&gt;setMode(QFileDialog::ExistingFile);  // 顯示目前存在的檔案<br>    fd-&gt;setFilter("Images (*.png *.xpm *.jpg)");  // 副檔名過濾<br>    fd-&gt;setViewMode(QFileDialog::Detail);  // 顯示詳細資訊<br><br>    QString fileName;<br>    if (fd-&gt;exec() == QDialog::Accepted) {<br>        fileName = fd-&gt;selectedFile();<br>        QMessageBox::information(0, "Get Selected File",<br>             fileName, "OK", "", "", 0, 1);<br>    }<br><br>    return 0;<br>}  </pre>
+
+
+      <small><br>
+
+
+以上的方法都使用註解說明了它們各自的作用；在setMode()方法中，如果是開啟舊檔，我們可以使用ExistingFile以顯示目前存在的檔案，
+如果設定為AnyFile，表示使用者可以選擇任何的檔案，即使檔名不存在，而這是在儲存對話方塊時使用的，例如另存新檔。 <br>
+
+
+      <br>
+
+
+下圖為程式執行時的一個畫面： <br>
+
+
+      </small><img style="width: 428px; height: 263px;" alt="" src="images/QFileDialog-2.jpg"><br>
+
+
+      <br>
+
+
+      <small>另外，在使用檔案對話方塊時，有時我們可以允許使用者一次選擇多個檔案同時開啟，這時可以使用靜態的
+getOpenFileNames()方法，或是在物件所使用的selectedFiles()方法，而它們會傳回QStringList物件，當中包含
+所選擇的多個檔名資訊，我們可以如下取出所選擇的多個檔案名稱： <br>
+
+
+      </small>
+      
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qfiledialog.h&gt;<br>#include &lt;qmessagebox.h&gt;<br>#include &lt;qstringlist.h&gt;<br><br>int main(int argc, char** argv) {<br>    QApplication app(argc, argv);<br><br>    QStringList list = QFileDialog::getOpenFileNames(<br>                    "Images (*.png *.xpm *.jpg)","/home",<br>                    0, "open file dialog Choose a file" );<br><br>    QStringList::Iterator it = list.begin();<br>    while( it != list.end() ) {<br>        QMessageBox::information(0, "Get Selected File",<br>             *it, "OK", "", "", 0, 1);<br>        ++it;<br>    }<br><br>    return 0;<br>} </pre>
+
+
+      <small><br>
+
+
+在以上我們都使用QMessageBox來顯示所選擇的檔名，真正應用時當然就將之置換為您取得檔名後所要進行的處理，例如檔案的開啟等等。 <br>
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+      <small></small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QFileDialog.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:24 GMT -->
+</html>

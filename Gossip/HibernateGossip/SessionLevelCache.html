@@ -1,0 +1,696 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/SessionLevelCache.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>簡介快取（Session Level）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;簡介快取（Session Level）</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"><small></small><small>資料庫每一次的查詢都是一次不小的開銷，例如連結的開啟、執行查詢指令，當資料庫與應用伺服器不在同一個伺服器上時，還必須有遠程調用、Socket的建
+立等開銷，在Hibernate這樣的ORM框架中，還有資料的封裝等開銷必須考慮進去。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+快取（Cache）是資料庫在記憶體中的臨時容器，從資料庫中讀取的資料在快取中會有一份臨時拷貝，當您查詢某個數據時，會先在快取中尋找是否有相對應的
+拷貝，如果有的話就直接返回資料，而無需連接資料庫進行查詢，只有在快取中找不到資料時，才從資料庫中查詢資料，藉由快取，可以提昇應用程式讀取資料時的
+效能。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+對於Hibernate這樣的ORM框架來說，快取的機制更形重要，在Hibernate中快取分作兩個層級：Session
+level與SessionFactory level（又稱Second level快取）。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+這邊先介紹Session level的快取，在Hibernate中Session level快取會在使用主鍵載入資料或是延遲初始（Lazy
+Initialization） 時作用，Session level的快取隨著Session建立時建立，而Session銷毀時銷毀。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+Session會維護一個Map容器，並保留與目前Session發生關係的資料，當您透過主鍵來載入資料時，Session會先依據所要載入的類別與所
+給定的主鍵，看看Map中是否已有資料，如果有的話就返回，若沒有就對資料庫進行查詢，並在載入資料後在Map中維護。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+可以透過==來比較兩個名稱是否參考至同一個物件，以檢驗這個事實：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = sessionFactory.openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user1 = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user2 = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user1
+== user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>
+      <br>
+
+
+
+
+
+
+第二次查詢資料時，由於在快取中找到資料物件，於是直接返回，這與第一次查詢到的資料物件是同一個實例，所以會顯示true的結果。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+可以透過evict()將某個物件從快取中移去，例如：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = sessionFactory.openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user1 = (User) session.load(User.class, new Integer(1));</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.evict(user1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user2 = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user1
+== user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>
+      <br>
+
+
+
+
+
+
+由於user1所參考的物件被從快取中移去了，在下一次查詢時，Session在Map容器中找不到對應的資料，於是重新查詢資料庫並再封裝一個物件，所
+以user1與user2參考的是不同的物件，結果會顯示false。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+也可以使用clear()清除快取中的所有物件，例如：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = sessionFactory.openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user1 = (User) session.load(User.class, new Integer(1));</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.clear();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user2 = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user1
+== user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>
+      <br>
+
+
+
+
+
+
+同樣的道理，這次也會顯示false。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+Session level的快取隨著Session建立與銷毀，看看下面這個程式片段：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session1 = sessionFactory.openSession(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user1 = (User) session1.load(User.class, new&nbsp;new Integer(1)); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session1.close();
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session2 = sessionFactory.openSession(); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user2 = (User)session2.load(User.class,&nbsp;new Integer(1)); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session2.close();
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user1
+== user2);</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>
+      <br>
+
+
+
+
+
+
+第一個Session在關閉後，快取也關閉了，在第二個Session的查詢中並無法用到第一個Session的快取，兩個Session階段所查詢到的
+並不是同一個物件，結果會顯示false。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+在載入大量資料時，Session level
+快取的內容會太多，記得要自行執行clear()清除快取或是用evict()移去不使用物件，以釋放快取所佔據的資源。<br>
+
+
+
+
+      <br>
+
+
+
+
+您也可以使用Session的setReadOnly(object, true)，設定某物件為唯讀，對於唯讀資料，不會在快取中維護一個複本，不會執行dirty check。</small><br>
+
+
+
+
+      <small>
+
+      <br>
+
+      <br>
+
+      </small><small> </small></td>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/SessionLevelCache.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/index.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:42:48 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <meta content="Python, Python3" name="keywords"><title>Python 學習筆記</title></head><body>
+<br>
+
+<div style="text-align: center;">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 15;
+google_ad_format = "728x15_0ads_al";
+google_ad_channel = "";
+google_color_border = "FFFFFF";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1>語言技術：Python Gossip</h1>
+
+<div style="text-align: center;"><span style="font-weight: bold; font-style: italic;"></span><span style="font-weight: bold; font-style: italic;">Beautiful is better
+than ugly.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Explicit is better
+than implicit.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Simple is better
+than complex.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Complex is better
+than complicated.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Flat is better
+than nested.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Sparse is better
+than dense.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Readability counts.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Special cases
+aren't special enough to break the rules.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Although
+practicality beats purity.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Errors should
+never pass silently.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Unless explicitly
+silenced.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">In the face of
+ambiguity, refuse the temptation to guess.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">There should be
+one-- and preferably only one --obvious way to do it.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Although that way
+may not be obvious at first unless you're Dutch.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Now is better than
+never.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Although never is
+often better than *right* now.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">If the
+implementation is hard to explain, it's a bad idea.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">If the
+implementation is easy to explain, it may be a good idea.</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-weight: bold; font-style: italic;">Namespaces are one
+honking great idea -- let's do more of those!</span><br style="font-weight: bold; font-style: italic;">
+<span style="font-style: italic; font-weight: bold;">The Zen of Python,
+by Tim Peters</span><br>
+<br>
+文件基於 <span style="font-weight: bold;">Python 3</span> 撰寫<big><span style="font-weight: bold; font-style: italic;"><br>
+</span></big></div>
+
+<br>
+
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+
+<br>
+
+<table style="text-align: left; width: 949px; height: 327px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 690px;">
+      <dl>
+        <dt><small>起步走</small></dt>
+      </dl><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 從一些簡單的語法與型態開始，了解 Python 內建特性，這已經足夠讓你作不少運算了。</small><ul>
+
+        
+        <li><small>基本環境與互動</small></li>
+</ul>
+      <div style="margin-left: 40px;"><small>指令互動環境可以讓你隨時測試一些小程式，基本輸出入讓你了解如何以程式與使用者互動並儲存結果。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="InteractiveShell.html"><small>指
+令互動環境</small></a></li>
+          <li><small><a href="ModuleABC.html">簡介模組</a></small></li>
+          <li><small><a href="IOABC.html">基本輸入輸出</a><br>
+            </small></li>
+        </ul>
+        <li><small>內建型態與操作</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>常用的物件都是語法內建，語法簡潔且功能豐富。</small><br>
+      </div>
+      <ul>
+
+        
+        <ul>
+
+          <li><a href="NumericType.html"><small>數值型態</small></a></li>
+          <li><a href="StringType.html"><small>字串型態</small></a></li>
+          <li><small><a href="StringFormat.html">字串格式化</a><br>
+            </small></li>
+          <li><a href="ListType.html"><small>串列</small></a></li>
+          <li><a href="SetType.html"><small>集合</small></a><br>
+</li>
+          <li><a href="DictionaryType.html"><small>字典</small></a></li>
+
+          <li><a href="TupleType.html"><small>Tuple</small></a></li>
+          
+        </ul>
+        <li><small>變數、運算子與物件</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>Python 是動態語言，所有資料都是物件。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+
+          <li><a href="Variable.html"><small>變數</small></a><br>
+          </li>
+          <li><a href="Operator.html"><small>運算子</small></a></li>
+          <li><small><a href="ObjectInMemory.html">物件與記憶體管理</a><br>
+</small></li>
+        
+        </ul>
+        <li><small>陳述句</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>基本的流程語法不多，但可以作的事很多。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="IfStatement.html"><small>if 陳述句</small></a></li>
+          
+          <li><a href="ForWhileStatement.html"><small>for 與 while 陳述句</small></a></li>
+          <li><a href="ForComprehension.html"><small>for 包含式（Comprehension）</small></a></li>
+
+          <li><small><a href="TryStatement.html">try、raise 陳述句</a><br>
+            </small></li>
+
+        </ul>
+
+
+        
+      
+      
+      </ul>
+
+
+      <br>
+<br>
+      
+      <dl>
+        <dt><small>函式、類別與模組</small><br>
+        </dt>
+      </dl><small>&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; 封裝演算、定義物件行為、組織程式元件。</small><br>
+<ul>
+        
+        <li><small>函式</small></li>
+</ul>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;">def</span> 是陳述句，函式是物件。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="DefStatement.html"><small>def 陳述句</small></a></li>
+          
+          <li><small><a href="LambdaExpression.html">lambda 運算式</a><br>
+</small></li>
+          <li><small><a href="VariableScope.html">變數範圍</a><br>
+            </small></li>
+          <li><a href="YieldGenerator.html"><small>yield 產生器</small></a></li>
+          
+
+          
+        </ul>
+        <li><small>類別</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>是物件的共同定義，也是個名稱空間。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="Class.html"><small>定義類別</small></a></li>
+          <li><a href="StaticClassMethod.html"><small>靜態方法、類別方法</small></a><br>
+</li>
+          <li><a href="PropertyNameSpace.html"><small>特性名稱空間</small></a></li>
+
+          <li><small><a href="SpecialMethodNames.html">特殊方法名稱</a></small></li>
+          <li><a href="NewInitDel.html"><small>建構、初始與消滅</small></a></li>
+          
+          
+          <li><a href="Inheritance.html"><small>繼承</small></a></li>
+          <li><small><a href="AbstractClass.html">抽象類別</a><br>
+            </small></li>
+
+          <li><small><a href="ObjectEquality.html">物件相等性</a></small></li>
+
+
+
+
+        </ul>
+        <li><small>模組</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>是個檔案，也是個功能元件。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="ImportModule.html"><small>匯入模組</small></a></li>
+          <li><small><a href="ImportImportAsFrom.html">import、import as、from import</a><br>
+</small></li>
+
+          <li><a href="ImportPackage.html"><small>匯入套件</small></a></li>
+          <li><a href="ModuleNameSpace.html"><small>模組名稱空間</small></a></li>
+        </ul>
+
+      </ul>
+<br>
+      <br>
+      <dl>
+        <dt><small>進階議題</small></dt>
+      </dl>
+      <ul>
+        </ul><small>&nbsp;&nbsp;&nbsp; 一些知道會更好的東西。</small><br>
+      <ul>
+        <li><small>例外</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>凡事有例外，有些是對的，有些是錯的，好好處理就是。</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="TryRaise.html"><small>再看 try、raise</small></a></li>
+          <li><small><a href="Assert.html">使用 assert</a><br>
+</small></li>
+
+          
+          <li><a href="WithAs.html"><small>使用 with as</small></a></li>
+          <li><a href="UserDefinedException.html"><small>自訂例外</small></a><br>
+</li>
+          
+
+
+        </ul>
+
+        <li><small>特性控制</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>物件上的特性不受控制嗎？其實你可以的。。XD</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          
+          <li><a href="Property.html"><small>property() 函式</small></a></li>
+          <li><small><a href="Descriptor.html">描述器</a></small></li>
+          <li><small><a href="Slots.html">__slots__</a><br>
+</small></li>
+
+          <li><a href="AttrAttribute.html"><small>__getattribute__()、__getattr__()、__setattr__()、__delattr__()</small></a></li>
+
+          
+
+
+          
+        </ul>
+        <li><small>修飾器</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>在不改變其它程式的前題下，增加程式的功能。</small><br>
+      </div>
+      <ul>
+
+
+
+        <ul>
+          <li><small><a href="FunctionDecorator.html">函式修飾器</a></small></li>
+          <li><a href="ClassDecorator.html"><small>類別修飾器</small></a></li>
+          <li><a href="MethodDecorator.html"><small>方法修飾器</small></a><br>
+</li>
+          
+
+        </ul>
+
+
+        
+        <li><small>Meta class</small></li></ul>
+      <div style="margin-left: 40px;"><small>在建立 type 實例之前，你可以作一些有的沒的。。XD</small><br>
+      </div>
+      <ul>
+
+        <ul>
+          <li><a href="TypeClass.html"><small>type 類別</small></a></li>
+          <li><a href="Metaclass.html"><small>定義 meta class</small></a></li>
+          <li><small><a href="AbstractClassAgain.html">再看抽象類別</a><br>
+</small></li>
+
+        </ul>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <br>
+<br>
+      <br>
+      <dl>
+        <dt><small>參考資料</small></dt>
+      </dl>
+      <ul>
+        <li><a href="http://docs.python.org/py3k/tutorial/"><small>The
+Python Tutorial</small></a></li>
+        <li><a href="http://diveintopython3.org/"><small>Dive
+into Python3</small></a></li>
+        <li><small><a href="http://www.ibm.com/developerworks/linux/library/l-python3-1/index.html">Python
+3 Primer, Part 1: What's new</a></small></li>
+        <li><small><a href="http://www.ibm.com/developerworks/linux/library/l-python3-2/index.html">Python
+3 Primer, Part 2: Advanced topics</a></small></li>
+        <li><small><a href="http://www.python.org/dev/peps/pep-0008/">Style
+Guide for Python Code</a><br>
+          </small></li>
+      </ul>
+      <small><br>
+      <br>
+      </small></td>
+      <td style="text-align: center; vertical-align: top; width: 253px;"><br>
+      <div align="center">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><!--
+<script language="JavaScript" src="../js/home.js"></script>
+<script language="JavaScript" src="../js/montage.js"></script>
+<script language="JavaScript">
+monTimeout = 10000;
+var urls = new Array();
+var imgs = new Array();
+var caps = new Array();
+urls[0] = "http://www.sunelearning.com.tw/index.jsp?src=T";
+imgs[0] = "../images/elearning-600-160.gif";
+caps[0] = "Sun 數位學院暑期特惠";
+urls[1] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4526&l=zh_TW";
+imgs[1] = "../images/sun_summer_160x600banner.jpg";
+caps[1] = "Sun 訓練中心暑期促銷";
+urls[2] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4521&l=zh_TW";
+imgs[2] = "../images/DL_banner_160X600.jpg";
+caps[2] = "2008 JCD 線上講座"; montage( urls, imgs, caps, 160, 600, monTimeout);
+</script>--></div>
+      <br>
+      <br>
+      <br>
+<!-- adsense for content-->
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><!-- adsense for content end--><br>
+      <br>
+      <br>
+      <center>
+       </center>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+
+  <ul>
+  </ul>
+</ul>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/Python/index.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:42:48 GMT -->
+</html>

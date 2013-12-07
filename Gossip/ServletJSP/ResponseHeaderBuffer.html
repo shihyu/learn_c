@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ResponseHeaderBuffer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>回應標頭、緩衝、重導向...</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 回應標頭、緩衝、重導向...<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small style="font-family: Courier New,Courier,monospace;">你可以使用HttpServletResponse物件上的<span style="font-weight: bold;">setHeader()</span>、<span style="font-weight: bold;">addHeader()</span>來設定回應標頭，setHeader()設定標頭名稱與值，addHeader()則可以在同一個標頭名稱上附加值。如果標頭的值是整數，則可以使用<span style="font-weight: bold;">setIntHeader()</span>、<span style="font-weight: bold;">addIntHeader()</span>方法，如果標頭的值是個日期，則可以使用<span style="font-weight: bold;">setDateHeader()</span>、<span style="font-weight: bold;">addDateHeader()</span>方法。<br>
+      <br>
+所有的標頭設定，必須在回應確認之前（Commit），在回應確認之後設定的標頭，會被容器忽略。<br>
+      </small><br>
+      <small>容器可以（但非必要）對回應進行緩衝，通常容器預設都會對回應進行緩衝，你可以操作HttpServletResponse以下有關緩衝的幾個方法：<br style="font-weight: bold;">
+      </small>
+      <ul style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+        <li><small>getBufferSize()</small></li>
+        <li><small>setBufferSize()</small></li>
+        <li><small>isCommitted()</small></li>
+        <li><small>reset()</small></li>
+        <li><small>resetBuffer()</small></li>
+        <li><small>flushBuffer()</small></li>
+      </ul>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">setBufferSize
+()必須在呼叫HttpServletResponse的getWriter()或getOutputStream()方法之前呼叫，所取得的
+Writer或ServletOutputStream都會套用這個設定，在呼叫HttpServletResponse的getWriter()或
+getOutputStream()方法之後呼叫setBufferSize()，會丟出IllegalStateException。</small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">在緩衝區未滿之
+前，所設定的回應相關內容都不會真正傳至客戶端，你可以使用isCommitted()看看是否回應已確認。如果想要重置所有的回應資訊，可以呼叫
+reset()方法，這會連同已設定的標頭一併清除，呼叫resetBuffer()會重置回應內容，但不會清除已設定的標頭內容。</small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">flushBuffer
+()會出清（flush）所有緩衝區中已設定的回應資訊至客戶端，reset()、resetBuffer()必須在回應未確認前呼叫，在回應已確認後呼
+叫reset()、resetBuffer()會丟出IllegalStateException。</small><br>
+      <br>
+      <small><big><a href="DispatchRequest.html"><small>調派請求</small></a></big> 中介紹過<span style="font-family: Courier New,Courier,monospace;">RequestDispatcher的forward()方法，forward()會將請求轉發至指定的</span>URL，這個動作是在Web容器中進行，瀏覽器並不會知道請求被轉發，網址列也不會有所變化。<br style="font-family: Courier New,Courier,monospace;">
+      <br>
+你可以使用<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse的<span style="font-weight: bold;">sendRedirect()</span></span>要求瀏覽器重新請求另一個URL，又稱為重新導向（Redirect），使用時可指定絕對URL或相對URL。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">response.sendRedirect("http://openhome.cc");</span></small><br>
+      </div>
+      <small><br>
+這個方法會在回應中設定HTTP狀態碼<span style="font-family: Courier New,Courier,monospace;">301以及Location</span>標頭，瀏覽器接收到這個標頭，會重新使用GET方法請求所指定的URL，因此在網址列上會發現URL的變更。由於是利用HTTP狀態碼與標頭資訊，要求瀏覽器重新導向網頁，因此這個方法必須在回應未確認輸出前執行，否則會發生<span style="font-family: Courier New,Courier,monospace;">IllegalStateException</span>。<br>
+      <br>
+如果在處理請求的過程中發現一些錯誤，而你想要傳送伺服器預設的狀態與錯誤訊息，則可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">sendError()</span>方法。例如，如果根據請求參數必須傳回的資源根本不存在，則可以如下送出錯誤訊息：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">response.sendError(HttpServletResponse.SC_NOT_FOUND);</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">SC_NOT_FOUND會令伺服器回應404狀態碼，這類的常數是定義在HttpServletResponse介面上。如果想使用自訂的訊息來取代預設的訊息文字，則可以使用sendError()的另一個版本：</span><br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">response.sendError(HttpServletResponse.SC_NOT_FOUND, "筆記文件");</small><br>
+      </div>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">以HttpServlet的以doGet()為例，其預設實作就使用了sendError()方法：</span><br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; protected void doGet(HttpServletRequest req,
+ HttpServletResponse resp)</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String protocol = req.getProtocol();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String msg = 
+lStrings.getString("http.method_get_not_supported");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (protocol.endsWith("1.1")) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+sendError()</span>方法必須在回應未確認輸出前執行，否則會發生<span style="font-family: Courier New,Courier,monospace;">IllegalStateException</span>。<br>
+      </small><br>
+      <small>回應物件若被容器關閉，則必須出清所有的回應內容，回應物件被關閉的時機點有：<br>
+      </small>
+      <ul>
+        <li><small>Servlet的<span style="font-family: Courier New,Courier,monospace;">service()</span>方法已結束</small></li>
+        <li><small>回應的內容長度超過<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse的setContentLength()</span>所設定的長度</small></li>
+        <li><small>呼叫了<span style="font-family: Courier New,Courier,monospace;">sendRedirect()</span>方法</small></li>
+        <li><small>呼叫了<span style="font-family: Courier New,Courier,monospace;">sendError()</span>方法</small></li>
+        <li><small>呼叫了<span style="font-family: Courier New,Courier,monospace;">AsyncContext的complete()</span>方法（之後還會介紹）</small></li>
+      </ul>
+      <small><br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ResponseHeaderBuffer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+</html>

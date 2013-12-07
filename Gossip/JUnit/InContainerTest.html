@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/InContainerTest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:37 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>In-container 測試</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: In-container 測試<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Java
+中，容器（Container）的表面意涵，代表著一個Java寫的程式，實質上，容器抽象了環境的概念。JVM是</small><small>Java
+程式唯一認得的</small><small>虛擬作業系統，容器則是運行於這個作業系統上的Java程式，代表著某個環境資源。例如，Web容器，代表
+著運行於JVM虛擬作業系統上的虛擬HTTP伺服器，是Servlet/JSP唯一認識的HTTP伺服器。<br>
+      <br>
+那麼你要怎麼測試與容器互動的服務？例如，你寫了個Servlet：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.IOException;<br>import javax.servlet.ServletException;<br>import javax.servlet.http.HttpServlet;<br>import javax.servlet.http.HttpServletRequest;<br>import javax.servlet.http.HttpServletResponse;<br><br>public class LoginServlet extends HttpServlet {<br>    @Override<br>    protected void doPost(HttpServletRequest req, HttpServletResponse resp)<br>            throws ServletException, IOException {<br>        String user = req.getParameter("user").trim();<br>        String passwd = req.getParameter("passwd").trim();<br>        String page = "login.html";<br>        if("justin".equals(user) &amp;&amp; "1234".equals(passwd)) {<br>            page = "success.html";<br>        }<br>        req.getRequestDispatcher(page).forward(req, resp);<br>    }<br>}<br></pre>
+      <small><br>
+那麼你要怎麼測試這個Servlet的運作？實際作好相關設定、部署（Deploy）至容器，然後開啟瀏覽器執行？這已經步入<span style="font-weight: bold;">功能測試（Functional test）</span>的範圍，而非單元測試，你不僅測試
+了Servlet，連同部署設定是否正確等，都一併測試了。<br>
+      <br>
+可以嘗試以 </small><small><big><a href="DummyObject.html"><small>Dummy 物件</small></a></big>
+的概念來進行測試。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package
+test.cc.openhome;<br>
+      <br>
+import cc.openhome.LoginServlet;<br>
+import java.security.Principal;<br>
+import static org.junit.Assert.*;<br>
+import org.junit.*;<br>
+import java.io.*;<br>
+import java.util.*;<br>
+import javax.servlet.*;<br>
+import javax.servlet.http.*;<br>
+      <br>
+class TestForLoginServlet extends LoginServlet {<br>
+&nbsp;&nbsp;&nbsp; public void doTest(HttpServletRequest req,
+HttpServletResponse resp)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws ServletException, IOException {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; doPost(req, resp);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}<br>
+      <br>
+      <span style="color: red;">class DummyHttpServletRequest extends
+HttpServletRequestWrapper {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; private
+Map&lt;String, String&gt; parameters;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; private String
+forwardToPage;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; private boolean
+isForwarded;</span><br style="color: red;">
+      <br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; public
+DummyHttpServletRequest(Map&lt;String, String&gt; parameters) {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+super(new HttpServletRequest() {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// 一些方法本體為空的實作</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// 純綷滿足HttpServletRequestWrapper建構的要求</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+});</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.parameters = parameters;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; }</span><br style="color: red;">
+      <br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; @Override</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; public String
+getParameter(String name) {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return parameters.get(name);</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; }</span><br style="color: red;">
+      <br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; @Override</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; public
+RequestDispatcher getRequestDispatcher(String path) {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+forwardToPage = path;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return new RequestDispatcher() {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public void forward(ServletRequest req, ServletResponse resp)</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws ServletException, IOException {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+isForwarded = true;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</span><br style="color: red;">
+      <br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public void include(ServletRequest req, ServletResponse resp)</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws ServletException, IOException {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+};</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; }</span><br style="color: red;">
+      <br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; public String
+getForwardToPage() {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return forwardToPage;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; }</span><br style="color: red;">
+      <br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; public boolean
+isForwarded() {</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return isForwarded;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp; }</span><br style="color: red;">
+      <span style="color: red;">}</span><br style="color: red;">
+      <br>
+public class LoginServletTest {<br>
+&nbsp;&nbsp;&nbsp; private TestForLoginServlet loginServlet;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; @Before<br>
+&nbsp;&nbsp;&nbsp; public void setUp() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; loginServlet = new
+TestForLoginServlet();<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; @Test<br>
+&nbsp;&nbsp;&nbsp; public void testLoginSuccess() throws Throwable {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Map&lt;String, String&gt;
+param = new HashMap&lt;String, String&gt;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; param.put("user", "justin");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; param.put("passwd", "1234");<br>
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DummyHttpServletRequest dummyRequest = </span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new DummyHttpServletRequest(param);</span><br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; loginServlet.doTest(<span style="color: red;">dummyRequest</span>, null);<br>
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+assertTrue(dummyRequest.isForwarded());</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+assertEquals("success.html", dummyRequest.getForwardToPage());</span><br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; @Test<br>
+&nbsp;&nbsp;&nbsp; public void testLoginFail() throws Throwable {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Map&lt;String, String&gt;
+param = new HashMap&lt;String, String&gt;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; param.put("user", "someone");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; param.put("passwd", "1234");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">DummyHttpServletRequest
+dummyRequest = </span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new DummyHttpServletRequest(param);<br>
+      <br>
+      </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+loginServlet.doTest(<span style="color: red;">dummyRequest</span>,
+null);<br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+assertTrue(dummyRequest.isForwarded());</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+assertEquals("login.html", dummyRequest.getForwardToPage());</span><br>
+&nbsp;&nbsp;&nbsp; }<br>
+}</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><br>
+      </div>
+      <small><br>
+最主要的是Servlet中，實際上需要的是從<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest取
+得請求參數，因此設計DummyHttpServletRequest</span>讓Servlet的測試得以運行，就這個例子而言，自行設計
+Dummy物件是有些麻煩，另一方式，就是使用Mock框架所提供的Mock物件，這之後會再談到。<br>
+      <br>
+然而事實上，</small><small><span style="font-family: Courier New,Courier,monospace;">HttpServletRequest的
+實作是由容器提供，</span></small><small>容器的行為實際上更為複雜，容器所管理的物件亦有其生命週期等議題，如果你要測試的，並
+不是上面那個簡單的Servlet，那麼用Dummy物件或Mock物件，皆不足以代表實際容器所提供的物件，你所需要的，是從容器中獲取更貼近部署環境
+的物件。<br>
+      <br>
+可以使用<big> </big></small><small><big><a href="EmbeddedResource.html"><small>Embedded
+資源</small></a></big> 的方式，實際運行一個嵌入式容器，想辦法從中獲取相關資源進行測試。例如：<br>
+      </small>
+      <pre>package test.cc.openhome;<br><br>import static org.junit.Assert.*;<br>import java.io.IOException;<br>import java.net.URL;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import org.eclipse.jetty.server.*;<br>import org.eclipse.jetty.server.handler.AbstractHandler;<br>import org.junit.*;<br>import cc.openhome.LoginServlet;<br><br>class TestForLoginServlet extends LoginServlet {<br>    public void doTest(HttpServletRequest req, HttpServletResponse resp) <br>                    throws ServletException, IOException {<br>        doPost(req, resp);<br>    }<br>}<br><br>class DummyHttpServletRequest extends HttpServletRequestWrapper {<br>    private String forwardToPage;<br>    private boolean isForwarded;<br><br>    public DummyHttpServletRequest(HttpServletRequest request) {<br>        super(request);<br>    }<br><br>    @Override<br>    public RequestDispatcher getRequestDispatcher(String path) {<br>        forwardToPage = path;<br>        return new RequestDispatcher() {<br>            public void forward(ServletRequest req, ServletResponse resp)<br>                    throws ServletException, IOException {<br>                isForwarded = true;<br>            }<br><br>            public void include(ServletRequest req, ServletResponse resp)<br>                    throws ServletException, IOException {<br>            }<br>        };<br>    }<br><br>    public String getForwardToPage() {<br>        return forwardToPage;<br>    }<br><br>    public boolean isForwarded() {<br>        return isForwarded;<br>    }<br>}<br><br>public class LoginServletTest {<br>    private Server server;<br><span style="font-weight: bold;">    private DummyHttpServletRequest dummyRequest;</span><br><br>    @Before<br>    public void setUp() throws Exception {<br>        <span style="font-weight: bold;">server = new Server(8080);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        server.setHandler(new AbstractHandler() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            public void handle(String target,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    Request baseRequest,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    HttpServletRequest request,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    HttpServletResponse response)</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    throws IOException, ServletException {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                dummyRequest = new DummyHttpServletRequest(request);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                new TestForLoginServlet().doTest(dummyRequest, response);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                baseRequest.setHandled(true);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        });</span><br style="font-weight: bold;"><span style="font-weight: bold;">        server.start();</span><br>    }<br>    <br>    @After<br>    public void tearDown() throws Exception {<br><span style="font-weight: bold;">        server.stop();</span><br>    }<br>    <br>    @Test<br>    public void testLoginSuccess() throws Throwable {<br>        URL url = new URL("http://localhost:8080/?user=justin&amp;passwd=1234");<br>        url.openStream().read();<br style="font-weight: bold;"><span style="font-weight: bold;">        assertTrue(dummyRequest.isForwarded());</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals("success.html", dummyRequest.getForwardToPage());</span><br>    }<br>    <br>    @Test<br>    public void testLoginFail() throws Throwable {<br>        URL url = new URL("http://localhost:8080/?user=someone&amp;passwd=1234");<br>        url.openStream().read();<br><span style="font-weight: bold;">        assertTrue(dummyRequest.isForwarded());</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals("login.html", dummyRequest.getForwardToPage());</span><br>    }<br>}<br></pre>
+      <small><br>
+在上面，請求會發送給內嵌的Jetty容器，Jetty容器產生<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest、
+HttpServletResponse</span>，你將所需的</small><small style="font-family: Courier New,Courier,monospace;">HttpServletRequest包
+裹為Dummy</small><small style="font-family: Courier New,Courier,monospace;">HttpServletRequest</small><small>物
+件，再產生Servlet進行測試，並驗證測試結果。<br>
+      <br>
+這是容器內（In-container）測試的基本概念，</small><small>你互動的資源或物件，是從實際的容器取得，這樣的測試，更貼近於<span style="font-weight: bold;">整合測試（Integration test）</span>，因為</small><small>你
+所獲取的物件或資源更貼近於實際環境，可以得到更可靠的測試結果。<br>
+      </small><small> <br>
+在容器內測試框架的部份，Servlet/JSP可以使用<span style="font-weight: bold;">Cactus</span>，JSF
+可以使用<span style="font-weight: bold;">JSFUnit</span>（擴充了Cactus），OSGi則有<span style="font-weight: bold;">JUnit4OSGi</span>，在EJB測試的部份，若需要以嵌入式的方式來執行測試，
+可以瞭解一下<span style="font-weight: bold;">OpenEJB</span>。<br>
+      <br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/InContainerTest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:37 GMT -->
+</html>

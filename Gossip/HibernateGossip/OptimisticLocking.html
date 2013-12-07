@@ -1,0 +1,1633 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/OptimisticLocking.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>樂觀鎖定（Optimistic Locking）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate Gossip:
+樂觀鎖定（Optimistic locking）</a></h1>
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>樂觀鎖定（Optimistic
+locking）樂觀的認為資料很少發生同時存取的問題，通常在資料庫層級上設為read-commited隔離層級，並實行樂觀鎖定。<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+在read commited隔離層級之下，允許交易讀取另一個交易已COMMIT的資料，但可能有unrepeatable read與lost update的問題存在，例如：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ol>
+
+
+
+
+        <li><small>交易A讀取欄位1</small></li>
+
+
+
+
+        <li><small>交易B讀取欄位1</small></li>
+
+
+
+
+        <li><small>交易A更新欄位1並COMMIT</small></li>
+
+
+
+
+        <li><small>交易B更新欄位1並COMMIT</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ol>
+
+
+
+
+      <br>
+
+
+
+
+      <small>交易B可能基於舊的資料來更新欄位，使得交易A的資料遺失，或者是：<br>
+
+
+      </small>
+      
+      
+      <ol>
+
+
+        <li><small>交易A讀取欄位1、2</small></li>
+
+
+        <li><small>交易B</small><small>讀取欄位1、2</small></li>
+
+
+        <li><small>交易A更新欄位1、2，欄位1是新資料，欄位2是舊資料，並COMMIT</small></li>
+
+
+        <li><small>交易A更新欄位1、2，</small><small>欄位1是舊資料，欄位2是新資料，並COMMIT</small></li>
+
+
+      
+      
+      </ol>
+
+
+      <small><br>
+
+
+為了維護正確的資料，樂觀鎖定使用應用程式上的邏輯實現版
+本控制的解決。 <br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+對於lost update的問題，可以有幾種選擇：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>先更新為主</small><small>（First commit wins）</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>交易A先COMMIT，交易B在COMMIT時會得到錯誤訊息，表示更新失敗，交易B必須重新取得資料，嘗試進行更新。</small></div>
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>後更新的為主</small><small>（Last commit wins）</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>交易A、B都可以COMMIT，交易B覆蓋交易A的資料也無所謂。</small></div>
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>合併衝突更新（Merge conflicting update）</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>先更新為主的變化應用，交易A先COMMIT，交易B要更新時會得到錯誤訊息，提示使用者檢查所有欄位，選擇性的更新沒有衝突的欄位。</small><br>
+
+
+
+
+      </div>
+
+
+
+
+      <small>
+
+
+      <br>
+
+
+
+
+Hibernate中透過版本號檢查來實現先更新為主，這也是Hibernate所推薦的方式，在資料庫中加入一個version欄位記錄，在讀取資料時
+連同版本號一同讀取，並在更新資料時比對版本號與資料庫中的版本號，如果等於資料庫中的版本號則予以更新，並遞增版本號，如果小於資料庫中的版本號就丟出
+例外。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+實際來透過範例瞭解Hibernate的樂觀鎖定如何實現，首先在資料庫中新增一個表格：<br>
+
+
+
+
+
+
+
+      </small>
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">create table user (<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; id bigint not null auto_increment,<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; version integer not null,<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; name varchar(255),<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; age bigint,<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; primary key (id)<br>
+
+
+
+
+)</span><span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+
+這個user表格中的version用來記錄版本號，以供Hibernate實現樂觀鎖定，接著設計User類別，當中必須包括version屬性：</small><br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li>User.java</li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class User {<br>    private Long id;<br><span style="font-weight: bold;">    private int version; // 增加版本屬性 </span><br>    private String name;<br>    private Long age;<br> <br>    public User() {}<br><br>    public Long getId() {<br>        return id;<br>    }<br><br>    public void setId(Long id) {<br>        this.id = id;<br>    }<br> <br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br> <br>    public Long getAge() {<br>        return age;<br>    }<br><br>    public void setAge(Long age) {<br>        this.age = age;<br>    }<br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <small>
+在映射文件的定義方面，則如下所示：</small><br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" <br>               table="user"<br>               <span style="font-weight: bold;">optimistic-lock="version"</span>&gt; <br> <br>        &lt;id name="id" column="id"&gt; <br>            &lt;generator class="native"/&gt; <br>        &lt;/id&gt; <br><br>        <span style="font-weight: bold;">&lt;version name="version" </span><span style="font-weight: bold;">column="version"</span><span style="font-weight: bold;"> access="field"/&gt; </span><br> <br>        &lt;property name="name" column="name"/&gt; <br><br>        &lt;property name="age" column="age"/&gt; <br> <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <small>
+注意&lt;version&gt;標籤必須出現在&lt;id&gt;標籤之後，接著您可以試著在資料庫中新增資料，
+例如：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User user = new User();<br>
+
+
+
+
+user.setName("caterpillar");<br>
+
+
+
+
+user.setAge(new Long(30));<br>
+
+
+
+
+      <br>
+
+
+
+
+Session session = HibernateUtil.getSessionFactory().openSession();<br>
+
+
+
+
+Transaction tx =&nbsp; session.beginTransaction();<br>
+
+
+
+
+session.save(user);<br>
+
+
+
+
+tx.commit();<br>
+
+
+
+
+session.close();</span><br>
+
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      <span class="postbody">您可以檢視資料庫中的資料，每一次對同一筆資料進行更新，version欄位
+的內容都會自動更新，接著來作個實驗，直接以範例說明：<br>
+
+
+
+
+
+
+
+
+      </span></small>
+
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;" class="postbody">// 有使用1者開啟了一個session1<br>
+
+
+
+
+Session session1 = HibernateUtil.getSessionFactory().openSession();<br>
+
+
+
+
+// 在這之後，馬上有另一個使用者2開啟了session2<br>
+
+
+
+
+Session session2 = HibernateUtil.getSessionFactory().openSession();<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+Long id = new Long(1);<br>
+
+
+
+
+      <br>
+
+
+
+
+Transaction tx1 = session1.beginTransaction();<br>
+
+
+
+
+Transaction tx2 = session2.beginTransaction();<br>
+
+
+
+
+      <br>
+
+
+
+
+// 使用者1查詢資料&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+User userV1 = (User) session1.load(User.class, id);<br>
+
+
+
+
+// 使用者2查詢同一筆資料<br>
+
+
+
+
+User userV2 = (User) session2.load(User.class, id);<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+// 此時userV1、userV2兩個版本號是相同的<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+// 使用者1更新age<br>
+
+
+
+
+userV1.setAge(new Long(31));<br>
+
+
+
+
+// 使用者2資料更新name<br>
+
+
+
+
+// userV2 的 age 資料還是舊的<br>
+
+
+
+
+userV2.setName("justin");<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+// 交易1進行commit<br>
+
+
+
+
+tx1.commit();<br>
+
+
+
+
+      <br>
+
+
+
+
+// 此時由於資料更新，資料庫中的版本號遞增了<br>
+
+
+
+
+// 因版本號比資料庫中的舊<br>
+
+
+
+
+// 交易2送出更新資料會失敗，丟出StableObjectStateException 例外<br>
+
+
+
+
+tx2.commit();<br>
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+session1.close();<br>
+
+
+
+
+session2.close();</span></small></div>
+
+
+
+
+      <small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+運行以下的程式片段，會出現以下的結果：<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+
+
+
+
+      </span></span></span></small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; select</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id as id0_0_,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.version as version0_0_,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.name as name0_0_,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.age as age0_0_ </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; from</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user user0_ </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id=?</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; select</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id as id0_0_,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.version as version0_0_,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.name as name0_0_,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.age as age0_0_ </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; from</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user user0_ </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id=?</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; update</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; set</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; version=?,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name=?,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; age=? </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id=? </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and version=?</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Hibernate: </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; update</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; set</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; version=?,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name=?,</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; age=? </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id=? </span></span></span></small><br>
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and version=?</span></span></span></small><br style="color: rgb(255, 0, 0);">
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">12:34:16,531 ERROR AbstractFlushingEventListener:301 - Could not synchronize database state with session</span></span></span></span></small><br style="color: rgb(255, 0, 0);">
+
+
+
+
+      <small><span class="postbody"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">org.hibernate.StaleObjectStateException:
+Row was updated or deleted by another transaction (or unsaved-value
+mapping was incorrect): [onlyfun.caterpillar.User#1]</span></span></span></span></small></div>
+
+
+
+
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="color: rgb(255, 0, 0);" class="postbody"><span style="font-weight: bold;"></span></span><br>
+
+
+
+
+
+
+
+
+      <span class="postbody"></span></small></div>
+
+
+
+
+
+
+
+
+      <span class="postbody"><small><span style="font-family: Courier New,Courier,monospace;">&nbsp;</span><br>
+
+
+
+
+
+
+
+
+由於新的版本號是1，而userV2的版本號還是0，因此更新失敗丟出StableObjectStateException，您可以捕捉這個例外作善後
+處理，例如在處理中重新讀取資料庫中的資料，同時將目前的資料與資料庫中的資料秀出來，讓使用者有機會比對不一致的資料，以決定要變更的部份，或者您可以
+設計程式自動讀取新的資料，並比對真正要更新的資料，這一切可以在背景執行，而不用讓您的使用者知道。 <br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+如果不想透過版本號來進行控制，則也可以讓Hibernate用最後一次物件更新前的屬性，來與資料庫中的資料進行比對，確定是否有不一致的情況，如果沒有才進行更新，如果發現有不一致的情況，則丟出StaleObjectStateException。<br>
+
+
+
+      <br>
+
+
+
+例如：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <ul>
+
+
+
+        <li>User.java</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class User {<br>    private Long id;<span style="font-weight: bold;"></span><br>    private String name;<br>    private Long age;<br> <br>    public User() {}<br><br>    public Long getId() {<br>        return id;<br>    }<br><br>    public void setId(Long id) {<br>        this.id = id;<br>    }<br> <br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br> <br>    public Long getAge() {<br>        return age;<br>    }<br><br>    public void setAge(Long age) {<br>        this.age = age;<br>    }<br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+      <span class="postbody"><small>User上不需要version屬性了，而映射文件上：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <ul>
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" <br>               table="user"<br>               <span style="font-weight: bold;">optimistic-lock="all"<br>               dynamic-update="true"</span>&gt; <br> <br>        &lt;id name="id" column="id"&gt; <br>            &lt;generator class="native"/&gt; <br>        &lt;/id&gt; <span style="font-weight: bold;"></span><br> <br>        &lt;property name="name" column="name"/&gt; <br><br>        &lt;property name="age" column="age"/&gt; <br> <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+      <small>optimistic-lock屬性設定為all，表示檢查最後一次更新前的所有屬性是否與資料庫中的欄位有不一致，如果執行先前的測試程式：</small><br style="font-weight: bold;">
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">Hibernate: </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; insert </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; into</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (name, age) </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; values</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (?, ?)</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">Hibernate: </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; select</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id as id0_0_,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.name as name0_0_,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.age as age0_0_ </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; from</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user user0_ </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id=?</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">Hibernate: </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; select</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id as id0_0_,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.name as name0_0_,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.age as age0_0_ </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; from</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user user0_ </span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.id=?</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">Hibernate: </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp; update</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp; set</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; age=? </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id=? </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and name=? </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and age=?</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">Hibernate: </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp; update</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp; set</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name=? </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp; where</span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id=? </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and name=? </span></small></span><br style="color: rgb(255, 0, 0); font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="color: rgb(255, 0, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and age=?</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">12:48:15,015 ERROR AbstractFlushingEventListener:301 - Could not synchronize database state with session</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">org.hibernate.StaleObjectStateException:
+Row was updated or deleted by another transaction (or unsaved-value
+mapping was incorrect): [onlyfun.caterpillar.User#1]</span></small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+可以看到，Hibernate使用where子句，用最一次更新前的舊資料進行查詢，如果有符合才更新屬性，若否則丟出StaleObjectStateException。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+要注意的是，由於樂觀鎖定是使用系統中的程式來控制，而不是使用資料庫中的鎖定機制，因而如果有人特意自行更新版本訊息來越過檢查，則鎖定機制就會無效，
+例如在上例中自行更改userV2的version屬性，使之與資料庫中的版本號相同的話就不會有錯誤，像這樣版本號被更改，或是由於資料是由外部系統而
+來，因而版本資訊不受控制時，鎖定機制將會有問題，設計時必須注意。</small>
+      <br>
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/OptimisticLocking.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/SourceFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:55 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>你的原始碼是什麼編碼？</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: 你的原始碼是什麼編碼？<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>很令人訝異的事情是，當被問及「你現在編輯的原始碼檔案是什麼編碼？」，多數的程式設計人員都答不出來。<br>
+      <br>
+如果你在正體中文Windows中開一個純文字檔案，用「記事本」編輯的話，應該是用MS950來處理原始碼中字元的儲存，現在許多Linux系統，預設
+都是使用UTF-8編碼，所以在這些Linux直接使用vi編輯原始碼的話，預設應該就是UTF-8，如果是在整合開發環境（IDE）中，則要視IDE的
+設定，有些IDE預設是使用作業系統編碼，有些IDE是預設使用UTF-8，如果在IDE中，預設是用Big5的編輯器，結果開啟UTF-8的原始碼，也
+會是亂碼，你必須指定編輯器使用正確的編碼來開啟原始碼。</small><small><br>
+      <br>
+這有什麼問題呢？以Java而言，在正體中文Windows中，如果你用記事本編輯原始碼：<br>
+      </small>
+      <pre>public class Main {<br>    public static void main(String[] args) {<br>        System.out.println("哈囉！世界！");<br>    }<br>}<br></pre>
+      <small><br>
+如果你直接如下編譯：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;javac Main.java<br>
+</span></small></td></tr></tbody>
+      </table>
+      <small><br>
+那麼就會編譯成功，不過，編譯器是使用哪種編碼來解譯原始碼呢？答案是作業系統預設編譯，</small><small>正體中文Windows中，如果你用記事本編輯原始碼，原始碼檔案是用MS950儲存，而編譯器採用作業系統編碼編譯，所以就不用任何指定，就可以正確編譯。</small><br>
+      <br>
+      <small>同樣地，在預設編碼為UTF-8的Linux中，如果你用vi編輯原始碼，原始碼檔案是用UTF-8儲存，而編譯器採用作業系統編碼編譯，所以就不用任何指定，就可以正確編譯。<br>
+      <br>
+如果你用記事本轉存為「Unicode」或「Unicode big endian」編碼</small><small>，那你要如何編譯？答案是指定<span style="font-weight: bold;">-encoding</span>告知編譯器原始檔案的編碼：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;javac -encoding UTF-16 Main.java<br>
+</span></small></td></tr></tbody>
+      </table>
+
+      <small><br>
+      </small><small>如果你用記事本轉存為「UTF-8」編碼</small><small>，那你要如何編譯？答案是無法編譯，即使你指定了-encoding為UTF-8也一樣...</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;javac -encoding UTF-8 Main.java<br>
+Main.java:1: illegal character: \65279<br>
+?public class Main {<br>
+^<br>
+1 error<br>
+</span></small></td></tr></tbody>
+      </table>
+
+
+      <small><small><br>
+      </small>在 </small><small><a href="UTF8.html">UTF-8</a> 中談過，</small><small>因為Windows的記事本存成UTF-8時，會在檔首加上BOM，javac編譯器並不處理BOM，只會視為不合法字元，如果你要將原始碼存為UTF-8，必須使用可存為檔首無BOM的編譯器，例如 <a href="http://notepad-plus-plus.org/">NotePad++</a>。<br>
+      <img style="width: 601px; height: 299px;" alt="" src="images/SourceFile-1.png"><br>
+      </small><br>
+      <small>如此指定-encoding為UTF-8進行編譯，就可以編譯成功。<br>
+      <br>
+如果你用gcc編譯一個C原始碼：<br>
+      </small>
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    printf("編譯成功");<br>    return 0;<br>}<br></pre>
+      <small><br>
+會得到錯誤訊息：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;gcc main.c<br>
+main.c: In function `main':<br>
+main.c:4: error: missing terminating " character<br>
+main.c:5: error: syntax error before "return"</span></small></td></tr></tbody>
+      </table>
+      <br>
+      <small>如果你將原始碼中的「成功」改為「OK」，編譯就會成功，為什麼？檢視原始碼的十六進位碼：<br>
+      <img style="width: 643px; height: 173px;" alt="" src="images/SourceFile-2.png"><br>
+      </small><br>
+      <small>「功」這個字儲存為a5、5c兩個位元組，而5C在ASCII字元表中，就是\字元，也就是說，gcc看到了\字元，以為是略過（escape）字元，但下一個字元是"，結果組成了\"，因此gcc以為"沒有成對，因此編譯失敗，這就是著名的「<a href="http://www.google.com.tw/search?q=%E8%A8%B1%E5%8A%9F%E8%93%8B&amp;ie=utf-8&amp;oe=utf-8&amp;aq=t&amp;rls=org.mozilla:zh-TW:official&amp;client=firefox-a">許功蓋</a>」</small><small>問題</small><small>。<br>
+      <br>
+如果將C原始碼存為UTF-8再直接編譯，則執行結果會出現亂碼：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;gcc main.c<br>
+            <br>
+C:\workspace&gt;a<br>
+蝺刻陌?&#26624;?</span></small></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>你只是將字元的位元組改為另一組位元，所以編譯可以成功，但執行時的Console對這組位元並沒有對應實際可辨識的字元，所以就是亂碼，你必須如下指定：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;gcc -fexec-charset=BIG5 main.c<br>
+            <br>
+C:\workspace&gt;a<br>
+編譯成功</span></small></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>不同語言辨識或指定原始碼編碼的方式並不相同，可以進一步參考：</small><br>
+      
+      <ul>
+<li><small><a href="String.html">Java 的字串</a><br>
+          </small></li><li><small><a href="JVMEncoding.html">JVM 預設編碼</a></small></li><li><small><a href="../Ruby/Encoding.html">Ruby
+的編碼</a></small></li><li><small><a href="Python.html">Python 的編碼</a></small></li>
+        <li><a href="JavaScript.html"><small>JavaScript 編碼基礎</small></a></li>
+      </ul>
+      <br>
+      <small>
+      甚至在不同環境中也會有不同方式，可參考：<br>
+      </small>
+      <ul>
+<li><a href="JSP.html"><small>JSP 的轉譯</small></a></li><li><small><a href="../Rails/Encoding.html">Rails
+的編碼</a></small></li>
+      </ul>
+      <br>
+      <small>
+      <br>
+      <br>
+      <br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/SourceFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+</html>

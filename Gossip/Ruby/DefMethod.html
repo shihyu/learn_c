@@ -1,0 +1,674 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/DefMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>def 定義方法</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: def 定義方法<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+ <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ruby中要定義方法，是使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">def</span>來定義，例如，以下是個求最大公因數的方法定義：<br>
+      </small>
+      <pre>def gcd(m, n)<br>    n == 0 ? m : gcd(n, m % n)<br>end<br>puts gcd(20, 30) # 顯示 10<br></pre>
+      <small>
+      </small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;">在上例中，gcd是函式名稱，m與n為參數（</span>Parameter<span style="font-family: Courier New,Courier,monospace;">）名稱，如果要傳回值可使用<span style="font-weight: bold;">return</span>，如果沒有指定return，則以最後一個陳述句執行結果的傳回值，作為函式的傳回值。<br>
+      <br>
+</span></small><small>在某些語言中，這稱之為定義函式，但在Ruby中<span style="font-family: Courier New,Courier,monospace;">def</span>確實是定義物件上的方法，只不過上例中沒有指明方法由誰擁有，呼叫<span style="font-family: Courier New,Courier,monospace;">gcd</span>時也沒有指定訊息接收者。<br>
+      <br>
+你也可以明確指定方法由哪個物件擁有，呼叫時也可以指定訊息接收者。例如。</small><small><br>
+      </small>
+      <pre><span style="font-weight: bold;">obj = Object.new</span><br>def <span style="font-weight: bold;">obj</span>.gcd(m, n)<br>    n == 0 ? m : gcd(n, m % n)<br>end<br>puts <span style="font-weight: bold;">obj</span>.gcd(20, 30) # 顯示 10<br></pre>
+
+      <small>
+      </small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;">上例中，為obj定義了gcd</span><span style="font-weight: bold;">單例方法（Singleton method）</span>。</small><small><span style="font-weight: bold;">如果在頂層環境中定義方法時，沒有指定方法由哪個物件擁有，則方法是由<span style="font-family: Courier New,Courier,monospace;">Object</span>擁有的私有（<span style="font-family: Courier New,Courier,monospace;">private</span>）實例方法（Instance method）。</span><br>
+      <br>
+例如，上面第一個範例的<span style="font-family: Courier New,Courier,monospace;">gcd</span>方法，相當於以下寫法：<br>
+      </small>
+      <pre>class Object<br>    # 以下定義了gcd實例方法<br>    def gcd(m, n)<br>        n == 0 ? m : gcd(n, m % n)<br>    end<br>    private :gcd   <br>end<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;"></span>定義在頂層的方法沒有指定擁有者時，就是<span style="font-family: Courier New,Courier,monospace;">Object</span>擁有的私有實例方法，</small><small><span style="font-family: Courier New,Courier,monospace;">Object</span>為所有類別的父類別，因此任何類別或模組定義中，就可以直接呼叫。<br>
+      <br>
+之後還會談到，呼叫方法時沒有指定訊息接收者，預設以<span style="font-family: Courier New,Courier,monospace;">self</span>為訊息接收者，如果是呼叫私有方法，不用也不能撰寫<span style="font-family: Courier New,Courier,monospace;">self（除了一個特例，之後會談到）</span>，因為私有方法只能在物件內部使用，不可透過「物件.訊息」的方式呼叫。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; print "some...."<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; some<br>
+            </span>some....=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; self.some<br>
+            </span>NoMethodError: private method `some' called for main:Object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+      <br>
+      <small>以上是<span style="font-family: Courier New,Courier,monospace;">def</span>定義方法時的細節，實際上初學者，將沒有指定擁有者的方法當作函式來看待，會是比較容易理解的方式。<br>
+      <br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">在</span>Ruby<span style="font-family: Courier New,Courier,monospace;">中不支援其它語言重載方法的概念（例如</span>Java<span style="font-family: Courier New,Courier,monospace;">），也就是在</span>Ruby<span style="font-family: Courier New,Courier,monospace;">中同一個名稱空間中，不能有相同的方法名稱。如果你定義了兩個方法具有相同的名稱但擁有不同的參數個數，則後者定義會覆蓋前者定義。例如：</span></small><small><br></small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def sum(a, b)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; a + b<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; def sum(a, b, c)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; a + b + c<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; sum(1, 2, 3)<br>
+            </span>=&gt; 6<span style="font-weight: bold;"><br>
+&gt;&gt; sum(1, 2)<br>
+            </span>ArgumentError: wrong number of arguments (2 for 3)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):29:in `sum'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):33<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">由於</span>Ruby<span style="font-family: Courier New,Courier,monospace;">是動態語言，只需在設計時確認傳入方法的物件所擁有的特性或方法，無需採</span></small><small><span style="font-family: Courier New,Courier,monospace;">方法重載中，依型態不同來區別所呼叫方法的部份，至於依參數個數不同來區別的方法重載概念，在</span>Ruby<span style="font-family: Courier New,Courier,monospace;">中可以使用預設引數（</span>Argument<span style="font-family: Courier New,Courier,monospace;">）來解決。例如：<br>
+</span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre># encoding: Big5<br>def sum(a, b, c = 0)<br>    a + b + c<br>end<br><br>puts sum(10, 20, 30)  # 顯示 60<br>puts sum(10, 20)      # 顯示 30<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;">
+      <br>
+      </span></small><small>像<span style="font-family: Courier New,Courier,monospace;">sum</span>這種加總數字的需求，事先可能不知道要傳入的引數個數，可以在定義方法的參數時使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">*</span>，表示該參數接受不定長度引數。例如：<br>
+      </small>
+      <pre>def sum(*numbers)<br>    total = 0<br>    numbers.each do |number|<br>        total += number<br>    end<br>    total<br>end<br><br>puts sum(1, 2)       # 顯示 3<br>puts sum(1, 2, 3)    # 顯示 6<br>puts sum(1, 2, 3, 4) # 顯示 10<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;">
+      </span></small><br>
+      <small>你傳入方法的引數，會被收集在一個陣列中，再設定給<span style="font-family: Courier New,Courier,monospace;">number</span>s參數。在 </small><small><big><a href="Array.html"><small>陣列型態</small></a></big> 中提過，</small><small>*可以用來拆解陣列，將元素逐一指定給數個變數，這個語法也適用在方法的參數指定，你可以將一個陣列傳入，只要在傳入時加上<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">*</span>，則陣列中每個元素會自動指定給各個參數。例如：<br>
+      </small>
+      <pre>def sum(a, b, c)<br>    a + b + c<br>end<br><br>numbers = [1, 2, 3]<br>puts sum(*numbers)   # 顯示 6<br></pre>
+
+      <br>
+      <small>如果方法中傳回陣列，也可以如此指定。例如：<br>
+      </small>
+      <pre>def some<br>    [1, 2, 3]<br>end<br>x, y, z = some<br>puts "#{x}, #{y}, #{z}"   # 顯示 1, 2, 3<br></pre>
+
+      <br>
+      <small><span style="font-weight: bold;">方法中的參數若沒有預設引數，或使用*設定接受不定長度引數，則呼叫方法時該參數不一定要接收引數。如果方法中的參數混用必要引數與非必要引數，則引數一律優先滿足必要引數的參數。</span>例如：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def some(a, *b, c, d)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp; p a, b, c, d<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3, 4, 5)<br>
+            </span>1<br>
+[2, 3]<br>
+4<br>
+5<br>
+            <span style="font-weight: bold;">=&gt; [1, [2, 3], 4, 5]<br>
+&gt;&gt; some(1, 2, 3, 4)<br>
+            </span>1<br>
+[2]<br>
+3<br>
+4<br>
+=&gt; [1, [2], 3, 4]<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3)<br>
+            </span>1<br>
+[]<br>
+2<br>
+3<br>
+=&gt; [1, [], 2, 3]<br>
+            <span style="font-weight: bold;">&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">參數中必要引數的部份一徑優先分派引數，所以在sum(1, 2, 3)時，a、c、d為必要引數，所以被指定了1、2、3，因為沒有引數了，所以b是空陣列。</span>類似地：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def some(a, b = 10, c, d)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; p a, b, c, d<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3, 4)<br>
+            </span>1<br>
+2<br>
+3<br>
+4<br>
+=&gt; [1, 2, 3, 4]<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3)</span><br>
+1<br>
+10<br>
+2<br>
+3<br>
+=&gt; [1, 10, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+      <small><span style="font-family: Courier New,Courier,monospace;">因為a、c、d為必要引數，所以some(1, 2, 3)時，被指定了1、2、3，因為沒有引數了，所以b會採預設值。<span style="font-weight: bold;">如果混用預設引數與接收不定長度引數的參數，則在分配完必要引數之後，接下來再分配預設引數，剩下的才給接受不定長度引數的參數。</span>例如：</span></small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def some(a, b = 10, *c, d)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; p a, b, c, d<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3, 4, 5)<br>
+            </span>1<br>
+2<br>
+[3, 4]<br>
+5<span style="font-weight: bold;"><br>
+            </span>=&gt; [1, 2, [3, 4], 5]<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3, 4)<br>
+            </span>1<br>
+2<br>
+[3]<br>
+4<br>
+=&gt; [1, 2, [3], 4]<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2, 3)<br>
+            </span>1<br>
+2<br>
+[]<br>
+3<br>
+=&gt; [1, 2, [], 3]<span style="font-weight: bold;"><br>
+&gt;&gt; some(1, 2)</span><br>
+1<br>
+10<br>
+[]<br>
+2<br>
+=&gt; [1, 10, [], 2]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+      <br>
+      <small>接收不定長度引數的參數，必須在預設引數的右邊，否則會發生錯誤。<br>
+      <br>
+如果方法的最後一個參數接受雜湊物件，例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def config(name, props)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "name = #{name}"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts props<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; config "system", {"p1" =&gt; "v1", "p2" =&gt; "v2", "p3" =&gt; "v3"}<br>
+            </span>name = system<br>
+{"p1"=&gt;"v1", "p2"=&gt;"v2", "p3"=&gt;"v3"}<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>則<span style="font-family: Courier New,Courier,monospace;">{}</span>可以省略，例如：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; config "system",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p1" =&gt; "v1",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p2" =&gt; "v2",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p3" =&gt; "v3"<br>
+</span>name = system<br>
+{"p1"=&gt;"v1", "p2"=&gt;"v2", "p3"=&gt;"v3"}<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; config "system",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :p1 =&gt; "v1",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :p2 =&gt; "v2",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :p3 =&gt; "v3"<br>
+            </span>name = system<br>
+{:p1=&gt;"v1", :p2=&gt;"v2", :p3=&gt;"v3"}<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; config "system",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p1: "v1",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p2: "v2",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p3: "v3"<br>
+            </span>name = system<br>
+{:p1=&gt;"v1", :p2=&gt;"v2", :p3=&gt;"v3"}<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small>這樣的方法呼叫方式，讓程式原始碼更像是個組態檔案，廣用於如Rails之類的框架中。通常提供這樣機制的方法：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">config "system",</span></small><br>
+      <small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p1" =&gt; "v1",</span></small><br>
+      <small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p2" =&gt; "v2",</span></small><br>
+      <small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p3" =&gt; "v3"</span></small><br>
+      </div>
+      <small><br>
+也可以提供另一種設定方式：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">config "system",</span></small><br>
+      <small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p1", "v1",</span></small><br>
+      <small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p2", "v2",</span></small><br>
+      <small style="color: black; font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p3", "v3"</span></small><br>
+      </div>
+
+
+
+      <small>
+      </small><br>
+      <small>則定義方法時，最後一個參數可以使用*設定為不定長度引數，如此兩種呼叫方式都可以支援：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def config(name, *props)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "name = #{name}"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts props<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; config "system",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p1" =&gt; "v1",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p2" =&gt; "v2",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p3" =&gt; "v3"<br>
+            </span>name = system<br>
+{"p1"=&gt;"v1", "p2"=&gt;"v2", "p3"=&gt;"v3"}<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; config "system",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p1", "v1",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p2", "v2",<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "p3", "v3"<br>
+            </span>name = system<br>
+p1<br>
+v1<br>
+p2<br>
+v2<br>
+p3<br>
+v3<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+<small>在Ruby中，</small><small>方法中還可以定義方法，可以使用區域方法將某個函式中的演算組織為更小的單元，例如，在 </small><small><a href="../AlgorithmGossip/SelectionInsertionBubble.htm">選
+擇排序</a> 的實作時，每次會從未排序部份選擇一個最小值放置到已排序部份之後，在底下的範例中，尋找最小值的演算就實作為區域方法的方式：<br>
+      </small>
+      <pre>def selection(number)<br>    # 找出未排序中最小值<br>   <span style="font-weight: bold;"> def min(nums, m, j)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if j == nums.length</span><br style="font-weight: bold;"><span style="font-weight: bold;">            m</span><br style="font-weight: bold;"><span style="font-weight: bold;">        elsif nums[j] &lt; nums[m]</span><br style="font-weight: bold;"><span style="font-weight: bold;">            min(nums, j, j + 1)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        else</span><br style="font-weight: bold;"><span style="font-weight: bold;">            min(nums, m, j + 1)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br>    for i in 0..(number.length - 1)<br>        m = min(number, i, i + 1)<br>        if i != m<br>            number[i], number[m] = number[m], number[i]<br>        end<br>    end<br>end<br><br>number = [1, 5, 2, 3, 9, 7]<br>selection(number)<br>print number                # 顯示 [1, 2, 3, 5, 7, 9]<br></pre>
+
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><br>
+      <small>不過在Ruby中，區域方法不可以直接存取包裹它的外部方法之參數（或宣告在區域方法前的區域變數）。關於變數範圍，之後還會細部討論。</small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/DefMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

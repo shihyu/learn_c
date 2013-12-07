@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Iterator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>從具體到抽象的迭代器</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 從具體到抽象的迭代器<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=77727">從具體到抽象的迭代器</a><br>
+      <br>
+      程式設計多半要面對一組資料，資料會因應不同需求而收集在某種類型的容器（Container），有時必須以一致的方式，取得不同類型容器中的資料加以處理，此時可採用迭代器（Iterator）代為尋訪容器或是包裹容器外觀。若需具體控制迭代細節，開發者可採用外部迭代器，若只在乎個別元素的處理，則可透過抽象的介面提供元素處理方式，由內部迭代器控制迭代細節。<br>
+      <br>
+      <dl>
+        <dt>傳統的迭代器模式</dt>
+      </dl>
+      <br>
+      不同物件容器內部實作時會採用不同資料結構，例如<span class="courier">ArrayList</span>內部採用陣列、<span
+        class="courier">LinkedList</span>採用鏈結、<span class="courier">HashSet</span>採用雜湊演算、<span
+        class="courier">TreeSet</span>採用樹狀結構等，如果開發者同時面對兩種以上的容器造訪需求，直接根據具體容器類型提供的介面，會撰寫出專用的存取邏輯。如果容器實作者可提供迭代器代為存取內部結構，容器使用者無論面對的容器類型為何，都只要針對迭代器外觀進行操作，以一致的邏輯進行元素存取。<br>
+      <br>
+      以Java的<span class="courier">Collection實作為例，由於Collection規範了iterator()方法必須傳回Iterator實作，無論是ArrayList、LinkedList、HashSet、TreeSet等，都必須根據內部結構實作Iterator，如果開發者想要存取的元素是收集在Collection實作品中，可操作Iterator的hasNext、next、remove等方法，無需考慮Collection實作品內部資料結構為何</span>。<br>
+      <span class="courier"><br>
+        Collection實作品是將Iterator</span>以內部類別（Inner class）方式，<span class="courier">實作在ArrayList、LinkedList、HashSet、TreeSet等類別之中</span>，讓客戶端完全無需考量結構等細節，那麼如果也想以一致方式存取陣列呢？可以結合配接器（Adapter）模式，<span
+        class="courier">獨立定義ArrayIterator類別實作Iterator介面，將想要迭代的陣列加以包裹。實際上，為了讓取得Iterator的方式也能夠一致</span>，從JDK5之後提供了<span
+        class="courier">Iterable介面定義iterator()傳回Iterator，而Collection成為子介面，這使得其他資料型態也可透過迭代器來取得想要的資料，例如可定義IterableString實作Iterable介面，使用IterableString包裹String，以傳回的Iterator來迭代字串中每個字元</span>。<br>
+      <br>
+      在《Design Patterns: Elements of Reusable Object-Oriented Software》書中定義了迭代器模式：「提供一種循序（Sequentially）存取聚集（aggregate）物件，但又不曝露底層細節的方式。」Java定義<span
+        class="courier">Iterator或Iterable</span>等，正是傳統迭代器的基本實現。<br>
+      <br>
+      <dl>
+        <dt>具體控制流程的外部迭代器</dt>
+      </dl>
+      <br>
+      無論是從容器內部傳回Iterator實作物件，或是以包裹器（Wrapper）方式實現Iterator，都是外部迭代器的作法，也就是對迭代器的控制權是在客戶端，也因此客戶端可以掌握迭代過程的整個細節，處理上會有較大的彈性，像是可決定以迴圈或遞迴控制迭代器、控制迭代停止時機，同時操作兩個以上的迭代器進行元素比較，或者是對一個實現组合（Composite）模式的容器進行巢狀等更複雜的迭代。<br>
+      <br>
+      然而正因為可控制的細節較多，在操作外部迭代器時也就容易出現較複雜的邏輯。例如在同一個迴圈中同時處理多個子問題，或者是操作某個迭代器尋訪容器元素時，另一執行緒改變了容器內容而造成迭代錯誤的問題，必要時必須對迭代器進行同步控制，或者是讓迭代器實現Fail Fast概念，也就是在錯誤發生時儘快呈現。以Java的<span
+        class="courier">Iterator實現為例，在某執行緒使用迭代器而另一執行緒改變容器內容時，會拋出ConcurrentModificationException</span>。<br>
+      <br>
+      使用迭代器的出發點是不涉及容器結構來存取元素，然而有時關心的是容器中個別元素的處理策略，不在乎迭代流程，此時可結合策略（Strategy）模式，傳回不同的迭代器實作。例如重載（Overload）<span
+        class="courier">iterator</span>方法，接收一個可針對元素進行轉換處理的物件，使傳回的迭代器在迭代時傳回轉換後的結果，像是迭代字元陣列時將小寫字母轉為大寫字母；或者是重載<span
+        class="courier">iterator方法，接收一個可針對元素進行true、false</span>判斷，使得透過迭代器取得的元素是容器中元素集合的子集。<br>
+      <br>
+      不過使用外部迭代器實現以上概念會使得程式碼繁雜，尤其是對於沒有一級（First-class）函式的語言來說更是如此；另一方面，使用外部迭代器不可避免地，就是操作迭代器的方式必然是線性的，然而有些時對容器中的物件可以分而治之（Divide and conquer），以多個執行緒分別對容器中不同區段元素進行處理，使用外部迭代器顯然不容易作到這點。<br>
+      <br>
+      <dl>
+        <dt>抽象控制流程的內部迭代器</dt>
+      </dl>
+      <br>
+      如果對迭代器的控制權不在客戶端，而是實現在某個方法中，這樣的方式稱為內部迭代器。實際上，客戶端並不會真正接觸到迭代器，而是呼叫某個方法，該方法內部以某種方式尋訪元素，對客戶端來說，迭代器的概念被抽象化為迭代方法或某個動作。以循序存取為例，JavaScript中的陣列擁有<span
+        class="courier">forEach方法，開發者可以傳入具備單參數的函式，forEach</span>會將元素逐一傳入函式，然而取得元素時是採用迴圈、遞迴甚至其他方式，開發者不得而知。<br>
+      <br>
+      顯而易見地，由於客戶端無法控制迭代流程，內部迭代器作法對客戶端較不具彈性，然而以抽象的外觀封裝迭代細節，客戶端可擁有較高階的語意，邏輯較為簡潔而清晰；如果關心的是容器中個別元素的處理策略，可使用高階的抽象方法名稱，像是迭代字元陣列時將小寫字母轉為大寫字母，以及<span>對一組數字進行過濾，可分別寫為：<br>
+      </span><br>
+      <div class="courier" style="margin-left: 40px;"><span>['a', 'b', 'c'].map(function(c) { </span><br>
+        <span>&nbsp;&nbsp;&nbsp; return c.toUpperCase(); </span><br>
+        <span>});</span><br>
+        <span></span><br>
+        <span>[1, 3, 2, 5, 4, 9, 8].filter(function(n) { </span><br>
+        <span>&nbsp;&nbsp;&nbsp; return n &gt; 4 ;</span><br>
+        <span>})</span>;</div>
+      <br>
+      由於內部迭代器被抽象化了，也有了許多最佳化的可行時機。例如對於極大的資料集合可以多執行緒分而治之，也許可設計<span class="courier">parallel</span>方法，在客戶端需要平行處理時，提供具體的語意選擇，針對<span
+        class="courier">parallel傳回的方法進行map、filter</span>等高階迭代處理時，採用分而治之進行處理；另一個例子是實現惰性求值（Lazy Evaluation），例如在極大資料<span
+        class="courier">list上進行list.map(function(ele) {...}).filter(function(ele) {...})時，第一階段並不會對list所有元素進行map處理，而是在filter條件符合時才處理map，如果filter可提前結束，那麼必須map的元素就可大幅減少</span>。<br>
+      <br>
+      採用內部迭代器會使得迭代處理流程抽象化，如果語言具備一級函式，撰寫的程式就會具備簡潔的語意，這也是為何具備一級函式特性的語言中，較常見到內部迭代器的概念，相對而言，不具一級函式特性的語言中，就較常見到外部迭代器的蹤跡。以Java而言，JDK7前的版本僅具備外部迭代器，而隨著JDK8的Lambda新語法導入，新的Collection API也開始見到內部迭代器的實現。<br>
+      <br>
+      <dl>
+        <dt>考量底層細節的封裝程度</dt>
+      </dl>
+      <br>
+      不少開發者是在《Design Patterns》書中接觸到迭代器的概念，然而隨著時空的轉移，迭代器用已不再僅是書中提到用於循序存取容器。有些語言一開始僅提供外部迭代器，有些語言則僅提供內部迭代器，然而在現代語言相互融合優點的情況下，不少語言在改版新增功能時，開始同時提供外部迭代器與內部迭代器，或者是在迭代器的使用加上更高階語意。<br>
+      <br>
+      舉例來說，由於從頭至尾循序存取容器中元素，是多數開發者經常的需求，Java在JDK5之後提供了增強式（Enhanced）<span
+        class="courier">for迴圈語法，雖然外觀上看來是新語法，實則底層是外部迭代器的表現；然而並非具備迴圈外觀的foreach語法就是使用外部迭代器的實現</span>，例如Ruby中的<span
+        class="courier">for..in</span>語法，實際上是內部迭代器<span class="courier">each</span>方法的語法蜜糖（Syntax sugar）；更進一步地，還可提供如Python、Scala、Haskell等語言中List comprehension的語法，讓迭代器語法更接近於數學表達式。<br>
+      <br>
+      回歸到《Design Patterns》書中對迭代器的定義：「...存取聚集物件，但又不曝露底層細節...」，無論是語言提供外部迭代或內部迭代器，或是兩者之間的語法蜜糖封裝，迭代器對客戶端本來就該是抽象的，該採用或提供何種語法的考量點在於對客戶端而言，底層細節該封裝至哪個程度，必要時客戶端亦不需意識到迭代器的存在。<br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Iterator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

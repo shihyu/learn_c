@@ -1,0 +1,506 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkComboBoxGtkTreeStore.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:51 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkComboBox 與 GtkTreeStore</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkComboBox 與 GtkTreeStore</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <a href="GtkComboBoxGtkListStore.html"><small>GtkComboBox 與 GtkListStore</small></a><small>
+中介紹了平坦無階層的選項如何製作，若想要製作有階層的樹狀結構，則要搭配GtkTreeStore來使用，主要的差別在於，GtkTreeStroe具
+有父子節點關係，也因此在加入子節點時，必須指明父節點為誰，加入節點可以使用gtk_tree_store_append()函式，設定節點資料可以使
+用gtk_tree_store_set()函式：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void gtk_tree_store_append(GtkTreeStore *tree_store,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkTreeIter *iter,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkTreeIter *parent);<br>
+
+void gtk_tree_store_set(GtkTreeStore *tree_store,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkTreeIter *iter,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+...);<br>
+
+      </small></div>
+
+      <small><br>
+
+使用gtk_tree_store_append()時若無父節點，則第三個參數設定為NULL，表示這是最上層節點，也因此，您必須有兩個GtkTreeIter，一個指向目前GtkTreeStore中的父節點位置，一個用以指向子節點位置。<br>
+
+      <br>
+
+下面這個程式改寫 </small><a href="GtkComboBoxGtkListStore.html"><small>GtkComboBox 與 GtkListStore</small></a>，<small>使其具有子階層，在GtkComboBox中會以子選單方式呈現，子選單的內容是亂數選取決定的，程式的改寫主要都是在Model的建立部份：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>gtk_combo_box_with_tree_demo.c</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>enum {<br>    PIXBUF_COL,<br>    TEXT_COL<br>};<br><br>GtkTreeModel* createModel() {<br>    const gchar *files[] = {"caterpillar.jpg", "momor.jpg",<br>                            "hamimi.jpg", "bush.jpg"};<br><span style="font-weight: bold;">    gchar *stocks[] = {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        GTK_STOCK_DIALOG_WARNING,</span><br style="font-weight: bold;"><span style="font-weight: bold;">        GTK_STOCK_STOP,</span><br style="font-weight: bold;"><span style="font-weight: bold;">        GTK_STOCK_NEW,</span><br style="font-weight: bold;"><span style="font-weight: bold;">        GTK_STOCK_CLEAR,</span><br style="font-weight: bold;"><span style="font-weight: bold;">        GTK_STOCK_OPEN    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    };</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    gchar *stockNames[] = {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        "WARNING",</span><br style="font-weight: bold;"><span style="font-weight: bold;">        "STOP",</span><br style="font-weight: bold;"><span style="font-weight: bold;">        "NEW",</span><br style="font-weight: bold;"><span style="font-weight: bold;">        "GTK_STOCK_CLEAR",</span><br style="font-weight: bold;"><span style="font-weight: bold;">        "GTK_STOCK_OPEN"</span><br style="font-weight: bold;"><span style="font-weight: bold;">    };</span><br><br><span style="font-weight: bold;">    GtkWidget *cellView;</span><br>    GdkPixbuf *pixbuf;<br><span style="font-weight: bold;">    GtkTreeIter iter1, iter2;</span><br><span style="font-weight: bold;">    GtkTreeStore *store;</span><br><span style="font-weight: bold;">    gint i, j, s;</span><br><br><span style="font-weight: bold;">    store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);</span><br><span style="font-weight: bold;">    cellView = gtk_cell_view_new();</span><br>    for(i = 0; i &lt; 4; i++) {<br>        pixbuf = gdk_pixbuf_new_from_file(files[i], NULL);<br><span style="font-weight: bold;">        gtk_tree_store_append(store, &amp;iter1, NULL);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        gtk_tree_store_set(store, &amp;iter1,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                           PIXBUF_COL, pixbuf,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                           TEXT_COL, files[i],</span><br style="font-weight: bold;"><span style="font-weight: bold;">		           -1);</span><br style="font-weight: bold;">        gdk_pixbuf_unref(pixbuf);<br><br><span style="font-weight: bold;">        for(j = 0; j &lt; 3; j++) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            s = rand() % 5;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            pixbuf = gtk_widget_render_icon(cellView, stocks[s],</span><br style="font-weight: bold;"><span style="font-weight: bold;">					   GTK_ICON_SIZE_BUTTON, NULL);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            gtk_tree_store_append(store, &amp;iter2, &amp;iter1);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            gtk_tree_store_set(store, &amp;iter2, </span><br style="font-weight: bold;"><span style="font-weight: bold;">                               PIXBUF_COL, pixbuf,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                               TEXT_COL, stockNames[s],</span><br style="font-weight: bold;"><span style="font-weight: bold;">                              -1);</span><br style="font-weight: bold;"><span style="font-weight: bold;">             gdk_pixbuf_unref(pixbuf);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br>    }<br><br>    return GTK_TREE_MODEL(store);<br>}<br><br>gboolean combo_changed(GtkComboBox *comboBox, GtkLabel *label) {<br>    GtkTreeModel *model = gtk_combo_box_get_model(comboBox);<br>    GtkTreeIter iter;<br>    gchar *active;<br>    gtk_combo_box_get_active_iter(comboBox, &amp;iter);<br>    gtk_tree_model_get(model, &amp;iter,<br>                       1, &amp;active,<br>                       -1);<br><br>    gtk_label_set_text(label, active);<br>}<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *comboBox;<br>    GtkCellRenderer *renderer;<br>    GtkWidget *label;<br>    GtkWidget *vbox;<br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkComboBox");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 200, 50);<br><br>    comboBox = gtk_combo_box_new_with_model(createModel());<br>    gtk_combo_box_set_active(GTK_COMBO_BOX(comboBox), 0);<br>    renderer = gtk_cell_renderer_pixbuf_new();<br>    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(comboBox), renderer, FALSE);<br>    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(comboBox), renderer,<br>				   "pixbuf", PIXBUF_COL, <br>				   NULL);<br>    renderer = gtk_cell_renderer_text_new();<br>    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(comboBox), renderer, FALSE);<br>    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(comboBox), renderer,<br>				   "text", TEXT_COL,<br>				   NULL);    <br><br>    label = gtk_label_new("caterpillar.jpg");<br>    vbox = gtk_vbox_new(TRUE, 5);<br><br>    gtk_box_pack_start(GTK_BOX(vbox), comboBox, TRUE, TRUE, 5);<br>    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 5);<br>    gtk_container_add(GTK_CONTAINER(window), vbox);<br><br>    g_signal_connect(GTK_OBJECT(comboBox), "changed",<br>                     G_CALLBACK(combo_changed), label);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+      <small><br>
+
+一個執行的結果如下所示：<br>
+
+      <br>
+
+      <img style="width: 546px; height: 295px;" alt="" src="images/GtkComboBoxGtkTreeStore-1.jpg"><br>
+
+      <br>
+
+      </small><small></small>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"> <br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkComboBoxGtkTreeStore.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:53 GMT -->
+</html>

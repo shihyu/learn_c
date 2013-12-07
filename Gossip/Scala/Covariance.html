@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/Covariance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>共變性（Covariance）</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 共變性（Covariance）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你定義了以下的類別：<br></small><pre>class Node[T](val value: T, val next: Node[T])</pre><small><br>如果在以下的例子中：<br></small><pre>class Fruit<br>class Apple extends Fruit {<br>    override def toString = "Apple"<br>}<br>class Banana extends Fruit {<br>    override def toString = "Banana"<br>}<br><br>val apple = new Node(new Apple, null)<br>val fruit: Node[Fruit] = apple    // 編譯錯誤，type mismatch</pre><small><br></small><small>在
+範例中，apple的型態是Node[Apple]，而fruit的型態為Node[Fruit]，你將apple所參考的物件給fruit參考，那麼Node[Apple]該是一種Node[Fruit]呢？在上例中編譯器給你的答案為「不是」！<br><br><span style="font-weight: bold;">如
+果B是A的子型態，而Node[B]被視為一種Node[A]型態，則稱Node具有共變性（Covariance）或有彈性的（flexible）。如
+果Node[A]被視為一種Node[B]型態，則稱Node具有逆變性（Contravariance）。如果不具共變性或逆變性，則Node是不可變
+的（nonvariant）或嚴謹的（rigid）。</span><br></small><small><br><span style="font-weight: bold;">如果要讓型態參數具有共變性，則在定義型態參數時，可以加上+標註。</span>例如：<br></small><pre>class Node[<span style="font-weight: bold;">+T</span>](val value: T, val next: Node[T])<br>class Fruit<br>class Apple extends Fruit {<br>    override def toString = "Apple"<br>}<br>class Banana extends Fruit {<br>    override def toString = "Banana"<br>}<br><br>val apple = new Node(new Apple, null)<br>val fruit: Node[Fruit] = apple    // 編譯通過</pre><small><br>何時讓型態參數具有共變性？假設你設計了以下的函式：<br></small><pre>def show(n: Node[Fruit]) {<br>    var node: Node[Fruit] = n<br>    do {<br>        println(node.value)<br>        node = node.next<br>    } while(node != null)<br>}<br><br>val apple1 = new Node(new Apple, null)<br>val apple2 = new Node(new Apple, apple1)<br>val apple3 = new Node(new Apple, apple2)<br><br>val banana1 = new Node(new Banana, null)<br>val banana2 = new Node(new Banana, banana1)<br><br>show(apple3)<br>show(banana2)</pre><small><br>你的目的是可以顯示所有的水果節點，如果上面的Node類別設計時不具共變性，則這個函式無法運作，如果Node類別設計時具有共變性，則這個函式就可以顯示Node[Apple]也可以顯示Node[Banana]。<br><br><span style="font-weight: bold;">注意！一旦你將型態參數標註為協變，就不可以用它來宣告方法的參數型態。</span>例如：<br></small><pre>class Node[+T](val value: T, val next: Node[T]) {<br>    def replace(value: T) = new Node[T](value, next) // 編譯錯誤<br>}</pre><small><br>假設上例可以通過編譯好了，那麼以下的程式碼就會不合理：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">val apple1 = new Node(new Apple, null)</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">val apple2 = new Node(new Apple, apple1)</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">val fruit1: Node[Fruit] = apple2</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">val fruit2 = fruit1.replace(new Banana)&nbsp;</small><br></div><small><br>fruit1所參考的實際上就是apple2的實例，而apple2所參考的是Node參數化為Apple後的物件，其實相當於以下的實例：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Node[Apple](val value: Apple, val next: Node[Apple]) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def replace(value: Apple) = new Node[Apple](value, next)&nbsp;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>所以你透過fruit1操作replace()方法時，相當於要將Banana實例給型態為Apple的value參考，這顯然是不合理！<br><br>如果你的目的是，是要在蘋果節點前放上香蕉節點，則方式是在定義方法時，另外提供型態參數，例如：<br></small><pre>class Node[+T](val value: T, val next: Node[T]) {<br>    def replace<span style="font-weight: bold;">[U &gt;: T]</span>(value: <span style="font-weight: bold;">U</span>) = new Node[<span style="font-weight: bold;">U</span>](value, next)<br>}<br><br>val apple1 = new Node(new Apple, null)<br>val apple2 = new Node(new Apple, apple1)<br>val fruit1: Node[Fruit] = apple2<br>val fruit2 = fruit1.replace<span style="font-weight: bold;">[Fruit]</span>(new Banana)<br>println(fruit2.value)       // Banana<br>println(fruit2.next.value)  // Apple</pre><small><br>上面的範例可以通過編譯，因為</small><small>fruit1所參考的實際上就是apple2的實例，而apple2所參考的是Node參數化為Apple後的物件，其實相當於以下的實例：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Node[Apple](val value: Apple, val next: Node[Apple]) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def replace[U &gt;: Apple](value: U) = new Node[U](value, next)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>所
+以範例中使用replace()時，其實是另又作了一次型態參數化，結果是建立了Node[Fruit]實例，Banana可以給Node[Fruit]
+實例的value參考（因為是Fruit型態）沒有問題（事實上，Apple的父類別只有Fruit，所以範例中repace()方法前的[Fruit]
+可以使用類型推斷方法省略）。<br><br><span style="font-weight: bold;">注意！如果型態參數支援共變性，則也不可以用型態參數宣告var成員。</span>例如：<br></small><pre>class Node[+T] {<br>    var value: T = _   // 編譯錯誤<br>}</pre><small><br>在 </small><small><big><a href="AccessorModifier.html"><small>屬性存取方法</small></a></big> 說過，一個var成員，事實上會是一對存取方法，也就是說，上例相當於以上的宣告：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Node[+T] {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; private[this] var v: T = _</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def value: T = v</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def value_=(v: T) { this.v = v }&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold;"></div><small><br>也就是說，var成員會產生一個設值方法，使用型態參數宣告傳入的參數型態，所以其實是上述原則「</small><small><span style="font-weight: bold;">將型態參數標註為協變，就不可以用它來宣告方法的參數型態</span></small><small>」的一個特例。<br><br><br></small><small></small></td></tr></tbody></table><br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/Covariance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

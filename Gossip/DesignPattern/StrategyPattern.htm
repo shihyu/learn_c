@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/StrategyPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:31 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Strategy 模式</title></head>
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Strategy 模式</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>觀察伺服器接受連線與處理服務的行為：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServerSocket server = new ServerSocket(port);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Socket client = server.accept();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">InputStream input = client.getInputStream();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">OutputStream output = client.getOutputStream();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">client.close();</span></small><br></div><small><br>伺服器撰寫時，會進行ServerSocket的建立、呼叫accept()傾聽連線、取得客戶端Socket等基本動作，真正不同的部份是連線之後的服務流程，如果</small><small>您想要設計一個通用的伺服器框架，可以將連線之後真正的服務流程獨立出來，封裝為服務物件，例如：<br></small><pre>import java.io.*;<br>import java.net.*;<br><br>interface Service {<br>    void doService(Socket client) throws IOException;<br>}<br><br>class Server {<br>    private ServerSocket server;<br>    private Service service;<br>    <br>    Server(int port, Service service) throws IOException {<br>        this.server = new ServerSocket(port);<br>        this.service = service;<br>    }<br>    <br>    void start() throws IOException {<br>        while(true) {<br>            Socket client = server.accept();<br>            service.doService(client);<br>        }<br>    }<br>}</pre><small><br>假設您要設計一個Echo服務器，則可以實作Service介面，例如：<br></small><pre>import java.io.*;<br>import java.net.*;<br><br>class EchoService implements Service {<br>    public void doService(Socket client) throws IOException {<br>        BufferedReader reader = null;<br>        PrintStream writer = null;<br>        try {<br>            reader = new BufferedReader(<br>                         new InputStreamReader(client.getInputStream()));<br>            writer = new PrintStream(client.getOutputStream());<br>            String input = reader.readLine();<br>            writer.println(input);<br>        }<br>        finally {<br>            client.close();<br>        }<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) throws Exception {<br>        Server server = new Server(9999, new EchoService());<br>        server.start();<br>    }<br>}</pre><small><br>依您的服務策略不同，您可以實作不同的Service物件，只要抽換掉服務物件，就可以有不同的服務策略，這是Strategy模式的一種實現：<br><img style="width: 528px; height: 174px;" alt="" src="images/Strategy-1.jpg"><br><br></small><small><span style="font-weight: bold;">Strategy模式著重在服務細節或演算流程的封裝，將服務與演算法封裝為一個個的Strategy物件，讓使用服務或演算法的客戶端可以依需求抽換服務或演算法，而不用關心服務或演算法的實作方式。</span>以上面的範例來說，實際連線之後所提供的服務，Server並不用知曉，Service也許如範例實作為簡單的Echo服務，也許實作為代理伺服器服務，或是更複雜具有多執緒池的多人連線通用服務。<br><br>以更一般的方式來顯示Strategy的結構：<br><img style="width: 563px; height: 171px;" alt="" src="images/Strategy-2.jpg"><br><br></small><small>Context
+是Strategy物件的客戶端，本身可能有些既定的流程，但在某些地方希望可以彈性的抽換Strategy物件，從使用Context的角度來看，不同
+的Strategy物件可能會影響Context的具體功能（如以上的範例），也有可能只是內部演算法不同，但不影響Context的行為（例如也許只是
+將氣泡排序改為快速排序）。<br><br></small><small>Python的socketserver模組在TCPServer與Handler設計上，亦採用了Strategy模式，</small><small>如果以Python來實現這個範例的話，如下所示：<br></small><pre>import socketserver<br><br>class EchoHandler(socketserver.StreamRequestHandler):<br>    def handle(self):<br>        self.data = self.rfile.readline().strip()<br>        self.wfile.write(self.data)<br><br>server = socketserver.TCPServer(("localhost", 9999), EchoHandler)<br>server.serve_forever()</pre><small><br>在Java SE中Strategy的實例是視窗程式中Container與LayoutManager的關係，Container對其所包納的元件該如何排列，是依所給定的LayoutManager而定（例如BorderLayout、FlowLayout）。<br>
+
+
+
+      <br>
+
+
+
+      </small>
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/StrategyPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:34 GMT -->
+</html>

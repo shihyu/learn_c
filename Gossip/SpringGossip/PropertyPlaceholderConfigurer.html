@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/PropertyPlaceholderConfigurer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>PropertyPlaceholderConfigurer</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: PropertyPlaceholderConfigurer</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; text-align: center; width: 302px;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script></td>
+
+      <td style="vertical-align: top; text-align: left; width: 638px;">
+      <small>
+
+
+
+
+
+
+Spring的框架中為您提供了一個 <a href="BeanFactoryPostProcessor.html">BeanFactoryPostProcessor</a>
+的實作類別：
+org.springframework.beans.factory.config.PropertyPlaceholderConfigurer。藉
+由這個類別，您可以將一些組態設定，移出至.properties檔案中，如此的安排可以讓XML定義檔負責系統相關設定，而.properties檔可
+以作為客戶根據需求，自定義一些相關的參數。<br>
+      <br>
+
+
+
+來看一個Bean定義檔的實際例子：</small>
+
+
+      <br>
+
+
+
+
+
+
+
+      <ul>
+        <li>beans-config.xml</li>
+      </ul>
+
+
+
+
+
+
+
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br><span style="font-weight: bold;">    &lt;bean id="configBean" <br> class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;property name="location"&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;value&gt;hello.properties&lt;/value&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;/property&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/bean&gt; </span><br><br>    &lt;bean id="helloBean" class="onlyfun.caterpillar.HelloBean"&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;<span style="font-weight: bold;">${onlyfun.caterpillar.helloWord}</span>&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+
+
+
+
+
+
+
+      <br>
+      <small>
+
+
+假設在helloBean中有許多依賴注入的屬性，這些都是比較不常變動的屬性，而其中helloWord會經常變動，可以透過hello.properties來簡單的設定，而這個資訊已設定在configBean的location屬性中： </small><br>
+
+
+
+      <ul>
+        <li>hello.properties</li>
+      </ul>
+
+
+
+      <pre>onlyfun.caterpillar.helloWord=Welcome!</pre>
+
+
+
+
+
+
+
+      <span class="postbody"></span><br>
+      <small>
+
+
+在helloBean的helloWord屬性中，${onlyfun.caterpillar.helloWord}將會被hello.properties的helloWord所取代。<br>
+      <br>
+
+
+
+如果有多個.properties檔案，則可以透過locations屬性來設定，例如：</small>
+
+
+      <br>
+
+
+
+      <ul>
+        <li>beans-config.xml</li>
+      </ul>
+
+
+
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br><span style="font-weight: bold;">    &lt;bean id="configBean" <br>  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"&gt; <br style="font-weight: bold;"></span><span style="font-weight: bold;">        &lt;property name="locations"&gt; </span><br><span style="font-weight: bold;">            &lt;list&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                &lt;value&gt;hello.properties&lt;/value&gt; <br></span><span style="font-weight: bold;">                &lt;value&gt;welcome.properties&lt;/value&gt; <br></span><span style="font-weight: bold;">                &lt;value&gt;other.properties&lt;/value&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">    <br></span><span style="font-weight: bold;">            &lt;/list&gt;</span><br><span style="font-weight: bold;">        &lt;/property&gt; </span><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/bean&gt; </span><br><br>    &lt;bean id="helloBean" class="onlyfun.caterpillar.HelloBean"&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;<span style="font-weight: bold;">${onlyfun.caterpillar.helloWord}</span>&lt;/value&gt; <br>        &lt;/property&gt; <br>        ...<br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+
+      </td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/PropertyPlaceholderConfigurer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

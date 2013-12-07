@@ -1,0 +1,1058 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/Scope.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>變數、函式可視範圍（static 與 extern）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">C&nbsp;Gossip: 變數、函式可視範圍（static 與 extern）</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+在C中，談到可視範圍（scope）可分為許多層次，也可以談到很複雜，在這邊先談談「全域變數」（Global
+variable）、「區域變數」（Local variable）與「區塊變數」（Block variable）。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+全域變數是指直接宣告在（主）函式之外的變數，這個變數在整個程式之中都「看」得它的存在，而可以呼叫使用，例如：<br>
+
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">const
+double PI =
+3.14159; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">doule
+area(double
+r) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp;
+return r * r * PI; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+main(void) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; //
+..... </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp;
+return 0; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}
+      </span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+在這個例子中，PI這個變數可以被主函式main()與副函式area()來使用，通常全域變數是用來定義一些常數，初學者不應為了方便而將所有的變數都
+設定為全域變數，否則將來一定會發生變數名稱管理上的問題，全域變數的生命週期始於程式開始之時，終止於程式結束之時。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+區域變數是指宣告在函式之內的變數，或是宣告在參數列之前的變數，它的可視範圍只在宣告它的函式區塊之中，其它的函式不可以使用該變數，例如在上例的主函
+式中，您不可以直接對area()函式中的變數r作出存取的動作，區域變數的生命週期開始於函式被呼叫之後，終止於函式執行完畢之時。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+區塊變數是指宣告在某個陳述區塊之中的變數，例如while迴圈區塊中，或是for迴圈區塊，例如下面的變數i在迴圈結束之後，就會自動消失： </small>
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">while(...) {<br>
+
+
+
+&nbsp; &nbsp; int i = 0;<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      </span>
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; //
+....<br>
+
+
+
+}<br>
+
+
+
+      </span>
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+當一可視範圍大的變數與可視範圍小的變數發生同名狀況時，可視範圍小的變數會暫時覆蓋可視範圍大的變數，稱之為「變數覆蓋」，例如： <br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int num = 10;<br>
+
+
+
+int i;<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      </span>
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">for(i = 0; i
+&lt; 100; i++) &nbsp;{<br>
+
+
+
+&nbsp;&nbsp; &nbsp;int num = 20;<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      </span>
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; //
+...</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">printf("%d", num);</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+這個程式最後顯示的 num 值仍是10，當執行迴圈時，迴圈內的 num 變數作用將覆蓋迴圈外的 num
+變數；同樣的作用發生於全域變數與區域變數發生同名的時候。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+再來介紹static變數，當變數有宣告時加上static限定時，一但變數生成，它就會一直存在記憶體之中，即使函式執行完畢，變數也不會消失，例如：
+      <br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>void count(void);<br><br>int main(void) {<br>    int i;<br>    for(i = 0; i &lt; 10; i++) {<br>        count();     <br>    }<br><br>    return 0;<br>}<br><br>void count(void) { <br>    static int c = 1; <br>    printf("%d\n", c); <br>    c++; <br>}</pre>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span><small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">1<br>
+
+
+
+
+
+
+2<br>
+
+
+
+
+
+
+3<br>
+
+
+
+
+
+
+4<br>
+
+
+
+
+
+
+5<br>
+
+
+
+
+
+
+6<br>
+
+
+
+
+
+
+7<br>
+
+
+
+
+
+
+8<br>
+
+
+
+
+
+
+9<br>
+
+
+
+
+
+
+10</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>
+雖然變數c是在count()函式中宣告的，但是函式結束後，變數仍然存在，它會直到程式執行結束時才消失，雖然變數一直存在，但由於它是被宣告在函式之
+中，所以函式之外仍無法存取static變數。 <br>
+
+
+
+
+
+      <br>
+
+您可以宣告全域static變數，其在程式執行期間一直存在，但在一個原始程式文件中宣告全域static變數，還表示其可以存取的範圍僅限於該原始程式文件之中，您也可以將函式宣告為static：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">static void some() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+
+      </div>
+
+      <small><br>
+
+      </small><small>一個static函式表示，其可以呼叫的範圍限於該原始碼文件之中，如果您有一些函式僅想在該原始程式文件之中使用，則可以宣告為static，這也可以避免與其他人寫的函式名稱衝突的問題。<br>
+
+      <br>
+
+      </small><small>
+
+
+
+
+extern可以聲明變數會在其它的位置被定義，這個位置可能是在同一份文件之中，或是在其它文件之中，例如：</small>
+      <br>
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li>some.c</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>double someVar = 1000;<br>// 其它定義 ...</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span>
+      
+      
+      
+      <ul>
+
+
+
+        <li>main.c</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    extern double someVar;<br>    <br>    printf("%f\n", someVar);<br>    <br>    return 0;<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+在main.c中實際上並沒有宣告someVar，extern指出someVar是在其它位置被定義，編譯器會試圖在其它位置或文件中找出
+someVar的定義，結果在some.c中找到，因而會顯示結果為1000，要注意的是，extern聲明someVar在其它位置被定義，如果您
+在使用extern時同時指定其值，則視為在該位置定義變數，結果就引發重覆定義錯誤，例如：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">#include &lt;stdio.h&gt;<br>
+
+
+
+      <br>
+
+
+
+int main(void) {<br>
+
+
+
+&nbsp;&nbsp;&nbsp; extern double someVar = 100; </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">// error, `someVar' has both `extern' and
+initializer </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; <br>
+
+
+
+&nbsp;&nbsp; &nbsp;...<br>
+
+
+
+&nbsp;&nbsp;&nbsp; return 0;<br>
+
+
+
+}</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+您必須先聲明extern找到變數，再重新指定其值，這麼使用才是正確的：<br>
+
+
+
+
+
+      </small>
+      
+      <small></small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">#include &lt;stdio.h&gt;</span></small><br>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><br>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int main(void) {</span></small><br>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; extern double someVar;<br>
+
+
+
+&nbsp; &nbsp; </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">someVar = 100;</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+      </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; &nbsp;...</span></small><br>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; return 0;</span></small><br>
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+
+
+
+      </div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+       <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/Scope.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+</html>

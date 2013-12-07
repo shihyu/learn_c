@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Layout.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>版型（Layout）</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror layout" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 版型（Layout）<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">樣版是回應中動態的部份，版型是回應中共用的靜態內容。Rails的預設的回應樣版，是位於app/views/layouts資料夾下的application.html.erb，例如用 <a
+        href="RESTful.html">RESTful 與 Rails</a> 中的範例來說：
+      <ul>
+        <li>application.html.erb</li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Bookmark&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;<br></pre>
+      <p>其中<span class="courier">&lt;%= yield %&gt;</span>的部份，就是各個樣版檔案的部份，以上版型中<span
+          class="courier">stylesheet_link_tag</span>輔助方法的呼叫方式，預設會產生以下內容：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;link href="/assets/application.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;<br>
+          &lt;link href="/assets/bookmarks.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;</strong></p>
+      <p>如果你有其它樣式表，可以如下自行加入：</p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">&lt;%= stylesheet_link_tag "main1" %&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&lt;%= stylesheet_link_tag "print/main2" %&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&lt;%= stylesheet_link_tag "/print/main3" %&gt;</span><br>
+      </p>
+      <p>這會產生以下的內容：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">&lt;link href="/assets/main1.css" media="screen" rel="stylesheet" type="text/css" /&gt;<br>
+        &lt;link href="/assets/print/main2.css" media="screen" rel="stylesheet" type="text/css" /&gt;<br>
+        &lt;link href="/print/main3.css" media="screen" rel="stylesheet" type="text/css" /&gt;</p>
+      <p><span class="courier">stylesheet_link_tag</span>指定相對路徑時，產生的路徑會以/assets開始，以範例前兩個路徑來說，可以在public資料夾下擺放assets/main1.css與assets/print/main2.css，如果<span
+          class="courier">stylesheet_link_tag</span>指定絕對路徑，產生的路徑就以你指定的為主，以範例最後一個路徑來說，可以在public資料夾下擺放print/main3.css。public資料夾是Rails應用程式中，可以使用HTTP方法直接取得資源的地方，簡單地說，public資料夾可作為文件根目錄。</p>
+      <p>（實際上，預設還可以將圖片、JavaScript檔案、CSS檔案擺放在app/assets、lib/assets或vender/assets三個資料夾下對應的images、javascripts與stylesheets資料夾中，這會進行一些額外處理動作，<a
+          href="Assets.html">資產（Assets）</a> 中會再說明）。</p>
+      <p><span class="courier">以上版型中javascript_include_tag</span>的呼叫方式，預設會產生以下內容：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">&lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;<br>
+        &lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;<br>
+        &lt;script src="/assets/bookmarks.js?body=1" type="text/javascript"&gt;&lt;/script&gt;<br>
+        &lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;</p>
+      <p>類似地，如果你有一些JavaScript檔案要載入，可以如下自行加入：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">&lt;%= javascript_include_tag "test1" %&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&lt;%= javascript_include_tag "print/test2" %&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&lt;%= javascript_include_tag "/print/test3" %&gt;</span><br>
+      </p>
+      <p>產生的內容是：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">&lt;script src="/assets/test1.js" type="text/javascript"&gt;&lt;/script&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&lt;script src="/assets/print/test2.js" type="text/javascript"&gt;&lt;/script&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&lt;script src="/print/test3.js" type="text/javascript"&gt;&lt;/script&gt;</span><br>
+      </p>
+      <p>可擺放.js的位置，可參考方才對的<span class="courier">stylesheet_link_tag</span>說明。<br>
+      </p>
+      <p><span class="courier">csrf_meta_tags</span>的原始碼是：</p>
+      <p class="courier" style="margin-left: 40px;"><strong># File actionpack/lib/action_view/helpers/csrf_helper.rb, line 19<br>
+          def csrf_meta_tags<br>
+          &nbsp; if protect_against_forgery?<br>
+          &nbsp;&nbsp;&nbsp; [<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag('meta', :name =&gt; 'csrf-param', :content =&gt; request_forgery_protection_token),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag('meta', :name =&gt; 'csrf-token', :content =&gt; form_authenticity_token)<br>
+          &nbsp;&nbsp;&nbsp; ].join("\n").html_safe<br>
+          &nbsp; end<br>
+          end</strong><br>
+      </p>
+      <p>也就是若頁面有防範跨站請求攻擊，預設會產生以下內容：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">&lt;meta content="authenticity_token" name="csrf-param" /&gt;<br>
+        &lt;meta content="qy/SsxqyQVDKSTjE2dWIeBjZa5eYXmZpq3G1cxGVYq4=" name="csrf-token" /&gt;</p>
+      <p>當使用JavaScript發送請求，若為非GET資料，會讀取這段meta，<span class="courier">將csrf-param與csrf-token的content分別作為請求參數名稱與值發送，以link_to輔助方法為例</span>，在按下其產生的鏈結時，會執行jquery_ujs.js中的程式碼，動態建立表單並發送：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&nbsp;&nbsp;&nbsp; // Handles "data-method" on links such as:<br>
+          &nbsp;&nbsp;&nbsp; // &lt;a href="/users/5" data-method="delete" rel="nofollow" data-confirm="Are you sure?"&gt;Delete&lt;/a&gt;<br>
+          &nbsp;&nbsp;&nbsp; handleMethod: function(link) {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var href = link.attr('href'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method = link.data('method'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; target = link.attr('target'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; csrf_token = $('meta[name=csrf-token]').attr('content'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; csrf_param = $('meta[name=csrf-param]').attr('content'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; form = $('&lt;form method="post" action="' + href + '"&gt;&lt;/form&gt;'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; metadata_input = '&lt;input name="_method" value="' + method + '" type="hidden" /&gt;';<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (csrf_param !== undefined &amp;&amp; csrf_token !== undefined) {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; metadata_input += '&lt;input name="' + csrf_param + '" value="' + csrf_token + '" type="hidden" /&gt;';<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (target) { form.attr('target', target); }<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; form.hide().append(metadata_input).appendTo('body');<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; form.submit();<br>
+          &nbsp;&nbsp;&nbsp; },</strong><br>
+      </p>
+      application.html.erb是預設的版型檔案，如果在app/views/layouts下有個與控制器相同名稱的.html.erb，則該控制器預設會使用它，例如若app/views/layouts下有個bookmarks.html.erb，則控制器bookmarks會使用它作個版型檔案。
+      <p>也可以在控制器中指定想使用的版型檔案。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>class BookmarksController &lt; ApplicationController<br>
+          &nbsp;&nbsp;&nbsp; layout "test"<br>
+          end</strong><br>
+      </p>
+      <p>如上指定之後，<span class="courier">BookmarksController</span>的畫面呈現，預設會使用app/views/layouts下的test.html.erb作為版型。可以指定方法傳回的字串值，動態決定使用哪個版型。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>class BookmarksController &lt; ApplicationController<br>
+          &nbsp;&nbsp;&nbsp; layout :random_layout<br>
+          <br>
+          &nbsp;&nbsp;&nbsp; private<br>
+          &nbsp;&nbsp;&nbsp; def random_layout<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ["layout1", "layout2", "layout3"][rand(3)]<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          end</strong><br>
+      </p>
+      <p></p>
+      可以使用<span class="courier">:only指定特定動作套用版型，或是使用:except指定特定動作不套用版型，例如若只有index</span>動作要套用test.html.erb版型，可以如下：
+      <p style="margin-left: 40px;"> <strong class="courier">class BookmarksController &lt; ApplicationController<br>
+          &nbsp;&nbsp;&nbsp; layout "test", :only =&gt; :index<br>
+          end</strong></p>
+      <p></p>
+      若<span class="courier">show、delete</span>不套用test.html.erb版型，可如下指定：<br>
+      <br>
+      <div style="margin-left: 40px;"><strong class="courier">class BookmarksController &lt; ApplicationController</strong><br>
+        <strong class="courier"> &nbsp;&nbsp;&nbsp; layout "test", :except =&gt; [:show, :delete]</strong><br>
+        <strong class="courier"> end</strong><br>
+      </div>
+      <p></p>
+      <p><span class="courier">在動作中使用render方法時，也可以使用:layout指定接下來呈現要使用哪個版型：</span><br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><strong>def new<br>
+          &nbsp;&nbsp;&nbsp; ....<br>
+          &nbsp;&nbsp;&nbsp; render :layout =&gt; "layout1"<br>
+          end</strong></p>
+      <p></p>
+      <p class="courier">如果不想使用版型，則可以指定<span>render :layout =&gt; false</span>。<br>
+      </p>
+      <p>在版型中使用<span class="courier">yield</span>時，可以指定使用樣版中哪個部份的內容。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;hr&gt;<br>
+          &lt;div id="navigation"&gt;<br>
+          &nbsp;&nbsp;&nbsp; &lt;%= yield :navigation %&gt;<br>
+          &lt;/div&gt;<br>
+          &lt;hr&gt;<br>
+          &lt;%= yield %&gt;</strong><br>
+      </p>
+      如此在樣版檔案中任意位置，可以使用<span class="courier">content_for指定yield :navigation</span>要呈現的內容：
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;%= content_for :navigation do %&gt;<br>
+          &nbsp;&nbsp;&nbsp; your navigation content .....<br>
+          &lt;% end %&gt;</strong></p>
+      <span class="courier">在樣版中使用render時，若用:partial指定局部樣版時，也可以使用:layout指定該局部樣版要套用的局部版型。例如</span>：
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;%= render :partial =&gt; "navi", :layout =&gt; "bar" %&gt;</strong></p>
+      <p>如上指定，會使用_navi.html.erb作為局部樣版，並使用_bar.html.erb作為局部樣版的局部版型。</p>
+      <p>更多樣版與版型的內容，可以參考 <a href="http://guides.rubyonrails.org/layouts_and_rendering.html">Layouts and Rendering in Rails</a>。<br>
+      </p>
+      <p><br>
+      </p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Layout.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+</html>

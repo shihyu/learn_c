@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/IteratorPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:28 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Iterator 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern: Iterator 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+     <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>在設計程式的過程中，經常有的需求之一，就是希望逐一取得某物件內部的所有資料（或物件），像是取得ArrayList中所有
+的資料，或取得HashSet中所有的資料。<br>
+      <br>
+例如，您也許會希望設計一個foreach方法，可以將丟給它的物件中的資料逐一取得並顯示在主控台中：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">List&lt;String&gt; list = new
+ArrayList&lt;String&gt;();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">foreach(list);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Set&lt;String&gt; set = new
+HashSet&lt;String&gt;();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">foreach(set);</small><br>
+      </div>
+      <small><br>
+      </small><small>因為List是有序結構並有索引特性，而Set則為無序不重複的特性，兩者所提供的公開存取方法也不相同，</small><small>如
+何將foreach方法設計的通用是個問題。<br>
+      <br>
+無
+論是List或Set，都有個iterator()方法可以傳回一個Iterator物件，這個物件會收集List或Set物件內部資料，並有
+hasNext()、next()方法可以使用，而實際上，這個方法是繼承自Collection介面（List與Set的父介面），您可以這麼設計
+foreach方法：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public static void
+foreach(Collection&lt;String&gt; collection) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; Iterator&lt;String&gt;
+iterator = collection.iterator();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; while(iterator.hasNext()) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp;
+System.out.println(iterator.next());</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+現在，無論是List或Set，無論真正的實作是ArrayList、LinkedList、HashSet...，都可以使用這個foreach方法來
+顯示內部所收集的物件。<br>
+      <br>
+這
+是Iterator模式的實現，不同的物件內部在組織資料方式並不相同（陣列？鏈結？雜湊？），所提供的公開存取介面也不一樣，為了有一致的方式來逐一取
+得物件內部的資料，您可以讓一個Iterator於物件內部進行收集，之後傳回Iterator物件，透過該Iterator來逐一取得物件內部資料。<br>
+      <br>
+以Java
+的Collection API設計來說，在JDK
+1.4時，iterator()方法是定義在Collection介面上，每個Collection的實現類別，都會有iterator()方法，在
+JDK5之後，則將iterator()方法定義在Iterable介面上，而Collection介面則繼承了Iterable介面：<br>
+      <img style="width: 591px; height: 382px;" alt="" src="images/Iterator-1.jpg"><br>
+      <br>
+由於物件在實作內部資料的組織時方式不盡相同，因此也只有物件本身才知道如何收集內部資料，因此Iterator的實作，通常會是物件的內部類別，外界無
+需關心，只要知道如何操作Iterator即可。<br>
+      <img style="width: 460px; height: 451px;" alt="" src="images/Iterator-2.jpg"><br>
+      <br>
+      </small><small>由於Iterable介面在JDK5後引進，使得只要是實作Iterable介面的物件，皆可搭配
+foreach語法來使用。例如：</small>
+      <pre>import java.util.Iterator;<br><br>class IterableString implements Iterable&lt;Character&gt; {<br>    private String original;<br><br>    public IterableString(String original) {<br>        this.original = original;<br>    }<br><br>    public Iterator&lt;Character&gt; iterator() {<br>        return new InnerIterator();<br>    }<br>	<br>    private class InnerIterator implements Iterator&lt;Character&gt; {<br>        private int index;<br>        public boolean hasNext() {<br>            return index &lt; original.length();<br>        }<br><br>        public Character next() {<br>            Character c = original.charAt(index);<br>            index++;<br>            return c;<br>        }<br><br>        public void remove() {}<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        foreach(new IterableString("Justin"));<br>    }<br>    public static void foreach(Iterable&lt;Character&gt; iterable) {<br>        Iterator&lt;Character&gt; iterator = iterable.iterator();<br>        while(iterator.hasNext()) {<br>            System.out.println(iterator.next());<br>        }      <br>    }<br>}</pre>
+      <br>
+      <small>以上其實只是為了示範才又寫了一次foreach方法的實現，事實上，JDK5之後引入了foreach語法的支援，您可以直
+接這麼撰寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">for(Character
+c : new IterableString("Justin")) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+System.out.println(c);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+      </div>
+      <br>
+      <small>Python
+在Iterator模式的實現方式，若要結合語法特性，則可透過類別上__iter__與__next__方法的定義。Python的foreach語法
+會利用類別上的__iter__方法取得Iterator物件，而後利用所取得的Iterator物件之__next__方法來逐一取得資料，例如：<br>
+      </small>
+      <pre>class NumberGenerator:<br>    class Iterator:<br>        def __init__(self, length):<br>            self.length = length<br>            self.number = -1<br>        def __next__(self):<br>            self.number = self.number + 1<br>            if self.number == self.length:<br>                raise StopIteration<br>            return self.number<br>    <br>    def __init__(self, length):<br>        self.length = length<br><br>    def __iter__(self):<br>        return NumberGenerator.Iterator(self.length)<br><br>for n in NumberGenerator(10):<br>    print(n)</pre>
+      <small><br>
+      <br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/IteratorPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:28 GMT -->
+</html>

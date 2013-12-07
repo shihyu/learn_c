@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Exception.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>Shit Happens！該抓還是該丟？</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: Shit Happens！該抓還是該丟？<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=75863">Shit Happens！該抓還是該丟？</a><br>
+      <br>
+      現代程式語言多內建例外處理（Exception handling）機制，目的在讓程式的錯誤發生時可以有更正式的處理方式。例外處理有如公園中跑步，跑步中踏到狗屎會迫使你停下來處理，而不僅是咒罵一聲「Shit Happens！」後繼續前進。<br>
+      <br>
+      <dl>
+        <dt>例外強制程式離開當時執行流程</dt>
+      </dl>
+      <br>
+      以C為例，函式執行失敗時的處理方式之一，是傳回錯誤代碼來表示某個錯誤，開發者必須檢查函式傳回值以判斷錯誤是否發生，然而此方式沒有任何強制性，開發者可能有意或無意地忽略了檢查，程式因而持續往下一步運行而進入錯誤流程，就算開發者忠實地檢查錯誤代碼，也會導致商務處理流程中夾雜著錯誤處理邏輯，使得程式碼充滿混亂。<br>
+      <br>
+      在內建例外處理機制的語言中（以下示範以Java為例），錯誤發生時會丟出（<span class="courier">throw</span>）例外，在沒有處理的情況下程式將被迫停止，方法呼叫者必然知道某些錯誤發生。被呼叫的方法中丟出例外，代表著方法撰寫時沒有足夠的前後文（Context）資訊決定錯誤如何處理，因而將錯誤相關資訊包裝為例外後丟出，由呼叫方法的更高層客戶端來決定。舉例來說，若要撰寫存取檔案的方法，如果指定的檔案不存在，直接於標準輸出顯示錯誤訊息，也許並不是個適當決定，因為該方法可能用於各種環境，因為檔案不存在時如何處理的資訊不足，不應勉強處理錯誤，而應丟出例外，讓方法客戶端去作決策。<br>
+      <br>
+      <span class="courier">如果呼叫某方法時丟出了例外，而呼叫者有相關資訊可以處理例外，則可將該方法置於try區塊中執行，並在catch區塊針對例外加以處理，這使得try區塊中可針對商務邏輯撰寫，而catch中針對錯誤處理撰寫。以先前檔案存取方法為例，如果呼叫的客戶端是個圖形介面，try中可以撰寫讀取檔案、進行格式處理而後顯示在編輯區的流程，至於檔案不存在的例外處理，可撰寫在catch區塊中，像是抽取例外中的訊息以顯示錯誤訊息方塊、清除相關資源或在日誌中加以記錄等。</span><br>
+      <br>
+      <span class="courier">在例外獲得適當處理的情況下，程式可以回復正常流程。以上例來說，檔案不存在執行完catch區塊後，方法如常返回（return），方法的呼叫端因而可繼續正常流程；另一種情況是，呼叫方法時的前後文資訊僅能處理部份錯誤，此時應在catch中針對擁有的資訊作部份處理，無法處理部份的相關資訊可從例外中抽取出來，建立新的例外重新丟出，或是基於錯誤訊息完整性將原例外直接丟出，讓之後擁有更多資訊的客戶端，有機會再針對未完部份進行處理。catch</span>中切勿吞掉（swallow）無法處理的部份資訊，甚至完全不處理而吞掉整個例外。<br>
+      <br>
+      <dl>
+        <dt>區分受檢（Checked）與非受檢（Unchecked）例外</dt>
+      </dl>
+      <br>
+      如果想瞭解方法中可能會丟出哪些例外，最透明的方式就是查看原始碼，瞭解丟出的例外種類，不過並不是隨時都有原始碼可以察看。Java首先採用了受檢例外，<span
+        class="courier">開發者可以使用throws在方法上聲明丟出的例外種類，方法的客戶端可藉此得知並針對宣告的例外加以處理，編譯器也會協助，如果方法上宣告的例外是Exception子類別但非RuntimeException，就會中止編譯來提醒開發者明確處理，如果開發者有相關資訊就用try...catch處理，無法處理就繼續在方法上宣告該例外沒有處理。</span><br>
+      <br>
+      如果在方法上宣告受檢例外，則暗示著兩件事：方法中忽略了該例外沒有處理、方法的客戶端可能有相關資訊可以處理例外。因而受檢例外應當用來表示程式中可以處理或可以回復程式狀態的錯誤。<br>
+      <br>
+      相對於受檢例外，Java中<span class="courier">RuntimeException</span>則歸屬於非受檢例外，用來表示程式中無法預期的錯誤，或是程式中完全無力處理或回復的錯誤。簡單來說，發生了非受檢例外就是程式有臭蟲，基本上不用處理任其往上傳播而中斷程式，最多就是為了除錯方便，在捕捉例外後進行日誌並重新丟出。<br>
+      <br>
+      舉例來說，如果帳戶實例有個提款方法，若使用者輸入的提款金額超過餘額時，可以提示使用者餘額不足，這個錯誤是可以處理的，因而可以將<span
+        class="courier">AccountException</span>設計為受檢例外，在餘額不足時丟出；然而，提款方法傳入的數字應該是正數，如果傳入了負數，表示提款方法的客戶端在呼叫前，並沒有針對提款金額進行檢查，這是一種臭蟲，此時應丟出非受檢的<span
+        class="courier">IllegalArgumentException</span>，讓程式停止下來，加入檢查提款金額的相關程式碼，避免呼叫提款方法傳入負數金額的可能性。<br>
+      <br>
+      在方法上宣告受檢例外時要注意的是，不同層次的例外應加以區分，例如在DAO（Data Access Object）物件的儲存方法上宣告<span
+        class="courier">SQLException</span>並不適當，這洩漏了底層可能採取的永續（Persistence）機制，如果DAO實作時採用的並非JDBC，將來可能面臨修改方法宣告，或者是實際上沒有丟出<span
+        class="courier">SQLException</span>的問題。<br>
+      <br>
+      <dl>
+        <dt>瞭解受檢例外的功與過</dt>
+      </dl>
+      <br>
+      如果呼叫的方法宣告了受檢例外，編譯器會提醒呼叫者明確指定處理方式，未指定處理方式的受檢例外會等同於語法錯誤而造成編譯失敗，說是提醒其實是強制，有些開發者若想專心撰寫商務流程時，會因為呼叫的方法宣告受檢例外而分心，有些開發者為了先專注於商務流程，隨意地撰寫暫時的<span
+        class="courier">try...catch</span>以滿足編譯器，想說之後再回來撰寫<span class="courier">catch</span>中真正的錯誤處理，如果最後開發者遺忘了，原先不當的錯誤處理往往造成更難察覺的臭蟲。<br>
+      <br>
+      另一個問題是，原先層次較淺的方法可能因宣告受檢例外而帶來好處，但隨著系統規模與層次的增加，該方法被帶到了較深的層次，或者是應用到另一個既存系統較深層的模組中，編譯器明確提醒受檢例外的好處就成了麻煩，如果層層呼叫的前後文資訊都不足以處理受檢例外，那麼要將原受檢例外往上傳播的方式，就是在層層呼叫的每個方法上都宣告該受檢例外，造成大幅的修改。<br>
+      <br>
+      如果程式規模擴大，異常處理的方式也應跟著演化，原先的受檢例外也許應考量是否演化為非受檢例外。如果層層呼叫的前後文資訊都不足以處理受檢例外，代表著對於呼叫的每一層來說，該例外都是代表無力處理的錯誤。將受檢例外改為非受檢例外的方式之一，就是改繼承<span
+        class="courier">RuntimeException</span>，Java永續框架Hibernate就是這麼作的，在3.0版本之後，將其<span
+        class="courier">HibernateException</span>從受檢例外改為非受檢例外，畢竟對於資料永續的相關方法而言，多數錯誤都是無力處理的，最好的方式就是任其向上傳播。另一種方式，就是抽取出原受檢例外的資訊，重新包裝至另一個非受檢例外再丟出，使之得以直接往上傳播。<br>
+      <br>
+      即便如此，有人認為受檢例外帶來的麻煩遠比好處還多，像是物件導向大師Martin Fowler就如此認為，有些程式庫放棄使用受檢例外，與Java血緣相近的Scala語言亦是如此，將例外的處理權交回給開發者，而不是由編譯器強制規範。<br>
+      <br>
+      <dl>
+        <dt>重在瞭解錯誤種類與處理錯誤的前後文資訊</dt>
+      </dl>
+      <br>
+      有人研究過，程式中可能會有高達90%的比率在管理與處理錯誤；軟體開發中或許只有相反比率的書籍或文件討論過如何處理錯誤。Java對受檢例外與非受檢例外的區分，其實是在迫使開發者思考開發程式時可能面對的錯誤，哪些是可處理的一般問題，哪些則是不可處理的異常狀況。撇除受檢例外與非受檢例外的差異不談，處理錯誤時，本應思考錯誤發生時的前後文資訊如何處理，有多少前後文資訊就處理多少錯誤，無法處理的部份就應丟出，而面對不可處理的例外，應思索該錯誤是否為可用程式邏輯避免的臭蟲，而不是在<span
+        class="courier">catch</span>之後勉強進行回復，這容易使得<span class="courier">catch</span>被誤用來進行商務邏輯，失去<span
+        class="courier">catch</span>用於錯誤處理的本意。<br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Exception.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

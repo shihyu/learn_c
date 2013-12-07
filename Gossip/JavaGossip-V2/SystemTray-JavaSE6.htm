@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/SystemTray-JavaSE6.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:35 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>啟動畫面與工具列圖示 - Java SE 6</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 啟動畫面與工具列圖示 - Java SE 6</a></h1>
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>有些視窗程式在啟動時，會有個啟動畫面，在Java SE 6之前，您要自己實作才可以擁有這個功能，現在您可以直接在使用"java"程式執行程式時下達"-splash"引數指定啟動畫面的圖片，就可以擁有這個功能，例如若執行 <a href="ExecutableJAR.htm">製作 Executable JAR</a> 所製作出來的Executable Jar檔時，可以如下指定圖片：</small><br>
+
+
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java -splash:caterpillar.jpg -jar JNotePad.jar</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+其中caterpillar.jpg是啟動畫面的圖片，支援的圖片可以是JPG、GIF或PNG，GIF若有動畫效果則可以呈現出來。<br>
+
+      <br>
+
+
+您也可以在製作Executable
+JAR檔案時，於manifest檔案中指定"SplashScreen-Image"為啟動畫面的圖片，並在使用jar程式進行包裝時一併包裝圖片，如
+此啟動JAR檔案時，就會自動展現啟動畫面，一個manifest檔案的寫法如下所示：</small>
+      <br>
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>manifest.txt
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      <pre>Manifest-Version: 1.0<br>Main-Class: onlyfun.caterpillar.JNotePad<br>SplashScreen-Image: caterpillar.jpg<br></pre>
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+如果您對於啟動畫面更進一步的控制感興趣，例如在不同的啟動階段顯示不同的圖片，或者是在啟動圖片上顯示進度列，則可以看看java.awt. SplashScreen的API文件說明。<br>
+
+      <br>
+
+
+在Java SE
+6中加入了系統工具列圖示的支援，您可以使用SystemTray類別的isSupported()方法，測試看看目前的系統是否支援系統工具列圖示，如
+果支援的話，可以使用getSystemTray()取得SystemTray實例，使用add()方法加入TrayIcon實例，如此就可以加入一個系
+統工具列圖示，例如：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li>SystemTrayDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.awt.*;<br><br>public class SystemTrayDemo {<br>    public static void main(String[] args) {<br>        if(SystemTray.isSupported()) {<br>            SystemTray tray = SystemTray.getSystemTray();<br>            Image image = Toolkit.getDefaultToolkit()<br>                                 .getImage("musical_note_smile.gif");<br>            TrayIcon trayIcon = new TrayIcon(image, "JNotePad 1.0");<br>            try {<br>                tray.add(trayIcon);<br>            } catch (AWTException e) {<br>                System.err.println("無法加入系統工具列圖示");<br>                e.printStackTrace();<br>            }<br>        } else {<br>            System.err.println("無法取得系統工具列");<br>        }<br>    }<br>}<br></pre>
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+一個執行的結果畫面如下所示：<br>
+
+      <img style="width: 151px; height: 85px;" alt="工具列圖示" title="工具列圖示" src="images/J6-031.JPG"><br>
+
+      <br>
+
+
+如果想在系統工具列圖示上按右鍵時，可以出現蹦現視窗，則可以在建構TrayIcon實例時，指定一個PopupMenu實例給它，例如：</small>
+
+      <br>
+
+
+      
+      <ul>
+
+        <li><span style="font-size: 10.5pt; font-family: &quot;Times New Roman&quot;; letter-spacing: 0.4pt;" lang="EN-US">SystemTrayDemo2.java</span>
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.awt.*;<br>import javax.swing.*;<br><br>public class SystemTrayDemo2 {<br>    public static void main(String[] args) {<br>        if(SystemTray.isSupported()) {<br>            SystemTray tray = SystemTray.getSystemTray();<br>            Image image = Toolkit.getDefaultToolkit()<br>                                 .getImage("musical_note_smile.gif");<br>            PopupMenu popup = new PopupMenu();<br>            MenuItem item = new MenuItem("開啟JNotePad 1.0");<br>            popup.add(item);<br>            TrayIcon trayIcon = <br>                    new TrayIcon(image, "JNotePad 1.0", popup);<br>            try {<br>                tray.add(trayIcon);<br>            } catch (AWTException e) {<br>                System.err.println("無法加入系統工具列圖示");<br>                e.printStackTrace();<br>            }<br>        } else {<br>            System.err.println("無法取得系統工具列");<br>        }工具列圖示<br>    }<br>}</pre>
+
+
+
+
+
+
+      <br>
+
+      <small>
+執行以上程式，並在出現的圖示上按滑鼠右鍵，將會出現以下的畫面：<br>
+
+      <img style="width: 248px; height: 74px;" alt="工具列圖示" title="工具列圖示" src="images/J6-032.JPG"><br>
+
+      <br>
+
+
+如果打算在系統工具列圖示上主動顯示訊息，則可以使用TrayIcon的displayMessage()方法，例如：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">trayIcon.displayMessage("哈囉", "該休息了嗎？", </span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TrayIcon.MessageType.WARNING);</span><br>
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small></div>
+
+
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br>
+
+
+      </span>TrayIcon可以顯示的MessageType包括有NONE、INFO、WARNING及ERROR，分別會顯示不同的圖示，上面這段程式片段執行結果畫面如下所示：<br>
+
+      <img style="width: 151px; height: 90px;" alt="工具列圖示" title="工具列圖示" src="images/J6-033.JPG"><br>
+
+      <br>
+
+      <span class="postbody"></span>如果要移除系統工具列中的圖示，則可以使用SystemTray實例的remove()方法，指定要移除的圖示，例如：<br>
+
+      <span style="font-weight: bold;">tray.remove(trayIcon);</span></small>
+
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/SystemTray-JavaSE6.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:41 GMT -->
+</html>

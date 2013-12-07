@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/MethodLookup.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>方法查找順序</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 方法查找順序<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>就目前為此，你已經知道實例方法、類別方法與單例方法，也已經看過類別、模組，那麼如果你有個物件<span style="font-family: Courier New,Courier,monospace;">o</span>，打算呼叫某個實例方法<span style="font-family: Courier New,Courier,monospace;">some</span>，那查找方法的順序為何？大致可循以下順序：<br>
+      </small>
+      <ol>
+        <li><small>查看物件是否定義<span style="font-family: Courier New,Courier,monospace;">some</span>單例方法</small></li>
+        <li><small>查看物件的類別是否定義<span style="font-family: Courier New,Courier,monospace;">some</span>實例方法</small></li>
+        <ol>
+          <li><small>若類別定義了<span style="font-family: Courier New,Courier,monospace;">some實例方法後，再include某模組具有some實例方法，則使用的是模組的some</span>方法</small></li>
+          <li><small>若類別<span style="font-family: Courier New,Courier,monospace;">include某模組具有some實例方法後，</span></small><small style="font-family: Courier New,Courier,monospace;">再定義了some實例方法，</small><small><span style="font-family: Courier New,Courier,monospace;">則使用的是類別的some</span>方法</small></li>
+        </ol>
+        <li><small>查看物件的父類別是否定義<span style="font-family: Courier New,Courier,monospace;">some</span>實例方法<br>
+          </small></li>
+      </ol>
+      <small><br>
+可以實際撰寫簡單的測試：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; module M1<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "M1 some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "Some some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<br>
+&gt;&gt; class Other &lt; Some; end<br>
+=&gt; nil<br>
+&gt;&gt; Other.new.some<br>
+            <span style="font-weight: bold;">Some some</span><br>
+=&gt; nil<br>
+            <span style="font-weight: bold;">&gt;&gt;&nbsp;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">以上Other僅繼承Some，使用的是繼承下來的實例方法。若再include模組：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;">&gt;&gt; class Other &lt; Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; include M1<br>
+&gt;&gt; end<br>
+      </span>=&gt; Other<span style="font-weight: bold;"><br>
+&gt;&gt; Other.new.some<br>
+      </span>M1 some<span style="font-weight: bold;"><br>
+=&gt; nil<br>
+      </span><span style="font-weight: bold;">&gt;&gt;&nbsp;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">模組覆蓋了Some的some定義，使用的是模組的some定義。若再於Other中定義方法：</span><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;">&gt;&gt; class Other<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "Other some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+      </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Other.new.some<br>
+Other some<br>
+      </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; </span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br><small>再度定義的方法覆蓋了模組的<span style="font-family: Courier New,Courier,monospace;">some</span>定義，若再於物件定義單例方法：</small><small><span style="font-family: Courier New,Courier,monospace;"></span><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;">&gt;&gt; o = Other.new<br>
+      </span>=&gt; #&lt;Other:0x27e2a28&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; def o.some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "o some"<br>
+&gt;&gt; end<br>
+      </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; o.some<br>
+      </span>o some<span style="font-weight: bold;"><br>
+      </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">則單例方法會覆蓋Other定義的some方法。<br>
+      <br>
+先前談過，可以使用<span style="font-weight: bold;">remove_method</span>移除實例方法，但僅能移除類別中定義的方法，繼承下來的方法或include進來的方法無法移除。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "Some some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; class Other &lt; Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; puts "Other some"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; o = Other.new<br>
+            </span>=&gt; #&lt;Other:0x212d888&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; o.some<br>
+            </span>Other some<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; class Other<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; remove_method :some<br>
+&gt;&gt; end<br>
+            </span>=&gt; Other<span style="font-weight: bold;"><br>
+&gt;&gt; o.some<br>
+            </span>Some some<span style="font-weight: bold;"><br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; class Other<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; remove_method :some<br>
+&gt;&gt; end<br>
+            </span>NameError: method `some' not defined in Other<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):18:in `remove_method'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):18:in `&lt;class:Other&gt;'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):17<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      
+      </table>
+&nbsp;
+
+
+
+
+
+
+
+
+      
+<br>
+
+      <small>你可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">undef_method</span>讓方法查找失效，想回復方法查找，可重新於類別中重新定義同名方法。<br>
+      </small><br>
+      <small><br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/MethodLookup.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

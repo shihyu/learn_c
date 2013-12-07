@@ -1,0 +1,574 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/StatementResultSet.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Statement、 ResultSet</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: Statement、 ResultSet</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small><span style="font-weight: bold;">Connection物件</span>是代表Java與資料庫的連線，接下來我們要執行SQL的話，必須取得 Statement物件，它代替您執行SQL敘述並取得執行之後的結果，您可以使用Connection的<span style="font-weight: bold;">createStatement()</span>來建立<span style="font-weight: bold;">Statement物件</span>：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Connection conn = DriverManager.getConnection(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+url, user, password); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Statement stmt = conn.createStatement(); </span><br>
+
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+
+&nbsp;<br>
+
+
+
+
+
+取得Statement物件之後，我們可以使用<span style="font-weight: bold;">executeUpdate()、executeQuery()</span>等方法來執行 SQL，executeUpdate()主要是用來執行CREATE TABLE、INSERT、DROP TABLE、ALTER TABLE等會改變資料庫內容的SQL，例如：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">stmt.executeUpdate("INSERT INTO message VALUES('良葛格', " +</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "'caterpillar@mail.com', '留言吧', '2004-5-26'," +</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "'到此一遊')");</span><span style="font-style: italic;"></span><br>
+
+
+
+
+      <span style="font-style: italic;"></span></small></div>
+
+
+
+
+      <small><span style="font-style: italic;">&nbsp; </span><br>
+
+
+
+
+
+executeQuery()方法則是用於SELECT等查詢資料庫的SQL，executeUpdate()與 executeQuery()都會傳回<span style="font-weight: bold;">ResultSet物件</span>，代表變更或查詢的結果，查詢的結果會是一筆一筆的資料，您使用<span style="font-weight: bold;">next()</span>來移動至下一筆資料，它會傳回 true 或 false表示是否有下一筆資料，接著可以使用getXXX()來取得資料，例如<span style="font-weight: bold;">getString()、getFloat()、getDouble()</span>等方法，分別取得相對應的欄位型態資料，getXXX()方法都提供有依欄位名稱取得資料，或是依欄位順序取得資料的方法，一個例子如下，您指定欄位名稱來取得資料：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ResultSet result = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stmt.executeQuery("SELECT * FROM message"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">while(result.next()) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString("name") + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString("email") + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString("subject") + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString("time") + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.println(result.getString("memo") + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+
+使用查詢到的結果之欄位順序來顯示結果的方式如下：<br>
+
+      </small>
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ResultSet result = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stmt.executeQuery("SELECT * FROM message"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">while(result.next()) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString(1) + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString(2) + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString(3) + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.print(result.getString(4) + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; System.out.println(result.getString(5) + "\t"); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+
+&nbsp;<br>
+
+
+Statement的execute()可以用來執行SQL，並可以測試所執行的SQL是執行查詢或是更新，傳回
+true的話表示SQL執行將傳回ResultSet表示查詢結果，此時可以使用getResultSet()取得ResultSet物件，如果
+execute()傳回false，表示SQL執行會傳回更新筆數或沒有結果，此時可以使用getUpdateCount()取得更新筆數。如果事先無法
+得知是進行查詢或是更新，就可以使用execute()。<br>
+
+      <br>
+
+
+
+
+
+下面的程式是個完整的範例，注意我們在查詢結束後，可以使用Statement的<span style="font-weight: bold;">close()</span>方法來釋放Statement的資料庫資源與JDBC資源，而最後不使用連線時也使用Connection的close()來關閉連線： </small>
+
+
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> DBTest.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.sql.*;<br> <br>public class DBTest { <br>    public static void main(String[] args) { <br>        String driver = "com.mysql.jdbc.Driver"; <br>        String url = "jdbc:mysql://localhost:3306/GUESTBOOK?" + <br>                   "useUnicode=true&amp;characterEncoding=Big5"; <br>        String user = "caterpillar"; <br>        String password = "123456"; <br><br>        Connection conn = null;<br>        Statement stmt = null;<br><br>        try { <br>            Class.forName(driver); <br>            conn = DriverManager.getConnection(<br>                                        url, user, password);<br>            stmt = conn.createStatement(); <br><br>            stmt.execute("INSERT INTO message VALUES('良葛格" + <br>               "', 'caterpillar@mail.com', '留言吧', "+ <br>               "'2004-5-26', '到此一遊')"); <br> <br>            ResultSet result = stmt.executeQuery(<br>                                  "SELECT * FROM message"); <br>            while(result.next()) { <br>                System.out.print(result.getString(1) + "\t"); <br>                System.out.print(result.getString(2) + "\t"); <br>                System.out.print(result.getString(3) + "\t"); <br>                System.out.print(result.getString(4) + "\t"); <br>                System.out.println(result.getString(5) + "\t"); <br>            }<br>        } <br>        catch(ClassNotFoundException e) { <br>            System.out.println("找不到驅動程式"); <br>            e.printStackTrace(); <br>        } <br>        catch(SQLException e) { <br>            e.printStackTrace(); <br>        } <br>        finally {<br>            if(stmt != null) {<br>                try {<br>                    stmt.close();<br>                }   <br>                catch(SQLException e) {<br>                    e.printStackTrace();<br>                }<br>            }<br>            if(conn != null) {<br>                try {<br>                    conn.close();<br>                }<br>                catch(SQLException e) {<br>                    e.printStackTrace();<br>                }<br>            }<br>        } <br>    } <br>} <br></pre>
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+最後注意到的是，Connection物件預設為自動<span style="font-weight: bold;">「認可」（Commit）</span>，也就是Statement執行SQL敘述完
+後，馬上對資料庫進行操作變更，如果想要對Statement要執行的SQL進行除錯，可以使用<span style="font-weight: bold;">setAutoCommit(false)</span>來將自動認可取
+消，在執行完SQL之後，再呼叫Connection<span style="font-weight: bold;">的commit(</span>)方法認可變更，使用Connection的<span style="font-weight: bold;">getAutoCommit()</span>可以測
+試是否設定為自動認可。 <br>
+
+      <br>
+
+
+
+
+
+不過無論是否有無執行commit()方法，只要SQL沒有錯，在關閉Statement或Connection前，都會執行認可動作，對資料庫進行變
+更。</small>
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/StatementResultSet.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+</html>

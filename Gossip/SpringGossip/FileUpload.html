@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/FileUpload.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>檔案上傳</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 檔案上傳</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>如
+果您想要進行檔案上傳的動作，則您可以使用實作
+org.springframework.web.multipart.MultipartResolver介面的類別，Spring提供
+org.springframework.web.multipart.commons.CommonsMultipartResolver與
+org.springframework.web.multipart.cos.CosMultipartResolver，分別支援Commands
+FileUpload及COS FileUpload。<br>
+
+      <br>
+
+舉個實際的例子，假設您設計了一個FileForm類別：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>FileForm.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class FileForm {<br>    private String name;<br>    private byte[] contents;<br>    <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>    <br>    public void setContents(byte[] contents) {<br>        this.contents = contents;<br>    }<br>    <br>    public String getName() {<br>        return name;<br>    }<br>    <br>    public byte[] getContents() {<br>        return contents;<br>    }<br>} </pre>
+
+      <small><br>
+
+FileForm中接受檔案上傳的屬性型態是byte陣列，使用者上傳的檔案可以藉由
+org.springframework.web.multipart.support.ByteArrayMultipartFileEditor將之
+轉換為byte陣列並設定給FileForm，這必須在定義Controller時註冊，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>UploadController.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.BufferedOutputStream;<br>import java.io.FileOutputStream;<br>import javax.servlet.http.HttpServletRequest;<br>import javax.servlet.http.HttpServletResponse;<br>import org.springframework.validation.BindException;<br>import org.springframework.web.bind.ServletRequestDataBinder;<br>import org.springframework.web.multipart.<br>                       support.ByteArrayMultipartFileEditor;<br>import org.springframework.web.servlet.ModelAndView;<br>import org.springframework.web.servlet.<br>                                   mvc.SimpleFormController;<br><br>public class UploadController extends SimpleFormController {<br>    private String path;<br>    <br>    public UploadController() {<br>        setCommandClass(FileForm.class);<br>    }<br>    <br>    protected ModelAndView onSubmit(<br>                            HttpServletRequest request,<br>                            HttpServletResponse response,<br>                            Object command,<br>                            BindException errors) <br>                                        throws Exception {<br>        FileForm form = (FileForm) command;<br>        <br>        String storedPath = path + <br>                            System.getProperty("file.separator") + <br>                            form.getName();<br>        <br>        BufferedOutputStream bufferedOutputStream = <br>                new BufferedOutputStream(<br>                       new FileOutputStream(storedPath));<br>        <br>        bufferedOutputStream.write(form.getContents());<br>        bufferedOutputStream.close();<br>        <br>        return new ModelAndView(getSuccessView(), <br>                                "filename", form.getName());<br>    }<br>    <br>    protected void initBinder(HttpServletRequest request, <br>                          ServletRequestDataBinder binder) <br>                                            throws Exception {<br>        super.initBinder(request, binder); <br>        binder.registerCustomEditor(<br>                byte[].class, new ByteArrayMultipartFileEditor());<br>    }<br>    <br>    public void setPath(String path) {<br>        this.path = path;<br>    }<br>}</pre>
+
+      <small><br>
+
+依以上的設定，檔案上傳後會儲存在指定的目錄下，要使用檔案上傳的功能，您必須在定義檔中加入MultipartResolver的定義，您可以選擇使用
+CommonsMultipartResolver或CosMultipartResolver，例如以下使用
+CommonsMultipartResolver來定義：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>mvc-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>"http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;   <br>    &lt;bean id="urlMapping"<br>          class="org.springframework.web.servlet.<br>                   &rarr; handler.SimpleUrlHandlerMapping"&gt;<br>        &lt;property name="mappings"&gt;<br>            &lt;props&gt;<br>                &lt;prop key="/index.do"&gt;<br>                   indexController<br>                &lt;/prop&gt;<br>                &lt;prop key="/upload.do"&gt;<br>                   uploadController<br>                &lt;/prop&gt;<br>            &lt;/props&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt; <br>    <br>    &lt;bean id="viewResolver"<br>          class="org.springframework.web.servlet.<br>                   &rarr; view.InternalResourceViewResolver"&gt;    <br>        &lt;property name="prefix"&gt;<br>            &lt;value&gt;/WEB-INF/jsp/&lt;/value&gt;<br>        &lt;/property&gt;<br>        &lt;property name="suffix"&gt;<br>            &lt;value&gt;.jsp&lt;/value&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br><br>    &lt;bean id="indexController"<br>           class="org.springframework.web.servlet.<br>                   &rarr; mvc.ParameterizableViewController"&gt;<br>        &lt;property name="viewName"&gt;<br>            &lt;value&gt;index&lt;/value&gt;<br>        &lt;/property&gt;     <br>    &lt;/bean&gt;    <br><br>    &lt;bean id="multipartResolver"<br>          class="org.springframework.web.multipart.<br>                   &rarr; commons.CommonsMultipartResolver"&gt;    <br>        &lt;property name="maxUploadSize"&gt;<br>            &lt;value&gt;1000000&lt;/value&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;    <br>        <br>    &lt;bean id="uploadController" <br>          class="onlyfun.caterpillar.UploadController"&gt; <br>        &lt;property name="formView"&gt; <br>            &lt;value&gt;form&lt;/value&gt; <br>        &lt;/property&gt;           <br>        &lt;property name="successView"&gt; <br>            &lt;value&gt;success&lt;/value&gt; <br>        &lt;/property&gt;        <br>        &lt;property name="path"&gt; <br>            &lt;value&gt;C:\upload&lt;/value&gt; <br>        &lt;/property&gt;  <br>    &lt;/bean&gt;<br>&lt;/beans&gt; </pre>
+
+      <small><br>
+
+在定義檔中，藉由設定UploadController的"path"屬性為"C:\upload"，表示上傳後的檔案會儲存在C:\upload目錄之中，接著設計一個index.jsp：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>index.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;Upload Page&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;form name="uploadForm" enctype="multipart/form-data" <br>          action="/FileUploadDemo/upload.do" method="POST"&gt;<br>        上載後檔案名稱: &lt;input name="name" type="text"/&gt;&lt;br&gt;<br>        選擇檔案: &lt;input name="contents" type="file"/&gt;&lt;br&gt;<br>        &lt;input type="submit" value="Submit"/&gt;  <br>    &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; </pre>
+
+      <small><br>
+
+在這個頁面中可以設定上傳後的檔案名稱，並可以選擇所要上傳的檔案名稱，success.jsp則設計如下：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>success.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;Upload Success&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;h1&gt;File: ${filename} upload successfully.&lt;/h1&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+      <small><br>
+
+這個專案使用到相依的Commands FileUpload，所以您要在lib目錄中包括commons-fileupload.jar檔案。<br>
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/FileUpload.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+</html>

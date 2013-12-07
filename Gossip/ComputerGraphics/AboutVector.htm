@@ -1,0 +1,412 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/AboutVector.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:00 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>向量運算</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics: 向量運算</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>
+
+
+
+
+
+
+
+要學習電腦圖學，除了對各種座標系統的掌握之外，不可或缺的就是向量的應用，這邊介紹一些基本的向量觀念與其應用。<br>
+
+
+      <br>
+
+
+假設三維空間中有一點(a, b, c)，則我們定義向量如下：<br>
+
+
+
+
+
+
+
+
+      <img style="width: 358px; height: 182px;" alt="" src="images/aboutVector-1.jpg"><br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+A向量為由原點出發、具有大小與方向性的向量，大小即為原點至該點的長度，而方向即為圖中箭頭所表示的；當向量長度為1時，我們稱為「單位向量」，通常使用i, j, k來表示X軸、Y軸與Z軸的單位向量，而向量的表示法，可以使用上圖右式所示。<br>
+
+
+      <br>
+
+
+向量表示法的好處是可以同時指明某變量的大小與方向，例如在模擬物理運動或力的作用時，向量表示法就相當的有用，例如若某物體的前進方向與速度，可以用向
+量來同時表示其X分量與Y分量的速度，如(a,
+b)就表示其在X方向的速度為a，Y方向速度為b，如果物體彈性碰撞右牆，則只要改變X分量為負方向，也就是(-a, b)即可。 <br>
+
+
+      <img style="width: 198px; height: 172px;" alt="" src="images/aboutVector-2.jpg"><br>
+
+
+      <br>
+
+
+定義兩個向量A(x1, y1, z1)與B(x2, y2, z2)的內積運算為：<br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">A * B = (x1, y1, z1) * (x2, y2, z2) = x1*x2 + y1*y2 + z1*z2</span><br>
+
+
+      </small></div>
+
+      <small>
+      <br>
+
+
+如上式所示，向量內積運算後是個純量，不帶有方向性，經過導證，向量內積運算也等同於下面這個式子：<br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">A * B = | A | * | B | * cos&theta;</span><br>
+
+
+      </small></div>
+
+      <small>
+      <br>
+
+
+其中&theta;與向量內積在圖形上的意義如下所示：<br>
+
+
+      <img style="width: 260px; height: 178px;" alt="" src="images/aboutVector-3.jpg"><br>
+
+
+      <br>
+
+
+也就是說，可以利用向量內積求得A向量在B向量上的投影（或反過來求B向量在A向量上的投影）。<br>
+
+
+      <br>
+
+
+向量內積在圖學上的應用之一，就是求得光線的照射量，我們必須先知道，與平面垂直的向量為平面的法向量，如果有一平行光源照射至某平面，則我們可以藉由平
+面法向量與光源的向量求內積，如果內積為零，則表示光源與平面平行，則平面受光量為0，內積求得值的絕對值越大，則平面受光量越大。 <br>
+
+
+      <img style="width: 198px; height: 132px;" alt="" src="images/aboutVector-4.jpg"><br>
+
+
+      <br>
+
+
+定義A(x1, y1, z1)與B(x2, y2, z2)兩向量的外積為<br>
+
+
+      <img style="width: 464px; height: 124px;" alt="" src="images/aboutVector-5.jpg"><br>
+
+
+      <br>
+
+
+由上式可以得知，向量外積運算後會得到另一個向量，其關係如下：<br>
+
+
+
+
+
+
+
+
+      <span class="postbody"></span><img style="width: 202px; height: 168px;" alt="" src="images/aboutVector-6.jpg"><br>
+
+
+      <br>
+
+
+向量外積運算後的方向判斷若使用右手來判斷，則右手食指為A向量，中指為B向量，姆指就為AXB，或單純右手四指由A繞至B，姆指即為AXB的方向，而 AXB的大小為：<br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">| A X B | = | A | * | B | * sin&theta;</span><br>
+
+
+      </small></div>
+
+      <small>
+      <br>
+
+
+向量外積的使用在圖學中也是相當廣泛，例如凸面體的隱藏面判斷，可以利用向量外積求得一平面的法向量，假設位於Z軸的正方向往負方向看過去，則若平面法向量的Z分量為正，表示平面朝向您，為可視平面，若Z分量為負，表示平面朝另一面，您看不到這個平面。 <br>
+
+
+      <img style="width: 370px; height: 188px;" alt="" src="images/aboutVector-7.jpg"><br>
+
+
+關於向量、內積與外積的應用還有得多，總之將線代好好研讀一遍，瞭解向量並應用於圖學上是一個重要的課題。<br>
+
+
+      <a href="http://episte.math.ntu.edu.tw/articles/mm/mm_15_1_12/index.html"><br>
+
+
+向量外積與四元數</a> 有一些外積的基本介紹。</small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/AboutVector.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:03 GMT -->
+</html>

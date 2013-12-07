@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/UseBeanSetPropertyGetProperty.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:51 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>深入 &lt;jsp:useBean&gt;、&lt;jsp:setProperty&gt; 與 &lt;jsp:getProperty&gt;</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 深入 &lt;jsp:useBean&gt;、&lt;jsp:setProperty&gt; 與 &lt;jsp:getProperty&gt;<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>JSP網頁最終將轉換為Servlet，所謂的JavaBean，實際上也是Servlet中的一個物件實例，當你使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;jsp: useBean&gt;</span>時，實際上就是在宣告一個JavaBean的物件，<span style="font-family: Courier New,Courier,monospace;">id</span>屬性即是用以指定參考名稱，而<span style="font-family: Courier New,Courier,monospace;">class</span>屬性則是型態名稱。例如若你在JSP的頁面中撰寫以下的內容：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:useBean id="user" class="cc.openhome.User" /&gt;</span></small><br>
+      </div>
+      <small><br>
+實際在轉譯為Servlet之後，會產生以下的程式碼片段：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cc.openhome.User user = null; // id="user" 就是產生這邊的user參考名稱</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">synchronized (request) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; user = (cc.openhome.User) _jspx_page_context.getAttribute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", PageContext.PAGE_SCOPE);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if (user == null){</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user = new cc.openhome.User();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.setAttribute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", user, PageContext.PAGE_SCOPE);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold;">
+      </div>
+      <br>
+      <small>其中<span style="font-family: Courier New,Courier,monospace;">_jspx_page_context參考至PageContext物件，也就是說，使用&lt;jsp:useBean&gt;標籤時，會在屬性範圍（預設是page範圍）中尋找有無id名稱所指定的屬性，如果找到就直接使用，如果沒有找到就建立新的物件。</span><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">你可以在使用&lt;jsp:useBean&gt;標籤時，使用<span style="font-weight: bold;">scope</span>屬性來指定其儲存的屬性範圍，可以指定的值有<span style="font-weight: bold;">page</span>（預設）、<span style="font-weight: bold;">request</span>、<span style="font-weight: bold;">session</span>與<span style="font-weight: bold;">application</span>。例如：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:useBean id="user" class="cc.openhome.User" scope="session"/&gt;</span></small><br>
+      </div>
+      <small><br>
+則轉譯後的Servlet中將會有以對的程式碼片段，也就是改從會話範圍中尋找指定的屬性：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cc.openhome.User user = null;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">synchronized (request) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; user = (cc.openhome.User) _jspx_page_context.getAttribute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", PageContext.SESSION_SCOPE);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if (user == null){</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user = new cc.openhome.User();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.setAttribute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", user, PageContext.SESSION_SCOPE);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold;">
+      </div>
+      <br>
+      <small>注意！如果你使用<span style="font-family: Courier New,Courier,monospace;">&lt;jsp:useBean&gt;標籤時沒有指定scope</span>，則預設「只」在page範圍中尋找JavaBean，找不到就建立新的JavaBean物件（不會再到<span style="font-family: Courier New,Courier,monospace;">request、session與application</span>中尋找）。<br>
+      <br>
+在轉譯後的Servlet程式碼中，如果想指定宣告JavaBean時的型態，則可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">type</span>屬性。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:useBean id="user"</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="cc.openhome.BaseUser" class="cc.openhome.User"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; scope="session"/&gt;</span></small><br>
+      </div>
+      <small><br>
+如此產生的Servlet程式碼中，將會有以下的片段：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">cc.openhome.BaseUser user = null;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">synchronized (request) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; user = (cc.openhome.BaseUser) _jspx_page_context.getAttribute(</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", PageContext.SESSION_SCOPE);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; if (user == null){</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user = new cc.openhome.User();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.setAttribute(</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", user, PageContext.SESSION_SCOPE);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">type屬性的設定可以是一個抽象類別，也可以是一個介面。如果你只設定type而沒有設定class屬性，則必須確定在某個屬性範圍中已經存在所要的物件，否則會發生<span style="font-weight: bold;">InstantiationException</span>例外。<br>
+      <br>
+      </span>標籤的目的是減少JSP中Script的使用<span style="font-family: Courier New,Courier,monospace;">，所以反過來說，如果你發現</span>JSP中有Scriptlet<span style="font-family: Courier New,Courier,monospace;">，撰寫的是從某個屬性範圍中取得物件，則可以思考一下，是否可以用&lt;jsp:useBean&gt;來消除</span>Scriptlet<span style="font-family: Courier New,Courier,monospace;">的使用。<br>
+      <br>
+      </span>在使用<span style="font-family: Courier New,Courier,monospace;">&lt;jsp:useBean&gt;</span>標籤取得或建立JavaBean實例之後，若要設值給JavaBean，則可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;jsp:setProperty&gt;</span>標籤，你可以使用幾個方式來進行設定。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:setProperty name="user" </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">property="password" value="123456" /&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這會在產生的Servlet程式碼中，使用<span style="font-family: Courier New,Courier,monospace;">PageContext的findAttribute()，從page、request、session、application依序找看看有無name</span>所指定的屬性名稱，找到的話，再透過反射（Reflection）機制找出JavaBean上的<span style="font-family: Courier New,Courier,monospace;">setPassword()方法，呼叫並將value</span>的指定值設定給JavaBean。<br>
+      <br>
+如果想要將請求參數的值設定給JavaBean的某個屬性，則以下是個範例：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:setProperty name="user"</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> param="password" property="password" /&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+如果請求參數中包括<span style="font-family: Courier New,Courier,monospace;">password</span>，則會透過JavaBean的<span style="font-family: Courier New,Courier,monospace;">setPassword()</span>方法設定給JavaBean實例。你也可以不指定請求參數名稱，而由JSP的自省（Introspection）機制來判斷是否有相同的請求參數名稱，如果有的話就自動找出對應的設值方法並呼叫以設值給JavaBean。例如以下會找看看有無<span style="font-family: Courier New,Courier,monospace;">password</span>請求參數，有的話就設定給JavaBean：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:setProperty name="user" property="password" /&gt;</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">&lt;jsp:setProperty&gt;</span>有個最有彈性的寫法，就是將請求參數名稱與JavaBean的屬性名稱交給自省機制來自動匹配。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:setProperty name="user" property="*" /&gt;</span></small><br>
+      </div>
+      <small><br>
+如果你的JavaBean屬性是整數、浮點數之類的基本型態，自省機制可以自動轉換請求參數字串為對應屬性的基本資料型態。<br>
+      <br>
+你也可以在使用<span style="font-family: Courier New,Courier,monospace;">&lt;jsp:useBean&gt;</span>時一併設定屬性值，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:useBean id="user" class="cc.openhome.User" scope="session"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;jsp:setProperty name="user" property="*" /&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/jsp:useBean&gt;</span></small><br>
+      </div>
+      <small><br>
+如此一來，如果屬性範圍中找不到<span style="font-family: Courier New,Courier,monospace;">user</span>時，則會新建一個物件並設定其屬性值；如果可以找到物件的話就直接使用。也就是轉譯後產生以下的程式碼：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">cc.openhome.User user = null;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">synchronized (request) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; user = (cc.openhome.User) _jspx_page_context.getAttribute(</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", PageContext.SESSION_SCOPE);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; if (user == null){</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user = new cc.openhome.User();</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.setAttribute(</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", user, PageContext.SESSION_SCOPE);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; org.apache.jasper.runtime.JspRuntimeLibrary.introspect(</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.findAttribute("user"), request);</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      </div>
+      <small><br>
+這與撰寫以下的內容是有點不同的：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:useBean id="user" class="cc.openhome.User" scope="session"/&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:setProperty name="user" property="*" /&gt;</span></small><br>
+      </div>
+      <small><br>
+如果使用以上的寫法，則無論是找到或新建JavaBean物件，都一定會使用內省機制來設值，也就是轉譯的Servlet程式碼中會有以下片段：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cc.openhome.User user = null;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">synchronized (request) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; user = (cc.openhome.User) _jspx_page_context.getAttribute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", PageContext.SESSION_SCOPE);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if (user == null){</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user = new cc.openhome.User();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.setAttribute(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"user", user, PageContext.SESSION_SCOPE);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">org.apache.jasper.runtime.JspRuntimeLibrary.introspect(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _jspx_page_context.findAttribute("user"), request);</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      </small><small>標籤的目的是減少JSP中Script的使用<span style="font-family: Courier New,Courier,monospace;">，所以反過來說，如果你發現</span>JSP中有Scriptlet<span style="font-family: Courier New,Courier,monospace;">，有透過設值方法</span>（Setter）對JavaBean<span style="font-family: Courier New,Courier,monospace;">作設值的動作，則可考慮使用&lt;jsp:setProperty&gt;來消除</span>Scriptlet<span style="font-family: Courier New,Courier,monospace;">的使用。<br>
+      <br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;">&lt;jsp:getProperty&gt;的使用比較單純，在使用&lt;jsp:useBean&gt;</span>標籤取得或建立JavaBean實例之後，基本上就只有一種用法：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;jsp:getProperty name="user" property="name"/&gt;</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">這會使用透過PageContext的findAttribute()找出user屬性，並透過getName()方法取得值以顯示在網頁上，也就是轉譯後的</span>Servlet原始碼中會有以下片段：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString(((</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; (cc.openhome.User)_jspx_page_context.findAttribute("user"))</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.getName()</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">)));</span></small><br>
+      </div>
+      <small><br>
+在使用<span style="font-family: Courier New,Courier,monospace;">&lt;jsp:useBean&gt;</span>標籤取得或建立JavaBean實例之後，由於<span style="font-family: Courier New,Courier,monospace;">&lt;jsp:setProperty&gt;與&lt;jsp:getProperty&gt;轉譯後，都是使用PageContext的findAttribute()</span>來尋找屬性，因此尋找的順序是頁面、請求、會話、應用程式範圍。<br>
+      <br></small><small>標籤的目的是減少JSP中Script的使用<span style="font-family: Courier New,Courier,monospace;">，所以反過來說，如果你發現</span>JSP中有Scriptlet<span style="font-family: Courier New,Courier,monospace;">，有透過取值方法</span>（Getter）對JavaBean<span style="font-family: Courier New,Courier,monospace;">作取值的動作，則可考慮使用&lt;jsp:setProperty&gt;來消除</span>Scriptlet<span style="font-family: Courier New,Courier,monospace;">的使用。</span></small><br>
+      <br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/UseBeanSetPropertyGetProperty.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:51 GMT -->
+</html>

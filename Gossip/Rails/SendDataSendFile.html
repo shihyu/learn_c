@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/SendDataSendFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>send_data 與 send_file</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror send_data send_file" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: send_data 與 send_file<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>如果你要傳送二進位資料給瀏覽器，可以使用<span class="courier">send_data</span>方法，說是傳遞二進位資料，實際上是提供ASCII-8BIT字串給<span
+          class="courier">send_data方法，send_data</span>會取得字串的位元組資料，預設以content-type為application/octet-stream送出。舉例來說，如果想以二進位方式傳送文字資料，並提示客戶端可以儲存為message.txt，可以如下：</p>
+      <p style="margin-left: 40px;"><span style="font-weight: bold;" class="courier">send_data "test", :filename =&gt; "message.txt"</span><br>
+      </p>
+      <p>如果要指定型態，可以使用<span class="courier">:type</span>（預設是application/octet-stream），<span
+          class="courier">:disposition</span>可指定inline或attachment（預設），<span
+          class="courier">:status</span>可指定狀態碼（預設200）。</p>
+      <p>使用<span class="courier">send_data</span>的一個時機，是使用程式動態產生圖片後，將圖片送給客戶端，以 <a
+          href="http://studio.imagemagick.org/RMagick/doc/usage.html#drawing">How to use RMagick 中的一個圖片產生範例</a>（要安裝RMagick，可參考 <a
+          href="http://www.imagemagick.org/script/install-source.php">Install ImageMagick From Source</a>），如果要將產生的圖片送回，可以如下：</p>
+      <p class="courier" style="margin-left: 40px;"><span># 記得要在Gemfile後加入gem 'rmagick'，然後執行bundle install<br>
+          require 'RMagick'<br>
+          <br>
+          def logo<br>
+          &nbsp;&nbsp;&nbsp;&nbsp; <strong>send_data image_data, :type =&gt; "image/gif", :disposition =&gt; 'inline'</strong><br>
+          end</span></p>
+      <p class="courier" style="margin-left: 40px;"><span>def image_data<br>
+          &nbsp;&nbsp;&nbsp; canvas = Magick::ImageList.new<br>
+          &nbsp;&nbsp;&nbsp; canvas.new_image(250, 250, Magick::HatchFill.new('white', 'gray90'))<br>
+          &nbsp;&nbsp;&nbsp; circle = Magick::Draw.new<br>
+          &nbsp;&nbsp;&nbsp; circle.stroke('tomato')<br>
+          &nbsp;&nbsp;&nbsp; circle.fill_opacity(0)<br>
+          &nbsp;&nbsp;&nbsp; circle.stroke_opacity(0.75)<br>
+          &nbsp;&nbsp;&nbsp; circle.stroke_width(6)<br>
+          &nbsp;&nbsp;&nbsp; circle.stroke_linecap('round')<br>
+          &nbsp;&nbsp;&nbsp; circle.stroke_linejoin('round')<br>
+          &nbsp;&nbsp;&nbsp; circle.ellipse(canvas.rows/2,canvas.columns/2, 80, 80, 0, 315)<br>
+          &nbsp;&nbsp;&nbsp; circle.polyline(180,70, 173,78, 190,78, 191,62)<br>
+          &nbsp;&nbsp;&nbsp; circle.draw(canvas)<br>
+          &nbsp;&nbsp;&nbsp; <strong>canvas.to_blob {self.format = "gif"} # 以ASCII-8BIT字串傳回</strong><br>
+          end</span><br>
+      </p>
+      <p><span class="courier">實際上send_data使用了render方法來傳送資料：</span></p>
+      <p style="margin-left: 40px;"><span class="courier"><span style="font-weight: bold;"># File actionpack/lib/action_controller/metal/data_streaming.rb, line 104</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">def send_data(data, options = {}) #:doc:</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;"> &nbsp; send_file_headers! options.dup</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">&nbsp; render options.slice(:status, :content_type).merge(:text =&gt; data)</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">end</span><br>
+        </span></p>
+      <p><span class="courier">如果要傳送的是個檔案，則可以使用send_file方法，這個方法接受檔案路徑，會將指定的檔案讀入，並傳送給瀏覽器，send_data支援的選項，send_file也都支援，除此之外，還支援:stream，預設是false，表示將整個檔案載入記憶體，如果檔案很大，可以將之設為true，:buffer_size則用來設定串流暫存空間</span>，預設是4096位元組。</p>
+      <p>例如，以下是驗證密碼正確後，傳送PDF檔案的一個範例：</p>
+      <div style="margin-left: 40px;"><span class="courier"><span style="font-weight: bold;">def download</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; if params[:passwd] == "123456"</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; send_file "/home/caterpillar/ACL034000.pdf", :type =&gt; "application/pdf"</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; end</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">end</span><br>
+        </span></div>
+      <p>可以查看一下<span class="courier">send_file</span>的原始碼：</p>
+      <p style="margin-left: 40px;"><span style="font-weight: bold;" class="courier"># File actionpack/lib/action_controller/metal/data_streaming.rb, line 66<br>
+          def send_file(path, options = {}) #:doc:<br>
+          &nbsp; raise MissingFile, "Cannot read file #{path}" unless File.file?(path) and File.readable?(path)<br>
+          <br>
+          &nbsp; options[:filename] ||= File.basename(path) unless options[:url_based_filename]<br>
+          &nbsp; send_file_headers! options<br>
+          <br>
+          &nbsp; self.status = options[:status] || 200<br>
+          &nbsp; self.content_type = options[:content_type] if options.key?(:content_type)<br>
+          &nbsp; self.response_body = File.open(path, "rb")<br>
+          end</span><br>
+      </p>
+      <p>在開啟檔案之後，如果使用Rails的預設行為，會將整個檔案讀入，將讀入的內容送給輸出串流。如果要傳送的檔案較小，這個行為負擔是還好，但如果是幾百MB的檔案，這樣的行為會是個很大的負擔。</p>
+      <p>如果伺服器有支援，可以告訴伺服器要傳送的檔案，讓伺服器負責將檔案傳送給瀏覽器，根據 <a href="http://api.rubyonrails.org/classes/ActionController/DataStreaming.html#method-i-send_file">API 文件</a> 的說明，可以將config.action_dispatch.x_sendfile_header設定為要使用的標頭。例如在上線環境設定檔config/environments/production.rb中，就提供有以下設定範例：</p>
+      <p style="margin-left: 40px;"><span class="courier">&nbsp;<span style="font-weight: bold;"># Specifies the header that your server uses for sending files</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">&nbsp;# config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache</span><br
+            style="font-weight: bold;">
+          <span style="font-weight: bold;">&nbsp;# config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx</span></span><br>
+      </p>
+      <p>一旦將傳送檔案的動作交給伺服器之後，此次請求就不會再佔用Rails的資源。</p>
+      <p><span class="courier"></span><br>
+      </p>
+      <p><br>
+      </p>
+      <br>
+      <br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/SendDataSendFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+</html>

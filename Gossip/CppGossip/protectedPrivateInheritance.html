@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/protectedPrivateInheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>保護（protected）繼承、私用（private）繼承</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index.html">C++
+Gossip: 保護（protected）繼承、私用（private）繼承</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+在繼承時採公開（public）繼承的方式來繼承一個類別時，父類別與子類別為<span style="font-weight: bold;">"is-a"</span>的
+關係，子類別繼承父類別的公開（public）介面及受保護（protected）的成員，子類別是父類別的細化型態。 <br>
+
+      <br>
+
+
+保護（protected）繼承可以改變繼承下來的基底類別成員權限，保護的意思就是讓這些成員繼承下來之後，保護它們僅能在類別與衍生類別中使用，保護
+繼承的語法如下所示： <br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class
+B : protected A {
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+// 實作 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">};</span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+保護繼承時使用protected來繼承基底類別，繼承下來的成員在衍生類別中的權限變為如下：</small><br>
+
+
+      
+      <table style="text-align: left; width: 25%;" border="1" cellpadding="2" cellspacing="2">
+
+
+        <tbody>
+
+
+          <tr>
+
+
+            <td style="background-color: rgb(204, 204, 204);"><small>基
+底類別</small></td>
+
+
+            <td style="background-color: rgb(204, 204, 204);"><small>衍
+生類別 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td><small>private</small></td>
+
+
+            <td><small> 不繼承 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td><small>protected</small></td>
+
+
+            <td><small>protected </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td><small>public</small></td>
+
+
+            <td><small>protected</small></td>
+
+
+          </tr>
+
+
+        
+        </tbody>
+      
+      </table>
+
+
+      <br>
+
+      <small>
+簡單的說，原來的權限在protected以下的保留其原來權限，而在protected以上的就降為protected，子類別protected繼承
+的目的在只希望保留父類別中已實作的公開成員與受保護的成員為己用或接下來的衍生類別使用，並提供自己的公開介面。<br>
+
+      <br>
+
+
+您也可以在繼承基底類別之後，將它所有的成員一律改為私用（private），使用私用（private）繼承可以達到這個目的，其語法如下： <br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">class
+B : private A { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+// 實作 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">};
+      </span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+      <br>
+
+
+基底類別中的成員在被繼承之後，其權限如下所示： </small>
+      <br>
+
+
+      
+      <table style="text-align: left; width: 25%;" border="1" cellpadding="2" cellspacing="2">
+
+
+        <tbody>
+
+
+          <tr>
+
+
+            <td style="background-color: rgb(204, 204, 204);"><small>基
+底類別</small></td>
+
+
+            <td style="background-color: rgb(204, 204, 204);"><small>衍
+生類別 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td><small>private</small></td>
+
+
+            <td><small>不繼承 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td><small>protected</small></td>
+
+
+            <td><small>private </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td><small>public</small></td>
+
+
+            <td><small>private</small></td>
+
+
+          </tr>
+
+
+        
+        </tbody>
+      
+      </table>
+
+
+      <br>
+
+      <small>
+private繼承被稱為「實作繼承」，意味著子類別只想保留父類別中已實作的公開與受保護的成員為己用，並提供自己的公開介面與接下來會被繼承的受保護
+的成員。</small><br>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/protectedPrivateInheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

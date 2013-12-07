@@ -1,0 +1,1119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QWaitCondition.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:08 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QWaitCondition</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QWaitCondition</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在執行緒的同步化時，有些條件下執行緒必須等待，有些條件下則不用，這可以使用QWaitCondition來達到。<br>
+
+
+
+
+      <br>
+
+
+
+
+例如在生產者（Producer）與消費者（Consumer）的例子中，</small><small>如果生產者會將產品交給店員，而消費者從店員處取走產品，店員一次只能持有固定數量產品，如果生產者生產了過多的產品，店員叫生產者等一下
+（wait），如果店中有空位放產品了再喚醒（wake）生產者繼續生產，如果店中沒有產品了，店員會告訴消費者等一下（wait），如果店中有產品
+了再喚醒（wake）消費者來取走產品。<br>
+
+
+
+
+      <br>
+
+
+
+
+      </small><small>
+
+
+
+以下舉一個最簡單的：生產者每次生產一個int整數交給在店員上，而消費者從店員處取走整數，店員一次只能持有一個整數，</small><small>以程式實例來看，首先是生產者： </small><br>
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>Producer.h</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#ifndef PRODUCER_H<br>#define PRODUCER_H<br><br>#include &lt;QThread&gt;<br><br>class Clerk;<br><br>class Producer : public QThread {<br>    <br>public:<br>    Producer(Clerk *clerk);<br>	<br>protected:<br>    void run();<br>    <br>private:<br>    Clerk *clerk;<br>};<br><br>#endif</pre>
+
+
+
+
+      <small><br>
+
+
+
+
+      </small>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><span class="postbody"><small>Producer.cpp</small></span></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      
+      <pre>#include "Producer.h"<br>#include "Clerk.h"<br><br>Producer::Producer(Clerk *clerk) {<br>    this-&gt;clerk = clerk;<br>}<br><br>void Producer::run() {<br>    // 生產1到10的整數<br>    for(int product = 1; product &lt;= 10; product++) {<br>        // 暫停隨機時間<br>        QThread::msleep(qrand() / 100); <br>        // 將產品交給店員<br>        clerk-&gt;setProduct(product); <br>    }         <br>}</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>再來是消費者：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><span class="postbody"><small>Consumer.h</small></span></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      
+      <pre>#ifndef CONSUMER_H<br>#define CONSUMER_H<br><br>#include &lt;QThread&gt;<br><br>class Clerk;<br><br>class Consumer : public QThread {<br>    <br>public:<br>    Consumer(Clerk *clerk);<br>    <br>protected:<br>    void run();<br>    <br>private:<br>    Clerk *clerk;<br>};<br><br>#endif</pre>
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><span class="postbody"><small>Consumer.cpp</small></span></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#include "Consumer.h"<br>#include "Clerk.h"<br><br>Consumer::Consumer(Clerk *clerk) {<br>    this-&gt;clerk = clerk;<br>}<br><br>void Consumer::run() {<br>    // 消耗10個整數<br>    for(int i = 1; i &lt;= 10; i++) {<br>        // 暫停隨機時間<br>        QThread::msleep(qrand() / 10); <br>        // 從店員處取走整數<br>        clerk-&gt;getProduct(); <br>    } <br>}</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      </span><small>
+
+
+生產者將產品放至店員，而消費者從店員處取走產品，所以店員來決定誰必須等待並等候喚醒：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>Clerk.h</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#ifndef CLERK_H<br>#define CLERK_H<br><br>#include &lt;QMutex&gt;<br>#include &lt;QWaitCondition&gt;<br><br>class Clerk {<br>public:<br>    Clerk();<br>    void setProduct(int product);<br>    int getProduct();<br>	<br>private:<br>    int product;<br>    QMutex mutex;<br>    QWaitCondition waitCondition;<br>};<br><br>#endif</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      </span>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><span class="postbody"><small>Clerk.cpp</small></span></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#include "Clerk.h"<br>#include &lt;iostream&gt;<br>using namespace std;<br><br>Clerk::Clerk() {<br>    product = -1;    <br>}<br><br>void Clerk::setProduct(int product) {<br><span style="font-weight: bold;">    mutex.lock();</span><br>    <br>    if(this-&gt;product != -1) { <br>        // 目前店員沒有空間收產品，請稍候！<br><span style="font-weight: bold;">        waitCondition.wait(&amp;mutex);</span><br>    } <br><br>    this-&gt;product = product; <br>    cout &lt;&lt; "生產者設定 " &lt;&lt; this-&gt;product &lt;&lt; endl; <br><br>    // 喚醒一個消費者可以繼續工作了<br><span style="font-weight: bold;">    waitCondition.wakeOne();</span><br>    <br><span style="font-weight: bold;">    mutex.unlock();</span><br>}<br><br>int Clerk::getProduct() {<br><span style="font-weight: bold;">    mutex.lock();</span><br>    <br>    if(this-&gt;product == -1) { <br>        // 缺貨了，請稍候！<br><span style="font-weight: bold;">        waitCondition.wait(&amp;mutex);</span><br>    } <br><br>    int p = this-&gt;product; <br>    cout &lt;&lt; "消費者取走 " &lt;&lt; this-&gt;product &lt;&lt; endl;<br>    <br>    this-&gt;product = -1; <br><br>    // 喚醒一個生產者可以繼續工作了<br><span style="font-weight: bold;">    waitCondition.wakeOne();</span><br>   <br><span style="font-weight: bold;">    mutex.unlock();</span><br>    <br>    return p;     <br>}</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      </span><small>
+
+
+使用這麼一個程式來測試：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>main.cpp</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#include &lt;QCoreApplication&gt;<br>#include "Clerk.h"<br>#include "Producer.h"<br>#include "Consumer.h"<br><br>int main(int argc, char *argv[]) {<br>    QCoreApplication app(argc, argv);<br>	<br>    Clerk *clerk = new Clerk; <br><br>    Producer *producer = new Producer(clerk); <br>    Consumer *consumer = new Consumer(clerk); <br><br>    producer-&gt;start(); <br>    consumer-&gt;start();<br>    producer-&gt;wait();<br>    consumer-&gt;wait();<br>    <br>    return 0;<br>}<br></pre>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">生產者設定 (1)<br>
+
+
+
+
+
+
+
+
+消費者取走 (1)<br>
+
+
+
+
+
+
+
+
+生產者設定 (2)<br>
+
+
+
+
+
+
+
+
+消費者取走 (2)<br>
+
+
+
+
+
+
+
+
+生產者設定 (3)<br>
+
+
+
+
+
+
+
+
+消費者取走 (3)<br>
+
+
+
+
+
+
+
+
+生產者設定 (4)<br>
+
+
+
+
+
+
+
+
+消費者取走 (4)<br>
+
+
+
+
+
+
+
+
+生產者設定 (5)<br>
+
+
+
+
+
+
+
+
+消費者取走 (5)<br>
+
+
+
+
+
+
+
+
+生產者設定 (6)<br>
+
+
+
+
+
+
+
+
+消費者取走 (6)<br>
+
+
+
+
+
+
+
+
+生產者設定 (7)<br>
+
+
+
+
+
+
+
+
+消費者取走 (7)<br>
+
+
+
+
+
+
+
+
+生產者設定 (8)<br>
+
+
+
+
+
+
+
+
+消費者取走 (8)<br>
+
+
+
+
+
+
+
+
+生產者設定 (9)<br>
+
+
+
+
+
+
+
+
+消費者取走 (9)<br>
+
+
+
+
+
+
+
+
+生產者設定 (10)<br>
+
+
+
+
+
+
+
+
+消費者取走 (10)</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>
+
+
+生產者會生產10個整數，而消費者會消耗10個整數，由於店員處只能放置一個整數，所以每生產一個就消耗一個，其結果如上所示是無誤的。<br>
+
+
+
+
+
+      </small><span class="postbody"><br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QWaitCondition.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:08 GMT -->
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ClientSideValidator.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>客戶端驗證器</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 客戶端驗證器</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+validator-rules.xml中包括了一些驗證器與驗器規則，除了要自訂驗證器或驗證規則之外，基本上
+您並不需要去變更它。 <br>
+
+      <br>
+
+
+如果您要進行客戶端的驗證，可以撰寫自己的 <a class="wikilink" href="ActionForm.htm">ActionForm</a>
+類別，並在validation.xml中定義要驗證的屬性欄位，一個範例如下：</small>
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li> validation.xml
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;<br><br>&lt;!DOCTYPE form-validation PUBLIC <br>  <big><big><span style="font-size: 69%;">"-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.0//EN"</span></big></big><br>  "http://jakarta.apache.org/commons/dtds/validator_1_0.dtd"&gt; <br> <br> &lt;form-validation&gt; <br>    &lt;formset&gt;<br>        &lt;form name="userForm"&gt; <br>            &lt;field <br>                property="name" <br>                depends="required"&gt; <br>                    &lt;arg0 key="logon.username.displayname"/&gt; <br>             &lt;/field&gt; <br>         &lt;field <br>            property="email" <br>            depends="required,mask"&gt; <br>            &lt;arg0 key="logon.email.displayname"/&gt; <br>            &lt;var&gt; <br>                &lt;var-name&gt;mask&lt;/var-name&gt; <br>                &lt;var-value&gt;<br>        ^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*$<br>                &lt;/var-value&gt; <br>            &lt;/var&gt; <br>         &lt;/field&gt; <br>        &lt;/form&gt; <br>    &lt;/formset&gt; <br>&lt;/form-validation&gt; <br></pre>
+
+
+
+      <br>
+
+      <small>
+&lt;form&gt;的name屬性指明我們將為哪一個ActionForm作驗證，這個名稱必須在struts-
+config.xml中有定義，userForm中包括兩個屬性name與email，&lt;field&gt;定義要驗證的屬性欄位，
+depends定義所使用的驗證器，required驗證器會檢查欄位是否填寫，如果沒有，它會使用application.properties中的訊
+息：</small> <br>
+
+
+
+      
+      <ul>
+
+        <li> application.properties
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre># -- validator -- <br>errors.invalid={0} is invalid. <br>..... <br><br># -- display -- <br>logon.username.displayname=Username <br>logon.email.displayname=Email  <br></pre>
+
+
+
+      <br>
+
+      <small>
+您可以將struts-blank中的application.properties複製過來，有 # -- validator --
+下的驗證訊息將為Validator使用，arg0 會替換 {0} 中的文字。 <br>
+
+      <br>
+
+
+如果depends中指定了兩個以上的驗證器，則會依序使用，如果有一個驗證不通過，則會停止驗證並作出相關回應，mask驗證器用來驗證所輸入的欄位是
+否符合我們的設定格式，使用regular expression來設定驗證格式。 <br>
+
+      <br>
+
+
+Validator的客戶端驗證是使用JavaScript來進行驗證，驗證規則定義在validator-rules.xml中，有興趣
+的話可以看看當中有關於JavaScript是如何進行驗證的，我們可以直接使用&lt;html:javascript&gt;標籤來寫出所必須的
+JavaScript，一個例子如下：</small>
+
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>test.jsp</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>&lt;%@ taglib uri="/tags/struts-bean" prefix="bean" %&gt; <br>&lt;%@ taglib uri="/tags/struts-html" prefix="html" %&gt; <br>&lt;%@page contentType="text/html; charset=Big5"%&gt; <br>&lt;html:html&gt; <br>&lt;head&gt; <br> &lt;title&gt;Login&lt;/title&gt; <br> &lt;html:base/&gt; <br>&lt;/head&gt; <br>&lt;body bgcolor="white"&gt;<br> <br> &lt;html:messages id="error"&gt; <br>     &lt;bean:write name="error"/&gt; <br> &lt;/html:messages&gt;<br> <br> &lt;html:form action="/login.do" focus="name"<br>            onsubmit="return validateUserForm(this)"&gt; <br>    名稱：&lt;html:text property="name" size="20"/&gt;&lt;br&gt; <br>    郵件：&lt;html:text property="email" size="20"/&gt;&lt;br&gt; <br>    &lt;html:submit/&gt; &lt;html:reset/&gt; <br> &lt;/html:form&gt; <br> <br> &lt;html:javascript formName="userForm"/&gt; <br> <br>&lt;/body&gt; <br>&lt;/html:html&gt; <br></pre>
+
+
+
+      <br>
+
+      <small>
+在validation.xml的設定上，您可以定義一些常量，以方便在設定過程中使用，例如定義mask的regular
+expression，例如：</small><br>
+
+
+      
+      <ul>
+
+        <li>validation.xml</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>... <br> &lt;global&gt; <br>     &lt;constant&gt; <br>         &lt;constant-name&gt;email&lt;/constant-name&gt; <br>         &lt;constant-value&gt;<br>        ^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*$<br>         &lt;/constant-value&gt; <br>     &lt;/constant&gt; <br> &lt;/global&gt; <br><br> &lt;formset&gt; <br>     &lt;form name="userForm"&gt; <br>         &lt;field <br>             property="name" <br>             depends="required"&gt; <br>             &lt;arg0 key="logon.username.displayname"/&gt; <br>             &lt;/field&gt; <br>         &lt;field <br>            property="email" <br>            depends="required,mask"&gt; <br>            &lt;arg0 key="logon.email.displayname"/&gt; <br>            &lt;var&gt; <br>                &lt;var-name&gt;mask&lt;/var-name&gt; <br>                &lt;var-value&gt;${email}&lt;/var-value&gt; <br>            &lt;/var&gt; <br>         &lt;/field&gt; <br>    &lt;/form&gt; <br> &lt;/formset&gt;<br>... <br></pre>
+
+
+
+      <br>
+
+      <small>
+定義常量在管理上會很方便，日後如果要改變regular expression，就只要更改常量中的設定就好了。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ClientSideValidator.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/PublishEvent.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>事件傳播</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 事件傳播</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+如果您打算發佈事件通知實作ApplicationListener的類別之實例，則您可以使用ApplicationContext的publishEvent()方法，例如：<br>
+      </small>
+
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">ApplicationContext context = </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new ClassPathXmlApplicationContext("beans-config.xml"); <br>
+
+
+....<br>
+
+
+      </span></small></div>
+
+
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">context.publishEvent(new ContextClosedEvent(context));</span><br>
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+假設您在Bean定義檔中有這麼定義：</small><br>
+
+
+      <ul>
+        <li>beans-config.xml</li>
+      </ul>
+
+
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br>    &lt;bean id="listener" <br>          class="org.springframework.context.event.ConsoleListener"/&gt;<br><br>    ....<br>&lt;/beans&gt;</pre>
+
+      <br>
+      <small>
+
+
+
+
+
+
+則在文字模式下會顯示以下的訊息：</small><span class="postbody"></span><br>
+
+
+
+
+
+
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">...<br>
+
+org.springframework.context.event.ContextClosedEvent[source=org.springframework.context.support.ClassPathXmlApplicationContext:
+display name
+[org.springframework.context.support.ClassPathXmlApplicationContext;hashCode=8795033];
+startup date [Fri Oct 28 22:24:15 GMT+08:00 2005]; root of context
+hierarchy]</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+        </tbody>
+      </table>
+
+
+
+
+
+
+      <br>
+      <small>
+如果您打算實作自己的ApplicationEvent，則可以直接繼承ApplicationEvent，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package onlyfun.caterpillar;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import org.springframework.context.ApplicationEvent;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class SomeEvent extends ApplicationEvent {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public SomeEvent(Object obj) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; super(obj);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+      </small></div>
+
+      <small><br>
+
+在必要的時候就使用ApplicationContext的publishEvent()方法發佈這個事件以通知實作ApplicationListener的類別之實例：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">context.publishEvent(new SomeEvent("SomeEvent published"));</span></small><br>
+
+      </div>
+      </td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/PublishEvent.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

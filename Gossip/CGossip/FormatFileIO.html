@@ -1,0 +1,737 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/FormatFileIO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>格式化檔案 I/O</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">C&nbsp;Gossip: 格式化檔案 I/O</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在 C 語言中，可以使用<big> <a href="PrintfScanf.html"><small>printf()
+與 scanf()</small></a> <small>針對輸入或輸出進行格式化，在進行檔案I/O時，也可以使用 fprintf() 與 fscanf() 來進行格式化：<br>
+
+
+
+
+
+
+      </small></big></small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><big><small><span style="font-weight: bold;">int fprintf(FILE *fp, char *formatstr, arg1, arg2, ...);</span></small></big></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><big><small><span style="font-weight: bold;">int fscanf(FILE *fp, char *formatstr, arg1, arg2, ...);<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      </span></small></big></small>
+      <small><big><small><span style="font-weight: bold;"></span></small></big></small></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <small>
+下面這個程式使用串流進行格式化檔案I/O，寫入姓名與成績資料至檔案中，然後再將它讀出： </small><br>
+
+
+
+
+
+      <span class="postbody">
+      </span><span class="postbody"></span>
+      
+      
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt; <br>                                                                                <br>int main(int argc, char* argv[]) {<br>    char ch; <br><br>    FILE *file = fopen("test.txt", "w"); <br>    if(!file) { <br>        puts("無法寫入檔案"); <br>        return 1; <br>    } <br><br>    fprintf(file, "%s\t%d\r\n", "Justin", 90);<br>    fprintf(file, "%s\t%d\r\n", "momor", 80);<br>    fprintf(file, "%s\t%d\r\n", "bush", 75);    <br><br>    fclose(file);<br><br>    file = fopen("test.txt", "r");; <br>    if(!file) { <br>        puts("無法讀入檔案"); <br>        return 1; <br>    } <br>    <br>    char name[10]; <br>    int score; <br>    <br>    puts("Name\tScore"); <br>    while(fscanf(file, "%s\t%d", name, &amp;score) != EOF) { <br>        printf("%s\t%d\n", name, score); <br>    } <br><br>    fclose(file);<br><br>    return 0; <br>}</pre>
+
+
+
+
+
+      <span class="postbody">
+      <br>
+
+
+
+
+
+      </span><small>執行結果會在純文字檔案中儲存以下的內容，並在螢幕上顯示之：</small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Name&nbsp;&nbsp;&nbsp; Score<br>
+
+
+
+
+
+
+Justin&nbsp; 90<br>
+
+
+
+
+
+
+momor&nbsp;&nbsp; 80<br>
+
+
+
+
+
+
+bush&nbsp;&nbsp;&nbsp; 75</span></small></td>
+
+
+
+
+
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+      <small>在程式執行過程開啟的標準輸出stdout、標準輸入stdin、標準錯誤stderr，事實上也是檔案串流的特例，在C程式中，也常見到以下的方式，以便直接控制這三個標準輸入、輸出、錯誤：<br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt; <br>                                                                                <br>int main(int argc, char* argv[]) {<br>    char ch; <br><br>    FILE *file = fopen("test.txt", "w"); <br>    if(!file) { <br style="font-weight: bold;"><span style="font-weight: bold;">	// 寫到標準錯誤</span><br style="font-weight: bold;"><span style="font-weight: bold;">        fprintf(stderr, "無法寫入檔案\n"); </span><br>        return 1; <br>    } <br><br>    fprintf(file, "%s\t%d\r\n", "Justin", 90);<br>    fprintf(file, "%s\t%d\r\n", "momor", 80);<br>    fprintf(file, "%s\t%d\r\n", "bush", 75);    <br><br>    fclose(file);<br><br>    file = fopen("test.txt", "r");; <br>    if(!file) { <br><span style="font-weight: bold;">	// 寫到標準錯誤</span><br style="font-weight: bold;"><span style="font-weight: bold;">        fprintf(stderr, "無法讀入檔案\n");</span>  <br>        return 1; <br>    } <br>    <br>    char name[10]; <br>    int score; <br>    <br>    puts("Name\tScore"); <br>    while(fscanf(file, "%s\t%d", name, &amp;score) != EOF) { <br><span style="font-weight: bold;">        // 寫到標準輸出</span><br style="font-weight: bold;"><span style="font-weight: bold;">        fprintf(stdout, "%s\t%d\n", name, score); </span><br>    } <br><br>    fclose(file);<br><br>    return 0; <br>}</pre>
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>程式的執行結果與上一個範例是相同的。</small><br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/FormatFileIO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/StaticClassMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>靜態方法、類別方法</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: 靜態方法、類別方法<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你定義了一個類別：</small><br>
+      <pre>class Some:<br>    def __init__(self, x):<br>        self.x = x<br>    <br>    def service(self, y):<br>        print('do service...', self.x + y)<br></pre>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">你可以透過Some實例來操作service()方法。例如：</small><br>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">s = Some(10)</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">s.service(2)&nbsp; # do service... 12</span></small><br>
+      </div>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">表面上，上例像是：<br>
+</small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">s = Some(10)</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some.service(s, 2)</span></small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+s所參考的實例，會綁定至service()的第一個參數，而所給定的引數，會指定service()方法的第二個參數，實際上在這類的情況下，service()方法是一個</small><small><span style="font-weight: bold;">綁定方法（Bound method）</span></small><small style="font-family: Courier New,Courier,monospace;">，而每個實例會有自己的綁定方法。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">s1 = Some(10)</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">service = s1.service</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">service(5)&nbsp;&nbsp;&nbsp; </small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service... 15</span></small><br style="font-weight: bold;">
+      <br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">s2 = Some(20)</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">service = s2.service</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">service(5)&nbsp;&nbsp;&nbsp; </small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service... 25<br>
+</span></small></div>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">而Some類別本身亦擁有一個service()函式，例如：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">s1 = Some(10)</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">Some.service(s1, 5)&nbsp; </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service... 15</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">s2 = Some(20)</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">Some.service(s2, 5)&nbsp; </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service... 25</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">service = Some.service</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">service(s1, 5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service... 15</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">service(s2, 5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service... 25</span></small></div>
+      <small><br>
+如果在定義類別時，類別中的函式沒有任何參數，則該函式無法成為綁定方法，因為試圖將實例作為第一個參數時會發生錯誤。例如：<br>
+      </small>
+      <pre>class Other:<br>    def service():<br>        print('do service...')<br>        <br>o = Other()<br>o.service()  # TypeError: service() takes no arguments (1 given)<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">像上例中service()只能作為Other上的一個函式來使用：</span><br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Other.service()&nbsp;&nbsp;&nbsp;&nbsp; </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"># do service...</span></small></div>
+      <small><br>
+如果你在定義類別時希望某個函式，完全不要作為實例的綁定方法，也就是不要將第一個參數綁定為所建立的實例，則可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">@staticmethod</span>加以修飾。例如：<br>
+      </small>
+      <pre>class Some:<br><span style="font-weight: bold;">    @staticmethod</span><br>    def service(x, y):<br>        print('do service...', x + y)<br><br>Some.service(10, 20) <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><span style="font-family: Courier New,Courier,monospace;"># do service... 25</span>
+<br>s = Some()<br><span style="font-family: Courier New,Courier,monospace;"></span>s.service(10, 20)    <span style="font-family: Courier New,Courier,monospace;"># do service... 25</span><br>s.service(10)        <small># TypeError: service() takes exactly 2 positional arguments (1 given)<br></small></pre>
+      <small><br>
+雖然你可以透過實例來呼叫<span style="font-family: Courier New,Courier,monospace;">@staticmethod</span>所修飾的靜態方法，但建議透過類別名稱來呼叫。類似的，建議透過實例來呼叫實例的綁定方法。一個沒有使用<span style="font-family: Courier New,Courier,monospace;">@staticmethod</span>宣告而又帶有參數的函式，就如先前所看到的，可以用實例方法來使用，也可以用靜態方法的方式呼叫，這是Python3給的方便性，讓你不一定得使用<span style="font-family: Courier New,Courier,monospace;">@staticmethod</span>來區別，只要你知道自己在作什麼。事實上，你還可以這麼作：<br>
+      </small>
+      <pre>class Some:<br>    def __init__(self, x):<br>        self.x = x<br>    <br>    def service(self, y):<br>        print('do service...', self.x + y)<br><br>class Other:<br>    pass<br><br>o = Other()<br>o.x = 100<br>Some.service(o, 200)    <span style="font-family: Courier New,Courier,monospace;"># do service... 25</span>
+      </pre>
+      <small><br>
+      </small><small style="font-family: Courier New,Courier,monospace;">Some.service()的第一個參數可以任何物件，只要它有個x屬性。</small><br>
+
+      <br>
+      <small>你還可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">@classmethod</span>來修飾一個函式成為類別方法，這樣的方法第一個參數永遠綁定為類別物件本身，無論是以實例方法來呼叫，或是以靜態方法來呼叫。例如：</small><br>
+      <span style="font-family: Courier New,Courier,monospace;"></span>
+      <pre>class Some:<br>    def __init__(self, x):<br>        self.x = x<br>        <br><span style="font-weight: bold;">    @classmethod</span><br>    def service(clz, y):<br>        print('do service...', clz, y)<br><br>s = Some(10)<br>s.service(20)      # do service... &lt;class '__main__.Some'&gt; 20<br>Some.service(30)   # do service... &lt;class '__main__.Some'&gt; 30<br></pre>
+      <span style="font-family: Courier New,Courier,monospace;"><br>
+      <br>
+      <br>
+      </span>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/StaticClassMethod.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

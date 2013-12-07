@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/JUnit4.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:23 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>使用 JUnit 4.x</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 使用 JUnit 4.x<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>JUnit
+4.x支援標註方式，可以在撰寫測試案例類別是簡化不少動作。舉個例子來說，若將 <a href="JUnit3.html">使用 JUnit
+3.x </a>中的範例改以 JUnit 4.x的方式來撰寫，可以如下：<br>
+      </small>
+      <ul>
+        <li><small>CalculatorTest.java</small></li>
+      </ul>
+      <pre>package test.cc.openhome;<br><br>import static org.junit.Assert.*;<br>import org.junit.*;<br>import cc.openhome.Calculator;<br><br>public class CalculatorTest {<br>    private Calculator calculator;<br><br><span style="font-weight: bold;">    @Before</span><br>    public void setUp() {<br>        calculator = new Calculator();<br>    }<br><br><span style="font-weight: bold;">    @After</span><br>    public void tearDown() {<br>        calculator = null;<br>    }<br><br><span style="font-weight: bold;">    @Test</span><br>    public void testPlus() {<br>        int expected = 5;<br>        int result = calculator.plus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>    <br><span style="font-weight: bold;">    @Test</span><br>    public void testMinus() {<br>        int expected = 1;<br>        int result = calculator.minus(3, 2);<br>        assertEquals(expected, result);<br>    }<br>}<br></pre>
+      <small><small> <br>
+      </small><span style="font-family: Courier New,Courier,monospace;">你
+不用再繼承TestCase類別，而可以使用<span style="font-weight: bold;">@Test</span>標註測試方
+法，方法只需公開、沒有傳回值、沒有參數，名稱則可以任意，</span>JUnit 4<span style="font-family: Courier New,Courier,monospace;">中會自動找出有標註@Test的方法並執
+行。<span style="font-weight: bold;">@Before</span>可用來標示每個測試方法開始前要執行的操作，<span style="font-weight: bold;">@After</span></span></small><small style="font-family: Courier New,Courier,monospace;">可用來標示每個測試方法完成後要執行的操
+作。<br>
+      <br>
+注意到，</small><small>JUnit 4</small><small style="font-family: Courier New,Courier,monospace;">的套件名稱是以<span style="font-weight: bold;">org.junit</span>開頭，有別於</small><small>JUnit 3</small><small style="font-family: Courier New,Courier,monospace;">的junit.framework套件開
+頭名稱，所以斷言相關方法，現在是在org.junit.Assert中的靜態方法。為了相容性，你下載的</small><small>JUnit
+4也會附帶舊有的JUnit 3</small><small style="font-family: Courier New,Courier,monospace;">相關類別。<br>
+      </small><br>
+      <small>由於不再繼承<span style="font-family: Courier New,Courier,monospace;">TestCase</span>，通常會
+稱這個類別為測試類別（Test class），一個測試類別用來集合相關的測試。要執行這個測試類別，可以如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-family: 'Courier New',Courier,monospace;">C:\workspace\calculator&gt;javac
+-sourcepath src -cp lib/junit-4.8.2.jar;classes -d classes
+src/test/cc/openhome/CalculatorTest.java<br>
+            <br>
+C:\workspace\calculator&gt;java -cp lib/junit-4.8.2.jar;classes
+org.junit.runner.JUnitCore test.cc.openhome.CalculatorTest<br>
+JUnit version 4.8.2<br>
+..<br>
+Time: 0.024<br>
+            <br>
+OK (2 tests)</span><span style="font-family: 'Courier New',Courier,monospace;"></span><br>
+            </span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>在這邊使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">org.junit.runner.JUnitCore</span>來
+讀入測試類別並執行測試，</small><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runner.JUnitCore
+是個<a href="../DesignPattern/FacadePattern.htm">Facade</a>
+類別，會自動判斷使用對應的預設runner來執行測試。例如，對於</span></small> <small><a href="JUnit3.html">使用 JUnit 3.x</a> 中的例子，你也可以使用</small><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runner.JUnitCore
+來執行，在內部，</span></small><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runner.JUnitCore
+會使用org.junit.internal.runners.JUnit38ClassRunner來運行測試</span></small><small><span style="font-family: Courier New,Courier,monospace;">。必要時，你也可以使用<span style="font-weight: bold;">org.junit.runner.RunWith</span>標註指定使用哪個
+runner。例如：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@RunWith(value=org.junit.internal.runners.JUnit38ClassRunner.class)</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class CalculatorTest extends
+TestCase {</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; ...</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"></span></span><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span>JUnit
+4<span style="font-family: Courier New,Courier,monospace;">內建的runner有：<br>
+      </span></small>
+      <ul>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">org.junit.internal.runners.JUnit38ClassRunner</span></small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>為了相容性，附帶在JUnit 4中，可運行JUnit
+3.x測試案例。</small><br>
+      </div>
+      <br>
+      <ul>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runners.JUnit4</span></small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>用來運行JUnit 4.x測試類別。</small><br>
+      </div>
+      <br>
+      <ul>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runners.Parameterized</span></small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>可設定一組參數，在每次運行測試時自動在指定位置給予不同
+的參數，之後說明。</small><br>
+      </div>
+      <br>
+      <ul>
+        <li><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runners.Suite</span></small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>正如同JUnit 3.x中的<span style="font-family: Courier New,Courier,monospace;">TestSuite</span>，用來
+任意組合測試，本身也是個<span style="font-family: Courier New,Courier,monospace;">runner</span>。</small><br>
+      </div>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><br>
+在這邊先示範一下</span></span><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runners.Parameterized
+的使用範例，直接先看程式：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package test.cc.openhome;<br><br>import java.util.*;<br>import static org.junit.Assert.*;<br>import org.junit.*;<br>import org.junit.runner.*;<br>import org.junit.runners.*;<br>import cc.openhome.Calculator;<br><br><span style="font-weight: bold;">@RunWith(value=Parameterized.class)</span><br>public class CalculatorTest {<br><span style="font-weight: bold;">    @Parameterized.Parameters</span><br>    <span style="font-weight: bold;">public static Collection&lt;Integer[]&gt;</span> getParameters() {<br>        return Arrays.asList(<br>            new Integer[][] {<br>                {5, 3, 2}, //expected, para1, para2<br>                {3, 1, 2}, //expected, para1, para2<br>                {2, 1, 1}  //expected, para1, para2<br>            }<br>        );<br>    }<br>    <br><span style="font-weight: bold;">    private int expected;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private int para1;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private int para2;</span><br>    <br><span style="font-weight: bold;">    public CalculatorTest(int expected, int para1, int para2) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        this.expected = expected;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        this.para1 = para1;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        this.para2 = para2;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br><br>    @Test<br>    public void testPlus() {<br>        Calculator calculator = new Calculator();<br>        int result = calculator.plus(<span style="font-weight: bold;">para1</span>, <span style="font-weight: bold;">para2</span>);<br>        assertEquals(<span style="font-weight: bold;">expected</span>, result);<br>    }<br>}<br></pre>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"> <br>
+在上例中，你使用<span style="font-family: Courier New,Courier,monospace;">@RunWith
+標註使用的runner</span>是</span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"></span></span><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runners.Parameterized，
+此時你必須提供一個方法傳回一組參數，方法可以使用@Parameterized.Parameters標註，這個方法必須是公開、無參數、傳回一個
+Collection，當中每個元素必須是一個一維陣列，陣列中第一個元素放預期值，之後參數值一、參數值二等。<br>
+      <br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;">org.junit.runners.Parameterized
+會使用你所標註的方法取得Collection，之後建立每個測試類別實例時，依序透過建構式將陣列中的每個元素傳入，如上例中，你就可以使用一組準備好
+的參數來運行測試。你的Collection長度多長，就會運行幾次測試，以上例而言，共會運行三次測試。</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><br>
+如果必要的話，你也可以在現有的JUnit 3測試案例中，結合JUnit 4的測試類別，只要使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">org.junit.JUnit4TestAdapter</span>。
+例如：<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public
+static Test suite() {</span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+return new JUnit4TestAdapter(CalculatorTest.class);</span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 14px; text-align: left;"><br>
+      </span></span><small><span style="font-family: Courier New,Courier,monospace;"><br>
+      <br class="Apple-interchange-newline">
+      </span></small><br>
+      <br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/JUnit4.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:23 GMT -->
+</html>

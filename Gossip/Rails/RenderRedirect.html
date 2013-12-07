@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/RenderRedirect.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>render 與 redirect_to</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror render redirect_to" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: render 與 redirect_to<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>在控制器的動作中處理完請求之後，接下來要準備對客戶端呈現回應，先前例子中，如果執行了<span class="courier">xxx</span>動作，接下來預設就會使用xxx.html.erb來呈現回應。</p>
+      <p>實際上，Rails會在動作完成之後（甚至控制器中沒有對應的動作），以預設方式呼叫<span class="courier">render</span>方法，也就是以預設的xxx.html.erb作為樣版回應，你也可以自行在動作中執行<span
+          class="courier">render</span>方法（會將回應以字串作為方法的傳回值，通常作為檢視回應之用），如果自行呼叫過<span
+          class="courier">render</span>方法，Rails後續就不會再呼叫<span class="courier">render</span>方法，一個請求/回應週期內，只能呼叫過一次<span
+          class="courier">render</span>方法，否則會發生<span class="courier">AbstractController::DoubleRenderError</span>錯誤。<br>
+      </p>
+      <p><span class="courier">呼叫render方法後，會將呈現回應給客戶端，如果只是想檢視目前回應內容，可以呼叫render_to_string，這僅會就目前回應資訊，將呈現以字串傳回，而不會回應給客戶端</span>。<br>
+      </p>
+      <p>如果不想使用樣版檔案回應，可以在呼叫<span class="courier">render</span>時給予參數。例如回應空白內容：</p>
+      <p style="margin-left: 40px; font-weight: bold;"><span class="courier">render :nothing =&gt; true</span></p>
+      <p>這會傳送HTTP狀態碼200以及相關標頭給客戶端，但沒有任何回應本體內容，你可以使用<span class="courier">:text、:xml或:json</span>傳回純文字、XML或是JSON格式。例如：</p>
+      <p style="margin-left: 40px;"><span style="font-weight: bold;" class="courier">render :text =&gt; "This is a test!"</span><br>
+      </p>
+      <p>傳回的content-type是text/html; charset=utf-8，內容為指定的純文字。如果：<br>
+      </p>
+      <p style="margin-left: 40px;"><strong><span class="courier">render :xml =&gt; @page</span></strong></p>
+      <p>傳回的content-type是application/xml; charset=utf-8，內容為指定的XML，可以指定字串，如果指定為物件，會嘗試呼叫物件的<span
+          class="courier">to_xml</span>方法取得XML內容。上例中，假設<span class="courier">to_xml</span>是產生的模型所定義的方法，則內容會是：</p>
+      <div style="margin-left: 40px;"><span class="courier" style="font-weight: bold;">&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>
+          &lt;page&gt;<br>
+          &nbsp; &lt;id type="integer"&gt;1&lt;/id&gt;<br>
+          &nbsp; &lt;title&gt;Openhome&lt;/title&gt;<br>
+          &nbsp; &lt;url&gt;http://openhome.cc&lt;/url&gt;<br>
+          &nbsp; &lt;description&gt;Orzxxxxxxx&lt;/description&gt;<br>
+          &nbsp; &lt;created-at type="datetime"&gt;2011-12-16T08:07:28Z&lt;/created-at&gt;<br>
+          &nbsp; &lt;updated-at type="datetime"&gt;2011-12-18T09:17:43Z&lt;/updated-at&gt;<br>
+          &lt;/page&gt;</span><br>
+      </div>
+      <p></p>
+      <p>如果要傳送JSON，可以如下：</p>
+      <p style="margin-left: 40px; font-weight: bold;"><span class="courier">render :json =&gt; @page</span></p>
+      <p>可以指定字串，如果指定為物件，會嘗試呼叫物件的<span class="courier">to_json</span>方法取得JSON內容，若上例是模型的<span
+          class="courier">to_json</span>方法，則傳回的內容會是：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;"><span>{<br>
+          &nbsp;&nbsp;&nbsp; "created_at":"2011-12-16T08:07:28Z",<br>
+          &nbsp;&nbsp;&nbsp; "description":"Orzxxxxxxx",<br>
+          &nbsp;&nbsp;&nbsp; "id":1,<br>
+          &nbsp;&nbsp;&nbsp; "title":"Openhome",<br>
+          &nbsp;&nbsp;&nbsp; "updated_at":"2011-12-18T09:17:43Z",<br>
+          &nbsp;&nbsp;&nbsp; "url":"http://openhome.cc"<br>
+          }</span><br>
+      </p>
+      <p>可以加上<span class="courier">:callback</span>指定JSONP的回呼函式名稱：</p>
+      <div style="margin-left: 40px; font-weight: bold;"><span class="courier">render :json =&gt; @page, :callback =&gt; "call_back"</span></div>
+      <p>如此，傳回的內容會是：</p>
+      <p style="margin-left: 40px;"><strong><span class="courier">call_back({<br>
+            &nbsp;&nbsp;&nbsp; "created_at":"2011-12-16T08:07:28Z",<br>
+            &nbsp;&nbsp;&nbsp; "description":"Orzxxxxxxx",<br>
+            &nbsp;&nbsp;&nbsp; "id":1,<br>
+            &nbsp;&nbsp;&nbsp; "title":"Openhome",<br>
+            &nbsp;&nbsp;&nbsp; "updated_at":"2011-12-18T09:17:43Z",<br>
+            &nbsp;&nbsp;&nbsp; "url":"http://openhome.cc"<br>
+            })</span></strong></p>
+      <p>也可以傳回JavaScript，例如：</p>
+      <p style="margin-left: 40px;"><strong class="courier">render :js =&gt; "alert('Hello! Rails!')"</strong><br>
+      </p>
+      <p>傳回的content-type是text/javascript; charset=utf-8，內容為指定的JavaScript內容。</p>
+      <p>如果使用<span class="courier">:inline</span>，可以在字串中撰寫樣版內容，但不鼓勵這麼作：</p>
+      <p style="margin-left: 40px;"><span style="font-weight: bold;" class="courier">render :inline =&gt; "&lt;b&gt;&lt;%= @page.title %&gt;&lt;/b&gt;"</span><br>
+      </p>
+      <p>你也可以指定使用哪個動作的樣版，以下的結果都是相同的：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">render :edit<br>
+          render :action =&gt; :edit<br>
+          render 'edit'<br>
+          render :action =&gt; 'edit'<br>
+          render 'bookmarks/edit'<br>
+        </span><span style="font-weight: bold;">render :action =&gt; 'edit.html.erb'</span><br>
+        <span style="font-weight: bold;">render 'edit.html.erb'</span><span
+          style="font-weight: bold;"><br>
+          render 'bookmarks/edit.html.erb'<br>
+          render :template =&gt; 'bookmarks/edit'<br>
+          render :template =&gt; 'bookmarks/edit.html.erb'<br>
+          render '/path/to/rails/app/views/bookmarks/edit'<br>
+          render '/path/to/rails/app/views/bookmarks/edit.html.erb'<br>
+          render :file =&gt; '/path/to/rails/app/views/bookmarks/edit'<br>
+          render :file =&gt; '/path/to/rails/app/views/bookmarks/edit.html.erb'</span><br>
+      </p>
+      <p class="courier">注意！以上指定都只是使用指定的樣版檔案，而不會呼叫動作方法，也就是前六個指定方式，都不會呼叫<span>edit</span>方法。<br>
+      </p>
+      <p><span class="courier">render</span>還有一些可搭配的選項，例如：</p>
+      <p style="margin-left: 40px; font-weight: bold;"><span class="courier">:content_type<br>
+          :status<br>
+          :location</span></p>
+      <p>以下是幾個使用的例子：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;"><span>render :file =&gt; filename, :content_type =&gt; 'application/rss'<br>
+          render :status =&gt; 500&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # HTTP 狀態碼 500<br>
+          render :status =&gt; :forbidden&nbsp; # </span><span>HTTP 狀態碼 403<br>
+          render :status =&gt; 301, :location =&gt; "http://localhost:3000/test/index"<br>
+        </span></p>
+      <p>最後一個例子，會傳回HTTP狀態碼301與Location標頭，結果是使得瀏覽器重新導向（Redirect）至指定的網址。如果你要重新導向，也可以使用<span
+          class="courier">redirect_to</span>方法。例如：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">redirect_to "http://localhost:3000/test/index"<br>
+          redirect_to "/bookmarks"<br>
+          redirect_to root_path<br>
+          redirect :back # 回到上一頁<br>
+          redirect_to "/bookmarks/new"<br>
+          redirect_to :action =&gt; "edit", :id =&gt; 1</span><br>
+        <span style="font-weight: bold;">redirect_to :action =&gt; "edit", :id =&gt; 1, :status =&gt; 301</span><br>
+      </p>
+      <p>要注意的是，<span class="courier">render</span>是在程式內轉移頁面回應，為同一個請求週期，瀏覽器並不會知道這件事，因而網址列不會產生變化，而<span
+          class="courier">redirect_to</span>會先回應瀏覽器Location標頭，瀏覽器再重新請求指定的網址，因此網址列會發生變化，也就是一個重新的請求。<br>
+      </p>
+      <p><span class="courier">由於redirect_to會對瀏覽器有實際的回應，因此同一個請求週期內，render與redirect_to只能擇一呼叫，否則會發生AbstractController::DoubleRenderError錯誤。</span><br>
+      </p>
+      更多有關<span class="courier">render</span>的說明，可以再參考 <a href="http://guides.rubyonrails.org/layouts_and_rendering.html">Layouts and Rendering in Rails</a>。<br>
+      <br>
+      <br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/RenderRedirect.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+</html>

@@ -1,0 +1,1106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ObjectClass.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Object 類別</title></head><body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: Object 類別</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在Java中，<span style="font-weight: bold;">所有的物件都隱含的擴充了Object類別</span>，Object類別是Java程式中所有類別的父類別，當您定義一個類別時： <br>
+
+
+
+      </small>
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Foo { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 實作 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </span><br>
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+這個程式碼相當於：<br>
+
+
+
+      </small>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Foo extends Object { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 實作 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+Object類別定義了幾個方法，包括"protected"的<span style="font-weight: bold;">clone()、finalize()</span>兩個方法，以及幾個"public"方法，像是<span style="font-weight: bold;">equals()</span>、<span style="font-weight: bold;">toString()</span>、<span style="font-weight: bold;">getClass()</span>、<span style="font-weight: bold;">hashCode()</span>、<span style="font-weight: bold;">notify()</span>、<span style="font-weight: bold;">notifyAll()</span>等等的方法，這些方法您都可以加以重新定義（除了 getClass()、notify()、notifyAll()、wait()等方法之外，它們被宣告為 "<a href="FinalKeyword.htm">final</a>"，無法被子類別重新定義），以符合您所建立的類別需求，我會在以後的適當主題中介紹這些方法的使用。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+由於Object類別是Java中所有類別的父類別，所以它可以參考至任何的物件而不會發生任何錯誤，這是很有用，以後您會看到一些
+Java程式中，有些物件可以加入一些衍生類別物件，並可透過方法呼叫會直接傳回Object物件，這些物件可以經由型態（介面）轉換而指定給衍生類別型
+態參考。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+下面這個程式中，您製作一個簡單的<span style="font-weight: bold;"> 集合（Collection）類別</span>，並將一些自訂類別物件加入其中，這個程式示範了Object的一個應用： </small>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li> Foo1.java </li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <pre>public class Foo1 { <br>    private String name; <br> <br>    public Foo1(String name) { <br>        this.name = name; <br>    }<br> <br>    public void showName() { <br>        System.out.println("foo1 name: " + name); <br>    } <br> <br>    // 重新定義toString() <br>    public String toString() { <br>        return "foo1 name: " + name; <br>    } <br>}</pre>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li> Foo2.java </li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <pre>public class Foo2 { <br>    private String name; <br> <br>    public Foo2(String name) { <br>        this.name = name; <br>    } <br> <br>    public void showName() { <br>        System.out.println("foo2 name: " + name); <br>    } <br> <br>    // 重新定義toString() <br>    public String toString() { <br>        return "foo2 name: " + name; <br>    } <br>} <br></pre>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li> SimpleCollection.java </li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <pre>public class SimpleCollection { <br>    private Object[] objArr; <br>    private int index = 0; <br> <br>    public SimpleCollection() { <br>        objArr = new Object[10]; // 預設10個物件空間 <br>    } <br> <br>    public SimpleCollection(int capacity) { <br>        objArr = new Object[capacity]; <br>    } <br> <br>    public void add(Object o) { <br>        objArr[index] = o; <br>        index++; <br>    } <br> <br>    public int getLength() { <br>        return index; <br>    } <br> <br>    public Object get(int i) { <br>        return objArr[i]; <br>    } <br>} <br></pre>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li> Test.java </li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <pre>public class Test { <br>    public static void main(String[] args) { <br>        SimpleCollection objs = new SimpleCollection(); <br> <br>        objs.add(new Foo1("f1 number 1")); <br>        objs.add(new Foo2("f2 number 1")); <br> <br>        Foo1 f1 = (Foo1) objs.get(0); <br>        f1.showName(); <br> <br>        Foo2 f2 = (Foo2) objs.get(1); <br>        f2.showName(); <br> <br>        System.out.println(); <br>        System.out.println("f1.toString(): " + <br>                              f1.toString()); <br>        System.out.println("f2.toString(): " +<br>                              f2.toString()); <br>    } <br>} </pre>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">foo1 name: f1 number 1 <br>
+
+
+
+
+
+
+
+foo2 name: f2 number 1 <br>
+
+
+
+
+
+
+
+&nbsp;<br>
+
+
+
+
+
+
+
+f1.toString(): foo1 name: f1 number 1 <br>
+
+
+
+
+
+
+
+f2.toString(): foo2 name: f2 number 1&nbsp;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+      <small>
+
+
+
+在程式中，SimpleCollection物件可以加入任何型態的物件至其中，而傳回物件時，您只要透過型態（介面）轉換，就可以操作型態（介面）上的方法。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+Object的toString()方法預設會傳回以下的字串： <br>
+
+
+
+      </small>
+
+
+
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-style: italic;">getClass().getName() + '@' +</span><br style="font-weight: bold; font-style: italic;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Integer.toHexString(hashCode());</span><br>
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+getClass()方法是Object中定義的方法，它會傳回物件於執行時期的Class實例，而hashCode()傳回該物件的hash
+code，toString()方法用來傳回物件的描述，通常是個文字性的描述，Object的toString()方法預設在某些場合是有用的，例如物
+件的自我檢視時，但在這邊，您將之重新定義為文字模式下使用者看得懂的文字描述。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+上面這個程式範例雖然簡單，但您以後一定會常常看到類似的應用，例如視窗程式容器、Vector類別等等。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+Object預設的equals()本身是比較物件的記憶體參考，如果您要有必要比較兩個物件的內含資料是否相同（例如當物件被儲存至Set時）您必須<span style="font-weight: bold;">實作equals()與hashCode()</span>。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+一個比較常被採用的方法是根據物件中包括的所有屬性值來作比較，來看看下面的一個例子： <br>
+
+
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">public class Cat { </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ... </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public boolean equals(Object other) { </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (this == other) </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return true; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (!(other instanceof Cat)) </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; final Cat cat = (Cat) other; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (!getName().equals(cat.getName())) </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (!getBirthday().equals(cat.getBirthday())) </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return true; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public int hashCode() { </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int result; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result = getName().hashCode(); </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result = 29 * result + getBirthday().hashCode(); </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return result; </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span><br style="font-weight: bold;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold;">}</span><br>
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+這稱之為by value equality，更嚴格的比對是根據<span style="font-weight: bold;">商務鍵值（Business key）</span>實作equals()與hashCode()，</small><small>商務鍵是一個屬性或多個屬性的結合，</small><small>挑選那些可以從不為null、很少改變且</small><small>組合後</small><small>具有唯一性的屬性</small><small>。<br>
+
+
+      <br>
+
+
+API中對於equals()的合約是必須具備<span style="font-weight: bold;">反身性（Reflexive）、對稱性（Symmetric）、傳遞性（Transitive）、一致性（Consistent）</span>。<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>反身性（Reflexive）：x.equals(x)的結果要是true。</small></li>
+
+
+
+        <li><small>對稱性（Symmetric）：x.equals(y)與y.equals(x)的結果必須相同。</small></li>
+
+
+
+        <li><small>傳遞性（Transitive）：x.equals(y)、y.equals(z)的結果都是true，則x.equals(z)的結果也必須是true。</small></li>
+
+
+
+        <li><small>一致性（Consistent）：同一個執行期間，對x.equals(y)的多次呼叫，結果必須相同。</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+      <small>
+      <br>
+
+
+
+
+
+
+可以參考API文件中Object類別的hashCode()之建議：<br>
+
+
+
+      </small>
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>在同一個應用程式執行期間，對同一物件呼叫 hashCode()方法，必須回傳相同的整數結果。</small></li>
+
+
+
+        <li><small>如果兩個物件使用equals(Object)測試結果為相等, 則這兩個物件呼叫hashCode()時，必須獲得相同的整數結果。</small></li>
+
+
+
+        <li><small>如果兩個物件使用equals(Object)測試結果為不相等, 則這兩個物件呼叫hashCode()時，可以獲得不同的整數結果。</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+兩個不同的物件，可以傳回相同的hashCode()結果，這是合法甚至適當的，只是物件會被丟到同一個雜湊桶中。<br>
+
+
+
+      <br>
+
+
+
+
+
+
+
+至於clone()方法，它是有關於如何複製物件本身，您可以在當中定義您的複製方法，不過物件的複製要深入的話必須考慮很多細節，您可以從 <a href="../DesignPattern/PrototypePattern.htm">這篇文章</a> 開始稍微瞭解一下如何定義clone()方法。</small>
+      <br>
+
+
+
+
+
+
+ </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ObjectClass.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

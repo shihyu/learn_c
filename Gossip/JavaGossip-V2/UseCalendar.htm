@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/UseCalendar.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:57 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>使用 Calendar</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 使用 Calendar</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>您可以使用Date來取得完整的日期時間顯示，但如果您想要單獨取得某個時間或日期資訊的話該如何？例如您想知道現在是5月的第幾天？<br>
+
+      <br>
+
+
+
+
+您要使用Calendar類別，在這之前，<span style="font-weight: bold;">您要先知道Calendar的一些方法取回的數字是對應於Calendar本身的常數</span>，也就是說並不是您取回1 這個數字，就表示今天是星期一。<br>
+
+      <br>
+
+
+
+
+想要取得現在的時間，首先使用Calendar的<span style="font-weight: bold;">getInstance()</span>取得一個Calendar的實例，例如：<br>
+
+      </small>
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Calendar rightNow = Calendar.getInstance();</span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+如果現在您想知道現在是西元幾年，則可以使用<span style="font-weight: bold;">get()</span>方法並指定常數，例如：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(rightNow.get(Calendar.YEAR));</span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+如果現在是2005年，則上例會顯示2005的數字，依照這個例子，假設撰寫本文的時間是5月份，而您現在想使用程式取得現在的月份，則下例您可能會有些困惑：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(rightNow.get(Calendar.MONTH));</span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+程式會顯示4這個數字，而不是您預期的5，因為傳回的4並不是代表月份，而是對應於Calendar.MAY常數的值，
+Calendar在月份上的常數值從Calendar.JANUARY開始是0，到Calendar.DECEMBER的11，所以您如果想要顯示傳回值
+的真正意涵，可以如下撰寫：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String[] months = {"一月", "二月", "三月", "四月",</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"五月", "六月", "七月", "八月",</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"九月", "十月", "十一月", "十二月"};</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Calendar rightNow = Calendar.getInstance();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(months[rightNow.get(Calendar.MONTH)]);</span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+同樣的，如果您想要取得星期資訊，要記得常數從Calendar.SUNDAY是1，到Calendar.SATURDAY是7，由於對應的數並不是從0 開始，所以如果要使用如上的陣列來對應的話，第一個陣列值就不包括資訊，例如：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String[] dayOfWeek = {"", "日", "一", "二",</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"三", "四", "五", "六"};</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Calendar rightNow = Calendar.getInstance();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(dayOfWeek[</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rightNow.get(Calendar.DAY_OF_WEEK)]);</span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+      <br>
+
+
+
+
+總之您要記得傳回的值是對應於Calendar的某個常數，會這樣設計的原因在於實際上英文中對於星期或月份並不附以數字上的意涵，如Sunday、
+Monday等，幸而除了月份、星期之外，傳回的值都對應於真正的時間意涵，畢竟像西元、小時、分等等本身就是以數字表示。<br>
+
+      <br>
+
+
+
+
+如果怕搞混，使用switch來比對是個不錯的作法，例如：</small>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li> CalendarDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Calendar;<br><br>public class CalendarDemo {<br>	public static void main(String[] args) {<br>        Calendar rightNow = Calendar.getInstance();<br>        <br>        System.out.println("現在時間是：");<br>        System.out.println("西元：" +<br>                   rightNow.get(Calendar.YEAR));<br>        System.out.println("月：" + <br>                   getChineseMonth(rightNow));<br>        System.out.println("日：" + <br>                   rightNow.get(Calendar.DAY_OF_MONTH));<br>        System.out.println("星期：" + <br>                   getChineseDayOfWeek(rightNow));<br>	}<br>    <br>    public static String getChineseMonth(Calendar rightNow) {<br>        String chineseMonth = null;<br>        <br>        switch(rightNow.get(Calendar.MONTH)) {<br>            case Calendar.JANUARY:<br>                chineseMonth = "一";<br>                break;<br>            case Calendar.FEBRUARY:<br>                chineseMonth = "二";<br>                break;<br>            case Calendar.MARCH:<br>                chineseMonth = "三";<br>                break;<br>            case Calendar.APRIL:<br>                chineseMonth = "四";<br>                break;<br>            case Calendar.MAY:<br>                chineseMonth = "五";<br>                break;<br>            case Calendar.JUNE:<br>                chineseMonth = "六";<br>                break;<br>            case Calendar.JULY:<br>                chineseMonth = "七";<br>                break;<br>            case Calendar.AUGUST:<br>                chineseMonth = "八";<br>                break;<br>            case Calendar.SEPTEMBER:<br>                chineseMonth = "九";<br>                break;<br>            case Calendar.OCTOBER:<br>                chineseMonth = "十";<br>                break;<br>            case Calendar.NOVEMBER:<br>                chineseMonth = "十一";<br>                break;<br>            case Calendar.DECEMBER:<br>                chineseMonth = "十二";<br>                break;                <br>        }<br>        <br>        return chineseMonth;<br>    }<br>    <br>    public static String getChineseDayOfWeek(<br>                                 Calendar rightNow) {<br>        String chineseDayOfWeek = null;<br>        <br>        switch(rightNow.get(Calendar.DAY_OF_WEEK)) {<br>            case Calendar.SUNDAY:<br>                chineseDayOfWeek = "日";<br>                break;<br>            case Calendar.MONDAY:<br>                chineseDayOfWeek = "一";<br>                break;<br>            case Calendar.TUESDAY:<br>                chineseDayOfWeek = "二";<br>                break;<br>            case Calendar.WEDNESDAY:<br>                chineseDayOfWeek = "三";<br>                break;<br>            case Calendar.THURSDAY:<br>                chineseDayOfWeek = "四";<br>                break;<br>            case Calendar.FRIDAY:<br>                chineseDayOfWeek = "五";<br>                break;<br>            case Calendar.SATURDAY:<br>                chineseDayOfWeek = "六";<br>                break;           <br>        }<br>        <br>        return chineseDayOfWeek;<br>    }<br>}</pre>
+
+
+
+
+      <small><br>
+
+      <span class="postbody"></span>在取得一個Calendar的實例後，您可以使用setTime()方法給它一個Date物件，將之改變為Date目前的時間，例如：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>Calendar c = Calendar.getInstance();<br>
+
+
+Date date = new Date(10000000000L);<br>
+
+
+c.setTime(date);<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+還可以使用add()方法，來改變Calendar的時間，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>c.add(Calendar.MONTH, 1); // 目前時間加1個月<br>
+
+
+c.add(Calendar.HOUR, 3); // 目前時間加3小時<br>
+
+
+c.add(Calendar.YEAR, -2); // 目前時間減2年<br>
+
+
+c.add(Calendar.DAY_OF_WEEK, 3); // 目前的時間加3天<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+如果打算只針對日期中某個欄位加減，則可以使用roll()方法，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">c.roll(Calendar.MONTH, 10); // 只增加月的欄位值為10個月</span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+在上例中，假設是2006/10/1，則執行過後的Calendar實例，其中的時間將是2006/8/1，也就是只改變月份的欄位。</small><br>
+
+
+      <br>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+   <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/UseCalendar.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:57 GMT -->
+</html>

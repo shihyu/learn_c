@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/ManyToMany.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:18 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>多對多</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 多對多</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+      </td>
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在資料庫表格上要進行多對多對應，可以藉由一個中介表格來完成，也就是藉由多對一、一對多來完成多對多關聯。<br>
+
+      <br>
+
+      <img style="width: 637px; height: 139px;" alt="" src="images/ManyToMany-1.jpg"><br>
+
+      <br>
+
+      </small><small>多對多由於使用了中介表格，在查詢效率不彰，且在程式的物件模式上，多對多會使得物件與物件之間彼此依賴，並不是一個很好的設計方式，在設計上應避免使用
+多對多關係。<br>
+
+      <br>
+
+若要設計多對多關係，則可以使用@ManyToMany的標註，例如設計User類別如下：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>User.java</small></li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.Serializable;<br>import java.util.Set;<br>import javax.persistence.CascadeType;<br>import javax.persistence.Column;<br>import javax.persistence.Entity;<br>import javax.persistence.GeneratedValue;<br>import javax.persistence.GenerationType;<br>import javax.persistence.Id;<br>import javax.persistence.JoinColumn;<br>import javax.persistence.JoinTable;<br>import javax.persistence.ManyToMany;<br>import javax.persistence.Table;<br><br>@Entity<br>@Table(name="T_USER")<br>public class User implements Serializable {<br>    @Id<br>    @GeneratedValue(strategy = GenerationType.AUTO)<br>    @Column(name="USER_ID")<br>    private Long id;<br>    private String name;<br>    private Long age;<br>    <br><span style="font-weight: bold;">    @ManyToMany(cascade=CascadeType.ALL)</span><br style="font-weight: bold;"><span style="font-weight: bold;">    @JoinTable(</span><br style="font-weight: bold;"><span style="font-weight: bold;">        name="T_USER_SERVER",</span><br style="font-weight: bold;"><span style="font-weight: bold;">        joinColumns={@JoinColumn(name="USER_FK")},</span><br style="font-weight: bold;"><span style="font-weight: bold;">        inverseJoinColumns={@JoinColumn(name="SERVER_FK")}</span><br style="font-weight: bold;"><span style="font-weight: bold;">    )</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private Set&lt;Server&gt; servers;</span><br><br>    // 以下為 Getter、Setter<br>    ...<br>}</pre>
+
+      <small><br>
+
+其中@JoinTable中name設定的是中介表格的名稱，並設定對應的欄位名稱。而Server可以如下設計：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>Server.java</small></li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Set;<br>import javax.persistence.CascadeType;<br>import javax.persistence.Column;<br>import javax.persistence.Entity;<br>import javax.persistence.GeneratedValue;<br>import javax.persistence.GenerationType;<br>import javax.persistence.Id;<br>import javax.persistence.ManyToMany;<br>import javax.persistence.Table;<br><br>@Entity<br>@Table(name="T_SERVER")<br>public class Server {<br>    @Id<br>    @GeneratedValue(strategy = GenerationType.AUTO)<br>    @Column(name="SERVER_ID")<br>    private Long id;<br>    private String address;<br><br><span style="font-weight: bold;">    @ManyToMany(cascade=CascadeType.ALL, mappedBy="servers")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private Set&lt;User&gt; users;</span><br><br>    // 以下是 Getter、Setter<br>    ...<br>}</pre>
+
+      <small><br>
+
+      </small><small>這邊直接透過mappedBy屬性設定了雙向關聯，</small><small>一個儲存時的例子如下：<br>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Server server1 = new Server();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server1.setAddress("PC-219");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server1.setUsers(new HashSet());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Server server2 = new Server();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server2.setAddress("PC-220");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server2.setUsers(new HashSet());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Server server3 = new Server();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server3.setAddress("PC-221");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server3.setUsers(new HashSet());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User user1 = new User();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1.setName("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1.setServers(new HashSet());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1.setAge(new Long(35));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User user2 = new User();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user2.setName("momor");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user2.setServers(new HashSet());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user2.setAge(new Long(30));<br>
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; // 多對多，互相參考</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1.getServers().add(server1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1.getServers().add(server2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user1.getServers().add(server3);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server1.getUsers().add(user1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server2.getUsers().add(user1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server3.getUsers().add(user1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user2.getServers().add(server1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user2.getServers().add(server3);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server1.getUsers().add(user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server3.getUsers().add(user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EntityManager entityManager =</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+JPAUtil.getEntityManagerFactory().createEntityManager();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EntityTransaction etx = entityManager.getTransaction();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.begin();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.persist(user1);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.persist(user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.commit();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.close();</span><br>
+
+      <br>
+
+      </small><small><span class="postbody">執行後資料庫的內容如下：</span></small>
+      <br>
+
+      <br>
+
+      <img style="width: 302px; height: 486px;" alt="" src="images/ManyToMany-2.jpg"><br>
+
+      <br>
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">如果您使用以下方式進行查詢：<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">EntityManager </span></small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">entityManager =<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+JPAUtil.getEntityManagerFactory().createEntityManager();<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">EntityTransaction </span></small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">etx = entityManager.getTransaction();<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.begin();<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">user1 = entityManager.find(User.class, new Long(1));</span><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; etx.commit();<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">System.out.println(user1.getServers());</span><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entityManager.close();</small><br>
+
+      <br>
+
+      <small>若是使用Hibernate作為JPA的實作，則首先會先查詢出T_USER表格的內容，再透過left out join的方式查詢對應的T_SERVER中的資料，如以下所產生的SQL語句：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hibernate: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; select</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.USER_ID as USER1_0_0_,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.age as age0_0_,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.name as name0_0_ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; from</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T_USER user0_ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; where</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user0_.USER_ID=?</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hibernate: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; select</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; servers0_.USER_FK as USER1_1_,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; servers0_.SERVER_FK as SERVER2_1_,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server1_.SERVER_ID as SERVER1_1_0_,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server1_.address as address1_0_ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; from</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T_USER_SERVER servers0_ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; left outer join</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T_SERVER server1_ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; on servers0_.SERVER_FK=server1_.SERVER_ID </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; where</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; servers0_.USER_FK=?</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+      </small><small><br>
+
+      </small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/ManyToMany.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:20 GMT -->
+</html>

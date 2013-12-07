@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/BigNumber.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:49 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>超長整數運算（大數運算）</title></head><body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 超長整數運算（大數運算）</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+      
+      <h2>說明</h2><small>
+
+
+基於記憶體的有效運用，程式語言中規定了各種不同的資料型態，也因此變數所可以表達的最大整數受到限制，例如123456789123456789這樣的
+整數就不可能儲存在long變數中（例如C/C++、Java等），我們稱這種數為long數，這邊翻為超長整數（避免與資料型態的長整數翻譯混淆），或俗稱大數運算。</small><br>
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+一個變數無法表示超長整數，那就使用多個變數，基本方式之一是使用陣列，假設程式語言的最大資料型態可以儲存至65535的數好了，為了計算方便及符合使用十進位制的習慣，讓每個陣列元素可以儲存0到9999的數，也就是10000進位。例如： </small><br>
+
+
+      <img style="width: 445px; height: 356px;" alt="大數運算" title="大數運算" src="images/bigNumber-1.jpg"><small><br>
+
+      <br>在
+考慮正負數的情況下，最高位數用來標示正負數，正數的話最高位數會是0000，負數的話最高位數會是9999，負數採10000補數，例如99為0000
+0000 0000 0099，而-99為9999 9999 9999 9901，也就是用9999減99表示法每個位數，最後低數位再加1。</small><small>由
+於使用陣列來儲存數值，關於數值在運算時的加減乘除等各種運算、位數的進位或借位就必須自行定義，加、減、乘都是由低位數開始運算，而除法則是由高位數開
+始運算。a + b時若b為負數，求b的補數c並改進行a - c；a - b時若b為負數，求b的補數c並改進行a + c，乘法與除法一律先以正數表示運算，之後再判斷正負數決定是否轉為補數。</small><br>
+      <small><br>
+如果使用的是高階語言，通常有內建API可進行大數運算，例如Java在java.lang下有BigInteger與BigDecimal可以直接使用，</small><small>很多人問到如何計算像50!這樣的問題，就是運用大數運算API，有些程式語言（例如Python、Ruby、Haskell等）直接支援大整數運算，無需顯式地使用API，JavaScript只有浮點數，超過浮點數可表示範圍為Infinity。<br>
+</small><small></small>
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt;<br><br>#define N 8<br><br>void add(int*, int*, int*);<br>void subtract(int*, int*, int*);<br>void multiply(int*, int, int*);<br>void divide(int*, int, int*);<br>void toComp(int*, int*);  // 轉補數<br>void absv(int*, int*);    // 轉絕對值<br>void print(int*);         // 顯示大整數<br><br>int main(void) { <br>    int a[] = {0, 0, 0, 1234, 5678, 9910, 1923, 1124};<br>    int b[] = {9999, 9999, 9999, 9999, 9999, 9999, 9999, 9901}; // -99<br>    int c1[N], c2[N], c3[N], c4[N] = {0};<br>        <br>    add(a, b, c1);       print(c1);<br>    subtract(a, b, c2);  print(c2);<br>    multiply(a, -3, c3); print(c3);<br>    divide(a, -3, c4);   print(c4);<br><br>    return 0; <br>} <br><br>void add(int* a, int* b, int* c) { <br>    if(b[0] == 9999) {<br>        int comp[N] = {0};<br>        toComp(b, comp);<br>        subtract(a, comp, c);<br>    } else {<br>        int i, carry = 0; <br>        for(i = N - 1; i &gt;= 0; i--) {<br>            c[i] = a[i] + b[i] + carry; <br>            if(c[i] &lt; 10000) {<br>                carry = 0; <br>            } else { // 進位 <br>                c[i] = c[i] - 10000; <br>                carry = 1; <br>            } <br>        } <br>    }<br>} <br><br>void subtract(int* a, int* b, int* c) {<br>    if(b[0] == 9999) {<br>        int comp[N] = {0};<br>        toComp(b, comp);<br>        add(a, comp, c);<br>    } else {<br>        int i, borrow = 0; <br>        for(i = N - 1; i &gt;= 0; i--) { <br>            c[i] = a[i] - b[i] - borrow; <br>            if(c[i] &gt;= 0) {<br>                borrow = 0;<br>            } else { // 借位 <br>                c[i] = c[i] + 10000; <br>                borrow = 1; <br>            } <br>       } <br>    }<br>} <br><br>void multiply(int* a, int b, int* c) { // b 為乘數<br>    int op1[N] = {0}; absv(a, op1);<br>    int op2 = abs(b);<br><br>    int i, tmp, carry = 0; <br>    for(i = N - 1; i &gt;= 0; i--) { <br>        tmp = op1[i] * op2 + carry; <br>        c[i] = tmp % 10000;    <br>        carry = tmp / 10000; <br>    }<br>    <br>    if((a[0] == 9999 &amp;&amp; b &gt; 0) || (a[0] == 0 &amp;&amp; b &lt; 0)) {<br>        toComp(c, c);<br>    }<br>} <br><br>void divide(int* a, int b, int *c) {  // b 為除數 <br>    int op1[N] = {0}; absv(a, op1);<br>    int op2 = abs(b);<br>    <br>    int i, tmp, remain = 0; <br>    for(i = 1; i &lt; N; i++) { <br>        tmp = op1[i] + remain; <br>        c[i] = tmp / op2; <br>        remain = (tmp % op2) * 10000; <br>    }<br><br>    if((a[0] == 9999 &amp;&amp; b &gt; 0) || (a[0] == 0 &amp;&amp; b &lt; 0)) {<br>        toComp(c, c);<br>    }    <br>}<br><br>void toComp(int* src, int* comp) {<br>    int j;<br>    for(j = 0; j &lt; N; j++) {<br>        comp[j] = 9999 - src[j];<br>    }<br>    comp[N - 1] += 1;<br>}<br><br>void absv(int* src, int* op) {<br>    if(src[0] == 9999) {<br>        toComp(src, op);<br>    } else {<br>        int i;<br>        for(i = 0; i &lt; N; i++) {<br>            op[i] = src[i];<br>        }<br>    }<br>}<br><br>void print(int* c) {<br>    int v[N] = {0}; absv(c, v);<br>    <br>    if(c[0] == 9999) {<br>        printf("-");<br>    }<br>    <br>    int isDropZero = 1;<br>    int i;<br>    for(i = 0; i &lt; N; i++) {<br>        char s[5] = {'\0'};<br>        sprintf(s, "%04d", v[i]);<br>        if(isDropZero) {<br>            int j;<br>            for(j = 0; s[j] == '0' &amp;&amp; j &lt; 4; j++);<br>            if(j &lt; 4) {<br>                isDropZero = 0;<br>                for(; j &lt; 4; j++) {<br>                    printf("%c", s[j]);<br>                }<br>            } else if(i == N - 1) {<br>                printf("0");<br>            }<br>        } else {<br>            printf(s);<br>        }<br>    }<br>    printf("\n");<br>}<br></pre>
+
+
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>import java.util.*;<br>import static java.lang.System.out;<br><br>public class BigInteger {<br>    private List&lt;Integer&gt; value;<br>    <br>    public BigInteger(String val) {<br>        // 取數字部份<br>        String v = val.charAt(0) == '-' ? val.substring(1) : val;<br>        // 每四個字元剖析為一個 int<br>        value = new ArrayList&lt;&gt;();<br>        for(int i = v.length() - 4; i &gt; -4; i -= 4) {<br>            value.add(Integer.parseInt(v.substring(i &gt;= 0 ? i : 0, i + 4)));<br>        }<br>        // 補位，位數以 8 為單位<br>        int valueLength = (value.size() / 8 + 1) * 8;<br>        for(int i = value.size(); i &lt; valueLength; i++) {<br>            value.add(0);<br>        }<br>        // 負數轉補數表示<br>        value = val.charAt(0) == '-' ? toComplement(value) : value;        <br>    }<br><br>    private BigInteger(List&lt;Integer&gt; value) {<br>        this.value = value;<br>    }<br>    <br>    public BigInteger add(BigInteger that) {<br>        if(isNegative(that.value)) {<br>            return subtract(new BigInteger(toComplement(that.value)));<br>        }<br>        // 對齊位數<br>        int length = Math.max(value.size(), that.value.size());<br>        List&lt;Integer&gt; op1 = copyOf(value, length);<br>        List&lt;Integer&gt; op2 = copyOf(that.value, length);<br>        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();<br>        <br>        int carry = 0;<br>        for(int i = 0; i &lt; length - 1; i++) {<br>            int c = op1.get(i) + op2.get(i) + carry;<br>            if(c &lt; 10000) {<br>                carry = 0;<br>            } else {<br>                c -= 10000;<br>                carry = 1;<br>            }<br>            result.add(c);<br>        }<br>        <br>        if(carry == 1) { // 溢位處理<br>            if(isPositive(op1)) { result.add(1); } <br>            else { result.clear(); } // 負數加法運算溢位就是 0<br>            for(int i = 0; i &lt; 8; i++) { result.add(0); } // 自動增加 8 位數<br>        } else { // 補位，正數補 0，負數補 9999<br>            result.add(isPositive(op1) ? 0 : 9999);<br>        }<br>        return new BigInteger(result);<br>    }<br>    <br>    public BigInteger subtract(BigInteger that) {<br>        if(isNegative(that.value)) {<br>            return add(new BigInteger(toComplement(that.value)));<br>        }<br>        // 對齊位數<br>        int length = Math.max(value.size(), that.value.size());<br>        List&lt;Integer&gt; op1 = copyOf(value, length);<br>        List&lt;Integer&gt; op2 = copyOf(that.value, length);<br>        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();<br>        <br>        int borrow = 0;<br>        for(int i = 0; i &lt; length - 1; i++) { <br>            int c = op1.get(i) - op2.get(i) - borrow; <br>            if(c &gt; -1) {<br>                borrow = 0;<br>            } else { // 借位 <br>                c += 10000; <br>                borrow = 1; <br>            }<br>            result.add(c);<br>        }<br>        <br>        if(borrow == 1) { // 溢位處理<br>            if(isNegative(op1)) { result.add(9998); } <br>            else { result.clear(); } // 正數減法運算溢位就是 0<br>            for(int i = 0; i &lt; 8; i++) { result.add(9999); } // 自動增加 8 位數<br>        } else {  // 補位，負數補 9999，正數補 0<br>            result.add(isNegative(op1) ? 9999 : 0);<br>        }<br>        <br>        return new BigInteger(result);<br>    }<br><br>    // 右運算元為 int 時的乘法運算，內部使用，兩個運算元都要是正數<br>    private BigInteger multiply(int val, int shift) {<br>        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();<br>        for(int i = 0; i &lt; shift; i++) { result.add(0); } // 位移補 0<br>        int carry = 0;<br>        for(int i = 0; i &lt; value.size() - 1; i++) {<br>            int tmp = value.get(i) * val + carry;<br>            result.add(tmp % 10000);<br>            carry = tmp / 10000;<br>        }<br>        if(carry != 0) {<br>            result.add(carry);<br>            for(int i = 0; i &lt; 8; i++) { result.add(0); }<br>        } else { result.add(0); }<br><br>        return new BigInteger(result);<br>    }<br>    <br>    public BigInteger multiply(BigInteger that) {<br>        // 轉正數表示<br>        BigInteger op1 = isNegative(value) ? <br>                           new BigInteger(toComplement(value)) : this;<br>        List&lt;Integer&gt; op2 = isNegative(that.value) ? <br>                                      toComplement(that.value) : that.value;<br>        // 逐位運算<br>        List&lt;BigInteger&gt; rs = new ArrayList&lt;&gt;();<br>        for(int i = 0; i &lt; op2.size() - 1; i++) {<br>            rs.add(op1.multiply(op2.get(i), i));<br>        }<br>        // 對逐位運算結果加總<br>        BigInteger result = rs.get(0);<br>        for(int i = 1; i &lt; rs.size(); i++) {<br>            result = result.add(rs.get(i));<br>        }<br>        // 判斷正負數<br>        return getLast(value) + getLast(that.value) == 9999 ? <br>            new BigInteger(toComplement(result.value)) : result;<br>    }<br>    <br>    public boolean greaterOrEquals(BigInteger that) {<br>        return isNegative(subtract(that).value) ? false : true;<br>    }<br>    <br>    private boolean islessOrEqualsToQuotient(BigInteger op1, BigInteger op2) {<br>        return op1.greaterOrEquals(multiply(op2)) ? true : false;<br>    }<br>    <br>    // 右運算元為 int 時的除法運算，內部使用，兩個運算元都要是正數<br>    private BigInteger divide(int that) {<br>        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();<br>        int remain = 0;<br>        for(int i = value.size() - 1; i &gt; -1; i--) {<br>            int tmp = value.get(i) + remain;<br>            result.add(tmp / that);<br>            remain = (tmp % that) * 10000;<br>        }<br>        Collections.reverse(result);<br>        for(int i = 0; i &lt; 8 - (result.size() % 8); i++) {<br>            result.add(0);<br>        }<br>        return new BigInteger(result);<br>    }<br><br>    public BigInteger divide(BigInteger that) {<br>        // 一律先以正數表示<br>        BigInteger op1 = isNegative(value) ? <br>                             new BigInteger(toComplement(value)) : this;<br>        BigInteger op2 = isNegative(that.value) ? <br>                             new BigInteger(toComplement(that.value)) : that;<br>        <br>        BigInteger one = new BigInteger("1");<br>        BigInteger left = new BigInteger("0");<br>        BigInteger right = op1;<br><br>        // 二分法搜尋 x.islessOrEqualsToQuotient(op1, op2) 為 true 的最大 x 值<br>        while(right.greaterOrEquals(left)) {<br>            BigInteger x = left.add(right).divide(2);<br>            if(x.islessOrEqualsToQuotient(op1, op2)) {<br>                left = x.add(one);<br>            } else {<br>                right = x.subtract(one);<br>            }<br>        }<br>        BigInteger result = left.subtract(one);<br><br>        // 判斷正負數<br>        return getLast(value) + getLast(that.value) == 9999 ? <br>            new BigInteger(toComplement(result.value)) : result;<br>    }<br>    <br>    public String toString() {<br>        // 一律以正數表示<br>        List&lt;Integer&gt; v = isNegative(value) ? toComplement(value) : value;<br>        StringBuilder builder = new StringBuilder();<br>        for(int i = v.size() - 1; i &gt; -1; i--) {<br>            builder.append(String.format("%04d", v.get(i)));<br>        }<br>        // 移去前端的 0，負數補負號<br>        while(builder.length() &gt; 0 &amp;&amp; builder.charAt(0) == '0') {<br>            builder.deleteCharAt(0);<br>        }<br>        return builder.length() == 0 ? "0" : <br>                   isNegative(value) ? builder.insert(0, '-').toString() : <br>                       builder.toString();<br>    }<br>        <br>    private static List&lt;Integer&gt; toComplement(List&lt;Integer&gt; v) {<br>        List&lt;Integer&gt; comp = new ArrayList&lt;&gt;();<br>        for(Integer i : v) { comp.add(9999 - i); }<br>        comp.set(0, comp.get(0) + 1);<br>        return comp;<br>    }<br>    <br>    private static List&lt;Integer&gt; copyOf(<br>                List&lt;Integer&gt; original, int newLength) {<br>        List&lt;Integer&gt; v = new ArrayList&lt;&gt;(original);<br>        for(int i = v.size(); i &lt; newLength; i++) {<br>            v.add(isPositive(original) ? 0 : 9999);<br>        }<br>        return v;<br>    }<br>    <br>    private static Integer getLast(List&lt;Integer&gt; list) {<br>        return list.get(list.size() - 1);<br>    }<br>    <br>    private static boolean isNegative(List&lt;Integer&gt; list) {<br>        return getLast(list) == 9999;<br>    }<br>    <br>    private static boolean isPositive(List&lt;Integer&gt; list) {<br>        return getLast(list) == 0;<br>    }<br>    <br>    private static boolean isZero(List&lt;Integer&gt; list) {<br>        for(Integer i : list) if(i != 0) {<br>            return false;<br>        }<br>        return true;<br>    }<br>    <br>    public static void main(String[] args) {<br>        BigInteger a = new BigInteger("9999999999999999999999999999");<br>        BigInteger b = new BigInteger("-2");<br>        out.println(a.add(b));       // 9999999999999999999999999997<br>        out.println(a.subtract(b));  // 10000000000000000000000000001<br>        out.println(a.multiply(b));  // -19999999999999999999999999998<br>        out.println(a.divide(b));    // -4999999999999999999999999999<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>from itertools import dropwhile<br>from functools import reduce<br><br>class BigInt:<br>    def __init__(self, val):<br>        self.value = BigInt.parse(val) if isinstance(val, str) else val<br>        <br>    def __str__(self):<br>        v = BigInt.toComplement(self.value) \<br>                if BigInt.isNegative(self.value) else self.value<br>        builder = ['%04d' % v[i] for i in range(len(v) - 1, -1, -1)]<br>        clist = list(dropwhile(lambda c: c == '0', list(''.join(builder))))<br>        return '0' if len(clist) == 0 else ''.join(<br>              ((['-'] + clist) if BigInt.isNegative(self.value) else clist))<br>        <br>    def __add__(self, that):<br>        return (self - BigInt(BigInt.toComplement(that.value))) \<br>                if BigInt.isNegative(that.value) else self.add(that)<br>            <br>    def add(self, that):            <br>        length = max(len(self.value), len(that.value))<br>        op1 = BigInt.copyOf(self.value, length)<br>        op2 = BigInt.copyOf(that.value, length)<br>        sum = BigInt.addForEach(op1, op2, 0)<br>        return BigInt(<br>            (((sum[0:-1] + [1]) if BigInt.isPositive(op1) else []) + [0] * 8)<br>                if sum[-1] == 1 <br>                else (sum[0:-1] + [0 if BigInt.isPositive(op1) else 9999])<br>        )<br>        <br>    def __sub__(self, that):<br>        return (self + BigInt(BigInt.toComplement(that.value))) \<br>            if BigInt.isNegative(that.value) else self.sub(that)<br>        <br>    def sub(self, that):<br>        length = max(len(self.value), len(that.value))<br>        op1 = BigInt.copyOf(self.value, length)<br>        op2 = BigInt.copyOf(that.value, length)        <br>        remain = BigInt.subForEach(op1, op2, 0)<br>        return BigInt(<br>            ((remain[0:-1] + [9998] if BigInt.isNegative(op1) else []) <br>                + [9999] * 8) if remain[-1] == 1 <br>                    else (remain[0:-1] + <br>                        [9999 if BigInt.isNegative(op1) else 0])<br>        )<br>    <br>    def multiply(self, val, shift):<br>        product = [0] * shift + \<br>            BigInt.multiplyForEach(self.value, val, 0)<br>        return BigInt((product[0:-1] + product[-1:] + [0] * 8) \<br>            if product[-1] != 0 else (product[0:-1] + [0]))<br><br>    def __mul__(self, that):<br>        op1 = BigInt(BigInt.toComplement(self.value)) \<br>                if BigInt.isNegative(self.value) else self<br>        op2 = BigInt.toComplement(that.value) \<br>                if BigInt.isNegative(that.value) else that.value<br>        result = reduce(BigInt.__add__, <br>                [op1.multiply(op2[i], i) <br>                    for i in range(len(op2) - 1)], BigInt('0'))<br>        return BigInt(BigInt.toComplement(result.value)) \<br>                if self.value[-1] + that.value[-1] == 9999 else result<br><br>    def __ge__(self, that):<br>        return False if BigInt.isNegative((self - that).value) else True<br><br>    def isLessOrEqualsQuotient(self, op1, op2):<br>        return True if op1 &gt;= (self * op2) else False<br>    <br>    def __floordiv__(self, that):<br>        op1 = BigInt(BigInt.toComplement(self.value)) \<br>                if BigInt.isNegative(self.value) else self<br>        op2 = BigInt(BigInt.toComplement(that.value)) \<br>                if BigInt.isNegative(that.value) else that<br>        one = BigInt('1')<br>        <br>        def quotient(left, right):<br>            if right &gt;= left:<br>                x = (left + right).divide(2)<br>                l, r = ((x + one, right) <br>                    if x.isLessOrEqualsQuotient(op1, op2) <br>                    else (left, x - one))<br>                return quotient(l, r)<br>            else:<br>                return left - one<br>        result = quotient(BigInt('0'), op1)<br>        return BigInt(BigInt.toComplement(result.value)) \<br>                if self.value[-1] + that.value[-1] == 9999 else result<br>    <br>    @staticmethod<br>    def divideForEach(op, val, remain):<br>        if op == []:<br>            return []<br>        else:<br>            tmp = op[-1] + remain<br>            nextRemain = (tmp % val) * 10000<br>            return [tmp // val] + \<br>                BigInt.divideForEach(op[0:-1], val, nextRemain)<br>    <br>    def divide(self, that):<br>        result = BigInt.divideForEach(self.value, that, 0)<br>        return BigInt(result[::-1] + [0] * (8 - (len(result) % 8)))<br>        <br>    @staticmethod<br>    def parse(val):<br>        v = val[1:] if val[0] == '-' else val<br>        digits = [int(v[i if i &gt;= 0 else 0 : i + 4]) <br>                for i in range(len(v) - 4, -4, -4)]<br>        zeros = [0] * ((len(digits) // 8 + 1) * 8 - len(digits))<br>        return BigInt.toComplement(digits + zeros) \<br>                if val[0] == '-' else (digits + zeros)<br><br>    @staticmethod<br>    def addForEach(op1, op2, carry):<br>        if op1 == []:<br>            return [carry]<br>        else:<br>            s = op1[0] + op2[0] + carry<br>            nextCarry, c = (0, s) if s &lt; 10000 else (1, s - 10000)<br>            return [c] + BigInt.addForEach(op1[1:], op2[1:], nextCarry)<br><br>    @staticmethod<br>    def subForEach(op1, op2, borrow):<br>        if op1 == []:<br>            return [borrow]<br>        else:<br>            r = op1[0] - op2[0] - borrow<br>            nextBorrow, c = (0, r) if r &gt; -1 else (1, r + 10000)<br>            return [c] + BigInt.subForEach(op1[1:], op2[1:], nextBorrow)<br><br>    @staticmethod<br>    def multiplyForEach(op, val, carry):<br>        if op == []:<br>            return [carry]<br>        else:<br>            tmp = op[0] * val + carry<br>            nextCarry = tmp // 10000<br>            return [tmp % 10000] + \<br>                    BigInt.multiplyForEach(op[1:], val, nextCarry)<br>            <br>    @staticmethod<br>    def toComplement(v):<br>        c = [9999 - i for i in v]<br>        return [c[0] + 1] + c[1:]<br>    <br>    @staticmethod<br>    def copyOf(original, newLength):<br>        return original + [0 if BigInt.isPositive(original) else 9999 <br>                for i in range(len(original), newLength)]<br>    <br>    @staticmethod<br>    def isNegative(list):<br>        return list[-1] == 9999<br>        <br>    @staticmethod<br>    def isPositive(list):<br>        return list[-1] == 0<br><br>a = BigInt('99999999999999990999')<br>b = BigInt('-200')<br>print(a + b)<br>print(a - b)<br>print(a * b)<br>print(a // b)</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>class BigInt private (v: List[Int]) {<br>    private val value = v<br>    import BigInt._<br>    override def toString = {<br>        val v = if(isNegative(value)) toComplement(value) else value<br>        val builder = for(i &lt;- v.size - 1 until (-1, -1)) <br>                         yield "%04d".format(v(i))<br>        val clist = builder.flatten.dropWhile(_ == '0').toList<br>        if(clist.size == 0) "0" <br>        else (if(isNegative(value)) '-' :: clist else clist).mkString<br>    }<br>    def + (that: BigInt): BigInt = {<br>       if(isNegative(that.value)) this - new BigInt(toComplement(that.value))<br>       else add(that)<br>    }<br>    <br>    private def add(that: BigInt) = {<br>        val length = scala.math.max(value.size, that.value.size)<br>        val op1 = copyOf(value, length)<br>        val op2 = copyOf(that.value, length)<br>        val sum = addForEach(op1, op2, 0)<br>        new BigInt(<br>            if(sum.last == 1) ((if(isPositive(op1)) sum.init ++ List(1)<br>                                else Nil) ++ (for(i &lt;- 0 until 8) yield 0))<br>            else sum.init ++ List(if(isPositive(op1)) 0 else 9999)<br>        )<br>    }<br>    <br>    def - (that: BigInt) = {<br>        if(isNegative(that.value)) this + new BigInt(toComplement(that.value))<br>        else sub(that)<br>    }<br>    <br>    private def sub(that: BigInt) = {<br>        val length = scala.math.max(value.size, that.value.size)<br>        val op1 = copyOf(value, length)<br>        val op2 = copyOf(that.value, length)<br>        val remain = subForEach(op1, op2, 0)<br>        new BigInt(<br>            if(remain.last == 1) {<br>                (if(isNegative(op1)) remain.init ++ List(9998) <br>                 else Nil) ++ (for(i &lt;- 0 until 8) yield 9999)<br>            }<br>            else remain.init ++ List(if(isNegative(op1)) 9999 else 0)<br>        )<br>    }<br>    <br>    def * (that: BigInt) = {<br>        val op1 = if(isNegative(value)) new BigInt(toComplement(value)) <br>                  else this<br>        val op2 = if(isNegative(that.value)) toComplement(that.value) <br>                  else that.value<br>        val result = (for(i &lt;- 0 until op2.size - 1) <br>                        yield op1.multiply(op2(i), i)).reduce(_ + _)<br>        if(value.last + that.value.last == 9999) {<br>            new BigInt(toComplement(result.value))<br>        }            <br>        else result<br>    }<br>    <br>    private def multiply(v: Int, shift: Int) = {<br>        val product = (for(i &lt;- 0 until shift) yield 0).toList ++<br>                            multiplyForEach(value, v, 0)<br>        new BigInt(<br>            if(product.last != 0) {<br>                (product.init ++ List(product.last) <br>                    ++ (for(i &lt;- 0 until 8) yield 0)).toList<br>            }<br>            else (product.init ++ List(0)).toList<br>        )<br>    }<br>    <br>    def &gt;= (that: BigInt) = <br>        if(isNegative((this - that).value)) false else true<br>    <br>    private def isLessOrEqualsQuotient(op1: BigInt, op2: BigInt) = <br>        if(op1 &gt;= (this * op2)) true else false<br>    <br>    def / (that: BigInt) = {<br>        val op1 = if(isNegative(value)) <br>                      new BigInt(toComplement(value))<br>                  else this<br>        val op2 = if(isNegative(that.value)) <br>                      new BigInt(toComplement(that.value))<br>                  else that<br>        val one = BigInt("1")<br>        <br>        def quotient(left: BigInt, right: BigInt): BigInt = {<br>            if(right &gt;= left) {<br>                val x = (left + right).divide(2)<br>                val (l, r) = if(x.isLessOrEqualsQuotient(op1, op2)) {<br>                                 (x + one, right) <br>                             }<br>                             else (left, x - one)<br>                quotient(l, r)<br>            }<br>            else left - one<br>        }<br>        <br>        val result = quotient(BigInt("0"), op1)<br>        if(value.last + that.value.last == 9999) {<br>            new BigInt(toComplement(result.value)) <br>        } <br>        else result<br>    }<br>    <br>    def divide(that: Int) = {<br>        val result = divideForEach(value, that, 0)<br>        new BigInt(result.reverse ++ <br>            (for(i &lt;- 0 until (8 - (result.size % 8))) yield 0))<br>    }<br>}<br>              <br>object BigInt {<br>    def apply(value: String) = {<br>        val v = if(value(0) == '-') value.substring(1) else value<br>        val digits = (for(i &lt;- v.length - 4 until (-4, -4)) <br>                yield v.substring(if(i &gt;= 0) i else 0, i + 4).toInt).toList<br>        val zeros = (<br>            for(i &lt;- 0 until (digits.size / 8 + 1) * 8 - digits.size)yield 0<br>        ).toList<br>        new BigInt(if(value(0) == '-') toComplement(digits ++ zeros) <br>                   else (digits ++ zeros));<br>    }<br>    <br>    private def toComplement(value: List[Int]) = {<br>        val c = for(i &lt;- value) yield 9999 - i<br>        (c.head + 1) :: c.tail<br>    }<br>    <br>    private def copyOf(original: List[Int], newLength: Int) = {<br>        original ++ (for(i &lt;- original.size until newLength) <br>            yield if(isPositive(original)) 0 else 9999)<br>    }<br>    <br>    private def addForEach(op1: List[Int], <br>                           op2: List[Int], carry: Int): List[Int] = {<br>        if(op1 == Nil) List(carry)<br>        else {<br>            val s = op1.head + op2.head + carry<br>            val (nextCarry, c) = if(s &lt; 10000) (0, s) else (1, s - 10000)<br>            c :: addForEach(op1.tail, op2.tail, nextCarry)<br>        }<br>    }<br>    <br>    private def subForEach(op1: List[Int], <br>                           op2: List[Int], borrow: Int): List[Int] = {<br>        if(op1 == Nil) List(borrow)<br>        else {<br>            val r = op1.head - op2.head - borrow<br>            val (nextBorrow, c) = if(r &gt; -1) (0, r) else (1, r + 10000)<br>            c :: subForEach(op1.tail, op2.tail, nextBorrow)<br>        }<br>    }<br>    <br>    private def multiplyForEach(op: List[Int], <br>                                v: Int, carry: Int): List[Int] = {<br>        op match {<br>            case Nil        =&gt; List(carry)<br>            case head::tail =&gt; {<br>                val tmp = head * v + carry<br>                val nextCarry = tmp / 10000<br>                (tmp % 10000) :: multiplyForEach(tail, v, nextCarry)<br>            }<br>        }<br>    }<br>    <br>    private def divideForEach(op: List[Int], <br>                              v: Int, remain: Int): List[Int] = {<br>        if(op == Nil) Nil<br>        else {<br>            val tmp = op.last + remain<br>            val nextRemain = (tmp % v) * 10000<br>            (tmp / v) :: divideForEach(op.init, v, nextRemain)<br>        }<br>    }<br><br>    private def isNegative(value: List[Int]) = value.last == 9999<br>    private def isPositive(value: List[Int]) = value.last == 0<br>}<br><br>val a = BigInt("99999999999999999999")<br>val b = BigInt("-200")<br>println(a)<br>println(b)<br>println(a + b)<br>println(a - b)<br>println(a * b)<br>println(a / b)<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>class BigInt<br>    attr_reader :value<br>    def initialize(val)<br>        @value = if val.instance_of? String<br>                     BigInt.parse(val) <br>                 else val end<br>    end<br>    <br>    def to_s<br>        v = if BigInt.isNegative(@value)<br>                BigInt.toComplement(@value) <br>            else @value end<br>        builder = (0...v.size - 1).to_a<br>                  .reverse.map { |i| sprintf("%04d", v[i]) }<br>        clist = builder.join.split(//).drop_while { |c| c == "0"}.join<br>        if clist.empty? <br>            "0" <br>        else <br>            if BigInt.isNegative(@value); "-" + clist else clist end<br>        end<br>    end<br>    <br>    def +(that)<br>        if BigInt.isNegative(that.value)<br>            self - BigInt.new(BigInt.toComplement(that.value))<br>        else<br>            add(that)<br>        end<br>    end<br>                <br>    def add(that)<br>        length = [@value.size, that.value.size].max<br>        op1 = BigInt.copyOf(@value, length)<br>        op2 = BigInt.copyOf(that.value, length)<br>        sum = BigInt.addForEach(op1, op2, 0)<br>        BigInt.new(<br>            if sum[-1] == 1<br>                (if BigInt.isPositive(op1); sum[0...-1] + [1] <br>                 else [] end) + [0] * 8 <br>            else <br>                sum[0...-1] + [if BigInt.isPositive(op1); 0 else 9999 end]  <br>            end<br>        )<br>    end<br>    <br>    def -(that)<br>       if BigInt.isNegative(that.value)<br>           self + BigInt.new(BigInt.toComplement(that.value))<br>       else<br>           sub(that)<br>       end<br>    end<br>    <br>    def sub(that)<br>       length = [@value.size, that.value.size].max<br>       op1 = BigInt.copyOf(@value, length)<br>       op2 = BigInt.copyOf(that.value, length)<br>       remain = BigInt.subForEach(op1, op2, 0)<br>       BigInt.new(<br>           if remain[-1] == 1<br>               (if BigInt.isNegative(op1); remain[0...-1] + [9998] <br>                else [] end) + [9999] * 8<br>           else<br>               remain[0...-1] + [if BigInt.isNegative(op1); 9999 else 0 end]<br>           end<br>       )<br>    end<br>    <br>    def multiply(val, shift)<br>        product = [0] * shift + BigInt.multiplyForEach(@value, val, 0)<br>        BigInt.new(<br>            if product[-1] != 0<br>                product[0...-1] + [product[-1]] + [0] * 8<br>            else<br>                product[0...-1] + [0]<br>            end<br>        )<br>    end<br><br>    def *(that)<br>        op1 = if BigInt.isNegative(@value)<br>                  BigInt.new(BigInt.toComplement(@value))<br>              else self end<br>        op2 = if BigInt.isNegative(that.value)<br>                  BigInt.toComplement(that.value) <br>              else that.value end<br>        result = (0...op2.size - 1).map { <br>            |i| op1.multiply(op2[i], i) }.reduce(:+)<br>        if @value[-1] + that.value[-1] == 9999<br>            BigInt.new(BigInt.toComplement(result.value))<br>        else result end<br>    end<br>    <br>    def &gt;=(that)<br>        if BigInt.isNegative((self - that).value); false<br>        else true end<br>    end<br>    <br>    def isLessOrEqualsQuotient(op1, op2)<br>        if op1 &gt;= (self * op2); true else false end<br>    end<br>    <br>    def /(that)<br>        op1 = if BigInt.isNegative(@value)<br>                  BigInt.new(BigInt.toComplement(@value))<br>              else self end<br>        op2 = if BigInt.isNegative(that.value)<br>                  BigInt.new(BigInt.toComplement(that.value))<br>              else that end<br>        one = BigInt.new("1")<br>        <br>        quotient = -&gt;(left, right) {<br>            if right &gt;= left<br>                x = (left + right).divide(2)<br>                l, r = *(if x.isLessOrEqualsQuotient(op1, op2)<br>                             [x + one, right]<br>                         else<br>                             [left, x - one]<br>                         end)<br>                quotient.call(l, r)<br>            else<br>                left - one<br>            end<br>        }<br>        result = quotient.call(BigInt.new("0"), op1)<br>        if @value[-1] + that.value[-1] == 9999<br>            BigInt.new(BigInt.toComplement(result.value))<br>        else result end<br>    end<br>    <br>    def divide(that)<br>        result = BigInt.divideForEach(@value, that, 0)<br>        BigInt.new(result.reverse + [0] * (8 - (result.size % 8)))<br>    end<br>                <br>    def self.parse(val)<br>        v = if val[0] == "-"; val[1, val.size] else val end<br>        digits = (if v.size % 4 == 0; 0 else (v.size % 4) - 4 end..v.size - 4)<br>                 .step(4).to_a.reverse.map { |i|<br>                     v[if i &gt;= 0; i else 0 end...i + 4].to_i<br>                 }<br>        zeros = [0] * ((digits.size / 8 + 1) * 8 - digits.size)<br>        if val[0] == "-"; BigInt.toComplement(digits + zeros) <br>        else digits + zeros end<br>    end<br>    <br>    def self.toComplement(v)<br>        c = v.map { |i| 9999 - i}<br>        [c[0] + 1] + c[1, c.size]<br>    end<br>    <br>    def self.isPositive(list)<br>        list[-1] == 0<br>    end<br>    <br>    def self.isNegative(list)<br>        list[-1] == 9999<br>    end<br>    <br>    def self.copyOf(original, newLength)<br>        original + (original.size...newLength).map { |i| <br>            if BigInt.isPositive(original); 0 else 9999 end <br>        }<br>    end<br>    <br>    def self.addForEach(op1, op2, carry)<br>        if op1 == []; [carry]<br>        else<br>            s = op1[0] + op2[0] + carry<br>            nextCarry, c = *(if s &lt; 10000; [0, s] <br>                             else [1, s - 10000] end)<br>            [c] + BigInt.addForEach(<br>                op1[1, op1.size], op2[1, op2.size], nextCarry)<br>        end<br>    end<br>    <br>    def self.subForEach(op1, op2, borrow)<br>        if op1 == []; [borrow]<br>        else<br>            r = op1[0] - op2[0] - borrow<br>            nextBorrow, c = *(if r &gt; -1; [0, r] <br>                              else [1, r + 10000] end)<br>            [c] + BigInt.subForEach(<br>                op1[1, op1.size], op2[1, op2.size], nextBorrow)<br>        end<br>    end<br>    <br>    def self.multiplyForEach(op, val, carry)<br>        if op == []; [carry]<br>        else<br>            tmp = op[0] * val + carry<br>            nextCarry = tmp / 10000<br>            [tmp % 10000] + <br>                BigInt.multiplyForEach(op[1, op.size], val, nextCarry)<br>        end<br>    end<br>    <br>    def self.divideForEach(op, val, remain)<br>        if op == []; []<br>        else<br>            tmp = op[-1] + remain<br>            nextRemain = (tmp % val) * 10000<br>            [tmp / val] + <br>                BigInt.divideForEach(op[0...-1], val, nextRemain)<br>        end<br>    end<br>end<br><br>a = BigInt.new("99999999999999999999")<br>b = BigInt.new("-200")<br>puts(a)<br>puts(b)<br>puts(a + b)<br>puts(a - b)<br>puts(a * b)<br>puts(a / b)<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>var BigNumber = function() {<br>    function apply(val) {<br>        var v = val.charAt(0) === '-' ? val.substring(1) : val;<br>        var value = [];<br>        for(var i = v.length - 4; i &gt; -4; i -= 4) {<br>            value.push(parseInt(v.substring(i &gt;= 0 ? i : 0, i + 4), 10));<br>        }<br>        var valueLength = (parseInt(value.length / 8) + 1) * 8;<br>        for(var i = value.length; i &lt; valueLength; i++) {<br>            value.push(0);<br>        }<br>        return new BigNumber(val.charAt(0) === '-' ? <br>                       toComplement(value) : value);<br>    }<br>    <br>    function BigNumber(value) {<br>        this.value = value;<br>    }<br>    <br>    BigNumber.prototype.toString = function() {<br>        var v = isNegative(this.value) ? <br>                    toComplement(this.value) : this.value;<br>        var builder = [];<br>        for(var i = v.length - 1; i &gt; -1; i--) {<br>            builder.push(new Array(5 - (v[i] + '').length).join('0') + v[i]);<br>        }<br>        var charArray = builder.join('').split('');<br>        while(charArray.length &gt; 0 &amp;&amp; charArray[0] === '0') {<br>            charArray.shift();<br>        }<br>        return charArray.length === 0 ? '0' : (isNegative(this.value) ? <br>                   '-' + charArray.join('') : charArray.join(''));<br>    };<br>    <br>    BigNumber.prototype.add = function(that) {<br>        if(isNegative(that.value)) {<br>            return this.subtract(new BigNumber(toComplement(that.value)));<br>        }<br>        <br>        var length = Math.max(this.value.length, that.value.length);<br>        var op1 = copyOf(this.value, length);<br>        var op2 = copyOf(that.value, length);<br>        var result = [];<br>        <br>        var carry = 0;<br>        for(var i = 0; i &lt; length - 1; i++) {<br>            var c = op1[i] + op2[i] + carry;<br>            if(c &lt; 10000) {<br>                carry = 0;<br>            } else {<br>                c -= 10000;<br>                carry = 1;<br>            }<br>            result.push(c);<br>        }<br>        <br>        if(carry === 1) {<br>            if(isPositive(op1)) { result.push(1); }<br>            else { result.length = 0; }<br>            for(var i = 0; i &lt; 8; i++) { result.push(0); }<br>        } else {<br>            result.push(isPositive(op1) ? 0 : 9999);<br>        }<br>        return new BigNumber(result);<br>    };<br>    <br>    BigNumber.prototype.subtract = function(that) {<br>        if(isNegative(that.value)) {<br>            return this.add(new BigNumber(toComplement(that.value)));<br>        }<br>    <br>        var length = Math.max(this.value.length, that.value.length);<br>        var op1 = copyOf(this.value, length);<br>        var op2 = copyOf(that.value, length);<br>        var result = [];<br>        <br>        var borrow = 0;<br>        for(var i = 0; i &lt; length - 1; i++) {<br>            var c = op1[i] - op2[i] - borrow;<br>            if(c &gt; -1) {<br>                borrow = 0;<br>            } else {<br>                c += 10000;<br>                borrow = 1;<br>            }<br>            result.push(c);<br>        }<br>        <br>        if(borrow === 1) {<br>            if(isNegative(op1)) { result.push(9998); }<br>            else { result.length = 0; }<br>            for(var i = 0; i &lt; 8; i++) { result.push(9999); }<br>        } else {<br>            result.push(isNegative(op1) ? 9999 : 0);<br>        }<br>        return new BigNumber(result);<br>    };<br>    <br>    BigNumber.prototype.mul = function(val, shift) {<br>        var result = [];<br>        for(var i = 0; i &lt; shift; i++) { result.push(0); }<br>        var carry = 0;<br>        for(var i = 0; i &lt; this.value.length - 1; i++) {<br>            var tmp = this.value[i] * val + carry;<br>            result.push(tmp % 10000);<br>            carry = parseInt(tmp / 10000);<br>        }<br>        <br>        if(carry != 0) {<br>            result.push(carry);<br>            for(var i = 0; i &lt; 8; i++) { result.push(0); }<br>        } else { result.push(0); }<br>        <br>        return new BigNumber(result);<br>    };<br>    <br>    BigNumber.prototype.multiply = function(that) {<br>        var op1 = isNegative(this.value) ? <br>                      new BigNumber(toComplement(this.value)) : this;<br>        var op2 = isNegative(that.value) ? <br>                      toComplement(that.value) : that.value;<br>        var rs = [];<br>        for(var i = 0; i &lt; op2.length - 1; i++) {<br>            rs.push(op1.mul(op2[i], i));<br>        }<br>        <br>        var result = rs[0];<br>        for(var i = 1; i &lt; rs.length; i++) {<br>            result = result.add(rs[i]);<br>        }<br>        <br>        return getLast(this.value) + getLast(that.value) === 9999 ?<br>            new BigNumber(toComplement(result.value)) : result;<br>    };<br>    <br>    BigNumber.prototype.greaterOrEquals = function(that) {<br>        return isNegative(<br>            this.subtract(that).value) ? false : true;<br>    };<br>    <br>    BigNumber.prototype.isLessOrEqualsQuotient = function(op1, op2) {<br>        return op1.greaterOrEquals(<br>            this.multiply(op2)) ? true : false;<br>    };<br>    <br>    BigNumber.prototype.div = function(that) {<br>        var result = [];<br>        var remain = 0;<br>        for(var i = this.value.length - 1; i &gt; -1; i--) {<br>            var tmp = this.value[i] + remain;<br>            result.push(parseInt(tmp / that));<br>            remain = (tmp % that) * 10000;<br>        }<br>        result.reverse();<br>        for(var i = 0; i &lt; 8 - (result.length % 8); i++) {<br>            result.push(0);<br>        }<br>        return new BigNumber(result);<br>    };<br>    <br>    BigNumber.prototype.divide = function(that) {<br>        var op1 = isNegative(this.value) ? <br>                      new BigNumber(toComplement(this.value)) : this;<br>        var op2 = isNegative(that.value) ? <br>                      new BigNumber(toComplement(that.value)) : that;<br>        <br>        var one = apply("1");<br>        var left = apply("0");<br>        var right = op1;<br>        <br>        while(right.greaterOrEquals(left)) {<br>            var x = left.add(right).div(2);<br>            if(x.isLessOrEqualsQuotient(op1, op2)) {<br>                left = x.add(one);<br>            } else {<br>                right = x.subtract(one);<br>            }<br>        }<br>        var result = left.subtract(one);<br>        <br>        return getLast(this.value) + getLast(that.value) === 9999 ?<br>            new BigNumber(toComplement(result.value)) : result;<br>    };<br>    <br>    function toComplement(v) {<br>        var comp = [];<br>        for(var i in v) { comp.push(9999 - v[i]); }<br>        comp[0] += 1<br>        return comp;<br>    };<br>    <br>    function getLast(list) {<br>        return list[list.length - 1];<br>    };<br>    <br>    function isNegative(list) {<br>        return getLast(list) === 9999;<br>    };<br>    <br>    function isPositive(list) {<br>        return getLast(list) === 0;<br>    };<br>    <br>    function copyOf(original, newLength) {<br>        var v = [].concat(original);<br>        for(var i = v.length; i &lt; newLength; i++) {<br>            v.push(isPositive(original) ? 0 : 9999);<br>        }<br>        return v;<br>    }<br>    <br>    return apply;<br>}();<br><br>var a = BigNumber('9999999999999999');<br>var b = BigNumber('-2');<br>print(a);<br>print(b);<br>print(a.add(b));<br>print(a.subtract(b));<br>print(a.multiply(b));<br>print(a.divide(b));<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>data BigInt = BigInt [Int]<br><br>instance Show BigInt where<br>    show (BigInt value) = <br>        let v = if isNegative value then toComplement value else value<br>            builder = [take (4 - (length $ show (v !! i))) (repeat '0') <br>                ++ show (v !! i) | i &lt;- (reverse [0..length v - 2])]<br>            clist = dropWhile (== '0') $ flatten builder<br>        in if length clist == 0 then "0" <br>           else if isNegative value then  '-' : clist<br>                else clist<br>                              <br>slice from to = take (to - from) . drop from<br><br>flatten list = [item | subList &lt;- list, item &lt;- subList]<br><br>toComplement v = (head c + 1) : (tail c)<br>    where c = [9999 - i | i &lt;- v]<br><br>isPositive list = last list == 0   <br> <br>isNegative list = last list == 9999<br><br>copyOf original newLength = original ++ [<br>    if isPositive original then 0 <br>    else 9999 | i &lt;- [(length original)..(newLength - 1)]]<br><br>addForEach op1 op2 carry =<br>    if op1 == [] then [carry]<br>    else<br>        let s = head op1 + head op2 + carry<br>            (nextCarry, c) = if s &lt; 10000 then (0, s) else (1, s - 10000)<br>        in c : addForEach (tail op1) (tail op2) nextCarry<br><br>subForEach op1 op2 borrow =<br>    if op1 == [] then [borrow]<br>    else<br>        let r = head op1 - head op2 - borrow<br>            (nextBorrow, c) = if r &gt; -1 then (0, r) else (1, r + 10000)<br>        in c : subForEach (tail op1) (tail op2) nextBorrow<br><br>multiplyForEach op val carry =<br>    if op == [] then [carry]<br>    else<br>        let tmp = head op * val + carry<br>            nextCarry = tmp `div` 10000<br>        in (tmp `mod` 10000) : multiplyForEach (tail op) val nextCarry<br><br>divideForEach op val remain =<br>    if op == [] then []<br>    else<br>        let tmp = last op + remain<br>            nextRemain = (tmp `mod` val) * 10000<br>        in (tmp `div` val) : divideForEach (init op) val nextRemain<br>        <br>bigNum val = BigInt (if head val == '-' <br>                         then toComplement (digits ++ zeros) <br>                     else digits ++ zeros)<br>    where v = if head val == '-' then tail val else val<br>          remain = (length v) `mod` 4<br>          begin = if remain == 0 then 0 else remain - 4<br>          digits = [read (slice (if i &gt;= 0 then i else 0) (i + 4) v) :: Int<br>                      | i &lt;- reverse [begin, begin + 4..length v - 4]]<br>          dLen = length digits<br>          zeros = replicate ((dLen `div` 8 + 1) * 8 - dLen) 0<br><br>op1@(BigInt v1) `bAdd` (BigInt v2) = <br>    if isNegative v2 then op1 `bSub` (BigInt (toComplement v2))<br>    else v1 `ad` v2<br>    <br>v1 `ad` v2 = <br>    BigInt (if last sum == 1 then<br>               if isPositive op1 then init sum ++ [1]<br>               else take 8 $ repeat 0<br>            else init sum ++ [if isPositive op1 then 0 else 9999])<br>    where len = max (length v1) (length v2)<br>          op1 = copyOf v1 len<br>          op2 = copyOf v2 len<br>          sum = addForEach op1 op2 0<br><br>op1@(BigInt v1) `bSub` (BigInt v2) = <br>    if isNegative v2 then op1 `bAdd` (BigInt (toComplement v2))<br>    else v1 `sb` v2<br>    <br>v1 `sb` v2 =<br>    BigInt(if last remain == 1 then<br>               if isNegative op1 then init remain ++ [9998]<br>               else take 8 $ repeat 9999<br>           else init remain ++ [if isNegative op1 then 9999 else 0])<br>    where len = max (length v1) (length v2)<br>          op1 = copyOf v1 len<br>          op2 = copyOf v2 len<br>          remain = subForEach op1 op2 0<br><br>multiply (BigInt v) val shift = <br>    BigInt (if last product /= 0 then <br>                init product ++ [last product] ++ take 8 (repeat 0)<br>            else init product ++ [0])<br>    where product = take shift (repeat 0) ++ multiplyForEach v val 0<br><br>op1@(BigInt v1) `bMul` (BigInt v2) =<br>    if last v1 + last v2 == 9999 then BigInt (toComplement value)<br>    else result<br>    where p1 = if isNegative v1 then BigInt (toComplement v1)<br>               else op1<br>          p2 = if isNegative v2 then toComplement v2<br>               else v2<br>          result@(BigInt value) = <br>              foldl1 (bAdd) [multiply p1 (p2 !! i) i <br>                  | i &lt;- [0..length p2 - 2]]<br><br>op1 `ge` op2 = <br>    let (BigInt v) = op1 `bSub` op2<br>    in if isNegative v then False else True<br><br>isLessOrEquqlsQuotient x op1 op2 =<br>    if op1 `ge` (x `bMul` op2) then True<br>    else False<br><br>divI (BigInt v) that = <br>    BigInt (reverse result ++ take (8 - (length result) `mod` 8) (repeat 0))<br>    where result = divideForEach v that 0<br><br>op1@(BigInt v1) `bDiv` op2@(BigInt v2) =<br>    if last v1 + last v2 == 9999 then BigInt (toComplement v)<br>    else result<br>    where p1 = if isNegative v1 then BigInt (toComplement v1) else op1<br>          p2 = if isNegative v2 then BigInt (toComplement v2) else op2<br>          one = bigNum "1"<br>          quotient left right =<br>              if right `ge` left then<br>                  let x = (left `bAdd` right) `divI` 2<br>                      (l, r) = if isLessOrEquqlsQuotient x p1 p2 then <br>                                   (x `bAdd` one, right) <br>                               else (left, x `bSub` one)<br>                  in quotient l r<br>              else left `bSub` one<br>          result@(BigInt v) = quotient (bigNum "0") p1<br><br>main = do<br>    print (a `bAdd` b)<br>    print (a `bSub` b)<br>    print (a `bMul` b)<br>    print (a `bDiv` b)<br>    where a = bigNum "99999999999999999999"<br>          b = bigNum "-200"<br></pre>
+<br>
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/BigNumber.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:50 GMT -->
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/Namespace.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:24 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>名稱管理</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: 名稱管理<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/Namespaces.html"><small>English</small></a><br>
+      </div>
+      <small><br>
+JavaScript本身沒有名稱空間管理的機制，名稱都是物件上的特性，要不就成為全域物件上的特性（全域變數），要不就使用var宣告使之成為呼叫物件上的變數（區域變數）。</small><br>
+      <br>
+      <small>名稱衝突的問題極容易在JavaScript中發生，就算是在同一個.js檔案中也有可能發生。例如你也許寫了個<span style="font-family: Courier New,Courier,monospace;">validate()</span>函式，假以時日別人接手你的程式，然後在檔案中某處又定義了另一個<span style="font-family: Courier New,Courier,monospace;">validate()</span>函式：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function validate() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; //.. 作些驗證</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">// 很長很長的程式。。</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">// 某年某月的某一天。。</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function validate() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp; //.. 作些別的驗證</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+}</small><br>
+      </div>
+      <small><br>
+很不幸地，之後的<span style="font-family: Courier New,Courier,monospace;">validate()</span>函式定義會覆蓋前一個函式，也許會讓之前可以動作的功能失效。<br>
+      <br>
+最基本的名稱空間管理，就是將這個函式作為某物件的特性，該物件是對組織或單位有意義的名稱所參考。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">var openhome = {};&nbsp;&nbsp;&nbsp;&nbsp; // 作為名稱空間</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function validate() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; //.. 作些驗證</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">openhome.validate = validate;</small><br>
+      </div>
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><small style="font-family: Courier New,Courier,monospace;">想要取用你定義的validate()函式，則可以如下：</small>
+      <br>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">openhome.validate();</span></small><br>
+      </div>
+      <br>
+      <small>其它人在定義函式時，也可以作類似考量。例如他也許在同一個.js中如下定義：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">var caterpillar = {};&nbsp;&nbsp;&nbsp;&nbsp; // 作為名稱空間</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function validate() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; //.. 作些驗證</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">caterpillar</span></span>.validate = validate;</small><br>
+      </div>
+
+
+
+      <br>
+      <small>呼叫時就使用：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">caterpillar.validate();</span></small><br>
+      </div>
+      <br>
+      <small>如此就不會發生名稱覆蓋的問題。或許在同一個.js中，以上名稱衝突的情況比較算少數，通常這會發生在兩個.js分別由兩個不同組識或作者撰寫時。<br>
+      <br>
+如果同一個組識在撰寫程式庫時，會使用同一名稱作為名稱空間，如果你在a.js中如下撰寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">var openhome = {};&nbsp;&nbsp;&nbsp;&nbsp; // 作為名稱空間</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function validate() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; //.. 作些驗證</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">openhome.validate = validate;</small><br>
+      </div>
+
+
+
+
+      <br>
+      <small>另一個人在b.js中如下撰寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">var openhome = {};&nbsp;&nbsp;&nbsp;&nbsp; // 作為名稱空間</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function format() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; //.. 作些格式化</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">openhome.format = format;</small><br>
+      </div>
+
+
+
+
+
+
+
+
+      <br>
+      <small>那在同一個網頁中引用a.js與b.js會如何？如果b.js較後引用，那麼，就沒辦法使用<span style="font-family: Courier New,Courier,monospace;">openhome.validate()</span>了。在建立名稱空間時，可以先測試一下作為名稱空間的物件是否存在，如果存在就直接使用，不存在再建立新的物件作為名稱空間。例如a.js可如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">var openhome = openhome || {};</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">function validate() {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; //.. 作些驗證</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">openhome.validate = validate;</small><br>
+      </div>
+
+
+
+
+      <small><br>
+如上，只有在openhome為undefined時，才會建立新的物件，b.js也作類似撰寫，就不會發生上述的情況。<br>
+      <br>
+在撰寫JavaScript時，要儘量避免使用全域變數，上面的例子似乎沒有？有的！a.js中至少侵入了兩個，一個是<span style="font-family: Courier New,Courier,monospace;">openhome名稱，一個是validate()</span>，要記得，在全域範圍定義函式時，函式名稱就是全域物件上的特性。你可以這麼解決：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">var openhome = openhome || {};</span></small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;"></small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">openhome.validate = function() {</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; // 作些驗證</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">};</small><br>
+      </div>
+
+      <small><br>
+但如果這個函式也想作為其它物件上的特性，函式實字的作法會比較不方便。有個方式可以比較漂亮地解決。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">var openhome = openhome || {};</span><br>
+      </small><small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">(function() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; function validate() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 作些驗證</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; openhome.validate = validate;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; // ... 其它...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">})();</span></small><br>
+      </div>
+      <small><br>
+乍看有些複雜，事實上，首先是撰寫..<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">function() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+這寫下了一個函式實字，沒有名稱參考至它，所以不會污染全域名稱空間...接著...<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;">(</span>function() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}<span style="color: red;">)</span></span></small><br>
+      </div>
+      <small><br>
+加上括號表示優先運算子，將括號中的函式實字運算為一個函式物件，接著...<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: black;">(</span>function() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}<span style="color: red;"><span style="color: black;">)</span>();</span></span></small><br>
+      </div>
+
+      <small><br>
+最後的括號表示呼叫傳回的函式物件。在這個函式物件中所建立的函式是區域的....<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="color: black;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">var openhome = openhome || {};</span></small><br style="color: black;">
+      <small style="color: black;">
+      </small><small style="font-family: Courier New,Courier,monospace; color: black;"><span style="font-weight: bold;">(function() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: black;">
+      <small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; function validate() { // validate 是區域的</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 作些驗證</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: black;">
+      <small style="font-family: Courier New,Courier,monospace; color: black;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; openhome.validate = validate;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: black;">
+      <small style="font-family: Courier New,Courier,monospace; color: black;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; // ... 其它...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: black;">
+      <small style="font-family: Courier New,Courier,monospace; color: black;"><span style="font-weight: bold;">})();</span></small><br>
+      </div>
+
+
+
+
+
+
+      <small><br>
+所以不會污染全域名稱空間，到最後，以上只會有<span style="font-family: Courier New,Courier,monospace;">openhome</span>這個名稱在全域中。像這樣的模式廣泛運用在JavaScript的設計領域，通常會用在一個.js中為模組初始化。<br>
+      <br>
+在設計程式庫時，若有名稱想避免別人佔用干擾，則有個慣用手法。例如，若不想被別人佔用干擾<span style="font-family: Courier New,Courier,monospace;">global</span>這個名稱，則可以如下：<br>
+</small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">(function(<span style="color: red;">global</span>) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp; var global.openhome = global.openhome || {};</span><br>
+&nbsp;&nbsp;&nbsp; ...<br>
+<br style="font-family: Courier New,Courier,monospace;">
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">})(<span style="color: red;">this</span>);</small><br>
+      </div>
+      <small>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">也許你的匿名函式
+初始中，不確定會用在哪個環境中，因此想使用global這個名稱作為全域變數，一方面也怕別人干擾global這個名稱，使用以上手法，若是在瀏覽器
+中，真正的全域名稱this所參考的物件會傳入函式作為參數global參考的對象，而global為區域變數，所以不受外部其它程式庫所定義的外部
+變數干擾。</span><br>
+<br>
+      <span style="font-weight: bold;">檔案名稱也是會發生衝突的，檔案名稱上也可以放上與組織相關的前置名稱。</span>例如openhome.formutil.js、caterpillar.formutil.js這樣的名稱，從而避免檔案名稱上的衝突。<br>
+      <br>
+如果作為名稱空間的物件階層很多。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">openhome.book.web.some = 'some';</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">openhome.book.web.other = 'other';</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">openhome.book.web.another = 'another';</small><br>
+      </div>
+      <small><br>
+這樣不僅撰寫麻煩，而且 <span style="font-weight: bold;">. </span>運算子的解析也會有效能影響，JavaScript很難對這種 . 運算子解析作最佳化（編譯式語言如Java通常就會最佳化）。雖然你可以使用<span style="font-family: Courier New,Courier,monospace;">with</span>：<br style="font-weight: bold;">
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">with(openhome.book.web) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; some = 'some';</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; other = 'other';</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; another = 'another';</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">但不建議，雖然省去一些打字上的麻煩，但with很難最佳化，甚至有可能更慢。比較好的方式是：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var web = openhome.book.web;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">web.some = 'some';</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">web.other = 'other';</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">web.another = 'another';</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/Namespace.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:24 GMT -->
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/InfoFromClass.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>從 Class 中獲取資訊</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 從 Class 中獲取資訊</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>Class物件表示所載入的類別，取得Class物件之後，您就可以取得與類別上相關聯的資訊，像是
+package、建構函式、方法、資料成員等等的訊息，而每一個訊息，也會有相應的物件作為其代表。<br>
+
+      <br>
+
+
+例如下面這個程式可以讓您取得類別所屬的package名稱：</small>
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li> ClassDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>public class ClassDemo {<br>    public static void main(String[] args) { <br>        try {<br>            Class c = Class.forName(args[0]);<br>            Package p = c.getPackage();<br>            System.out.println(p.getName());<br>        }<br>        catch(ClassNotFoundException e) {<br>            e.printStackTrace();<br>        }<br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+
+      <small><span style="font-weight: bold;">Package物件</span>是package的代表，一個執行的結果如下：</small><span class="postbody"></span><br>
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java ClassDemo java.util.ArrayList<br>
+
+
+java.util</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+同樣的道理，您可以分別取回<span style="font-weight: bold;">Field、Constructor、Method</span>等物件，分別代表資料成員、建構子與方法，下面這個程式簡單的示範了一
+些類別基本資訊的取得：</small><br>
+
+
+
+      
+      <ul>
+
+        <li>SimpleClassViewer.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.lang.reflect.*;<br><br>public class SimpleClassViewer {<br>     public static void main(String[] args) { <br>        try {<br>            Class c = Class.forName(args[0]);<br>            Package p = c.getPackage();<br>            <br>            System.out.printf("package %s;%n", p.getName());<br>            <br>            int m = c.getModifiers();<br>            <br>            System.out.print(Modifier.toString(m) + " ");<br>            if(Modifier.isInterface(m)) {<br>                System.out.print("interface ");<br>            }<br>            else {<br>                System.out.print("class ");<br>            }<br>            <br>            System.out.println(c.getName() + " {");<br>            <br>            Field[] fields = c.getDeclaredFields();<br>            for(Field field : fields) {<br>                System.out.print("\t" + <br>                    Modifier.toString(field.getModifiers()));<br>                System.out.print(" " + <br>                    field.getType().getName() + " ");<br>                System.out.println(field.getName() + ";");<br>            }<br>            <br>            Constructor[] constructors = <br>                            c.getDeclaredConstructors();<br>            for(Constructor constructor : constructors) {<br>                System.out.print("\t" + <br>                     Modifier.toString(<br>                       constructor.getModifiers()));<br>                System.out.println(" " + <br>                      constructor.getName() + "();");<br>            }<br>            <br>            Method[] methods = c.getDeclaredMethods();<br>            for(Method method : methods) {<br>                System.out.print("\t" + <br>                     Modifier.toString(<br>                              method.getModifiers()));<br>                System.out.print(" " + <br>                     method.getReturnType().getName() + " ");<br>                System.out.println(method.getName() + "();");<br>            }<br>            System.out.println("}");<br>        }<br>        catch(ArrayIndexOutOfBoundsException e) {<br>            System.out.println("沒有指定類別");<br>        }<br>        catch(ClassNotFoundException e) {<br>            System.out.println("找不到指定類別");<br>        }<br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+執行結果：</small><br>
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java onlyfun.caterpillar.SimpleClassViewer java.util.ArrayList<br>
+
+
+package java.util;<br>
+
+
+public class java.util.ArrayList {<br>
+
+
+&nbsp;&nbsp;&nbsp; private static final long serialVersionUID;<br>
+
+
+&nbsp;&nbsp;&nbsp; private transient [Ljava.lang.Object; elementData;<br>
+
+
+&nbsp;&nbsp;&nbsp; private int size;<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.util.ArrayList();<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.util.ArrayList();<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.util.ArrayList();<br>
+
+
+&nbsp;&nbsp;&nbsp; public boolean add();<br>
+
+
+&nbsp;&nbsp;&nbsp; public void add();<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.lang.Object clone();<br>
+
+
+&nbsp;&nbsp;&nbsp; public void clear();<br>
+
+
+&nbsp;&nbsp;&nbsp; public boolean contains();<br>
+
+
+&nbsp;&nbsp;&nbsp; public int indexOf();<br>
+
+
+&nbsp;&nbsp;&nbsp; public int lastIndexOf();<br>
+
+
+&nbsp;&nbsp;&nbsp; public boolean addAll();<br>
+
+
+&nbsp;&nbsp;&nbsp; public boolean addAll();<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.lang.Object get();<br>
+
+
+&nbsp;&nbsp;&nbsp; public int size();<br>
+
+
+&nbsp;&nbsp;&nbsp; public [Ljava.lang.Object; toArray();<br>
+
+
+&nbsp;&nbsp;&nbsp; public [Ljava.lang.Object; toArray();<br>
+
+
+&nbsp;&nbsp;&nbsp; public boolean remove();<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.lang.Object remove();<br>
+
+
+&nbsp;&nbsp;&nbsp; private void writeObject();<br>
+
+
+&nbsp;&nbsp;&nbsp; public boolean isEmpty();<br>
+
+
+&nbsp;&nbsp;&nbsp; private void readObject();<br>
+
+
+&nbsp;&nbsp;&nbsp; public java.lang.Object set();<br>
+
+
+&nbsp;&nbsp;&nbsp; public void ensureCapacity();<br>
+
+
+&nbsp;&nbsp;&nbsp; protected void removeRange();<br>
+
+
+&nbsp;&nbsp;&nbsp; public void trimToSize();<br>
+
+
+&nbsp;&nbsp;&nbsp; private void RangeCheck();<br>
+
+
+&nbsp;&nbsp;&nbsp; private void fastRemove();<br>
+
+
+&nbsp;}</span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+      </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+
+      <small>
+一些類別檢視器的實作原理基本上就是上面這個程式所示範的，當然還可以取得更多的資訊，您可以參考Class的線上API文件得到更多的訊息。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+         <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/InfoFromClass.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

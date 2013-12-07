@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/AbstractWizardFormController.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>AbstractWizardFormController</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: AbstractWizardFormController</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>org.springframework.web.servlet.mvc.AbstractWizardFormController
+可以讓您設計出如桌面應用程式的精靈（Wizard），通常用於問卷表單內容相當長時，與其使用一個表單呈現所有的問卷內容，不如將問卷內容分作數個畫
+面，讓使用者一頁一頁完成問卷，您可以繼承AbstractWizardFormController，並重新定義它的processFinish()方
+法，當中定義的是全部問卷提交完後的處理，例如：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>WizardController.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br>import javax.servlet.http.*; <br>import org.springframework.web.servlet.ModelAndView; <br>import org.springframework.web.servlet.<br>                   mvc.AbstractWizardFormController;<br>import org.springframework.validation.BindException;<br><br>public class WizardController <br>                extends AbstractWizardFormController {<br>    private String successView;<br>    <br>    public WizardController() {<br>        setCommandClass(Questionnaire.class);<br>    }<br>    <br>    protected ModelAndView processFinish(<br>                          HttpServletRequest request,<br>                          HttpServletResponse response,<br>                          Object command,<br>                         BindException exception) throws Exception {<br>        Questionnaire questionnaire = (Questionnaire) command; <br>        <br>        Map model = new HashMap();<br>        model.put("q1", questionnaire.getQuestion1());<br>        model.put("q2", questionnaire.getQuestion2());<br>        model.put("q3", questionnaire.getQuestion3());<br>        <br>        return new ModelAndView(getSuccessView(), "ans", model);<br>    }<br>    <br>    public void setSuccessView(String successView) {<br>        this.successView = successView;<br>    }<br>    <br>    public String getSuccessView() {<br>        return successView;<br>    }<br>}</pre>
+
+
+      <small><br>
+
+
+所有的問卷結果收集在一個Command物件中，上面的程式只是將結果取得並設定在Model資料物件中，以在View上呈現資料，Command的類別設計如下：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>Questionaire.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class Questionnaire {<br>    private String question1;<br>    private String question2;<br>    private String question3;<br>    <br>    public void setQuestion1(String question1) {<br>        this.question1 = question1;<br>    }<br>    <br>    public void setQuestion2(String question2) {<br>        this.question2 = question2;<br>    }<br>    <br>    public void setQuestion3(String question3) {<br>        this.question3 = question3;<br>    }<br>    <br>    public String getQuestion1() {<br>        return question1;<br>    }<br>    <br>    public String getQuestion2() {<br>        return question2;<br>    }<br>    <br>    public String getQuestion3() {<br>        return question3;<br>    }    <br>}</pre>
+
+
+      <small><br>
+
+
+問卷的流程是規範在Bean定義檔中，藉由設定AbstractWizardFormController的"pages"屬性來決定，例如：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>mvc-config.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>"http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;   <br>    &lt;bean id="urlMapping" <br>          class="org.springframework.web.servlet.<br>                   &rarr; handler.SimpleUrlHandlerMapping"&gt; <br>        &lt;property name="mappings"&gt; <br>            &lt;props&gt; <br>                &lt;prop key="/wizard.do"&gt;wizardController&lt;/prop&gt; <br>            &lt;/props&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>    <br>    &lt;bean id="viewResolver" <br>          class="org.springframework.web.servlet.<br>                   &rarr; view.InternalResourceViewResolver"&gt; <br>        &lt;property name="prefix"&gt; <br>            &lt;value&gt;/WEB-INF/jsp/&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="suffix"&gt; <br>            &lt;value&gt;.jsp&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br><br>   &lt;bean id="wizardController" <br>          class="onlyfun.caterpillar.WizardController"&gt; <br>        &lt;property name="successView"&gt; <br>            &lt;value&gt;success&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="pages"&gt; <br>            &lt;list&gt;<br>                &lt;value&gt;start&lt;/value&gt;<br>                &lt;value&gt;question1&lt;/value&gt;<br>                &lt;value&gt;question2&lt;/value&gt;<br>                &lt;value&gt;question3&lt;/value&gt;<br>            &lt;/list&gt;<br>        &lt;/property&gt;         <br>    &lt;/bean&gt; <br>&lt;/beans&gt;</pre>
+
+
+      <br>
+
+
+依以上的設定，問卷將依start.jsp、question1.jsp、question2.jsp、question3.jsp的順序來完成，首先看看start.jsp的撰寫：<br>
+
+
+      
+      
+      <ul>
+
+
+        <li>start.jsp</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;Start Page&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;form name="questionform" <br>          action="/AbstractWizardDemo/wizard.do" method="POST"&gt; <br>          歡迎您填寫問卷！<br>        &lt;input type="submit" value="Start" name="_target1"/&gt;<br>    &lt;/form&gt;   <br>    &lt;/body&gt;<br>&lt;/html&gt; </pre>
+
+
+      <small><br>
+
+
+當您連接至Wizard控制器時，預設會取得設定檔中索引0位置的網頁來顯示，第一個頁面通常是歡迎或問卷說明頁面，決定下一個要展示的頁面之方法，在於
+請求中有無帶有一個"_target"開頭，並跟著一個號碼的請求參數，例如"_target1"這樣的設定，號碼表示在設定檔中&lt;
+list&gt;的順序，上面的網頁在按下Start按鈕後，會顯示第二個頁面：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>question1.jsp</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;Question 1&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;form name="questionform1" <br>          action="/AbstractWizardDemo/wizard.do" method="POST"&gt; <br>        問題一 &lt;input type="text" name="question1"/&gt;&lt;br&gt; <br>        &lt;input type="submit" value="Previous" name="_target0"/&gt;         <br>        &lt;input type="submit" value="Next" name="_target2"/&gt;  <br>    &lt;/form&gt; <br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+      <small><br>
+
+
+依"_target"與號碼來決定顯示的頁面是getTaretPage()方法所預設的，必要的話，您也可以重新定義這個方法以決定下一個頁面由哪一個
+參數決定，在question1.jsp的設計中，按下Previous按鈕的話，會返回問卷的上一頁，按下Next的按鈕的話，會返回問卷的下一頁，
+question2.jsp的設計也是類似。<br>
+
+
+      <br>
+
+
+決定是否完成問卷的方式，在於檢驗請求中是否有請求參數"_finish"，如果檢查到有這個值，就會執行processFinish()方法，question3.jsp是最後一個問卷，來看看它是如何撰寫的：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>question3.jsp</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>               content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;Question 3&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br><br>    &lt;form name="questionform3" <br>          action="/AbstractWizardDemo/wizard.do" method="POST"&gt; <br>        問題三 &lt;input type="text" name="question3"/&gt;&lt;br&gt; <br>        &lt;input type="submit" value="Previous" name="_target2"/&gt;<br>        &lt;input type="submit" value="Finish" name="_finish"/&gt;<br>    &lt;/form&gt; <br>    <br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+      <small><br>
+
+
+記得最後一個送出的問卷要帶有一個"_finish"參數，才會執行AbstractWizardFormControlle的processFinish()方法，最後設計一個success.jsp來顯示結果：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>success.jsp</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;Success&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>    &lt;H1&gt;Q1: ${ans.q1}&lt;/H1&gt; &lt;br&gt;<br>    &lt;H1&gt;Q2: ${ans.q2}&lt;/H1&gt; &lt;br&gt;<br>    &lt;H1&gt;Q3: ${ans.q3}&lt;/H1&gt; &lt;br&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+      <small><br>
+
+
+您也可以在問卷中設計一個Cancel按鈕，在按下該按鈕後，可以送出"_cancel"請求參數，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;form name="questionform3"</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; action="/AbstractWizard/wizard.do" method="POST"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input type="submit" value="Cancel" name="_cancel"/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/form&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">....</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+當請求中帶有"_cancel"請求參數時，則會呼叫processCancel()方法，您可以重新定義這個方法，例如將使用者送回問卷開始時：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; protected ModelAndView processFinish(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletRequest request,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletResponse response,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Object command,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BindException exception) throws Exception {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return new ModelAndView("start");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">...</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+
+
+      </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/AbstractWizardFormController.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+</html>

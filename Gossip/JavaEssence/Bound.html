@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Bound.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:01 GMT -->
+<head>
+
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>到此為止</title></head><body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence:&nbsp;到此為止</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在定義泛型時，可以定義型態的邊界（Bound）。例如：<br></small><pre>class Animal {}<br>class Human extends Animal {}<br>class Toy {}<br><br>class Duck<span style="font-weight: bold;">&lt;T extends Animal&gt;</span> {}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        Duck&lt;Animal&gt; ad = new Duck&lt;Animal&gt;();<br>        Duck&lt;Human&gt; hd = new Duck&lt;Human&gt;();<br>        Duck&lt;Toy&gt; hd = new Duck&lt;Toy&gt;();  // 編譯錯誤<br>    }<br>}</pre><small><br></small><small>在上例中，使用 <span style="font-weight: bold;">extends</span> 定義指定泛型真正型態時，必須是Animal的子類，你可以使用Animal與Human來指定型態，但不可以使用Toy指定型態，因為Toy不是Animal的子類。<br><br></small><small>一個實際應用可以用 <a href="../AlgorithmGossip/QuickSort3.htm#Scala">快速排序法</a> 中的例子來說明：<br></small><pre>class Sort {<br>    public void quick(int[] number) {<br>        sort(number, 0, number.length-1);<br>    }<br>    <br>    private void sort(int[] number, int left, int right) {<br>        if(left &lt; right) { <br>            int q = partition(number, left, right); <br>            sort(number, left, q-1); <br>            sort(number, q+1, right); <br>        } <br><br>    }<br><br>    private int partition(int number[], int left, int right) {  <br>        int i = left - 1; <br>        for(int j = left; j &lt; right; j++) { <br>            if(number[j] &lt;= number[right]) { <br>                i++; <br>                swap(number, i, j); <br>            } <br>        } <br>        swap(number, i+1, right); <br>        return i+1; <br>    } <br><br>    private void swap(int[] number, int i, int j) {<br>        int t = number[i]; <br>        number[i] = number[j]; <br>        number[j] = t;<br>    }<br>}</pre><br><small>在這個例子中，是以int來示範演算法的實作，如果要讓這個類別更一般化，可以排序任何型態的物件，則該型態必須具備可比較物件大小的方法，一個方式是要求要排序的物件實作<a href="http://java.sun.com/javase/6/docs/api/java/lang/Comparable.html">java.lang.Comparable&lt;T&gt;</a>介面。所以可以修改類別定義如下：<br></small><pre>class Sort<span style="font-weight: bold;">&lt;T extends Comparable&lt;T&gt;&gt;</span> {<br>    void quick(T[] array) {<br>        sort(array, 0, array.length-1);<br>    }<br>    <br>    private void sort(T[] array, int left, int right) {<br>        if(left &lt; right) { <br>            int q = partition(array, left, right); <br>            sort(array, left, q-1); <br>            sort(array, q+1, right); <br>        } <br><br>    }<br><br>    private int partition(T[] array, int left, int right) {  <br>        int i = left - 1; <br>        for(int j = left; j &lt; right; j++) { <br>            if(array[j].compareTo(array[right]) &lt;= 0) {<br>                i++; <br>                swap(array, i, j); <br>            } <br>        } <br>        swap(array, i+1, right); <br>        return i + 1; <br>    } <br><br>    private void swap(T[] array, int i, int j) {<br>        T t = array[i]; <br>        array[i] = array[j]; <br>        array[j] = t;<br>    }<br>}</pre><small><br></small><small>只要你定義的類別實作了java.lang.Comparable&lt;T&gt;，就可以使用這個類別來進行排序，例如字串就實作了</small><small>java.lang.Comparable&lt;T&gt;</small><small>：<br></small><pre>public class Main {<br>    public static void main(String[] args) {<br>       Sort&lt;String&gt; sort = new Sort&lt;String&gt;();<br>       String[] strs = {"3", "2", "5", "1"};<br>       sort.quick(strs);<br>       for(String s : strs) {<br>           System.out.println(s);<br>       }<br>    }<br>}</pre><small><br>若extends之後指定了類別或介面後，想再指定其它介面，可以使用<span style="font-weight: bold;">&amp;</span>連接。例如：<br>
+</small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some&lt;T extends Iterable&lt;T&gt; <span style="color: red;">&amp;</span> Comparable&lt;T&gt;&gt; {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+<br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Bound.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:01 GMT -->
+</html>

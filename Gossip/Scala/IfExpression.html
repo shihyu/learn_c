@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/IfExpression.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>if 運算式</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: if 運算式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>要在某條件成立時才進行某些動作，Scala提供了if運算式，一個例子如下：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var filename = "default.properties"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">if(!args.isEmpty) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; filename = args(0)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>這
+個範例中，預設的檔案名稱是default.properties，如果使用者有提供命令列引數，則args不為空，isEmpty會傳回false，所
+以!args.isEmpty的結果是true，所以if條件成立，將filename設定為使用者所提供的命令列引數。<br><br></small><small>在Scala中，如果if中只有一個陳述句，則大括號可以不用撰寫，所以上例也可以這麼寫：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var filename = "default.properties"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">if(!args.isEmpty)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; filename = args(0)</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br></div><small><br></small><small>if可以搭配else，在if條件不成立時，執行else中定義的程式碼，所以上例也可以這麼寫：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var filename = ""</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">if(args.isEmpty)</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; filename = "default.properties"</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">else</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; filename = args(0)</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br></span><span style="font-family: Times New Roman,Times,serif;">在Scala
+中一個重要的特性就是，if..else是個運算式（expression），也就是說if..else會有傳回值，傳回值就是if或else中最後一個
+語句。由於Scala鼓勵你使用val宣告變數，你可以利用if...else運算式會傳回值的特性，將上例改寫為以下：<br></span></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">val filename = if(args.isEmpty) "default.properties" else args(0)</span></span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"></span></small></div><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"><br>如果沒有提供命令列引數，則args.isEmpty為true，if條件成立，所以傳回"default.properties"的字串給filename，否則傳回args(0)的值給filename。<br><br>if..else為運算式的特性，可以讓Scala撰寫簡潔的程式碼，例如以下是個簡單的判斷輸入數是奇數或偶數的程式：<br></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"></span></small><pre>print("輸入整數：")<br>val input = readInt<br>printf("%d 為 %s", input, if(input % 2 == 0) "偶數" else "奇數")</pre><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"><br>if..else運算式的傳回值，是區塊中的最後一個語句，如果if..else中丟出了例外會如何呢？<br></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"></span></small><pre>val filename = if(!args.isEmpty) <br>                   args(0) <br>               else <br>                   throw new RuntimeException("必須提供引數")<br>println(filename)</pre><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"><br>這個例子是可通過編譯並運行的，執行時其實是先運算if..else，如果有提供命令列引數，則filename變數會被宣告並設定為args(0)，否則else中會丟出例外，所以就不會宣告filename變數了。<br><br>if..
+else既然是運算式，就上例來說，條件成立是會傳回值，那丟出例外時是否有傳回值？丟出例外時，基本上是標示其傳回Nothing，Nothing是Scala型態架構中最底層的
+型態，</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">如此就可通過</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">編譯器對</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">if..else運算式的語法檢查</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">。</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">不過實際上並沒有Nothing的實例，</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">傳回Nothing代表著程式異常終止</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">，</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;">例外丟出就是跳離該行執行，所以filename變數的宣告就沒有執行。</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small><br><br><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/IfExpression.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

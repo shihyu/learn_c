@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/DisplayVisibilityOpacity-2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:18 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function(event) {
+                function style(obj, prop) {
+                    if(window.getComputedStyle) {
+                        return window.getComputedStyle(obj, null)[prop];
+                    }
+                    else if(obj.currentStyle) {
+                        return obj.currentStyle[prop];
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                
+                function opacity(element, value) {
+                    if(value === undefined) {
+                        var opt = style(element, 'opacity') 
+                                     || style(element, 'filter');
+                        if(opt === '') {
+                            return 1;
+                        }
+                        if(opt.indexOf('alpha') !== -1)  {
+                            return opt.substring(14, opt.length - 1) / 100;
+                        }
+                        return parseFloat(opt);
+                    }
+                
+                    if(style(element, 'opacity') !== undefined) {
+                        element.style.opacity = value;
+                    }
+                    else {
+                        element.style.filter = 
+                           'alpha(opacity=' + parseInt(value * 100) + ')';
+                    }
+                }
+                
+                function fadeIn(element, speed) {
+                    speed = speed || 5000;
+                    var target = element.previousOpacity || 1;
+                    delete element.previousOpacity;
+                    var step = target / speed * 500;
+                    var opt = 0;
+                    setTimeout(function next() {
+                        opt += step;
+                        if(opt < target) {
+                            opacity(element, opt);
+                            setTimeout(next);
+                        }
+                        else {
+                            opacity(element, target);
+                        }
+                    }, 500);
+                }                
+                
+                function fadeOut(element, speed) {
+                    speed = speed || 5000;
+                    element.previousOpacity = opacity(element);
+                    
+                    var step = element.previousOpacity / speed * 500;
+                    var opt = element.previousOpacity;
+                    setTimeout(function next() {
+                        opt -= step;
+                        if(opt > 0) {
+                            opacity(element, opt);
+                            setTimeout(next);
+                        }
+                        else {
+                            opacity(element, 0);
+                        }
+                    }, 500);
+                }
+                
+                var image = document.getElementById('image');
+                
+                document.getElementById('fadeIn').onclick = function() {
+                   fadeIn(image, 10000);
+                };
+                
+                document.getElementById('fadeOut').onclick = function() {
+                   fadeOut(image, 10000);
+                };
+            };
+        </script>        
+    </head>
+    <body>
+        <button id='fadeOut'>淡出</button>
+        <button id='fadeIn'>淡入</button><br>
+        <img id="image" src="../../images/caterpillar_small.jpg">
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/DisplayVisibilityOpacity-2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:18 GMT -->
+</html>

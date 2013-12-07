@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/TreeCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:54 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript" src="js/turtle.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                function tree(n, x0, y0, leng, angle, branch,
+                              scale1, scale2) {
+                    if (n == 0) {
+                        return;
+                    }
+
+                    turtle.setPoint(x0, y0);
+                    turtle.setAngle(angle);
+                    turtle.move(leng);
+                    // Turtle 目前的位置
+                    var x = turtle.currentX;
+                    var y = turtle.currentY;
+
+                    tree(n - 1, x, y, leng * scale1,
+                        angle + branch, branch, scale1, scale2);
+                    tree(n - 1, x, y, leng * scale2,
+                        angle - branch, branch, scale1, scale2);
+                }
+            
+                var INIT_LENG = 100;
+                var INIT_ANGLE = 90;
+                var INIT_BRANCH = 20;
+                
+                var canvas1 = document.getElementById('canvas1');
+                var context = canvas1.getContext('2d');
+                var turtle = new Turtle(context);
+                
+                turtle.window(0, 0, canvas1.width, canvas1.height);
+                
+                turtle.view(0, 0, canvas1.width, canvas1.height);
+                
+                tree(8, 230, 0, 
+                     INIT_LENG, INIT_ANGLE, INIT_BRANCH, 0.8, 0.6);
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="350" height="400"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/TreeCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:54 GMT -->
+</html>

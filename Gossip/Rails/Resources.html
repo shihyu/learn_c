@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Resources.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>RESTful 路由</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror restful resources" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: RESTful 路由<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>在 <a href="RESTful.html">RESTful 與 Rails</a> 中介紹過Rails對REST的基本支援，除了基本的resources設定之外，你還可以作一些進階設定，例如單個資源的URL定義，像是想對messages/:id/preview這樣的路由作定義，可以如下：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>resources :messages do<br>
+          &nbsp;&nbsp;&nbsp; member do<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get 'preview'<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          end</strong><br>
+      </p>
+      <p>如此一來，就可以使用對像messages/1/preview作GET請求，請求會由messages_controller.rb中定義的<span
+          class="courier">preview</span>動作處理，有<span class="courier">preview_message_path與preview_message_url</span>輔助方法可以使用。member中也可以使用match設定。例如：</p>
+      <p style="margin-left: 40px;"><strong class="courier">resources :messages do<br>
+          &nbsp;&nbsp;&nbsp; member do<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; match 'preview', :to =&gt; 'messages#preview', :via =&gt; 'post'<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          end</strong></p>
+      <p>也可以如下定義：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>resources :messages do<br>
+          &nbsp;&nbsp;&nbsp; get 'preview', :on =&gt; :member<br>
+          end</strong><br>
+      </p>
+      <p>也可以使用rake routes來得知路由對應：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ rake routes<br>
+              preview_message GET&nbsp;&nbsp;&nbsp; /messages/:id/preview(.:format) {:action=&gt;"preview", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; messages GET&nbsp;&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"index", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POST&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp; new_message GET&nbsp;&nbsp;&nbsp; /messages/new(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"new", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp; edit_message GET&nbsp;&nbsp;&nbsp; /messages/:id/edit(.:format)&nbsp;&nbsp;&nbsp; {:action=&gt;"edit", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; message GET&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"messages"}<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p>如果想對多個資源的URL作定義，例如想對messages/search的GET作定義，則可以如下：</p>
+      <p style="margin-left: 40px;"><strong class="courier">resources :messages do<br>
+          &nbsp;&nbsp;&nbsp; collection do<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get 'search'<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          end</strong></p>
+      <p>如此也會產生<span class="courier">search_messages_path與search_messages_url</span>可以使用。可以使用rake routes來得知路由對應：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ rake routes<br>
+              search_messages GET&nbsp;&nbsp;&nbsp; /messages/search(.:format)&nbsp;&nbsp; {:action=&gt;"search", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; messages GET&nbsp;&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"index", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POST&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp; new_message GET&nbsp;&nbsp;&nbsp; /messages/new(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"new", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp; edit_message GET&nbsp;&nbsp;&nbsp; /messages/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; message GET&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"messages"}<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p>資源有時必須巢狀顯示，例如messages/1的回應，也許可以用messages/1/replies來表示（訊息與回應為 <a
+          href="OneToMany.html">一對多</a> 的情況），這時可以如下設定：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>resources :messages do<br>
+          &nbsp;&nbsp;&nbsp; resources :replies<br>
+          end</strong><br>
+      </p>
+      <p>使用rake routes來得知路由對應：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ rake routes<br>
+              &nbsp;&nbsp; message_replies GET&nbsp;&nbsp;&nbsp; /messages/:message_id/replies(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"index", :controller=&gt;"replies"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POST&nbsp;&nbsp; /messages/:message_id/replies(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"replies"}<br>
+              &nbsp;new_message_reply GET&nbsp;&nbsp;&nbsp; /messages/:message_id/replies/new(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"new", :controller=&gt;"replies"}<br>
+              edit_message_reply GET&nbsp;&nbsp;&nbsp; /messages/:message_id/replies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"replies"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp; message_reply GET&nbsp;&nbsp;&nbsp; /messages/:message_id/replies/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"replies"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /messages/:message_id/replies/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"replies"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /messages/:message_id/replies/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"replies"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; messages GET&nbsp;&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"index", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POST&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new_message GET&nbsp;&nbsp;&nbsp; /messages/new(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"new", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; edit_message GET&nbsp;&nbsp;&nbsp; /messages/:id/edit(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"edit", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; message GET&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"messages"}<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p>也就是說實際上處理的動作，必須在replies_controller.rb中定義<span class="courier">RepliesController</span>，並於其中定義對應的動作，像先前member與collection定義時，若有不瞭解URL對應與輔助方法時，也可以使用rake routes來得知。</p>
+      <p>resources用來定義複數資源，如果要定義單數資源，可以使用resource（沒有s），例如若訊息與最佳解答可以如下定義（為 <a
+          href="OneToOne.html">一對一</a> 的情況）：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">resources :messages do</span><br
+          style="font-weight: bold;">
+        <strong><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; resource :answer</span>&nbsp;&nbsp;&nbsp; # 單數</strong><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">end</span><br>
+      </p>
+      <p>使用rake routes來得知路由對應：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ rake routes<br>
+              &nbsp;&nbsp;&nbsp;&nbsp; message_answer POST&nbsp;&nbsp; /messages/:message_id/answer(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"answers"}<br>
+              &nbsp;new_message_answer GET&nbsp;&nbsp;&nbsp; /messages/:message_id/answer/new(.:format)&nbsp; {:action=&gt;"new", :controller=&gt;"answers"}<br>
+              edit_message_answer GET&nbsp;&nbsp;&nbsp; /messages/:message_id/answer/edit(.:format) {:action=&gt;"edit", :controller=&gt;"answers"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GET&nbsp;&nbsp;&nbsp; /messages/:message_id/answer(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"answers"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /messages/:message_id/answer(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"answers"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /messages/:message_id/answer(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"answers"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; messages GET&nbsp;&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"index", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POST&nbsp;&nbsp; /messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new_message GET&nbsp;&nbsp;&nbsp; /messages/new(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"new", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; edit_message GET&nbsp;&nbsp;&nbsp; /messages/:id/edit(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"edit", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; message GET&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"messages"}<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p></p>
+      <p>你可以為URL加上名稱空間。例如admin/messages/1、admin/messages/new這樣的URL，可以如下設定：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>namespace :admin do<br>
+          &nbsp;&nbsp;&nbsp; resources :messages<br>
+          end</strong><br>
+      </p>
+      <p>使用rake routes來看有哪些路由對應：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~gossip$ rake routes<br>
+              &nbsp;&nbsp;&nbsp; admin_messages GET&nbsp;&nbsp;&nbsp; /admin/messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"index", :controller=&gt;"admin/messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POST&nbsp;&nbsp; /admin/messages(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"create", :controller=&gt;"admin/messages"}<br>
+              &nbsp;new_admin_message GET&nbsp;&nbsp;&nbsp; /admin/messages/new(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"new", :controller=&gt;"admin/messages"}<br>
+              edit_admin_message GET&nbsp;&nbsp;&nbsp; /admin/messages/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"admin/messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp; admin_message GET&nbsp;&nbsp;&nbsp; /admin/messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"show", :controller=&gt;"admin/messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUT&nbsp;&nbsp;&nbsp; /admin/messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"update", :controller=&gt;"admin/messages"}<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE /admin/messages/:id(.:format)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {:action=&gt;"destroy", :controller=&gt;"admin/messages"}<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      更多有關路由設定的內容，可以參考 <a href="http://guides.rubyonrails.org/routing.html">Rails Routing from the Outside in</a>，表單設計的範例可以參考 <a
+        href="http://ihower.tw/rails3/index.html">RESTful 與表單設計</a> 或 <a
+        href="http://archives.ryandaigle.com/articles/2009/2/1/what-s-new-in-edge-rails-nested-attributes">What's New in Edge Rails: Nested Object Forms</a>。<br>
+      <br>
+      <p> </p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Resources.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:15 GMT -->
+</html>

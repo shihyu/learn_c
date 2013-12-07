@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Ivy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:32 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>簡介 Apache Ivy</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 簡介 Apache Ivy<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>長
+久以下，JAR檔案的管理一直是專案的困擾，到底這個框架相依於哪些JAR檔？而JAR檔案的版本為何？多個框架搭配時，共用的JAR檔版本該如何解決？
+如何確認目前的JAR是你指定的版本等？<br>
+      <br>
+      <a href="http://ant.apache.org/ivy/">Apache Ivy</a>
+是個相依性管理工具，用來記錄、追蹤、報告專案的相依性，可與Ant緊密結合，運作的方式與 <a href="http://maven.apache.org/">Apache Maven</a>
+類似，將各種開放原始碼專案的JAR檔放在網路或本地端的貯藏室（repository）加以管理，開發人員只要列出所需的程式庫或框架，相依性管理工具
+就會自動從貯藏室下載相對應且正確的相關JAR檔案。<br>
+      <br>
+要在Ant中使用Ivy，只要將下載的ivy-x.x.x.jar（x為版本號）放在Ant的lib目錄中，接著撰寫<span style="font-weight: bold;">ivy.xml</span>檔案，列出你所需的程式庫或框架。例如：<br>
+      </small>
+      <pre>&lt;ivy-module version="2.0"&gt;<br>    &lt;info organisation="org.apache" module="hello-ivy"/&gt;<br>    &lt;dependencies&gt;<br>        &lt;dependency org="commons-lang" name="commons-lang" rev="2.6"/&gt;<br>        &lt;dependency org="commons-logging" name="commons-logging" rev="1.1"/&gt;<br>    &lt;/dependencies&gt;<br>&lt;/ivy-module&gt; <br></pre>
+      <small><br>
+在這邊列出來，將下載Commons Lang與Commons Logging及其版本，<span style="font-family: Courier New,Courier,monospace;">由於</span>Ivy預設使用
+Apache Maven 2<span style="font-family: Courier New,Courier,monospace;">的
+貯藏室，org、name、rev</span>屬性該放哪些值，可以參考Apache Maven 2的POM設定。例如原本</small><small>Apache
+Maven 2中</small><small>若是如下的POM設定：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;dependency&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;groupId&gt;commons-lang&lt;/groupId&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;artifactId&gt;commons-lang&lt;/artifactId&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;version&gt;2.0&lt;/version&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/dependency&gt;</small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">則&lt;groudId&gt;
+的值就是設定在Ivy中&lt;dependency&gt;的org的值．&lt;artifactId&gt;的值就是設定name的值，你可以使用</span>
+      <a href="http://mvnrepository.com/">http://mvnrepository.com/</a>
+來查詢相關程式庫的設定。</small><br>
+      <small><br>
+如果要在Ant的build.xml中使用Ivy下載相依JAR。以下是一個例子：<br>
+      </small>
+      <pre>&lt;project <span style="font-weight: bold;">xmlns:ivy="antlib:org.apache.ivy.ant"</span> name="hello-ivy"&gt;<br>    &lt;target name="retrieve"&gt;<br>        &lt;ivy:retrieve /&gt;<br>    &lt;/target&gt;<br>&lt;/project&gt; <br></pre>
+      <small><br>
+你在build.xml後宣告XML名稱空間<span style="font-family: Courier New,Courier,monospace;">ivy，之後使用retrieve標</span>籤
+來開始下載JAR檔案。一個執行的例子如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;ant
+retrieve<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">Buildfile:
+C:\workspace\Demo\build.xml<br>
+            <br>
+retrieve:<br>
+[ivy:retrieve] :: Ivy 2.2.0 - 20100923230623 ::
+http://ant.apache.org/ivy/ ::<br>
+[ivy:retrieve] :: loading settings :: url =
+jar:file:/C:/Winware/apache-ant-1.8<br>
+2/lib/ivy-2.2.0.jar!/org/apache/ivy/core/settings/ivysettings.xml<br>
+[ivy:retrieve] :: resolving dependencies ::
+org.apache#hello-ivy;working@caterp<br>
+llar<br>
+[ivy:retrieve]&nbsp; confs: [default]<br>
+[ivy:retrieve]&nbsp; found commons-lang#commons-lang;2.6 in public<br>
+[ivy:retrieve]&nbsp; found commons-logging#commons-logging;1.1 in public<br>
+[ivy:retrieve]&nbsp; found log4j#log4j;1.2.12 in public<br>
+[ivy:retrieve]&nbsp; found logkit#logkit;1.0.1 in public<br>
+[ivy:retrieve]&nbsp; found avalon-framework#avalon-framework;4.1.3 in
+public<br>
+[ivy:retrieve]&nbsp; found javax.servlet#servlet-api;2.3 in public<br>
+[ivy:retrieve] downloading
+http://repo1.maven.org/maven2/commons-logging/common<br>
+-logging/1.1/commons-logging-1.1-sources.jar ...<br>
+[ivy:retrieve]
+................................................................<br>
+...................... 略<br>
+[ivy:retrieve] :: resolution report :: resolve 26027ms :: artifacts dl
+20164ms<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------------------------------------------------------------------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+modules&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+||&nbsp;&nbsp; artifacts&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+conf&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | number|
+search|dwnlded|evicted|| number|dwnlded|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------------------------------------------------------------------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; default&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp; 6&nbsp;&nbsp; |&nbsp;&nbsp; 5&nbsp;&nbsp; |&nbsp;&nbsp;
+5&nbsp;&nbsp; |&nbsp;&nbsp; 0&nbsp;&nbsp; ||&nbsp;&nbsp; 9&nbsp;&nbsp;
+|&nbsp;&nbsp; 6&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------------------------------------------------------------------<br>
+[ivy:retrieve] :: retrieving :: org.apache#hello-ivy<br>
+[ivy:retrieve]&nbsp; confs: [default]<br>
+[ivy:retrieve]&nbsp; 9 artifacts copied, 0 already retrieved
+(2902kB/36ms)<br>
+            <br>
+BUILD SUCCESSFUL<br>
+Total time: 47 seconds</span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>下載的JAR，預設會使用者目錄的<span style="font-weight: bold;">.ivy2</span>目
+錄中，之後專案有用到的話，會複製一份放在你的lib資料夾中。<br>
+      <br>
+在 <a href="JUnitReport.html">產生測試報告</a>
+中的build.xml，可以改使用Ivy下載JUnit的JAR檔案。例如定義ivy.xml：<br>
+      </small>
+      <pre>&lt;ivy-module version="2.0"&gt;<br>    &lt;info organisation="org.apache" module="junit-ivy"/&gt;<br>    &lt;dependencies&gt;<br>        &lt;dependency org="junit" name="junit" rev="4.8"/&gt;<br>    &lt;/dependencies&gt;<br>&lt;/ivy-module&gt; <br></pre>
+      <small><br>
+接著定義build.xml：<br>
+      </small>
+      <pre>&lt;project <span style="font-weight: bold;">xmlns:ivy="antlib:org.apache.ivy.ant" </span><br>            name="example" default="report"&gt; <br>    &lt;property name="src.dir" value="src"/&gt; <br>    &lt;property name="bin.dir" value="bin"/&gt;<br>    &lt;property name="report.dir" value="report"/&gt;<br>    <br><span style="font-weight: bold;">    &lt;ivy:retrieve file="./ivy.xml" sync="true"/&gt;</span><br>    <br><span style="font-weight: bold;">    &lt;property name="junit.dir" value="lib/junit-4.8.jar"/&gt;</span><br><br>    &lt;target name="clean"&gt;<br>        &lt;delete dir="${bin.dir}"/&gt;<br>        &lt;delete dir="${report.dir}"/&gt;<br>    &lt;/target&gt;<br>    <br>    &lt;target name="prepare" depends="clean"&gt; <br>        &lt;mkdir dir="${bin.dir}"/&gt; <br>        &lt;mkdir dir="${report.dir}"/&gt; <br>    &lt;/target&gt; <br><br>    &lt;target name="compile" depends="prepare"&gt; <br>        &lt;javac srcdir="${src.dir}" destdir="${bin.dir}"&gt; <br>            &lt;classpath&gt; <br>                &lt;pathelement location="${junit.dir}"/&gt;<br>            &lt;/classpath&gt;        <br>        &lt;/javac&gt;<br>    &lt;/target&gt;<br>        	<br>    &lt;target name="test" depends="compile"&gt; <br>        &lt;junit printsummary="yes"&gt;<br>            &lt;formatter type="xml"/&gt;<br>            &lt;batchtest todir="${report.dir}"&gt;<br>                &lt;fileset dir="${src.dir}" includes="**/*Test.java"/&gt;<br>            &lt;/batchtest&gt;<br>            &lt;classpath&gt; <br>                &lt;pathelement location="${bin.dir}"/&gt;<br>                &lt;pathelement location="${junit.dir}"/&gt;  <br>            &lt;/classpath&gt;<br>        &lt;/junit&gt; <br>    &lt;/target&gt; <br><br>    &lt;target name="report" depends="test"&gt; <br>        &lt;junitreport todir="${report.dir}"&gt; <br>            &lt;fileset dir="${report.dir}"&gt; <br>                &lt;include name="TEST-*.xml"/&gt; <br>            &lt;/fileset&gt; <br>            &lt;report format="frames" todir="${report.dir}/html"/&gt; <br>        &lt;/junitreport&gt; <br>    &lt;/target&gt;    <br>&lt;/project&gt;<br></pre>
+      <small><br>
+接著只要下ant指令，就會自動為你下載JUnit相關JAR檔、設定相關屬性、編譯、測試、完成報告等動作。<br class="Apple-interchange-newline">
+      </small><br>
+      <small><br>
+      <br>
+      <br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Ivy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:32 GMT -->
+</html>

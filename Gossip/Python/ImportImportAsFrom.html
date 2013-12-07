@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/ImportImportAsFrom.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>import、import as、from import</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: import、import as、from import<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>接續</small> <a href="ImportModule.html"><small>匯入模組</small></a><small>，使用<span style="font-family: Courier New,Courier,monospace;">import</span>匯入模組，會以被匯入的模組名稱在當前模組命名一個同名的名稱，被匯入模組中的變數，其實是以被匯入模組為名稱空間。例如，若有個some.py：<br>
+      </small>
+      <pre>name = 'Justin'<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">若你匯入some模組，要存取some模組中的name變數，則必須使用some.name。事實上，你可以使用<span style="font-weight: bold;">del</span>刪除與被匯入模組同名的變數：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>import some<br>print(some.name)  # Justin<br><span style="font-weight: bold;">del some</span><br>print(some.name)  # NameError: name 'some' is not defined<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+上例中，於del some後，由於目前模組中已沒有some變數，因而發生錯誤。你可以在del與被匯入模組同名的變數，之後再度使用import設回該變數。例如：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>import some<br>print(some.name)  # Justin<br><span style="font-weight: bold;">del some</span><br style="font-weight: bold;"><span style="font-weight: bold;">import some</span><br>print(some.name)  # Justin<br>      </pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+再次匯入模組，可以設回與被匯入模組的同名變數，但不會再度執行被匯入模組，import模組時只會執行模組一次，再次import是不會再度執行模組的。<br>
+      <br>
+如果想要知道現在到底匯入了多少模組，則可以使用<span style="font-weight: bold;">sys.modules</span>得知，這是個字典物件。例如：</span></small><small><br></small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; import sys</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">&gt;&gt;&gt; sys.modules.keys()</span><br>
+dict_keys(['heapq', 'sre_compile', '_collections', 'locale', '_multibytecodec',<br>
+'functools', 'encodings', 'site', 'operator', 'io', '__main__', 'copyreg', '_hea<br>
+pq', '_weakref', 'abc', 'builtins', 'errno', 'itertools', 'sre_constants', 're',<br>
+&nbsp;'encodings.latin_1', 'collections', 'ntpath', '_sre', 'nt', 'genericpath', 'sta<br>
+t', 'zipimport', '_codecs', '_bisect', 'encodings.utf_8', 'sys', 'codecs', 'os.p<br>
+ath', '_functools', '_locale', 'keyword', 'bisect', '_codecs_tw', 'signal', 'wea<br>
+kref', '_io', '_weakrefset', 'encodings.cp950', 'encodings.aliases', 'sre_parse'<br>
+, 'os', '_abcoll'])<br>
+<span style="font-weight: bold;">&gt;&gt;&gt;</span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">如果你使用del刪除某個與被匯入模組同名的變數，並不會</small><small style="font-family: Courier New,Courier,monospace;">影響</small><small style="font-family: Courier New,Courier,monospace;">sys.modules。例如：<br>
+      </small>
+      <pre>import sys<br>import some<br>print(some.name)     # Justin<br>del some<br>print(<span style="font-weight: bold;">sys.modules['some']</span>.name)  # Justin<br>print(some.name)    # NameError: name 'some' is not defined<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+如果你想要改變被匯入模組在當前模組中的變數名稱，則可以使用<span style="font-weight: bold;">import as</span>。例如：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre><span style="font-weight: bold;">import some as other</span><br>print(other.name)   # Justin<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+import as改變的是被匯入模組在當前模組的名稱，而不是sys.modules中的名稱，以上例來說，sys.modules中的名稱仍然是some。上例比較像是：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import some</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">other = some</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">del some</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">print(other.name)</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small><small>可以使用<span style="font-family: Courier New,Courier,monospace;">from
+ import語</span>句建立與被匯入模組中相同的變數名稱。例如：<br>
+      </small>
+      <pre>import some<br>from some import name<br><br>print(name)            # Justin<br>print(some.name)       # Justin<br><br>name = 'caterpillar'  <br>print(name)            # caterpillar<br>print(some.name)       # Justin<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+上例比較像是：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import some</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">name = some.name</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">print(name)</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">print(some.name)</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">name = 'caterpillar'</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">print(name)</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">print(some.name)</span></span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small><small></small><small>但如果是可變動物件，例如：<br>
+      </small>
+      <ul>
+<li><small>other.py</small></li>
+      </ul>
+
+      <pre>list = [1, 2, 3]<br>print(list)</pre>
+
+      <br>
+
+      <small>則會有以下的結果：</small><small><br></small>
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; import other<br>
+</span>[1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; from other import list<br>
+&gt;&gt;&gt; list<br>
+      </span>[1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; list[0] = 100<br>
+&gt;&gt;&gt; list<br>
+      </span>[100, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; other.list<br>
+      </span>[100, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"> </span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+      <small><br></small><small><span style="font-family: monospace;">Python</span><span style="font-family: Courier New,Courier,monospace;">是個不斷演進的語言，有些新語法或功能會不相容於舊版本</span><span style="font-family: monospace;">Python，甚至破壞舊版本Python原本的功能，如果你想要體驗一下將來版本可能有的新語法或功能，則可以透過<span style="font-weight: bold;">__future__</span>模組。例如在Python 2.6中，print是個陳述句，而在Python 3中，print是個函式，若要在Python 2.6中使用Python 3中的print函式，則可以：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: monospace;"><span style="font-weight: bold;">from __future__ import print_function</span></span></small><br>
+      <small><span style="font-family: monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      <br>
+      </span></small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/ImportImportAsFrom.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/MultiToOneDim.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:05:10 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>多維矩陣轉一維矩陣</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 多維矩陣轉一維矩陣</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+
+      
+      <h2>說明</h2>
+
+      <small>
+
+有的時候，為了運算方便或資料儲存的空間問題，使用一維陣列會比二維或多維陣列來得方便，例如上三角矩陣、下三角矩陣或對角矩陣，使用一維陣列會比使用二維陣列來得節省空間。</small><br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+以二維陣列轉一維陣列為例，索引值由0開始，在由二維陣列轉一維陣列時，我們有兩種方式：「以列（Row）為主」或「以行（Column）為主」。由於
+C/C++、Java等的記憶體配置方式都是以列為主，所以您可能會比較熟悉前者（Fortran的記憶體配置方式是以行為主）。<br>
+
+      <br>
+
+
+
+以列為主的二維陣列要轉為一維陣列時，是將二維陣列由上往下一列一列讀入一維陣列，此時索引的對應公式如下所示，其中row與column是二維陣列索引，loc表示對應的一維陣列索引：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">loc = column + row*行數</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+以行為主的二維陣列要轉為一維陣列時，是將二維陣列由左往右一行一行讀入一維陣列，此時索引的對應公式如下所示：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">loc = row + column*列數</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+公式的推導您畫圖看看就知道了，如果是三維陣列，則公式如下所示，其中i（個數u1）、j（個數u2）、k（個數u3）分別表示三維陣列的三個索引：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">以列為主：loc = i*u2*u3 + j*u3 + k</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">以行為主：loc = k*u1*u2 + j*u1 + i</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+更高維度的可以自行依此類推，但通常更高維度的建議使用其它資料結構（例如物件包裝）會比較具體，也不易搞錯。<br>
+
+      <br>
+
+
+
+在C/C++中若使用到指標時，會遇到指標運算與記憶體空間位址的處理問題，此時也是用到這邊的公式，不過必須在每一個項上乘上資料型態的記憶體大小。 </small>
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala&nbsp;</a>&nbsp;&nbsp; <a href="#Scala"><a href="#Ruby">Ruby</a><br>
+      </a></h2>
+
+
+
+
+      
+      <ul>
+
+        <li> <a name="C"></a>C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt;<br>#define ROW 3<br>#define COLUMN 4<br><br>void toOneByRow(int[][], int[]);<br>void toOneByColumn(int[][], int[]);<br>int indexByRow(int, int);<br>int indexByColumn(int, int);<br>void toOne(int[][COLUMN], int[], int (*)(int, int));<br><br>int main(void) { <br>    int arr1[ROW][COLUMN] = {{1, 2, 3, 4}, <br>                             {5, 6, 7, 8}, <br>                             {9, 10, 11, 12}}; <br>    int arr2[ROW * COLUMN] = {0}; <br><br>    printf("原二維資料：\n"); <br>    int row, column;<br>    for(row = 0; row &lt; 3; row++) { <br>        for(column = 0; column &lt; 4; column++) { <br>            printf("%4d", arr1[row][column]); <br>        } <br>        printf("\n"); <br>    } <br><br>    printf("\n以列為主："); <br>    toOneByRow(arr1, arr2);<br>    int i;<br>    for(i = 0; i &lt; 12; i++) <br>        printf("%d ", arr2[i]); <br><br>    printf("\n以行為主："); <br>    toOneByColumn(arr1, arr2);<br>    for(i = 0; i &lt; 12; i++) <br>        printf("%d ", arr2[i]); <br><br>    printf("\n"); <br><br>    return 0; <br>} <br><br>void toOneByRow(int arr1[][COLUMN], int arr2[]) {<br>    toOne(arr1, arr2, indexByRow);<br>}<br><br>void toOneByColumn(int arr1[][COLUMN], int arr2[]) {<br>    toOne(arr1, arr2, indexByColumn);<br>}<br><br>int indexByRow(int row, int column) {<br>    return column + row * COLUMN;<br>}<br><br>int indexByColumn(int row, int column) {<br>    return row + column * ROW;<br>}<br><br>void toOne(int arr1[][COLUMN], int arr2[], int (*index)(int, int)) {<br>    int row, column;<br>    for(row = 0; row &lt; ROW; row++) { <br>        for(column = 0; column &lt; COLUMN; column++) { <br>            arr2[index(row, column)] = arr1[row][column]; <br>        } <br>    }    <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li> <a name="Java"></a>Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>public class Matrix {   <br>    public static int[] toOneByRow(final int[][] array) {<br>        return toOne(array, new Index() {<br>            public int get(int row, int column) {<br>                return column + row * array[0].length; <br>            }<br>        });<br>    }<br>    <br>    public static int[] toOneByColumn(final int[][] array) {<br>        return toOne(array, new Index() {<br>            public int get(int row, int column) {<br>                return row + column * array.length; <br>            }<br>        });<br>    }<br><br>    private static interface Index {<br>        int get(int row, int column);<br>    }<br>    <br>    private static int[] toOne(int[][] array, Index index) {<br>        int[] arr = new int[array.length * array[0].length];<br>        for(int row = 0; row &lt; array.length; row++) { <br>            for(int column = 0; column &lt; array[0].length; column++) { <br>                arr[index.get(row, column)] = array[row][column]; <br>            } <br>        }<br>        return arr;<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>def toOneByRow(array):<br>    return toOne(array, (lambda row, column: column + row * len(array[0])))<br><br>def toOneByColumn(array):<br>    return toOne(array, (lambda row, column: row + column * len(array)))<br><br>def toOne(array, f):<br>    arr = [0] * (len(array) * len(array[0]))<br>    for row in range(len(array)):<br>        for column in range(len(array[0])):<br>            arr[f(row, column)] = array[row][column]<br>    return arr</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>object Matrix {<br>    def toOneByRow(array: Array[Array[Int]]) = {<br>        toOne(array, _ * array(0).length + _)<br>    }<br>    <br>    def toOneByColumn(array: Array[Array[Int]]) = {<br>        toOne(array, _ + _ * array.length)<br>    }<br>    <br>    private def toOne(array: Array[Array[Int]], f: (Int, Int) =&gt; Int) = {<br>        val arr = new Array[Int](array.length * array(0).length)<br>        for(row &lt;- 0 until array.length; column &lt;- 0 until array(0).length) {<br>            arr(f(row, column)) = array(row)(column)<br>        }<br>        arr    <br>    }<br>}<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>def toOneByRow(array)<br>    toOne(array) { |row, column| column + row * array[0].length }<br>end<br><br>def toOneByColumn(array)<br>    toOne(array) { |row, column| row + column * array.length }<br>end<br><br>def toOne(array)<br>    arr = Array.new(array.length * array[0].length, 0)<br>    array.length.times { |row|<br>        array[0].length.times { |column|<br>            arr[yield(row, column)] = array[row][column]<br>        }<br>    }<br>    arr<br>end<br></pre>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+<br>
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/MultiToOneDim.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:05:10 GMT -->
+</html>

@@ -1,0 +1,469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/StrutsSpring.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:15 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>在 Struts 中整合 Spring</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 在 Struts 中整合 Spring</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>Struts要與Spring結合使用，主要的方法就是讓Struts知道Spring的存在，以讓Spring與其管理相關的組件，避免在程式中直接撰寫相關組件的依賴關係建立。<br>
+
+      <br>
+
+首先要在Struts的struts-config.xml中使用&lt;plug-in&gt;標籤註冊org.springframework.web.struts.ContextLoaderPlugIn：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;plug-in className="org.springframework.web.</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&rarr; struts.ContextLoaderPlugIn"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;set-property property="contextConfigLocation" </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">value="/WEB-INF/beans-config.xml, /WEB-INF/..."/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/plug-in&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+      <small><br>
+
+有幾個方法可以讓您取得Spring所管理的Bean，方法之一是Struts的Action改繼承
+org.springframework.web.struts.ActionSupport，這個類別是Struts的Action抽象類別的實作，您
+可以使用它的getWebApplicationContext()來取得ApplicationContext的實例，然後進一步取得Spring容器
+所管理的Bean實例，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class SomeAction extends ActionSupport {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public ActionForward execute(ActionMapping mapping,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ActionForm form,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletRequest req,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletResponse res) </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws Exception {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ApplicationContext context = </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+getWebApplicationContext();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SomeBean bean = (SomeBean) context.getBean("some");</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return mapping.findForward("view");</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+      <small><br>
+
+這種方式符合Struts的使用習慣，透過繼承來實作Action，並可得到Spring管理組件間關係的好處，但壞處就是Spring與Struts的API耦合在一起，而且在Action中包括了取得相依物件的邏輯，這並沒有善用Spring管理依賴注入的好處。<br>
+
+      <br>
+
+另一個方式是讓Struts的Action直接繼承它自己的抽象Action類，但讓Spring來管理Struts的Action物件，讓Action
+物件也成為Spring容器管理下的一個Bean，這麼一來就可以直接使用依賴注入的方式注入相依物件，例如可以重新修改一下</small><a href="FirstStruts.html"><small>第一個 Struts 程式</small></a> <small>中的HelloAction類別：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>HelloAction.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br>import javax.servlet.http.*;<br>import org.apache.struts.action.Action;<br>import org.apache.struts.action.ActionForm;<br>import org.apache.struts.action.ActionForward;<br>import org.apache.struts.action.ActionMapping;<br><br>public class HelloAction extends Action {<br>    private UserChecker userChecker;<br>    <br>    public ActionForward execute(<br>                             ActionMapping mapping, <br>                             ActionForm form, <br>                             HttpServletRequest request, <br>                             HttpServletResponse response) <br>                                  throws Exception {<br>        String username = request.getParameter("user");<br>        username = this.getUserChecker().check(username);<br>        <br>        Map model = new HashMap();<br>        model.put("username", username);<br>        request.setAttribute("userInfo", model);<br><br>        return mapping.findForward("helloUser");<br>    }<br>    <br>    public UserChecker getUserChecker() {<br>        return userChecker;<br>    }<br>    <br>    public void setUserChecker(UserChecker userChecker) {<br>        this.userChecker = userChecker;<br>    }<br>}</pre>
+
+      <small><br>
+
+其中UserChecker類別的定義如下所示：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>UserChecker.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class UserChecker {<br>    public String check(String username) {<br>        if(username != null) {<br>            return username;<br>        }<br>        else {<br>            return "guest";<br>        }<br>    }<br>}</pre>
+
+      <small><br>
+
+UserChecker模擬商務層的一個檢查權限的物件，您要在Struts的Action中使用到UserChecker的實例，這可以交由
+Spring來為您作依賴注入，您可以將HelloAction與UserChecker的實例都交給Spring容器來管理，例如在Bean定義檔中這
+麼定義：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br> "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;   <br>    &lt;bean id="userChecker" <br>          class="onlyfun.caterpillar.UserChecker"/&gt;<br><br>    &lt;bean name="/hello" <br>          class="onlyfun.caterpillar.HelloAction"&gt;<br>        &lt;property name="userChecker"&gt;<br>            &lt;ref bean="userChecker"/&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+      <small><br>
+
+Action的實例現在已納入Spring的管理，那麼Struts在請求轉發時，要有一個中間代理機制，當請求要轉發至指定的Action之前，先轉發
+至代理物件，由代理物件通知Spring以取得Spring所管理的Action實例來處理請求，並將處理結果返回給代理物件，再由代理物件返回給
+Struts，這可以在struts-config.xml中使用
+org.springframework.web.struts.DelegatingActionProxy的實例來作代理，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;<br><br>&lt;!DOCTYPE struts-config PUBLIC<br> "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN"<br> "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd"&gt;<br> &lt;struts-config&gt; <br>    &lt;action-mappings&gt; <br>        &lt;action <br>            path="/hello" <br>            type="org.springframework.web.<br>                        &rarr; struts.DelegatingActionProxy"&gt;<br>            &lt;forward<br>                name="helloUser" <br>                path="/WEB-INF/jsp/hello.jsp"/&gt; <br>        &lt;/action&gt; <br>    &lt;/action-mappings&gt; <br>    <br>    &lt;plug-in className="org.springframework.web.<br>                             &rarr; struts.ContextLoaderPlugIn"&gt;<br>        &lt;set-property property="contextConfigLocation" <br>                      value="/WEB-INF/beans-config.xml"/&gt;<br>    &lt;/plug-in&gt;    <br>&lt;/struts-config&gt;</pre>
+
+      <small><br>
+
+在定義檔中注意使用了&lt;plug-in&gt;標籤加入ContextLoaderPlugIn，並指定了Spring的Bean定義檔之位置與名稱。<br>
+
+      <br>
+
+注意beans-config.xml中HelloAction的"name"屬性設定為"/hello"，則&lt;action&gt;中的
+"path"屬性也必須設定為"/hello"，DelegatingActionProxy是藉著這個來找到Action實例並進行請求處理的，這個方
+法的缺點就是要花功夫在兩個定義檔的名稱比對上，並不是那麼的方便。<br>
+
+      <br>
+
+您可以使用Spring的org.springframework.web.struts.DelegatingRequestProcessor來取代Struts自己的RequestProcessor，在struts-config.xml中定義：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;plug-in className="org.springframework.web.struts.ContextLoaderPlugIn"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;set-property property="contextConfigLocation" </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+value="/WEB-INF/beans-config.xml"/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/plug-in&gt;&nbsp;&nbsp;&nbsp; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;controller processorClass="org.springframework.web.struts.DelegatingRequestProcessor"/&gt;&nbsp; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+這一次，可以直接將Struts的Action類別名稱寫在struts-config.xml，看來會比較直覺，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;action path="/hello"</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="onlyfun.caterpillar.HelloAction"/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+      <small><br>
+
+事實上並不會使用到"type"屬性的設定，撰寫出來只是為了看來比較清楚Action使用了哪一個類別，簡潔的寫法只要這樣就可以了：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;action path="/someAction"/&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+      <small><br>
+
+同樣的，當請求轉發時，會由代理物件將請求轉發至Bean定義檔中具有相同名稱（/hello）的Action實例來處理。<br>
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/StrutsSpring.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:15 GMT -->
+</html>

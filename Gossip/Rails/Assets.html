@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Assets.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>資產（Assets）</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror assets" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 資產（Assets）<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>資產是指Web應用程式使用的JavaScript檔案、樣式表（Style sheet）檔案與圖檔等靜態檔案資源，雖然可以將這些檔案放在public資料夾下，直接供HTTP請求讀取，但往往隨著網站應用程式的擴大，這些資源的管理就會趨於混亂，沒有一定的處理規則，若要針對這些資源合併檔案、附加檔案摘要名稱、進行壓縮等，還要自行進行處理。</p>
+      <p>Rails為資產的管理與額外處理提供支援，可以將Web應用程式用到的自定義資產檔案分別放置在app/assets資料夾中javascripts、stylesheet與images資料夾，搭配<span
+          class="courier">javascript_include_tag、stylesheet_link_tag與image_tag</span>等輔助方法以及相關設定，可直接提供合併檔案、附加檔案摘要名稱、進行壓縮等處理。</p>
+      <p>除了app/assets之外，還可以將自定義程式庫用到的資產檔案放在lib/assets，第三方廠商用到的程式庫資產放在vender/assets中，如果想放到其它路徑，可以在config/application.rb中設定。例如：</p>
+      <p style="margin-left: 40px;"><strong><span class="courier">config.assets.paths &lt;&lt; Rails.root.join("app", "assets", "flash")</span></strong><br>
+      </p>
+      <p>首先解釋app/assets/javascripts中application.js，雖然是js檔案，但其中只有註解文字：</p>
+      <ul>
+        <li>application.js</li>
+      </ul>
+      <pre>// This is a manifest file that'll be compiled into including all the files listed below.
+// Add new JavaScript/Coffee code in separate files in this directory and they'll automatically
+// be included in the compiled file accessible from http://example.com/assets/application.js
+// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
+// the compiled file.
+//
+//= require jquery
+//= require jquery_ujs
+//= require_tree .<br></pre>
+      <p>這個檔案是個manifest檔案，記錄了要載入的js檔案，Rails會用到jQuery程式庫，<span class="courier">require jquery</span>表示要載入jQuery的js檔案，<span
+          class="courier">require jquery_ujs</span>表示要載入Rails的jQuery adapter的js檔案，也就是在頁面上各種操作時，調用jQuery程式庫的js檔案。<span
+          class="courier">require_tree .</span>表示將目前資料夾中所有js檔案載入。<br>
+      </p>
+      <p>再來看看app/assets/stylesheets中的appplication.css：</p>
+      <ul>
+        <li>application.css</li>
+      </ul>
+      <pre>/*
+ * This is a manifest file that'll automatically include all the stylesheets available in this directory
+ * and any sub-directories. You're free to add application-wide styles to this file and they'll appear at
+ * the top of the compiled file, but it's generally better to create a new file per style scope.
+ *= require_self
+ *= require_tree . 
+*/<br></pre>
+      <p>這同樣也是manifest檔案，<span class="courier">require_self</span>會尋找路徑下同名的css檔案，<span
+          class="courier">require_tree .</span>表示將目前資料夾中所有css檔案載入。</p>
+      <p>在開發環境下，若搭配以下：</p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">&lt;%= stylesheet_link_tag&nbsp;&nbsp;&nbsp; "application" %&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;"> &lt;%= javascript_include_tag "application" %&gt;</span>&nbsp; <br>
+      </p>
+      <p>預設會產生以下內容：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">&lt;link href="/assets/application.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;"> &lt;link href="/assets/bookmarks.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;"> &lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;"> &lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;"> &lt;script src="/assets/bookmarks.js?body=1" type="text/javascript"&gt;&lt;/script&gt;</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;"> &lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;</span><br>
+      </p>
+      <p>實際上application.css與applications.js並沒有什麼東西，這是因為在開發環境下，config.assets.debug預設是true，如果在config/environments/development.rb設定：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>config.assets.debug = false&nbsp; # development.rb 中預設是 true</strong><br>
+      </p>
+      <p>那麼會產生以下的內容：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;link href="/assets/application.css" media="screen" rel="stylesheet" type="text/css" /&gt;<br>
+          &lt;script src="/assets/application.js" type="text/javascript"&gt;&lt;/script&gt;</strong><br>
+      </p>
+      <p>Rails會將assets中用到的js合併為一個application.js，用到的css合併為一個application.css，減少個別下載檔案的時間，如果要進一步啟用壓縮，可以如下設定：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>config.assets.compress = true&nbsp;&nbsp; # development.rb 中預設是 false</strong><br>
+      </p>
+      <p>為了避免瀏覽器快取JavaScript、CSS、圖檔等靜態檔案，Rails可以根據檔案名稱、存取時間等產生訊息摘要，附加在檔名之後，如果要啟用這個功能，可以如下設定：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><strong>config.assets.digest = true&nbsp;&nbsp; # development.rb 中無設定</strong><br>
+      </p>
+      <p>如此設定之後，會產生以下的內容：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;link href="/assets/application-db9e40ab62db6ecfb06e1320fce0cb3c.css" media="screen" rel="stylesheet" type="text/css" /&gt;<br>
+          &lt;script src="/assets/application-aadaf146ff756296ac7b477e62ec1127.js" type="text/javascript"&gt;&lt;/script&gt;</strong><br>
+      </p>
+      <p>如果檔案有變更，那麼產生的檔名就不相同，也就可以避免瀏覽器快取檔案，如果是圖檔，可以使用<span class="courier">image_tag</span>輔助方法。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;%= image_tag "rail.png" %&gt;</strong><br>
+      </p>
+      <p>產生出來的內容會像是：</p>
+      <p style="margin-left: 40px;"><strong class="courier">&lt;img alt="Rails" src="/assets/rails-344f187095a74f5ea05774cd37dc3450.png" /&gt;</strong><br>
+      </p>
+      <p>在開發環境中，Rails會即時編譯出相關檔案傳送給瀏覽器，在產品環境中，必須將assets中的檔案經過預編譯後放在public目錄，你可以在config/environments/production.rb中，看到以下的設定：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>config.assets.compile = false</strong><br>
+      </p>
+      <p>這要求Rails不要即時編譯相關檔案，因此在產品環境中要自行預編譯好檔案，放在public目錄中，可用以下指令進行預編譯：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rake assets:precompile<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>這會將預編譯好的檔案放在public/assets目錄中，預編譯的動作包括合併檔案、附加檔案摘要名稱、進行壓縮等。如果要清除預編譯的檔案，可以如下：</p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rake assets:clean<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>實際上在產品環境的設定檔config/environments/production.rb中，已設定好以上相關選項，所以只要執行Rails時如下：<br>
+      </p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rails s -e production<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>就可以用產品環境運行，也就可以看到以上所呈現的回應結果。你也可以設定環境變數RAILS_ENV來決定使用哪個模式。<br>
+      </p>
+      <p>放在assets資料夾中的檔案，並非只能有js、css或圖檔，實際上還可以使用erb、coffee、sass或scss等撰寫，預編譯不只有合併檔案、附加檔案摘要名稱、進行壓縮，還可以將erb、coffee、sass或scss等撰寫而成的檔案，轉換為實際的js或css檔案。</p>
+      <p>舉例來說，如果你使用.js.erb或.css.erb來撰寫js或css要產生的實際內容，就可以使用內嵌Ruby程式碼。例如若js檔案中必須使用到圖檔名稱，由於圖檔名稱會加上訊息摘要，因此你可以在.js.erb中如下撰寫：</p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">var img = document.createElement('img');</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">img.src = '&lt;%= image_tag "rails.png" %&gt;';</span><br>
+      </p>
+      <p>藉由在.js.erb中內嵌Ruby程式碼，並呼叫<span class="courier">image_tag</span>，如此預編譯出來的js檔案中圖檔名稱的部份，就會是帶有訊息摘要的名稱。</p>
+      <p>如果你對於coffee、sass、scss等的撰寫有興趣，可以參考 <a href="http://wp.xdite.net/?p=3244">淺談 Rails 3.1 Asset Pipeline</a>。<br>
+      </p>
+      <p>在assets/javascripts/application.js與assets/stylesheets/application.css中使用了<span
+          class="courier">require_tree .</span>，這會將目前資料夾中所有js或css檔案載入，如果你有不同的頁面需要不同的js或css，可以將該行拿掉，並自行新增manifest檔案。</p>
+      <p>例如，如果你想在assets/javascripts/bookmarks中，放置bookmarks控制器專用的js檔案，可以新增assets/javascripts/bookmarks.js，內容如下：</p>
+      <ul>
+        <li>bookmarks.js</li>
+      </ul>
+      <pre>//= require ./bookmarks/test</pre>
+      <p>如此就會將bookmarks中的test.js合併為一個檔案，如果想將bookmarks中所有js檔案合併為一個檔案，則可以如下：</p>
+      <ul>
+        <li>bookmarks.js</li>
+      </ul>
+      <pre>//= require_tree ./bookmarks</pre>
+      <p>可以在使用<span class="courier">javascript_include_tag</span>時如下：</p>
+      <p style="margin-left: 40px;"><strong class="courier">&lt;%= javascript_include_tag "bookmarks" %&gt;</strong><br>
+      </p>
+      <p></p>
+      <p>如果真的要動態依控制器名稱調整，可以直接於版型中如下撰寫：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;%= stylesheet_link_tag params[:controller] %&gt;&nbsp;&nbsp; <br>
+          &lt;%= javascript_include_tag params[:controller] %&gt;</strong><br>
+      </p>
+      <p>啟用Rails的資產管理之後，<span class="courier">javascript_include_tag或</span><span
+          class="courier">stylesheet_link_tag</span>實際上接受的參數，是指定manifest檔案名稱，如果你這麼撰寫：</p>
+      <p style="margin-left: 40px;"><strong class="courier">&lt;%= javascript_include_tag "some/other" %&gt;</strong><br>
+      </p>
+      <p></p>
+      <p>表示在assets/some中必須找到other.js作為manifest檔案。</p>
+      <p>在產品環境中執行預編譯，預設只會預編譯application.js、application.css，以及其它非js、css結尾的檔案，如果要連同其它js檔案一同預編譯，必須在production.rb中設定：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>config.assets.precompile += %w( bookmarks.js some/other.js )</strong><br>
+      </p>
+      更多有關Rails的資源管理，可以參考 <a href="http://guides.rubyonrails.org/asset_pipeline.html">Asset Pipeline</a>。<br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Assets.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/BridgePattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:12 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Bridge 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Bridge 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>您現在打算開發一個烏龜繪圖程式，</small><small>烏龜會在平面上移動，您想</small><small>將</small><small>烏
+龜所經過的路線都畫下來，繪圖時所使用的API可能是Java 2D API，或者是 Open 2D
+API，您用它們分別實現了JavaDuke與OpenDuke類別：<br>
+      <img style="width: 293px; height: 223px;" alt="" src="images/Bridge-1.jpg"><br>
+      <br>
+如果今天您要繼承擴充，讓烏龜變成海龜，可以在海洋中自由活動，您擴充了Turtle成為Turtle3D，並再分別使用Java 2D
+API與Open 2D API實作如下：<br>
+      <img style="width: 458px; height: 208px;" alt="" src="images/Bridge-2.jpg"><br>
+      <br>
+因
+為您的烏龜實作時，都依賴於特定的API，應用程式若持續演化下去，與特定 API
+的相依性就越大，最後無法自拔！例如，如果Open&nbsp;2D API作了介面的調整，您所有依賴Open 2D
+API的實作就得一一找出相關的部份進行修正。或者是如果將來您想要使用別的2D API，顯然地就得重寫所有的實現類別，而不能簡單地抽換。<br>
+      <br>
+您應該辨識出實作介面時，相依於特定API的部份，為它們製定介面，讓實作依賴於介面：<br>
+      <img style="width: 532px; height: 210px;" alt="" src="images/Bridge-3.jpg"><br>
+      <br>
+這麼一來，您的應用程式與相依的2D API都可以獨立地演化，您可以抽換應用程式所使用的2D API，如果打算使用新的2D
+API，只需使用該2D API實作Drawing介面就可以了。<br>
+      <br>
+以Java程式來示範的話：<br>
+      </small>
+      <pre>interface Turtle {<br>    void move();<br>    void turn();<br>}<br><br>interface Drawing {<br>    void drawImage(String image);<br>    void drawLine();<br>    void turnImage(String image);<br>    void rotateImage(String image);<br>}<br><br>class JavaDrawing implements Drawing {<br>    public void drawImage(String image) {<br>        System.out.println("Java 2D 畫 " + image);<br>    }<br>    public void drawLine() {<br>        System.out.println("Java 2D 畫線 ");<br>    }<br>    public void turnImage(String image) {<br>        System.out.println("Java 2D 轉 " + image);<br>    }<br>    public void rotateImage(String image) {<br>        System.out.println("Java 2D 翻 " + image);<br>    }<br>}<br><br>class Duke implements Turtle {<br>    private String image = "Duke";<br>    private Drawing drawing;<br>    <br>    Duke(Drawing drawing) {<br>        this.drawing = drawing;<br>    }<br>    <br>    public void move() {<br>        System.out.println("計算出目的地位置");<br>        drawing.drawImage(image);<br>        drawing.drawLine();<br>    }<br>    public void turn() {<br>        drawing.rotateImage(image);<br>        drawing.drawImage(image);<br>    }    <br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        Turtle turtle = new Duke(new JavaDrawing());<br>        turtle.move();<br>        turtle.turn();<br>    }<br>}</pre>
+      <small><br>
+以Python來示範的話：<br>
+      </small>
+      <pre>class JavaDrawing:<br>    def drawImage(self, image):<br>        print("Java 2D 畫 " + image)<br>    def drawLine(self):<br>        print("Java 2D 畫線 ")<br>    def turnImage(self, image):<br>        print("Java 2D 轉 " + image)<br>    def rotateImage(self, image):<br>        print("Java 2D 翻 " + image)<br>    <br>class Duke:<br>    def __init__(self, drawing):<br>        self.image = "Duke"<br>        self.drawing = drawing<br>    def move(self):<br>        print("計算出目的地位置")<br>        self.drawing.drawImage(self.image)<br>        self.drawing.drawLine()<br>    def turn(self):<br>        self.drawing.rotateImage(self.image)<br>        self.drawing.drawImage(self.image)<br><br>turtle = Duke(JavaDrawing())<br>turtle.move()<br>turtle.turn()</pre>
+      <small><br>
+      <span style="font-weight: bold;">Bridge模式的目的，在於將抽象與實現分離，使兩者都可以獨立地演
+化。</span>這邊所謂的抽象，指的是指應用程式行為定義的演化，而實現指的是應用程式實作時，所需使用的特定API或平台。<br>
+      <br>
+以UML來表示Bridge模式的結構：<br>
+      <img style="width: 516px; height: 165px;" alt="" src="images/Bridge-4.jpg"><br>
+      <br>
+      </small><small>簡單地說，Bridge模式的重點在於，對Abstraction的實作，不應該依賴於特定API或平台，應
+辨識出Implementor，透過Implementor來橋接特定API或平台實現。<br>
+      <br>
+      <br>
+      </small><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/BridgePattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:13 GMT -->
+</html>

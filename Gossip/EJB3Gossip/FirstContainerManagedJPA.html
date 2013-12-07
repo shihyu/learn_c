@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/FirstContainerManagedJPA.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:58 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>第一個 JPA（容器管理）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 第一個 JPA（容器管理）</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>若
+您以Java
+EE容器來管理JPA相關資源，則您可以使用資源注入的方式取得EntityManager，並可由容器來為您管理Persistence
+Context，每個EntityManager會關聯至一個Persistence Context，容器會管理Persistence
+Context的存活範圍，像是Transaction-scoped或Extended-scoped，Persistence
+Context管理一組Entity，這些</small><small>進階議題之後介紹。<br>
+
+
+
+      <br>
+
+
+
+以下的例子使用Session Facade模式，在一個Stateful Session Bean注入EntityManager，Servlet客戶端利用Session Bean來進行操作，首先定義Stateful Session Bean：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>EntitySessionRemote.java</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.ejb.Remote;<br><br>@Remote<br>public interface EntitySessionRemote {<br>    public void save(User user);<br>    public User findById(Long id);<br>    public void clearup();<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>EntitySessionBean.java</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.ejb.*;<br>import javax.persistence.*;<br><br>@Stateful<br>public class EntitySessionBean implements EntitySessionRemote {<br><span style="font-weight: bold;">    @PersistenceContext(unitName="sample")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private EntityManager entityManager;</span><br>    <br>    public void save(User user) {<br>        <span style="font-weight: bold;">entityManager.persist(user);</span><br>    }<br><br>    public User findById(Long id) {<br><span style="font-weight: bold;">        User user = entityManager.find(User.class, id);</span><br>        return user;<br>    }<br><br>    @Remove<br>    public void clearup() {<br>    }<br>}</pre>
+
+
+
+      <small><br>
+
+&nbsp;在這邊使用@PersistenceContext注入EntityManager實例，這樣的方式取得的EntityManager，稱之
+為Container-Managed
+EntityManager，其中unitName屬性指定了persistence.xml中的Persistence Context名稱，</small><small>Persistence Context預設為Transaction-scoped，也就是在方法開始前會啟始交易，結束後停止交易，</small><small>Persistence Context的存活範圍在交易之間。<br>
+
+
+
+      <br>
+
+
+
+注意到，EntityManager不是Thread-safe，所以要注意在多執行緒下共用存取的同步問題，在這邊使用Stateful Session Bean，讓每個客戶端取得一個Session Bean實例，並獨自使用一個EntityManager。<br>
+
+
+
+      <br>
+
+
+
+在persistence.xml的部份：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>persistence.xml</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" <br>xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <br>xsi:schemaLocation="http://java.sun.com/xml/ns/persistence <br>http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"&gt;<br><span style="font-weight: bold;">  &lt;persistence-unit name="sample" transaction-type="JTA"&gt;</span><br><span style="font-weight: bold;">    &lt;jta-data-source&gt;jdbc/sample&lt;/jta-data-source&gt;</span><br>    &lt;properties&gt;<br>      &lt;property name="toplink.ddl-generation" <br>                value="drop-and-create-tables"/&gt;<br>    &lt;/properties&gt;<br>  &lt;/persistence-unit&gt;<br>&lt;/persistence&gt;</pre>
+
+
+
+      <small><br>
+
+
+
+      </small><small>注意到transaction-type屬性為JTA，並透過&lt;jta-data-source&gt;設置容器端管理的Data Source之JNDI名稱，這必須在容器端先定好，JDBC資源與Connection Pool等。<br>
+
+
+
+      <br>
+
+
+
+接著來寫個Servlet客戶端：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>UserAdmin.java</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br><br>import java.util.logging.*;<br>import javax.naming.*;<br>import javax.rmi.PortableRemoteObject;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br><br>public class UserAdmin extends HttpServlet {    <br>    protected void processRequest(HttpServletRequest request, <br>                                HttpServletResponse response)<br>                                    throws ServletException, IOException {<br>        <br>        String name = request.getParameter("name");<br>        String age = request.getParameter("age");<br>        <br>        User user = new User();<br>        user.setName(name);<br>        user.setAge(new Long(Long.parseLong(age)));<br>        <br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br>        try {<br>            <span style="font-weight: bold;">InitialContext context = new InitialContext();</span><br><span style="font-weight: bold;">            Object obj = context.lookup(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    "onlyfun.caterpillar.EntitySessionRemote");</span><br style="font-weight: bold;"><span style="font-weight: bold;">            EntitySessionRemote entitySession = (EntitySessionRemote) </span><br style="font-weight: bold;"><span style="font-weight: bold;">               PortableRemoteObject.narrow(obj, EntitySessionRemote.class);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            </span><br style="font-weight: bold;"><span style="font-weight: bold;">            entitySession.save(user);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            user = entitySession.findById(new Long(2));</span><br style="font-weight: bold;"><span style="font-weight: bold;">            </span><br style="font-weight: bold;"><span style="font-weight: bold;">            out.println(user.getName() + " saved...");<br><br>            entitySession.clearup();<br></span>        } catch (NamingException ex) {<br>            Logger.getLogger(UserAdmin.class.getName())<br>                    .log(Level.SEVERE, null, ex);<br>        } finally { <br>            out.close();<br>        }<br>    } <br><br>    protected void doGet(HttpServletRequest request, <br>                         HttpServletResponse response)<br>                                  throws ServletException, IOException {<br>        processRequest(request, response);<br>    } <br><br>    protected void doPost(HttpServletRequest request, <br>                          HttpServletResponse response)<br>                                 throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+您可以使用請求參數name與age指定要儲存的使用者名稱與年紀，程式中透過JNDI Lookup來查找Stateful Session Bean，並操作對應的方法來儲存或取得使用者的資料。<br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/FirstContainerManagedJPA.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:58 GMT -->
+</html>

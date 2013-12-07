@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ListPattern.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>List 處理模式</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 設計模式反映問題的抽象分類<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=76081">List 處理模式</a><br>
+      <br>
+      如果有一組（List）資料，如何取得資料的長度？開發者容易開始設想程式語言提供哪種資料結構，如果是陣列，使用C語言的開發者會使用陣列記憶體大小除以個別元素記憶體大小，使用Java的開發者會從<span
+        class="courier">length</span>屬性取得陣列長度。不！現在這個問題還沒有要考慮使用哪種程式語言，而是要把這個問題定義為通用語言。<br>
+      <br>
+      <dl>
+        <dt>List資料結構模式</dt>
+      </dl>
+      <br>
+      思考實體世界中若有一組資料，如何計算該組資料長度？最簡單的方式，就是從資料組開頭計數至尾端，也就是從資料組取得首元素時計數為1，若還可從剩餘資料組取得首元素時計數加1，依此類推至剩餘資料組為空。類似地，如果要把一組資料反過來排列呢？從資料組取得首元素，附加至剩餘資料組尾端，依此類推至剩餘資料組為空。<br>
+      <br>
+      許多List的問題，解決時都有個固定模式：「取得首元素與剩餘資料組作某些事，直到剩餘資料組為空為止。如果想將List的問題定義為通用語言，必須先定義何為「空List」，假設定義為<span
+        class="courier">[]</span>，再來定義何謂「首元素」與「剩餘資料組」，含有單一元素<span class="courier">y</span>的List可定義為<span
+        class="courier">y:[]，有x、y</span>兩個元素的List可表示為<span class="courier">x:y:[]</span>，依此類推，如果有個List為<span
+        class="courier">x:y:[]</span>，則該List首元素為<span class="courier">x，剩餘資料組為y:[]，而y:[]首元素為y，剩餘資料組為[]，[]沒有首元素與剩餘資料組，而[x, y]為x:y:[]撰寫時的簡便形式</span>。<br>
+      <br>
+      顯然地，如此定義方式，與多數程式語言提供的List結構並不相同，多數程式語言定義List為有順序、具索引的結構，如果從程式語言來思考解決問題，就會受制於程式語言提供的特性，例如思考如何利用變數計算、如何利用索引取得元素等。想想看，實體世界中處理一組資料，會使用變數嗎？會特地為資料加上索引嗎？基本上不會！那麼如何利用方才定義的List結構解決問題呢？以解決資料組長度來說，可以如下定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>length [] = 0</strong></span><span><strong><br>
+          </strong></span><span><strong>length (x:xs) = length xs + 1</strong></span><strong><br>
+        </strong></div>
+      <br>
+      若傳入List給<span class="courier">length</span>，<span class="courier">x表示取得首元素，xs表示剩餘資料組</span>。如果是空List，那長度當然是0，如果可以取得首元素則計數為1，然後持續拆解下去至空List為止，結果讀來就是：<span
+        class="courier">x:xs的長度，就是xs</span>的長度加1。類似地，將一組資料反轉排列可如下定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>reverse [] = 0</strong></span><span><strong><br>
+          </strong></span><span><strong>reverse (x:xs) = reverse xs ++ [x]</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <dl>
+        <dt>產生新List的<span class="courier">map、filter</span>模式</dt>
+      </dl>
+      <br>
+      如果想將一組整數都遞增1，可以如下定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>addOne [] = []</strong></span><span><strong><br>
+          </strong></span><span><strong>addOne (x:xs) = x + 1 : addOne xs</strong></span><strong><br>
+        </strong></div>
+      <br>
+      如果想讓一組整數都減2，其實只要將+1改為-2，如果想讓它們都乘上3，只要將+1改為*3。如果想讓這組整數都作某個運算，也只要將該運算傳入就可以了。將某組資料作某個動作而成為另一組資料，是處理List的常見模式，因此可以抽象出以下的<span
+        class="courier">map</span>定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>map [] = []</strong></span><span><strong><br>
+          </strong></span><span><strong>map f (x:xs) = f x : map xs</strong></span><strong><br>
+        </strong></div>
+      <br>
+      其中f用來接受傳入的動作，例如<span class="courier">map (+1) [1, 2, 3]將會產生[2, 3, 4]的結果，map (*3) [4, 5, 6]會產生[12, 15, 18]</span>。類似地，如果想將一組整數進行過濾，只留下大於3的部份，可以如下定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>greatThanThree [] = []</strong></span><span><strong><br>
+          </strong></span><span><strong>greatThanThree (x:xs) = if (x &gt; 3) then (x : greatThanThree xs) else (greatThanThree xs)</strong></span><span><strong><br>
+          </strong></span></div>
+      <br>
+      如果想從該組整數取得小於10的一組整數，其實只要將<span class="courier">&gt;3改為&lt;10</span>，想從該組整數取得等於100的一組整數，只要將<span
+        class="courier">&gt;3改為==100</span>。如果想過濾這組整數取得另一組整數，也只要將該過濾運算傳入就可以了。將某組資料作某個過濾而得到另一組資料，也是處理List的常見模式，因此可以抽象出以下的<span
+        class="courier">filter定義，如此filter (&gt;3) [10, 9, 8, 3, 2, 1]結果就會是[10, 9, 8]</span>：<br>
+      <div style="margin-left: 40px;"><span><strong class="courier">filter f [] = []</strong></span><span><strong><br>
+          </strong></span><span><strong class="courier">filter f (x:xs) = if (f x) then (x : filter f xs) else (filter f xs)</strong></span><span><strong><br>
+          </strong></span></div>
+      <br>
+      <dl>
+        <dt>對List運算取值的<span class="courier">fold</span>處理模式</dt>
+      </dl>
+      <br>
+      如果想對一組整數作加總呢？可以如下定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>sum seed [] = seed</strong></span><span><strong><br>
+          </strong></span><span><strong>sum seed (x:xs) = sum (seed + x) xs</strong></span><strong><br>
+        </strong></div>
+      <br>
+      加總動作就是從0開始，也就是<span class="courier">seed</span>為0，接著逐一取出剩餘資料組中的首元素與傳入的<span
+        class="courier">seed進行相加，最後得到的就是加總值，例如對[1, 2, 3]加總，可以寫為sum 0 [1, 2, 3]</span>，得到結果就會是6。如果想得到一組整數的相乘值呢？只要將<span
+        class="courier">+改為*</span>，如果想對這組整數作某運算取值，也只要將該運算傳入就可以了。將某組資料作某運算取值，也是處理List的常見模式，因此可以抽象出以下的<span
+        class="courier">foldLeft</span>定義：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>foldLeft f seed [] = seed</strong></span><span><strong><br>
+          </strong></span><span><strong>foldLeft f seed (x:xs) = foldLeft f (f seed x) xs</strong></span><strong><br>
+        </strong></div>
+      <br>
+      之所以稱為<span class="courier">foldLeft</span>，是因為若將List比喻為書本，每個元素就像書頁，逐一取得首元素就像往左翻頁。如果想取得<span
+        class="courier">[1, 2, 3]</span>的加總，則可以<span class="courier">foldLeft (+) 0 [1, 2, 3]</span>，得到結果就會是6。有些程式庫會提供<span
+        class="courier">reduce，實際上就是自動將seed設為首元素，然後進行foldLeft</span>，也就是如下定義，其中空List沒有元素，無法提供<span
+        class="courier">seed</span>，因此會得到一個大大的錯誤：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>reduce f [] = error "couldn't reduce empty list"</strong></span><span><strong><br>
+          </strong></span><span><strong>reduce f (x:xs) = foldLeft f x xs</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <dl>
+        <dt>重新思考資料管理問題</dt>
+      </dl>
+      <br>
+      由於思考如何解決問題時，都是將問題定義為通用語言，因而實際使用某個程式語言解決問題時，就可套用類似的模式抽取過程。以未來JDK8版本為例，如果有組方塊，想過濾出藍色積木後取得重量總合，如下撰寫不但直覺，而且隱藏更多細節，可以想像一下，如果直接以程式語言的迴圈及索引來嘗試解決問題，會是多麻煩且曝露過多細節的結果：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>blocks.filter(b -&gt; b.getColor() == BLUE)</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .map(b -&gt; b.getWeight())</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .sum();</strong></span></div>
+      <br>
+      有許多程式面對的都是資料管理問題，像是處理關聯式資料庫取得的一組資料，許多開發者以迴圈或索引方式，直接對該組資料撰寫的程式碼，無非都是將資料映射或過濾為另一組資料、對該組資料作某個動作，重複的程式邏輯一再出現，開發者應當思考更高階的資料處理模式，以通用語言先行定義，方可以不受程式語言的實現限制。<br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/ListPattern.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

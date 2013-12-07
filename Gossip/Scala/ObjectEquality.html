@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ObjectEquality.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>物件相等性</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 物件相等性</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+     <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Scala中，如果要比較兩個物件的實質相等性，可以使用==或!=，例如：<br></small><pre>val s1 = new String("Java")<br>val s2 = new String("Java")<br>println(s1 == s2)       // 顯示 true<br>println(s1 eq s2)       // 顯示 false<br></pre><br><small>雖然兩個物件是新建構出來的，s1與s2是參考到不同物件，但在Scala中使用==是比較兩個字串的實質字元序列，所以結果會是true，在Scala中若要測試兩個參考是否為同一物件，則可以使用eq或ne方法。<br><br>==與!=方法有兩個版本，一個版本是定義在 <a href="http://www.scala-lang.org/docu/files/api/scala/Any.html">scala.Any </a>中，Any是Scala中所有類別的最頂層父類別，其中==與!=的方法定義為：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">final&nbsp;def&nbsp;==(arg0 : Any) : Boolean</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">final&nbsp;def&nbsp;!=(arg0 : Any) : Boolean</span></small><br></div><small><br>在API文件說明中表示，==的作用等於equals()的作用：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def&nbsp;equals(arg0 : Any) : Boolean</span></small><br></div><small><br>equals()的作用是測試兩個args0的作用與this是否參考同一物件。而!=等於==的反相結果，也就是o != arg0等於!(o == (arg0))。<br><br>事實上，當你在Scala中定義一個類別時沒有明確指定父類別，則會繼承 <a href="http://www.scala-lang.org/docu/files/api/scala/AnyRef.html#equals%28Any%29">scala.AnyRef</a>（相當於Java的java.lang.Object），這是Any的直接子類別。AnyRef定義了==與!=，其版本為：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">final def&nbsp;==(arg0 : AnyRef) : Boolean&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">final def&nbsp;!=(arg0 : AnyRef) : Boolean</span></small><br></div><small><br></small><small>!=等於==的反相結果，而</small><small>==的定義內容相當於：<br></small><div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">final def == (arg0 : Any): Boolean = </span></small><br><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; if (this eq null) arg0 eq null else this.equals(arg0)</span></small><br><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small></div><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br></span></small><small>eq與ne方法，是定義在AnyRef中（在Scala中，像1這樣的物件是 <a href="https://www.scala-lang.org/docu/files/api/scala/AnyVal.html">scala.AnyVal</a> 的實例，AnyVal是Any的直接子類別，所以AnyVal沒有eq與ne方法，AnyVal物件只要值相同，一定是同一個物件實例，也就是 1 equals 1 結果一定是true）：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">final def eq(arg0 : AnyRef) : Boolean&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">final def ne(arg0 : AnyRef) : Boolean&nbsp; </span></small><br></div><small><br>ne為eq的反相結果，而eq主要在測試目前物件與arg0所參考的物件是否為同一物件。<br><br>無論是Any中的==、!=或AnyRef中的==、!=、eq、ne方法，都被宣告為final，你沒辦法在子類別中重新定義（</small><small>AnyVal被宣告為final，你沒辦法繼承</small><small>），別以為以下是重新定義==方法：<br></small><pre>class Point(val x: Int, val y: Int) {<br>    def ==(that: Point) = this.x == that.x &amp;&amp; this.y == that.y<br>}<br><br>val p1 = new Point(1, 1)<br>val p2 = new Point(1, 1)<br>println(p1 == p2)         // 顯示 true</pre><small><br>看來好像是對的，但是如果你這麼測試：<br></small><pre>val p1: AnyRef = new Point(1, 1)<br>val p2 = new Point(1, 1)<br>println(p1 == p2)        // 顯示 false</pre><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br></span>事實上是，你沒有重新定義Any或AnyRef的==方法，你是定義了一個新的==方法，而直接繼承了</small><small>Any與AnyRef的==方法，所以之前顯示true是因為方法被重載了，而你使用的是接受Point參數的==版本。<br><br>因為Any與AnyRef的==、!=都被宣告為final，你不能重新定義==、!=方法來定義自己的物件相等性。依以上的說明，無論是哪個版本，!=一定是==的反相結果，而==都會呼叫equals()方法，所以結論是，<span style="font-weight: bold;">要定義物件相等性，請重新定義equals()方法</span>（跟Java相同）。<br><br>如何正確定義equals()需要作些討論，如果你熟悉Java，可以先看看&nbsp;</small><small><a href="../JavaEssence/ObjectEquality.html">Java 物件相等性</a> </small><small>中的說明，如果你想要知道如何以Scala語法正確定義equals()方法，則可以看看 <a href="OverrideEquals.html">重新定義 equals() 方法</a>。<br><br></small><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/ObjectEquality.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

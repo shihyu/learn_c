@@ -1,0 +1,442 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/VariableScope.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>變數範圍</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: 變數範圍<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Python中，變數無需宣告就可以直接使用並指定值，除非特別使用<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">global</span>或<span style="font-weight: bold;">nonlocal</span></span>指明，否則變數範圍（Scope）總是在指定值時建立。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; x = 10<br>
+&gt;&gt;&gt; y = 10<br>
+&gt;&gt;&gt; def some():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 20<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(x)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(y)<br>
+...<br>
+&gt;&gt;&gt; some()<br>
+</span>20<br>
+10<br>
+            <span style="font-weight: bold;">&gt;&gt;&gt; print(x)<br>
+            </span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; print(y)<br>
+            </span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">在
+上例中，some()函式中的x，其實是在函式範圍中所建立的新x，其覆蓋了外部的x範圍，所以你所設定的是區域變數x，指定值給變數時，就是在該範圍中
+建立該變數，就是指這樣的情況。如果取用變數時，也是從當時的範圍開始尋找，若沒有，才找尋外部範圍，例如上例中，取用x時，在區域範圍找到區域變數x，
+所以顯示的是區域變數x的值，而不是外部變數x，取用y時，由於區域範圍找不到，所以取得外部y的值。</span><br>
+      <br>
+記得變數範圍的建立是在指定時發生，而不是在取用時發生，所以像下面這個例子：<br>
+      </small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; x = 20<br>
+&gt;&gt;&gt; def some(x = x):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(x)<br>
+...<br>
+&gt;&gt;&gt; some()<br>
+</span>20<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; some(30)<br>
+            </span>30<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; print(x)<br>
+            </span>20<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">是定義了一個some()函式，將當時外部變數x的值20設定給參數x作為預設值。</span><br>
+      <br>
+實際上，在Python中變數可以在四個範圍中建立或尋找。內建（Builtin）、全域（Global）、外包函式（Endosing function）、函式（Local functon）。一個例子如下：<br>
+      </small>
+      <ul>
+        <li>demo.py<br>
+        </li>
+      </ul>
+      <pre>x = 10       　　# 全域<br><br>def outer():<br>   y = 20        # 在 outer() 函式範圍<br>   <br>   def inner():<br>       z = 30    # 在 inner() 函式範圍<br>       print(x)  # 內建範圍 print，全域的 x<br>   　　print(y)  # 內建範圍 print，外包 outer() 函式的 y<br>   <br>   print(x)       # 內建範圍 print，全域的 x<br></pre>
+      <small><br>
+取用名稱時（而不是指定），一定是從最內層往外尋找。Python中所謂全域，實際上是以模組檔案為界，以上例來說，<span style="font-family: Courier New,Courier,monospace;">x</span>實際上是<span style="font-family: Courier New,Courier,monospace;">demo</span>模組範圍中的變數，不會橫跨所有模組範圍。<br>
+      <br>
+注意，到<span style="font-family: Courier New,Courier,monospace;">print</span>名稱，實際上它是內建範圍，在Python 3中有個<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">builtins</span>模組，該模組中的變數，會自動被所有的模組所擁有。例如：</small><small><br>
+      </small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; import builtins<br>
+&gt;&gt;&gt; dir(builtins)<br>
+</span>['ArithmeticError', 'AssertionError', 'AttributeError', 'BaseException', 'Buffer<br>
+Error', 'BytesWarning', 'DeprecationWarning', 'EOFError', 'Ellipsis', 'Environme<br>
+ntError', 'Exception', 'False', 'FloatingPointError', 'FutureWarning', 'Generato<br>
+rExit', 'IOError', 'ImportError', 'ImportWarning', 'IndentationError', 'IndexErr<br>
+or', 'KeyError', 'KeyboardInterrupt', 'LookupError', 'MemoryError', 'NameError',<br>
+&nbsp;'None', 'NotImplemented', 'NotImplementedError', 'OSError', 'OverflowError', 'P<br>
+endingDeprecationWarning', 'ReferenceError', 'RuntimeError', 'RuntimeWarning', '<br>
+StopIteration', 'SyntaxError', 'SyntaxWarning', 'SystemError', 'SystemExit', 'Ta<br>
+bError', 'True', 'TypeError', 'UnboundLocalError', 'UnicodeDecodeError', 'Unicod<br>
+eEncodeError', 'UnicodeError', 'UnicodeTranslateError', 'UnicodeWarning', 'UserW<br>
+arning', 'ValueError', 'Warning', 'WindowsError', 'ZeroDivisionError', '__build_<br>
+class__', '__debug__', '__doc__', '__import__', '__name__', '__package__', 'abs'<br>
+, 'all', 'any', 'ascii', 'bin', 'bool', 'bytearray', 'bytes', 'chr', 'classmetho<br>
+d', 'compile', 'complex', 'copyright', 'credits', 'delattr', 'dict', 'dir', 'div<br>
+mod', 'enumerate', 'eval', 'exec', 'exit', 'filter', 'float', 'format', 'frozens<br>
+et', 'getattr', 'globals', 'hasattr', 'hash', 'help', 'hex', 'id', 'input', 'int<br>
+', 'isinstance', 'issubclass', 'iter', 'len', 'license', 'list', 'locals', 'map'<br>
+, 'max', 'memoryview', 'min', 'next', 'object', 'oct', 'open', 'ord', 'pow', 'pr<br>
+int', 'property', 'quit', 'range', 'repr', 'reversed', 'round', 'set', 'setattr'<br>
+, 'slice', 'sorted', 'staticmethod', 'str', 'sum', 'super', 'tuple', 'type', 'va<br>
+rs', 'zip']<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">所以許多Python中可以直接使用的函式，其名稱實際上是在builtins模組之中。基本上，你也可以將變數建立至builtins中。例如：<br>
+      </small>
+      <pre>import builtins<br>import sys<br>builtins.argv = sys.argv<br>print(argv[1])<br></pre>
+      <small><br>
+變數指定值的同時就確立其所在的範圍。如果你希望指定值的變數是全域範圍的話，則可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">global</span>指明（雖然並不鼓勵全域變數）。例如：</small><small><br>
+      </small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; x = 10<br>
+&gt;&gt;&gt; def some():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; global x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 20<br>
+...<br>
+&gt;&gt;&gt; some()<br>
+&gt;&gt;&gt; print(x)<br>
+</span>20<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>來看看以下這個會發生什麼事情？</small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; x = 10<br>
+&gt;&gt;&gt; def some():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(x)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 20<br>
+...<br>
+&gt;&gt;&gt; some()<br>
+</span>Traceback (most recent call last):<br>
+&nbsp; File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>
+&nbsp; File "&lt;stdin&gt;", line 2, in some<br>
+UnboundLocalError: local variable 'x' referenced before assignment<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">在some()函式中，print(x)中的x其實是some()函式中的區域變數x，因為範圍建立總是在指定時發生，在some()函式的第二行中，有個x指定，所以</span>Python<span style="font-family: Courier New,Courier,monospace;">直譯器看到的是這個x，而你在指定x值之前，就要顯示其值，就會發生錯誤。上面這個錯誤可以這麼修改：</span></small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; x = 10<br>
+&gt;&gt;&gt; def some():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; global x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(x)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 20<br>
+...<br>
+&gt;&gt;&gt; some()<br>
+</span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+      <br>
+<small>在Python 3中新增了<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">nonlocal</span>，可以讓你指明變數並非區域變數，請依照</small><small>函式（Local functon）</small><small>、外包函式（Endosing function）、</small><small>全域（Global）、</small><small>內建（Builtin）的順序來尋找，即使是指定運算。例如：</small><br>
+
+      <pre>x = 10<br>def outer():<br>   x = 100         # 這是在 outer() 函式範圍的 x<br>   def inner():<br>       <span style="font-weight: bold;">nonlocal</span> x<br>       x = 1000    # 改變的是 outer() 函式的 x<br>   inner()<br>   print(x)        # 顯示 1000<br><br>outer()<br>print(x)           # 顯示 10<br></pre>
+      <small><br>
+因此，在 </small><small><a href="LambdaExpression.html">lambda 運算式</a> 看過的一個例子：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt;
+ def func():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 10<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def getX():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def setX(n):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = n<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; return (getX, setX)<br>
+...<br>
+&gt;&gt;&gt; getX, setX = func()<br>
+&gt;&gt;&gt; getX()<br>
+</span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; setX(20)<br>
+&gt;&gt;&gt; getX()<br>
+            </span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+      <br>
+
+      <small><span style="font-family: Courier New,Courier,monospace;">在
+上例中，func()中的setX()宣告的x，其實是setX()中的區域變數x，其覆蓋了外部func()的x，所以你的n是指定給區域變數x。如果你要改變func()中的x值，則可以在setX()函式中宣告nonlocal。例如：</span></small><small><br></small>
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; def func():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 10<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def getX():<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; def setX(n):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nonlocal x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = n<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; return (getX, setX)<br>
+...<br>
+&gt;&gt;&gt; getX, setX = func()<br>
+&gt;&gt;&gt; getX()<br>
+</span>10<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; setX(20)<br>
+&gt;&gt;&gt; getX()<br>
+            </span>20<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+      <br>
+      <small><br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/VariableScope.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

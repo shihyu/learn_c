@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/MessageResources.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>訊息管理</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 訊息管理</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+在Struts中可以在一個訊息資源檔中統一管理訊息，您可以在struts-config.xml中設定資源檔名稱及位置，例如：</small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>struts-config.xml</li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;<br><br>&lt;!DOCTYPE struts-config PUBLIC<br>"-//Apache Software Foundation//DTD Struts Configuration 1.2//EN"<br>"http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd"&gt;<br>&lt;struts-config&gt;<br>&nbsp;&nbsp;&nbsp; &lt;action-mappings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;action<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; path="/hello" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="onlyfun.caterpillar.HelloAction"&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;forward<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name="helloUser" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; path="/WEB-INF/pages/hello.jsp"/&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/action&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; &lt;/action-mappings&gt;<br>&nbsp;&nbsp;&nbsp; <br>&nbsp;&nbsp;&nbsp; &lt;message-resources parameter="resources/messages"/&gt;<br>&lt;/struts-config&gt;</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span><br>
+
+      <small>
+
+
+在&lt;message-resources&gt;標籤中設定了資源檔位置為
+resources/messages，這表示將使用CLASSPATH下的resources/messages.properties檔案，例如您可
+以將之放在/WEB-INF/classes/resources/messages.properties下，資源檔內容如下：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li>messages.properties</li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>welcome.helloWord=Hello!<br>welcome.message=This is your secret gift!!</pre>
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+配合訊息資源檔，來寫個簡單的 <a class="wikilink" href="ActionClass.htm">Action</a>
+測試一下訊息管理：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li>HelloAction.java</li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br>import javax.servlet.http.*;<br>import org.apache.struts.action.*;<br>import org.apache.struts.util.MessageResources;<br><br>public class HelloAction extends Action {<br>    public ActionForward execute(<br>                             ActionMapping mapping, <br>                             ActionForm form, <br>                             HttpServletRequest request, <br>                             HttpServletResponse response) <br>                                     throws Exception {<br>        <br>        MessageResources messageResources = <br>                             getResources(request);<br>        <br>        String helloWord = <br>           messageResources.getMessage("welcome.helloWord");<br>        String message = <br>           messageResources.getMessage("welcome.message");<br>        <br>        // get information from request object<br>        String username = request.getParameter("user");<br>        <br>        // prepare model<br>        Map model = new HashMap();<br>        model.put("helloWord", helloWord);<br>        model.put("message", message);<br>        <br>        if(username != null)<br>            model.put("username", username);<br>        else<br>            model.put("username", "nobody");<br>        <br>        // pass information to View by using reqeust object<br>        request.setAttribute("userInfo", model);<br>        <br>        // no more carrying information from client<br>        request.removeAttribute("user");<br>        <br>        return mapping.findForward("helloUser");<br>    }<br>}</pre>
+
+
+
+
+      <br>
+
+      <small>
+
+
+這邊使用繼承Action下來的getResources()取得一個MessageResources物件，當中包括了 messages.properties的訊息，然後使用它的getMessage()指定鍵值來取得對應訊息，來寫一個簡單的JSP網頁測試一下：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li>hello.jsp</li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>&lt;html&gt; <br>&lt;head&gt; <br>&lt;title&gt;<br>     ${userInfo["helloWord"]} ${userInfo["username"]}!<br>&lt;/title&gt; <br>&lt;/head&gt; <br>&lt;body&gt;<br><br> &lt;H1&gt;${userInfo["helloWord"]} ${userInfo["username"]} !&lt;/H1&gt; <br> &lt;H1&gt;${userInfo["message"]}&lt;/H1&gt;                                <br><br>&lt;/body&gt; <br>&lt;/html&gt;</pre>
+
+
+
+
+      <br>
+
+      <small>
+
+
+依上面的設定，如果依下面的方式請求：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">http://localhost:8080/strutsapp/hello.do?user=Justin</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+則將傳回以下的結果：<br>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;html&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;head&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;title&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; Hello! Justin !</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/title&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/head&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;body&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;H1&gt;Hello! Justin !&lt;/H1&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;H1&gt;This is your secret gift!!&lt;/H1&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/body&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/html&gt;</span></small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/MessageResources.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

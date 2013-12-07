@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/Lock.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>Lock 機制</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: Lock 機制</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+      </td>
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在多人使用的環境
+下，每個使用者可能進行自己的交易，交易與交易之間，必須互不干擾，使用者不會意識到別的使用者正在進行交易，就好像只有自己在進行操作一樣。<br>
+
+
+
+
+
+      <br>
+
+
+
+隔離設定與</small><small>與特定的資源相關，並</small><small>不在 Java EE 規範之中。<br>
+
+
+
+      <br>
+
+
+
+您可以進一步參考：</small><small><big><a href="../HibernateGossip/IsolationLevel.html"><small>簡
+介隔離層級</small></a></big>。<br>
+      <br>
+      </small><small>樂觀鎖定（Optimistic
+locking）樂觀的認為資料很少發生同時存取的問題，通常在資料庫層級上設為read-commited隔離層級，並實行樂觀鎖定。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+在read commited隔離層級之下，允許交易讀取另一個交易已COMMIT的資料，但可能有unrepeatable read與lost update的問題存在，例如：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <ol>
+        <li><small>交易A讀取欄位1</small></li>
+        <li><small>交易B讀取欄位1</small></li>
+        <li><small>交易A更新欄位1並COMMIT</small></li>
+        <li><small>交易B更新欄位1並COMMIT</small></li>
+      </ol>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>交易B可能基於舊的資料來更新欄位，使得交易A的資料遺失，或者是：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ol>
+        <li><small>交易A讀取欄位1、2</small></li>
+        <li><small>交易B</small><small>讀取欄位1、2</small></li>
+        <li><small>交易A更新欄位1、2，欄位1是新資料，欄位2是舊資料，並COMMIT</small></li>
+        <li><small>交易A更新欄位1、2，</small><small>欄位1是舊資料，欄位2是新資料，並COMMIT</small></li>
+      </ol>
+
+
+
+      <small><br>
+
+
+
+為了維護正確的資料，樂觀鎖定使用應用程式上的邏輯實現版
+本控制的解決。 <br>
+      <br>
+      </small><small>對於lost update的問題，可以有幾種選擇：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <ul>
+        <li><small>先更新為主</small><small>（First commit wins）</small></li>
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>交易A先COMMIT，交易B在COMMIT時會得到錯誤訊息，表示更新失敗，交易B必須重新取得資料，嘗試進行更新。</small></div>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+        <li><small>後更新的為主</small><small>（Last commit wins）</small></li>
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>交易A、B都可以COMMIT，交易B覆蓋交易A的資料也無所謂。</small></div>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+        <li><small>合併衝突更新（Merge conflicting update）</small></li>
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>先更新為主的變化應用，交易A先COMMIT，交易B要更新時會得到錯誤訊息，提示使用者檢查所有欄位，選擇性的更新沒有衝突的欄位。</small><br>
+
+
+
+
+
+      </div>
+
+
+
+
+
+      <small>
+
+
+      <br>
+JPA中透過版本號檢查來實現先更新為主，在資料庫中加入一個version欄位記錄，在讀取資料時
+連同版本號一同讀取，並在更新資料時比對版本號與資料庫中的版本號，如果等於資料庫中的版本號則予以更新，並遞增版本號，如果小於資料庫中的版本號就丟出
+例外（OptimisticLockingException</small><small>），版本號可以是數字或時間戳記，通常使用數字。<br>
+      <br>
+若要定義Entity上版本號欄位對應的屬性，則可以使用@Version，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">package onlyfun.caterpillar;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class User {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private Long id;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; <span style="color: rgb(255, 0, 0);">@Version</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp; private Long version; // 增加版本屬性 </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; public Long getVersion() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; return version;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; public void setVersion(Long version) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; this.version = version;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;}</small><br>
+      </div>
+      <small><br>
+在EntityManager上有個lock()方法，可以讓您主動對Entity進行鎖定，lock()有兩種模式：
+LockModeType.READ與LockModeType.WRITE。前者允許另一使用者讀取，但不允許更新、刪除，可避免Dirty
+read、Non-repeatable
+read，後者則不允許另一使用者讀取、更新、刪除。使用lock()方法，Entity上必須有版本屬性，且必須在Managed狀態，否則無法取得鎖
+定，會丟出javax.persistence.PersistenceException，EntityManager會嘗試將lock()轉為資料庫
+的鎖定指令。<br>
+      <br>
+      <br>
+      </small><br>
+      <small></small><small></small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/Lock.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+</html>

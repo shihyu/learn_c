@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/BehindHttpSession.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:03 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>HttpSession 原理</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: HttpSession 原理<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>使用<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>進行會話管理十分方便，讓Web應用程式看似可以「記得」是瀏覽器發出的請求，連接數個請求間的關係。但無論如何，Web應用程式是基於HTTP協定的事實並沒有改變，實際上如何「得知」數個請求之間的關係，這件工作是由Web容器幫你執行。<br>
+      <br>
+當你嘗試執行<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest的getSession()</span>時，Web容器會為你建立<span style="font-family: Courier New,Courier,monospace;">HttpSession物件，關鍵在於每個HttpSession</span>物件都會有個特殊的ID，稱之為Session ID，你可以執行<span style="font-family: Courier New,Courier,monospace;">HttpSession的<span style="font-weight: bold;">getId()</span></span>來取得Session ID。這個Session ID<span style="font-weight: bold;">預設會使用Cookie</span>存放至瀏覽器，Cookie的名稱預設是<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">JSESSIONID</span>，數值則是<span style="font-family: Courier New,Courier,monospace;">getId()</span>所取得的Session ID。</small><br>
+      <img style="width: 666px; height: 236px;" alt="" src="images/BehindHttpSession-1.png"><br>
+      <br>
+      <br>
+      <small>由於Web容器本身是執行於JVM中的一個Java程式，透過<span style="font-family: Courier New,Courier,monospace;">getSession()取得的HttpSession</span>，則是Web容器中的一個Java物件，<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>中所存放的屬性，自然也就存放於伺服端的Web容器之中。每個<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>各有特殊的Session ID，當瀏覽器請求應用程式時，會將Cookie中存放的Session ID一併發送給應用程式，Web容器根據Session ID來找出對應的<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>物件，如此就可以取得各瀏覽器個別的會話資料。<br>
+      <img style="width: 664px; height: 330px;" alt="" src="images/BehindHttpSession-2.png"><br>
+      <br>
+所以使用<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>來進行會話管理時，設定為屬性的資料是儲存在伺服端，而Session ID預設使用Cookie存放於瀏覽器。Web容器儲存Session ID的Cookie預設為關閉瀏覽器就失效，所以當你重新開啟瀏覽器請求應用程式時，透過<span style="font-family: Courier New,Courier,monospace;">getSession()所取得的就是新的HttpSession</span>物件。<br>
+      <br>
+每次請求來到應用程式時，容器會根據發送過來的Session ID取得對應的<span style="font-family: Courier New,Courier,monospace;">HttpSession。由於HttpSession</span>物件會佔用記憶體空間，所以<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>的屬性中儘量不要儲存耗資源的大型物件，必要時將屬性移除，或者不需使用<span style="font-family: Courier New,Courier,monospace;">HttpSession時，執行invalidate()讓HttpSession</span>失效。<br>
+      <br>
+注意！預設關閉瀏覽器會馬上失效的是瀏覽器上的Cookie，不是伺服器上的<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>物件。因為Cookie失效了，就無法透過Cookie來發送Session ID，所以嘗試<span style="font-family: Courier New,Courier,monospace;">getSession()時，容器會產生新的HttpSession。要讓HttpSession立即失效必須執行invalidate()方法，否則的話，HttpSession</span>會等到設定的失效期間過後才會被容器銷毀回收。<br>
+      <br>
+你可以執行<span style="font-family: Courier New,Courier,monospace;">HttpSession的setMaxInactiveInterval()</span>方法，設定瀏覽器多久沒有請求應用程式的話，<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>就自動失效，設定的單位是<span style="font-weight: bold;">「秒」</span>。你也可以在web.xml中設定<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>預設的失效時間，但要特別注意！設定的時間單位是<span style="font-weight: bold;">「分鐘」</span>。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/web-app …&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;session-config&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;session-timeout&gt;30&lt;/session-timeout&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/session-config&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/web-app&gt;</span></small><br>
+      </div>
+      <br>
+      <small>注意！使用<span style="font-family: Courier New,Courier,monospace;">HttpSession</span>，預設是使用Cookie儲存Session ID，但你不用介入操作Cookie的細節，容器會幫你完成相關操作。特別注意的是，執行<span style="font-family: Courier New,Courier,monospace;">HttpSession的setMaxInactiveInterval()方法，所設定的是HttpSession</span>物件在瀏覽器多久沒活動就失效的時間，而不是儲存Session ID的Cookie失效時間。儲存Session ID的Cookie預設為關閉瀏覽器就失效。</small><br>
+      <br>
+      <small>在Servlet 3.0中新增了<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">SessionCookieConfig</span>介面，你可以透過<span style="font-family: Courier New,Courier,monospace;">ServletContext的<span style="font-weight: bold;">getSessionCookieConfig()</span></span>來取得實作該介面的物件，要取得<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>的話，則可以透過Servlet實例的<span style="font-family: Courier New,Courier,monospace;">getServletContext()來取得（關於ServletContext，之後還會介紹）</span>。透過<span style="font-family: Courier New,Courier,monospace;">SessionCookieConfig</span>實作物件，你可以設定儲存Session ID的Cookie相關資訊，例如可以透過<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">setName()</span>將預設的Session ID名稱修改為別的名稱，透過<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">setAge()</span>設定儲存Session ID的Cookie存活期限等（單位是秒）。<br>
+      <br>
+但是要注意的是，設定<span style="font-family: Courier New,Courier,monospace;">SessionCookieConfig必須在ServletContext</span>被初始化之前，所以實際上你要修改Session ID、Cookie存活期等資訊時，必須在web.xml中設定。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/web-app …&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;session-config&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;session-timeout&gt;30&lt;/session-timeout&gt;</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;cookie-config&gt;</span></span></small><br style="color: red;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;name&gt;sid-caterpillar&lt;/name&gt;</span></span></small><br style="color: red;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;http-only&gt;true&lt;/http-only&gt;</span></span></small><br style="color: red;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/cookie-config&gt;</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/session-config&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/web-app&gt;</span></small><br>
+      </div>
+
+
+
+
+
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">另一個方法則是實作<span style="font-weight: bold;">ServletContextListener</span>，
+容器在初始化ServletContext時會呼叫ServletContextListener的contextInitialized()方法，你可
+以在其中取得ServletContext進行設定SessionCookieConfig。關於ServletContextListener之後還會
+說明。</span><br>
+      </small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/BehindHttpSession.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:11 GMT -->
+</html>

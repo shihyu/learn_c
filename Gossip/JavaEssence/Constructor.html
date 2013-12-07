@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Constructor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:25 GMT -->
+<head>
+
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>到底有哪些建構式</title></head><body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 到底有哪些建構式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在建構物件時，如果想要指定物件建立時的初始方式，可以定義類別的建構式。建構式像是與類別名稱同名，無需傳回值的方法。<br></small><small></small><pre>public class Some {<br>&nbsp;&nbsp;&nbsp; private int a;<br>&nbsp;&nbsp;&nbsp; private String text;<br>&nbsp;&nbsp;&nbsp; public Some(int a, String text) {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.a = a;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.text = text;<br>&nbsp;&nbsp;&nbsp; }<br>}</pre><small><br>當你這麼建構它時，事實上，<span style="font-weight: bold;">成員a與text初始了兩次</span>：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some s = new Some(1, "Java");</span></small><br></div><small><br><span style="font-weight: bold;">建構物件時，成員就會初始化，如果沒有指定初始值，則會使用預設值初始化。</span>整數會初始為0，浮點數會初始為0.0，參考會初始為null。之後執行建構式進行當中所指定的初始內容。所以上例中，建構物件時，a與text分別先初始為0與null，再於建構式中，被設定為建構式參數所指定的值。<br><br><span style="font-weight: bold;">如果你定義類別時，沒有指定任何的建構式，那麼編譯器會自動加入一個無引數、內容為空的建構式。</span>例如：<br></small><pre>public class Some {<br>}</pre><small><br>這個類別在反組譯之後，會變成這樣：<br></small><div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class Some {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public Some()&nbsp;{</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br></div><small><br>所以，你才可以這麼撰寫：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Some s = new Some();</small><br></div><small><br>有人稱編譯器自動為你加入的建構式為<span style="font-weight: bold;">預設建構式（default constructor）</span>，你自己寫的<span style="font-weight: bold;">無引數建構式</span>不稱為預設建構式，其實這只是名詞問題，別太特意去區分。<br><br>如果你定義了自己的建構式，那麼編譯器就不會&#40388;婆地為你建立建構式。如果你這麼寫：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Some(int a) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>那就不可以直接：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some s = new Some();</span></small><br></div><small><br>一般建議，如果自己定義了有引數的建構式，也可以加入無引數建構式，即使內容為空也無所謂，這是為了日後使用上的彈性起見。例如在運用Reflection機制生成物件時，或者是繼承時呼叫父類別建構式時。<br><br>無引數建構式的使用，通常是為了一些預設情況，例如這樣寫其實是多餘的：<br></small><pre>public class Some {<br>&nbsp;&nbsp;&nbsp; private int a;<br>&nbsp;&nbsp;&nbsp; private String text;<br>&nbsp;&nbsp;&nbsp; public Some() {<br>        a = 0;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text = null;<br>&nbsp;&nbsp;&nbsp; }<br>}</pre><br><small>一個使用的時機也許像是：<br></small><pre>public class Some {<br>&nbsp;&nbsp;&nbsp; private int a;<br>&nbsp;&nbsp;&nbsp; private String text;<br>    public Some () {<br>        this(10, "Java");<br>    }<br>&nbsp;&nbsp;&nbsp; public Some(int a, String text) {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.a = a;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.text = text;<br>&nbsp;&nbsp;&nbsp; }<br>}</pre><br><small>這邊示範了this關鍵字的引數使用，這表示呼叫另一個有引數的建構式，並指定建構時的值。所以這麼寫時：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Some s = new Some();</span></small><br></div><small><br>物件的a就會設定為10，text參考至"Java"。</small><small>如此可以避免重複程式碼的撰寫，就不用像這樣寫：</small><br><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; private int a = 10;</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; private String text = "Java";</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp; &nbsp; public Some () {</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; this(10, "Java");</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; public Some(int a, String text) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.a = a;</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.text = text;</span><br style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span></small><br></div><br><small>你也許看過這樣的寫法：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; private int a;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; private String text;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a = 10;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text = "Java";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>那個初始a與text的寫法，並不是建構式，而是<span style="font-weight: bold;">非靜態類別成員初始化區塊</span>，讓你明確地在區塊中初始某些類別成員。<br><br><span style="font-weight: bold;">如果類別有繼承關係，在建構子類別實例後，會先進行父類別定義的初始流程，再進行子類別中定義的初始流程，也就是建構子類別實例後，會先執行父類別建構式定義的流程，再執行子類別建構式定義的流程。如果沒有指定執行哪個父類別建構式，則預設就是呼叫父類別無引數建構式。</span><br><br>所以你這麼寫時：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Other extends Some {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>相當於這麼寫：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Some() {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Other extends Some {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Other() {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; super();</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>別忘了，沒有定義建構式時，編譯器會自動加上無引數建構式。這邊你看到super關鍵字的使用，你可用以呼叫父類別建構式。例如：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Some() {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Some(int a) {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Other extends Some {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Other() {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; super(10);</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>如果你這麼寫，無法通過編譯：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Some {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Some(int a) {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public class Other extends Some {</span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; public Other() {</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br></small><small>在
+定義建構式時，如果沒有明確指定super()，那麼就是呼叫父類別無引數建構式。上例中，父類別定義了有引數的建構式，所以編譯器不會再自動加上無引數
+建構式，而在繼承的Other中，因為沒有使用super()指定使用哪個父類別建構式，所以預設就是呼叫父類別無引數建構式，但父類別中並不存在無引數
+建構式，因此發生編譯錯誤。<br><br>建構子類別的物件時，父類別的物件會先行建構，所以父類別成員變數初始化的動作也先進行，所以順序是父類別成員變數、父類別建構式、子類別成員變數、子類別建構式。<br></small><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Constructor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:25 GMT -->
+</html>

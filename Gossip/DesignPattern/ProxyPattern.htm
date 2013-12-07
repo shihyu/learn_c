@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ProxyPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:21 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Proxy 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Proxy 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+    <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br>  <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>您打算開發一個文書編輯器，文件中可以有圖片，如果您在載入文件時連同圖片一同載入：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Document {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; private Image image;<br>
+&nbsp; &nbsp; ...<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; Document() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; image = new
+Image("doc://images/xxx.jpg");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }<br>
+      <br>
+&nbsp; &nbsp; void scroll() {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; ...<br>
+&nbsp; &nbsp; &nbsp; &nbsp; image.draw();<br>
+&nbsp; &nbsp; &nbsp; &nbsp; ...<br>
+&nbsp; &nbsp; }<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+若文件中有很多圖片，則開啟文件的速度可能非常慢，但實際上，圖片可能在文件的中間，開啟文件後顯示第一頁時，圖片並不用繪製出來，在一開始載入所有的圖
+片實非必要，若可以的話，在要顯示時再載入該圖片，將可以加快開啟文件的速度。<br>
+      <br>
+您可以改寫為這種方式：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">interface Graphic {<br>
+&nbsp; &nbsp; void draw();<br>
+}<br>
+      <br>
+class Image implements Graphic {<br>
+&nbsp; &nbsp; ...&nbsp; &nbsp; <br>
+&nbsp; &nbsp; public void draw() {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; ...<br>
+&nbsp; &nbsp; }<br>
+}<br>
+      <br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class ImageProxy implements Graphics {<br>
+&nbsp; &nbsp; private Graphic image;<br>
+&nbsp; &nbsp; private String firename;<br>
+&nbsp; &nbsp; ImageProxy(String&nbsp;</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">firename</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; this.</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">firename</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> =&nbsp;</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">firename</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">;<br>
+&nbsp; &nbsp; }<br>
+      <span style="color: red;">&nbsp; &nbsp; public void draw() {</span><br style="color: red;">
+      <span style="color: red;">&nbsp; &nbsp; &nbsp; &nbsp; if(image ==
+null) {</span><br style="color: red;">
+      <span style="color: red;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; image = new Image(filename);</span><br style="color: red;">
+      <span style="color: red;">&nbsp; &nbsp; &nbsp; &nbsp; }</span><br style="color: red;">
+      <span style="color: red;">&nbsp; &nbsp; &nbsp; &nbsp;
+image.draw();</span><br style="color: red;">
+      <span style="color: red;">&nbsp; &nbsp; }</span><br>
+}</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+class Document {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; private Graphic image;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; Document() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; image = <span style="color: red;">new ImageProxy("doc://images/xxx.jpg");</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; void scroll() {</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; image.draw();</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+文件載入並建立Document時，建立的是ImageProxy實例，在真正需要繪製圖片時，才會真正建立Image實例並進行繪製動作，使用這種方
+式，即使文件中圖片很多，也不至於拖累開啟文件的速度。<br>
+      <br>
+以UML圖來表示這個例子：<br>
+      <img style="width: 380px; height: 255px;" alt="" src="images/Proxy-1.jpg"><br>
+      <br>
+以Python來示意一下實現：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Image:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; def draw(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class ImageProxy:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; def __init__(self, filename):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; self.image =
+None</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; self.filename =
+filename</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; def draw(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; if not
+self.image:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+self.image = Image(filename)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp;
+self.image.draw()</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Document:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; def __init__(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; self.image =
+ImageProxy("doc://images/xxx.jpg")</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; def scroll(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp;
+self.image.draw()</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; ...</span></small><br>
+      </div>
+      <small><br>
+這是Proxy模式的一個實例，您為其它的物件提供一種代理，以控制對這個物件的訪問，根據您的目的不同，您的代理物件將負有不同的責任，因而產生多種不
+同的代理情況。<br>
+      </small><small><img style="width: 330px; height: 237px;" alt="" title="Proxy" src="images/Proxy-2.jpg"></small><br>
+      <small><br>
+在調用RealSubject的request()之前，Proxy物件也許會有一些預先處理的操作，就假設我們組織為preOperation()與
+postOperation()好了，當客戶對Proxy發出request()請求後，一個可能的時序圖如下所示：</small><small><img style="width: 321px; height: 350px;" alt="Proxy" title="Proxy" src="images/Proxy-3.jpg"></small><small><br>
+      <br>
+您的preOperation()與postOperation()正決定了Proxy模式使用於何種情況，例如可能是在某個方法呼叫前後作日誌的動作</small><small>，
+或甚至作為攔截器，以條件決定是否呼叫真正的物件等。<br>
+      <br>
+      </small> </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ProxyPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:25 GMT -->
+</html>

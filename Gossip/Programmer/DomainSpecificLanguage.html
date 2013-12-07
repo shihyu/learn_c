@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/DomainSpecificLanguage.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>運用工廠、回呼與鞣製來自訂語意</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 運用工廠、回呼與鞣製來自訂語意<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=76670">運用工廠、回呼與鞣製來自訂語意</a><br>
+      <br>
+      基於相容性、程式典範、面對的問題與可能引入的複雜度等考量，程式語言的語法演化不易，相較之下程式庫進化則較為靈活，可根據既有的程式語法與某些模式進行組合，並考慮特定領域需求來為API命名，如此一來就可運用程式庫來構造特定領域語意。<br>
+      <br>
+      <dl>
+        <dt>用工廠模式隱藏物件建立細節</dt>
+      </dl>
+      <br>
+      設計模式中的工廠（Factory）模式可用來隱藏物件建立細節。舉例來說，JDK6使用群集（Collection）的泛型（Generics）功能建立物件時，必須使用<span
+        class="courier">List&lt;Integer&gt; scores = new ArrayList&lt;Integer&gt;()</span>之類的語法，等號兩邊重複指定了<span
+        class="courier">Integer</span>型態資訊，因而JDK7使用<span class="courier">List&lt;Integer&gt; scores = new ArrayList&lt;&gt;()</span>語法來簡化型態指定，但在JDK6中要解決此問題，<span
+        class="courier">可以如下設計emptyList方法，如此一來，就可使用List&lt;Integer&gt; scores = emptyList()來建立實例</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>public static </strong></span><span><strong>&lt;T&gt; List&lt;T&gt;</strong></span><span><strong> emptyList() {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return new ArrayList&lt;T&gt;();</strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span><strong><br>
+        </strong></div>
+      <br>
+      JDK API本身亦有類似案例，<span class="courier">像是Arrays的asList方法，可以使用asList(1, 2, 3)的方式構造List&lt;Integer&gt;實例。類似地，亦可設計如下設計set方法，之後就可以用set(1, 2, 3)的語法來建立Set&lt;Integer&gt;物件</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>@SafeVarargs</strong></span><span><strong><br>
+          </strong></span><span><strong>public static &lt;T&gt; Set&lt;T&gt; set(T... elems) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return new HashSet&lt;&gt;(Arrays.asList(elems));&nbsp;&nbsp;&nbsp; </strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span></div>
+      <br>
+      有時候程式語言本身語法雖不支援，但可透過工廠模式隱藏細節，以建立高階抽象語意。例如有些程式語言有建立字典（Dictionary）物件的實字（Literal）語法，像是Python可用<span
+        class="courier">{'Justin' : 123456, 'Monica' : 933933}</span>語法來建立；Java的字典物件是<span
+        class="courier">Map</span>實例，必須建立後逐一新增鍵（Key）值（Value），<span class="courier">若想擁有類似的建立Map實字語法，可如下設計emptyMap與map方法，如此之來，就可使用map("Justin", 123456, "Monica", 933933)來建立Map&lt;String, Integer&gt;實例</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>public static &lt;K, V&gt; Map&lt;K, V&gt; emptyMap() {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; return new HashMap&lt;&gt;();</span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong><strong><span><br>
+          </span></strong><strong><span><br>
+          </span></strong><strong><span>@SuppressWarnings("unchecked")</span></strong><strong><span><br>
+          </span></strong><strong><span>public static &lt;K, V&gt; Map&lt;K, V&gt; map(Object... kvs) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; Map&lt;K, V&gt; map = emptyMap();</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; for(int i = 0; i &lt; kvs.length; i += 2) { </span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; map.put((K) kvs[i], (V) kvs[i + 1]); </span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; }</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; return map;</span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong></div>
+      &nbsp;&nbsp;&nbsp; <br>
+      <dl>
+        <dt>使用樣版回呼重用共通流程</dt>
+      </dl>
+      <br>
+      我之前專欄 <a href="ReusableWorkflow.html">實現共用程式碼樣版的模式</a> 中談過樣版回呼（Template callback）模式，可將共用流程予以封裝，特定演算委託回呼物件執行，只要透過適當名稱，就可以賦予共用流程高階語意。例如說，Java中有條件成立時予以執行的<span
+        class="courier">if</span>語法，但沒有條件不成立時予以執行的<span class="courier">unless</span>語法，若可如下設計<span
+        class="courier">Block方面與unless</span>方法：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>/* Block.java */<br>
+            public interface Block {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; void apply();</span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong><strong><span><br>
+          </span></strong><strong><span><br>
+            /* 某類別中 */<br>
+          </span></strong><strong><span>public static void unless(boolean cond, Block block) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; if(!cond) { </span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; block.apply(); </span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; }</span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong><span><br>
+        </span></div>
+      <br>
+      <br>
+      若結合JDK8的Lambda語法，則可以如下運用<span class="courier">unless</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>int number = Integer.parseInt(args[0]);</span></strong><strong><span><br>
+          </span></strong><strong><span>unless(number == 2, () -&gt; {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; out.println("猜錯囉！");</span></strong><strong><span><br>
+          </span></strong><strong><span>});</span></strong></div>
+      <br>
+      使用API創造語意時，必須配合語言原有語法支援，才不會有冗餘資訊並呈現出適切語意。例如上述<span class="courier">unless</span>的例子受限於Java語法，多了不必要的括號、箭頭符號與分號資訊，因此創造出來的<span
+        class="courier">unless與原語言語法有格格不入的感覺；同樣是unless的例子</span>，Scala由於具備以名呼叫參數（By-name parameter）、鞣製（Curry）等語法特性，因而定義的<span
+        class="courier">unless</span>方法，可以如以下方式使用，看來就像程式語言內建語法：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>unless(number == 2) { </span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; </span></strong><strong><span>println("猜錯囉！") </span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong><span><br>
+        </span></div>
+      <br>
+      Ruby可指定區塊（Block）給方法，因而可構造出如下的語法：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>butThat(number == 1) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; </strong></span><span><strong>print "猜錯囉！" </strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span><span><strong><br>
+          </strong></span></div>
+      <br>
+      有時可試著結合工廠與回呼，利用工廠隱藏物件建立細節的特性，將繁瑣語法封裝起來。舉例來說，某個斷言為<span class="courier">assertTrue(number &lt; 2)</span>，若可試著如下設計<span
+        class="courier">Matcher介面、assertThat與lessTh</span><span class="courier">an</span><span>方法，如此就</span><span
+        class="courier">可改用assertThat(1, lessThan(2))的方式進行斷言</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><strong>/* Matcher.java */</strong><strong><br>
+        </strong><strong>p</strong><strong>ublic </strong><strong>interface Matcher&lt;T&gt; {</strong><strong><br>
+        </strong><strong>&nbsp;&nbsp;&nbsp; boolean matches(T item);</strong><strong><br>
+        </strong><strong>}</strong><strong><br>
+        </strong><strong><br>
+        </strong><strong>/* 某類別中 */</strong><strong><br>
+        </strong><strong>public static &lt;T&gt; void assertThat(T elem, Matcher&lt;T&gt; matcher) {</strong><strong><br>
+        </strong><strong>&nbsp;&nbsp;&nbsp; if(!matcher.matches(elem)) {</strong><strong><br>
+        </strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throw new RuntimeException("Assertion fails");</strong><strong><br>
+        </strong><strong>&nbsp;&nbsp;&nbsp; }</strong><strong><br>
+        </strong><strong>}</strong><strong><br>
+        </strong><strong><br>
+        </strong><strong>@SuppressWarnings("unchecked")</strong><strong><br>
+        </strong><strong>public static &lt;T extends Comparable&gt; Matcher&lt;T&gt; lessThan(Object that) {</strong><strong><br>
+        </strong><strong>&nbsp;&nbsp;&nbsp; return elem -&gt; elem.compareTo(that) &lt; 0;</strong><strong><br>
+        </strong><strong>}</strong></div>
+      <br>
+      類似地，像<span class="courier">assertTrue(numbers.contains(1) &amp;&amp; numbers.contains(3) &amp;&amp; numbers.contains(4))</span>不易閱讀的語法，<span
+        class="courier">可設計如下的hasItems()方法，之後就可以使用assertThat(numbers, hasItems(1, 3, 4))來進行斷言</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>public static &lt;T extends Collection&gt; Matcher&lt;T&gt; hasItems(Object... elems) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return (T c) -&gt; { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for(Object elem : elems) if(!c.contains(elem)) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong></span><span><strong>return false; <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; return true; </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; };</strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <dl>
+        <dt>使用鞣製概念建立管線操作</dt>
+      </dl>
+      <br>
+      透過設計，還可進一步地自由組合API形成更複雜語意。例如想達成<span class="courier">assertThat(numbers, hasItem(lessThan(5)))效果，可如下設計hasItem()方法，就可取代不易閱讀的assertTrue(numbers.get(0) &lt; 5 || numbers.get(1) &lt; 5 || numbers.get(2) &lt; 5)</span>：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>@SuppressWarnings("unchecked")<br>
+            public static &lt;T extends Collection&gt; Matcher&lt;T&gt; hasItem(Matcher matcher) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; return (T c) -&gt; {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for(Object o : c) if(matcher.matches(o)) { <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return true; <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false;</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; };</strong></span><span><strong><br>
+          </strong></span><span><strong>}</strong></span></div>
+      <br>
+      我之前專欄 <a href="CurriedFunction.html">函式的鞣製化</a> 中談過，使用傳回物件保有前次操作成果，以便開發者進一步作後續方法呼叫，因而可形成方法鏈（Method chain），這種形式可說是鞣製概念的延伸。JavaScript程式庫jQuery的鏈狀風格，Java的ORM框架Hibernate的<span
+        class="courier">Criteria</span> API，或者是JDK8中為Lambda語法增加的<span class="courier">Collection</span> API，都運用了相同概念。<br>
+      <br>
+      實際上，像<span class="courier">assertThat(numbers, everyItem(lessThan(5)))的組合方式，也是鞣製概念的延伸。相較於session.createCriteria(User.class).setFirstResult(51).setMaxResults(50).list()風格是由左而右逐一生成具可執行能力的物件，assertThat(numbers, everyItem(lessThan(5)))則是由右而左逐一生成具可執行能力的物件，lessThan會生成Matcher實例作為hasItem的回呼物件，而hasItem再生成Matcher實例作為assertThat的回呼物件</span>，無論是由左而右或是由右而左，形成的管線（Piped）操作只要方法命名適當，都可為程式增加不少語意上的可讀性。<br>
+      <br>
+      <dl>
+        <dt>思考程式庫於特定領域的命名與組合方式</dt>
+      </dl>
+      <br>
+      今日的程式庫不再僅是共用功能的集中地，特定領域的程式庫，某種程度上就是在建立特定領域語言，只不過有時程式庫本身的命名過於空泛而不易看出，與其如此，不如思考基於程式既有語法，採用適當模式建立特定領域的相關語意，並重視API命名，讓程式庫不僅是程式庫，而是作為語言的延伸。<br>
+      <br>
+      舉例來說，JDK8的<span class="courier">Collection</span>配合Lambda語法增加了一些高階操作，<span
+        class="courier">實際上前述的hasItems是在進行一種allMatch操作，然而使用allMatch的高階語意來撰寫會是assertTrue(asList(1, 2, 3).allMatch(elem -&gt; numbers.contains(elem)))，雖然重用了allMatch定義的流程，但可讀性並不好，不如針對測試領域採用assertThat(numbers, hasItems(1, 2, 3))來得清楚；類似地，前述的hasItem實際上是在進行一種anyMatch操作，然而與其採用assertTrue(numbers.anyMatch(elem -&gt; elem &lt; 5))的寫法，不如針對測試領域在命名上給予巧思，改採可讀性更好的assertThat(numbers, hasItem(lessThan(5)))寫法</span>。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/DomainSpecificLanguage.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

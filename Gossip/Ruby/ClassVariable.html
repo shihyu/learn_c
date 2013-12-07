@@ -1,0 +1,1217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/ClassVariable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>類別變數</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 類別變數<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>接續 </small><small><big><a href="ClassMethod.html"><small>單例方法、實例方法、類別方法</small></a></big> 的討論。</small><small><br>
+      <br>
+</small><small>
+個別類別可以擁有自己的類別方法，也可以擁有自己的<span style="font-weight: bold;">類別變數（Class variable）</span>，只要變數前加上<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">@@</span>符號就可以定義類別變數。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@s = 10<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def Some.s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def Some.s=(value)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@s = value<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s<br>
+=&gt; 10<br>
+&gt;&gt; Some.s = 20<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <small>上例中定義了<span style="font-family: Courier New,Courier,monospace;">Some的類別變數@@s，</span>預設外界是不可以直接存取類別變數，你必須為類別變數定義類別方法，外界才可存取，如上例所示。<br>
+      <br>
+      </small><small>可以在實例方法中使用類別變數，不過，你不能 類別方法中使用實例變數，因為類別方法屬於類別擁有，但實例變數屬於實例擁有，類別方法中無法單就<span style="font-family: Courier New,Courier,monospace;">@name</span>來識別該取得哪個實例的變數值：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def initialize(value)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @value = value<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def Some.doValue<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @value += 1<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<br>
+&gt;&gt; s = Some.new(10)<br>
+=&gt; #&lt;Some:0x1df6658 @value=10&gt;<br>
+      <span style="font-weight: bold;">&gt;&gt; Some.doValue<br>
+      </span>NoMethodError: undefined method `+' for nil:NilClass<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):6:in `doValue'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):9<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <small><br>
+      </small><small>在頂層範圍中，如果你如下定義：<br>
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">X = 10</span></small><br>
+      </div>
+
+      <small><br>
+相當於如此定義：<br>
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Object</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; X = 10</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">end</span></small><br>
+      </div>
+
+
+      <br>
+
+      <small>這可以如下證實：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; X = 20<br>
+</span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; X<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; Object::X<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <small>類似地，如果你如下定義：<br>
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">y = 5<br>
+@@y = 10</span></small><br>
+      </div>
+
+      <small><br>
+相當於如下定義：<br>
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Object<br>
+&nbsp;&nbsp;&nbsp; y = 5<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; @@y = 10</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">end</span></small><br>
+      </div>
+
+      <br>
+
+      <small>這可以如下證實：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; @@y = 10<br>
+</span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; y = 10<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; def show_y<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts y<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; show_y<br>
+            </span>NameError: undefined local variable or method `y' for main:Object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):35:in `show_y'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):37<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt; def show_aay<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts @@y<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<br>
+</span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; show_aay<br></span>
+10<br>
+
+=&gt; nil</span></small><br>
+            <small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; def Object.y<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@y<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Object.y<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <small>在</small> <small><big><a href="Scope.html"><small>變數範圍</small></a></big> 談過，區域變數的範圍就是該區塊，因此上例中<span style="font-family: Courier New,Courier,monospace;">y是不能在show_y</span>中可見的。<br>
+      <br><span style="font-family: Courier New,Courier,monospace;">類別既然為Class實例，而類別方法實際上為Class實例上的單例方法，那麼類別變數就是Class實例的實例變數嗎？答案是否定的！Class實例還是可以擁有自己的實例變數。例如：</span></small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@s = 10<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def Some.s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def Some.s=(v)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@s = v<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s = 10<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; def Some.instance_s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @s<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; def Some.instance_s=(v)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @s = v<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.instance_s = 20<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; Some.instance_s<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">@@開頭的變數之所以稱為類別變數，是因為它定義了類別範圍內可見的變數，而不是定義Class實例的實例變數。注意，@@開頭的變數是定義在哪個類別中，它的可視範圍就是在該類別。</small><small style="font-family: Courier New,Courier,monospace;">例如以下是可行的：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@s = 10<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def Some.s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">@@s是定義在Some中，所以在整個Some中都是可見的，不過以下這個範例有個陷阱：</span></small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@s = 10<br>
+&gt;&gt; end<br>
+</span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; def Some.s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@s<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.s<br>
+            </span>NameError: uninitialized class variable @@s in<span style="font-weight: bold;"> Object</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):5:in `s'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):7<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">Some中的@@s確實是指在Some中可見的類別變數，但是你在頂層定義Some.s時，實際上是等同於：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Object</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ...</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def Some.s</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@s</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; end</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">end</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+這時的@@s是想取得Object中的@@s，當然就看不到而發生錯誤，注意以上的NameError中的訊息，就是uninitialized class variable @@s in <span style="font-weight: bold;">Object</span>，而不是uninitialized class variable @@s in <span style="font-weight: bold;">Some</span>。<br>
+      <br>
+再來看個有趣的實驗：</span></small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; def Some.x=(v)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x = v<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; def Object.x<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.x = 10<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; Object.x<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; @@x<br>
+</span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt;</span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">定義在Some.x中的@@x，經由Object.x中的@@x取得的值是相同的。<br>
+      <br>
+      <span style="font-weight: bold;">注意，在頂層或者說是Object類別中，若有@@變數與內部類別的@@變數同名，則外部類別的@@變數會覆蓋內部類別的@@變數。</span>例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; @@x = 10<br>
+</span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x = 20<br>
+&gt;&gt; end<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; @@x<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>這相當於：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Object<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x = 10<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@x = 20<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt; @x<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; @@x<br>
+            </span>=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+<small><span style="font-family: Courier New,Courier,monospace;">別以為如下就是設定Some的類別變數：</span></small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; def Some.x=(v)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x = v<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; def Some.x<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x<br>
+&gt;&gt; end<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.x = 10<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; Some.x<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; @@x<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">但是在非頂層或Object中的行為則不同，外部類別的@@變數「不會」覆蓋內部類別的@@同名變數</span>。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; @@x = 10<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; class Other<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @@x = 20<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts @@x<br>
+&gt;&gt; end<br>
+</span>10<br>
+=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">
+      </span>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/ClassVariable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

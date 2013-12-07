@@ -1,0 +1,1053 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GTKUnderUbuntu.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Ubuntu 下安裝 GTK</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: Ubuntu 下安裝 GTK</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在撰寫這篇教學文件時正好在玩Ubuntu，這邊說明一下如何在Ubuntu下設定GTK開發基本環境。<br>
+
+
+
+
+      <br>
+
+
+
+
+由於GTK基本上主要以C語言來撰寫，您必須有C編譯器，Ubuntu預設安裝好後就有gcc了，不過缺少必要的Header file，您可以在文字模式下，安裝<span style="font-weight: bold;">build-essential</span>套件，例如：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">sudo apt-get install build-essential<br>
+
+
+
+
+      <br>
+
+
+
+
+      </span></small></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><small>安裝完成後，可以寫個基本的C語言程式：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>hello.c</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    printf("Hello! World!\n");<br>    printf("哈囉！C語言！\n");<br>    return 0;<br>}</pre>
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+編譯並執行看看：</small></span><br>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="color: rgb(255, 255, 255);">$ gcc -o hello hello.c<br>
+
+
+
+
+$./hello<br>
+
+
+
+
+            </small><small style="color: rgb(255, 255, 255);">Hello! World!<br>
+
+
+
+
+
+
+
+
+
+哈囉！C語言！</small><br>
+
+
+
+
+            </td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small><span class="postbody"></span>再來安裝GTK開發套件<span style="font-weight: bold;">libgtk2.0-dev</span>：</small><br>
+
+
+
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;" class="postbody"><span style="font-weight: bold;">sudo apt-get install libgtk2.0-dev</span></span></small><br>
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>安裝完成後，可以使用<span style="font-weight: bold;">pkg-config</span>查看一下GTK的相關編譯環境資訊：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">pkg-config --cflags --libs gtk+-2.0</span></small></span><br>
+
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+
+      <span class="postbody"></span><span class="postbody"></span><br>
+
+
+
+
+      <small>pkg-config會讀取GTK附帶的.pc檔來取得相關編譯資訊，--cflags會列出include目錄，--libs列出所連結的函式庫及其所在目錄，</small><small>以我的電腦為例：</small><br>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">$ pkg-config --cflags --libs gtk+-2.0</span><br>
+
+
+
+
+-I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include
+-I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pango-1.0
+-I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+-I/usr/include/freetype2 -I/usr/include/libpng12
+-I/usr/include/pixman-1&nbsp; -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0
+-lgdk_pixbuf-2.0 -lm -lpangocairo-1.0 -lpango-1.0 -lcairo -lgobject-2.0
+-lgmodule-2.0 -ldl -lglib-2.0</small><small style="color: rgb(255, 255, 255);"></small><br>
+
+
+
+
+            </td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>可以分開執行比較清楚，例如：</small><br>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">$ pkg-config --cflags gtk+-2.0</span><br>
+
+
+
+
+-I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include
+-I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pango-1.0
+-I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+-I/usr/include/freetype2 -I/usr/include/libpng12
+-I/usr/include/pixman-1 &nbsp;<br>
+
+
+
+
+            <span style="font-weight: bold;">$ pkg-config --libs gtk+-2.0</span><br>
+
+
+
+
+-lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lm
+-lpangocairo-1.0 -lpango-1.0 -lcairo -lgobject-2.0 -lgmodule-2.0 -ldl
+-lglib-2.0&nbsp;</small></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+
+      <small>所連結的函式庫包括了（擷取翻譯自<a href="http://library.gnome.org/devel/gtk-tutorial/stable/x111.html">Compiling Hello World</a>）：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li style="font-weight: bold;"><small>GTK（-lgtk）：基於 GDK 的 widget 函式庫。</small></li>
+
+
+
+
+        <li style="font-weight: bold;"><small>GDK（-lgdk）：Xlib 包裏（Wrapper）。.</small></li>
+
+
+
+
+        <li><small>gdk-pixbuf（-lgdk_pixbuf）：影像處理函式庫。</small></li>
+
+
+
+
+        <li><small>Pango（-lpango）：國際化文字。</small></li>
+
+
+
+
+        <li><small>gobject（-lgobject）：GTK 用以為基礎的型態系統。</small></li>
+
+
+
+
+        <li><small>gmodule（-lgmodule）：用來載入執行時期的擴充。</small></li>
+
+
+
+
+        <li style="font-weight: bold;"><small>GLib（-lglib）：包括各種函式，GTK 基於 GLib，所以您會需要這個函式庫。</small></li>
+
+
+
+
+        <li style="font-weight: bold;"><small>Xlib（-lX11）：被 GDK 所使用。</small></li>
+
+
+
+
+        <li><small>Xext（-lXext）：包括共享記憶體 pixmaps（shared memory pixmaps）與其它 X 擴充。</small></li>
+
+
+
+
+        <li><small>math（-lm）：因各種目的而被 GTK 所使用的數學函式庫。</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <small><small><br>
+
+
+
+
+      </small></small><span class="postbody"><small>GTK基於GDK（Gnome Drawing Kit），GDK顧名思義，就是一個與繪圖相關的開發工具箱，GDK將Xlib（X函式庫）加以包裝簡化，像是點、線、視窗、色彩等的設定，以及鍵盤、滑鼠等事件的支援。<br>
+
+
+
+      <br>
+
+
+
+GLib基本上是將C的</small></span><span class="postbody"><small>型態、陣列、</small></span><span class="postbody"><small>函式庫等重新包裝，例如在/usr/include/glib-2.0/glib/gtypes.h中，定義了一些基本資料型態</small></span><span class="postbody"><small>，使其更容易達到可攜性</small></span><span class="postbody"><small>：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef char&nbsp;&nbsp; gchar;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef short&nbsp; gshort;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef long&nbsp;&nbsp; glong;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef int&nbsp;&nbsp;&nbsp; gint;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef gint&nbsp;&nbsp; gboolean;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef unsigned char&nbsp;&nbsp; guchar;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef unsigned short&nbsp; gushort;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef unsigned long&nbsp;&nbsp; gulong;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef unsigned int&nbsp;&nbsp;&nbsp; guint;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef float&nbsp;&nbsp; gfloat;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">typedef double&nbsp; gdouble;</span></small></span><br style="font-weight: bold;">
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+在撰寫GTK程式時，若見到以g_開頭的型態或函式，或是以G_開頭的巨集，都是由GLib提供。<br>
+
+
+
+      <br>
+
+
+
+      </small></span><span class="postbody"><small>雖然說GTK基於GDK及GLib，但在撰寫GTK程式時，也常見到GDK及GLib相關函式或</small></span><span class="postbody"><small>結構</small></span><span class="postbody"><small>，所以更確實的說法是，GTK本身專注在視窗元件之安排，並與GDK及GLib緊密結合。</small></span><br>
+
+      <span class="postbody"><small>
+
+      </small>
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GTKUnderUbuntu.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:22 GMT -->
+</html>

@@ -1,0 +1,778 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/newDelete.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>new 運算子與 delete 運算子</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index.html">C++ Gossip:&nbsp;<span class="Topic">new
+運算子與 delete 運算子</span><br>
+
+
+
+
+
+</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+到目前為止，您都是事先宣告好所要使用的變數，當程式開始執行時，這些變數就會自動被配置記憶體空間。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+然而有時有些變數並不知道何時會被使用，您希望在使用到的時候再配置空間給變數，並在變數不使用的時候，將變數所佔有的空間還給記憶體，這時候我們可以使
+用new運算子與delete運算子。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+舉個簡單的例子來說，您可以在程式中以動態的方式來配置一個int型態大小的記憶體，例如： <br>
+
+
+
+
+      </small>
+
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*ptr = new int;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+在這段程式中，new運算子會配置一個int所需要的空間，並傳回該空間的位址，所以您使用指標ptr來儲存這個位址，這段程式只配置空間但不初始空間中
+的儲存值，如果要在配置完成後指定儲存值，則可以如此宣告： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">int
+*ptr = new int(100);</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+這段程式在配置空間之後，會將空間中的儲存值設定為100，以下使用一個簡單的程式來示範動態配置的使用：</small><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    int *ptr = new int(100); <br><br>    cout &lt;&lt; "空間位置:" &lt;&lt; ptr <br>         &lt;&lt; endl; <br>    cout &lt;&lt; "空間儲存值：" &lt;&lt; *ptr<br>         &lt;&lt; endl; <br><br>    *ptr = 200; <br><br>    cout &lt;&lt; "空間位置:" &lt;&lt; ptr <br>         &lt;&lt; endl;<br>    cout &lt;&lt; "空間儲存值：" &lt;&lt; *ptr <br>         &lt;&lt; endl;<br><br>    delete ptr;<br> <br>    return 0; <br>}</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+執行結果：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">空間位置:0x3d2458<br>
+
+
+
+
+
+空間儲存值：100<br>
+
+
+
+
+
+空間位置:0x3d2458<br>
+
+
+
+
+
+空間儲存值：200</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+使用new運算子動態配置的空間，在整個程式結束前並不會自動歸還給記憶體，您必須使用delete將這個空間還給記憶體，如上面的程式在結束前所作的動
+作，在這個程式中，雖然顯示完畢後程式也就結束，但這邊還是示範delete的用法，而這也是個好習慣，日後您的程式在持續執行過程中若大量使用new而
+沒有適當的使用delete的話，由於空間一直沒有歸還，最後將導致整個記憶體空間用盡。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+接下來看一個簡單的動態記憶體配置的應用，您知道陣列使用的一個缺點，就是陣列的大小必須事先決定好，然而有時候您無法知道我們會使用多大的陣列，或者希
+望由使用者自行決定陣列大小，這時候您就可以使用動態記憶體配置加上指標運算來解決這個問題，先說明陣列動態配置的方式，如下所示： <br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*arr = new
+int[1000];</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+這段程式碼動態配置了1000個int大小的空間，並傳回空間的第一個位址，配置後的空間資料是未知的，沒有方法在動態配置陣列空間後同時宣告元素初值。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+同樣的，使用new配置得來的空間，在不使用時應該使用delete歸還給記憶體，方法如下： <br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">delete
+[] arr;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+注意在使用delete歸還陣列空間給記憶體時，我們必須加上[ ]，表示歸還的是整個陣列空間。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+下面這個程式是個陣列動態配置的簡單示範： <br>
+
+
+
+
+      </small>
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    int size = 0; <br><br>    cout &lt;&lt; "請輸入陣列長度："; <br>    cin &gt;&gt; size; <br>    int *arr = new int[size]; <br><br>    cout &lt;&lt; "指定元素值：" &lt;&lt; endl; <br>    for(int i = 0; i &lt; size; i++) { <br>        cout &lt;&lt; "arr[" &lt;&lt; i &lt;&lt; "] = "; <br>        cin &gt;&gt; *(arr+i); <br>    } <br><br>    cout &lt;&lt; "顯示元素值：" &lt;&lt; endl; <br>    for(int i = 0; i &lt; size; i++) {<br>        cout &lt;&lt; "arr[" &lt;&lt; i &lt;&lt; "] = " &lt;&lt; *(arr+i)<br>             &lt;&lt; endl; <br>    } <br><br>    delete [] arr; <br> <br>    return 0; <br>}<br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+執行結果：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">請輸入陣列長度：5<br>
+
+
+
+
+
+指定元素值：<br>
+
+
+
+
+
+arr[0] = 1<br>
+
+
+
+
+
+arr[1] = 2<br>
+
+
+
+
+
+arr[2] = 3<br>
+
+
+
+
+
+arr[3] = 4<br>
+
+
+
+
+
+arr[4] = 5<br>
+
+
+
+
+
+顯示元素值：<br>
+
+
+
+
+
+arr[0] = 1<br>
+
+
+
+
+
+arr[1] = 2<br>
+
+
+
+
+
+arr[2] = 3<br>
+
+
+
+
+
+arr[3] = 4<br>
+
+
+
+
+
+arr[4] = 5</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+您也可以使用指標來模擬二維陣列，只要清楚二維陣列中的兩個維度的索引值之位移量就可以了，這在 <a href="TwoDimArray.html">二維陣列</a> 中有談到了，下面這個程式是個簡單的示範： </small><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() {<br>    int m = 0;<br>    int n = 0; <br><br>    cout &lt;&lt; "輸入二維陣列維度："; <br>    cin &gt;&gt; m &gt;&gt; n; <br><br>    int *ptr = new int[m*n]; <br> <br>    for(int i = 0; i &lt; m; i++) {<br>        for(int j = 0; j &lt; n; j++) {<br>            *(ptr + n*i + j) = i+j; <br>        }<br>    }<br><br>    for(int i = 0; i &lt; m; i++) { <br>        for(int j = 0; j &lt; n; j++) {<br>            cout &lt;&lt; *(ptr+n*i+j) &lt;&lt; "\t"; <br>        } <br>        cout &lt;&lt; endl; <br>    } <br><br>    delete [] ptr; <br> <br>    return 0; <br>}<br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+執行結果：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">輸入二維陣列維度：4 5<br>
+
+
+
+
+
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4<br>
+
+
+
+
+
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5<br>
+
+
+
+
+
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6<br>
+
+
+
+
+
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+ </td>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <center>
+       <br>
+
+      </center>
+
+ </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/newDelete.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

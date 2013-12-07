@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/OverloadLocalRepeat.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>函式重載、區域函式、重複參數</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 函式重載、區域函式、重複參數</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Scala支援函式重載（Overload），函式重載的功能使得程式設計人員能較少苦惱於方法名稱的設計，以統一名稱來呼叫相同功能的方法，函式重載主要根據傳遞引數的資料型態不同，或是參數列的參數個數來呼叫對應的函式，傳回值不是函式重載的區別依據。<br><br>以下是個簡單的範例：<br></small><pre>def sum(a: Int, b: Int) = a + b<br>def sum(a: Int, b: Int, c: Int) = a + b + c<br><br>println(sum(1, 2))     // 顯示 3<br>println(sum(1, 2, 3))  // 顯示 6</pre><small><br>重載在面對基本類型如Int、Long、Double等時的規則，基本上是與Java相同的，也就是從最嚴格的長度開始試著符合。例如：<br></small><pre>def sum(a: Int, b: Int) = a + b<br>def sum(a: Long, b: Long) = a + b<br>println(sum(1, 2))                   // 使用的是 Int 版本的 sum 函式<br>println(sum(1L, 2L))                 // 使用的是 Long 版本的 sum 函式<br>println(sum(1, 2L))                  // 使用的是 Long 版本的 sum 函式</pre><small><br>上例中最後一個會尋找長度符合的函式版本，雖然有Int引數，但會自動尋找更長的Long參數函式版本來符合。像下面這個也是可以的：<br></small><pre>def sum(a: Long, b: Long) = a + b<br>println(sum(1, 2))                   // 這是 OK 的</pre><small><br>但如果是下面這樣的話不行，因為Long的長度比Int大，不會自動裁剪長度來符合函式呼叫：<br></small><pre>def sum(a: Int, b: Int) = a + b<br>println(sum(1L, 2L))                 // type mismatch 錯誤</pre><small><br>注意在 </small><small><a href="InteractiveShell.html">指令互動環境</a> 中沒辦法讓你測試重載函式，後面定義的同名函式之名稱會直接覆蓋先前定義的同名函式。<br><br>在Scala中，函式中還可以定義函式，稱之為區域函式（Local function），你可以使用區域函式將某個函式中的演算組織為更小的單元，例如，在 </small><small><a href="../AlgorithmGossip/SelectionInsertionBubble.htm">選
+擇排序</a> 的實作時，每次會從未排序部份選擇一個最小值放置到已排序部份之後，在底下的範例中，尋找最小值的演算就實作為區域函式的方式：<br></small><pre>def selection(number: Array[Int]) {<br>    // 找出未排序中最小值<br>    def min(m: Int, j: Int): Int = {<br>        if(j == number.length) m<br>        else if(number(j) &lt; number(m)) min(j, j + 1) <br>        else min(m, j + 1)<br>    }<br>        <br>    for(i &lt;- 0 until number.length -1; m = min(i, i + 1)<br>        if i != m<br>    ) swap(number, i, m)<br>}<br><br>def swap(number: Array[Int], i: Int, j: Int) {<br>    val t = number(i)<br>    number(i) = number(j)<br>    number(j) = t<br>}</pre><small></small><small><br>可以看到，區域函式的好處之一，就是可以直接存取包裹它的外部函式之參數（或宣告在區域函式之前的區域變數），如此可減少呼叫函式時引數的傳遞。<br><br>如果你想實作一個加總所有整數的函式，問題在於使用函式的客戶端可能提供的引數是不固定的，此時你可以使用重複參數（Repeated parameters）。例如：<br></small><pre>def sum(numbers: Int*) = numbers.reduceLeft((sum, k) =&gt; sum + k)<br><br>println(sum(1, 2))         // 顯示 3<br>println(sum(1, 2, 3))      // 顯示 6<br>println(sum(1, 2, 3, 4))   // 顯示 10</pre><small><br>只
+要在參數宣告型態時，旁邊放個*符號，該參數就成了可重複參數，可重複參數實際上是陣列，所以上例中，numbers的型態可以<span style="font-weight: bold;">看作是</span>Array[Int]（也就是說實際上不是，其實是一種 <a href="http://www.scala-lang.org/docu/files/api/scala/Seq.html">scala.Seq[T]</a>，如果你要取得scala.Array實例，可以使用<span style="font-weight: bold;">toArray</span>方法），reduceLeft方法接受一個函式物件，reduceLeft每次會將函式物件的運算結果傳入函式物件作為第一個參數值（第一次第一個參
+數預設是0），而陣列的下一個元素作為第二個參數的值。<br><br>numbers可以看作是陣列，但實際上不是陣列，所以你不能直接將一個陣列傳入，例如：<br></small><pre>def sum(numbers: Int*) = numbers.reduceLeft((sum, k) =&gt; sum + k)<br><br>val numbers = Array(1, 2)<br>println(sum(numbers))        // 錯誤 type mismatch</pre><small><br>如果你真的要傳入一個陣列，則要在陣列後特別標註: _*，這告訴編譯器，陣列的每個元素要作為個別引數傳入sum函式，例如：<br></small><pre>def sum(numbers: Int*) = numbers.reduceLeft((sum, k) =&gt; sum + k)<br><br>val numbers = Array(1, 2)<br>println(sum(numbers: _*))    // 顯示 3</pre><small><br></small><small>如果你有興趣再簡化sum函式的寫法</small><small>（有興趣的研究看看為什麼這樣就好，因為會用到許多進階特性）</small><small>，以下是個使用佔位字元_的寫法：<br></small><pre>def sum(numbers: Int*) = numbers.reduceLeft(_ + _)<br>println(sum(1, 2))         // 顯示 3</pre><small><br>reduceLeft方法第一次迭代時預設傳入函式物件的第一個參數值為0，如果使用foldLeft的話，可以指定第一次的傳入值，例如：<br></small><pre>def sum(numbers: Int*) = numbers.foldLeft(0) {_ + _}<br>println(sum(1, 2))         // 顯示 3</pre><small><br>這其實還使用到Scala中 </small><small><a href="Curry.html">鞣製（Curry）</a> 的特性，事實上，foldLeft有個別名為/:，記得:結尾的方法，是右邊物件所呼叫的方法，上面的sum函式還可以定義為以下的方式：<br></small><pre>def sum(numbers: Int*) = (0 /: numbers) {_ + _}<br>println(sum(1, 2))         // 顯示 3</pre><small><br>這個函式=右邊的讀法是，從0開始，每一次numbers的元素取出後進行{}中的動作，上例{}中的動作就是加總。<br></small><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/OverloadLocalRepeat.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Proxy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:15 GMT -->
+<head>
+
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>動態代理</title></head><body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 動態代理</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>來看一個最簡單的例子，當您需要在執行某些方法時留下日誌訊息，直覺的，您可能會如下撰寫：<br>
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package cc.openhome;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.util.logging.*;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class HelloSpeaker {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private Logger logger = </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Logger.getLogger(this.getClass().getName()); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void hello(String name) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 方法執行開始時留下日誌</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; logger.log(Level.INFO, "hello method starts...."); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 程式主要功能</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("Hello, " + name); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 方法執行完畢前留下日誌</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; logger.log(Level.INFO, "hello method ends...."); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      </div>
+
+
+
+
+      <small><br>
+
+
+
+在HelloSpeaker類別中，當執行hello()方法時，你希望該方法執行開始與執行完畢時都能留下日誌，最簡單的作法就是如以上的程式設計，在
+方法執行的前後加上日誌動作，然而記錄的這幾行程式碼橫切入（Cross-cutting）HelloSpeaker類別中，對於
+HelloSpeaker來說，日誌的這幾個動作並不屬於HelloSpeaker商務邏輯（顯示"Hello"等文字），這使得
+HelloSpeaker增加了額外的職責。<br>
+
+
+
+      <br>
+
+
+
+想想如果程式中這種日誌的動作到處都有需求，以上的寫法勢必造成你必須到處撰寫這些日誌動作的程式碼，這將使得維護日誌程式碼的困難度加大。如果需要的服
+務（Service）不只有日誌動作，有一些非物件本身職責的相關動作也混入了物件之中（例如權限檢查、交易管理等等），會使得物件的負擔更形加重，甚至
+混淆了物件本身該負有的職責，物件本身的職責所佔的程式碼，或許還小於這些與物件職責不相關的動作或服務的程式碼。<br>
+
+
+
+      <br>
+
+
+
+另一方面，使用以上的寫法，若你有一日不再需要日誌（或權限檢查、交易管理等）的服務，那麼你將需要修改所有留下日誌動作的程式碼，你無法簡單的就將這些相關服務從即有的程式中移去。<br>
+
+
+
+      <br>
+
+
+
+可以使用代理（Proxy）機制來解決這個問題，在這邊討論兩種代理方式：<span style="font-weight: bold;">靜態代理（Static proxy）</span>與<span style="font-weight: bold;">動態代理（Dynamic proxy）</span>。<br>
+
+
+
+      <br>
+
+
+
+在靜態代理的實現中，代理物件與被代理的物件都必須實現同一個介面，在代理物件中可以實現記錄等相關服務，並在需要的時候再呼叫被代理的物件，如此被代理物件當中就可以僅保留商務相關職責。<br>
+      <br>
+      </small><small>舉個實際的例子來說，首先定義一個IHello介面：<br>
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+<li>IHello.java</li>
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>package cc.openhome;<br><br>public interface IHello {<br>    public void hello(String name);<br>}</pre>
+
+
+
+
+      <small><br>
+
+
+
+然後讓實現商務邏輯的HelloSpeaker類別要實現IHello介面，例如：<br>
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+<li>HelloSpeaker.java</li>
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>package cc.openhome;<br><br>public class HelloSpeaker implements IHello {<br>    public void hello(String name) {<br>        System.out.println("Hello, " + name); <br>    }<br>}</pre>
+
+
+
+
+      <small><br>
+
+
+
+可以看到，在HelloSpeaker類別中現在沒有任何日誌的程式碼插入其中，日誌服務的實現將被放至代理物件之中，代理物件同樣也要實現IHello介面，例如：<br>
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+<li>HelloProxy.java</li>
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>package cc.openhome;<br><br>import java.util.logging.*; <br><br>public class HelloProxy implements IHello { <br>    private Logger logger = <br>            Logger.getLogger(this.getClass().getName());<br>    <br>    private IHello helloObject; <br><br>    public HelloProxy(IHello helloObject) { <br>        this.helloObject = helloObject; <br>    } <br><br>    public void hello(String name) { <br>        // 日誌服務<br>        log("hello method starts....");      <br><br>        // 執行商務邏輯<br>        helloObject.hello(name);<br>        <br>        // 日誌服務<br>        log("hello method ends...."); <br>    } <br>    <br>    private void log(String msg) {<br>        logger.log(Level.INFO, msg);<br>    }<br>}</pre>
+
+
+
+
+      <small><br>
+
+
+
+在HelloProxy類別的hello()方法中，真正實現商務邏輯前後可以安排記錄服務，可以實際撰寫一個測試程式來看看如何使用代理物件。<br>
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+<li>ProxyDemo.java</li>
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>package cc.openhome;<br><br>public class ProxyDemo {<br>    public static void main(String[] args) {<br>        IHello proxy = <br>            new HelloProxy(new HelloSpeaker());<br>        proxy.hello("Justin");<br>    }<br>} </pre>
+
+
+
+
+      <small><br>
+
+
+
+程式中呼叫執行的是代理物件，建構代理物件時必須給它一個被代理物件，記得在操作取回的代理物件時，必須轉換操作介面為IHello介面。<br>
+
+
+
+      <br>
+
+
+
+代理物件HelloProxy將代理真正的HelloSpeaker來執行hello()，並在其前後加上日誌的動作，這使得我們的
+HelloSpeaker在撰寫時不必介入日誌動作，HelloSpeaker可以專心於它的職責。<br>
+      <br>
+      </small><small>在JDK
+1.3之後加入了可協助開發動態代理功能的API等相關類別，您不必為特定物件與方法撰寫特定的代理物件，使用動態代理，可以使得一個處理者
+（Handler）服務於各個物件，首先，一個處理者的類別設計必須實作java.lang.reflect.InvocationHandler介面，
+以實例來進行說明，例如設計一個LogHandler類別：<br>
+
+      </small>
+      
+      
+      <ul>
+<li>LogHandler.java</li>
+      </ul>
+
+
+      
+      
+      <pre>package cc.openhome;<br><br>import java.util.logging.*; <br>import java.lang.reflect.*; <br><br>public class LogHandler implements InvocationHandler { <br>    private Logger logger = <br>            Logger.getLogger(this.getClass().getName()); <br>    <br>    private Object delegate;<br><br>    public Object bind(Object delegate) { <br>        this.delegate = delegate; <br>        return Proxy.newProxyInstance( <br>                           delegate.getClass().getClassLoader(), <br>                           delegate.getClass().getInterfaces(), <br>                           this); <br>    } <br><br>    public Object invoke(Object proxy, Method method, <br>                         Object[] args) throws Throwable { <br>        Object result = null; <br>        <br>        try { <br>            log("method starts..." + method);<br>            <br>            result = method.invoke(delegate, args);<br>            <br>            logger.log(Level.INFO, "method ends..." + method); <br>        } catch (Exception e){ <br>            log(e.toString()); <br>        }<br>        <br>        return result; <br>    } <br>    <br>    private void log(String message) {<br>        logger.log(Level.INFO, message);<br>    }<br>}</pre>
+
+
+      <small><br>
+
+主要的概念是使用Proxy.newProxyInstance()靜態方法建立一個代理物件（底層會使用Native的方式生成代理物件的Class實例），建立代理物件時必須告知所要代理的介面，之後您可以操作所
+建立的代理物件，在每次操作時會呼叫InvocationHandler的invoke()方法，invoke()方法會傳入被代理物件的方法名稱與執行
+參數，實際上要執行的方法交由method.invoke()，您在method.invoke()前後加上記錄動作，method.invoke()傳
+回的物件是實際方法執行過後的回傳結果。<br>
+
+      </small><br>
+      <small>接下來撰寫一個測試的程式，您要使用LogHandler的bind()方法來綁定被代理物件，如下所示：<br>
+
+      </small>
+      
+      
+      <ul>
+<li>ProxyDemo.java</li>
+      </ul>
+
+
+      
+      
+      <pre>package cc.openhome;<br><br>public class ProxyDemo {<br>    public static void main(String[] args) {<br>        LogHandler logHandler  = new LogHandler(); <br>        <br>        IHello helloProxy = <br>                (IHello) logHandler.bind(new HelloSpeaker()); <br>        helloProxy.hello("Justin");<br>    }<br>}</pre>
+
+
+      <small><br></small><br>
+      <small><br>
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/Proxy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:15 GMT -->
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/JavaEEException.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>簡介 Java EE 例外處理</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 簡介 Java
+EE 例外處理</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Java
+的</small> <small><a href="../JavaGossip-V1/ExceptionHierarchy.htm">例
+外的繼承架構</a> 中，分為Checked Exception、Unchecked Exception，Checked
+Exception需要您使用try-catch或throws加以處理方可通過編譯，Unckecked
+Exception是RuntimeException的子類別，屬於執行時期例外，不需要特別</small><small>使
+用try-catch或throws加以處理也可通過編譯，</small><small>Error的子類別亦是
+Unchecked Exception，屬於系統方面的嚴重錯誤，不需也不希望您特別處理</small><small>。<br>
+
+
+      <br>
+
+
+在Java EE中，對EJB的例外則是區分為</small><small>System Exception、</small><small>Application
+Exception，分類上較為複雜，並非以</small><small>Checked
+Exception、Unchecked Exception來區分。<br>
+
+
+      </small>
+      
+      <ul>
+
+
+        <li><small>System Exception</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>System
+Exception是在容器提供服務給EJB元件時因發生錯誤而引發的例外，可能是RuntimeException子類、
+RemoteException或EJBException等。<br>
+
+
+      <br>
+
+
+基本上繼承RuntimeException的子類別大都可歸類為</small><small>System
+Exception（除了使用@ApplicationException標註的RuntimeException子類外）</small><small>，System
+Exception也可以是EJB元件的商務方法或MDB的onMessage()方法所丟出的例外，</small><small>。<br>
+
+
+      <br>
+
+
+RemoteException（IOException子類）雖然是Checked Exception，不過在EJB2.0之後被視為System
+Exception，但是撰寫程式時，不可以自己丟出</small><small>RemoteException。<br>
+
+
+      <br>
+
+
+      </small><small>當容器遇到System
+Exception，容器會記錄錯誤，若認定Bean無法繼續服務，則執行回收資源程序而後加以清除，並藉由丟出EJBException</small><small>（RuntimeException
+子類）、</small><small>NoSuchEJBException等例外丟出通知呼叫者。<br>
+
+
+      </small></div>
+
+
+      
+      <ul>
+
+
+        <li><small>Application Exception</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>除了
+RemoteException之外的</small><small>Checked Exception，都是</small><small>Application
+Exception，</small><small>也就是那些定義在EJB元件介面上throws的例外。<br>
+
+
+      <br>
+
+
+以下是幾個Java EE中有定義的Application Exception：<br>
+
+
+      </small></div>
+
+
+      
+      <ul>
+
+
+        
+        <ul>
+
+
+          <li><small>javax.ejb.CreateException</small></li>
+
+
+          <li><small>javax.ejb.RemoveException</small></li>
+
+
+          <li><small>javax.ejb.FinderException</small></li>
+
+
+          <li><small>javax.ejb.DuplicateKeyException</small></li>
+
+
+          <li><small>javax.ejb.ObjectNotFoundException</small></li>
+
+
+        
+        </ul>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small><br>
+
+
+Application
+Exception也可以是RuntimeException的子類別，不過要以@ApplicationException標註，例如：<br>
+
+
+      <br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">@ApplicationException(rollback=true)</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public
+class SomeException extends RuntimeException {}</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+如果EJB元件丟出Application
+Exception，容器會原封不動的將例外丟回給呼叫者，例如若發生SQLException，這類錯誤通常是由於底層，開發人員無法獨力回復的錯誤
+（像是資料庫關閉、無法連線等），這類錯誤直接丟給呼叫者，讓呼叫者知曉這件事並作適當處理（像是顯示錯誤訊息給使用者看）。<br>
+
+
+      <br>
+
+
+在交易環境中，發生Application
+Exception不會自動將交易撤回，除非您明確使用setRollbackOnly()設定為true，或是在標註
+@ApplicationException時設定rollback=true，則發生例外時會先撤回交易，再將例外傳給客戶端。<br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+      </small><small><br>
+
+
+      </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/JavaEEException.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+</html>

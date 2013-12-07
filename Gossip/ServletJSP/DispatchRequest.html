@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/DispatchRequest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>調派請求</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 調派請求<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Web應用程式中，經常需要多個Servlet來完成請求，像是將另一個Servlet的回應包括進來，或將請求轉發給別的Servlet處理。例如，在 </small><small><big><a href="Model2.html"><small>關於 MVC/Model 2</small></a> </big>曾經看過範例中出現這段程式碼：</small><small><br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">req.getRequestDispatcher("hello.jsp").forward(req, resp);</span></small><br>
+      </div>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">實際上透過HttpServletRequest的<span style="font-weight: bold;">getRequestDispatcher()</span>取得的是一個實作了<span style="font-weight: bold;">RequestDispatcher</span>介面的物件，呼叫HttpServletRequest的getRequestDispatcher()時需要傳入一個相對於目前請求</small><small><span style="font-family: monospace;">URL</span></small><small style="font-family: Courier New,Courier,monospace;">的路徑資訊。<br>
+      <br>
+（你還有另外兩個方式，可以取得RequestDispatcher的方式還有兩個，即透過ServletContext的getRequestDispatcher()或getNamedDispatcher()，之後談到ServletContext時會再介紹。）</small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">RequestDispatcher上有個<span style="font-weight: bold;">include()</span>方法，可以讓你將另一個Servlet回應包括至目前的回應之中。例如：</small><br>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="SomeServlet", urlPatterns={"/some.view"})<br>public class SomeServlet extends HttpServlet {<br>    @Override<br>    protected void doGet(HttpServletRequest req, HttpServletResponse resp) <br>            throws ServletException, IOException {<br>        PrintWriter out = resp.getWriter();<br>        out.println("Some do one...");<br>        <span style="font-weight: bold;">RequestDispatcher dispatcher = req.getRequestDispatcher("other.view");</span><br><span style="font-weight: bold;">        dispatcher.include(req, resp);</span><br>        out.println("Some do two...");<br>        out.close();<br>    } <br>}<br></pre>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">other.view</span>實際上會循URL模式取得對應的Servlet。呼叫<span style="font-family: Courier New,Courier,monospace;">include()時，必須分別傳入實作HttpServletRequest、HttpServletResponse介面的物件，這可以是service()方法</span>上傳入的物件，或者是自定義的物件或包裹器（Wrapper）。如果被<span style="font-family: Courier New,Courier,monospace;">include()</span>的Servlet是這麼撰寫的：<br>
+      </small>
+      <pre>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="OtherServlet", urlPatterns={"/other.view"})<br>public class OtherServlet extends HttpServlet {<br>    @Override<br>    protected void doGet(HttpServletRequest req, HttpServletResponse resp)<br>            throws ServletException, IOException {<br>        PrintWriter out = resp.getWriter();<br>        out.println("Other do one...");<br>    }<br>}<br></pre>
+      <br>
+      <small>則網頁上見到的順序是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Some do one...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Other do one...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Some do two...</span></small><br>
+      </div>
+      <small><br>
+&nbsp;在取得<span style="font-family: Courier New,Courier,monospace;">RequestDispatcher</span>時，也可以包括查詢字串，這會在被包括（Include）或轉發（Forward，透過<span style="font-family: Courier New,Courier,monospace;">forward()</span>方法）的Servlet中取得。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">req.getRequestDispatcher("other.view?data=123456").include(req, resp);</span></small><br>
+      </div>
+      <small><br>
+則被包括的Servlet，可以使用<span style="font-family: Courier New,Courier,monospace;">req.getParameter("data")</span>來取得請求參數值。在調派請求的過程中，如果有必須共用的物件，可以設定給請求物件成為屬性，稱之為<span style="font-weight: bold;">請求範圍屬性（Request Scope Attribute）</span>。<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest</span>上與請求範圍屬性有關的幾個方法是：<br>
+      </small>
+      <ul>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">getAttribute()</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">getAttributeNames()</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">setAttribute()</span></small></li>
+        <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">removeAttribute()</span></small></li>
+      </ul>
+      <small><br>
+例如有個Servlet會根據某些條件查詢資料：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; List&lt;Book&gt; books = bookDAO.query("some books");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">&nbsp;&nbsp;&nbsp; request.setAttribute("books", books); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; request.getRequestDispatcher("result.view") </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .include(request,response); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br>
+假設<span style="font-family: Courier New,Courier,monospace;">result.view</span>這個URL是個負責回應的Servlet實例，則它可以利用<span style="font-family: Courier New,Courier,monospace;">ServletRequest物件的getAttribute()</span>取得查詢結果：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; List&lt;Book&gt; books = (List&lt;Book&gt;) <span style="color: red;">request.getAttribute("books");</span></span><br>
+      <br>
+      <img style="width: 558px; height: 265px;" alt="" src="images/DispatchRequest-1.png"><br>
+      <br>
+由於請求物件僅在此次請求週期內有效，在請求/回應之後，請求物件會被銷毀回收資源，設定在請求物件中的屬性自然也就消失了，所以透過<span style="font-family: Courier New,Courier,monospace;">setAttribute()</span>所設定的屬性才稱之為請求範圍屬性。<br>
+      <br>
+在設定請求範圍屬性時，需注意屬性名稱由<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">java.</span><span style="font-family: Courier New,Courier,monospace;">或</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">javax.</span>開頭的名稱通常保留給規格書中某些特定意義之屬性。例如：<br>
+      </small>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small><span style="font-weight: bold;">javax.servlet.include.request_uri</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.include.context_path</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.include.servlet_path</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.include.path_info</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.include.query_string</span></small></li>
+      </ul>
+      <br>
+      <small>以上的屬性名稱在被包括的Servlet中，分別表示上一個Servlet的Request URI、Context path、Servlet path、Path info與取得<span style="font-family: Courier New,Courier,monospace;">RequestDispatcher</span>時所給定的請求參數，如果被包括的Servlet還有包括其它的Servlet，則這些屬性名稱的對應值也會被代換。<br>
+      <br>
+在使用<span style="font-family: Courier New,Courier,monospace;">include()</span>時，被包括的Servlet中可以使用<span style="font-family: Courier New,Courier,monospace;">getSession()方法取得HttpSession</span>物件（之後會介紹，預設會在回應中加個一個<span style="font-family: Courier New,Courier,monospace;" class="">Cookie請求標頭</span></small><small>），除了這個之外，在被包括的Servlet中任何對請求標頭的設定都會被忽略。<br>
+      </small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;">RequestDispatcher有個<span style="font-weight: bold;">forward()</span></span>方法，呼叫時同樣必須傳入請求與回應物件，這表示你要將請求處理轉發給別的Servlet，回應亦轉發給另一個Servlet，要呼叫<span style="font-family: Courier New,Courier,monospace;">forward()</span>方法的話，目前的Servlet不能有任何回應確認（Commit），如果在目前的Servlet的有透過回應物件設定了一些回應但未確認（回應緩衝區未滿或未呼叫任何出清方法），則所有回應設定會被忽略，如果已經有回應確認且呼叫了<span style="font-family: Courier New,Courier,monospace;">forward()方法，則會丟出IllegalStateException</span>。<br>
+      <br>
+在被轉發請求的Servlet中，亦可透過以下的請求範圍屬性名稱取得對應資訊：<br>
+      </small>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small><span style="font-weight: bold;">javax.servlet.forward.request_uri</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.forward.context_path</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.forward.servlet_path</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.forward.path_info</span></small></li>
+        <li><small><span style="font-weight: bold;">javax.servlet.forward.query_string</span></small></li>
+      </ul>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/DispatchRequest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/MementoPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:39 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Memento 模式</title></head>
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Design Pattern: Memento 模式</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+
+ </td>
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+您的使用者可以對應用程式屬性進行設定，假設應用程式相關屬性是放在Application物件中，您想要設計一個</small><small>屬性備份還原功能，</small><small>如果您直接在Application物件中建立備份復原機制，這會使得物件本身的職責加重，與其在物件內建立</small><small>備份復原</small><small>機制，不如將</small><small>備份復原</small><small>機制從物件中脫離出來，如此一來還有可能在別的地方重用</small><small>備份復原機制。<br><br>您可使用一個Backup物件來封裝想要備份的資訊，Application會負責建立Backup物件，建立的Backup物件則交由一個Recovery物件來管理，一個可能的設計方式如下所示：<br></small><pre>import java.util.*;<br><br><span style="font-weight: bold;">class Backup {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    final String state;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    final Date date;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    Backup(String state) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        this.state = state;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        this.date = new Date();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>class Application {<br>    private String state = "default setting";<br>    <br><span style="font-weight: bold;">    Backup backup() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        return new Backup(state);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    void recover(Backup backup) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        this.state = backup.state;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>    <br>    void setState(String state) {<br>        this.state = state;<br>    }<br>    String getState() {<br>        return state;<br>    }<br>}<br><br><span style="font-weight: bold;">class Recovery {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private List&lt;Backup&gt; backups = new ArrayList&lt;Backup&gt;();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    void add(Backup backup) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        backups.add(backup);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    Backup retrieve(Date date) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        for(Backup backup : backups) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            if(backup.date.equals(date)) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                backups.remove(backup);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                return backup;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        return null;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span></pre><small>
+
+
+      <br>在改變Application狀態設定之前，您可以使用backup()方法對狀態進行備份，Recovery則管理儲存Backup物件，之後若想要還原Application狀態，則可以從Recovery取得備份資訊進行還原。例如：<br></small><pre>public class Main {<br>    public static void main(String[] args) {<br>        Application application = new Application();<br>        Recovery recovery = new Recovery();<br>        <br>        System.out.println(application.getState());<br>        <br>        Backup backup = application.backup();  // 建立備忘<br>        recovery.add(backup); // 加入備忘錄<br>        <br>        application.setState("customer setting");<br>        System.out.println(application.getState());<br>        <br>        Date date = backup.date; // 假設 date 是使用者自行設定所要取得的還原時間！<br>        application.recover(recovery.retrieve(date)); // 取得備忘來還原<br>        System.out.println(application.getState());<br>    }<br>}</pre><small><br>這是</small><small>Memento模式的一個例子。</small><small>Memento模式在Originator中保留一個Memento成員，這個Memento可以包括Originator的成員資訊，在外部的話，
+Memento可以由一個Caretaker維護，每對Originator作一個動作，Caretaker就保留Originator動作前的成員狀
+態，如果以後要復原物件狀態，只要從Caretaker取回Memento物件，對Originator進行狀態復原。<br>
+
+
+      <br>
+
+
+
+Memento模式的 UML 類別結構圖如下所示： <br>
+
+
+      <img style="width: 526px; height: 150px;" alt="" title="Memento" src="images/Memento-1.jpg"><br>
+
+
+      <br>
+
+
+圖中的Caretaker是用來保留原發者所創造的備忘錄物件，以供日後復原時取回，state表示一個內部狀態，內部狀態多時，也可以將之組織為一個類別，Caretaker維護的Memento可以是多個，可用來實現Redo與Undo多次的功能。<br><br>範例中Application即Originator的角色，Backup即Memento的角色，Recovery即Caretaker的角色。<br><br>如果使用Python來示範方才的範例：<br></small><pre>import time<br>class Backup:<br>    def __init__(self, state):<br>        self.state = state<br>        self.date = time.ctime()<br><br>class Application:<br>    def __init__(self):<br>        self.state = "default setting"<br>        <br>    def backup(self):<br>        return Backup(self.state)<br>    <br>    def recover(self, backup):<br>        self.state = backup.state<br><br>class Recovery:<br>    def __init__(self):<br>        self.backups = []<br>    <br>    def add(self, backup):<br>        self.backups.append(backup)<br>    <br>    def retrieve(self, date):<br>        for backup in self.backups:<br>            if backup.date == date:<br>                self.backups.remove(backup)<br>                return backup<br>        return None<br><br>application = Application()<br>recovery = Recovery()<br>        <br>print(application.state)<br>        <br>backup = application.backup()  # 建立備忘<br>recovery.add(backup) # 加入備忘錄<br>        <br>application.state = "customer setting"<br>print(application.state)<br>        <br>date = backup.date; # 假設 date 是使用者自行設定所要取得的還原時間！<br>application.recover(recovery.retrieve(date)) # 取得備忘來還原<br>print(application.state)</pre><small>
+
+
+      </small><small><br><br></small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+<div style="text-align: center;">
+<div style="text-align: left;"><br>
+
+
+
+<br>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/MementoPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:41 GMT -->
+</html>

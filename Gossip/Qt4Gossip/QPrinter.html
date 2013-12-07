@@ -1,0 +1,463 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QPrinter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QPrinter</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QPrinter</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>印
+表機列印，基本上就是透過印表機在紙上進行繪圖的動作，印表機為一種繪圖裝置，在Qt中使用QPrinter作為印表機繪圖裝置的表現，您可以基於
+QPrinter建立QPainter，然後使用QPainter進行圖形繪製，至於印表機的選擇、相關列印參數的設定，若是在圖形環境中，可以直接使用
+QPrintDialog來顯示列印對話方塊，讓使用者可以選擇印表機及相關參數。<br>
+
+
+      <br>
+
+
+下面這個簡單的程式，示範如何使用QPrinter及QPrintDialog，您可以使用QFileDialog載入一個圖片檔案，並使用QPrintDialog設定印表機，然後將選擇的圖檔名稱及圖片本身列印出來：<br>
+
+
+      </small>
+      
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QWidget&gt;<br>#include &lt;QLabel&gt;<br>#include &lt;QPixmap&gt;<br>#include &lt;QPrinter&gt;<br>#include &lt;QPainter&gt;<br>#include &lt;QFileDialog&gt;<br>#include &lt;QPrintDialog&gt;<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br>    QLabel *label = new QLabel("&lt;center&gt;Image&lt;/center&gt;");<br>    label-&gt;setWindowTitle("QPrinter");<br>    label-&gt;resize(500, 100);<br><br>    label-&gt;setFont(QFont( "Times", 18, QFont::Bold ));<br>    label-&gt;show();<br><br>    QString fileName = QFileDialog::getOpenFileName(label, "Open Image",<br>                "C:\\", "Image Files (*.png *.xpm *.jpg *.gif)");<br><br>    if(fileName != NULL) {<br>    	label-&gt;setWindowTitle(fileName);<br>    	<br>    	QPixmap pixmap(fileName);<br>    	label-&gt;setPixmap(pixmap);<br>    	label-&gt;resize(pixmap.width() , pixmap.height());<br>    	<br><span style="font-weight: bold;">    	QPrinter printer;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    	QPrintDialog printDialog(&amp;printer, label);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    	if (printDialog.exec()) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    	    QPainter painter(&amp;printer);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    	    painter.drawText(50, 50, fileName);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    	    painter.drawPixmap(50, 100, pixmap);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    	}</span><br>    }<br><br>    return app.exec();<br>}</pre>
+
+
+      <small><br>
+
+
+下圖為執行時出現QPrintDialog的參考畫面：<br>
+
+
+      <br>
+
+
+      <img style="width: 464px; height: 389px;" alt="" src="images/QPrinter-1.jpg"><br>
+
+
+      <br>
+
+
+若要列印時進行換頁，可以使用QPrinter的newPage()方法，若要中斷印表機列印，則可以呼叫abort()方法，您也可以透過
+QPrinter來產生pdf檔案，只要執行QPrinter的setOutputFormat(QPrinter::PdfFormat)，並使用
+setOutputFileName()設定輸出的檔案名稱，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">printer.setOutputFormat(QPrinter::PdfFormat);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">printer.setOutputFileName("QPrinterOutput.pdf");</span></small><br>
+
+
+      </div>
+
+
+      <small><small><br>
+
+
+      </small></small>
+
+
+
+
+
+
+
+
+      <span class="postbody"><small>若
+不想透過QPrintDialog的方式設定QPrinter的相關參數，則可以使用QPrinter上的幾個方法來設定，像是
+setOrientation()設定紙張方向，setPageSize()設定紙張大小，setResolution()設定列印的DPI（Dots
+per inch）解析度，setFullPage()設定是否整張紙作為列印，setNumCopies()設定列印份數等。</small><br>
+
+      <br>
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QPrinter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:57 GMT -->
+</html>

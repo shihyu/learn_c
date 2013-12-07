@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/XML-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:19 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                var xhr = window.XMLHttpRequest && 
+                      (window.location.protocol !== 'file:' 
+                          || !window.ActiveXObject) ?
+                       function() {
+                           return new XMLHttpRequest();
+                       } :
+                       function() {
+                          try {
+                             return new ActiveXObject('Microsoft.XMLHTTP');
+                          } catch(e) {
+                             throw new Error('XMLHttpRequest not supported');
+                          }
+                       };
+                
+                function param(obj) {
+                    var pairs = [];
+                    for(var name in obj) {
+                        var pair = encodeURIComponent(name) + '=' + 
+                                   encodeURIComponent(obj[name]);
+                        pairs.push(pair.replace('/%20/g', '+'));
+                    }
+                    return pairs.join('&');
+                }
+                
+                function ajax(option) {
+                    option.type = option.type || 'GET';
+                    option.header = option.header || {
+                      'Content-Type':'application/x-www-form-urlencoded'};
+                    option.callback = option.callback || function() {};
+                    
+                    if(!option.url) {
+                        return;
+                    }
+                    
+                    var request = xhr();
+                    request.onreadystatechange = function() {
+                        option.callback.call(request, request);
+                    };
+                    
+                    var body = null;
+                    var url = option.url;
+                    if(option.data) {
+                        if(option.type === 'POST') {
+                            body = param(option.data);
+                        }
+                        else {
+                            url = option.url + '?' + param(option.data) 
+                                     + '&time=' + new Date().getTime();
+                        }
+                    }
+                    
+                    request.open(option.type, url);
+                    for(var name in option.header) {
+                        request.setRequestHeader(
+                                name, option.header[name]);
+                    }
+                    request.send(body);
+                }
+                
+                document.getElementById('category').onchange = function() {
+                    ajax({
+                        url     : 'XML-1.php',
+                        data    : {category : this.value},
+                        callback: function(request) {
+                            if(request.readyState === 4) {
+                                if(request.status === 200) {
+                                    var select = 
+                                         document.createElement('select');
+                                    var xml = request.responseXML;
+                                    var options = 
+                                         xml.getElementsByTagName('option');
+                                    for(var i = 0; i < options.length; i++) {
+                                        var value = 
+                                          options[i].getAttribute('value');
+                                        // 注意，文字也是節點
+                                        var text = 
+                                          options[i].firstChild.nodeValue;
+                                        if(navigator.userAgent
+                                            .indexOf('MSIE') === -1) {
+                                            select.add(
+                                             new Option(text, value), 
+                                              select.options[
+                                               select.options.length]);
+                                        }
+                                        else {
+                                            select.add(
+                                              new Option(text, value),
+                                               select.options.length);
+                                        }
+                                    }
+                                    var book = 
+                                      document.getElementById('book');
+                                    if(book.firstChild) {
+                                        book.removeChild(book.firstChild);
+                                    }
+                                    book.appendChild(select);
+                                }
+                            }
+                        }
+                    });
+                };
+            };
+        </script>        
+    </head>
+    <body>
+        圖書：<br>
+        <select id="category">
+            <option>-- 選擇分類 --</option>
+            <option value="theory">理論基礎</option>
+            <option value="language">程式語言</option>
+            <option value="web">網頁技術</option>
+        </select><br><br>
+        採購：<div id="book"></div>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/XML-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:19 GMT -->
+</html>

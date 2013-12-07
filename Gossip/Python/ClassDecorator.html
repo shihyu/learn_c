@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/ClassDecorator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>類別修飾器</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: 類別修飾器<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>所謂</small> <small><a href="FunctionDecorator.html">函式修飾器</a>，指的是對函式作修飾，基於原函式的處理結果再作加工。你也可以對類別作修飾，也就是所謂<span style="font-weight: bold;">類別修飾器</span>，如果你如下撰寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">@decorator</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Some:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; pass</span></small><br>
+      </div>
+      <small><br>
+其結果相當於：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Some:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; pass</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some = decorator(Some)</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+例如，若 </small><small><a href="FunctionDecorator.html">函式修飾器</a> 中的主餐改使用類別封裝：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class FriedChicken:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def getContent(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return "不黑心炸雞"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def price(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return 49.0</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+若你想要對<span style="font-family: Courier New,Courier,monospace;">FriedChicken</span>類別作修飾，使其加上附餐功能，則可以設計一個函式如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def dish1(<span style="color: red;">clz</span>):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; class SideDishOne:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def __init__(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.meal = <span style="color: red;">clz()</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;  </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def getContent(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return self.meal.getContent() + " | 可樂 | 薯條"</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def price(self):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return self.meal.price() + 30.0</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; return SideDishOne </span></small><br>
+      </div>
+      <small><br>
+那麼你可以如下使用，使<span style="font-family: Courier New,Courier,monospace;">FriedChicken</span>具有附餐：<br>
+      </small>
+      <pre>def dish1(clz):<br>    class SideDishOne:<br>        def __init__(self):<br>            self.meal = clz()<br>        <br>        def getContent(self):<br>            return self.meal.getContent() + " | 可樂 | 薯條"<br>    <br>        def price(self):<br>            return self.meal.price() + 30.0<br>            <br>    return SideDishOne <br>    <br><span style="font-weight: bold;">@dish1</span><br>class FriedChicken:<br>    def getContent(self):<br>        return "不黑心炸雞"<br>    def price(self):<br>        return 49.0<br>        <br>friedchicken = FriedChicken()<br>print(friedchicken.getContent())   # 不黑心炸雞 | 可樂 | 薯條<br>print(friedchicken.price())        # 79.0<br></pre>
+      <small><br>
+這是將修飾器使用在類別上的例子。除了使用函式來定義修飾器之外，你也可以使用類別來定義修飾器，在了解如何使用類別定義修飾器之前，你要先了解<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">__call__()</span>方法的作用：<br>
+      </small>
+      <pre>class Some:<br><span style="font-weight: bold;">    def __call__(self, *args):</span><br style="font-weight: bold;"><span style="font-weight: bold;">        for arg in args:</span><br style="font-weight: bold;"><span style="font-weight: bold;">            print(arg, end=' ')</span><br style="font-weight: bold;"><span style="font-weight: bold;">        print()</span><br><br>s = Some()<br>s(1)<br>s(1, 2)<br>s(1, 2, 3)<br></pre>
+      <small><br>
+簡單來說，如果一個物件上具有<span style="font-family: Courier New,Courier,monospace;">__call__()</span>方法，則其實例可以使用圓括號來傳入引數，此時會呼叫實例<span style="font-family: Courier New,Courier,monospace;">__call__()</span>方法，就如上面的例子所示範的。<br>
+      <br>
+所以若要<span style="font-weight: bold;">使用類別來定義函式修飾器</span>，其作法為：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class decorator:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def __init__(self, func):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.func = func</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def __call__(self, *args):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result = self.func()</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 對 result 作修飾（傳回）<br>
+      <br>
+@decorator<br>
+def some(arg):<br>
+&nbsp;&nbsp;&nbsp; pass<br>
+      <br>
+some(1)<br>
+      </span></small></div>
+      <small><br>
+上例其實相當於：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">some = decorator(some)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">some(1)&nbsp;&nbsp; # 呼叫 some.__call__(1)</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">也就是使用decorator建立實例，之後對some所參考實例的呼叫，其實都轉換為對__call__()方法的呼叫。所以，若要使用類別來作對</span> </small><small><a href="FunctionDecorator.html">函式修飾器</a> 中點餐程式的修飾，則可以如下：<br>
+      </small>
+      <pre><span style="font-weight: bold;">class dish1:</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def __init__(self, func):</span><br style="font-weight: bold;"><span style="font-weight: bold;">        self.func = func</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def __call__(self):</span><br style="font-weight: bold;"><span style="font-weight: bold;">        return self.func() + 30</span><br style="font-weight: bold;"><span style="font-weight: bold;">        </span><br style="font-weight: bold;"><span style="font-weight: bold;">@dish1</span><br>def friedchicken():<br>    return 49.0<br><br>print(friedchicken())    #   79.0<br></pre>
+      <small><br>
+若要使用類別實作對類別的修飾器，則原理是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class decorator:</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def __init__(self, clz):</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.clz = clz</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; def __call__(self, *args):</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; class wrapper:</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def __init__(self, *args):</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; self.wrapped = self.clz(*args)</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 其它的方法</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return wrapper(*args)</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+@decorator</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class Some:</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; pass</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><small><br>
+上面的例子，其實相當於：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some = decorator(Some)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">s = Some(1, 2)&nbsp; # 其實是呼叫Some.__call__(1, 2)傳回wrapper實例</span></small><br>
+      </div>
+      <small><br>
+例如若使用類別來對<span style="font-family: Courier New,Courier,monospace;">FriedChicken</span>作修飾，則可以如下實作：<br>
+      </small>
+      <pre>class dish1:<br>    def __init__(self, clz):<br>        self.clz = clz<br>        <br>    def __call__(self):<br>        class SideDishOne:<br>            def __init__(self, meal):<br>                self.meal = meal<br>            def getContent(self):<br>                return self.meal.getContent() + " | 可樂 | 薯條"<br>            def price(self):<br>                return self.meal.price() + 30.0<br>            <br>        return SideDishOne(self.clz())<br>    <br><span style="font-weight: bold;">@dish1</span><br>class FriedChicken:<br>    def getContent(self):<br>        return "不黑心炸雞"<br>    def price(self):<br>        return 49.0<br>        <br>friedchicken = FriedChicken()<br>print(friedchicken.getContent())   # 不黑心炸雞 | 可樂 | 薯條<br>print(friedchicken.price())        # 79.0<br></pre>
+      <small><br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/ClassDecorator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

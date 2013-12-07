@@ -1,0 +1,516 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/BasicObject.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>BasicObject</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: BasicObject<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>先前一直談到，<span style="font-family: Courier New,Courier,monospace;">Object</span>是Ruby中所有物件的父類別，如果定義類別時沒有指定父類別，那預設就是繼承<span style="font-family: Courier New,Courier,monospace;">Object</span>，然而從Ruby 1.9之後，<span style="font-family: Courier New,Courier,monospace;">Object更上層還有一個<span style="font-weight: bold;">BasicObject</span></span>類別：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; Some.superclass<br>
+            </span>=&gt; Object<span style="font-weight: bold;"><br>
+&gt;&gt; Some.superclass.superclass<br>
+            </span>=&gt; BasicObject<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+      <br>
+
+      <small style="font-family: Courier New,Courier,monospace;">Object實際上繼承了BasicObject，並含括了<span style="font-weight: bold;">Kernel</span>模組，可以使用<span style="font-weight: bold;">ancestors</span>方法得知類別的父類別與含括的模組。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; Object.ancestors<br>
+</span>=&gt; [Object, Kernel, BasicObject]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">BasicObject上定義了少量的實例方法：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; BasicObject.instance_methods<br>
+</span>=&gt; [:==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">instance_methods可以取得public、protected的實例方法清單，如果傳入false，則可取得該類別階層定義的實例方法。以下可以看出，Object繼承BasicObject後，實際上並沒有定義實例方法：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; Object.instance_methods(false)<br>
+</span>=&gt; []<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+Object含括了Kernel模組，每個實例預設的實例方法，實際上都是BasicObject與Kernel模組提供：<span style="font-weight: bold;"></span></small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; Object.instance_methods<br>
+=&gt; [:nil?, :===, :=~, :!~, :eql?, :hash, :&lt;=&gt;, :class, :singleton_class, :clone,<br>
+&nbsp;:dup, :initialize_dup, :initialize_clone, :taint, :tainted?, :untaint, :untrust<br>
+, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods, :singleton_<br>
+methods, :protected_methods, :private_methods, :public_methods, :instance_variab<br>
+les, :instance_variable_get, :instance_variable_set, :instance_variable_defined?<br>
+, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :re<br>
+spond_to_missing?, :extend, :display, :method, :public_method, :define_singleton<br>
+_method, :__id__, :object_id, :to_enum, :enum_for, :==, :equal?, :!, :!=, :insta<br>
+nce_eval, :instance_exec, :__send__]<br>
+&gt;&gt; method_list = Object.instance_methods - Kernel.instance_methods(false)<br>
+</span>=&gt; [:==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]<span style="font-weight: bold;"><br>
+&gt;&gt; method_list - BasicObject.instance_methods(false)<br>
+            </span>=&gt; []<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+BasicObject幾乎什麼功能都沒有，這代表了你要教它什麼都可以，具體而言，你可以繼承BasicObject，定義出自己的繼承體系，而不用擔心太多方法名稱衝突問題。<br>
+      <br>
+例如，你也許會想要有以下的程式碼：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">xml = Xml.new</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">xml.person do</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.name("caterpillar")</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.phone("0970933933")</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.mail("caterpillar@openhome.cc")</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.address do</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xml.office("台北市....")</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xml.home("高雄市....")</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; end</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">end</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">puts xml.list</small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+產生出以下的</small><small>XML</small><small style="font-family: Courier New,Courier,monospace;">：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;person&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;name&gt;caterpillar&lt;/name&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;phone&gt;0970933933&lt;/phone&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;mail&gt;caterpillar@openhome.cc&lt;/mail&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;address&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;office&gt;台北市....&lt;/office&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;home&gt;高雄市....&lt;/home&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;/address&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/person&gt;</span></small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;"><br>
+那麼你可以定義以下的類別：<br>
+      </small>
+      <pre># encoding: Big5<br>class Xml &lt; BasicObject<br>    attr_reader :list<br>    def initialize<br>        @list = ""<br>        @level = 0<br>    end<br><br>    def indent<br>        @list &lt;&lt; " " * @level<br>    end<br>    <br>    <span style="font-weight: bold;">def method_missing(mth, *args, &amp;block)</span><br>        indent<br>        @list &lt;&lt; "&lt;#{mth}&gt;"<br>        @list &lt;&lt; "#{args[0]}" if args[0]<br>        @list &lt;&lt; "\n" if block<br>        @level += 2<br>        <br>        yield if block<br>        <br>        @level -= 2<br>        @list &lt;&lt; " " * @level if block<br>        @list &lt;&lt; "&lt;/#{mth}&gt;\n" <br><span style="font-weight: bold;">    end</span><br>end<br></pre>
+      <small style="font-family: Courier New,Courier,monospace;">
+      </small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">method_missing</span>是BasicObject
+定義的private方法，如果有個訊息傳送給物件，而在物件的方法查找中都沒有方法可以回應該訊息，就會呼叫method_missing方法，傳入方
+法、參數與程式區塊。為了突顯以上Xml繼承BasicObject的好處，可以故意使用與Kernel上定義的實例方法相同的名稱：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">xml = Xml.new</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">xml.hash do</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.public_send("orz")</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.freeze("XD")</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; xml.inspect("zzz")</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">end</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts xml.list</span></small><br>
+      </div>
+      <small style="font-weight: bold;"><br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">由於繼承自BasicObject，不用擔心會與Kernel發生方法上的名稱衝突問題，因而</span>會產生以下的XML：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;hash&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &lt;public_send&gt;orz&lt;/public_send&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &lt;freeze&gt;XD&lt;/freeze&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &lt;inspect&gt;zzz&lt;/inspect&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/hash&gt;</small><br>
+      </div>
+      <small style="font-weight: bold;"><br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/BasicObject.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

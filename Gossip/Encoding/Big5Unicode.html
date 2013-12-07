@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/Big5Unicode.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Big 5 網頁難字</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: Big 5 網頁難字<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </script></center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你有個Big5編碼撰寫的網頁，上頭的表單欄位，有人輸入了非Big5編碼容納的文字後送出，那會如何呢？<br>
+      </small>
+      <pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>"http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;<br>&lt;title&gt;Big5 網頁&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    &lt;form action="form.do" method="post"&gt;<br>        姓名：&lt;input type="text" name="name"&gt;<br>        &lt;input type="submit" value="送出"&gt;<br>    &lt;/form&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+例如，若在上面這個範例網頁中輸入「王大&#29319;」，發送至以下的Servlet：<br>
+</small>
+      <pre>package cc.openhome;<br><br>import java.io.IOException;<br>import javax.servlet.ServletException;<br>import javax.servlet.annotation.WebServlet;<br>import javax.servlet.http.HttpServlet;<br>import javax.servlet.http.HttpServletRequest;<br>import javax.servlet.http.HttpServletResponse;<br><br>@WebServlet("/form.do")<br>public class Form extends HttpServlet {<br>    protected void doPost(HttpServletRequest request, <br>                          HttpServletResponse response) <br>                             throws ServletException, IOException {<br>        request.setCharacterEncoding("Big5");<br>        System.out.println(request.getParameter("name"));<br>    }<br>}<br></pre>
+      <small>
+      </small><br>
+      <small>那你會看到：<br>
+      <img style="width: 203px; height: 80px;" alt="" src="images/Big5Unicode-1.png"><br>
+      <br>
+「&#29319;」變亂碼了？不對，並不是亂碼。<br>
+      <br>
+在 <a href="http://www.w3schools.com/HTML/html_entities.asp">HTML實體</a> 中規範了實體名稱（Entity）與</small><small>實體編號（Entity number），用以表達網頁上無法直接表現的字元，</small><small>實體名稱的格式是<span style="font-weight: bold;">&amp;entity_name;</span>，</small><small>以&lt;與&gt;為例，因為&lt;與&gt;在HTML原始碼中，用來作為標籤之用，所以若要在網頁上呈現</small><small>&lt;與&gt;，在HTML原始碼中必須撰寫為<span style="font-weight: bold;">&amp;lt;</span>與<span style="font-weight: bold;">&amp;gt;</span>，實體編號的格式為<span style="font-weight: bold;">&amp;#entity_number;</span>，若要用實體編碼來表示&lt;與&gt;，則必須寫為<span style="font-weight: bold;">&amp;#60;</span>與<span style="font-weight: bold;">&amp;#62;</span>。<br>
+      <br>
+如果你知道一個字元的Unicode編碼，要得到它的實體編號，就只要將十六進位表示換為十進位表示就可以了，以&#29319;為例，其Unicode編碼為U+7287，7287為十六進位表示，換為十進位表示就是29319。<br>
+      <br>
+有一些程式庫可以直接作轉換，例如Java中，可以使用 <a href="http://commons.apache.org/lang/">Commons Lang</a> 中<span style="font-family: Courier New,Courier,monospace;">StringEscapeUtils</span>的<span style="font-family: Courier New,Courier,monospace;">escapeHTML()與unescapeHTML()作轉換，以上面的</span>Servlet<span style="font-family: Courier New,Courier,monospace;">為例，可以改為以下：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package cc.openhome;<br><br>import java.io.IOException;<br>import javax.servlet.ServletException;<br>import javax.servlet.annotation.WebServlet;<br>import javax.servlet.http.HttpServlet;<br>import javax.servlet.http.HttpServletRequest;<br>import javax.servlet.http.HttpServletResponse;<br><br><span style="font-weight: bold;">import org.apache.commons.lang.StringEscapeUtils;</span><br><br>@WebServlet("/form.do")<br>public class Form extends HttpServlet {<br>    protected void doPost(HttpServletRequest request, <br>	        HttpServletResponse response) <br>	throws ServletException, IOException {<br>	    request.setCharacterEncoding("Big5");<br>        System.out.println(<br>	  <span style="font-weight: bold;">  StringEscapeUtils.unescapeHtml(</span>request.getParameter("name")<span style="font-weight: bold;">)</span><br>	);<br>    }<br>}<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+重新發送「王大&#29319;」，結果就可以看到正確的中文了：<br>
+      <img style="width: 199px; height: 88px;" alt="" src="images/Big5Unicode-2.png"><br>
+      <br>
+網頁表單通常不允許使用者輸入</span>HTML<span style="font-family: Courier New,Courier,monospace;">，客戶端或伺服端通常會加以過濾，舉例來說，你有個留言版，客戶端若輸入</span>HTML<span style="font-family: Courier New,Courier,monospace;">，最基本的，你可能會過濾掉&lt;與&gt;，這在</span>Java中<span style="font-family: Courier New,Courier,monospace;">可以用Filter來達到目的，在 </span></small><small><big><a href="../ServletJSP/RequestWrapper.html"><small>請求包裹器</small></a></big> 中有個例子，將HTML的</small><small><span style="font-family: Courier New,Courier,monospace;">&lt;與&gt;換為實體名稱</span></small><small>。<br>
+      <br>
+如果你事先沒有過濾HTML，而這些留言進到了資料庫，你不想一個一個修正，或者你想保留使用者原有的留言，那另一個方式，就是在傳送至使用者瀏覽器前，
+將&lt;與&gt;等換為實體名稱或實體編號，最簡單的作法，就是使用JSTL核心標籤庫的&lt;c:out&gt;。例如：<br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%&gt;<br>&lt;%<br>    // 假設訊息來自資料庫<br>    request.setAttribute("message", <br>            "&lt;a href='http://openhome.cc'&gt;打廣告&lt;/a&gt;");<br>%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    留言：${message}<br>&lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br>
+      <small>這個JSP會呈現以下的結果：<br>
+      <img style="width: 354px; height: 87px;" alt="" src="images/Big5Unicode-3.png"><br>
+      <br>
+加上JSTL：<br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%&gt;<br><span style="font-weight: bold;">&lt;%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%&gt;</span><br>&lt;%<br>    // 假設訊息來自資料庫<br>    request.setAttribute("message", <br>            "&lt;a href='http://openhome.cc'&gt;打廣告&lt;/a&gt;");<br>%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    留言：<span style="font-weight: bold;">&lt;c:out value="${message}"/&gt;</span><br>&lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br>
+      <small>則會呈現以下的結果：<br>
+      <img style="width: 362px; height: 83px;" alt="" src="images/Big5Unicode-4.png"><br>
+      <br>
+觀看網頁原始碼，可以發現實體名稱的存在：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; "http://www.w3.org/TR/html4/loose.dtd"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;html&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;head&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/head&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;body&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; 留言：&amp;lt;a href=&amp;#039;http://openhome.cc&amp;#039;&amp;gt;打廣告&amp;lt;/a&amp;gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/body&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/html&gt;</small><br>
+      </div>
+
+      <br>
+      <small>這是因為JSTL的<span style="font-family: Courier New,Courier,monospace;">&lt;c:out&gt;，其escapeXML屬性預設為true</span>，會替換特定的XML字元，不過它並不會替換像「&#29319;」這類的字元，所以如果你的資料庫中撈出了「王大&#29319;」，設定為請求範圍<span style="font-family: Courier New,Courier,monospace;">name</span>屬性，並轉發至以下JSP網頁：<br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=<span style="font-weight: bold;">Big5</span>" pageEncoding="<span style="font-weight: bold;">Big5</span>"%&gt;<br>&lt;%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;meta http-equiv="Content-Type" content="text/html; charset=<span style="font-weight: bold;">Big5</span>"&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    留言：&lt;c:out value="${name}"/&gt;<br>&lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <small><br>
+這個網頁是Big5，無法直接顯示「&#29319;」，所以會出現以下的畫面：<br>
+      <img style="width: 364px; height: 77px;" alt="" src="images/Big5Unicode-5.png"><br>
+      <br>
+如果要解決這個問題，方法之一，就是設定請求範圍屬性前，先用</small><small><span style="font-family: Courier New,Courier,monospace;">StringEscapeUtils</span>的<span style="font-family: Courier New,Courier,monospace;">escapeHTML()替換為實體編號：<br>
+</span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">request.setAttribute("name", StringEscapeUtils.escapeHtml(name));</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">request.getRequestDispatcher("test.jsp").forward(request, response);</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><br>
+但這麼作之後，反而出現以下畫面：<br>
+      <img style="width: 372px; height: 77px;" alt="" src="images/Big5Unicode-6.png"><br>
+      <br>
+這是當然地，由於已經替換為實體編號了，就不需要再使用<span style="font-family: Courier New,Courier,monospace;">&lt;c:out&gt;</span>了，否則你的HTML會是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; "http://www.w3.org/TR/html4/loose.dtd"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;html&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;head&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/head&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;body&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; 留言：&amp;amp;#29579;&amp;amp;#22823;&amp;amp;&amp;#29319;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/body&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/html&gt; </span></small><br>
+      </div>
+      <small><br>
+將原本的JSP拿掉<span style="font-family: Courier New,Courier,monospace;">&lt;c:out&gt;</span>就正常了：<br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=Big5" pageEncoding="Big5"%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    留言：${name}<br>&lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <small><br>
+畫面如下：</small><br>
+      <img style="width: 370px; height: 82px;" alt="" src="images/Big5Unicode-7.png"><br>
+      <br>
+      <small>因為HTML原始碼現在是：</small><br>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" </span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; "http://www.w3.org/TR/html4/loose.dtd"&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;html&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;head&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/head&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;body&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; 留言：&amp;#29579;&amp;#22823;&amp;#29319;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/body&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/html&gt; </span></small><br>
+      </div>
+      <br>
+      <small>看到這邊，你會覺得，為何要這麼麻煩？現在不是鼓勵全部改用UTF-8嗎？為何要用Big5網頁自找麻煩？別忘了，有許多維護為主的公司，也許因為系統的歷史包袱，也許因為公司的組織分工，也許是其它的人事問題，舊系統不是你說改就改，即使是改個文字編碼也會困難重重。<br>
+      <br>
+有許多人常簡單地問，為什麼我的網頁出現亂碼？為什麼我的資料庫出現亂碼？為什麼我的XXX出現亂碼，老實說，很難回答這個問題，唯有了解系統中對於文字編碼的關鍵部份處理，才能解決問題，而這又有賴於你對編碼的了解，與所使用工作的熟悉度。<br>
+      <br>
+<br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/Big5Unicode.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:58 GMT -->
+</html>

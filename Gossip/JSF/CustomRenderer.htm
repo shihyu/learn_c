@@ -1,0 +1,400 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/CustomRenderer.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:21 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>自訂 Renderer</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">JSF Gossip:&nbsp;自訂 Renderer </a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+Component可以將解碼、編碼的動作交給Renderer，這讓您的表現層技術可以輕易的抽換，我們可以將之前的自訂元件的解碼、編碼動作移出至
+Renderer，不過由於我們之前設計的Component是個很簡單的元件，事實上，如果只是要新增一個Command在輸入欄位旁邊，我們並不需要
+大費周章的自訂一個新的元件，我們可以直接為輸入欄位更換一個自訂的Renderer。<br>
+
+      <br>
+
+
+要自訂一個Renderer，您要繼承javax.faces.render.Renderer，我們的自訂Renderer如下：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li> TextCmdRenderer.java</li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.IOException;<br>import java.util.Map;<br>import javax.faces.component.EditableValueHolder;<br>import javax.faces.component.UIComponent;<br>import javax.faces.component.UIInput;<br>import javax.faces.context.FacesContext;<br>import javax.faces.context.ResponseWriter;<br>import javax.faces.render.Renderer;<br><br>public class TextCmdRenderer extends Renderer {<br>    private static final String TEXT = ".text";<br>    private static final String CMD = ".cmd";<br>    <br>    public void encodeBegin(FacesContext context, <br>                 UIComponent component) throws IOException {<br>        ResponseWriter writer = context.getResponseWriter();<br>        String clientId = component.getClientId(context);<br>        <br>        encodeTextField(component, writer, clientId);<br>        encodeCommand(component, writer, clientId);<br>    }<br>    <br>    public void decode(FacesContext context, <br>                               UIComponent component) {<br>        Map reqParaMap = context.getExternalContext().<br>                                   getRequestParameterMap();<br>        String clientId = component.getClientId(context);<br>        <br>        String submittedValue = <br>                  (String) reqParaMap.get(clientId + TEXT);<br>        ((EditableValueHolder) component).setSubmittedValue(<br>                                             submittedValue);<br>        ((EditableValueHolder) component).setValid(true);<br>    }<br>    <br>    private void encodeTextField(UIComponent component, <br>                     ResponseWriter writer, String clientId)  <br>                                      throws IOException {<br>        writer.startElement("input", component);<br>        writer.writeAttribute("name", clientId + TEXT, null);<br>        <br>        Object value = ((UIInput) component).getValue();<br>        if(value != null) {<br>            writer.writeAttribute("value", <br>                         alue.toString(), null);<br>        }<br>        <br>        String size = <br>             (String) component.getAttributes().get("size");<br>        if(size != null) {<br>            writer.writeAttribute("size", size, null);   <br>        }<br>        <br>        writer.endElement("input");<br>    }<br>    <br>    private void encodeCommand(UIComponent component, <br>                        ResponseWriter writer,  <br>                        String clientId) throws IOException {<br>        writer.startElement("input", component);<br>        writer.writeAttribute("type", "submit", null);<br>        writer.writeAttribute("name", clientId + CMD, null);<br>        writer.writeAttribute("value", "submit", null);<br>        writer.endElement("input");<br>    }<br>}</pre>
+
+
+
+
+
+
+      <br>
+
+      <small>
+這個自訂的Renderer其解碼、編碼過程，與之前直接在Component中進行解碼或編碼過程是類似的，所不同的是在解碼與編碼的方法上，多了 UIComponent參數，代表所代理繪製的Component。<br>
+
+      <br>
+
+
+接下來在自訂Tag上，我們的TextWithCmdTag與之前主題所介紹的沒什麼差別，只不過在getComponentType()與 getRendererType()方法上要修改一下：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li> TextWithCmdTag.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.faces.application.Application;<br>import javax.faces.component.UIComponent;<br>import javax.faces.context.FacesContext;<br>import javax.faces.el.ValueBinding;<br>import javax.faces.webapp.UIComponentTag;<br><br>public class TextWithCmdTag extends UIComponentTag {<br>    private String size;<br>    private String value;<br>    <br>    public String getComponentType() {<br>        return "javax.faces.Input";<br>    }<br><br>    public String getRendererType() {<br>        return "onlyfun.caterpillar.TextCmd";<br>    }<br>    .....<br>}</pre>
+
+
+      <br>
+
+      <small>
+getComponentType()取得的是"javax.faces.Input"，它實際上對應至UIInput類別，而
+getRendererType()取回的是"onlyfun.caterpillar.TextCmd"，這會在faces-config.xml中定
+義，以對應至實際的Renderer類別</small>：<br>
+
+
+      
+      <ul>
+
+        <li> faces-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>....<br>&lt;faces-config&gt;<br>     &lt;render-kit&gt;<br>         &lt;renderer&gt;<br>             &lt;component-family&gt;<br>                 javax.faces.Input<br>             &lt;/component-family&gt;<br>             &lt;renderer-type&gt;<br>                 onlyfun.caterpillar.TextCmd<br>             &lt;/renderer-type&gt;<br>             &lt;renderer-class&gt;<br>                 onlyfun.caterpillar.TextCmdRenderer<br>             &lt;/renderer-class&gt;<br>         &lt;/renderer&gt;<br>     &lt;/render-kit&gt;<br> ....<br>&lt;/faces-config&gt;</pre>
+
+
+      <br>
+
+      <small>
+為Component定義一個Renderer，必須由component family與renderer
+type共同定義，這並不難理解，因為一個Component可以搭配不同的Renderer，但它是屬於同一個component
+family，例如UIInput就是屬於javax.faces.Input這個元件家族，而我們為它定義一個新的Renderer。<br>
+
+      <br>
+
+
+接下未完成的範例可以取之前主題介紹過的，我們雖然沒有自訂元件，但我們為UIInput置換了一個新的Renderer，這個Renderer會在輸入欄位上加入一個按鈕。<br>
+
+      <br>
+
+
+如果您堅持使用之前自訂的UITextWithCmd，則可以如下修改：</small>
+
+      <br>
+
+
+      
+      <ul>
+
+        <li> UITextWithCmd.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.faces.component.UIInput;<br><br>public class UITextWithCmd extends UIInput {<br>    public UITextWithCmd() {<br>        setRendererType("onlyfun.caterpillar.TextCmd");   <br>    }<br>}</pre>
+
+
+      <br>
+
+      <small>
+我們只是單純的繼承UIInput，然後使用setRendererType()設定"onlyfun.caterpillar.TextCmd"，但並沒有為元件加入什麼行為，看來什麼事都沒有作，但事實上這是因為繼承了UIInput，它為我們處理了大多數的細節。<br>
+
+      <br>
+
+
+接下來同樣的，設定自訂Tag：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li> TextWithCmdTag.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import javax.faces.application.Application;<br>import javax.faces.component.UIComponent;<br>import javax.faces.context.FacesContext;<br>import javax.faces.el.ValueBinding;<br>import javax.faces.webapp.UIComponentTag;<br><br>public class TextWithCmdTag extends UIComponentTag {<br>    private String size;<br>    private String value;<br>    <br>    public String getComponentType() {<br>        return "onlyfun.caterpillar.TextWithCmd";<br>    }<br><br>    public String getRendererType() {<br>        return "onlyfun.caterpillar.TextCmd";<br>    }<br>    .....<br>}</pre>
+
+
+      <br>
+
+      <small>
+要使用自訂的Component，記得要在faces-config.xml中再加入：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">&nbsp;....</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;component&gt;</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;component-type&gt;</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; onlyfun.caterpillar.TextWithCmd</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/component-type&gt;</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;component-class&gt;</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; onlyfun.caterpillar.UITextWithCmd</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/component-class&gt;</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/component&gt;</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;...</span><br style="font-weight: bold;">
+
+
+      </small></div>
+
+      <small>
+&nbsp;</small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/CustomRenderer.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:21 GMT -->
+</html>

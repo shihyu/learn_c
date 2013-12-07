@@ -1,0 +1,506 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/DragDrop.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:24:18 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>拖放功能（DragDrop）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: 拖放功能（DragDrop）</a></h1>
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>一個Widget元件是藉由setAcceptDrops()方法來設定是否接受拖放功能，拖放的動作是從按下滑鼠按鍵開始，我們產生一個QDragObject並指定拖曳內容，然後使用dragCopy()開始拖曳，QDragObject在拖曳結束之後會自動消滅：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">void mousePressEvent(QMouseEvent *e) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; if(e-&gt;button() == LeftButton) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(labeltype == Des) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QDragObject *drobj = 0; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(pixmap()) { // 如果有圖片 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 產生QDragObject </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; drobj = new QImageDrag(pixmap()-&gt;convertToImage(), this); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QPixmap pm; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 產生縮圖 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pm.convertFromImage( </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+pixmap()-&gt;convertToImage().smoothScale(25, 25)); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 拖曳時的顯示圖形與游標位移 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; drobj-&gt;setPixmap(pm, QPoint(-14, -20)); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else if(text()) { // 如果有文字 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; drobj = new QTextDrag(text(), this); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; drobj-&gt;setPixmap(QPixmap("text.gif"), QPoint(-25, -15)); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 開始拖放動作 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(drobj) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; drobj-&gt;dragCopy(); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">} </small><br>
+
+      </div>
+
+      <small><br>
+
+當物件被拖曳至目的地時，會發生dragEnterEvent()事件，我們使用canDecode()方法判斷物件是否可解析，然後使用accept()設定接收此物件：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">void dragEnterEvent(QDragEnterEvent *e) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; if(e-&gt;source() == this) return; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; if(labeltype == Des) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 如果可解析物件: 影像或文字 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(QImageDrag::canDecode(e) || QTextDrag::canDecode(e)) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e-&gt;accept(); // 接收拖放物件 </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; setBackgroundColor(Qt::white); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">} </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <br>
+
+      </div>
+
+      <small>拖曳至目的地後放開滑鼠按鍵會發生dropEvent()，我們使用QMimeSource接收物件，使用decode()解析物件，然後設定相對應的放置動作：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void dropEvent(QDropEvent *e) { </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; QString str; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; QPixmap pm; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; QMimeSource *drop = e; </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 解析物件 </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; if(QTextDrag::decode(drop, str)) </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; setText(str); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; else if(QImageDrag::decode(drop, pm)) </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; setPixmap(pm); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; setBackgroundColor(Qt::green); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">} </small><br>
+
+      </div>
+
+      <small><br>
+
+如果拖曳物件離開目的地，會發生dragLeaveEvent()，您可以設定一些還原動作，或不作任何事：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void dragLeaveEvent(QDragLeaveEvent *) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; setBackgroundColor(Qt::green); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+      </div>
+
+      <small><br>
+
+下面的程式碼是一個拖放功能的完整程式示範，您可以將圖片或文字拖放至最右邊的QLabel： <br>
+
+      </small>
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qhbox.h&gt;<br>#include &lt;qlabel.h&gt;<br>#include &lt;qdragobject.h&gt;<br>#include &lt;qclipboard.h&gt;<br>#include &lt;qdatetime.h&gt;<br><br>class DDLabel : public QLabel {<br>public:<br>    enum labelType {Sor, Des};<br><br>    DDLabel(QWidget *parent, int type) : QLabel(parent), labeltype(type) {<br>        setBackgroundColor(Qt::green);<br>        setAlignment(AlignCenter);<br>        setAcceptDrops(true); // 可接收Drop<br>    }<br><br>protected:<br>    void dragEnterEvent(QDragEnterEvent *e) {<br>        if(e-&gt;source() == this) return;<br><br>        if(labeltype == Des) {<br>            // 如果可解析物件: 影像或文字<br>            if(QImageDrag::canDecode(e) || QTextDrag::canDecode(e)) {<br>                e-&gt;accept(); // 接收拖放物件<br>                setBackgroundColor(Qt::white);<br>            }<br>        }<br>    }<br><br>    // 還原背景顏色<br>    void dragLeaveEvent(QDragLeaveEvent *) {<br>        setBackgroundColor(Qt::green);<br>    }<br><br>    void dropEvent(QDropEvent *e) {<br>        QString str;<br>        QPixmap pm;<br><br>        QMimeSource *drop = e;<br><br>        // 解析物件<br>        if(QTextDrag::decode(drop, str))<br>            setText(str);<br>        else if(QImageDrag::decode(drop, pm))<br>            setPixmap(pm);       <br><br>        setBackgroundColor(Qt::green);<br>    }<br><br>    void mousePressEvent(QMouseEvent *e) {<br>        if(e-&gt;button() == LeftButton) {<br>            if(labeltype == Des)<br>                return;<br><br>            QDragObject *drobj = 0;<br><br>            if(pixmap()) { // 如果有圖片<br>                // 產生QDragObject<br>                drobj = new QImageDrag(pixmap()-&gt;convertToImage(), this);<br><br>                QPixmap pm;<br>                // 產生縮圖<br>                pm.convertFromImage(<br>                   pixmap()-&gt;convertToImage().smoothScale(25, 25));<br>                // 拖曳時的顯示圖形與游標位移<br>                drobj-&gt;setPixmap(pm, QPoint(-14, -20));<br>            }<br>            else if(text()) { // 如果有文字<br>                drobj = new QTextDrag(text(), this);<br>                drobj-&gt;setPixmap(QPixmap("text.gif"), QPoint(-25, -15));<br>            }<br><br>            // ?#125;始拖放動作<br>            if(drobj)<br>                drobj-&gt;dragCopy();<br>        }<br>    }   <br><br>private:<br>    int labeltype;<br>};<br><br>int main(int argc, char **argv) {<br>    QApplication app(argc, argv);<br><br>    QHBox *hbox = new QHBox();<br>    hbox-&gt;setMargin(10);<br>    hbox-&gt;setSpacing(10);<br><br>    DDLabel *lab1 = new DDLabel(hbox, DDLabel::Sor);<br>    lab1-&gt;setText("Drag the Content\nto the rightest\nand drop it");<br><br>    DDLabel *lab2 = new DDLabel(hbox, DDLabel::Sor);<br>    lab2-&gt;setPixmap(QPixmap("logo.jpg"));<br><br>    DDLabel *lab3 = new DDLabel(hbox, DDLabel::Des);<br>    lab3-&gt;setText("Drop here");<br><br>    app.setMainWidget(hbox);<br>    hbox-&gt;show();<br><br>    return app.exec();<br>}  </pre>
+
+      <small><br>
+
+以下為執行時的結果畫面之一（拖曳圖片中）：<br>
+
+      <img style="width: 546px; height: 186px;" alt="" src="images/DragDrop-1.jpg"><br>
+
+      </small>
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/DragDrop.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:24:20 GMT -->
+</html>

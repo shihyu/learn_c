@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/TimerServiceABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:49 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>簡介 Timer 服務</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 簡介 Timer
+服務</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      <br>
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>EJB
+容器提供Timer服務，可適用於Stateless Session Bean、Message-Driven
+Bean，您可以取得Timer服務物件建立Timer，並於Bean上提供Timeout回呼，當指定的時間或間隔到時，就會呼叫Timeout回呼方
+法。<br>
+
+
+      <br>
+
+
+您可以從EJB容器的Timer服務建立的Timer主要有Single-action Timer與Interval
+Timer，前者為一次Timeout事件通知，後者會持續間隔的Timeout事件通知。</small><small>Single-action
+Timer與Interval Timer首次啟動時間各有兩種方式：絕對時間與相對時間。<br>
+
+
+      <br>
+
+
+所以共計會有</small><small>四種類型的Timer：<br>
+
+
+      </small>
+      
+      <ul>
+
+
+        <li><small>絕對時間的一次事件通知Timer</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>您可以指定一個絕
+對時間，當該時間到達,（expiration）時，會呼叫Timeout回呼方法一次，這可以呼叫TimerService的以下方法</small><small>來
+建立該</small><small>Timer</small>：<br>
+
+
+      
+      <div style="margin-left: 40px;"><small><a href="http://java.sun.com/javaee/5/docs/api/javax/ejb/TimerService.html#createTimer%28java.util.Date,%20java.io.Serializable%29">Timer
+createTimer(Date expiration, Serializable info)</a></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small></div>
+
+
+      
+      <ul>
+
+
+        <li><small>相對時間的一次事件通知</small><small>Timer</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>您可以指定一個相
+對於Timer建立的時間，當相對時間（duration）到達時，會呼叫Timeout回呼方法一次，</small><small>這
+可以呼叫TimerService的以下方法</small><small>來建立該</small><small>Timer</small>：<br>
+
+
+      
+      <div style="margin-left: 40px;"><small><a href="http://java.sun.com/javaee/5/docs/api/javax/ejb/TimerService.html#createTimer%28long,%20java.io.Serializable%29">Timer
+createTimer(long duration, Serializable info)&nbsp;</a></small><br>
+
+
+      </div>
+
+
+      </div>
+
+
+      
+      <ul>
+
+
+        <li><small>絕對時間的持續間隔通知</small><small>Timer</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>您可以指定一個開
+始的絕對時間（initialExpiration），當該時間到達時，會呼叫Timeout回呼方法，之後每間隔一段指定的時間
+（intervalDuration）就會呼叫Timeout回呼方法，</small><small>這可以呼叫
+TimerService的以下方法</small><small>來建立該</small><small>Timer</small>：<br>
+
+
+      
+      <div style="margin-left: 40px;"><a href="http://java.sun.com/javaee/5/docs/api/javax/ejb/TimerService.html#createTimer%28java.util.Date,%20long,%20java.io.Serializable%29"><small>Timer
+createTimer(Date initialExpiration, long intervalDuration, Serializable
+info)</small>&nbsp;</a><br>
+
+
+      </div>
+
+
+      </div>
+
+
+      
+      <ul>
+
+
+        <li><small>相對時間的持續間隔通知</small><small>Timer</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>您可以指定一個相
+對於Timer建立的時間（initialDuration），當相對時間到達時，</small><small>呼叫
+Timeout回呼方法，之後每間隔一段指定的時間（intervalDuration）就會呼叫Timeout回呼方法，</small><small>這
+可以呼叫TimerService的以下方法</small><small>來建立該</small><small>Timer</small>：<br>
+
+
+      
+      <div style="margin-left: 40px;"><a href="http://java.sun.com/javaee/5/docs/api/javax/ejb/TimerService.html#createTimer%28long,%20long,%20java.io.Serializable%29"><small>Timer
+createTimer(long initialDuration, long intervalDuration, Serializable
+info)</small></a></div>
+
+
+      </div>
+
+
+      <br>
+
+
+      <small>以上四個createTimer()最後一個Serializable參數，可以設定給Timer物件，
+Timeout回呼方法中必須接受Timer物件作為引數，您可以由其getInfo()方法取得傳入的Serializable物件，當多個Timer與Bean關聯時，必須辨識Timer事件是來自於哪個Timer，也可以藉由這個傳入的</small><small>Serializable物件辨識</small><small>。<br>
+      <br>
+Timer在伺服器關機之後收被永續保存，伺服器開機後重新發送事件，通知所有逾期的Timer，對於持續間隔通知型的Timer，可能只會收到一次通知。<br>
+
+
+      <br>
+
+
+您可以利用容器為您注入TimerService，或是使用EJBContext來取得TimerService，之後再使用TimerService建
+立Timer物件，下圖為使用TimerService與建立Timer的UML順序圖：<br>
+
+
+      <br>
+
+
+      </small><img style="width: 543px; height: 361px;" alt="" src="images/TimerServiceABC-1.jpg"> <small><br>
+
+
+      </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/TimerServiceABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+</html>

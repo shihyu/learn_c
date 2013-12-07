@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ChainofResponsibility.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:25 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Chain of Responsibility 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Chain of
+Responsibility 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>如果您有一個應用程式，必須對輸入的字元作不同的處理，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">char
+c = 'A';</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">if
+(Character.isLetter(c)) {</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp; &nbsp;System.out.println("處理字母資料");</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">if
+(Character.isDigit(c)) {</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"> &nbsp;
+&nbsp;System.out.println("處理數字資料");</span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">}</span></small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">
+System.out.println("處理符號資料");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </div>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-family: Courier New,Courier,monospace;">
+使用結構化的方式，用if..else來判斷是否應處理，雖然直覺，壞處是如果要調整處理方式，例如要增加或減少處理方式、調整處理順序等，都必須對程式
+作出修改。<br>
+      <br>
+您可以改為以下的方式：<br>
+      </small>
+      <pre>abstract class Handler {<br>    protected Handler next;<br>    Handler(Handler next) {<br>        this.next = next;<br>    }    <br>    void doNext(char c) {<br>        if(next != null) {<br>           next.handle(c);<br>        }<br>    }<br>    abstract void handle(char c);<br>}<br><br>class SymbolHandler extends Handler {<br>    SymbolHandler(Handler next) {<br>        super(next);<br>    }<br>    void handle(char c) {<br>        System.out.println("Symbol has been handled");<br>        doNext(c);<br>    }<br>}<br><br>class CharacterHandler extends Handler {<br>    CharacterHandler(Handler next) {<br>        super(next);<br>    }    <br>    void handle(char c) {<br>        if(Character.isLetter(c)) {<br>            System.out.println("Character has been handled"); <br>        }<br>        doNext(c);<br>    }<br>}<br><br>class DigitHandler extends Handler {<br>    DigitHandler(Handler next) {<br>        super(next);<br>    }    <br>    void handle(char c) { <br>       if(Character.isDigit(c)) {<br>            System.out.println("Digit has been handled"); <br>       }<br>       doNext(c);<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        Handler handler = new SymbolHandler(<br>                            new CharacterHandler(<br>                              new DigitHandler(null)));<br>        handler.handle('A');<br>        handler.handle('1');<br>    }<br>}</pre>
+      <small><br>
+在上例中，在每個特定處理器物件處理過後，可以決定是否交給下一個物件作處理（如果有的話），您可以自由設定下一個處理器，調整處理的順序等，而不用修改
+程式。<br>
+      <br>
+      </small><small>這
+是Chain of
+Responsibility模式的一個例子，多個物件都有機會處理請求，除了可以自由組合處理請求的物件之外，也可以避免請求的發送者與接收者之間的耦
+合關係，將這些物件組合為一個鏈，並沿著這個鏈傳遞該請求，每個都可以物件處理它，決定是否傳遞給下一個處理物件。<br>
+      <br>
+以下是使用Python示範：<br>
+      </small>
+      <pre>class Handler:<br>    def __init__(self, next):<br>        self.next = next;<br>    def doNext(self, c):<br>        if self.next:<br>            self.next.handle(c)<br><br>class SymbolHandler(Handler):<br>    def __init__(self, next):<br>        Handler.__init__(self, next)<br>        <br>    def handle(self, c):<br>        print("Symbol has been handled")<br>        self.doNext(c)<br><br>class CharacterHandler(Handler):<br>    def __init__(self, next):<br>        Handler.__init__(self, next)<br>        <br>    def handle(self, c):<br>        if c.isalpha():<br>            print("Character has been handled")<br>        self.doNext(c)        <br><br>class DigitHandler(Handler):<br>    def __init__(self, next):<br>        Handler.__init__(self, next)<br>        <br>    def handle(self, c):<br>        if c.isdigit():<br>            print("Digit has been handled")<br>        self.doNext(c)        <br><br>handler = SymbolHandler(CharacterHandler(DigitHandler(None)))<br>handler.handle('A')<br>handler.handle('1')</pre>
+      <small><br>
+      </small> <small>在組織物件之間的職責時，通常是從細粒度至粗粒度的方式來組織，從特殊到抽象化，就像程式中將數字視為字
+元的特殊化，字元又為符號的特殊化。 <br>
+      </small><small><br>
+      </small><small>Chain of Responsibility的 UML 結構圖如下所示： <br>
+      <img style="width: 426px; height: 186px;" alt="" src="images/ChainOfResponsibility-1.jpg"><br>
+      <br>
+      </small><small><br>
+      </small><small>從物件執行請求的時間來看，其運作是很簡單的職責傳遞而已，如下：<br>
+      <img style="width: 434px; height: 217px;" alt="" src="images/ChainOfResponsibility-2.jpg"><br>
+      </small><small><br>
+在更一般的情況下，可以將請求包裝為一個物件，並提供getType()之間的方法，以讓
+Chain of Responsibility中的物件進行比對，例如：</small> <br>
+      <ul>
+        <li>Request.java</li>
+      </ul>
+      <pre>abstract class Request{ <br>　　private String type; <br><br>    Request(String type) { this.type=type; }<br>    String getType() { return type; }<br><br>    abstract void execute();<br>} <br><br>abstract class Handler {<br>    protected Handler next;<br>    Handler(Handler next) {<br>        this.next = next;<br>    }    <br>    void doNext(Request request) {<br>        if(next != null) {<br>           next.handle(request);<br>        }<br>    }<br>    abstract void handle(Request request);<br>}<br><br>class ConcreteHandler extends Handler {<br>    ConcreteHandler(Handler next) {<br>        super(next);<br>    }<br>    void handle(Request request) {<br>        if(request.getType().equals("concrete")) {<br>            request.execute();<br>        }<br>        else {<br>            doNext(request);<br>        }<br>    }<br>}<br></pre>
+      <br>
+      <small>在Gof的書中所舉的例子為輔助說明系統，在一個介面中希望使用者一定可以得到相關的說明主題，如果子元件有說明的話，就顯示
+相關說明，否則的話就轉發給
+包括它的容器元件或父元件，以保證使用者的輔助說明請求一定可以得到回應。<br>
+      <br>
+      </small> </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/ChainofResponsibility.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:26 GMT -->
+</html>

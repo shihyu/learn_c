@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QProgressBar.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:36 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QProgressBar</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QProgressBar</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QProgressBar常用來顯示目前的工作進度，例如程式安裝、檔案複製、下載等，以下這個範例使用QTimer來模擬執行進度，並使用QProgressBar來顯示執行進度。<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>ProgressBar.h</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#ifndef PROGRESSBAR_H<br>#define PROGRESSBAR_H<br><br>#include &lt;QProgressBar&gt;<br><br>class ProgressBar : public QProgressBar {<br>    Q_OBJECT<br><br>public:<br>    ProgressBar(QWidget *parent=0) : QProgressBar(parent) {}<br><br>public slots:<br>    void stepOne();<br>    <br>};<br><br>#endif</pre>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+      <small>stepOne()每執行一次，會根據目前的進度加一，如果加到QProgressBar最大值，就從最小值重新開始：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li><small>ProgressBar.cpp</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include "ProgressBar.h"<br><br>void ProgressBar::stepOne() {<br>    if(this-&gt;value() + 1 &lt;= this-&gt;maximum()) {<br>        this-&gt;setValue(this-&gt;value() + 1); <br>    }<br>    else {<br>        this-&gt;setValue(this-&gt;minimum());<br>    }        <br>}</pre>
+
+      <span class="postbody"><br>
+
+      <small>程式中將使用QTimer的timerout()來連接stepOne()，每500毫秒進行一個進度：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li><small>main.cpp</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include "ProgressBar.h"<br><br>#include &lt;QApplication&gt;<br>#include &lt;QTimer&gt;<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br>    ProgressBar *progressBar = new ProgressBar;<br>    progressBar-&gt;setWindowTitle("QProgressBar");<br>    progressBar-&gt;resize(250, 20);<br>    <br>    progressBar-&gt;setMaximum(100);<br>    progressBar-&gt;setMinimum(0);<br>    progressBar-&gt;setValue(0);<br>    <br>    QTimer *timer = new QTimer;<br>    timer-&gt;start(500);<br>    <br>    QObject::connect(timer, SIGNAL(timeout()), progressBar, SLOT(stepOne()));<br>    <br>    progressBar-&gt;show();<br>    <br>    return app.exec();<br>}</pre>
+
+      <span class="postbody"><br>
+
+      <small>執行結果畫面如下所示：<br>
+
+      <br>
+
+      <img style="width: 266px; height: 58px;" alt="" src="images/QProgressBar-1.jpg"><br>
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QProgressBar.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:36 GMT -->
+</html>

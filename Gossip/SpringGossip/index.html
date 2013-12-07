@@ -1,0 +1,4098 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/ by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:01:57 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="Spring, IoC, AOP, Aspect, Lightweight" name="keywords">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>Spring 學習筆記</title></head>
+<body>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<div style="text-align: center;">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 15;
+google_ad_format = "728x15_0ads_al";
+google_ad_channel = "";
+google_color_border = "FFFFFF";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1>開源框架: Spring Gossip</h1>
+
+
+
+
+
+
+
+<img style="width: 101px; height: 73px; float: left;" alt="春天來了？。。。" title="春天來了？。。。" src="images/bee.jpg"><a href="http://springframework.org/">Spring</a>&nbsp;
+是由 Rod Johnson 撰寫，並在其著作 Expert One-on-One: J2EE Design and Development
+中有提到過，它是個輕量級（Lightweight）容器（Container）、實現 IoC（Inversion of
+Control）、AOP（Aspect-oriented
+programming）概念，是一個全方位的應用程式（Application）框架（Framework），可協助建立以往在 EJB
+下才有可能建立的一些應用程式。<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+這邊的文件將以我之前曾寫過的 <a href="http://www.javaworld.com.tw/confluence/display/opensrc/Spring">文
+件</a> 為基礎，並在 Spring 1.2.5 的基礎上撰寫範例以作重新整理的動作。<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<spring:bind><spring:message><spring:transform></spring:transform></spring:message></spring:bind>
+<table style="text-align: left; width: 965px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 695px; vertical-align: top;">
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>認識 Spring</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp; 來認識
+Spring
+的一些特性，並初步了解一下什麼叫作 IoC？什麼叫作 DI？ </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small><a href="SpringABC.html">簡介
+Spring</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="IOC.html">Inversion
+of Control</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="DI.html">Dependency
+Injection</a></small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>核心容器</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp; Spring
+核心容器實作了
+IoC，BeanFactory 與 ApplicationContext 的運用是了解 Spring 的重點所在。 </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>管理 Bean&nbsp;</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>從第一個
+Spring
+應用程式開始，逐步了解何謂依賴注入，以及如何使用 Spring 的容器功能來管理 Bean，了解 Bean 在 Spring 容器中的生命週期。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><small><a href="FirstSpring.html">第
+一個 Spring 程式</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="BeanFactoryApplicationContext.html">BeanFactory、
+ApplicationContext</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="Type2Type3.html">Type
+2 IoC、Type 3
+IoC</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="RefBean.html">屬性參
+考</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="AutoWiring.html">自
+動綁定</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="CollectionInjection.html">集
+合物件注入</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="BeanLifeCycle.html">Bean
+的生命週期</a></small></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>Bean 進階管理</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>理想上對於
+Bean 來說，它不需要意識到
+Spring 容器的存在，然而有時候 Bean 仍必須知道有關於 Spring 容器或自己的一些訊息，而另一方面，您可能必須讓容器對 Bean
+進行一些額外處理。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><small><a href="BeanDefWithoutXML.html">不
+使用XML定義檔進行
+Bean設置</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="AwareInterface.html">Aware
+相關介面</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="BeanPostProcessor.html">BeanPostProcessor</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="BeanFactoryPostProcessor.html">BeanFactoryPostProcessor</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="PropertyPlaceholderConfigurer.html">PropertyPlaceholderConfigurer</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="PropertyOverrideConfigurer.html">PropertyOverrideConfigurer</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="CustomEditorConfigurer.html">CustomEditorConfigurer</a></small></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>訊息與事件</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>ApplicationContext
+除了具備如
+BeanFactory 基本的容器管理功能之外，並支援更多應用程式框架的特性，像是資源的取得、訊息解析、事件的處理與傳播。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><small><a href="Resource.html">Resource
+的取得</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="MessageResource.html">解
+析文字訊息</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="ApplicationListener.html">傾
+聽事件</a></small></li>
+
+
+
+
+
+
+
+          <li><small><a href="PublishEvent.html">事
+件傳播</a></small></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>AOP（Aspect-Oriented Programming）</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+在一個服務的流程中插入與服務無關的邏輯（例如Logging、Security），這樣的邏輯稱為 Cross-cutting
+concerns，將 Crossing-cutting concerns 獨立出來為一個物件，這樣的特殊物件稱之為
+Aspect，Aspect-oriented programming 著重在 Aspect 的設計及與應用程式的縫合（Weave）。<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>AOP 入門</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>AOP
+的觀念與術語都不是很直覺，可以先從代理機制（Spring 實現 AOP 的一種方式）來看看實際的例子，從而了解 AOP 的觀念與各種術語。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="FromProxyToAOP.html"><small>從
+代理機制初探 AOP</small></a></li>
+
+
+
+
+
+
+
+          <li><small><a href="DynamicProxy.html">動
+態代理</a><br>
+
+
+
+
+
+
+
+            </small></li>
+
+
+
+
+
+
+
+          <li><a href="AOPConcept.html"><small>AOP
+觀念與術語</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="SpringAOP.html"><small>Spring
+AOP</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>Advices</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Advices
+包括了Aspect
+的真正邏輯，由於縫合至Targets的時機不同，Spring 提供了幾種不同的 Advices。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="BeforeAdvice.html"><small>Before
+Advice</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="AfterAdvice.html"><small>After
+Advice</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="AroundAdvice.html"><small>Around
+Advice</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ThrowAdvice.html"><small>Throw
+Advice</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+        <li><small>Pointcut、Advisor</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Pointcut
+定義了 Advice
+的應用時機，在 Spring 中，使用 PointcutAdvisor 將 Pointcut 與 Advice 結合成為一個物件，Spring
+中大部分內建的 Pointcut
+都有對應的 PointcutAdvisor。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="NameMatchMethodPointcutAdvisor.html"><small>NameMatchMethodPointcutAdvisor</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="RegExpMethodPointcutAdvisor.html"><small>RegExpMethodPointcutAdvisor</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ControlFlowPointcut.html"><small>ControlFlowPointcut</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="Pointcut.html"><small>Pointcut
+介面</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="PointcutCU.html"><small>Pointcut
+交集、聯集操作</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>Introduction</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>為特殊的
+Advice，它影響的不是方法的流程，而是影響整個物件的行為，為物件動態 mixin 職責。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="IntroductionInterceptor.html"><small>IntroductionInterceptor</small></a></li>
+
+
+
+
+
+
+
+          <li><small><a href="DelegatingIntroductionInterceptor.html">DelegatingIntroductionInterceptor</a>
+            </small></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+        <li><small>Autoproxing</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>自動代理可以讓您
+不用為每一個要被 Advised 的
+Target 手動定義代理物件，透過 Bean 名稱或是 Pointcut 的比對，自動為符合的 Target 建立代理物件。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="BeanNameAutoProxyCreator.html"><small>BeanNameAutoProxyCreator</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="DefaultAdvisorAutoProxyCreator.html"><small>DefaultAdvisorAutoProxyCreator</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>持久層</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp; 來看看
+Spring 的 IoC 容器與 AOP
+框架如何應用於持久層，包括了資料庫、交易等相關議題。 </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>資料庫存取</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring
+提供了 DAO
+框架，讓應用程式開發時無須耦合於特定資料庫技術。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="SpringDAO.html"><small>Spring
+的 DAO 支持</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="DataSource.html"><small>DataSource
+注入</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ReplaceDataSource.html"><small>DataSource
+置換</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+        <li><small>JDBC 支援</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring
+在 JDBC
+的使用上提供了幾個類別，讓您可以簡化 JDBC 在使用時的流程。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="UseJdbcTemplate.html"><small>使
+用 JdbcTemplate</small></a></li>
+
+
+
+
+
+
+
+          <li><small><a href="JdbcTemplateExecuteUpdate.html">JdbcTemplate 執行與更新</a><br>
+
+
+
+
+
+
+
+            </small></li>
+
+
+
+
+
+
+
+          <li><a href="JdbcTemplateQuery.html"><small>JdbcTemplate
+- 查詢</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ObjectCRUD.html"><small>以
+物件方式進行操作</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="DataFieldMaxValueIncrementer.html"><small>DataFieldMaxValueIncrementer</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>交易管理</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring
+提供編程式的交易管理（Programmatic transaction management）與宣告式的交易管理（Declarative
+transaction management），為不同的交易實作提供了一致的編程模型。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="SpringTransaction.html"><small>Spring
+對交易的支援</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="JDBCProgrammaticTransaction.html"><small>JDBC
+編程式交易管理</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="JDBCDeclarativeTransaction.html"><small>JDBC
+宣告式交易管理</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="TransactionAttribute.html"><small>交
+易的屬性介紹</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="TransactionAttributeSource.html"><small>TransactionAttributeSource、
+TransactionAttribute</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>Hibernate 支援</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring
+整合了對 Hibernate
+的設定，並提供有 HibernateTemplate 等類別，讓您在結合 Hibernate 時可以簡化使用上的流程。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="FirstHibernate.html"><small>第
+一個 Hibernate 程式</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="SessionFactoryInjection.html"><small>SessionFactory
+注入</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HibernateTemplate.html"><small>HibernateTemplate</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="HibernateProgramaticTransaction.html"><small>Hibernate
+編程交易管理</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HibernateDeclarativeTransaction.html"><small>Hibernate
+宣告式交易管理</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>Web 層</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp; Spring
+提供了 MVC Web 框架，您可以善用
+IoC 容器在依賴注入上的好處，另一方面，Spring 也致力於與其它的 Web 框架的整合。 </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>Spring MVC 入門</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>從一個最簡單的
+Spring Web
+應用程式，來看看 Spring &nbsp;MVC 框架的架構與 API 組成元素。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="FirstSpringMVC.html"><small>第
+一個 Spring MVC 程式</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="WebApplicationContext.html"><small>WebApplicationContext</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HandlerMapping.html"><small>Handler
+Mapping</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HandlerInterceptor.html"><small>Handler
+Interceptor</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="Controller.html"><small>Controller
+繼承架構</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ModelAndView.html"><small>ModelAndView</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ViewResolver.html"><small>View
+Resolver</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ExceptionResolver.html"><small>Exception
+Resolver</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>使用 Controller 相關類別</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>與其它 Web
+框架的 Action
+物件不同的是，Spring 提供了豐富的 Controller 相關類別，讓您可以依需求來製作自己所需的 Controller 物件。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="AbstractController.html"><small>AbstractController</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="MultiActionController1.html"><small>MultiActionController
+與 ParameterMethodNameResolver</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="MultiActionController2.html"><small>MultiActionController
+與 PropertiesMethodNameResolver</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ParameterizableViewController.html"><small>ParameterizableViewController</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="AbstractCommandController.html"><small>AbstractCommandController</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="AbstractFormController.html"><small>AbstractFormController</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="SimpleFormController.html"><small>SimpleFormController</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="AbstractWizardFormController.html"><small>AbstractWizardFormController</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ThrowawayController.html"><small>ThrowawayController</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+        <li><small>搭配 Controller 的類別</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>介紹如何在
+Controller上搭配使用驗證器（Validator）、如何實作Command資料的型態轉換，以及如何使用Spring的相關API來實作檔案
+上傳的功能。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="Validator.html"><small><span class="Topic">實作
+Validator</span></small></a></li>
+
+
+
+
+
+
+
+          <li><a href="PropertyEditor.html"><small><span class="Topic">使用
+PropertyEditor</span></small></a></li>
+
+
+
+
+
+
+
+          <li><small><span class="Topic"><a href="FileUpload.html">檔案上傳</a><br>
+
+
+
+
+
+
+
+            </span></small></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>View層方案、Web框架整合</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+當使用JSP作為View層技術時，您可以結合JSTL以及Spring提供的標籤，而除了JSP技術作為View層之外，Spring還提供了不同
+View層技術的解決方案，您甚至可以定義自己的View層技術實現。</small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>JSP View 層</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>當使用 JSP
+作為 View 層技術時，您可以結合
+JSTL 以及 Spring 提供的標籤。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><small><a href="JSTL.html">結合
+JSTL</a><span class="Topic"></span></small></li>
+
+
+
+
+
+
+
+          <li><a href="SpringBind.html"><small><span class="Topic">&lt;spring:bind&gt;
+標籤</span></small></a></li>
+
+
+
+
+
+
+
+          <li><a href="Bind.html"><small>數據綁定的幾
+個方法</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="SpringMessage.html"><small>&lt;spring:message&gt;
+標籤</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="SpringTransform.html"><small>&lt;spring:transform&gt;
+標籤</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>其它 View 層</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>除了 JSP
+View
+層技術之外，您還可以使用其它的 View 層技術，或建立自己的 View Class。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="TilesExample.html"><small>以
+Tiles 為例</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="ViewClass.html"><small>自
+訂 View Class</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>與其它 Web 框架的整合</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>您可以將
+Spring 與現在的一些 Web
+框架結合在一起，重點都在於如何讓 Web 框架意識到 Spring 的存在。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="FirstStruts.html"><small>第
+一個 Struts 程式</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="StrutsSpring.html"><small>在
+Struts 中整合 Spring</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="FirstJSF.html"><small>第一
+個 JSF 程式</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="JSFSpring.html"><small>在
+JSF 中整合 Spring</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>其它</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+Spring&nbsp;提供了簡化且一致的方式，讓您在使用一些 API 或服務時更加簡單。 </small>
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small>遠程（Remoting）</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring
+提供了一致的使用方式，即使所採用的遠程服務技術不儘相同，在 Spring 中運用它們的方式卻是一致的。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="RMI.html"><small>RMI</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HessianBurlap.html"><small>Hessian、
+Burlap</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HttpInvoker.html"><small>Http
+Invoker</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+        <li><small>Java Message Service</small></li>
+
+
+
+
+
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring 使用 JmsTemplate 簡化了 JMS 的開發過程。</small></div>
+
+
+
+
+
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+          <li><a href="MessageConcept.html"><small>訊息（Message）觀念</small></a></li>
+
+
+
+
+
+          <li><a href="JavaMessageService.html"><small>簡介 Java Message Service</small></a></li>
+
+
+
+
+
+          <li><small><a href="JmsTemplate.html">使用 JmsTemplate</a><br>
+
+
+
+
+
+            </small></li>
+
+
+
+
+
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+        <li><small>郵件</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>對於郵件發送服務
+的支援是由Spring的
+org.springframework.mail.MailSender介面所定義，它有兩個實作類別，
+org.springframework.mail.cos.CosMailSenderImpl與
+org.springframework.mail.javamail.JavaMailSenderImpl。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="SimpleMail.html"><small>簡
+單郵件</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="HTMLMail.html"><small>HTML
+郵件</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="AttachedFileMail.html"><small>內
+嵌圖片或附檔</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+        <li><small>排程</small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>Spring則對
+java.util.Timer提供了抽象封裝，讓您可以善用Spring的容器管理功能，而Spring對Quartz進行了封裝，讓它在使用上更加方
+便。</small></div>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        <ul>
+
+
+
+
+
+
+
+          <li><a href="UseTimerTask.html"><small>使
+用 TimerTask</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="MethodInvokingTimerTaskFactoryBean.html"><small>使
+用 MethodInvokingTimerTaskFactoryBean</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="UseQuartz.html"><small>使
+用 Quartz</small></a></li>
+
+
+
+
+
+
+
+          <li><a href="MethodInvokingJobDetailFactoryBean.html"><small>使
+用 MethodInvokingJobDetailFactoryBean</small></a></li>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      <small><br><br></small><dl><dt><small>Acegi 入門</small></dt><dd><small>
+
+為</small>&nbsp;<small>Spring&nbsp;
+所設計的安全框架（Security Framework），在不撰寫任何一行程式碼的情況下，讓您為應用程式加入安全性。</small></dd></dl>
+
+      <ul><li><small>從實例了解</small></li></ul>
+
+      <ul><ul><li><small><a href="../AcegiGossip/FirstAcegConfig.html">第
+一個Acegi 程式 -
+設定文件</a></small></li><li><small><a href="../AcegiGossip/FirstAcegPage.html">第
+一個Acegi 程式 -
+表單網頁</a></small></li><li><small><a href="../AcegiGossip/FirstAcegLogoutCookies.html">第一個
+Acegi 程式 -&nbsp;登出、自動Cookies登入</a></small></li><li><small><a href="../AcegiGossip/FirstAcegiFromDB.html">第
+一個Acegi 程式
+- 改用資料庫作為驗證來源</a></small></li><li><small><a href="../AcegiGossip/FirstAcegiUserCache.html">第
+一個Acegi
+程式 - 使用User Cache</a></small></li><li><small><a href="../AcegiGossip/FirstAcegLogoutMethod.html">第
+一個Acegi
+程式 - 保護對方法的呼叫</a></small></li></ul><li><small>架構</small></li><ul><li><small><a href="../AcegiGossip/AcegiComponent.html">Acegi
+元件</a></small></li><li><small><a href="../AcegiGossip/AcegiArchitecture.html">Acegi
+架構</a></small></li><li><small><a href="../AcegiGossip/AcegiAPF.html">Authentication
+Processing Filter&nbsp;的運作</a></small></li></ul></ul><br><br>
+      
+      
+      
+      
+      
+      
+      <dl>
+
+
+
+
+
+
+
+        <dt><small>參考資料</small></dt>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </dl>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small><a href="http://www.martinfowler.com/articles/injection.html">Inversion
+of Control Containers and the Dependency Injection pattern</a></small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li><small><a href="../../../www.objectmentor.com/resources/articles/dip.pdf">The
+Dependency Inversion Principle</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="http://javaboutique.internet.com/tutorials/spring_frame/">The
+Spring Framework</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="http://www.springframework.org/docs/MVC-step-by-step/Spring-MVC-step-by-step.html">Developing
+a Spring Framework MVC application step-by-step</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="http://www.theserverside.com/articles/article.tss?l=SpringFramework">Introducing
+the Spring Framework</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="http://tools.devchannel.org/devtoolschannel/04/04/15/1457223.shtml?tid=25&amp;tid=46&amp;tid=56">Aspect-oriented
+programming with the Spring framework</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="http://www.cjsdn.net/post/view?bid=20&amp;id=100439&amp;sty=1&amp;tpg=1&amp;age=0">A
+tutorial for Spring Web</a></small></li>
+
+
+
+
+
+
+
+        <li><small><a href="http://www.xiaxin.net/Spring_Dev_Guide.rar">Spring
+開發指南</a></small></li><li><small><a href="http://www-128.ibm.com/developerworks/java/library/j-acegi1/index.html">Securing
+Java applications with Acegi, Part 1: Architectural overview and
+security filters</a></small></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <div align="center"> 
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+<!--
+<script language="JavaScript" src="../js/home.js"></script>
+<script language="JavaScript" src="../js/montage.js"></script>
+<script language="JavaScript">
+monTimeout = 10000;var urls = new Array();
+var imgs = new Array();
+var caps = new Array();
+urls[0] = "http://www.sunelearning.com.tw/index.jsp?src=T";
+imgs[0] = "../images/elearning-600-160.gif";
+caps[0] = "Sun 數位學院暑期特惠";
+urls[1] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4526&l=zh_TW";
+imgs[1] = "../images/sun_summer_160x600banner.jpg";
+caps[1] = "Sun 訓練中心暑期促銷";
+urls[2] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4521&l=zh_TW";
+imgs[2] = "../images/DL_banner_160X600.jpg";
+caps[2] = "2008 JCD 線上講座"; montage( urls, imgs, caps, 160, 600, monTimeout);
+</script>--></div>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+<!-- adsense for content-->
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><!-- adsense for content end-->
+      <br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       </center>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/ by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:02:43 GMT -->
+</html>

@@ -1,0 +1,936 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/Map.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:40 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>Map</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;Map</a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+關於Map的特性，請參考 <a href="../JavaGossip-V2/HashMap.htm">HashMap</a>、<a href="../JavaGossip-V2/TreeMap.htm">TreeMap</a>
+這兩篇文件。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+Map的特性是key/value對，容器中的每一個物件都有一個key與之對應，所以將Map集合的資料儲存至資料庫時，必須一同儲存它的key資訊。<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+假設您設計了以下的類別：</small>
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li>User.java</li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.Map;<br><br>public class User {<br>    private Long id;<br>    private String name;<br>    <span style="font-weight: bold;">private Map items;</span><br><br>    // 必須要有一個預設的建構方法<br>    // 以使得Hibernate可以使用Constructor.newInstance()建立物件<br>    public User() {}<br><br>    public Long getId() {<br>        return id;<br>    }<br><br>    public void setId(Long id) {<br>        this.id = id;<br>    }<br><br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br><br>    public Map getItems() {<br>        return items;<br>    }<br><br>    public void setItems(Map items) {<br>        this.items = items;<br>    }<br><br>    public void addItem(String name, String description) {<br>        items.put(name, description);<br>    }<br> <br>    public void removeItem(String name) {<br>        items.remove(name);<br>    }<br>}</pre>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      <small>
+您可以建立以下的表格來分別儲存user資訊與當中的items資訊：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">create table item (<br>
+
+
+
+&nbsp;&nbsp;&nbsp; id bigint not null,<br>
+
+
+
+&nbsp;&nbsp;&nbsp; description varchar(255),<br>
+
+
+
+&nbsp;&nbsp;&nbsp; name varchar(255) not null,<br>
+
+
+
+&nbsp;&nbsp;&nbsp; primary key (id, name)<br>
+
+
+
+)<br>
+
+
+
+      <br>
+
+
+
+create table user (<br>
+
+
+
+&nbsp;&nbsp;&nbsp; id bigint not null auto_increment,<br>
+
+
+
+&nbsp;&nbsp;&nbsp; name varchar(255),<br>
+
+
+
+&nbsp;&nbsp;&nbsp; primary key (id)<br>
+
+
+
+)<br>
+
+
+
+      <br>
+
+
+
+alter table item <br>
+
+
+
+&nbsp;&nbsp;&nbsp; add index&nbsp;id (id), <br>
+
+
+
+&nbsp;&nbsp;&nbsp; add constraint&nbsp;id <br>
+
+
+
+&nbsp;&nbsp;&nbsp; foreign key (id) <br>
+
+
+
+&nbsp;&nbsp;&nbsp; references user (id)</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br>
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+在映射文件方面，使用&lt;map&gt;標籤來定義Map的映射，如下：</small><br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br>    &lt;class name="onlyfun.caterpillar.User" table="user"&gt; <br><br>        &lt;id name="id" column="id"&gt; <br>            &lt;generator class="native"/&gt; <br>        &lt;/id&gt; <br><br>        &lt;property name="name" column="name"/&gt; <br> <br><span style="font-weight: bold;">        &lt;map name="items" table="item"&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;key column="id" foreign-key="id"/&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;map-key column="name" type="string"/&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;element column="description" type="string"/&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;/map&gt; </span><br> <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      <small>
+假設您使用以下的程式片段來儲存User實例：<br>
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user1 = new User();<br>
+
+
+
+
+
+
+
+user1.setItems(new HashMap());<br style="font-weight: bold;">
+
+
+
+
+
+
+
+user1.setName("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user1.addItem("Book",
+"Java Gossip");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user1.addItem("DC",
+"Caxxx A80");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user2 = new User();<br>
+
+
+
+
+
+
+
+user2.setItems(new HashMap());</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user2.setName("momor");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">user2.addItem("Doll",
+"Snoppy world");&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = HibernateUtil.getSessionFactory().openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Transaction
+tx = session.beginTransaction();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.save(user2);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">tx.commit();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br>
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+則資料庫中將儲存以下的資訊：</small><span class="postbody"></span><br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">mysql&gt; select *
+from user;<br>
+
+
+
+
+
+
+
++----+--------------+<br>
+
+
+
+
+
+
+
+| id &nbsp;&nbsp; | name&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+
+
+
+
+
+
+
++----+--------------+<br>
+
+
+
+
+
+
+
+|&nbsp; 1 &nbsp;&nbsp; | caterpillar&nbsp; |<br>
+
+
+
+
+
+
+
+|&nbsp; 2 &nbsp; &nbsp;|
+momor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+
+
+
+
+
+
+
++----+--------------+<br>
+
+
+
+
+
+
+
+2 rows in set (0.00 sec)<br>
+
+
+
+
+
+
+
+            <br>
+
+
+
+
+
+
+
+mysql&gt; select * from item;<br>
+
+
+
+
+
+
+
++----+--------+-------------------+<br>
+
+
+
+
+
+
+
+| id &nbsp;&nbsp; | name&nbsp; | description&nbsp;
+&nbsp; &nbsp; |<br>
+
+
+
+
+
+
+
++----+--------+-------------------+<br>
+
+
+
+
+
+
+
+|&nbsp; 1 &nbsp;&nbsp; | DC&nbsp; &nbsp;&nbsp;
+| Caxxx A80 &nbsp; &nbsp;&nbsp; &nbsp; |<br>
+
+
+
+
+
+
+
+|&nbsp; 1 &nbsp; &nbsp;| Book | Java Gossip &nbsp;
+&nbsp; |<br>
+
+
+
+
+
+
+
+|&nbsp; 2 &nbsp; &nbsp;| Doll &nbsp; | Snoppy world |<br>
+
+
+
+
+
+
+
++----+-------+-------------------+<br>
+
+
+
+
+
+
+
+3 rows in set (0.00 sec)</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/Map.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:40 GMT -->
+</html>

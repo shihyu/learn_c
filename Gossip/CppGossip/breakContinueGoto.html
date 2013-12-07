@@ -1,0 +1,488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/breakContinueGoto.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:07 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>break、continue、goto</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index.html">C++ Gossip:
+break、goto、continue</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;">
+      <small>
+break可以離開目前switch、for、while、do
+while的區塊，並前進至區塊後下一個陳述句，在switch中主要用來結束陳述句進行至下一個case的比對，在for、while與do
+while中，主要用於中斷目前的迴圈執行，如果break出現並不是內含在for、while迴圈中或switch陳述中，則會發生編譯錯誤，
+break的例子我們之前看過不少，這邊不再舉例。 <br>
+
+
+
+      <br>
+
+
+
+
+continue的作用與break類似，主要使用於迴圈，所不同的是break會結束區塊的執行，而continue只會結束接下來區塊中的陳述句，並
+跳回迴圈區塊的開頭繼續下一個迴圈，而不是離開迴圈，例如：<br>
+
+
+
+      </small>
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">for(int
+i = 1; i &lt; 10; i++) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; if(i == 5) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; break; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; cout &lt;&lt; "i = " &lt;&lt; i
+&lt;&lt; endl; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+這段程式會顯示i = 1到4，因為當 i 等於5時就會執行break而離開迴圈，再看下面這個程式： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">for(int
+i = 1; i &lt; 10; i++) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; if(i == 5) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; continue; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; cout &lt;&lt; "i = " &lt;&lt; i
+&lt;&lt; endl; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+      <br>
+
+
+
+
+這段程式會顯示1到4，與6到9，當 i
+等於5時，會執行continue直接結束此次迴圈，這次迴圈cout該行並沒有被執行，然後從區塊開頭頭執行下一次迴圈，所以5並沒有被顯示。 <br>
+
+
+
+      <br>
+
+
+
+
+goto是一個很方便，但是最不被建議使用的語法，濫用它的話會破壞程式的架構、使得程式的邏輯難以trace，事實上，在完全不使用goto的情況下，
+您也可以使用結構化的語法來撰寫程式。<br>
+
+
+
+      <br>
+
+
+
+
+goto可以在程式中任意跳躍，跳躍前必須先設定好目的地，跳躍時必須指定目的地，例如： <br>
+
+
+
+      </small>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">start:
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">....
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">....
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">goto
+start;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+其中start就是goto目的地的一個標籤（Label），後面使用冒號，標籤可以出現在程式的任一個地方。 <br>
+
+
+
+      <br>
+
+
+
+
+一個簡單的例子是這樣的：</small>
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() { <br>    int input = 0; <br><br>begin: <br><br>    cout &lt;&lt; "輸入一數："; <br>    cin &gt;&gt; input; <br><br>    if(input == 0) <br>        goto error; <br><br>    cout &lt;&lt; "100 / " &lt;&lt; input <br>         &lt;&lt; " = " &lt;&lt; static_cast&lt;double&gt;(100) / input <br>         &lt;&lt; endl; <br><br>    return 0; <br><br>error: <br>    cout &lt;&lt; "除數不可為0" &lt;&lt; endl; <br>    goto begin;<br>}</pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+執行結果：</small><br>
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">輸入一數：0<br>
+
+
+
+
+除數不可為 0<br>
+
+
+
+
+輸入一數：10<br>
+
+
+
+
+100 / 10 = 10</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+
+
+
+      <small>
+如果您輸入0，則程式會跳至error標籤然後顯示錯誤訊息，並重新跳至begin標籤，然後再執行一次提示與輸入，想想看就知道了，多跳個幾次之後，這
+個程式的邏輯馬上會讓您變得混亂不堪。 <br>
+
+
+
+      <br>
+
+
+
+
+這個程式還是這麼寫好一些： </small>
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() { <br>    int input = 0; <br><br>    while(true) { <br>        cout &lt;&lt; "輸入一數："; <br>        cin &gt;&gt; input; <br><br>        if(input != 0) { <br>            cout &lt;&lt; "100 / " <br>                 &lt;&lt; input <br>                 &lt;&lt; " = " <br>                 &lt;&lt; static_cast&lt;double&gt;(100) / input <br>                 &lt;&lt; endl; <br> <br>            break; <br>        } <br>        cout &lt;&lt; "除數不可為0"; <br>    } <br> <br>    return 0; <br>}<br></pre>
+
+
+
+
+      <br>
+
+
+
+      <small>
+總之，最好先忘了goto的存在，多培養結構化程式設計的思考，習慣養成之後就不會再想要用到goto了。 </small></td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+      <br>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/breakContinueGoto.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:07 GMT -->
+</html>

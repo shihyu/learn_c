@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/BuildAjaxLibrary-2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:19 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript" src="js/gossip-0.5.js"></script>
+        <script type="text/javascript">
+            XD.bind(window, 'load', function() {
+                XD('#category').change(function() {
+                    XD.get('XML-1.php', {category : this.value}, function(responseXML) {
+                        var select = XD('<select>')[0];
+                        var options = responseXML.getElementsByTagName('option');
+                        XD.each(options, function(option) {
+                            var value = option.getAttribute('value');
+                            var text = option.firstChild.nodeValue;
+                            if(navigator.userAgent.indexOf('MSIE') === -1) {
+                                select.add(new Option(text, value), 
+                                    select.options[select.options.length]);
+                            }
+                            else {
+                                select.add(new Option(text, value),
+                                    select.options.length);
+                            }
+                        });
+                        XD('#book').removeChilds().append(select);                 
+                    }, 'xml');
+                });
+            });
+        </script>        
+    </head>
+    <body>
+        圖書：<br>
+        <select id="category">
+            <option>-- 選擇分類 --</option>
+            <option value="theory">理論基礎</option>
+            <option value="language">程式語言</option>
+            <option value="web">網頁技術</option>
+        </select><br><br>
+        採購：<div id="book"></div>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/BuildAjaxLibrary-2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:20 GMT -->
+</html>

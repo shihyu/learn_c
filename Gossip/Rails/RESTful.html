@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/RESTful.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:57 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>RESTful 與 Rails</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror RESTful" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: RESTful 與 Rails<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>Rails支援REST風格的軟體架構，REST全名<span style="font-weight: bold;">REpresentational State Transfe</span>r，可譯為<strong>表徵狀態轉移</strong>，為 <a
+          href="http://en.wikipedia.org/wiki/Roy_Fielding">Roy Fielding</a> 於2000年在他的論文 <a
+          href="http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">Architectural Styles and the Design of Network-based Software Architectures</a> 中提及。</p>
+      <p>REST的架構由<strong>客戶端（Client）/伺服端（Server）</strong>組成，客戶端與伺服端之間的通訊機制是<strong>無狀態的（Stateless）</strong>，客戶端對伺服端請求<strong>資源（Resource）</strong>，伺服端的回應為資源的表徵（Representation），或稱為表現方式，<strong
+          style="font-weight: normal;">也就是說，資</strong>源在REST中是<strong>可</strong><strong>定址的（Addressed）</strong>概念<strong
+          style="font-weight: normal;">，可能用檔案、文件</strong>、格式等來表現，代表資源目前或可能的<strong>狀態（S</strong><strong>tate</strong><strong>）</strong>。客戶端發出的請求，會獲得資源的最新狀態，如果一或多個請求獲取的狀態有了差異，客戶端就認定為發生了<strong>轉移（Transition）</strong>，客戶端獲取的表徵，可能包括發生下一次狀態轉移的連結，請求方法與回應方式，是根據資源的表徵狀態將如何<strong>轉移（Transfer）</strong>而決定。</p>
+      <p>在REST的架構中，<strong>資源是可定址的（Addressed）概念</strong>，<strong>會有獨一無二的識別名稱</strong>（例如Web中的URI名稱），<strong>請求動作必須能表現出如何處理請求</strong>（例如HTTP中的GET、POST、PUT、DELETE等請求），而<strong>回應的內容型態與資源的概念是分離的，一個資源可以有多種內容型態來展現</strong>（狀態）。<br>
+      </p>
+      <p>在設計REST風格的架構時，許多人會提到REST Triangle，例如 <a href="http://en.wikipedia.org/wiki/Talk:Representational_state_transfer">Talk:Representational state transfer</a> 中的這張圖：</p>
+      <p><img title="REST Triangle of nouns, verbs, and content types."
+          alt="REST Triangle of nouns, verbs, and content types." src="../../../upload.wikimedia.org/wikipedia/en/thumb/8/89/Resttriangle.svg/273px-Resttriangle.svg.png"><br>
+      </p>
+      <p>在REST Triangle中有<strong>名詞（</strong><strong>Nouns</strong><strong>）</strong>、<strong>動</strong><strong>詞（Verbs）</strong>與<strong>內容型態（Content Types）</strong>，分別用以代表資源獨一無二的識別、對資源進行操作的動作，以及資源的表徵（表現方式）。以HTTP來說，URI就是處於名詞角色，為資源定義了識別名稱，HTTP具有一組有限的GET、POST、PUT與DELETE等方法來操作資源，而HTTP可以使用content-type標頭來定義資源表現方式。這些概念與REST概念不謀而合，REST架構基於HTTP 1.0，與HTTP1.1平行發展，符合REST最大實現就是WWW，整個Web就像是個狀態機，藉由連結不斷改變狀態，不過REST架構的風格與特定協定無關，雖然最初是使用HTTP來描述，但不限於HTTP。</p>
+      <p>更多REST的概念，可以參考 <a href="http://en.wikipedia.org/wiki/REST">Representational state transfer</a>。來看看HTTP如何實現REST概念，以 <a
+          href="CRUD.html">基本 CRUD 程式</a> 中的例子來說，針對第一筆書籤而言，有以下的URL：</p>
+      <ul>
+        <li>/bookmarks/show/1</li>
+        <li>/bookmarks/update/1</li>
+        <li>/bookmarks/destroy/1</li>
+      </ul>
+      <p>第一筆書籤就是一個資源（符合REST資源可以被定址的概念），如果搭配HTTP請求：</p>
+      <ul>
+        <li>GET /bookmarks/1</li>
+        <li>PUT /bookmarks/1</li>
+        <li>DELETE /bookmarks/1</li>
+      </ul>
+      <p>那麼第一筆書籤的URL識別就是/bookmarks/1，而根據請求為GET、PUT或POST，就可以知道對該資源要作什麼樣的處理（符合REST中請求動作必須能表現出本身如何處理的概念）。<br>
+      </p>
+      <p>以上說明的是REST的基本實現概念。符合REST風格的實現稱為RESTful，Rails就以REST的概念來簡化路由設定，並使用<span
+          class="courier">respond_to</span>方法來實現同一資源的不同呈現。</p>
+      <p>以 <a href="CRUD.html">基本 CRUD 程式</a> 為例，如果在routes.rb中如下設定：</p>
+      <ul>
+        <li>routes.rb</li>
+      </ul>
+      <pre>resources :bookmarks<br># match ':controller(/:action(/:id(.:format)))' 這行不需要了，所以註解掉...</pre>
+      <p>就會相當於routes.rb中作以下設定（當然你也可以自行視需求如下設定，而不一定要如上撰寫<span class="courier">resources :bookmarks</span>）：</p>
+      <pre>get&nbsp;&nbsp;&nbsp; '/bookmarks'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; "bookmarks#index",&nbsp;&nbsp; :as =&gt; "bookmarks"
+post&nbsp;&nbsp; '/bookmarks'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; "bookmarks#create",&nbsp; :as =&gt; "bookmarks"
+get&nbsp;&nbsp;&nbsp; '/bookmarks/:id'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; "bookmarks#show",&nbsp;&nbsp;&nbsp; :as =&gt; "bookmark"
+put&nbsp;&nbsp;&nbsp; '/bookmarks/:id'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; "bookmarks#update",&nbsp; :as =&gt; "bookmark"
+delete '/bookmarks/:id'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; "bookmarks#destroy", :as =&gt; "bookmark"
+get&nbsp;&nbsp;&nbsp; '/bookmarks/new'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt; "bookmarks#new",&nbsp;&nbsp;&nbsp;&nbsp; :as =&gt; "new_bookmark"
+get&nbsp;&nbsp;&nbsp; '/bookmarks/:id/edit' =&gt; "bookmarks#edit",&nbsp;&nbsp;&nbsp; :as =&gt; "edit_bookmark"</pre>
+      <p>這個慣例是Rails制定的，只能強記，不能更改，這麼作的好處除了符合REST風格外，產生的路由輔助方法，在需要產生鏈結的地方可以簡化。例如原先的index.html.erb：</p>
+      <ul>
+        <li>index.html.erb</li>
+      </ul>
+      <pre>&lt;ul&gt;
+  &lt;% @pages.each do |page| %&gt;
+    &lt;li&gt;
+      &lt;%= link_to page.title, page.url %&gt;
+      &lt;%= link_to "Details", :controller =&gt; 'bookmarks', :action =&gt; 'show', :id =&gt; page %&gt;
+      &lt;%= link_to "Edit", :controller =&gt; 'bookmarks', :action =&gt; 'edit', :id =&gt; page %&gt;
+      &lt;%= link_to "Delete", :controller =&gt; 'bookmarks', :action =&gt; 'destroy', :id =&gt; page %&gt;
+    &lt;/li&gt;
+  &lt;% end %&gt;
+&lt;/ul&gt;
+&lt;%= link_to "New", :controller =&gt; 'bookmarks', :action =&gt; 'new' %&gt;</pre>
+      <p></p>
+      <p>可以簡化為：</p>
+      <ul>
+        <li>index.html.erb</li>
+      </ul>
+      <pre>&lt;ul&gt;
+  &lt;% @pages.each do |page| %&gt;
+    &lt;li&gt;
+      &lt;%= link_to page.title, page.url %&gt;
+      &lt;%= link_to "Details", <strong>bookmark_path(page)</strong> %&gt;
+      &lt;%= link_to "Edit",<strong> edit_bookmark_path(page)</strong> %&gt;
+      &lt;%= link_to "Delete",<strong> bookmark_path(page), :method =&gt; :delete</strong> %&gt;
+    &lt;/li&gt;
+  &lt;% end %&gt;
+&lt;/ul&gt;
+&lt;%= link_to "New", new_bookmark_path %&gt;
+</pre>
+      <p> </p>
+      <p>如果不寫<span class="courier">:method</span>，預設就是<span class="courier">:get</span>。對於new_html.erb：</p>
+      <ul>
+        <li>new.html.erb</li>
+      </ul>
+      <pre>&lt;%= form_for @page, :url =&gt; { :controller =&gt; 'bookmarks', :action =&gt; 'create' } do |f| %&gt;
+    ...略
+&lt;% end %&gt;</pre>
+      <p></p>
+      <p>可改為：</p>
+      <ul>
+        <li>new.html.erb</li>
+      </ul>
+      <pre>&lt;%= form_for @page, :url =&gt;<strong> bookmarks_path, :method =&gt; :post </strong>do |f| %&gt;
+    ...略
+&lt;% end %&gt;</pre>
+      <p></p>
+      <p>對於show.html.erb：</p>
+      <ul>
+        <li>show.html.erb</li>
+      </ul>
+      <pre>...略
+&lt;%= link_to "Home", root_path %&gt; 
+&lt;%= link_to "Edit", :controller =&gt; 'bookmarks', :action =&gt; 'edit', :id =&gt; @page %&gt;<br>&lt;%= link_to "Delete", :controller =&gt; 'bookmarks', :action =&gt; 'destroy', :id =&gt; @page %&gt;</pre>
+      <p></p>
+      <p>可修改為：</p>
+      <ul>
+        <li>show.html.erb</li>
+      </ul>
+      <pre>...略
+&lt;%= link_to "Home", root_path %&gt; 
+&lt;%= link_to "Edit", <strong>edit_bookmark_path(@page)</strong> %&gt;<br>&lt;%= link_to "Delete", <strong>bookmark_path(@page), :method =&gt; :delete</strong> %&gt;</pre>
+      <p></p>
+      <p>對於edit.html.erb：</p>
+      <ul>
+        <li>edit.html.erb</li>
+      </ul>
+      <pre>&lt;%= form_for @page, :url =&gt; { :controller =&gt; 'bookmarks', :action =&gt; 'update', :id =&gt; @page } do |f| %&gt;
+    ...略
+&lt;% end %&gt;</pre>
+      <p></p>
+      <p>可修改為：</p>
+      <ul>
+        <li>edit.html.erb</li>
+      </ul>
+      <pre>&lt;%= form_for @page, :url =&gt; <strong>bookmark_path(@page), :method =&gt; :put</strong> do |f| %&gt;
+    ...略
+&lt;% end %&gt;</pre>
+      <p></p>
+      由於HTML網頁上，表單的<span class="courier">method</span>只能設定GET、POST，因此Rails中<span
+        class="courier">若設定:method為:get、:post以外的值時，如果是鏈結，會在&lt;a&gt;上加上個data-method屬性</span>。例如index.html.erb產生的HTML為：<br>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Bookmark&lt;/title&gt;
+  &lt;link href="/assets/application.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;
+  &lt;link href="/assets/bookmarks.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;
+  &lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+  &lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+  &lt;script src="/assets/bookmarks.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+  &lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+
+  &lt;meta content="authenticity_token" name="csrf-param" /&gt;
+  &lt;meta content="QSkysEtZsLhKIedQitVJaPb2p9ij5/rsQbxm97bjQas=" name="csrf-token" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;ul&gt;
+    &lt;li&gt;
+      &lt;a href="http://openhome.cc"&gt;Openhome&lt;/a&gt;
+      &lt;a href="/bookmarks/1"&gt;Details&lt;/a&gt;
+      &lt;a href="/bookmarks/1/edit"&gt;Edit&lt;/a&gt;
+      &lt;a href="/bookmarks/1"<strong> data-method="delete" </strong>rel="nofollow"&gt;Delete&lt;/a&gt;
+    &lt;/li&gt;
+    ...略
+&lt;/ul&gt;
+&lt;a href="/bookmarks/new"&gt;New&lt;/a&gt;
+
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><br>
+      實際上按下鏈結時，會以Ajax的方式，以指定的<span class="courier">data_method</span>來發送請求。<br>
+      <br>
+      如果是表單，則會用隱藏欄位方式，額外發送一個<span class="courier">_method</span>參數。例如edit.html.erb產生的HTML為：<br>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Bookmark&lt;/title&gt;
+  &lt;link href="/assets/application.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;
+&lt;link href="/assets/bookmarks.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;
+  &lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/bookmarks.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+
+  &lt;meta content="authenticity_token" name="csrf-param" /&gt;
+&lt;meta content="QSkysEtZsLhKIedQitVJaPb2p9ij5/rsQbxm97bjQas=" name="csrf-token" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;form accept-charset="UTF-8" action="/bookmarks/1" <br>      class="edit_page" id="edit_page_1" method="post"&gt;<br>    &lt;div style="margin:0;padding:0;display:inline"&gt;<br>       &lt;input name="utf8" type="hidden" value="&amp;#x2713;" /&gt;<br><strong>       &lt;input name="_method" type="hidden" value="put" /&gt;</strong><br>       &lt;input name="authenticity_token" type="hidden" <br>              value="QSkysEtZsLhKIedQitVJaPb2p9ij5/rsQbxm97bjQas=" /&gt;<br>    &lt;/div&gt;
+    ...略
+    &lt;input name="commit" type="submit" value="Update" /&gt;
+&lt;/form&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre> <br>
+      像index.html.erb使用鏈結，必須使用Ajax，也就是必須使用JavaScript才能完成任務，如果考慮客戶端關閉瀏覽器時，基本的CRUD也可以運作，則可以將<span
+        class="courier">link_to改為button_to</span>。例如：<br>
+      <ul>
+        <li>index.html.erb</li>
+      </ul>
+      <pre>&lt;ul&gt;
+  &lt;% @pages.each do |page| %&gt;
+    &lt;li&gt;
+      &lt;%= link_to page.title, page.url %&gt;
+<span style="font-weight: bold;">      &lt;%= button_to "Details", bookmark_path(page), :method =&gt; :get %&gt;
+      &lt;%= button_to "Edit", edit_bookmark_path(page), :method =&gt; :get %&gt;
+      &lt;%= button_to "Delete", bookmark_path(page), :method =&gt; :delete %&gt;</span>
+    &lt;/li&gt;
+  &lt;% end %&gt;
+&lt;/ul&gt;
+&lt;%= link_to "New", new_bookmark_path %&gt;</pre>
+      <p> </p>
+      <p></p>
+      如此產生的HTML中就會出現按鈕，而實際上會以表單方式來發送請求。例如產生的HTML為：<br>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Bookmark&lt;/title&gt;
+  &lt;link href="/assets/application.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;
+&lt;link href="/assets/bookmarks.css?body=1" media="screen" rel="stylesheet" type="text/css" /&gt;
+  &lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/bookmarks.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+
+  &lt;meta content="authenticity_token" name="csrf-param" /&gt;
+&lt;meta content="QSkysEtZsLhKIedQitVJaPb2p9ij5/rsQbxm97bjQas=" name="csrf-token" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;ul&gt;
+    &lt;li&gt;
+      &lt;a href="http://openhome.cc"&gt;Openhome&lt;/a&gt;<br>      &lt;form action="/bookmarks/1" class="button_to" method="get"&gt;<br>         &lt;div&gt;&lt;input type="submit" value="Details" /&gt;&lt;/div&gt;<br>      &lt;/form&gt;
+      &lt;form action="/bookmarks/1/edit" class="button_to" method="get"&gt;<br>         &lt;div&gt;&lt;input type="submit" value="Edit" /&gt;&lt;/div&gt;<br>      &lt;/form&gt;
+      &lt;form action="/bookmarks/1" class="button_to" method="post"&gt;<br>         &lt;div&gt;<br>              &lt;input name="_method" type="hidden" value="delete" /&gt;<br>              &lt;input type="submit" value="Delete" /&gt;<br>              &lt;input name="authenticity_token" type="hidden" <br>                     value="QSkysEtZsLhKIedQitVJaPb2p9ij5/rsQbxm97bjQas=" /&gt;<br>         &lt;/div&gt;<br>      &lt;/form&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;a href="/bookmarks/new"&gt;New&lt;/a&gt;
+
+
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center> </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/RESTful.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+</html>

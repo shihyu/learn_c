@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/OverrideLAOperator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>重載 &lt;&lt; 運算子</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index.html">C++ Gossip: 重載 &lt;&lt; 運算子</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"><small>如果您想要輸出一個物件的資料，例如一個自訂的Point物件中的x與y值，則您通常會這麼作： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Point p1(10, 5); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">cout &lt;&lt; p1.x &lt;&lt; ", " &lt;&lt; p2.y &lt;&lt; endl; </small><br>
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+每一次若都要這麼撰寫程式碼，事實上也是很麻煩的，您可以重載 &lt;&lt; 運算子，讓 &lt;&lt; 擁有輸出物件資料的能力，例如使下面這段程式碼與上面的作用相同： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Point p1(10, 5); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cout &lt;&lt; p1 &lt;&lt; endl; </span></small><br>
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+要重載 &lt;&lt; 運算子，其方法與重載其它運算子類似，其語法如下： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ostream &amp;operator&lt;&lt;(ostream &amp;s, class-name ob) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; // 實作 </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; return s; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+第一個參數是ostream型態的參數，也就是輸出串流，傳回這個串流給cout的話，就可以顯示輸出至串流中的資訊，第二個參數是要輸出的物件，實作時將指定輸出的資訊。 <br>
+
+      <br>
+
+下面這個程式是個使用friend函式來重載 &lt;&lt; 的範例： <br>
+
+      </small>
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>class Point { <br>    int x, y; <br><br>public: <br>    Point() { <br>        x = y = 0; <br>    } <br><br>    Point(int x, int y) { <br>        this-&gt;x = x; <br>        this-&gt;y = y; <br>    } <br><br>    friend ostream &amp;operator&lt;&lt;(ostream &amp;s, Point p); <br>}; <br><br>ostream &amp;operator&lt;&lt;(ostream &amp;s, Point p) { <br>    s &lt;&lt; "("&lt;&lt; p.x &lt;&lt; ", " &lt;&lt; p.y &lt;&lt; ")"; <br>    return s; <br>} <br><br>int main() { <br>    Point p1(1, 3), p2(10, 5); <br><br>    cout &lt;&lt; "p1: " &lt;&lt; p1 &lt;&lt; endl<br>         &lt;&lt; "p2: " &lt;&lt; p2 &lt;&lt; endl; <br>    <br>    return 0; <br>}</pre>
+
+      <small><br>
+
+執行結果： </small><br>
+
+
+
+
+
+      <small> </small><small> </small><small>
+      </small><small> </small><small>
+      </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">p1: (1, 3)<br>
+
+p2: (10, 5)&nbsp;</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <small><br>
+
+通常重載 &lt;&lt; 運算子時，會使用friend函式，這是因為重載 &lt;&lt; 函式時，它不是一個成員函式，理由在於
+&lt;&lt; 左邊不是物件，而是一個輸出串流，由於 &lt;&lt;
+函式不是成員函式，若要能存取資料成員，則該資料成員必須設定為public，使用friend函式來進行重載的話，則不用受此限制。 <br>
+
+      <br>
+
+下面這個程式示範了不使用friend函式來重載，由於 &lt;&lt; 函式不是成員函式，所以x與y必須宣告為public才可以： <br>
+
+      </small>
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>class Point { <br>public: <br>    int x, y; <br><br>    Point() { <br>        x = y = 0; <br>    } <br><br>    Point(int x, int y) { <br>        this-&gt;x = x; <br>        this-&gt;y = y; <br>    } <br>}; <br><br>ostream &amp;operator&lt;&lt;(ostream &amp;s, Point p) { <br>    s &lt;&lt; "("&lt;&lt; p.x &lt;&lt; ", " &lt;&lt; p.y &lt;&lt; ")"; <br>    return s; <br>} <br><br>int main() { <br>    Point p1(1, 3), p2(10, 5); <br><br>    cout &lt;&lt; "p1: " &lt;&lt; p1 &lt;&lt; endl <br>         &lt;&lt; "p2: " &lt;&lt; p2 &lt;&lt; endl; <br><br>    return 0; <br>}</pre>
+
+      <small><br>
+
+執行結果：<br>
+
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+        <tbody>
+
+          <tr>
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">p1: (1, 3)<br>
+
+p2: (10, 5)</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      <br>
+
+      </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/OverrideLAOperator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

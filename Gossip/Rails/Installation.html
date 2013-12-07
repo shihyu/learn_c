@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Installation.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>安裝 Rails</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror installation" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 安裝 Rails<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>Rails應用程式必須使用Ruby程式語言撰寫，要安裝Rails，自然也得先安裝Ruby。</p>
+      <p>在Windows中，可以使用 <a href="http://railsinstaller.org/">RailsInstaller</a> 提供的套裝程式進行安裝，在撰寫這篇文件時，RailsInstaller 安裝完成後，就會有以下支援：</p>
+      <ul>
+        <li><b><a href="http://ruby-lang.org/">Ruby</a></b> 1.9.2-p290</li>
+        <li><b><a href="http://rubyonrails.org/">Rails</a></b> 3.1.1</li>
+        <li><b><a href="http://gembundler.com/">Bundler</a></b> 1.0.18</li>
+        <li><b><a href="http://git-scm.com/">Git</a></b> 1.7.6</li>
+        <li><b><a href="http://sqlite.org/">Sqlite</a></b> 3.7.3</li>
+        <li><b><a href="https://github.com/rails-sqlserver/tiny_tds">TinyTDS</a></b> 0.4.5</li>
+        <li><b><a href="https://github.com/rails-sqlserver/activerecord-sqlserver-adapter">SQL Server support</a></b> 3.3.3</li>
+        <li><b><a href="https://github.com/oneclick/rubyinstaller/wiki/Development-Kit">DevKit</a></b></li>
+      </ul>
+      <p></p>
+      <p>在Linux中，可以試著使用指令sudo apt-get install ruby1.9.1來安裝 Ruby 1.9.2，沒錯，根據 <a
+          href="http://www.ruby-lang.org/en/downloads/">官方文件</a> 的說法：</p>
+      <p><strong>Yes, this will install Ruby 1.9.2. It has a ‘library compatibility version’ of 1.9.1, hence the name.</strong></p>
+      <p>如果想放心一些，也可以自己下載原始碼來進行編譯，由於Ruby本身或相關套件，都使用 <a href="http://git-scm.com/">Git</a> 版本控制系統，所以首先安裝Git與相關編譯套件，接下來的內容皆以Ubuntu 11.10為例：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ sudo apt-get install git-core<br>
+              ~$ sudo apt-get install build-essential zlib1g-dev libssl-dev libreadline-gplv2-dev<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      接著下載Ruby原始碼進行編譯：<br>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz<br>
+              ~$ tar xvfz ruby-1.9.2-p290.tar.gz<br>
+              ~$ cd ruby-1.9.2-p290/<br>
+              ~$ ./configure<br>
+              ~$ make<br>
+              ~$ sudo make install</td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      對於學習Rails，可使用SQLite作為資料庫系統，可如下安裝：
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ sudo apt-get install sqlite3 libsqlite3-dev<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>接下來要開始安裝Rails，首先安裝SQLite的Adapter（gem指令前的sudo是在Ubuntu要下的指令，你的系統中不一定需要）：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ sudo gem install sqlite3 --no-ri --no-rdoc<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>gem</strong>是 <a href="http://rubygems.org/">RubyGem</a> 指令，RubyGem 為 Ruby 程式庫的套件管理系統，使用gem install gem_name時，會自動下載相關套件與文件進行安裝，如果想不要安裝文件，可以加上--no-ri與--no-rdoc。</p>
+      <p>接下來安裝Rails套件：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ sudo gem install rails --no-ri --no-rdoc<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p>安裝完成後，可以如下確認Git、Ruby、SQLite與Rails版本，在撰寫本文件的時候，所取得的版本資訊為：<br>
+      </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ git --version<br>
+              git version 1.7.5.4<br>
+              ~$ ruby -v<br>
+              ruby 1.9.2p290 (2011-07-09 revision 32553) [i686-linux]<br>
+              ~$ sqlite3 --version<br>
+              3.7.7 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2<br>
+              ~$ rails -v<br>
+              Rails 3.1.3<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <p>無論是在Windows或Linux下完成Rails的相關安裝，接下來要開始建立第一個Rails應用程式了，這沒什麼，只是先建個基本專案目錄，啟動Rails伺服器，然後看看能否透過瀏覽器看到首頁而已。</p>
+      <p>以下的範例仍是繼續以Ubunto 11.10為例，首先建立新專案：</p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~$ rails new hello<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; README<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; Rakefile<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; config.ru<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; .gitignore<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; Gemfile<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app/assets/images/rails.png<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; app/assets/javascripts/application.js<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...略<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp; vendor/plugins/.gitkeep<br>
+              <span style="font-weight: bold;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; run&nbsp; bundle install</span><br>
+              Fetching source index for http://rubygems.org/<br>
+              Using rake (0.9.2.2) <br>
+              Using multi_json (1.0.4) <br>
+              Using activesupport (3.1.3) <br>
+              ...略<br>
+              Installing turn (0.8.2) <br>
+              Installing uglifier (1.1.0) <br>
+              Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p>這會建立hello目錄，當中包括了許多基本目錄與檔案，之後還會說明。注意以上訊息中，有行執行了bundle install指令，這會根據專案目錄中的Gemfile檔案設定，下載安裝Ra的ils應用程式所需的相關程式庫套件。<br>
+      </p>
+      <p>接著進入hello目錄（cd hello），執行rails server（或rails s，其中s就是server簡寫）啟動Rails伺服器，如果是Windows，開啟瀏覽器連結http://localhost:3000，就可以看到預設首頁。如果是Ubuntu，可能會看到以下錯誤訊息：<br>
+      </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~/hello$ rails s<br>
+              /usr/local/lib/ruby/gems/1.9.1/gems/execjs-1.2.12/lib/execjs/runtimes.rb:47:in `autodetect': <span
+                style="font-weight: bold;">Could not find a JavaScript runtime</span>. See https://github.com/sstephenson/execjs for a list of available runtimes. (ExecJS::RuntimeUnavailable)<br>
+              ...略<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      <p>這是因為Linux中沒有預設的JavaScript執行環境，可以開啟專案目錄中的Gemfile檔案，在當中加上一行：</p>
+      <ul>
+        <li>Gemfile<br>
+        </li>
+      </ul>
+      <pre>gem 'therubyracer'</pre>
+      <p>再度執行bundle install，就會自動下載therubyracer套件，然後再度執行rails s嘗試啟動Rails伺服器：</p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~/hello$ rails s<br>
+              =&gt; Booting WEBrick<br>
+              =&gt; Rails 3.1.3 application starting in development on http://0.0.0.0:3000<br>
+              =&gt; Call with -d to detach<br>
+              =&gt; Ctrl-C to shutdown server<br>
+              [2011-12-13 21:13:14] INFO&nbsp; WEBrick 1.3.1<br>
+              [2011-12-13 21:13:14] INFO&nbsp; ruby 1.9.2 (2011-07-09) [i686-linux]<br>
+              [2011-12-13 21:13:14] INFO&nbsp; WEBrick::HTTPServer#start: pid=2757 port=3000<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p>
+      開啟瀏覽器連結http://localhost:3000，就可以看到預設首頁，這個首頁來自專案目錄中public目錄中的index.html：<br>
+      <br>
+      <img alt="預設首頁" src="images/Installation-1.PNG"><br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Installation.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:45 GMT -->
+</html>

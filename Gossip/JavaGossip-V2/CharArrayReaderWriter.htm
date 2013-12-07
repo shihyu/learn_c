@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/CharArrayReaderWriter.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>CharArrayReader、CharArrayWriter</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: CharArrayReader、CharArrayWriter</a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small><a class="wikilink" href="ByteArrayInOutStream.htm">ByteArrayInputStream、ByteArrayOutputStream</a>
+即是將位元陣列當作串流輸入來源、輸出目的地的工具類別，與其類似的是CharArrayReader與CharArrayWriter，使用它們可以將
+字元陣列當作字元資料輸出或輸入的來源。 <br>
+
+      <br>
+
+
+通常很少會對文字檔案進行隨機存取的動作，因為為了與ASCII相容，一個文字檔案中可能會有ASCII與雙位元組字元，也就是說每個字元的長度不一定相同，所以對文字檔案進行隨機存取容易發生錯誤。<br>
+
+      <br>
+
+
+由於Java中的Char是Unicode字元，藉由這個特性，您可以將文字檔案的內容讀入字元陣列，對字元陣列作隨機存取，然後再將之寫回檔案，這麼一來對於文字檔案您也可以達到類似的隨機存取功能，這樣的程式在以文字模式為主的編輯器可以應用上。<br>
+
+      <br>
+
+
+您開啟一個簡單的文字檔案，當中有簡單的ABCDEFG與中文等字元，在讀取檔案之後，您可以直接以程式來指定文字檔案的字元位置，以修改您所指定的字
+元，程式的作法是將檔案讀入陣列中，修改位置的指定被用作陣列的指針，在修改完陣列內容之後，重新將陣列存回檔案，範例如下： </small>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> CharArrayReaderWriterDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*;<br>import java.util.*;<br> <br>public class CharArrayReaderWriterDemo {<br>    public static void main(String[] args) {<br>        try { <br>            File file = new File(args[0]); <br>            BufferedReader bufInputReader = <br>                new BufferedReader( <br>                     new FileReader(file)); <br> <br>            // 將檔案讀入字元陣列 <br>            CharArrayWriter charArrayWriter = <br>                new CharArrayWriter(); <br>            char[] array = new char[1]; <br>            while(bufInputReader.read(array) != -1) <br>                charArrayWriter.write(array); <br>             <br>            charArrayWriter.close(); <br>            bufInputReader.close(); <br> <br>            // 顯示字元陣列內容 <br>            array = charArrayWriter.toCharArray(); <br>            for(int i = 0; i &lt; array.length; i++) <br>                System.out.print(array[i] + " "); <br>            System.out.println(); <br> <br>            // 讓使用者輸入位置與字元修改字元陣列內容 <br>            Scanner scanner = new Scanner(System.in);<br>             <br>            System.out.print("輸入修改位置："); <br>            int pos = scanner.nextInt(); <br>            System.out.print("輸入修改字元："); <br>            char ch = scanner.next().charAt(0); <br>            array[pos-1] = ch; <br> <br>            // 將字元陣列內容存回檔案 <br>            CharArrayReader charArrayReader = <br>                new CharArrayReader(array); <br>            BufferedWriter bufWriter = <br>                new BufferedWriter( <br>                     new FileWriter(file)); <br>            char[] tmp = new char[1]; <br>            while(charArrayReader.read(tmp) != -1) <br>                bufWriter.write(tmp); <br>            <br>            charArrayReader.close();<br>            bufWriter.flush(); <br>            bufWriter.close(); <br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            e.printStackTrace(); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    }<br>} <br></pre>
+
+
+
+      
+      <p><br>
+
+      <small>
+假設文字檔案中為：一 個Test！一個測試 ！&nbsp;</small></p>
+
+      <small>
+
+一個執行程式的範例如下：&nbsp;</small><span class="postbody"></span><br>
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">一 個 T e s t ！ 一 個 測 試 ！ <br>
+
+
+&nbsp; <br>
+
+
+輸入修改位置：3 <br>
+
+
+輸入修改字元：t&nbsp;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+      <small>
+修改過後，文字檔案的內容會是：一個test！一個測試！ </small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/CharArrayReaderWriter.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

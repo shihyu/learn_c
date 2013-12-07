@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Routing.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:57 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>基本路由</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror routing" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 基本路由<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>config/routes.rb中的設定，決定了請求會由哪個控制器的動作處理，這邊要先來介紹Rails中典型路由（Regular route）與命令路由（Named route）設定的方式（注意，routes.rb中越前頭的設定會先套用）。</p>
+      <p>你可以設定整個應用程式的首頁，例如若想要在連結http://localhost:3000時，等同於連結http://localhost:3000/messages/index，可以如下：</p>
+      <pre>root :to =&gt; 'messages#index'<br></pre>
+      <p>Rails應用程式預設首頁是public/index.html，必須將之移除，才會讓以上設定有效，當然，記得在messages_controller.rb中建立<span
+          class="courier">index</span>方法，並在app/views/messages中建立index.html.erb作為首頁回應。<br>
+      </p>
+      <p class="courier"><strong></strong>如果要將某個網址請求分配至某個控制器的動作，可以使用<span
+          class="courier">match</span>。例如：</p>
+      <p class="courier"> </p>
+      <pre class="courier">match 'messages/show',   :to =&gt; 'messages#show',  :via =&gt; 'get'<br>match 'messages/update', :to =&gt; 'message#update', :via =&gt; [:get, :post]<br></pre>
+      <p class="courier">以上可以簡化為以下：<br>
+      </p>
+      <pre class="courier">match 'messages/show'   =&gt; 'messages#show', :via =&gt; 'get'<br>match 'messages/update' =&gt; 'message#update', :via =&gt; [:get, :post]<br></pre>
+      <p class="courier">以上設定，相當於：</p>
+      <pre class="courier">get  'messages/show'   =&gt; 'messages#show'
+get  'messages/update' =&gt; 'messages#update'<br>post 'messages/update' =&gt; 'messages#update'
+</pre>
+      <p><span class="courier">match</span>有些設定省略時會有預設，例如：</p>
+      <pre>match 'messages/show'  <br></pre>
+      <p>相當於：</p>
+      <pre class="courier">match 'messages/show'  =&gt; 'messages#show'</pre>
+      <p></p>
+      <p>例如：</p>
+      <pre>get 'messages/show'<br></pre>
+      <p>相當於：</p>
+      <pre>match 'messages/show' =&gt; 'messages#show', :via =&gt; 'get'
+</pre><br>
+      在 <a href="MVC.html">MVC 與 Rails</a> 中，messages_controller.rb中的<span
+        class="courier">show</span>若要取得id請求參數，必須使用messages/show/?id=1的請求方式，如果想在請求messages/show/1時，將id設為1，可以如下：<br>
+      <pre>match 'messages/show/:id' =&gt; 'messages#show'<br></pre>
+      <br>
+      實際上，Rails會試著將請求網址匹配至每個:name，不過有些:name有意義，例如:controller與:action，來想想，應用程式中會有許多網址代表不同的請求動作，例如messages/create代表建立新訊息，messages/show/1代表顯示第一筆訊息、messages/update/1代表更新第一筆訊息，messages/destroy/1代表刪除第一筆訊息等，如果要逐一設定，會像是以下：<br>
+      <pre>match 'messages/create'<br>match 'messages/show/:id' =&gt; 'messages#show'
+match 'messages/update/:id' =&gt; 'messages#update'
+match 'messages/destroy/:id' =&gt; 'messages#destroy'
+</pre><br>
+      也可以直接使用:controller、:action來指定控制器與動作：<br>
+      <pre>match 'messages/:id' =&gt; :controller =&gt; 'messages', :action =&gt; show<br></pre>
+      <br>
+      如上設定之後，請求messages/1就會轉發給mesages_controller.rb中的<span class="courier">show</span>方法處理。<br>
+      <br>
+      隨著應用程式越來越大，請求網址的匹配設定會越來越多，實在很麻煩，針對以上的設定，此時可以僅設定如下一行：<br>
+      <pre>match ':controller(/:action(/:id(.:format)))'</pre>
+      <br>
+      其中括號表示網址請求中可有可無，事實上，這行正是在routes.rb中最後一行註解的內容，例如若請求messages/destroy/1，則:controller會是messages，:action會是destroy，:id會是1，而Rails會根據:controller與:action，自動將請求分配至messages#destroy，藉此簡化設定，不過要注意，這會讓所有控制器的每個公開動作，都可以使用GET請求，如果不想被請求的動作，請在方法上加上<span
+        class="courier">private</span>限定。<br>
+      <br>
+      現在假設你的routes.rb中有以下內容：<br>
+      <pre>root :to =&gt; 'messages#index'<br>match ':controller(/:action(/:id(.:format)))'
+</pre><br>
+      假設你想在show.html.erb中加上個回首頁的鏈結，則可以如下：<br>
+      <ul>
+        <li>show.html.erb</li>
+      </ul>
+      <pre>&lt;ul&gt;
+    &lt;li&gt;&lt;%= @message.name %&gt;'s message&lt;/li&gt;
+    &lt;li&gt;&lt;%= @message.content %&gt;&lt;/li&gt;
+&lt;/ul&gt;
+<strong>&lt;%= link_to "Home", root_path %&gt;</strong><br></pre>
+      <br>
+      <span class="courier">link_to</span>是個輔助方法（Helper），會產生超鏈結語法，第一個參數是顯示的文件，第二個參數是實際的網址，在這邊使用<span
+        class="courier">root_path</span>輔助方法來產生頁面的相對網址，如果使用<span class="courier">root_url</span>則會產生絕對網址。<br>
+      <br>
+      實際上，有些match設定，都會產生<span class="courier">*_path</span>與<span class="courier">*_url</span>的命名路由輔助方法，例如：<br>
+      <pre>match 'messages/show'  </pre>
+      <br>
+      預設的命名路由就是messages_show、輔助方法就是<span class="courier">messages_show_path</span>、<span
+        class="courier">messages_show_url</span>。你也可以自行取名，例如：<br>
+      <pre>match 'messages' =&gt; 'messages#index', :as =&gt; 'index'<br></pre>
+      <p>則命名路由為index，而輔助方法為<span class="courier">index_path</span>與<span
+          class="courier">index_url</span>，你可以如下使用：</p>
+      <pre>&lt;%= link_to "Home",  index_path %&gt;<br></pre>
+      <p>如果是以下：</p>
+      <pre>match 'messages/:id' =&gt; :controller =&gt; 'messages', :action =&gt; show, :as =&gt; messages<br></pre>
+      <p>則可以如下使用輔助方法，其中<span class="courier">message</span>參考至<span class="courier">Message</span>實例：</p>
+      <p> </p>
+      <pre>&lt;%= link_to "Show",  messages_path(message) %&gt;</pre>
+      <p>如果不使用命名路由的輔助方法，則可以在指定控制器與動作。例如：</p>
+      <pre>&lt;%= link_to "Home", :controller =&gt; 'messages', :action =&gt; 'index' %&gt;
+</pre><br>
+      routes.rb中設定越前頭越先套用，<span class="courier">*_url</span>、<span class="courier">*_path</span>輔助方法、網址與控制器動作的對應，可以執行rake routes指令來得知。<br>
+      <br>
+      如果想限制參數，可以如下：<br>
+      <pre>match "/messages/show/:id" =&gt; "messages#show", :constraints =&gt; {:id =&gt; /\d/}</pre>
+      <br>
+      這會限制id一定要是一個整數，也可以使用<span class="courier">contraints</span>方法作進階限定，例如限定IP位址：<br>
+      <pre>constraints(:ip =&gt; /(^127.0.0.1$)|(^192.168.[0-9]{1,3}.[0-9]{1,3}$)/) do<br>&nbsp;&nbsp;  match "/admins/edit/:id" =&gt; "admins#edit"<br>end</pre>
+      <br>
+      Rails還支援RESTful路由設定，這在之後還會說明。<br>
+      <br>
+      <br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Routing.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:57 GMT -->
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/VetexArray.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:04 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>頂點索引陣列</title></head><body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics: 頂點索引陣列</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+
+無論是2D或是3D繪製，頂點的使用是一個重要的課題，頂點的使用與座標息息相關，這也就是為何之前一直在談論座標系統的原因。<br>
+
+      <br>
+
+
+頂點的記錄方式有許多種，不同的繪圖目的應搭配不同的頂點資料結構，這邊介紹最簡單的幾個立體物件頂點記錄方式。<br>
+
+      <br>
+
+
+假設有一個正立方體，其中心位於原點，則可以如下圖先定出頂點的座標： <br>
+
+      <img style="width: 394px; height: 232px;" alt="" src="images/vetexArray-1.jpg"><br>
+
+      <br>
+
+
+
+
+
+
+
+
+
+紙上作業與程式規劃所不同的是，如何使用這些頂點來繪製一個立方體，基本上必須以四個頂點為一個單位，使用繪製多邊型的函式來繪製一個四邊形，然後以較方
+便的方式選擇四個頂點，通常會使用迴圈，但為了能使用迴圈，頂點資料結構必須有可重複索引的性質，在這邊介紹兩種規劃方式。<br>
+
+      <br>
+
+
+其中一個規劃方式是使用6*4=24個元素的陣列，每個面使用掉四個頂點，如下圖所示： <br>
+
+      <span class="postbody"></span><img style="width: 542px; height: 404px;" alt="" src="images/vetexArray-2.jpg"><br>
+
+      <br>
+
+
+如此就可以使用迴圈取出頂點資訊，這個方法的好處是簡單，但由於頂點會有重複，因而會耗用大量的記憶體，對於複雜圖形並不適用。<br>
+
+      <br>
+
+
+可以使用頂點索引來解決頂點重複的問題，首先必須先將頂點編號，如下圖所示： <br>
+
+      <img style="width: 240px; height: 190px;" alt="" src="images/vetexArray-3.jpg"><br>
+
+      <br>
+
+
+通常為了具有判別法向量的作用，頂點編號時使用右手定則，以逆時針的順序來編號同一個面的頂點；頂點編號完畢後，使用一個頂點索引陣列來記錄每個面所使用到的頂點編號，如下所示：<br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">// Java<br>
+int V_INDEX[][] = {{0, 1, 2, 3}, {0, 7, 6, 1}, {4, 5, 6, 7},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+{2, 5, 4, 3}, {0, 3, 4, 7}, {1, 6, 5, 2}};<br>
+      <br>
+// JavaScript<br>
+var V_INDEX = [</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">[0, 1, 2, 3], [0, 7, 6, 1], [4, 5, 6, 7],</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [2, 5, 4, 3], [0, 3, 4, 7], [1, 6, 5, 2]</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">];<br>
+      </span>
+
+
+      </small></div>
+
+      <small>
+&nbsp;<br>
+
+      <br>
+
+
+使用索引陣列的好處是減少記憶體使用量，雖然額外使用了一個索引陣列，但對於頂點越多時，記憶體的減少使用會更顯著，但缺點就是必須額外耗用一些運算是處理頂點資訊。VetexArray.htm<br>
+
+      <br>
+
+
+下面是使用頂點索引陣列來繪製正立方體的Java Applet程式，您可以參考我們是如何處理頂點資訊的：</small>
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>Demo.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package cc.openhome;<br><br>import java.awt.*;<br>import java.applet.*;<br><br>import static java.lang.Math.*;<br><br>class Point {<br>    final int x, y, z;<br>    Point(int x, int y, int z) {<br>        this.x = x;<br>        this.y = y;<br>        this.z = z;<br>    }<br>}<br><br>public class Demo extends Applet {<br>    private final static int L = 100;<br>    // 索引陣列<br>    private final static int V_INDEX[][] = {<br>        {0, 1, 2, 3}, {0, 7, 6, 1}, {4, 5, 6, 7},<br>        {2, 5, 4, 3}, {0, 3, 4, 7}, {1, 6, 5, 2}<br>    };<br>    // 立方體頂點<br>    private final static Point[] VETEX = {<br>        new Point(L, L, L), new Point(L, -L, L),<br>        new Point(L, -L, -L), new Point(L, L, -L),<br>        new Point(-L, L, -L), new Point(-L, -L, -L),<br>        new Point(-L, -L, L), new Point(-L, L, L)<br>    };<br>    // 視窗中心<br>    private int orgX;<br>    private int orgY;<br>    public void init() {<br>        super.init();<br>        setBackground(Color.black);<br>        setSize(640, 480);<br>        orgX = getWidth() / 2;<br>        orgY = getHeight() / 2;<br>    }<br>    <br>    public void paint(Graphics g) {<br>        g.setColor(Color.yellow);<br>        // 旋轉以斜角繪製圖形<br>        double ax = toRadians(30);<br>        double ay = toRadians(-30);<br>        <br>        double sinAx = sin(ax);<br>        double cosAx = cos(ax);<br>        double sinAy = sin(ay);<br>        double cosAy = cos(ay);<br>        <br>        int[] px = new int[4];<br>        int[] py = new int[4];<br>        for (int i = 0; i &lt; 6; i++) {<br>            for (int j = 0; j &lt; 4; j++) {<br>                // 利用索引陣列取出正確的頂點<br>                Point v = VETEX[V_INDEX[i][j]];<br>                // 旋轉以斜角繪製圖形<br>                px[j] = (int) (v.x * cosAy + v.z * sinAy + orgX);<br>                py[j] = (int) (v.y * cosAx -<br>                              (-v.x * sinAy + v.z * cosAy) * sinAx + orgY);<br>            }<br>            g.drawPolyline(px, py, 4);<br>        }<br>    }<br>}<br></pre>
+
+
+      <br>
+      
+      <small>以下是使用HTML5 Canvas的方式（如果瀏覽器支援HTML5 Canvas，例如最新版的Firexfox、Chrome、IE9等，可以直接將下面的內容存為HTML或按下檔名連結，直接載入瀏覽器執行觀看結果：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+      </span></span>
+      <ul>
+        <li><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><a href="html/VetexArray-1.html">VetexArray-1.html</a></span></span></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function toRadians(angle) {<br>                    return angle * Math.PI / 180;<br>                }<br>                <br>                var sin = Math.sin;<br>                var cos = Math.cos;<br>                var sqrt = Math.sqrt;<br>                <br>                function Point(x, y, z) {<br>                    this.x = x;<br>                    this.y = y;<br>                    this.z = z;<br>                }<br>                <br>                var V_INDEX = [<br>                    [0, 1, 2, 3], [0, 7, 6, 1], [4, 5, 6, 7],<br>                    [2, 5, 4, 3], [0, 3, 4, 7], [1, 6, 5, 2]<br>                ];<br>                <br>                var L = 100;<br>                var VETEX = [<br>                    new Point(L, L, L), new Point(L, -L, L),<br>                    new Point(L, -L, -L), new Point(L, L, -L),<br>                    new Point(-L, L, -L), new Point(-L, -L, -L),<br>                    new Point(-L, -L, L), new Point(-L, L, L)<br>                ];<br><br>                // 旋轉以斜角繪製圖形<br>                var ax = toRadians(30);<br>                var ay = toRadians(-30);<br>        <br>                var sinAx = sin(ax);<br>                var cosAx = cos(ax);<br>                var sinAy = sin(ay);<br>                var cosAy = cos(ay);<br>        <br>                var px = [];<br>                var py = [];<br>                <br>                var canvas1 = document.getElementById('canvas1');<br>                <br>                var orgX = canvas1.width / 2;<br>                var orgY = canvas1.height / 2;<br>                <br>                var context = canvas1.getContext('2d');<br>                context.beginPath();<br>                for(var i = 0; i &lt; 6; i++) {<br>                    for (var j = 0; j &lt; 4; j++) {<br>                        // 利用索引陣列取出正確的頂點<br>                        var v = VETEX[V_INDEX[i][j]];<br>                        // 旋轉以斜角繪製圖形<br>                        px[j] = parseInt(v.x * cosAy + v.z * sinAy + orgX);<br>                        py[j] = parseInt(v.y * cosAx -<br>                              (-v.x * sinAy + v.z * cosAy) * sinAx + orgY);<br>                    }<br>                    context.moveTo(px[0], py[0]);<br>                    for(var k = 1; k &lt; 4; k++) {<br>                        context.lineTo(px[k], py[k]);<br>                    }<br>                }<br>                context.stroke();<br>                context.closePath();<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;       <br>        &lt;canvas id="canvas1" width="640" height="480"&gt;&lt;/canvas&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">在Firefox下的效果如下：<br>
+      <img style="width: 640px; height: 480px;" alt="" src="images/VetexArray-5.png"><br>
+</span></span><br>
+
+      <small>
+如果您使用3D函式庫時，通常可以自行選擇使用哪一種頂點記錄方式，而且包裝成物件之後，您也無須親自處理索引的細節。</small><br>
+
+
+      <br>
+
+
+      <br>
+</td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/VetexArray.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:06:06 GMT -->
+</html>

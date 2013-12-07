@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/InOutputStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>InputStream、 OutputStream</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: InputStream、 OutputStream</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>電腦中的資料都是以0與1的方式來儲存，如果您要在兩個裝置之間進行資料的存取，當然也是以0與1位元的方式來進行，實際上資料的流動是透過電路，而上面
+的資料則是電流，而在程式上來說，將資料目的地與來源之間抽象化為一個串流（Stream），而當中流動的則是位元資料。<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">01010101 Stream --&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">來源地 ===================== 目的地</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在Java中有兩個類別用來作串流的抽象表示：<span style="font-weight: bold;">InputStream與OutputStream</span>。<br>
+
+      <br>
+
+
+
+
+InputStream是所有表示位元輸入串流的類別之父類別，它是一個抽象類別，子類會重新定義它當中所定義的方法，
+InputStream用於從裝置來源地讀取資料的抽象表示，例如System中的標準輸入串流 in 物件就是一個
+InputStream，在程式開始之後，這個串流物件就會開啟，以從標準輸入裝置中讀取資料，這個裝置通常是鍵盤或是其它使用者定義的裝置。<br>
+
+      <br>
+
+
+
+
+OutputStream是所有表示位元輸出串流的類別之父類別，它是一個抽象類別，子類會重新定義它當中所定義的方法， OutputStream是用於將資料寫入目的地的抽象表示，例如System中的標準輸出串流物件 out ，<span style="font-weight: bold;">out 的類型是PrintStream</span>，
+這個類別是OutputStream的子類別（FilterOutputStream繼承OutputStream，
+PrintStream再繼承FilterOutputStream），在程式開始之後，這個串流物件就會開啟，您可以將資料透過它來寫入目的地裝置，這
+個裝置通常是螢幕或其它使用者定義的裝置。<br>
+
+      <br>
+
+
+
+
+下面程式可以讀取鍵盤輸入串流，並將資料以10進位方式顯示在螢幕上： </small>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> StreamDemo.java </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*;<br> <br>public class StreamDemo { <br>    public static void main(String[] args) { <br>        try { <br>            System.out.print("輸入字元: "); <br>            System.out.println("輸入字元十進位表示: " + <br>                                    System.in.read()); <br>            System.out.println("換行字元十進位表示: " + <br>                                    System.in.read()); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    } <br>} <br></pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+執行結果：&nbsp;</small><span class="postbody"></span><br>
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">輸入字元: A&nbsp; <br>
+
+
+
+
+輸入字元十進位表示: 65 <br>
+
+
+
+
+換行字元十進位表示: 10</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+字元A輸入後被標準輸入串流讀取，A的位元表示以十進位來看就是65，這是A字元的編碼（查查ASCII編碼表就知道了），在這邊要注意的是<span style="font-weight: bold;">read()</span>只讀取一個位元組的資料，而當輸入A並按Enter鍵時，實際上在串流中會有A的位元資料與換行字元的位元資料，換行字元的位元資料以十進位來表示的話就是10。<br>
+
+      <br>
+
+
+
+
+作業系統之間的換行字元各不相同，Windows 為<span style="font-weight: bold;">"\r\n"</span>，Linux 為<span style="font-weight: bold;">'\n'</span>，而 Mac 為<span style="font-weight: bold;">'\r'</span>。</small>
+
+
+      <br>
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/InOutputStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

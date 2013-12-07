@@ -1,0 +1,523 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/returnBy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>return 的傳值、傳參考</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip:&nbsp;<span class="Topic">return 的傳值、傳參考</span><br>
+
+
+
+</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在
+定義函式時，一定要定義函式的傳回值型態，如果函式不傳回值，則使用void表示不傳回任何數值；一旦指定函式的傳回值不為void，則在函式中一定要
+使用return傳回一個數值，否則編譯器將回報錯誤。 <br>
+
+
+
+      <br>
+
+
+
+在之前的範例中，您只是使用傳值的方式傳回函式的執行結果，事實上您也可以傳回一個指標或是參考，傳回指標通常意味著您要對這個指標所指向的記憶體位置作
+取值或更動的動作，例如下面的程式中，您在函式中動態建立一個陣列，並傳回它的指標值： </small> <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int* createArray(int);<br>void deleteArray(int*);<br><br>int main() { <br> int m = 0; <br><br> cout &lt;&lt; "陣列大小: "; <br> cin &gt;&gt; m; <br><br> int *arr = createArray(m); <br><br> for(int i = 0; i &lt; m; i++) {<br> arr[i] = i; <br> }<br> <br> for(int i = 0; i &lt; m; i++) {<br> cout &lt;&lt; "arr[" &lt;&lt; i &lt;&lt; "] = " <br> &lt;&lt; arr[i] &lt;&lt; endl; <br> }<br><br> deleteArray(arr);<br><br> return 0; <br>} <br><br>// 傳回建立的陣列位址<br>int* createArray(int m) { <br> int *a = new int[m]; <br><br> for(int i = 0; i &lt; m; i++) {<br> a[i] = 0; <br> }<br><br> return a; <br>}<br><br>void deleteArray(int* arr) {<br> delete [] arr; <br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>執行結果：</small></span><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">陣列大小: 5<br>
+
+
+
+arr[0] = 0<br>
+
+
+
+arr[1] = 1<br>
+
+
+
+arr[2] = 2<br>
+
+
+
+arr[3] = 3<br>
+
+
+
+arr[4] = 4</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+
+      <small>由於您使用動態配置的方式，所以在使用delete之前，這塊被配置的記憶體並不會自動清除，所以您可以直接傳回
+給呼叫函式的主函式，注意如果您不是使用
+new來配置，則在副函式中所宣告的變數記憶體，在函式執行結束後都會自動消失，則您傳回指標值也就沒有意義，也會造成存取錯誤，因為該塊記憶體在副函式
+執行完畢後已經自動回收了。 <br>
+
+
+
+      </small><small><br>
+
+
+
+在這邊的範例您也看到了如何傳遞陣列給函式，以及如何傳回一個陣列，在C++中傳遞陣列或傳回陣列一律使用傳遞記憶體位址的方法，因為陣列名稱本身就是個
+指標，儲存有
+位址資訊。</small><br>
+
+
+
+      <small> <br>
+
+
+
+在進一步討論傳參考之前，您先要瞭解到，在C++中傳遞一個物件，預設也是使用傳值的方式，例如下面這個程式： </small> <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;string&gt; <br>using namespace std; <br><br>string foo(); <br><br>int main() { <br> string str; // 空字串<br><br> str = foo(); <br><br> cout &lt;&lt; "address: " &lt;&lt; &amp;str <br> &lt;&lt; endl &lt;&lt; str &lt;&lt; endl; <br> <br> return 0; <br>} <br><br>string foo() { <br> string s = "This is caterpillar speaking."; <br><br> cout &lt;&lt; "address: " &lt;&lt; &amp;s <br> &lt;&lt; endl &lt;&lt; s &lt;&lt; endl; <br><br> return s; <br>}<br></pre>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>執行結果：</small></span><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">address: 0x22ff40<br>
+
+
+
+This is caterpillar speaking.<br>
+
+
+
+address: 0x22ff50<br>
+
+
+
+This is caterpillar speaking.</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+
+      <small>您可以發現到，兩個字串的記憶體位置並不相同，表示傳回的字串在傳值時是複製一份新的傳回，您可以改用傳參考的方
+式將字串值傳回，方式如下所示： </small><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;string&gt; <br>using namespace std; <br><br>string&amp; foo(); <br><br>int main() { <br> string &amp;str = foo(); <br><br> cout &lt;&lt; "address: " &lt;&lt; &amp;str <br> &lt;&lt; endl &lt;&lt; str &lt;&lt; endl; <br><br> delete &amp;str; <br><br> return 0; <br>} <br><br>string&amp; foo() { <br> string *s = new string("This is caterpillar speaking."); <br><br> cout &lt;&lt; "address: " &lt;&lt; s <br> &lt;&lt; endl &lt;&lt; *s &lt;&lt; endl; <br><br> return *s; <br>}<br></pre>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span><small><span class="postbody">執行結
+果：</span></small><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">address: 0x3d2458<br>
+
+
+
+This is caterpillar speaking.<br>
+
+
+
+address: 0x3d2458<br>
+
+
+
+This is caterpillar speaking.</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+
+      <small>使用傳參考的方式是直接告知物件的記憶體位置，而沒有作物件複製的動作，可以加快程式執行的效率，而某些情況下，
+編譯器也會自行將物件的傳回結果自動設定
+為傳參考，即使語法上並沒有指定，例如： <br>
+
+
+
+      </small> <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;string&gt; <br>using namespace std; <br><br>string foo(); <br><br>int main() { <br> string str = foo(); <br><br> cout &lt;&lt; "address: " &lt;&lt; &amp;str <br> &lt;&lt; endl &lt;&lt; str &lt;&lt; endl; <br> <br> str = foo(); // 指定新字串，會複製一份<br> <br> cout &lt;&lt; "address: " &lt;&lt; &amp;str <br> &lt;&lt; endl &lt;&lt; str &lt;&lt; endl; <br> <br> return 0; <br>} <br><br>string foo() { <br> string s = "This is caterpillar speaking."; <br><br> cout &lt;&lt; "address: " &lt;&lt; &amp;s <br> &lt;&lt; endl &lt;&lt; s &lt;&lt; endl; <br><br> return s; <br>}<br></pre>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span><small><span class="postbody">執行結
+果：</span></small><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">address: 0x22ff50<br>
+
+
+
+This is caterpillar speaking.<br>
+
+
+
+address: 0x22ff50<br>
+
+
+
+This is caterpillar speaking.<br>
+
+
+
+address: 0x22ff40<br>
+
+
+
+This is caterpillar speaking.<br>
+
+
+
+address: 0x22ff50<br>
+
+
+
+This is caterpillar speaking.</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+
+      <small>在這個程式中，第一行宣告str並指定foo()傳回值時，雖然並沒有指定傳回參考，但是您可以看到兩個字串變數
+的值都指向同一塊記憶體，但是編譯器會自
+動判斷並以傳參考的方式來傳回這個物件，而不是使用傳值的方法傳回，這是編譯器的功能，您可以將之當作一個效率上的考量作法，但不可以將之當作一個傳參考
+的方式來使用。 <br>
+
+
+
+      <br>
+
+
+
+必須注意的是，函式中的區域變數在函式開始時被配置，在函式結束後所佔有的記憶體位址也會被清除，絕對不要傳回一個區域變數的位址給呼叫者，或是以傳參考
+的方式傳回一個區域變數，因為您所存取的記憶體位址中資料是未知的，所以結果是不可預期的。</small> </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/returnBy.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

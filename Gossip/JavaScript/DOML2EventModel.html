@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/DOML2EventModel.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:30 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>DOM Level 2 事件模型</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: DOM Level 2 事件模型<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/DOMLevel2EventModel.html">English</a><br>
+      </div>
+      <small><big><br>
+<a href="BasicEventModel.html"><small>基本事件模型</small></a></big> 的缺點之一，就是只能註冊一個事件處理器，如果你想註冊多個事件處理器，那麼類似以下的方式是行不通的：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">window.onload = function() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 處理器一</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">};</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+window.onload = function() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+&nbsp;&nbsp;&nbsp; // 處理器二</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+};</small><br>
+      </div>
+      <br>
+      <small>在上例中，第二個函式實例會成為onload參考的對象，而第一個函式實例就不再有用了。如果你想在基本事件處理中，在事件發生時處理時呼叫兩個以上的函式，則必須透過設計的方式來達到，最簡單的方式之一就是...<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">function handler1() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">function handler2() {</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+}</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">window.onload = function() {</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; handler1();</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; handler2();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">};</span></small><br>
+      </div>
+      <small><br>
+但通常這類設計方式不好管理。事件模型在DOM Level 2時獲得標準化，所以又稱為<span style="font-weight: bold;">標準事件模型</span>，<span style="font-weight: bold;">DOM Level 2事件模型</span>允
+許你一次註冊兩個以上的事件，不過DOM Level 2並沒有獲得Internet Explorer的支援，所以接下來的程式，僅可在支援DOM
+Level 2標準事件的瀏覽器上執行。（在Internet Explorer 9之後，DOM Level 2事件模型終於得到比較好的支援。）<br>
+      <br>
+在DOM Level 2事件模型中，要註冊事件，必須使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">addEventListener()</span>方法。舉個例子來說，若要以DOM Level 2事件模型實現 </small><small><small><big><big><a href="BasicEventModel.html"><small>基本事件模型</small></a></big> 中第一個範例，可以如下：<br>
+</big></small></small>
+      <ul>
+        <li><small><small><big><a href="samples/DOML2EventModel-1.html">DOML2EventModel-1.html</a></big></small></small></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.<span style="font-weight: bold;">addEventListener</span>('load', function() {<br>                function handler() {<br>                    document.getElementById('console').innerHTML <br>                         = 'Who\'s clicked: ' + this.id;<br>                }<br>                document.getElementById('btn1')<br>                    .<span style="font-weight: bold;">addEventListener</span>('click', handler, false);<br>                document.getElementById('btn2')<br>                    .<span style="font-weight: bold;">addEventListener</span>('click', handler, false);<br>            }, false);<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;button id="btn1"&gt;按鈕一&lt;/button&gt;&lt;br&gt;<br>        &lt;button id="btn2"&gt;按鈕二&lt;/button&gt;&lt;br&gt;<br>        &lt;div id="console"&gt;&lt;/div&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><small><big><br>
+      </big></small></small><small><span style="font-family: Courier New,Courier,monospace;">addEventListener()的第一個參數指出要註冊的事件，不需要'on'開頭，第二個參數是事件處理器，第三個參數為false時，表示這是個事件浮昇處理器（之後再說明）。<br>
+      <br>
+在上例中，於事件處理器中使用this取得目前觸發事件的元素，雖然目前多數遵守</span>DOM Level 2<span style="font-family: Courier New,Courier,monospace;">的瀏覽器都會如此實作，</span></small><small><span style="font-family: Courier New,Courier,monospace;">不過這並不是</span>DOM Level 2<span style="font-family: Courier New,Courier,monospace;">標準的規範，在</span>DOM Level 2<span style="font-family: Courier New,Courier,monospace;">的標準中，可以從Event實例的<span style="font-weight: bold;">currentTarget</span>特性來取得目前觸發事件的元素。</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+在</span>DOM Level 2<span style="font-family: Courier New,Courier,monospace;">事件模型下，Event會作為事件處理器的第一個參數傳入，有些事件有預設的動作，若要停止預設動作，在</span>DOM Level 2<span style="font-family: Courier New,Courier,monospace;">事件模型下，必須呼叫Event的<span style="font-weight: bold;">preventDefault(</span>)方法（而不是從事件處理器中傳回false）。例如可改寫<span style="font-weight: bold;"> </span></span></small><small><small><big><big><a href="BasicEventModel.html"><small>基本事件模型</small></a></big> 中第三個表單驗證範例</big></small></small><small><span style="font-family: Courier New,Courier,monospace;">：<br>
+      </span></small>
+      <ul>
+        <li><small><a href="samples/DOML2EventModel-2.html">DOML2EventModel-2.html</a></small></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.addEventListener('load', function() {<br>                document.form1.addEventListener('submit', function(<span style="font-weight: bold;">event</span>) {<br>                    if(event.<span style="font-weight: bold;">currentTarget</span>.data.value.length === 0) {<br><span style="font-weight: bold;">                        event.preventDefault();</span><br>                    }<br>                }, false);<br>            }, false);<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;form name="form1" action="fake.do"&gt;<br>            輸入資料：&lt;input name="data"&gt;&lt;br&gt;<br>            &lt;button type="submit"&gt;送出&lt;/button&gt;<br>        &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span>在DOM Level 2事件模型中，事件會歷經兩個傳播階段，當事件發生時，會先從<span style="font-family: Courier New,Courier,monospace;">document</span>往內傳播至操作目標元素，這個階段稱之為<span style="font-weight: bold;">捕捉階段（Capturing phase）</span>，接著事件再從操作目標元素往外傳播至<span style="font-family: Courier New,Courier,monospace;">document</span>，這個階段稱之為<span style="font-weight: bold;">氣泡階段（Bubbling phase）</span>。<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">addEventListener()方法的第三個參數若為true，表示事件處理器將作為捕捉階段處理器，若為false則為氣泡階段處理器。</span><br>
+      <br>
+例如，可改寫 </small><small><a href="Event.html">Event 實例</a> 中第一個範例，同時設定兩個階段的處理器來觀察事件：<br>
+      </small>
+      <ul>
+        <li><a href="samples/DOML2EventModel-3.html"><small>DOML2EventModel-3.html</small></a></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.addEventListener('load', function() {<br>                function handler(event) {<br>                    document.getElementById('console').innerHTML += <br>                      '&lt;br&gt;&lt;b&gt;currentTarget.id:&lt;/b&gt; '<br>                          + event.currentTarget.id + <br>                      ', &lt;b&gt;target.id:&lt;/b&gt; ' + event.target.id;<br>                }<br>                document.getElementById('bodyId')<br>                    .addEventListener('click', handler, true);<br>                document.getElementById('bodyId')<br>                    .addEventListener('click', handler, false);<br>                document.getElementById('divId')<br>                    .addEventListener('click', handler, true);<br>                document.getElementById('divId')<br>                    .addEventListener('click', handler, false);<br>                document.getElementById('btnId')<br>                    .addEventListener('click', handler, true);<br>                document.getElementById('btnId')<br>                    .addEventListener('click', handler, false);<br>            }, false);<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body id="bodyId"&gt;<br>        &lt;div id="divId"&gt;&lt;button id="btnId"&gt;按我&lt;/button&gt;&lt;/div&gt;<br>        &lt;span id="console"&gt;&lt;/span&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+操作的目標元素，可以使用<span style="font-family: Courier New,Courier,monospace;">Event的target</span>特性取得。如果按下按鈕，會發現以下的結果，可發現事件先從外往內，再從內往外傳播：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span id="console"><b>currentTarget.id:</b> bodyId, <b>target.id:</b> btnId<br><b>currentTarget.id:</b> divId, <b>target.id:</b> btnId<br><b>currentTarget.id:</b> btnId, <b>target.id:</b> btnId<br><b>currentTarget.id:</b> btnId, <b>target.id:</b> btnId<br><b>currentTarget.id:</b> divId, <b>target.id:</b> btnId<br><b>currentTarget.id:</b> bodyId, <b>target.id:</b> btnId</span>
+      </small></div>
+      <br>
+      <small>如果你想要停止事件傳播，必須呼叫<span style="font-family: Courier New,Courier,monospace;">Event的<span style="font-weight: bold;">stopPropagation()</span>方法。</span></small><small><span style="font-family: Courier New,Courier,monospace;">例如上一個範例若僅註冊浮昇處理器，要停止目標元素外的事件傳播，可以如下：<br>
+</span></small>
+      <ul>
+        <li><a href="samples/DOML2EventModel-4.html"><small>DOML2EventModel-4.html</small></a></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.addEventListener('load', function() {<br>                function handler(event) {<br>                    document.getElementById('console').innerHTML += <br>                        '&lt;br&gt;&lt;b&gt;currentTarget.id:&lt;/b&gt; ' <br>                            + event.currentTarget.id + <br>                        ', &lt;b&gt;target.id:&lt;/b&gt; ' + event.target.id;<br><span style="font-weight: bold;">                    event.stopPropagation();</span><br>                }<br><br>                document.getElementById('bodyId')<br>                    .addEventListener('click', handler, false);<br>                document.getElementById('divId')<br>                    .addEventListener('click', handler, false);<br>                document.getElementById('btnId')<br>                    .addEventListener('click', handler, false);<br>            }, false);<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body id="bodyId"&gt;<br>        &lt;div id="divId"&gt;&lt;button id="btnId"&gt;按我&lt;/button&gt;&lt;/div&gt;<br>        &lt;span id="console"&gt;&lt;/span&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">若要移除事件處理器，則可以使用<span style="font-weight: bold;">removeEventListener()</span>，第一個參數指定事件類型，第二個參數是當初註冊的函式實例，第三個參數指出要移除捕捉階段（true）或浮昇階段（false）的處理器。</span><br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/DOML2EventModel.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:31 GMT -->
+</html>

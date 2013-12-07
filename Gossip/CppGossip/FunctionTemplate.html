@@ -1,0 +1,521 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/FunctionTemplate.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>函式範本（Function template）</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip: 函式範本（Function template）</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+來看看氣泡排序法：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>//
+整數氣泡排序法<br>
+
+
+
+      </small></div>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+bubbleSort(int number[], int length) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; int i, j, k, flag = 1; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; int tmp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; for(i = 0; i &lt; length-1 &amp;&amp; flag == 1;
+i++) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; flag = 0; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; for(j = 0; j &lt; length-i-1; j++)
+{ </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(number[j+1]
+&lt; number[j]) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; tmp = number[j]; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; number[j] = number[j+1]; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; number[j+1] = tmp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; flag = 1; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+// 浮點數氣泡排序</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+bubbleSort(float number[], int length) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; int i, j, k, flag = 1; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; float tmp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; for(i = 0; i &lt; length-1 &amp;&amp; flag == 1;
+i++) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; flag = 0; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; for(j = 0; j &lt; length-i-1; j++)
+{ </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(number[j+1]
+&lt; number[j]) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; tmp = number[j]; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; number[j] = number[j+1]; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; number[j+1] = tmp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; flag = 1; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; } </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+函式範本（Function template）又稱「通用函式」（Generic
+function），它可以適用於不同資料型態的參數列，但實作內容相同的函式，以上面的氣泡排序法為例，除了參數列資料型態不同之外，其實排序的程式碼
+幾乎相同，實在沒必要為了資料型態的不同而重覆撰寫相同的程式碼。 <br>
+
+
+      <br>
+
+
+
+建立函式範本的方法之一是使用"template"關鍵字，並使用class來宣告取代用的資料型態宣告字，使用下面這個程式作個示範：</small>
+      <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>template &lt;class X&gt; <br>void bubbleSort(X[], int); <br><br>int main() { <br>    int iarr[] = {5, 3, 11, 6, 8, 9, 20, 11}; <br>    float farr[] = {5.1, 3.4, 11.3, 6.6, 8.9, 9.11, 20.2, 11.4}; <br><br>    bubbleSort(iarr, 8); <br>    for(int i = 0; i &lt; 8; i++) <br>        cout &lt;&lt; " " &lt;&lt; iarr[i]; <br>    cout &lt;&lt; endl; <br><br>    bubbleSort(farr, 8); <br>    for(int i = 0; i &lt; 8; i++) <br>        cout &lt;&lt; " " &lt;&lt; farr[i]; <br>    cout &lt;&lt; endl; <br> <br>    return 0; <br>} <br><br>template &lt;class X&gt; <br>void bubbleSort(X number[], int length) { <br>    int i, j, k, flag = 1; <br>    X tmp; <br><br>    for(i = 0; i &lt; length-1 &amp;&amp; flag == 1; i++) { <br>        flag = 0; <br>        for(j = 0; j &lt; length-i-1; j++) { <br>            if(number[j+1] &lt; number[j]) { <br>                tmp = number[j]; <br>                number[j] = number[j+1]; <br>                number[j+1] = tmp; <br>                flag = 1; <br>            } <br>        } <br>    } <br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>
+執行結果：</small></span><br>
+
+
+
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">&nbsp; 3 5 6 8 9 11
+11 20<br>
+
+
+
+&nbsp;3.4 5.1 6.6 8.9 9.11 11.3 11.4 20.2</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+            </span></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+      <small>
+在這個程式中，編譯器會自動產生兩個版本的bubbleSort()函式，一個是整數陣列的參數，一個是浮點數陣列的參數，也可以使用
+"typename"來取代class關鍵字，例如： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">template &lt;typename
+X&gt; </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">void bubbleSort(X
+number[], int length) { </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">&nbsp; &nbsp;
+.... </span><br style="font-weight: bold;">
+
+
+
+      <span style="font-weight: bold;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+"typename"是後來才加入至C++中的，早期的撰寫風格主要都是使用"class"。<br>
+
+
+      <br>
+
+
+
+在宣告了函式範本之後，您還是可以自行重載函式，例如： <br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">template
+&lt;class X&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+bubbleSort(X number[], int length) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">....
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+bubbleSort(int number[], int length, int descend) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">//
+以descend決定要由大至小或由小至大排序 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">....
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+在這個程式片段中，雖然您宣告了樣版函式bubbSort()，但您仍自行重載了一個函式以自行定義特定的函式功能。 </small> </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/FunctionTemplate.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

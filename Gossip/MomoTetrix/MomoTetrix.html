@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  
+<!-- Mirrored from openhome.cc/Gossip/MomoTetrix/MomoTetrix.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:12 GMT -->
+<head>
+    <title>Momo Tetrix</title>
+    <script type="text/javascript" src="js/tetrix.js"></script>
+    <script type="text/javascript">
+            window.onload = function() {
+                var isRestart = true;
+                var isPause = false;
+                var level = 1;
+                var speed = 1000;
+        
+                var logoIcon = new Image();
+                logoIcon.src = 'images/logo.jpg';
+                
+                var imgs = document.getElementsByTagName('img');
+                var images = [];
+                for(var i = 0; i < imgs.length; i++) {
+                    images.push(imgs[i]);
+                }
+                
+                for(var i = 0; i < images.length; i++) {
+                    document.body.removeChild(images[i]);
+                }
+                document.body.appendChild(logoIcon);
+        
+                var tetrixBox = new TetrixBox(4, 4, 25, 25);
+                tetrixBox.setTetrixImages(images);
+                tetrixBox.generate();
+        
+                var tetrixGround = new TetrixGround(10, 20);
+                tetrixGround.addPieceOfType(tetrixBox.getTetrixPiece().getType());
+        
+                var stackArea = new TetrixStackArea(tetrixBox, tetrixGround);
+                tetrixBox.generate();
+                
+                var stackareaCanvas = document.getElementById('stackarea');
+                stackareaCanvas.width = stackArea.getWidth();
+                stackareaCanvas.height = stackArea.getHeight();
+                var stackareaContext = stackareaCanvas.getContext('2d');
+                stackArea.paint(stackareaContext);
+                
+                var tetrixboxCanvas = document.getElementById('tetrixbox');
+                tetrixboxCanvas.width = tetrixBox.getWidth();
+                tetrixboxCanvas.height = tetrixBox.getHeight();
+                var tetrixboxContext = tetrixboxCanvas.getContext('2d');
+                tetrixBox.paint(tetrixboxContext);
+                
+                var levelLabel = document.getElementById('level');
+                var lineLabel = document.getElementById('line');
+                var scoreLabel = document.getElementById('score');
+                
+                document.getElementById('newGame').onclick = function() {
+                    this.blur();
+                    isRestart = true;
+                    // wait for 1 seconds to end the previous game
+                    setTimeout(function() {
+                        function down() {
+                            if(!isPause) {
+                                tetrixGround.moveTetrixDown();
+                                tetrixGround.updateGround();
+                               
+                                if(!tetrixGround.isMovable(0, 1)) { 
+                                    tetrixGround.addPieceOfType(tetrixBox.getTetrixPiece().getType());
+                                    tetrixBox.generate();
+                                    tetrixBox.paint(tetrixboxContext);
+                                    lineLabel.innerHTML = tetrixGround.getRemovedLines();
+                                    scoreLabel.innerHTML = tetrixGround.getScore();
+                                }
+                                
+                                stackArea.paint(stackareaContext);
+                                
+                                if((tetrixGround.getScore() / 50) > (level - 1)) {
+                                    level++;
+                                    if(speed > 200) {
+                                        speed -= 100;
+                                    }
+                                    levelLabel.innerHTML = level;
+                                }
+                            
+                                if(!tetrixGround.isGameover() && !isRestart) {
+                                    setTimeout(down, speed);
+                                }
+                            }
+                        }
+                        
+                        level = 1;
+                        speed = 1000;
+                        tetrixGround.reset();
+                        levelLabel.innerHTML = level;
+                        lineLabel.innerHTML = tetrixGround.getRemovedLines();
+                        scoreLabel.innerHTML = tetrixGround.getScore();
+                        
+                        isRestart = false;                        
+                        down();
+                    }, 1000);
+                };
+                
+                document.getElementById('pause').onclick = function() {
+                    this.blur();
+                    isPause = true;
+                    alert('Paused%20-%20http_/openhome.html');
+                    isPause = false;
+                };
+                
+                document.onkeydown = function(event) {
+                    if(isRestart || tetrixGround.isGameover() || isPause) {
+                        return;
+                    }
+                    
+                    switch (event.which) {
+                        case 39: // Right
+                            tetrixGround.moveTetrixRight()
+                            break;
+                        case 37: // Left
+                            tetrixGround.moveTetrixLeft();
+                            break;
+                       case 38: // Up
+                            tetrixGround.rotateTetrix(false);
+                            break;
+                       case 40: // Down
+                            tetrixGround.rotateTetrix(true);
+                            break;
+                       case 32: // Space
+                            tetrixGround.dropTetrix();
+                            break;
+                    }
+                    stackArea.paint(stackareaContext);
+                };
+            
+            };
+        </script>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  </head>
+  <body>
+    <div style="text-align: right;"><a href="https://github.com/JustinSDK/MomoTetrixHTML5-Toy">GitHub</a></div>
+    Momo Tetrix - Use Up, Down, Left, Right and Space to play. <br>
+    <br>
+    <canvas id="stackarea" style="border-style: solid; border-width: 1px; float: left;"></canvas> <canvas
+      id="tetrixbox" style="border-style: solid; border-width: 1px; margin-left: 10px; padding-top: 5px; padding-left: 5px;"></canvas><br>
+    <br>
+    　　Level : <span id="level">0</span><br>
+    　　Lines : <span id="line">0</span><br>
+    　　Score : <span id="score">0</span><br>
+    <br>
+    　<button id="newGame">New Game</button><br>
+    　<button id="pause">Pause</button><br>
+    <br>
+    <img src="images/1.jpg"> <img src="images/2.jpg"> <img src="images/3.jpg"> <img
+      src="images/4.jpg"> <img src="images/5.jpg"> <img src="images/6.jpg"> <img
+      src="images/7.jpg">
+  </body>
+
+<!-- Mirrored from openhome.cc/Gossip/MomoTetrix/MomoTetrix.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

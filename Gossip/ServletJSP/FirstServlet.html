@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/FirstServlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:49 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>第一個 Servlet</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 第一個 Servlet<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你要寫第一個Servlet，基本上不會太簡單，無論如何！有個整合開發環境（Integrated Development Environment, IDE）會方便許多，像是整合Glassfish的NetBeans IDE。<br>
+      <br>
+一個Servlet基本上必須繼承<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">javax.servlet.http.HttpServlet</span>，如果你要處理的是GET請求，則重新定義<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">doGet()</span>方法。例如：<br>
+      </small>
+      <ul>
+        <li><small>HelloWorld.java</small><br>
+        </li>
+      </ul>
+      <pre>package cc.openhome;<br><br>import java.io.IOException;<br>import java.io.PrintWriter;<br>import javax.servlet.ServletException;<br>import javax.servlet.annotation.WebServlet;<br>import javax.servlet.http.HttpServlet;<br>import javax.servlet.http.HttpServletRequest;<br>import javax.servlet.http.HttpServletResponse;<br><br><span style="font-weight: bold;">@WebServlet(name="HelloServlet", urlPatterns={"/hello.view"}<span style="font-weight: bold;">,<br>           &nbsp;</span>loadOnStartup=1)</span><br>public class HelloWorld <span style="font-weight: bold;">extends HttpServlet</span> {<br>    @Override<br>    protected void <span style="font-weight: bold;">doGet</span>(HttpServletRequest req, HttpServletResponse resp)<br>                        throws ServletException, IOException {<br>        PrintWriter out = resp.getWriter();<br>        out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Hello Servlet&lt;/title&gt;");<br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br>        out.println("&lt;h1&gt; Hello! World!&lt;/h1&gt;");<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>        out.close();<br>    }<br>}<br></pre>
+      <small><br>
+當客戶端發出HTTP GET請求時，若最後是由上面這個Servlet來處理，則會呼叫<span style="font-family: Courier New,Courier,monospace;">doGet()</span>方法，在<span style="font-family: Courier New,Courier,monospace;">doGet()</span>方法中，<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">javax.servlet.http.HttpServletRequest</span>是GET請求的Java代表物件，有關於GET請求的資訊都是由它來取得，而<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">javax.servlet.http.HttpServletResponse</span>則是回應的Java代表物件，在上例中，你透過<span style="font-family: Courier New,Courier,monospace;">getWriter()取得PrintWriter</span>，如果你要想對客戶端有任何純文字的回應，就使用它來進行輸出。<br>
+      <br>
+在這個例子中，只是輸出一連串的HTML標籤至客戶端，實際上並不會在Servlet中作HTML輸出，但這邊只是第一個Servlet，這麼作只是為了簡化範例。<br>
+      <br>
+容器是怎麼知道要由哪個Servlet來處理請求？在這個例子中，是透過標注（Annotation）<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">@WebServlet</span>來告知容器，<span style="font-family: Courier New,Courier,monospace;">HelloWorld</span>這個Servlet的名稱是<span style="font-family: Courier New,Courier,monospace;">HelloServlet</span>，這是由<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">name</span>屬性指定，而如果客戶端請求的URL是<span style="font-family: Courier New,Courier,monospace;">/hello.view</span>，則由<span style="font-family: Courier New,Courier,monospace;">HelloServlet</span>名稱的Servlet來處理，這是由<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">urlPatterns</span>屬性來指定。<br>
+      <br>
+所以，假設這個Servlet的應用程式路徑是ServletDemo，則請求http://localhost:8080/ServletDemo/hello.view，則會由這個Servlet處理。<br><br>
+當你的應用程式啟動後，事實上並沒有載入所有的Servlet。容器會在你請求時，才將對應的Servlet類別載入、實例化、進行初始動作，然後再處理
+你的請求。這意謂著第一次請求該Servlet的客戶端，必須等待Servlet類別載入、實例化、進行初始動作所必須花費的時間，才真正得到請求的處
+理。<br>
+      <br>
+如果你希望應用程式啟動時，就先將Servlet類別載入、實例化並作好初始化動作，則可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">loadOnStartup</span>設定。設定大於0的值（預設值-1），表示在啟動應用程式後就要初始化Servlet（而不是實例化幾個Servlet）。數字代表了Servlet的初始順序，</small><small>容器必須保證有較小數字的Servlet先初始化，</small><small>如果有多個Servlet在設定<span style="font-family: Courier New,Courier,monospace;">loadOnStartup</span>時使用了相同的數字，則容器實作廠商可以自行決定要如何載入哪個Servlet。<br>
+<br>
+使用標注來定義Servlet是在Java EE 6中Servlet 3.0的功能，你也可以使用<span style="font-weight: bold;">web.xml</span>檔案來定義Servlet，就像在Java EE 5中定義Servlet一樣。例如：<br>
+      </small>
+      <ul>
+        <li><small>web.xml</small></li>
+      </ul>
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"<br>xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>xsi:schemaLocation="http://java.sun.com/xml/ns/javaee<br>http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"&gt;<br><span style="font-weight: bold;">    &lt;servlet&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;servlet-name&gt;helloworld&lt;/servlet-name&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;servlet-class&gt;cc.openhome.HelloWorld&lt;/servlet-class&gt;<br>         &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;<br style="font-weight: bold;"></span><span style="font-weight: bold;">    &lt;/servlet&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;servlet-mapping&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;servlet-name&gt;helloworld&lt;/servlet-name&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;url-pattern&gt;/helloworld.view&lt;/url-pattern&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/servlet-mapping&gt;</span><br>&lt;/web-app&gt;<br></pre>
+
+      <small><br>
+使用XML來定義是比較麻煩一些，不過web.xml中的設定會覆蓋Servlet中的標注設定，你可以使用標注來作預設值，而web.xml來作日後更改設定值之用。在上例中，若有客戶端請求<span style="font-family: Courier New,Courier,monospace;">/helloworld.view</span>，則是由<span style="font-family: Courier New,Courier,monospace;">helloworld</span>這個Servlet來處理，這分別是由<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;servlet-mapping&gt;</span>中的<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;url-pattern&gt;</span>與<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;servlet-name&gt;</span>來定義，而<span style="font-family: Courier New,Courier,monospace;">helloworld</span>名稱的Servlet，實際上是<span style="font-family: Courier New,Courier,monospace;">HelloWorld</span>類別的實例，這分別是由<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;servlet&gt;</span>中的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;servlet-name&gt;</span>與<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;servlet-class&gt;</span>來定義。如果有多個Servlet在設定<span style="font-family: Courier New,Courier,monospace;">&lt;load-on-startup&gt;</span>時使用了相同的數字，則依其在web.xml中設定的順序來初始Servlet。<br>
+      <br>
+web.xml中的設定是選擇性的，你可以在一個Web應用程式中混用標注與web.xml設定，如果容器發現web.xml中指定的類別中亦有標注，會以web.xml為主。<br>
+      <br>
+如果你使用的是IDE，那基本上就可以執行應用程式並對Servlet發出請求了，實際上，IDE會將你的應用程式包裝為<span style="font-weight: bold;">WAR（Web Archive）</span>，然後上傳至應用程式伺服器（Application Server）完成部署（Deployment）。所謂WAR檔，實際上是一個副檔名為<span style="font-weight: bold;">.war</span>的檔案，使用zip格式進行包裝壓縮，而當中的結構（就目前的功能而言）必須如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">/ServletDemo.war/</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">/WEB-INF/</span></span></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;"></span></span></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="color: red;">/classes/</span></span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /cc/</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /openhome/</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|HelloWorld.class<br>
+      </span></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<span style="color: red;">web.xml</span></span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      <br>
+      </span>也就是說，一個Web應用程式中，編譯出來的.class檔案，必須放置在<span style="font-weight: bold;">/WEB-INF/classes/</span>資
+料夾中，並必須按照套件（Package）層次放在對應的資料夾內，如果你使用web.xml設定檔，則web.xml必須放置在/WEB-INF/中。
+WAR檔案是zip壓縮格式，所謂的部署，就是將WAR檔上傳至應用程式伺服器，由伺服器解壓縮並讀取設定、載入Servlet後進行服務（例如
+Tomcat
+7的話，就是將.war放置至/webapps目錄中）。如果你想要手動建立WAR檔案，也可以自己使用JDK工具程式jar來建立，僅要遵守要求的資料
+夾與檔案放置即可。<br>
+      </small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/FirstServlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:49 GMT -->
+</html>

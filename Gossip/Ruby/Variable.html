@@ -1,0 +1,762 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Variable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>變數</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 變數<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+  <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>依型態資訊是記錄在宣告在變數之上，或者是執行時期的物件之上，程式語言可以區分為靜態（Static）語言（例如C/C++、Java）與動態（Dynamic）語言（例如Python、JavaScript）。</small><br>
+
+      <small><br>Ruby是動態語言，也就是變數本身並沒有型態資訊，型態的資訊是在執行時期的物件之上，在Ruby中有五種變數，包括<span style="font-weight: bold;">區域變數</span>、<span style="font-weight: bold;">全域變數</span>、<span style="font-weight: bold;">實例變數</span>、<span style="font-weight: bold;">類別變數</span>與<span style="font-weight: bold;">常數</span>。<br>
+      <br>
+要建立區域變數，無需宣告型態，只要以小寫字母開頭命名變數並指定值給它，就建立了一個變數，在建立變數之前，嘗試存取某個變數會發生變數未定義的錯誤。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x<br>
+</span>NameError: undefined local variable or method `x' for main:Object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt; x = 10<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; x<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; x = "Justin"<br>
+            </span>=&gt; "Justin"<span style="font-weight: bold;"><br>
+&gt;&gt; x<br>
+            </span>=&gt; "Justin"<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+      <br>
+      <small>在上例中，一開始建立了一個<span style="font-family: Courier New,Courier,monospace;">x</span>變數，參考至整數10，由於變數本身沒有型態，之後你可以將字串<span style="font-family: Courier New,Courier,monospace;">"Justin"指定給x</span>。在Ruby中，變數始終是個參考至真實物件的名稱，指定運算只是更改變數的參考對象。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x = 1.0<br>
+</span>=&gt; 1.0<span style="font-weight: bold;"><br>
+&gt;&gt; y = x<br>
+            </span>=&gt; 1.0<span style="font-weight: bold;"><br>
+&gt;&gt; x.object_id<br>
+            </span>=&gt; 3696828<span style="font-weight: bold;"><br>
+&gt;&gt; y.object_id<br>
+            </span>=&gt; 3696828<span style="font-weight: bold;"><br>
+&gt;&gt; y = 2.0<br>
+            </span>=&gt; 2.0<span style="font-weight: bold;"><br>
+&gt;&gt; x.object_id<br>
+            </span>=&gt; 3696828<span style="font-weight: bold;"><br>
+&gt;&gt; y.object_id<br>
+            </span>=&gt; 20871252<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+      <small>在上例中，<span style="font-family: Courier New,Courier,monospace;">x</span>一開始參考至1.0浮點數物件，而後將<span style="font-family: Courier New,Courier,monospace;">x</span>參考的物件指定給<span style="font-family: Courier New,Courier,monospace;">y</span>來參考，你可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">object_id</span>方法來取得所參考物件的記憶體位址代表數字，可以看到<span style="font-family: Courier New,Courier,monospace;">x與y</span>都參考同一物件。之後<span style="font-family: Courier New,Courier,monospace;">y</span>參考至2.0，所以<span style="font-family: Courier New,Courier,monospace;">x與y</span>就參考至不同的物件。</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x = 1<br>
+</span>=&gt; 1<span style="font-weight: bold;"><br>
+&gt;&gt; x.object_id<br>
+            </span>=&gt; 3<span style="font-weight: bold;"><br>
+&gt;&gt; x = x + 1<br>
+            </span>=&gt; 2<span style="font-weight: bold;"><br>
+&gt;&gt; x.object_id<br>
+            </span>=&gt; 5<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+      <small>一開始<span style="font-family: Courier New,Courier,monospace;">x</span>參考至1整數物件，之後<span style="font-family: Courier New,Courier,monospace;">+</span>運算後，建立了新的2整數物件，而後指定給<span style="font-family: Courier New,Courier,monospace;">x</span>，所以x參考至新的物件。由於變數在Ruby中只是個參考至物件的名稱，所以對於可變動物件，才會有以下的操作結果：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x = [1, 2]<br>
+</span>=&gt; [1, 2]<span style="font-weight: bold;"><br>
+&gt;&gt; x[0] = 10<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; x<br>
+            </span>=&gt; [10, 2]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>在Ruby中，<span style="font-family: Courier New,Courier,monospace;">==</span>常單純比較兩個物件的實質內容是否相同。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; list1 = [1, 2, 3]<br>
+</span>=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; list2 = [1, 2, 3]<br>
+            </span>=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt; list1 == list2<br>
+            </span>=&gt; true<br>
+            <span style="font-weight: bold;">&gt;&gt; list1.object_id</span><br>
+=&gt; 21564936<br>
+            <span style="font-weight: bold;">&gt;&gt; list2.object_id</span><br>
+=&gt; 21538056<br>
+            <span style="font-weight: bold;">&gt;&gt; list1.equal? list2</span><br>
+=&gt; false<br>
+<span style="font-weight: bold;">
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small>上例中，實際上<span style="font-family: Courier New,Courier,monospace;">list1與list2</span>是參考至不同的物件，如果想知道兩個變數是否參考同一物件，除了使用<span style="font-family: Courier New,Courier,monospace;">object_id</span>得知之外，通常還可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">equal?</span>方法。<br>
+</small><small><br>
+相等比較還可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">eql?</span>方法，這個方法通常會檢查變數是否參考同一實例，若否則</small><small>比較物件是否為同一類別的實例，若是則</small><small>比較實值是否相同。</small><small>例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; x = 1.0<br>
+</span>=&gt; 1.0<span style="font-weight: bold;"><br>
+&gt;&gt; y = 1<br>
+            </span>=&gt; 1<span style="font-weight: bold;"><br>
+            </span>&gt;&gt; x == y<span style="font-weight: bold;"><br>
+=&gt; true<br>
+&gt;&gt; x.eql? y<br>
+            </span>=&gt; false<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">上例中，x與y參考的物件分別是Float與Fixnum的實例，因此eql?比較結果為false。<br>
+      <br>
+</small><small style="font-family: Courier New,Courier,monospace;">相等比較還可以使用===，通常若===兩邊都是實例，</small><small style="font-family: Courier New,Courier,monospace;">預設實作會比較兩個變數是否參考同一實例，如果不是，會再呼叫==。如果左邊是類別而右且是實例，===比較實例是否由該類別所生成。使用</small><a href="CaseWhenElse.html"><small>case...when...else</small></a> <small style="font-family: Courier New,Courier,monospace;">時，就是使用===作為依據。</small><small style="font-family: Courier New,Courier,monospace;"><br></small><small style="font-family: Courier New,Courier,monospace;"></small><small style="font-family: Courier New,Courier,monospace;"><br>
+      </small><small>Ruby</small><small style="font-family: Courier New,Courier,monospace;">區域變數有個特性，直譯器只要看到程式碼中有「變數=值」的語句，就會為建立該變數，這會造成有以下的結果：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; if false<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; a = 10<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; a<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; b<br>
+            </span>NameError: undefined local variable or method `b' for main:Object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):5<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">在上例中，雖然if的區塊不會執行，但直譯器看到a = 10，就會建立a變數，因此之後嘗試顯示a的值，是有a變數但預設為nil，然後b變數是不存在的，因此出現錯誤。<br>
+</small><small style="font-family: Courier New,Courier,monospace;"><br>
+在</small><small>Ruby</small><small style="font-family: Courier New,Courier,monospace;">中若要建立全域變數，變數名稱只要以$開頭，全域變數一旦建立，整個程式都是可見。例如：<br>
+      </small>
+      <ul>
+        <li>main.rb</li>
+      </ul>
+      <pre>$x = 10<br>x = 20<br>puts "%d, %d" % [$x, x]<br><br>load "util.rb"<br><br>puts "%d, %d" % [$x, x]<br></pre>
+      <small><br>
+      </small>
+      <ul>
+        <li>util.rb</li>
+      </ul>
+      <pre>$x = 100<br>x = 200<br></pre>
+      <small><br>
+在上例中，main.rb中的<span style="font-family: Courier New,Courier,monospace;">$x是全域變數，x</span>是區域變數，範圍限於main.rb中，util.rb中的<span style="font-family: Courier New,Courier,monospace;">$x</span>是全域變數，x是區域變數，範圍限於util.rb中，在<span style="font-family: Courier New,Courier,monospace;">load "util.rb"執行其內容時，$x</span>被設定為100，由於是全域變數，這個修改在main.rb是可見的，<span style="font-family: Courier New,Courier,monospace;">因此第二次puts時，會看到$x的值為100。</span></small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby main.rb<br>
+</span>10, 20<br>
+100, 20<span style="font-weight: bold;"><br><br>
+&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>在Ruby中有一些內建的全域變數，用來儲存整個系統可見的資訊，可查看Ruby安裝目錄中的English.rb，瞭解有哪些全域變數可用。例如：</small><br>
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; $$<br>
+</span>=&gt; 4656<span style="font-weight: bold;"><br>
+&gt;&gt; require "English"<br>
+            </span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt; $PID<br>
+            </span>=&gt; 4656<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">$$可以取得目前程式的行程</small><small>ID</small><small style="font-family: Courier New,Courier,monospace;">，要求English特性之後，可以用較清楚的名稱使用全域變數，例如$PID就等於$$。</small><br>
+      <br>
+      <small>如果變數名稱以大寫作開頭，則稱之為常數，在Ruby中，常數並非不能修改，只不過你對常數作第二次修改的話，直譯器會提出警告：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; XCONST = 10<br>
+</span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; XCONST = 20<br>
+            </span>(irb):2: warning: already initialized constant XCONST<br>
+=&gt; 20<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <small><small><br>
+      </small>實例變數與類別變數，之後會再說明。</small><br>
+      <small><br>
+      </small>
+      <small><br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Variable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/InetAddress.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>InetAddress 類別</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: InetAddress 類別</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>網路程式的第一步通常是從網址資訊的處理開始，這很容易理解，如果連網址都無法取得，更別談網路連線了。 <br>
+
+
+      <br>
+
+
+java.net.InetAddress類別可用來包裝與進行網址處理的相關操作，它要有幾個靜態方法傳回InetAddress物件： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public static InetAddress InetAddress.getLocalHost() </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public static InetAddress InetAddress.getByName(String hostname) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">public static InetAddress[] InetAddress.getAllByName(String hostname) </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+InetAddress主要包括兩個欄位（field），即名稱與位址，名稱即像是openhome.cc這樣的名稱，
+而位址則是IP位址，我們可以使用getHostName()與getHostAddress()方法分別取得這兩個資訊。 <br>
+
+
+      <br>
+
+
+getLocalhost()可以取得本機網址資訊，下面這個簡單的程式即可顯示本機名稱與位址： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>Host.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.net.*;<br><br>public class Host {<br>    public static void main(String[] args) {    <br>        try {<br>            InetAddress address = InetAddress.getLocalHost();<br>            System.out.println(address); <br>            System.out.printf("HostName: %s%n", address.getHostName()); <br>            System.out.printf("HostAddress: %s%n", address.getHostAddress()); <br>        } catch (UnknownHostException e) {<br>            e.printStackTrace();<br>        } <br>    }<br>}</pre>
+
+
+      <br>
+
+
+      <small>執行結果： </small><br>
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">caterpillar-PC/192.168.1.23<br>
+
+
+HostName: caterpillar-PC<br>
+
+
+HostAddress: 192.168.1.23</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+      <small>下面的程式也很簡單，可以指定查詢遠端主機的名稱與IP位址：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>Host.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.net.*;<br><br>public class Host {<br>    public static void main(String[] args) {    <br>        try {<br>            InetAddress address = InetAddress.getByName(args[0]);<br>            System.out.println(address); <br>            System.out.printf("HostName: %s%n", address.getHostName()); <br>            System.out.printf("HostAddress: %s%n", address.getHostAddress()); <br>        } catch (UnknownHostException e) {<br>            e.printStackTrace();<br>        } <br>    }<br>}<br></pre>
+
+
+      <br>
+
+
+      <small>執行結果： </small><br>
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java onlyfun.caterpillar.Host openhome.cc<br>
+
+
+openhome.cc/64.22.69.61<br>
+
+
+HostName: openhome.cc<br>
+
+
+HostAddress: 64.22.69.61</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+      <small>有的網站上可能擁有不止一個的IP位址，可以使用getAllByName()方法取回所有的網址資訊，這會傳回InetAddress物件陣列，可以使用迴圈將這些物件一一取出，下面的程式是一個簡單的示範： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>Host.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.net.*;<br><br>public class Host {<br>    public static void main(String[] args) {<br>        try { <br>            InetAddress[] addresses = InetAddress.getAllByName(args[0]); <br>            for(int i = 0; i &lt; addresses.length; i++) <br>                System.out.println(addresses[i]); <br>        } <br>        catch(UnknownHostException e) { <br>            e.printStackTrace();<br>        } <br>    }<br>}<br></pre>
+
+
+      <br>
+
+
+      <small>執行結果： </small><br>
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java onlyfun.caterpillar.Host cnn.com</span></small><br>
+
+
+            <small><span style="color: rgb(255, 255, 255);">cnn.com/64.236.16.20<br>
+
+
+cnn.com/64.236.16.52<br>
+
+
+cnn.com/64.236.24.12<br>
+
+
+cnn.com/64.236.29.120</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+      <span class="postbody">
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+         <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/InetAddress.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:22 GMT -->
+</html>

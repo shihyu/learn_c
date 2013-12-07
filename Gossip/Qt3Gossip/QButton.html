@@ -1,0 +1,587 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QButton.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:43 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>QButton 類別下的一堆按鈕</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: QButton 類別下的一堆按鈕</a></h1>
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QPushButton、QCheckBox、QRadioButton等Widget類別，它們都繼承自QButton類別，在Qt安裝後所提供的線上範例，有一個程式將這些類別整合在一起加以顯示，這邊我們解釋這個程式，這個程式雖然長，但其實很簡單。 <br>
+
+
+      <br>
+
+
+首先編輯定義檔buttongroups.h： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>buttongroups.h</li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>#ifndef BUTTONS_GROUPS_H<br>#define BUTTONS_GROUPS_H<br><br>#include &lt;qwidget.h&gt;<br><br>class QCheckBox;<br>class QRadioButton;<br><br>class ButtonsGroups : public QWidget<br>{<br>    Q_OBJECT<br><br>public:<br>    ButtonsGroups( QWidget *parent = 0, const char *name = 0 );<br><br>protected:<br>    QCheckBox *state;<br>    QRadioButton *rb21, *rb22, *rb23;<br><br>protected slots:<br>    void slotChangeGrp3State();<br><br>};<br><br>#endif<br></pre>
+
+
+      <br>
+
+
+      <small>其中class QCheckBox;與class QRadioButton;是一個技巧，我們在這邊還沒有正式使用到這兩個類別，所以我們「向前宣告」這兩個類別；接下來我們編輯buttongroups.cpp： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>buttongroups.cpp</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include "buttongroups.h"<br><br>#include &lt;qpopupmenu.h&gt;<br>#include &lt;qbuttongroup.h&gt;<br>#include &lt;qlayout.h&gt;<br>#include &lt;qradiobutton.h&gt;<br>#include &lt;qcheckbox.h&gt;<br>#include &lt;qgroupbox.h&gt;<br>#include &lt;qpushbutton.h&gt;<br><br>/*<br>* Constructor<br>*<br>* Creates all child widgets of the ButtonGroups window<br>*/<br><br>ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )<br>    : QWidget( parent, name )<br>{<br>    // Create Widgets which allow easy layouting<br>    QVBoxLayout *vbox = new QVBoxLayout( this, 11, 6 );<br>    QHBoxLayout *box1 = new QHBoxLayout( vbox );<br>    QHBoxLayout *box2 = new QHBoxLayout( vbox );<br><br>    // ------- first group<br><br>    // Create an exclusive button group<br>    QButtonGroup *bgrp1 = new QButtonGroup( 1, QGroupBox::Horizontal, <br>                                   "Button Group 1 (exclusive)", this);<br>    box1-&gt;addWidget( bgrp1 );<br>    bgrp1-&gt;setExclusive( TRUE );<br><br>    // insert 3 radiobuttons<br>    QRadioButton *rb11 = new QRadioButton( "&amp;Radiobutton 1", bgrp1 );<br>    rb11-&gt;setChecked( TRUE );<br>    (void)new QRadioButton( "R&amp;adiobutton 2", bgrp1 );<br>    (void)new QRadioButton( "Ra&amp;diobutton 3", bgrp1 );<br><br>    // ------- second group<br><br>    // Create a non-exclusive buttongroup<br>    QButtonGroup *bgrp2 = new QButtonGroup( 1, QGroupBox::Horizontal, <br>                              "Button Group 2 (non-exclusive)", this );<br>    box1-&gt;addWidget( bgrp2 );<br>    bgrp2-&gt;setExclusive( FALSE );<br><br>    // insert 3 checkboxes<br>    (void)new QCheckBox( "&amp;Checkbox 1", bgrp2 );<br>    QCheckBox *cb12 = new QCheckBox( "C&amp;heckbox 2", bgrp2 );<br>    cb12-&gt;setChecked( TRUE );<br>    QCheckBox *cb13 = new QCheckBox( "Triple &amp;State Button", bgrp2 );<br>    cb13-&gt;setTristate( TRUE );<br>    cb13-&gt;setChecked( TRUE );<br><br>    // ------------ third group<br><br>    // create a buttongroup which is exclusive <br>    // for radiobuttons and non-exclusive for all other buttons<br>    QButtonGroup *bgrp3 = new QButtonGroup( 1, QGroupBox::Horizontal, <br>                                 "Button Group 3 (Radiobutton-exclusive)", this );<br>    box2-&gt;addWidget( bgrp3 );<br>    bgrp3-&gt;setRadioButtonExclusive( TRUE );<br><br>    // insert three radiobuttons<br>    rb21 = new QRadioButton( "Rad&amp;iobutton 1", bgrp3 );<br>    rb22 = new QRadioButton( "Radi&amp;obutton 2", bgrp3 );<br>    rb23 = new QRadioButton( "Radio&amp;button 3", bgrp3 );<br>    rb23-&gt;setChecked( TRUE );<br><br>    // insert a checkbox...<br>    state = new QCheckBox( "E&amp;nable Radiobuttons", bgrp3 );<br>    state-&gt;setChecked( TRUE );<br>    // ...and connect its SIGNAL clicked() with the SLOT slotChangeGrp3State()<br>    connect( state, SIGNAL( clicked() ), this, SLOT( slotChangeGrp3State() ) );<br><br>    // ------------ fourth group<br><br>    // create a groupbox which layouts its childs in a columns<br>    QGroupBox *bgrp4 = new QButtonGroup( 1, QGroupBox::Horizontal, <br>                               "Groupbox with normal buttons", this );<br>    box2-&gt;addWidget( bgrp4 );<br><br>    // insert four pushbuttons...<br>    (void)new QPushButton( "&amp;Push Button", bgrp4, "push" );<br><br>    // now make the second one a toggle button<br>    QPushButton *tb2 = new QPushButton( "&amp;Toggle Button", bgrp4, "toggle" );<br>    tb2-&gt;setToggleButton( TRUE );<br>    tb2-&gt;setOn( TRUE );<br><br>    // ... and make the third one a flat button<br>    QPushButton *tb3 = new QPushButton( "&amp;Flat Button", bgrp4, "flat" );<br>    tb3-&gt;setFlat(TRUE);<br><br>    // .. and the fourth a button with a menu<br>    QPushButton *tb4 = new QPushButton( "Popup Button", bgrp4, "popup" );<br>    QPopupMenu *menu = new QPopupMenu(tb4);<br>    menu-&gt;insertItem("Item1", 0);<br>    menu-&gt;insertItem("Item2", 1);<br>    menu-&gt;insertItem("Item3", 2);<br>    menu-&gt;insertItem("Item4", 3);<br>    tb4-&gt;setPopup(menu);<br>}<br><br>/*<br>* SLOT slotChangeGrp3State()<br>*<br>* enables/disables the radiobuttons of the third buttongroup<br>*/<br><br>void ButtonsGroups::slotChangeGrp3State()<br>{<br>    rb21-&gt;setEnabled( state-&gt;isChecked() );<br>    rb22-&gt;setEnabled( state-&gt;isChecked() );<br>    rb23-&gt;setEnabled( state-&gt;isChecked() );<br>}</pre>
+
+
+      <small><br>
+
+
+程式雖然長，但絕大多數都只是在配置元件，先看看註解，您可以大致瞭解每一個元件是如何配置的；接下來是最後一個主函式main.cpp的編輯： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>main.cpp</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include "buttongroups.h"<br>#include &lt;qapplication.h&gt;<br><br>int main( int argc, char **argv )<br>{<br>    QApplication a( argc, argv );<br><br>    ButtonsGroups buttonsgroups;<br>    buttonsgroups.resize( 500, 250 );<br>    buttonsgroups.setCaption( "Qt Example - Buttongroups" );<br>    a.setMainWidget( &amp;buttonsgroups );<br>    buttonsgroups.show();<br><br>    return a.exec();<br>}</pre>
+
+
+      <small><br>
+
+
+      <br>
+
+
+這個程式使用四個QButtonGroups將版面分為四個部份，每個部份置入一些QButton的子類別Widget，我們解說一些主要的方法，</small><small>setExclusive()可以設定QButtonGroups中的QButton類別子類別彼此之間是否互斥</small><small>： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">bgrp1-&gt;setExclusive( TRUE ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>上面這行主要讓您注意字串的指定，&amp;這個字元指定其下一個字元在顯示時加上底線，也就是顯示為Radiobutton 1，而指定的字元也是快捷鍵（accelerator key）的字元，例如這個例子可以使用Alt+R來將焦點移至rb11：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QRadioButton *rb11 = new QRadioButton( "&amp;Radiobutton 1", bgrp1 ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>設定核取方塊為三態，也就是擁有勾取、未勾取與關閉三種狀態，不過在某些視窗外觀下不一定會顯示：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cb13-&gt;setTristate( TRUE ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small><br>
+
+
+將Signal - clicked()連接至Slot - slotChangeGrp3State()，slotChangeGrp3State()會將第三個Group的單選鈕設定為失效，也就是下面這個程式： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">connect( state, SIGNAL( clicked() ), this, SLOT( slotChangeGrp3State() ) ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+      </small><small>setEnabled()可以設定單選鈕是否啟用：</small><br style="font-weight: bold;">
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void ButtonsGroups::slotChangeGrp3State() </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; rb21-&gt;setEnabled( state-&gt;isChecked() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; rb22-&gt;setEnabled( state-&gt;isChecked() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; rb23-&gt;setEnabled( state-&gt;isChecked() ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>QPushButton可以設定為ToggledButton，這是由setToggleButton()來設定，我們並使用setOn()來設定其預設狀態為按下：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QPushButton *tb2 = new QPushButton( "&amp;Toggle Button", bgrp4, "toggle" ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">tb2-&gt;setToggleButton( TRUE ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">tb2-&gt;setOn( TRUE ); </span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>設定QPushButton的外觀為不突起的按鈕外觀：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QPushButton *tb3 = new QPushButton( "&amp;Flat Button", bgrp4, "flat" ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">tb3-&gt;setFlat(TRUE); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>在QPushButton上設定QPopupMenu，也就是蹦現式選單，我們必須指定QPopupMenu屬於tb4，並設定tb4按下時顯示menu（setPopup()）：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QPushButton *tb4 = new QPushButton( "Popup Button", bgrp4, "popup" ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QPopupMenu *menu = new QPopupMenu(tb4); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">menu-&gt;insertItem("Item1", 0); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">menu-&gt;insertItem("Item2", 1); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">menu-&gt;insertItem("Item3", 2); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">menu-&gt;insertItem("Item4", 3); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">tb4-&gt;setPopup(menu); </span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+以下是執行結果：<br>
+
+
+      <img style="width: 542px; height: 309px;" alt="" src="images/QButton-1.jpg"><br>
+
+
+      </small>
+
+
+
+
+      <span class="postbody"><br>
+
+
+      </span><small>有的效果在某些主題下無法顯示，以下是另一個桌面主題所顯示的效果，我們看不到QCheckBox的三態效果： </small><br>
+
+
+<!--<img src="http://www.caterpillar.onlyfun.net/images/qt/qgroupbutton_2.jpg" border="0" />--><img style="width: 542px; height: 314px;" alt="" src="images/QButton-2.jpg"><br>
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QButton.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:50 GMT -->
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/JavaEESecurityABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>簡介 Java EE 安全</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 簡介 Java
+EE 安全</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      <br>
+
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>要
+防護應用程式的資源，驗證（Authentication）與授權（Authorization）是基本需求。<br>
+
+
+      <br>
+
+
+驗證基本上就是識別登入系統的使用者，是否為系統所允許的身份，是否如其所宣告的身份。授權則是對資源加以管理保護，針對請求資源的使用者，檢查其是否具
+備足夠的權限。<br>
+
+
+      <br>
+
+
+在Java EE中，容器提供驗證、授權服務，透過適當的組態設定或API，您可以讓容器為您管理大部份的驗證與授權，要運用Java
+EE所提供的驗證、授權服務，基本上您必須了解幾個概念名詞：<br>
+
+
+      </small>
+      
+      <ul>
+
+
+        <li><small>Realm</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>中文稱之為「域」
+或「範圍」，在Java EE的規範之中，Realm指的是身份驗證資料的來源，Realm可能是記憶體、檔案、憑證、資料庫、網路（如LDAP）等。<br>
+
+
+      <br>
+
+
+例如若為Web容器部份，Tomcat預設是將身份驗證資料儲存於tomcat-users.xml檔案之中，在啟動Tomcat之後，將該檔案載入記憶
+體作為Memory Realm，您也可以將之改為JDBC Realm。Glassfish</small><small>（原
+Sun Java System Application Server）</small><small>的Realm可以是
+File Realm（一般使用者）、Admin Realm（管理者）、 Certificate
+realm等，您可以在Glassfish管理介面中加以設定。</small></div>
+
+
+      
+      <ul>
+
+
+        <li><small>Role</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>在系統上會有
+User，而在多人共用的系統會有不同的權限，為了方便管理使用者的權限，通常會定義Group，將User歸類於某些Group，您可以直接將權限設定
+給Group，而Group下的User就擁有該權限。</small><br>
+
+
+      <br>
+
+
+      <small>然而在設計應用程式時，並無法事先得知系統上會有哪些Group，所以您無法直接在應用程式中使用Group名稱
+來設定資源的權限，因此在Java EE的規範中，是定義資源可以被哪些Role存取，至於如何將</small><small>系
+統上的Group對應至應用程式的Role不在Java EE的規範之中，而是依伺服器廠商的實作而有所不同。</small><br>
+
+
+      </div>
+
+
+
+      
+      <ul>
+
+
+        <li><small>Principal</small></li>
+
+
+      
+      </ul>
+
+
+      
+      <div style="margin-left: 40px;"><small>在設計應用程式
+時，因無法事先得知將被部署至的系統上，會有哪些User，因此</small><small>在Java
+EE中，登入系統的使用者是定義為Principal，您是依據Proincipal於應用程式中作識別驗證，如何將系統上的User對應至應用程式的
+Principal不在Java EE的規範之中，而是依伺服器廠商的實作而有所不同。</small></div>
+
+
+      <small><br>
+
+
+例如，Tomcat可以在tomcat-users.xml中設定Role與User的對應，而Glassfish，則可以在sun-web.xml、
+sun-ejb-jar.xml、sun-application.xmll等檔案中設定Role與Group的對應。</small><small><br>
+
+
+      </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/JavaEESecurityABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:53 GMT -->
+</html>

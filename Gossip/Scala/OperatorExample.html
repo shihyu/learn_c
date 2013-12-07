@@ -1,0 +1,739 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/OperatorExample.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>數值操作</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 數值操作</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Scala中，所謂的運算子其實是方法，可以在類別上定義這些方法以實現相關操作。在這邊，以基本的一些型態來示範這些運算子的基本意涵。<br><br></small><small>算術操作如+、-、*、/、%，</small><small>基本上與我們學過的加減乘除一樣，也是先乘除後加減，必要時加上括號表示運算的先後順序，例如這個程式碼會在主控台顯示7： <br></small><pre><span style="font-family: Courier New,Courier,monospace;">println(1 + 2 * 3)</span></pre><small><br><br></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small>同樣的，你也可以使用括號來指定運算順序，例如(1+2)*3這樣的方式。接下來看看這段程式碼：</small><small><br>
+
+      </small>
+
+
+
+      
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><pre><span style="font-family: Courier New,Courier,monospace;">println(10 / 3)</span></pre><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>&nbsp;</span></small><br><small>這會印出3而不是3.3333...，</small><small>小數點之後的部份被自動消去了，這是因為10是整數，而3也是整數，運算出來的程式被自動轉換為整數
+了，為了解決這個問題，可以使用下面的方法：<span style="font-family: Courier New,Courier,monospace;"><br></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-family: Courier New,Courier,monospace;"></span></span></small><pre><span style="font-family: Courier New,Courier,monospace;">println(10.0 / 3)</span></pre><small><span style="font-family: Courier New,Courier,monospace;"><br></span></small><small><span style="font-family: Courier New,Courier,monospace;">當運算式中有不同長度的型態時，所有數值會提昇為長度最長的型態再進行運算，以上例來說，就是全部用<span style="font-family: Times New Roman,Times,serif;">Double來運算，結果就會是Double，同樣的，如果是1L+3，則結果會是Long。<br><br>在操作數值時，對於浮點數要留意一下，例如：<br></span></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"></span></span></small><pre style="font-family: Courier New,Courier,monospace;">val x = 0.1<br>println((x + x + x) == 0.3)</pre><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"><br></span></span></small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-family: Times New Roman,Times,serif;"></span></span><span style="font-family: Times New Roman,Times,serif;">很意外的，印出的結果會是false，這是因為Scala使用IEEE754浮點數演算（IEEE 754 floating-point arithmetic），其並非以小數（decimal）表示，而是以分數及指數表示（Java也是），所以：<br></span></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">0.5 = 1/2</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">0.75 = 1/2 + 1/4</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">0.875 = 1/2 + 1/4 + 1/8</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">0.1 = 1/16 + 1/32 + 1/256 + 1/512 + 1/4096 + 1/8192 + ...</span></small><br style="font-weight: bold;"><small><span style="font-family: Times New Roman,Times,serif;"></span></small></div><small><span style="font-family: Times New Roman,Times,serif;"><br>所以，0.1並非是真正的0.1，而是分數模擬的結果，更多的例子，你可以參考 <a href="http://java.sun.com/developer/JDCTechTips/2003/tt0204.html#2">Some Things You Should Know About Floating-Point Arithmetic</a> 一文。<br><br>所以避免直接對浮點數作比較操作，若你對浮點數的精確有所要求，你要使用scala.BigDecimal，例如：<br></span></small><small><span style="font-family: Times New Roman,Times,serif;"></span></small><pre style="font-family: Courier New,Courier,monospace;">val x = BigDecimal("0.1")<br>println((x + x + x) == 0.3)</pre><small><span style="font-family: Times New Roman,Times,serif;"><br><br></span></small><small><span style="font-family: Times New Roman,Times,serif;"></span></small><small>關係操作如&gt;、&gt;=、&lt;、&lt;=、==、!=，</small><small>比較的條件成立時以true表示，比較的條件不成立時
+以false表示： <br></small><pre>println("10 &gt;&nbsp; 5&nbsp; -&gt; " + (10 &gt; 5))<br>println("10 &gt;= 5&nbsp; -&gt; " + (10 &gt;= 5))<br>println("10 &lt;&nbsp; 5&nbsp; -&gt; " + (10 &lt; 5))<br>println("10 &lt;= 5&nbsp; -&gt; " + (10 &lt;= 5))<br>println("10 == 5&nbsp; -&gt; " + (10 == 5))<br>println("10 != 5&nbsp; -&gt; " + (10 != 5))</pre><small><br></small><small>程式的執行如下所示：</small><span class="postbody"></span><br>
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">10 &gt;&nbsp; 5&nbsp; -&gt; true<br>
+
+
+
+10 &gt;= 5&nbsp; -&gt; true<br>
+
+
+
+10 &lt;&nbsp; 5&nbsp; -&gt; false<br>
+
+
+
+10 &lt;= 5&nbsp; -&gt; false<br>
+
+
+
+10 == 5&nbsp; -&gt; false<br>
+
+
+
+10 != 5&nbsp; -&gt; true</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+      </span></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+<br><small>在Scala中，==、!=是用來比較兩個物件內容值是否相同（這與Java不同，Java的==、!=是用來比較兩個參考是否為同一實例），例如Scala的List類別定義，若內含元素序列相同，則==傳回true：<br></small><pre>println(List(1, 2, 3) == List(1, 2, 3))</pre><small><br></small><small>如果你要比較兩個參考實際上是否為同一實例，可以使用<span style="font-weight: bold;">eq</span>方法或<span style="font-weight: bold;">ne</span>方法，例如以下傳回false：<br></small><pre>println(List(1, 2, 3) eq List(1, 2, 3))</pre><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br></span></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><span style="font-family: Times New Roman,Times,serif;"><span style="font-weight: bold;"></span></span></small><small><span style="font-family: Courier New,Courier,monospace;">之後還會針對如何定義物件相等性作詳細介紹，不過</span></small><small><span style="font-family: Times New Roman,Times,serif;">有一點必須先注意，<span style="font-weight: bold;">在Scala
+中，==與!=也是個方法定義，是由 <a href="http://www.scala-lang.org/docu/files/api/scala/Any.html">scala.Any</a>（Scala的最頂層父類別）繼承下來，不過你不可以定義==與!=（因為它們被宣告為
+final，你也不可以重新定義eq與ne，因為它們定義在 <a href="http://www.scala-lang.org/docu/files/api/scala/AnyRef.html">scala.AnyRef</a> 中，也是被宣告為final），如果你要定義物件內容值是否相同，則要重新定義
+equals()方法（與Java相同），因為Any中定義的==或!=方法，會呼叫equals()來檢查物件的相等性</span>。</span><span style="font-family: Courier New,Courier,monospace;"><br><br>邏輯操作如&amp;&amp;、||、!可用來</span></small><small>同時進行兩個以上的條件判斷，例如：</small><br><pre>val number = 75<br>println(number &gt; 70 &amp;&amp; number &lt; 80)<br>println(number &gt; 80 || number &lt; 75)<br>println(!(number &gt; 80))</pre><br><small>
+
+
+
+
+三段程式分別會輸出true、false與true三種狀況。&amp;&amp;、||有<span style="font-weight: bold;">捷徑（short-circuited）運算</span>的特性。因為&amp;&amp;只要有一個運算元為false，結果就會是false，所以如果&amp;&amp;的左運算元運算為false，就不會再去運算右運算元，直接傳回false。||則是只要有一個為true，結果就會是true，所以</small><small>如果||的左運算元運算為true，就不會再去運算右運算元，直接傳回true（實際上，&amp;&amp;、||也是個方法，右運算元不是得運算過才可以</small><small>作為引數</small><small>傳入方法嗎？這是因為Scala可以使用 <a href="ByNameParameter.html">以名呼叫參數（By-name parameter）</a> 的特性，來延遲或甚至不執行引數的運算）。<br><br></small><small><span style="font-family: Courier New,Courier,monospace;">位元操作如&amp;、|、^、~，用來執行</span></small><small>數位設計上AND、OR、XOR與補數等運算，例如：<br></small><pre>println("AND運算：")<br>println("0 AND 0\t\t" + (0 &amp; 0))<br>println("0 AND 1\t\t" + (0 &amp; 1))<br>println("1 AND 0\t\t" + (1 &amp; 0))<br>println("1 AND 1\t\t" + (1 &amp; 1))<br><br>println("\nOR運算：")<br>println("0 OR 0\t\t" + (0 | 0))<br>println("0 OR 1\t\t" + (0 | 1))<br>println("1 OR 0\t\t" + (1 | 0))<br>println("1 OR 1\t\t" + (1 | 1))<br><br>println("\nXOR運算：")<br>println("0 XOR 0\t\t" + (0 ^ 0))<br>println("0 XOR 1\t\t" + (0 ^ 1))<br>println("1 XOR 0\t\t" + (1 ^ 0))<br>println("1 XOR 1\t\t" + (1 ^ 1))</pre><small><span style="font-family: Courier New,Courier,monospace;"><br></span></small><small><span class="postbody">執行結果：</span></small><br>
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">AND運算： <br>
+
+
+
+
+0 AND 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 <br>
+
+
+
+
+0 AND 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 <br>
+
+
+
+
+1 AND 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 <br>
+
+
+
+
+1 AND 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 <br>
+
+
+
+
+&nbsp;<br>
+
+
+
+
+OR運算： <br>
+
+
+
+
+0 OR 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 <br>
+
+
+
+
+0 OR 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 <br>
+
+
+
+
+1 OR 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 <br>
+
+
+
+
+1 OR 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 <br>
+
+
+
+
+&nbsp;<br>
+
+
+
+
+XOR運算： <br>
+
+
+
+
+0 XOR 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 <br>
+
+
+
+
+0 XOR 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 <br>
+
+
+
+
+1 XOR 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 <br>
+
+
+
+
+1 XOR 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+      </span></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+<small><br>位元運算是逐位元運算的，例如10010001與01000001作AND運算，是一個一個位元對應運算，答案就是00000001；而補數
+運算是將所有的位元0變1，1變0，例如00000001經補數運算就會變為11111110，例如下面這個程式所示：<br></small><small></small><pre>val number: Byte = 0<br>println(~number)</pre><small><br></small><small>這個程式會在主控台顯示-1，因為Byte佔記憶體一個位元組，它儲存的0在記憶體中是00000000，經補數運算就變成11111111，這在電腦中
+用整數表示則是-1。</small><br><br><small><span style="font-family: Courier New,Courier,monospace;">以下是個</span></small><small>簡單的XOR字元加密例子：<br></small><pre>val original = 'A'<br>println("before encoding：" + original)   // 顯示A<br>println("after encoding：" + (original ^ 0x7).toChar) // 顯示F</pre><small><br></small><small>將位元與1作XOR的作用其實就是位元反轉，0x7的最右邊三個位元為1，所以其實就是反
+轉original的最後三個位元，</small><small>同樣的，這個簡單的XOR字元加密，要解密也只要再進行相同的位元反轉就可以了。</small><br><small><br></small><small>在位元運算上，Scala還有<span style="font-weight: bold;">左移（&lt;&lt;）</span>與<span style="font-weight: bold;">右移（&gt;&gt;）</span>兩個運算子，左移運算子會將所有的位元往左移指定的位
+數，左邊被擠出去的位元會被丟棄，而右邊會補上0；右移運算則是相反，會將所有的位元往右移指定的位數，右邊被擠出去的位元會被丟棄，至於左邊位元補0或
+補1 則視最左邊原來的位元而定，如果原來是0就補0，是1就補1，<span style="font-weight: bold;">&gt;&gt;&gt;</span>運算子則是右移後一行在最左邊補上0。<br><br></small><small>可以使用左移運算來作簡單的2次方運算示範，如下所示：</small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><pre>val number = 1<br>println("2的1次: " +  (number &lt;&lt; 1))<br>println("2的2次: " +  (number &lt;&lt; 2))<br>println("2的3次: " +  (number &lt;&lt; 3))<br>println("2的4次: " +  (number &lt;&lt; 4))</pre><small><br></small><small><span class="postbody">執行結果：</span></small><br>
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">2的1次: 2<br>2的2次: 4<br>2的3次: 8<br>2的4次: 16</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+      </span></td></tr></tbody></table><br><small>實際來左移看看就知道為何可以如此運算了： <br>
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">00000001 -&gt; 1</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">00000010 -&gt; 2</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">00000100 -&gt; 4</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">00001000 -&gt; 8 </span></small>
+
+
+
+
+
+
+
+
+
+
+
+<br><small><br></small><small><span style="font-family: Courier New,Courier,monospace;">指定操作如+=、-=、*=、/=、%=、&amp;=、|=、~=、&gt;&gt;=、&gt;&gt;&gt;=、&lt;&lt;=，主要就是完成以下的工作：</span></small><br>
+
+
+
+
+      
+      
+      <table style="width: 100%;" border="1">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="vertical-align: top; text-align: left; background-color: rgb(204, 204, 204); font-weight: bold;"><small>運
+算子 </small></td>
+
+
+
+
+      <td style="vertical-align: top; text-align: left; background-color: rgb(204, 204, 204); font-weight: bold;"><small>範
+例 </small></td>
+
+
+
+
+      <td style="vertical-align: top; text-align: left; background-color: rgb(204, 204, 204); font-weight: bold;"><small>結
+果 </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>+= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a += b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a + b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>-= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a -= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a - b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>*= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a *= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a * b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>/= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a /= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a / b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>%= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a %= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a % b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>&amp;= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a &amp;= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a &amp; b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>|= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a |= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a | b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>^= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a ^= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a ^ b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>&lt;&lt;= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a &lt;&lt;= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a &lt;&lt; b </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td align="left" valign="top"><small>&gt;&gt;= </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a &gt;&gt;= b </small></td>
+
+
+
+
+      <td align="left" valign="top"><small>a = a &gt;&gt; b</small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+        
+        
+        <tr><td align="left" valign="top"><small>&gt;&gt;&gt;=</small></td><td align="left" valign="top"><small>a &gt;&gt;&gt;= b</small></td><td align="left" valign="top"><small>a = a &gt;&gt;&gt; b</small></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+
+      <small><span style="font-weight: bold; font-family: Times New Roman,Times,serif;"></span></small><br><small>視你所使用的物件是否為<span style="font-weight: bold;">可變動的（Mutable）</span>，如果是<span style="font-weight: bold;">不可變動（Immutable）</span>物件，則上表操作方法左邊的參考名稱不能是val，而必須是var宣告，如果是可變動的，則左邊物件可以是val宣告（基本上就是看物件對上表方法是如何實作的）。</small><br><br style="font-family: Times New Roman,Times,serif;"><small style="font-family: Times New Roman,Times,serif;"></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/OperatorExample.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

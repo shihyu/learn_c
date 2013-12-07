@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/MultitableMapping.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>多表映射</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 多表映射</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <br>
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+      <br>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+      </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>有
+時您必須將同一個物件實體中的屬性，映射至兩個表格，例如，您有一個User類別，其中name與age屬性要映射至T_USER表格，而email、
+blog、twitter屬性要映射至T_CONTACT表格，T_USER與T_CONCACT表格分別擁有自己的主鍵ID為USER_ID與
+CONTACT_ID。<br>
+      <br>
+您可以使用@SecondTable來標註User物件所要映射的其它表格，例如：<br>
+      </small>
+      <ul>
+        <li><small>User.java</small></li>
+      </ul>
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.Serializable;<br>import javax.persistence.Column;<br>import javax.persistence.Entity;<br>import javax.persistence.GeneratedValue;<br>import javax.persistence.GenerationType;<br>import javax.persistence.Id;<br>import javax.persistence.PrimaryKeyJoinColumn;<br>import javax.persistence.SecondaryTable;<br>import javax.persistence.Table;<br><br>@Entity<br><span style="font-weight: bold;">@Table(name="T_USER")</span><br style="font-weight: bold;"><span style="font-weight: bold;">@SecondaryTable(name="T_CONTACT",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                pkJoinColumns={</span><br style="font-weight: bold;"><span style="font-weight: bold;">                   @PrimaryKeyJoinColumn(name="CONTACT_ID")})</span><br>public class User implements Serializable {<br>    @Id<br>    @GeneratedValue(strategy = GenerationType.AUTO)<br>    @Column(name="USER_ID")<br>    private Long id;<br>    private String name;<br>    private Long age;<br><br><span style="font-weight: bold;">    @Column(name="email", table="T_CONTACT")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private String email;</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    @Column(name="blog", table="T_CONTACT")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private String blog;</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    @Column(name="twitter", table="T_CONTACT")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private String twitter;</span><br style="font-weight: bold;"><br>    public Long getAge() { return age; }<br>    public void setAge(Long age) { this.age = age; }<br><br>    public String getBlog() { return blog; }<br>    public void setBlog(String blog) { this.blog = blog; }<br><br>    public String getEmail() { return email; }<br>    public void setEmail(String email) { this.email = email; }<br><br>    public Long getId() { return id; }<br>    public void setId(Long id) { this.id = id; }<br><br>    public String getName() { return name; }<br>    public void setName(String name) { this.name = name; }<br><br>    public String getTwitter() { return twitter; }<br>    public void setTwitter(String twitter) { this.twitter = twitter; }<br>}</pre>
+      <small><br>
+在@SecondTable中，必須指定所映射的第二個表格名稱，並使用內嵌的@PrimaryKeyJoinColumn來標註所要連結的主鍵欄位，該
+主鍵欄位值將與T_USER的主鍵欄位值同步。而在對應於第二個表格的屬性，則必須使用@Column標註出來，表明其對應哪一個表格的哪一個欄位。<br>
+      <br>
+如果您使用EntityManager來儲存User物件，則會分別將屬性儲存至所設定的對應欄位，而在查找時，則會使用left outer join從兩個表格中擷取欄位值，在刪除物件時，則會從兩個表格中刪除對應的資料。<br>
+      <br>
+如果一個實體物件所要映射的表格不只有兩個，而有兩個以上的話，則使用@SecondaryTables標註，而在內嵌的部份，再使用@SecnondTable分別標註出所要映射的表格，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">@Entity</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">@Table(name="CUSTOMER_TABLE")</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">@SecondaryTables({</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp; @SecondaryTable(name="T_CONTACT",</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pkJoinColumns={@PrimaryKeyJoinColumn (name="CONTACT_ID")}),</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp; @SecondaryTable(name="T_OOO",</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pkJoinColumns={@PrimaryKeyJoinColumn (name="OOO_ID")}),</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp; @SecondaryTable(name="T_XXX",</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pkJoinColumns={@PrimaryKeyJoinColumn (name="XXX_ID")})</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">})</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class User implements Serializable {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+      </div>
+      <small><br>
+而User類別中的屬性，同樣使用@Column來標註將映射至哪個表格。<br>
+      <br>
+      </small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/MultitableMapping.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/ActiveRecord.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>ActiveRecord 基礎</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror activerecord" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: ActiveRecord 基礎<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>ActiveRecord是Rails的物件/關聯映射（Object/Relational Mapping, ORM）解決方案，可以物件角度來進行資料庫操作，將物件與物件關係，映射至關聯資料庫表格與表格的關係，Rails的ActiveRecord方案實現了<a
+          href="http://martinfowler.com/eaaCatalog/activeRecord.html">ActiveRecord 模式</a>，物件本身代表資料表格中的一筆資料，物件本身攜帶資料庫存取的相關操作方法。</p>
+      <p>先前在 <a href="MVC.html">MVC 與 Rails</a> 中曾略為看過ActiveRecord的一些使用，當你使用rails generate model產生指定的資料庫模型物件時，會產生幾個檔案：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>$ rails g model message name:string content:text is_read:boolean<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp; active_record<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; db/migrate/20111214072231_create_messages.rb<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; app/models/message.rb<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp;&nbsp;&nbsp; test_unit<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; test/unit/message_test.rb<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; test/fixtures/messages.yml<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      以上例而言，*_create_messages.rb記錄了稍後執行db:migrate時要作的動作，其中*是時間標記，用以避免名稱衝突，就之前的指令主要是建立新表格：<br>
+      <ul>
+        <li>*_create_messages.rb</li>
+      </ul>
+      <pre>class CreateMessages &lt; ActiveRecord::Migration
+  def change
+    create_table :messages do |t|
+      t.string :name
+      t.text :content
+      t.boolean :is_read
+
+      t.timestamps
+    end
+  end
+end<br></pre>
+      <p> <span class="courier">create_table</span>方法指定建立messages表格，在程式區塊中分別指定<span
+          class="courier">t.string、t.text、t.boolean</span>等建立了name、content、is_read欄位，<span
+          class="courier">t.timestamps</span>則會自動建立created_at與updated_at兩個欄位，每個表格也會有個自動增生的id欄位作為主鍵。為了執行*_create_messages.rb的內容以建立表格，需要執行db:migrate任務： </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>~/hello$ bundle exec rake db:migrate<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>使用的SQL可在log/development.log中查到：</p>
+      <div class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">CREATE TABLE "messages" (</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, </span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; "name" varchar(255), </span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; "content" text, </span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; "is_read" boolean, </span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; "created_at" datetime, </span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; "updated_at" datetime</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">) </span><br>
+      </div>
+      <p>message.rb中定義了對應資料庫表格的模型：<br>
+      </p>
+      <ul>
+        <li>message.rb<br>
+        </li>
+      </ul>
+      <pre>class Message &lt; ActiveRecord::Base
+end<br></pre>
+      <br>
+      <span class="courier">ActiveRecord</span>是Rails中提供ORM（Object-Relaction Mapping）的元件，預設的message.rb只繼承<span
+        class="courier">ActiveRecord:Base</span>定義的基本功能，基本上，類別方法是對整體資料庫的操作，實例方法是對表格中各筆資料的操作。<br>
+      <br>
+      <span class="courier">ActiveRecord物件並不支援在類別上定義屬性，而是直接參考所連結的資料表格，要新增、刪除或改變屬性，都是直接對資料庫表格相關欄位加以修改，資料表格欄位的變化，會反應在ActiveRecord的屬性</span>。<br>
+      <br>
+      要準備一筆新的資料，可以使用<span class="courier">new</span>方法，例如：<br>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">message = Message.new</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">message.name = "Justin"</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">message.content = "Justin's message"</span><br>
+      </p>
+      <p>欄位名稱對應會實例方法名稱，另一個建立實例並指定資料的方式是：</p>
+      <p class="courier" style="margin-left: 40px;"><strong class="courier">message = Message.new { |msg|<br>
+          &nbsp;&nbsp;&nbsp; msg.name = "Justin"<br>
+          &nbsp;&nbsp;&nbsp; msg.content = "Justin's message"<br>
+          } </strong></p>
+      <p>最簡單建立實例並準備資料的方式，<span class="courier">是在new時給予一個Hash實例，這對於接受params請求參數時相當方便</span>：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>message = Message.new(:name =&gt; "Justin", :content =&gt; "Hi! Justin!")</strong><br>
+      </p>
+      <p>此時建立的實例，只是記憶體中的一筆資料，還沒有真正新增至資料庫，如果要儲存資料，可以使用<span class="courier">save或save!</span>方法。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>message.save</strong><br>
+      </p>
+      <p><span class="courier">save儲存成功與否，會傳回布林值true或false表示，save!如果成功會傳回true，如果失敗會丟出例外，如果是新建物件執行save或save!</span>，會執行INSERT。例如：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">INSERT INTO "messages" ("content", "created_at", "is_read", "name", "updated_at") VALUES (?, ?, ?, ?, ?)</p>
+      <p>如果緊接著修改了物件的屬性，再次執行儲存，則會進行UPDATE。例如若僅<span class="courier">message.content = "XD</span>"，再次執行<span
+          class="courier">save或save!</span>會如下：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>UPDATE "messages" SET "content" = 'XD', "updated_at" = '2012-01-13 03:43:38.294211' WHERE "messages"."id" = 1</strong><br>
+      </p>
+      <p>如果想直接建立實例並儲存至資料庫，可以使用<span class="courier">create或create!</span>。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>Message.create(:name =&gt; "Justin", :content =&gt; "Hi! Justin!")</strong><br>
+      </p>
+      <p>物件建立並儲存為資料表中的一筆資料後，物件的id就會被指定，此時物件就對應於資料庫的一筆資料，可以用<span class="courier">new_record?</span>來得知資料是否已經在資料庫。如果要查找資料，可以使用<span
+          class="courier">find</span>指定id查找。例如：</p>
+      <p style="margin-left: 40px;"><strong><span class="courier">Message.find(1)</span></strong><br>
+      </p>
+      <p>如果有兩筆以上要查找的資料，可以使用<span class="courier">find</span>指定多個id，此時會以陣列方式傳回實例。例如：</p>
+      <p style="margin-left: 40px;"><strong><span class="courier">Message.find(1, 2) # 或Message.find([1, 2])</span></strong></p>
+      <p>直接更新物件上的屬性，並不會直接對資料庫中的資料造成修改，而必須在執行<span class="courier">save或save!</span>之後，才會對資料庫造成更新。除了根據id查找的<span
+          class="courier">find方法之外，可以使用find_by_*或find_all_by_*方法，</span>前者只找回第一個符合資料，後者則找回所有符合資料，*部份表示欄位名稱，可以使用<span
+          class="courier">and</span>連接。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>Message.find_by_name("Justin")<br>
+          Message.find_all_by_name("Justin")<br>
+          Message.find_by_name_and_content("Justin", "Hi, Justin!")</strong><br>
+      </p>
+      <p><span class="courier">all可以取得所有資料，first可以取得第一筆資料，last可以取得最後一筆資料，也可以使用where指定條件</span>。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>Message.where(:name =&gt; "Justin", :is_read =&gt; nil) # 結果相當於 Message.find_all_by_name_and_is_read("Justin", nil)<br>
+          Message.where("name = ? or is_read = ?", "Justin", nil)</strong><br>
+      </p>
+      <p><span class="courier">可以注意一開始就使用find_all_by、all等方法與where的不同，find_all_by、all等方法會一次取出所有符合資料至記憶體，如果之後有緊接著其它限定方法，則是從記憶體中符合的資料中再取得，where之後若緊接著有一些限定方法，</span>將會影響產生的SQL。例如<span
+          class="courier">Message.find_all_by_name("Justin").last與Message.where(:name =&gt; "Justin").last</span>，最後取得的物件雖然相同的，但自動產生的SQL卻是不同。例如<span
+          class="courier">Message.find_all_by_name("Justin").last</span>會產生以下的SQL：</p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">SELECT "messages".* FROM "messages" WHERE "messages"."name" = 'Justin'</span><br>
+      </p>
+      <p><span class="courier">Message.where(:name =&gt; "Justin").last</span>則會產生以下的SQL：</p>
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">SELECT "messages".* FROM "messages" WHERE "messages"."name" = 'Justin' ORDER BY "messages"."id" DESC LIMIT 1</span><br>
+      </p>
+      <p>以上兩個例子，在資料筆數多時，使用<span class="courier">where</span>會比較有效率，像是搭配<span
+          class="courier">count、sum、maximum、average</span>等統計方法：</p>
+      <p style="margin-left: 40px;"><span class="courier" style="font-weight: bold;">Message.where(:name =&gt; "Justin").count</span><br>
+      </p>
+      <p><span class="courier">以上會比Message.find_all_by_name("Justin").count來得有效率。</span><br>
+      </p>
+      <p>可以使用<span class="courier">limit</span>限制查詢筆數。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>messages = Message.limit(5).find_all_by_name("Justin")</strong><br>
+      </p>
+      <p>可以使用<span class="courier">offset</span>設定從第幾筆查到的資料之後開始取得，通常用於分頁查詢：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>messages = Message.offset(2).find_by_name("Justin")</strong><br>
+      </p>
+      <p>可以使用<span class="courier">order作排序，用reorder</span>取消排序。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>Message.order("name").find_by_name("Justin")<br>
+          Message.order("name DESC").find_by_name("Justin")<br>
+          Message.order("name DESC, updated_at ASC").find_by_name("Justin")</strong><br>
+      </p>
+      <p>可以使用<span class="courier">select</span>指定只取出哪些欄位。例如：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">Message.select("content").find_all_by_name("Justin")<br>
+        Message.select("content, is_read").find_all_by_name("Justin")</p>
+      <span class="courier">以上介紹到的where、limit、offset、select、order等方法可以自由組合</span>，以取得想要的查詢，方法呼叫組合的結果會影響產生的SQL語句，不確定哪種組合有效率的話，可以在Rails console中試試，觀察產生的SQL。如果真要自己下SQL查找，可以使用<span
+        class="courier">find_by_sql</span>。例如：
+      <p class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">messages = Message.find_by_sql("SELECT * FROM messages")</span></p>
+      如果查詢出來的資料不希望被修改，可以使用<span class="courier">readonly</span>。例如：
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">message = Message.readonly.find(1) </p>
+      <p>如上取得的資料，如果<span class="courier">message的屬性被更改而後嘗試更新資料庫，或者嘗試</span>刪除資料，就會引發例外。</p>
+      如果要更新資料，除了對查找到的資料使用<span class="courier">save或save!之外，還可以使用update_attributes或update_attributes!，單一屬性更新則使用update_attribute或update_attribute!</span>。例如：
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">message.update_attributes(:content =&gt; "Justin! Welcome to Rails!", :is_read =&gt; true)<br>
+        message.update_attribute("name", "caterpillar")</p>
+      <p><span class="courier">如果資料庫中某筆資料有變更，物件可以使用reload來重新載入資料</span>。例如：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">message.reload</p>
+      <p class="courier">如果已取得資料，可以使用destroy刪除資料。例如：</p>
+      <p class="courier" style="margin-left: 40px; font-weight: bold;">message.destroy</p>
+      <p class="courier">或者也可以透過類別方法delete、delete_all、destroy_all來刪除資料。例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>Message.delete(1) # 刪除id為1的資料<br>
+          Message.delete_all(["updated_at &lt; ?", 10.minute.ago]</strong></p>
+      <p>以上先介紹基本的增刪查找，物件與資料表關聯在之後會介紹，更多資料則可參考 <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html">ActiveRecord::BASE 文件</a>，或是 <a
+          href="http://guides.rubyonrails.org/active_record_querying.html">Active Record Query Interface 文件</a>，交易（Transaction）則可參考 <a
+          href="http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html">Active Record Transactions</a>。<br>
+      </p>
+      <p><br>
+      </p>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/ActiveRecord.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+</html>

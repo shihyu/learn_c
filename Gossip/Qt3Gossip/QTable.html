@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QTable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:37 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QTable 類別</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: QTable 類別</a></h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>製
+作統計軟體或是資料庫列示軟體時，會使用到表格將資料列出或使用圖表進行資料設定，在Qt中我們可以使用QTable類別，Qt的線上範例中，提供了三個
+有關於QTable的程式，在這邊我們介紹其中一個small-table-demo，以下是這個程式的主程式內容： <br>
+
+      </small>
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qtable.h&gt;<br>#include &lt;qimage.h&gt;<br>#include &lt;qpixmap.h&gt;<br>#include &lt;qstringlist.h&gt;<br><br>// Qt logo: static const char *qtlogo_xpm[]<br>#include "qtlogo.xpm"<br><br>// Table size<br><br>const int numRows = 30;<br>const int numCols = 10;<br><br>// The program starts here.<br><br>int main( int argc, char **argv )<br>{<br>    QApplication app( argc, argv );<br><br>    QTable table( numRows, numCols );<br><br>    // 水平欄位名稱<br>    QHeader *header = table.horizontalHeader();<br>    header-&gt;setLabel( 0, QObject::tr( "Tiny" ), 40 );<br>    header-&gt;setLabel( 1, QObject::tr( "Checkboxes" ) );<br>    header-&gt;setLabel( 5, QObject::tr( "Combos" ) );<br>    header-&gt;setMovingEnabled(TRUE); // 可以改變大小<br><br>    QImage img( qtlogo_xpm );<br>    QPixmap pix = img.scaleHeight( table.rowHeight(3) );<br>    table.setPixmap( 3, 2, pix ); // 顯示ICON<br>    table.setText( 3, 2, "A Pixmap" );  // 顯示文字<br><br>    QStringList comboEntries;<br>    comboEntries &lt;&lt; "one" &lt;&lt; "two" &lt;&lt; "three" &lt;&lt; "four";<br><br>    for ( int i = 0; i &lt; numRows; ++i ){<br>        // 表格內容可以下拉選擇<br>   QComboTableItem * item =<br>             new QComboTableItem( &amp;table, comboEntries, FALSE );<br>   item-&gt;setCurrentItem( i % 4 );<br>   table.setItem( i, 5, item );<br>    }<br><br>    // 表格內容為核取方塊選項<br>    for ( int j = 0; j &lt; numRows; ++j )<br>   table.setItem( j, 1, new QCheckTableItem( &amp;table, "Check me" ) );<br><br>    app.setMainWidget( &amp;table );<br>    table.show();<br>    return app.exec();<br>}</pre>
+
+      <small><br>
+
+這個程式相當簡單，一些重要的方法已經使用註解加以說明了，以下為這個程式的執行結果： <br>
+
+      </small><img style="width: 599px; height: 385px;" alt="" src="images/QTable-1.jpg"><br>
+
+
+
+
+
+
+
+
+      <small></small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QTable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:41 GMT -->
+</html>

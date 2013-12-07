@@ -1,0 +1,666 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkFrameGtkAspectFrame.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:02 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkFrame 與 GtkAspectFrame</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkFrame 與 GtkAspectFrame</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>GtkFrame是GtkContainer的子類，可以容納子元件，並擁有一個外框及標籤文字：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkContainer</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;+----GtkBin</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp;+----GtkFrame</span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+您可以使用gtk_frame_new()建立一個GtkFrame，並在建立時指定標籤文字，或是在之後使用gtk_frame_set_label
+()設定文字，標籤文字的位置預設是左上邊，您可以使用gtk_frame_set_label_align()設定標籤文字的位置：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkWidget* gtk_frame_new(const gchar *label);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void&nbsp;gtk_frame_set_label(GtkFrame *frame,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;const gchar *label);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void gtk_frame_set_label_align(GtkFrame *frame,<br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gfloat xalign,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gfloat
+yalign);</span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>gtk_frame_set_label_align()可以設定xalign與yalign，設定值為0.0到1.0，xalign設定水平對齊，yalign設定文字的垂直對齊，您也可以使用gtk_frame_set_shadow_type()來設定外框樣式：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void gtk_frame_set_shadow_type(GtkFrame&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *frame,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GtkShadowType&nbsp;
+type);</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+下面的程式是個簡單的設定範例：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>gtk_frame_demo.c</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *frame;</span><br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkFrame");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 200, 150);<br><br><span style="font-weight: bold;">    frame = gtk_frame_new("caterpillar");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_frame_set_label_align(GTK_FRAME(frame), 0.5, 0.5);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_OUT);</span><br style="font-weight: bold;"><br><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(window), frame);</span><br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+      <small><br>
+
+
+下圖是一個執行的結果畫面：<br>
+
+
+      <br>
+
+
+      <img style="width: 216px; height: 184px;" alt="" src="images/GtkFrameGtkAspectFrame-1.jpg"><br>
+
+
+      <br>
+
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><small>GtkAspectFrame是GtkFrame的子類，使用上與GtkFrame類似，但多了xsize/ysize的比例設定，可用以限定子元件的長寬比例：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>GtkWidget* gtk_aspect_frame_new(const gchar *label,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gfloat xalign,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gfloat yalign,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gfloat ratio,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;gboolean obey_child);</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+xalign與yalign的作用與GtkFrame相同，ratio就是比例設定，obey_child設定為TRUE時，表示依子元件的長寬比例來顯示，若設定為FALSE，則表示依ratio的比例設定來顯示。<br>
+
+
+      <br>
+
+
+下面的範例是個簡單的示範，由於GtkAspectFrame的ratio設定為2（xsize/ysize），所以按鈕元件的顯示將依這個比例：<br>
+
+
+      </small></span>
+      
+      
+      <ul>
+
+
+        <li><span class="postbody"><small>gtk_aspect_frame_demo.c</small></span></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *frame;</span><br>    GtkWidget *button;<br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkAspectFrame");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 300, 300);<br><br><span style="font-weight: bold;">    frame = gtk_aspect_frame_new("caterpillar", 0.5, 0.5, 2, FALSE);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_OUT);</span><br style="font-weight: bold;"><br><span style="font-weight: bold;">    button = gtk_button_new_with_label("Press");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(frame), button);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(window), frame);</span><br style="font-weight: bold;"><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+      <span class="postbody"><small><br>
+
+
+一個執行的結果如下所示：</small><br>
+
+
+      <br>
+
+
+      <img style="width: 315px; height: 336px;" alt="" src="images/GtkFrameGtkAspectFrame-2.jpg"><br>
+
+
+      <br>
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkFrameGtkAspectFrame.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:03 GMT -->
+</html>

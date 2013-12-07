@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Struts/HtmlFTPS.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>&lt;html:form&gt;、 &lt;html:text&gt;、&lt;html:password&gt;、&lt;html:submit&gt;</title></head><body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: &lt;html:form&gt;、 &lt;html:text&gt;、&lt;html:password&gt;、&lt;html:submit&gt;</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+
+來看看 <a class="wikilink" href="ActionForm.htm">使用
+ActionForm</a> 這個主題，當時使用了一個靜態表單網頁：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li>form.htm</li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>&lt;html&gt; <br>&lt;head&gt;&lt;title&gt;Login&lt;/title&gt;&lt;/head&gt; <br> &lt;body&gt; <br>   Please login：&lt;p&gt; <br>    &lt;form name="userForm" <br>          action="/strutsapp/login.do" method="post"&gt; <br>   username &lt;input type="text" name="username"/&gt;&lt;br&gt; <br>   password &lt;input type="password" name="password"/&gt;&lt;p&gt; <br>        &lt;input type="submit"/&gt; <br>    &lt;/form&gt;<br>&lt;/body&gt; <br>&lt;/html&gt; <br></pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+您可以將網頁改為JSP網頁，並使用Struts標籤來撰寫表單元件，例如：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li>form.jsp</li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>&lt;%@ taglib uri="/tags/struts-bean" prefix="bean" %&gt; <br>&lt;%@ taglib uri="/tags/struts-html" prefix="html" %&gt; <br>&lt;%@page contentType="text/html; charset=Big5"%&gt; <br>&lt;html&gt; <br>&lt;head&gt;&lt;title&gt;Login&lt;/title&gt;&lt;/head&gt; <br>&lt;body&gt; <br>   Please login：&lt;p&gt; <br>   &lt;html:form action="/strutsapp/login.do" <br>              method="post" focus="username"&gt;<br>   username &lt;html:text property="username" size="20"/&gt;&lt;br&gt;<br>   password &lt;html:password property="password" size="20"/&gt;&lt;p&gt; <br>        &lt;html:submit/&gt;<br>    &lt;/form&gt;<br>&lt;/body&gt; <br>&lt;/html&gt; <br></pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+&lt;html:form&gt;指定的login必須在struts-config.xml中有定義，&lt;html:text&gt;與&lt;
+html:password&gt;會取出Action所搭配的<span class="wikilink">ActionForm</span>物件
+中對應的屬性值，如果使用者填寫的內容不正確而被送回表單頁面，使用者將可以看到先前所填寫的值，如果不想顯示先前所填寫的值，則將&lt;
+html:text&gt;與&lt;html:password&gt;的redisplay屬性設定為false即可，這幾個Struts標籤必須與
+Action物件及ActionForm物件搭配使用。</small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      <h2> &lt;html:form&gt; </h2>
+
+      <small>
+
+
+
+用來產生HTML表單標籤，屬性name可以指定所使用的ActionForm名稱，如果沒有指定，則自動匹配ActionMapping中的name屬
+性，必須與&lt;html:submit/&gt;、&lt;html:reset/&gt;等表單相關標籤使用，常用屬性介紹如下：<br>
+
+      </small>
+
+
+
+      
+      <ul>
+
+        <li><small> action: 表單提交的URL </small></li>
+
+        <li><small> enctype: 提交表單時所使用的內容編碼，上傳檔案時設定 </small></li>
+
+        <li><small> multipart/form-data </small></li>
+
+        <li><small> focus: 指定focus的元素名稱 </small></li>
+
+        <li><small> method: 表單提交的方式 </small></li>
+
+        <li><small> name: 使用的ActionForm名稱 </small></li>
+
+        <li><small> scope: ActionForm作用範圍 </small></li>
+
+        <li><small> type: ActionForm類型 </small></li>
+
+        <li><small> onreset: 表單被重置時呼叫的JavaScript </small></li>
+
+        <li><small> onsubmit: 表單被送出時呼叫的JavaScript</small> </li>
+
+      
+      </ul>
+
+
+
+
+
+
+      
+      <h2> &lt;html:text&gt;、&lt;html:password&gt; </h2>
+
+      <small>
+
+
+
+文字方塊欄位與密碼欄位，搭配&lt;html:form&gt;使用，如果&lt;html:form&gt;所使用的ActionForm有值，預設
+會顯示在對應的欄位，當用屬性如下： <br>
+
+      </small>
+
+
+
+      
+      <ul>
+
+        <li><small> property: 元素名稱 </small></li>
+
+        <li><small> size: 顯示的字數 </small></li>
+
+        <li><small> value: 元素初值 </small></li>
+
+        <li><small> redisplay: 是否顯示ActionForm的值（僅用於&lt;html:password&gt;）</small> </li>
+
+      
+      </ul>
+
+
+
+
+
+
+      
+      <h2> &lt;html:submit&gt;、&lt;html:reset&gt; </h2>
+
+      <small>
+
+
+
+表單的submit按鈕，搭配&lt;html:form&gt;使用，常用屬性如下： <br>
+
+      </small>
+
+
+
+      
+      <ul>
+
+        <li><small> property: 元素名稱 </small></li>
+
+        <li><small> value: 按鈕顯示文字 </small></li>
+
+        <li><small> onclick: 按下按鈕後呼叫的JavaScript </small></li>
+
+      
+      </ul>
+
+
+
+
+
+      <small><br>
+
+
+
+
+使用範例：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> &lt;html:submit value="送出"/&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> &lt;html:reset value="重清"/&gt; </span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+ 
+      <small><br>
+
+
+
+
+搭配 <a class="wikilink" href="BeanMessage.htm">&lt;bean:message&gt;</a>
+標籤與訊息資源檔的寫法： <br>
+
+      </small>
+
+
+
+ 
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;html:submit property="method"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;bean:message key="button.save"/&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> &lt;/html:submit&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> &lt;html:submit property="method"&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;bean:message key="button.preview"/&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> &lt;/html:submit&gt; </span></small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+      </div>
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/Struts/HtmlFTPS.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

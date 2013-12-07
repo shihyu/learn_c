@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/JSON.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:44 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>傳送與接收 JSON</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: 傳送與接收 JSON<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/JSON.html">English</a><br>
+      </div>
+      <small><br>
+XML可用來表現階層性資料，然而建立與處理XML DOM較為複雜，在Web應用程式中，許多時候並不需要用到XML的複雜階層性，此時通常會採用<span style="font-weight: bold;">JSON</span>作為資料交換格式。<br>
+      <br>
+JSON全名<span style="font-weight: bold;">JavaScript Object Notation</span>，為JavaScript物件實字（Object literal）的子集，你可以在 <a href="http://www.json.org/">http://www.json.org/</a> 找到詳細的JSON格式說明。大致而言，與物件實字格式類似，主要注意的是JSON：<br>
+      </small>
+      <ul>
+        <li><small>名稱為字串，必須用"雙引號包括</small></li>
+        <li><small>值可以是</small><small>"雙引號包括的</small><small>字串，或者是數字、<span style="font-family: Courier New,Courier,monospace;">true、false、null</span>、物件或陣列。<br>
+          </small></li>
+        <li><small>不支援JavaScript的Data、Error、規則表示式或函式表示。</small></li>
+      </ul>
+      <br>
+      <small>舉個例子來說，下面是個物件實字：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var obj = {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; name : 'Justin',</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; age : 35,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; childs : [ { name : 'hamimi', age : 3} ]</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">};</span></small><br>
+      </div>
+      <br>
+      <small>若使用JSON表示，則是如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">var json = <small>'</small></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">{"name":"Justin","age":35,"childs":[{"name":"hamimi","age":3}]}</span><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">';</span></small></small><br>
+      </div>
+      <br>
+      <small>若為排版會比較容易觀察：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">{<br>
+&nbsp;&nbsp;&nbsp; "name":"Justin",<br>
+&nbsp;&nbsp;&nbsp; "age":35,<br>
+&nbsp;&nbsp;&nbsp; "childs":[<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "name":"hamimi",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "age":3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; ]<br>
+}</span><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></small><br>
+      </div>
+      <br>
+      <small>你可以傳送JSON字串給伺服端，要建立JSON字串很簡單，在Firefox 3.1、Internet Explorer 8以上，支援簡單的JSON處理程式庫，如果要從物件建立JSON字串，只要使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">JSON.stringify()</span>。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var obj = {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; name : 'Justin',</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; age : 35,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; childs : [ { name : 'hamimi', age : 3} ]</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">};<br>
+var json = JSON.stringify(obj);<br>
+</span></small>
+      </div>
+
+      <br>
+      <small>這樣就可以得到方才所示範的JSON字串，如果要用非同步物件傳送JSON，則可以如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">var request = xhr(); // xhr() 會建立非同步物件</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+request.onreadystatechange = handleStateChange; // handleStateChange 參考至函式</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">request.</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">open('POST', url);</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">request.</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">setRequestHeader('Content-Type', 'application/json');</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+request.send(json);</small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">請求標頭'Content-Type'建議設為<span style="font-weight: bold;">'application/json'</span></span>。當然，伺服端要能夠剖析JSON字串以取出資料，但無需親自撰寫，<a href="http://www.json.org/">http://www.json.org/</a> 網站中提供許多語言實作的JSON剖析器，可協助你剖析JSON取得結果。<br>
+      <br>
+伺服端可以傳回JSON字串，可以使用<span style="font-family: Courier New,Courier,monospace;">eval()</span>將JSON字串計值（evaluate）為JavaScript物件。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var obj = eval(json);</span></small><br>
+      </div>
+      <small><br>
+然而<span style="font-family: Courier New,Courier,monospace;">eval()</span>也會運算傳入的JavaScript程式碼，因此並不建議直接用<span style="font-family: Courier New,Courier,monospace;">eval()</span>，如果只是要計值JSON為JavaScript物件，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">JSON.parse()</span>。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var obj = JSON.parse(json);</span></small><br>
+      </div>
+      <small><br>
+如果是</small><small>Firefox 3.1、Internet Explorer 8以外沒有內建JSON支援的瀏覽器，可以在 <a href="http://www.json.org/">http://www.json.org/</a> 下載 <span style="font-weight: bold;">json2.js</span>（還有其它檔案，你可以看看上頭的README說明），將之包括在網頁中，即可獲得上述的相關JSON方法：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;script type="text/javascript" src="json2.js"&gt;</span></small><br>
+      </div>
+      <small><br>
+如果遇到瀏覽器已內建JSON支援，json2.js什麼都不作。以下是個使用JSON的示範，會提示可搜尋的選項（沒有真的有搜尋功能就是了），如果有符合的選項，則會以JSON的格式傳回字串陣列，例如<span style="font-family: Courier New,Courier,monospace;">'["caterpillar", "ceo"]'</span>這樣的格式（</small><small>範例</small><small>的伺服端上可搜尋的字串有"caterpillar"、"car"</small><small>、</small><small>"ceo"</small><small>、</small><small>"c++"</small><small>、</small><small>"justin"</small><small>、</small><small>"java"</small><small>、</small><small>"javascript"），你必須知道搜尋輸入方塊的位置，以讓選項對齊在輸入方塊下方，這可以參考 </small><small><big><a href="TopLeft.html"><small>存取元素位置</small></a></big> 第三個範例</small><small>：<br>
+      </small>
+      <ul>
+        <li><a href="samples/JSON-1.html"><small>JSON-1.html</small></a></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;style type="text/css"&gt;<br>            div {<br>                color: #ffffff;<br>                background-color: #ff0000;<br>                border-width: 1px;<br>                border-color: black;<br>                border-style: solid;<br>                position: absolute;<br>            }        <br>        &lt;/style&gt;<br>        <span style="font-weight: bold;">&lt;script type="text/javascript" src="js/json2.js"&gt;&lt;/script&gt;</span><br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function offset(element) {<br>                    var x = 0;<br>                    var y = 0;<br>                    while(element) {<br>                        x += element.offsetLeft;<br>                        y += element.offsetTop;<br>                        element = element.offsetParent;<br>                    }<br>                    return { <br>                        x: x, <br>                        y: y, <br>                        toString: function() {<br>                            return '(' + this.x + ', ' + this.y + ')';<br>                        }<br>                    };<br>                }<br>                var xhr = window.XMLHttpRequest &amp;&amp; <br>                      (window.location.protocol !== 'file:' <br>                          || !window.ActiveXObject) ?<br>                       function() {<br>                           return new XMLHttpRequest();<br>                       } :<br>                       function() {<br>                          try {<br>                             return new ActiveXObject('Microsoft.XMLHTTP');<br>                          } catch(e) {<br>                             throw new Error('XMLHttpRequest not supported');<br>                          }<br>                       };<br>                <br>                function param(obj) {<br>                    var pairs = [];<br>                    for(var name in obj) {<br>                        var pair = encodeURIComponent(name) + '=' + <br>                                   encodeURIComponent(obj[name]);<br>                        pairs.push(pair.replace('/%20/g', '+'));<br>                    }<br>                    return pairs.join('&amp;');<br>                }<br>                <br>                function ajax(option) {<br>                    option.type = option.type || 'GET';<br>                    option.header = option.header || {<br>                      'Content-Type':'application/x-www-form-urlencoded'};<br>                    option.callback = option.callback || function() {};<br>                    <br>                    if(!option.url) {<br>                        return;<br>                    }<br>                    <br>                    var request = xhr();<br>                    request.onreadystatechange = function() {<br>                        option.callback.call(request, request);<br>                    };<br>                    <br>                    var body = null;<br>                    var url = option.url;<br>                    if(option.data) {<br>                        if(option.type === 'POST') {<br>                            body = param(option.data);<br>                        }<br>                        else {<br>                            url = option.url + '?' + param(option.data) <br>                                     + '&amp;time=' + new Date().getTime();<br>                        }<br>                    }<br>                    <br>                    request.open(option.type, url);<br>                    for(var name in option.header) {<br>                        request.setRequestHeader(<br>                                name, option.header[name]);<br>                    }<br>                    request.send(body);<br>                }<br><br>                var search = document.getElementById('search');<br>                search.onkeyup = function() {<br>                    <span style="font-weight: bold;">// 移除選項的&lt;div&gt;容器</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    var divs = document.getElementsByTagName('div');</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    for(var i = 0; i &lt; divs.length; i++) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        document.body.removeChild(divs[i]);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    // 沒有輸入值，直接結束</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    if(search.value === '') {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        return;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    }</span><br>                    // 發出非同步請求，取得可能的選項，以JSON的字串陣列格式傳回<br>                    ajax({<br>                        url     : 'JSON-1.php',<br>                        data    : {keyword : search.value},<br>                        callback: function(request) {<br>                            if(request.readyState === 4) {<br>                                if(request.status === 200) {<br><span style="font-weight: bold;">                                    // 剖析JSON</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                    var keywords = JSON.parse(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                            request.responseText);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                    // 字串陣列長度不為0時加以處理</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                    if(keywords.length !== 0) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        var innerHTML = '';</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        for(var i = 0; </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                              i &lt; keywords.length; i++) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                            innerHTML += </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                                (keywords[i] + '&lt;br&gt;');</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        // 建立容納選項的&lt;div&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        var div = </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                              document.createElement('div');</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        div.innerHTML = innerHTML;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        // 設定&lt;div&gt;的位置</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        var xy = offset(search);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        div.style.left = xy.x + 'px';</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        div.style.top = </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                             xy.y + search.offsetHeight + 'px';</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        div.style.width = </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                             search.offsetWidth + 'px';</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        // 附加至DOM樹</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        document.body.appendChild(div);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                    }</span><br>                                }<br>                            }<br>                        }<br>                    });<br>                };<br>            };<br>        &lt;/script&gt;        <br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;hr&gt;<br>        搜尋：&lt;input id="search" type="text"&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+這個例子沒有考慮使用者打字速度，因此每鍵一個字就會發出一次請求，你可以試著設定時間，例如一秒才發出一次，以避免使用者打字速度過快，頻繁發出請求的問題。<br>
+      <br>
+另外，對於每個選項，你還可以加上滑鼠點選事件，在使用者點選項目時，將項目值設定至輸入方塊，並移除<span style="font-family: Courier New,Courier,monospace;">&lt;div&gt;</span>，這些額外工作，可以自行練習看看。<br>
+      <br>
+      </small><small><br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/JSON.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:44 GMT -->
+</html>

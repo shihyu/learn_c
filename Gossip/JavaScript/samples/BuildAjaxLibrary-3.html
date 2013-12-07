@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/BuildAjaxLibrary-3.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:20 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <style type="text/css">
+            div {
+                color: #ffffff;
+                background-color: #ff0000;
+                border-width: 1px;
+                border-color: black;
+                border-style: solid;
+                position: absolute;
+            }        
+        </style>
+        <script type="text/javascript" src="js/gossip-0.5.js"></script>
+        <script type="text/javascript">
+            XD.bind(window, 'load', function() {
+                var searchXD = XD('#search').keyup(function() {
+                    XD('div').each(function(element) {
+                       XD(element).remove();
+                    });
+                    
+                    if(searchXD.val() === '') {
+                        return;
+                    }
+                
+                    XD.get('JSON-2.html', {keyword : searchXD.val()}, function(keywords) {
+                        if(keywords.length !== 0) {
+                            var innerHTML = '';
+                            XD.each(keywords, function(keyword) {
+                            innerHTML += (keyword + '<br>');
+                            });
+                            var offset = searchXD.offset();
+                            XD('<div>')
+                              .html(innerHTML)
+                              .css({
+                                  left : offset.left + 'px',
+                                  top  : offset.top + offset.offsetHeight + 'px',
+                                  width: offset.offsetWidth + 'px'
+                              })
+                              .appendTo(document.body);
+                        }
+                    }, 'json');                    
+                });
+            });
+        </script>        
+    </head>
+    <body>
+        <hr>
+        搜尋：<input id="search" type="text">
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/BuildAjaxLibrary-3.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:21 GMT -->
+</html>

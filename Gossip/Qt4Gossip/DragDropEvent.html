@@ -1,0 +1,701 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/DragDropEvent.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:57 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>拖放事件</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: 拖放事件</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>想
+要在圖形元件上啟用拖放功能，可以使用QWidget上所繼承下來的setAcceptDrops()方法，設定元件接受拖放動作，在拖放動作發生時，會
+有相對應的QDragEnterEvent、QDragMoveEvent、QDragLeaveEvent與QDropEvent等事件發生，您可以重
+新定義dragEnterEvent()、dragMoveEvent()、dragLeaveEvent()與dropEvent()等事件處理者，以
+處理相對應的拖放事件，通常會使用的是dragEnterEvent()與dropEvent()。<br>
+
+
+
+
+      <br>
+
+
+
+
+以下是一個簡單的拖放事件處理程式，您可以將圖檔拖放至QLabel上，QLabel會自動載入圖片並顯示出來：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>ImageLabel.h</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#ifndef IMAGE_LABEL_H<br>#define IMAGE_LABEL_H<br><br>#include &lt;QLabel&gt;<br><br>class QDragEnterEvent;<br>class QDropEvent;<br><br>class ImageLabel : public QLabel {<br>   Q_OBJECT<br>   <br>public:<br>    ImageLabel(QWidget *parent = 0);<br><br>protected:<br>    void dragEnterEvent(QDragEnterEvent *event);<br>    void dropEvent(QDropEvent *event);<br><br>private:<br>    void readImage(const QString &amp;fileName);<br>};<br><br>#endif</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>ImageLabel繼承了QLabel，並且將重新定義dragEnterEvent()及dropEvent()，以處理
+對應的拖放事件，readImage()則會在拖放圖檔至QLabel上時，將圖片檔案載入並設定給QLabel來顯示，ImageLabel的實作如
+下：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>ImageLabel.cpp</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      
+      <pre>#include &lt;QDragEnterEvent&gt;<br>#include &lt;QDropEvent&gt;<br>#include &lt;QUrl&gt;<br>#include &lt;QFile&gt;<br>#include &lt;QTextStream&gt;<br>#include "ImageLabel.h"<br><br>ImageLabel::ImageLabel(QWidget *parent) : QLabel(parent) {<br>    this-&gt;setAcceptDrops(true);<br>}<br><br>void ImageLabel::dragEnterEvent(QDragEnterEvent *event) {<br>    if(event-&gt;mimeData()-&gt;hasFormat("text/uri-list")) {<br>        event-&gt;acceptProposedAction();<br>    }<br>}<br><br>void ImageLabel::dropEvent(QDropEvent *event) {<br>    QList&lt;QUrl&gt; urls = event-&gt;mimeData()-&gt;urls();<br>    if (urls.isEmpty()) {<br>        return;<br>    }<br>    <br>    QString fileName = urls.first().toLocalFile();<br>    if (fileName.isEmpty()) {<br>        return;<br>    }<br>    <br>    this-&gt;setWindowTitle(fileName);<br>    readImage(fileName);<br>}<br><br>void ImageLabel::readImage(const QString &amp;fileName) {<br>    QPixmap pixmap(fileName);<br>    this-&gt;setPixmap(pixmap);<br>    this-&gt;resize(pixmap.width(), pixmap.height());<br>}</pre>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>setAcceptDrops(true)設定接受拖放，當圖片檔案被拖入元件時，發生QDragEnterEvent並分派
+給dragEnterEvent()處理。QDragEnterEvent的mimeData()方法傳回QMimeData，當中包括了MIME
+（Multipurpose Internet Mail
+Extensions）類型的相關資訊，hasFormat("text/uri-list")測試是否含有文字資訊的URI（Universal
+Resource
+Identifier），也可以使用hasUrls()來進行同樣的測試。<br>
+
+
+
+      <br>
+
+
+
+當拖放行為開始執行時，執行拖放行為的一方會需要知道接受放置的另一方接受何種操作，例如拖放檔案時，當拖放完成時，原檔案是被複製或移動。</small></span><span class="postbody"><small>執行拖放行為的一方會設定可被接受的動作，而接受放置的一方可選擇接受何種動作，並傳回相關資訊給執行方</small></span><span class="postbody"><small>，</small></span><span class="postbody"><small>acceptProposedAction()的作用為接受</small></span><span class="postbody"><small>執行拖放行為的一方所設定的預設動作。</small></span><br>
+
+
+
+      <span class="postbody"><small>
+      <br>
+
+
+
+
+當放置時會發生QDropEvent並分派給dropEvent()來處理，QMimeData的urls()取得所拖放檔案的QUrl，由於您所拖放的
+檔案可能不只一個，所以urls()傳回的是內含QUrl的QList物件，您取得第一個QUrl並取得檔名資訊，再進行圖檔的讀取並設定至QLabel
+上。<br>
+
+
+
+
+      <br>
+
+
+
+
+可以撰寫以下的程式來執行：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li><small>main.cpp</small></li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QMainWindow&gt;<br>#include "ImageLabel.h"<br>#include &lt;QTextEdit&gt;<br><br>int main(int argc, char **argv) {<br>    QApplication app(argc, argv);<br>    <br>    ImageLabel *imgLabel = new ImageLabel;<br>    imgLabel-&gt;setWindowTitle("Drag &amp; Drop");<br>    imgLabel-&gt;setText("&lt;center&gt;Drag &amp; Drop Image here&lt;/center&gt;");<br>    imgLabel-&gt;resize(300, 200);<br>    imgLabel-&gt;show();<br><br>    return app.exec();<br>}</pre>
+
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+執行時，元件若可以進行拖放，則會出現相關的游標以提醒使用者，在Windows下是個「+」的游標：<br>
+
+
+
+
+      <br>
+
+
+
+
+      <img style="width: 316px; height: 238px;" alt="" src="images/DragDropEvent-1.jpg"><br>
+
+
+
+
+      <br>
+
+
+
+
+有些元件預設即接受拖放行為，例如QLineEdit，您可以直接將文字拖曳至QLineEdit，這會將拖曳的文字置放至您置放的位置，若您想改變這個
+行為，可以設定QLineEdit的setAcceptDrops()為false，然後設定其父元件的setAcceptDrops()為true，讓
+拖放事件傳播至父元件，由父元件來處理拖放相關事件，以改變QLineEdit的預設拖放行為，例如讓純文字檔案拖至QLineEdit時，可以自動載入
+文字至QLineEdit中。<br>
+
+
+
+
+      </small><br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/DragDropEvent.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:59 GMT -->
+</html>

@@ -1,0 +1,718 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkComboBoxGtkListStore.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:50 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkComboBox 與 GtkListStore</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkComboBox 與 GtkListStore</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在</small> <small><big><a href="GtkComboBox.html"><small>GtkComboBox</small></a></big> 中的範例，是GtkComboBox最簡單的用法，選項只有純文字，若想要進一步讓GtkComboBox呈現更多的功能與樣貌，則必須了解GtkComboBox的Model-View設計。<br>
+
+
+      <br>
+
+
+GtkComboBox的外觀是View物件的部份，選項資料的部份則是Model物件的部份，GtkComboBox使用的Model物件為實作
+GtkTreeModel介面的物件，例如GtkListStore或GtkTreeStore，其實作了Model物件的資料儲存與存取方式等，在這邊
+先介紹GtkComboBox與GtkListStore的使用。<br>
+
+
+      <br>
+
+
+GtkListStore是沒有階層平坦式的資料，當下拉選單需要的是直接列示選項就可以使用，GtkListStore中可以設定文字、圖片、元件等，要建立GtkListStore，必須指明要建立幾個欄位以及欄位中的型態，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkListStore *store = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);</span></small><br>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>這個程式片段將建立一個具有兩個欄位的GtkListStore，一個欄位儲存圖片，使用GDK_TYPE_PIXBUF來指定，欄位將儲存的是GdkPixbuf，另一個儲存文字，使用G_TYPE_STRING來指定。<br>
+
+
+      <br>
+
+
+您可以使用gdk_pixbuf_new_from_file()讀取圖檔並傳回其GdkPixbuf，第二個參數是GError，若不需要可以設定為NULL：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(files[i], NULL);</span></small></span><br style="font-weight: bold;">
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+GtkListStore使用GtkTreeIter作為內部的資料位置指標，當您使用gtk_list_store_append()時，會將
+GtkTreeIter指向GtkListStore下一列的位置，接著您再搭配gtk_list_store_set()設定GtkListStore
+該位置的欄位資料，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>GtkTreeIter iter;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>gtk_list_store_append(store, &amp;iter);</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>gtk_list_store_set(store, &amp;iter,</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0, pixbuf,</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1, filename,</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -1);</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+gtk_list_store_set()的前兩個參數分別為GtkListStore與GtkTreeIter，之後則兩兩成對指定欄位索引與資料，最後以-1作為結束。<br>
+
+
+      <br>
+
+
+有了GtlListStore這個Model物件之後，接著可以用以建立View，也就是GtkComboBox，您可以使用gtk_combo_box_new_with_model()來建立：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">GtkWidget *comboBox = </span></small></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));</small></span><br>
+
+
+      </div>
+
+
+      <span class="postbody"><br>
+
+
+      <small>您的資料要如何顯示，需要對應的GtkCellRenderer來進行繪製，哪個欄位要使用哪個
+GtkCellRenderer以及該欄位的一些相關屬性，則要告知GtkCellLayout，GtkComboBox有實作
+GtkCellLayout介面，因此，您可以如下使用gtk_cell_layout_pack_start()設定GtkCellRenderer繪
+製哪個欄位，以及使用gtk_cell_layout_set_attributes()設定相關屬性：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>GtkCellRender *render;<br>
+
+
+renderer = gtk_cell_renderer_pixbuf_new();</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(comboBox), renderer, FALSE);</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(comboBox), renderer,</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"pixbuf", 0, // "pixbuf" 設定圖像</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NULL); &nbsp;// 最後以 NULL 結尾</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>renderer = gtk_cell_renderer_text_new();</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(comboBox), renderer, FALSE);</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(comboBox), renderer,</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"text", 1, // "text" 設定文字</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NULL);</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+以上這些大致上是設定GtkComboBox的Model與View的基本流程。假設現在使用者選擇下拉清單中的選項，則要取得選項資料，則需先取得
+Model，也就是CtkComboBox中的GtkListStore，並取得選中的選項之GtkTreeIter（記得嗎？GtkTreeIter指
+向GtkListStore中的某列資料），然後再使用gtk_tree_model_get()取得想要的欄位值，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>gboolean combo_changed(GtkComboBox *comboBox, GtkLabel *label) {</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; GtkTreeModel *model = gtk_combo_box_get_model(comboBox);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; GtkTreeIter iter;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; gchar *active;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; gtk_combo_box_get_active_iter(comboBox, &amp;iter);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; gtk_tree_model_get(model, &amp;iter,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+1, &amp;active,</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-1);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>&nbsp;&nbsp;&nbsp; gtk_label_set_text(label, active);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>}</small></span><br style="font-weight: bold;">
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+綜合以上說明，來改寫一下</small></span><small><big><a href="GtkComboBox.html"><small>GtkComboBox</small></a></big> 中的範例，讓下拉選項可以擁有一個小圖示：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>gtk_combo_box_with_icon_demo.c</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">enum {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    PIXBUF_COL,</span><br style="font-weight: bold;"><span style="font-weight: bold;">    TEXT_COL</span><br style="font-weight: bold;"><span style="font-weight: bold;">};</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">GtkTreeModel* createModel() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    const gchar *files[] = {"caterpillar.jpg", "momor.jpg",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                            "hamimi.jpg", "bush.jpg"};</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GdkPixbuf *pixbuf;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GtkTreeIter iter;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GtkListStore *store;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gint i;</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    store = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    for(i = 0; i &lt; 4; i++) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        pixbuf = gdk_pixbuf_new_from_file(files[i], NULL);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        gtk_list_store_append(store, &amp;iter);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        gtk_list_store_set(store, &amp;iter,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                           PIXBUF_COL, pixbuf,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                           TEXT_COL, files[i],</span><br style="font-weight: bold;"><span style="font-weight: bold;">		           -1);</span><span style="font-weight: bold;">       </span><br style="font-weight: bold;"><span style="font-weight: bold;">        gdk_pixbuf_unref(pixbuf);</span><br>   <span style="font-weight: bold;">&nbsp;}</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    return GTK_TREE_MODEL(store);</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">gboolean combo_changed(GtkComboBox *comboBox, GtkLabel *label) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GtkTreeModel *model = gtk_combo_box_get_model(comboBox);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GtkTreeIter iter;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gchar *active;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_combo_box_get_active_iter(comboBox, &amp;iter);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_tree_model_get(model, &amp;iter,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                       1, &amp;active,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                       -1);</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_label_set_text(label, active);</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *comboBox;</span><br><span style="font-weight: bold;">    GtkCellRenderer *renderer;</span><br>    GtkWidget *label;<br>    GtkWidget *vbox;<br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkComboBox");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 200, 50);<br><br><span style="font-weight: bold;">    comboBox = gtk_combo_box_new_with_model(createModel());</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_combo_box_set_active(GTK_COMBO_BOX(comboBox), 0);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    renderer = gtk_cell_renderer_pixbuf_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(comboBox), renderer, FALSE);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(comboBox), renderer,</span><br style="font-weight: bold;"><span style="font-weight: bold;">				   "pixbuf", PIXBUF_COL, </span><br style="font-weight: bold;"><span style="font-weight: bold;">				   NULL);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    renderer = gtk_cell_renderer_text_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(comboBox), renderer, FALSE);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(comboBox), renderer,</span><br style="font-weight: bold;"><span style="font-weight: bold;">				   "text", TEXT_COL,</span><br style="font-weight: bold;"><span style="font-weight: bold;">				   NULL);    </span><br style="font-weight: bold;"><br>    label = gtk_label_new("caterpillar.jpg");<br>    vbox = gtk_vbox_new(TRUE, 5);<br><br><span style="font-weight: bold;">    gtk_box_pack_start(GTK_BOX(vbox), comboBox, TRUE, TRUE, 5);</span><br>    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 5);<br>    gtk_container_add(GTK_CONTAINER(window), vbox);<br><br style="font-weight: bold;"><span style="font-weight: bold;">    g_signal_connect(GTK_OBJECT(comboBox), "changed",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     G_CALLBACK(combo_changed), label);</span><br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+      <span class="postbody"><br>
+
+
+      <small>一個執行的結果如下所示：<br>
+
+
+      <br>
+
+
+      <img style="width: 438px; height: 288px;" alt="" src="images/GtkComboBoxGtkListStore-1.jpg"><br>
+
+
+      </small><br>
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkComboBoxGtkListStore.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:51 GMT -->
+</html>

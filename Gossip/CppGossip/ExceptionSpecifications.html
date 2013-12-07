@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/ExceptionSpecifications.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+  
+  <title>例外規格（Exception Specifications）</title>
+</head>
+
+
+<body>
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+<h1><a href="index.html">C++
+Gossip: 例外規格（Exception Specifications）</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"><small>
+例外規格（Exception
+Specifications）指的是在函式定義時，宣告其將丟回某些類型的例外，當您宣告一個函式將丟回例外物件時，通常表示該函式中發生某些類型例外
+時會將之丟出（函式中可能不處理，或是處理完後重新丟出），呼叫該函式的函式必須負責處理它所丟出的例外，另一方面，您也只能丟出函式上所指定的例外，這
+意味著除了指定的例外之後，其它類型的例外您必須在函式中加以處理。<br>
+
+
+      <br>
+
+
+要宣告一個函式丟出例外，其語法如下： <br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">return-type function throw
+(type1, type2, type3) { </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+// .... </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+throw type1; </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+// .... </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+throw type2; </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+// .... </span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">}</span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+例外規格是函式定義的一部份，函式宣告式與定義式必須都寫出來，例如：<br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+divide(int, int) throw(DividedByZero); </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+divide(int a, int b) throw(DividedByZero) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+例外的丟出是在執行時期引發的，當在執行時期丟出未列於例外規格中的例外時，unexpected()會被呼叫執行，它預設會呼叫terminate()
+函式，結果就是終止程式。<br>
+
+
+      <br>
+
+
+如果想限制函式不丟出任何類型的例外，則在函式定義時使用throw，但不指定任何類型的例外，例如：<br>
+
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+function() throw() {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+如此一來，所有的例外都不能從函式中丟出，所以例外的發生都必須在函式中捕捉並處理完畢。<br>
+
+
+      <br>
+
+
+在定義函式指標時，如果函式上有宣告例外規格，則例外規格也必須一併寫出，例如宣告一個可指向前例中divide的函式指標：<br>
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+(*fptr)(int, int) throw(DividedByZero);</span> </small></td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+<br>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/ExceptionSpecifications.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

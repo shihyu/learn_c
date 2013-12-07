@@ -1,0 +1,498 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/Constructor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>建構式（Constructor）</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: 建構式（Constructor）<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/Constructors.html">English</a></div>
+      <small><br>
+如果你有以下建立物件的需求：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var p1 = { name : 'Justin', age : 35};</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">var p2 = { name : 'Momor', age : 32};</small><br style="font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var p3 = { name : 'Hamimi', age : 2};</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這些物件在建立時，具有相同的特性名稱，只不過特性值不同，其實你可以定義一個函式：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">function Person(name, age) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; this.name = name;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; this.age = age;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <small><br>
+接著如下呼叫，就可以有相同的效果：<br>
+      </small>
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">var p1 = new Person('Justin', 35);</span></small><br style="font-weight: bold;">
+      <small><span style="font-weight: bold;">var p2 = </span></small><small style="font-weight: bold;">new Person('Momor', 32);</small><br style="font-weight: bold;">
+      <small style="font-weight: bold;">var p3 = </small><small style="font-weight: bold;">new Person('Hamimi', 2);</small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">像Person這樣的函式，接在<span style="font-weight: bold;">new</span>之後使用時</span>，俗稱為<span style="font-weight: bold;">建構式（Constructor）</span>，通常對從類別為基礎的語言過來的人，也會說這就像是一個類別（Class），不過這只是比擬，實際上當然與類別有所差別。<br>
+      <br>
+實際上你使用<span style="font-family: Courier New,Courier,monospace;">new</span>運算子後接上一個函式時，相當於作這樣的動作（一部份是這樣，不過還有別的細節，之後再談）：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person(name, age) {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.name = name;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.age = age;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.toString = function() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return '[' + this.name + ', ' + this.age + ']';<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; };<br>
+&nbsp; &gt; }<br>
+js&gt; var p = {};<br>
+js&gt; Person.call(p, 'Justin', 35);<br>
+js&gt; p<br>
+</span>[Justin, 35]<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">這也說明了，為什麼使用new接上函式，傳回的物件會有name與age，因為Person中，this所參考的就是p所參考的物件，所以在this上新增特性，就相當於在p所參考物件上新增特性。</span><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">一個函式作為建構式使用時，基本上無需撰寫return</span>，如果建構式有傳回值，那傳回值就會被當作最後名稱所參考的值。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person(name, age)&nbsp; {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; return [];<br>
+&nbsp; &gt; }<br>
+js&gt; var o = new Person();<br>
+js&gt; o instanceof Person;<br>
+</span>false<span style="font-weight: bold;"><br>
+js&gt; o instanceof Array;<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>所以要以比擬的方式來說，<span style="font-family: Courier New,Courier,monospace;">new</span>之後接上建構式，預設相當於這樣：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person(name, age) {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.name = name;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.age = age;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.toString = function() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return '[' + this.name + ', ' + this.age + ']';<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; };<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; return this;<br>
+&nbsp; &gt; }<br>
+js&gt; var p = {};<br>
+js&gt; p = Person.call(p, 'Justin', 35);<br>
+</span>[Justin, 35]<span style="font-weight: bold;"><br>
+js&gt; </span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">每個透過new建構的物件，都會有個<span style="font-weight: bold;">constructor</span>特性，</span>參考至當初建構它的函式。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person() {}<br>
+js&gt; var p = new Person();<br>
+js&gt; p.constructor == Person<br>
+</span>true<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">這可以作為物件類型的參考依據，不過要注意的是，constructor是可以修改的。</span><br>
+      <br>
+由於透過建構式所建立的物件，所有的特性都是直接新增在物件上，也因此可以直接透過<span style="font-weight: bold;"> .</span> 運算子加以存取。例如：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person(name, age) {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.name = name;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.age = age;<br>
+&nbsp; &gt; }<br>
+js&gt; var p = new Person('Justin', 35);<br>
+js&gt; p.name;<br>
+</span>Justin<span style="font-weight: bold;"><br>
+js&gt; p.age;<br>
+            </span>35<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+
+
+      <br>
+      <small>對熟悉物件導向私有性基本觀念的人來說，可能覺得這不安全，這相當於在物件導向觀念中，每個類別成員都是公開成員的意味。JavaScript本身並不支援物件導向公開、私用性等觀念，如果你想模擬，則可以如下：</small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person(name, age) {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.getName = function() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return name;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; };<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.age = age;<br>
+&nbsp; &gt; }<br>
+js&gt; var p = new Person('Justin', 35);<br>
+js&gt; print(p.name);<br>
+</span>undefined<span style="font-weight: bold;"><br>
+js&gt; print(p.getName());<br>
+            </span>Justin<span style="font-weight: bold;"><br>
+js&gt; print(p.age);<br>
+            </span>35<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">以上假設的是，name不可以被設定，但可以透過getName()來取得，之所以會有這樣的效果，其實就是 </span><a style="font-family: Courier New,Courier,monospace;" href="Closure.html">閉包</a><span style="font-family: Courier New,Courier,monospace;"> 的作用。上例中，在物件上新增了getName特性，參考至一個函式，該函式形成閉包綁定了參數name，參數也就是區域變數，並非物件上的特性，所以無法透過</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> . </span><span style="font-family: Courier New,Courier,monospace;">運算子取得，因此模擬了私用性。<br>
+      <br>
+由於閉包綁定的是變數本身，所以也可以如下，在設定值（或取得值）時予以保護：</span></small><small><br></small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Account() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; var balance = 0;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.getBalance = function() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return balance;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; };<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; this.setBalance = function(money) {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(money &lt; 0) {<br>
+&nbsp;
+&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throw new Error('can\'t set negative balance.');<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; balance = money;<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; };<br>
+&nbsp; &gt; }<br>
+js&gt; var acct = new Account();<br>
+js&gt; acct.getBalance();<br>
+</span>0<span style="font-weight: bold;"><br>
+js&gt; acct.setBalance(1000);<br>
+js&gt; acct.getBalance();<br>
+            </span>1000<span style="font-weight: bold;"><br>
+            </span>js&gt; acct.setBalance(-1000);<br>
+js: "&lt;stdin&gt;", line 113: exception from uncaught JavaScript throw: Error: can't<br>
+set negative balance.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at &lt;stdin&gt;:113<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at &lt;stdin&gt;:111<br>
+            <span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><a href="http://openhome.cc/eGossip/JavaScript/Constructors.html"></a><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/Constructor.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:22 GMT -->
+</html>

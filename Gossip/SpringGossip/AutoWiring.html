@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/AutoWiring.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>自動綁定</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 自動綁定</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+接續 <a href="RefBean.html">屬性參考</a> 的內容。<br>
+
+      <br>
+
+
+直接指定值或是使用&lt;ref&gt;直接指定參考至其它的Bean，Spring也支援隱式的自動綁定，您可以透過類型（byType）或名稱（byName）將Bean綁定至其它Bean上對應的屬性，下面是個byType的例子：</small>
+ <br>
+
+
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br>    &lt;bean id="dateBean" class="java.util.Date"/&gt;<br>    &lt;bean id="helloBean" <br>          class="onlyfun.caterpillar.HelloBean" <span style="font-weight: bold;"><br>          autowire="byType"</span>&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;Hello!&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>&lt;/beans&gt;</pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+在定義檔中，並沒有指定helloBean的Date屬性，而是透過自動綁定，由於autowire指定了byType，所以會根據helloBean的
+Date屬性所接受的型態，判斷是否有類似的型態物件，並將之綁定至helloBean的Date屬性上，如果byType無法完成綁定，則丟出
+org.springrframework.beans.factory.UnsatisfiedDependencyExcpetion例外。<br>
+
+      <br>
+
+
+您也可以指定byName來綁定，則Spring會根據bean的別名與屬性名稱是否符合來進行自動綁定，舉個例子來說，如果是byName而Date屬性要完成依賴注入的話，則必須修改一下第一個Bean的id值為date： </small>
+      <br>
+
+
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br>    &lt;bean id=<span style="font-weight: bold;">"date"</span> class="java.util.Date"/&gt;<br>    &lt;bean id="helloBean" <br>          class="onlyfun.caterpillar.HelloBean" <br>          <span style="font-weight: bold;">autowire="byName"</span>&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;Hello!&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>&lt;/beans&gt;</pre>
+
+
+
+
+
+
+      <br>
+
+      <small>
+如果byName無法完成綁定，則屬性維持未綁定狀態。<br>
+
+      <br>
+
+      <span class="postbody"></span>在建構方法上，也可以嘗試進行自動綁定，例如若HelloBean.java修改如下：</small>
+
+
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>HelloBean.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar; <br><br>import java.util.Date; <br><br>public class HelloBean { <br>    private String helloWord; <br>    private Date date; <br>    <br>    public HelloBean() {<br>    }<br>    <br>    public HelloBean(Date date) {<br>        this.date = date;<br>    }<br>    <br>    public void setHelloWord(String helloWord) { <br>        this.helloWord = helloWord; <br>    } <br>    public String getHelloWord() { <br>        return helloWord; <br>    } <br>    public void setDate(Date date) { <br>        this.date = date; <br>    }    <br>    public Date getDate() { <br>        return date; <br>    } <br>}</pre>
+
+
+      <br>
+
+      <small>
+您可以如下定義beans-config.xml：</small><br>
+
+
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br>    &lt;bean id="date" class="java.util.Date"/&gt;<br>    &lt;bean id="helloBean" <br>          class="onlyfun.caterpillar.HelloBean" <br>          <span style="font-weight: bold;">autowire="constructor"</span>&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;Hello!&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+
+      <br>
+
+      <small>
+由於autowire設定為constructor，在建立綁定關係時，Spring容器會試圖比對容器中的Bean及相關的建構方法，在型態上是否有符
+合，如果有的話，則選用該建構方法來建立Bean實例，例如上例中，HelloBean的帶參數建構方法與date這個Bean的型態相符，於是選用該建
+構方法來建構實例，並將date這個Bean注入給它，如果無法完成綁定，則丟出
+org.springframework.beans.factory.UnsatisfiedDependencyException例外。<br>
+
+      <br>
+
+
+還想再偷懶的話。就使用autodetect，例如：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br>    &lt;bean id="date" class="java.util.Date"/&gt;<br>    &lt;bean id="helloBean" <br>          class="onlyfun.caterpillar.HelloBean" <br>          <span style="font-weight: bold;">autowire="autodetect"</span>&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;Hello!&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+
+      <br>
+
+      <small>
+使用autodetect時，會嘗試使用constructor，然後使用byType，哪一個先符合就先用。<br>
+
+      <br>
+
+
+隱式的自動綁定沒辦法從定義檔中，清楚的看到是否每個屬性都完成設定，我們可以加入相依檢查，在&lt;bean&gt;上加入dependency-
+check，有四種相依檢查方式：simple、objects、all、none。第一個只檢查簡單的屬性，像是原生（primitive）資料型態或
+字串物件，objects檢查物件屬性，all則檢查全部的屬性，none是預設，表示不檢查相依性，例如：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li>beans-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;  <br>    &lt;bean id="date" class="java.util.Date"/&gt;<br>    &lt;bean id="helloBean" <br>          class="onlyfun.caterpillar.HelloBean" <br>          autowire="autodetect"  <br>          <span style="font-weight: bold;">dependency-check="all"</span>&gt; <br>        &lt;property name="helloWord"&gt; <br>            &lt;value&gt;Hello!&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+
+      <br>
+
+      <small>
+如果相依檢查發現有未完成的依賴關係，則運行時會丟出org.springframework.beans.factory.UnsatisfiedDependencyException。</small></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/AutoWiring.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+</html>

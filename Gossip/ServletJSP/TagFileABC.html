@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/TagFileABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>簡介 Tag File</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 簡介 Tag File<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果要自訂標籤，Tag File是最簡單的方式，即使是不會Java的網頁設計人員也有能力自訂Tag File。事實上，Tag File本來就是為了不會Java的網頁設計人員而存在的。<br>
+      <br>
+假設有以下的JSP片段：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; List&lt;String&gt; errorList = (List&lt;String&gt;) request.getAttribute("errors");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if (errorList != null) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">%&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;ul style="color: rgb(255, 0, 0);"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for(String error : errorList) {<br>
+</span></small>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out.println("&lt;li&gt;" + error + "&lt;/li&gt;");</span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out.println("&lt;/ul&gt;");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">%&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這個片段的作用，在於使用者新增書籤時沒有填寫必要欄位時而回到原網頁時，會出現相關的錯誤訊息，這些錯誤訊息是收集在一個List物件中，並在<span style="font-family: Courier New,Courier,monospace;">request設定errors</span>屬性後傳遞過來。由於你已經學過JSTL了，可以將這個Scriptlet與HTML夾雜的片段改為：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;c:if test="${requestScope.errors != null}"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;ul style="color: rgb(255, 0, 0);"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;c:forEach var="error" items="${requestScope.errors}"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;li&gt;${error}&lt;/li&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/c:forEach&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/ul&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/c:if&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+現在即使是網頁設計人員，也可以看懂並依需求修改這個片段了。然而，這種錯誤訊息的呈現方式，也許並不僅出現在一個網頁，其它網頁也需要同樣的片段。每次
+都得複製貼上同樣的片段還不成問題，但將來要修改外觀樣式時才是一大麻煩。網頁設計人員也許會想說，這樣的片段若可以像是<span style="font-family: Courier New,Courier,monospace;">&lt;html:errrors&gt;</span>這樣的標籤存在就好了。<br>
+      <br>
+如果網頁設計人員知道可以使用Tag File，那這個需求就解決了。他們可以撰寫一個副檔名為<span style="font-weight: bold;">.tag</span>的檔案，把它們放在<span style="font-weight: bold;">WEB-INF/tags</span>底下，內容如下：<br>
+      </small>
+      <ul>
+        <li><small>Errors.tag</small></li>
+      </ul>
+      <pre>&lt;%@tag description="顯示錯誤訊息的標籤" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%&gt;<br>&lt;c:if test="${requestScope.errors != null}"&gt;<br>    &lt;ul style="color: rgb(255, 0, 0);"&gt;<br>        &lt;c:forEach var="error" items="${requestScope.errors}"&gt;<br>            &lt;li&gt;${error}&lt;/li&gt;<br>        &lt;/c:forEach&gt;<br>    &lt;/ul&gt;<br>&lt;/c:if&gt; <br></pre>
+      <small><br>
+在這邊你看到了<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">tag</span>指示元素，它就像是JSP的<span style="font-family: Courier New,Courier,monospace;">page</span>指示元素，用來告知容器如何轉譯這個Tag File。<span style="font-family: Courier New,Courier,monospace;">description</span>只是一段文字描述，用來說明這個Tag File的作用。<span style="font-family: Courier New,Courier,monospace;">pageEncoding</span>屬性告知容器在轉譯Tag File時使用的編碼。Tag File中可以使用<span style="font-family: Courier New,Courier,monospace;">taglib</span>指示元素引用其它自訂標籤庫，可以在Tag File中使用JSTL。基本上，JSP檔案中可以使用的EL或Scriptlet，在Tag File中也可以使用。<br>
+      <br>
+在需要這個Tag File的JSP頁面中，可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">taglib</span>指示元素的<span style="font-family: Courier New,Courier,monospace;">prefix</span>定義前置名稱，以及使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">tagdir</span>屬性定義Tag File的位置：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%@taglib prefix="html" tagdir="/WEB-INF/tags" %&gt;</span></small><br>
+      </div>
+      <small><br>
+接著就可以在JSP中需要呈現錯誤訊息的地方，使用&lt;html:Errors/&gt;標籤來代替先前呈現錯誤訊息的片段。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">&lt;%@taglib&nbsp; prefix="html" tagdir="/WEB-INF/tags" %&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">"http://www.w3.org/TR/html4/loose.dtd"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;html&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;head&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;title&gt;新增書籤&lt;/title&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;meta http-equiv="Content-Type"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+content="text/html; charset=UTF-8"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/head&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;body&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace; color: red;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;html:Errors/&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;form method="post" action="add.do"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+網址&amp;nbsp;http:// &lt;input name="url"
+value="${param.url}"&gt;&lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+網頁名稱：&lt;input name="title" value="${param.title}"&gt;&lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 分　　類：&lt;input type="text"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+name="category" value="${param.category}"&gt;&lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input value="送出" type="submit"&gt;&lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/form&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/body&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/html&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">當然！使用這個自
+訂的&lt;html:Errors/&gt;標籤有個假設前題。錯誤訊息是收集在一個List物件中，在request中設定errors屬性後傳遞過
+來。除非是大家都公認的標準，否則自訂標籤必然與應用程式有某種程度的相依性，在自訂標籤前，於使用的方便性及相依性之間必須作出考量。<br>
+      <br style="font-family: Courier New,Courier,monospace;">
+      </span>注意！雖然<span style="font-family: Courier New,Courier,monospace;">tagdir</span>可以指定Tag File的位置，但事實上只能指定/WEB-INF/tags的子資料夾，也就是說，以<span style="font-family: Courier New,Courier,monospace;">tagdir</span>屬性設定的話，Tag File就只能放在/WEB-INF/tags或子資料夾之中。<br>
+      <br>
+前面提過Tag File會被容器轉譯，實際上是轉譯為<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">javax.servlet.jsp.tagext.SimpleTagSupport</span>的子類別。以Tomcat為例，Errors.tag轉譯後的類別原始碼名稱是Errors_tag.java。在Tag File中可以使用<span style="font-family: Courier New,Courier,monospace;">out、config、request、response、session、application、jspContext等隱含物件，其中jspContext在轉譯之後，實際上則是javax.servlet.jsp.JspContext物件。</span><br>
+      <br>
+所以，Tag File在JSP中，並不是靜態包含或動態包含，在Tag File中撰寫Scriplet的話，其中的區域變數也不可能與JSP中Scriptlet溝通。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">JspContext是PageContext的父類別，JspContext</span>上定義的API不像<span style="font-family: Courier New,Courier,monospace;">PageContext</span>有使用到Servlet API，原本在設計上希望JSP的相關實現可以不依賴特定技術（例如Servlet），所以才會有<span style="font-family: Courier New,Courier,monospace;">JspContext</span>這個父類別的存在。<br>
+      <br>
+      <br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/TagFileABC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+</html>

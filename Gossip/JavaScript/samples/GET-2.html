@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/GET-2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:18 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                var xhr = window.XMLHttpRequest && 
+                      (window.location.protocol !== 'file:' 
+                          || !window.ActiveXObject) ?
+                       function() {
+                           return new XMLHttpRequest();
+                       } :
+                       function() {
+                          try {
+                             return new ActiveXObject('Microsoft.XMLHTTP');
+                          } catch(e) {
+                             throw new Error('XMLHttpRequest not supported');
+                          }
+                       };
+                
+                function param(obj) {
+                    var pairs = [];
+                    for(var name in obj) {
+                        var pair = encodeURIComponent(name) + '=' + 
+                                   encodeURIComponent(obj[name]);
+                        pairs.push(pair.replace('/%20/g', '+'));
+                    }
+                    return pairs.join('&');
+                }
+                
+                document.getElementById('url').onblur = function() {
+                    var request = xhr();
+                    request.onreadystatechange = function() {
+                        if(request.readyState === 4) {
+                            if(request.status === 200) {
+                                var message = '';
+                                if(request.responseText === 'urlExisted') {
+                                    message = 'URL 已存在';
+                                }
+                                document.getElementById('message')
+                                        .innerHTML = message;
+                            }
+                        }
+                    };
+                    var params = param(
+                       { url : document.getElementById('url').value}
+                    );
+                    request.open('GET', 'GET-2d41d.html?' + params + 
+                         '&time=' + new Date().getTime()); // 避免GET被快取
+                    request.send(null);
+                };
+            };
+        </script>        
+    </head>
+    <body>
+        新增書籤：<br>
+        網址：<input id="url" type="text">
+        <span id="message" style="color:red"></span><br>
+        名稱：<input type="text">
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/samples/GET-2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:19 GMT -->
+</html>

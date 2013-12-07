@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/PartiallyAppliedFunction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>部份套用函式（Partially applied function）</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 部份套用函式（Partially applied function）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>部份套用函式（Partially applied function）所謂的部份套用，是指對某個已定義的函式，希望先對某些參數套用指定的值，之後需要時再指定剩下未定參數的值。<br><br>例如：<br></small><pre>import scala.Math._<br><br>def sumOfCubes(a: Double, b: Double, c: Double)=pow(a, 3)+pow(b, 3)+pow(c, 3)<br><br>val sumOfCubes32 = sumOfCubes(3, 2, <span style="font-weight: bold;">_: Double</span>) <br>println(sumOfCubes32(4))  // 顯示 99.0</pre><small><br>原
+先的sumOfCubes函式定義了三個參數，現在假設你希望其中兩個參數預定為3、2，方便接下來的程式只需呼叫一個參數的版本，則可以使用範例中的方
+式，先套用部份參數，而未套用的部份使用佔位字元與型態宣告保留下來，這樣的語法會傳回一個函式物件，型態為(Double) =&gt;
+Double，你將之指定給sumOfCubes32參考，之後就可以只指定未套用參數的值。<br><br>部份套用函式的語法會傳回函式物件，</small><small>實際上</small><small>所產生的函式
+物件其類別來源，是由編譯器自動產生，這個自動產生的類別，會有個apply方法，正如Scala語法的一致性，如果要呼叫某個apply方法，可以只使
+用括號，所以sumOfCubes32(4)，其實是轉為呼叫sumOfCubes32.apply(4)。以下是另一個範例，用以證明方才的說法：<br></small><pre>import scala.Math._<br><br>def sumOfCubes(a: Double, b: Double, c: Double)=pow(a, 3)+pow(b, 3)+pow(c, 3)<br><br>val sumOfCubes3 = sumOfCubes(3, _: Double, _: Double) <br>println(sumOfCubes3(4, 5))        // 顯示 216.0<br>println(sumOfCubes3.apply(4, 5))  // 顯示 216.0</pre><small><br>如果你想要：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">val s = sumOfCubes(_: Double , _: Double, _: Double) </span></small><br></div><small><br>則可以簡寫為：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">val s = sumOfCubes _</span></small><br></div><small><br>_可以看作是，代表sumOfCubes整個參數列。這個語法的作用之一，就是能將def所定義的函式轉換為函式物件來傳遞，相當於你這麼定義：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import scala.Math._<br>val sumOfCubes=(a: Double, b: Double, c: Double) =&gt; pow(a, 3)+pow(b, 3)+pow(c, 3)</span></small><br></div><small><br>例如在使用陣列的foreach方法時，你可以這麼使用：<br></small><pre>Array(1, 2, 3).foreach(x =&gt; println(x))</pre><small><br>你也可以使用佔位字元語法來簡化：<br></small><pre>Array(1, 2, 3).foreach(println(_))</pre><small><br>若使用部份套用函式語法的話，則可以這麼撰寫：<br></small><pre>Array(1, 2, 3).foreach(println _)   // 相當於 .foreach(x =&gt; println(x))</pre><small><br>注意！上面這個不是佔位字元語法，而是部份套用函式的語法，如果用_代表整個參數列，並將函式物件傳給另一個函式作為引數時，可以省略_不寫，也就是寫為：<br></small><pre>Array(1, 2, 3).foreach(println)</pre><br><small>注意！只寫下函式名稱的方式，僅在將函式物件傳遞給另一個函式作為引數時可以使用，為部份套用語法的簡寫方式，如果你試圖：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import scala.Math._</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">def sumOfCubes(a: Double, b: Double, c: Double)=pow(a, 3)+pow(b, 3)+pow(c, 3)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">val s = sumOfCubes &nbsp; &nbsp; &nbsp; // 這是錯的</span></small><br></div><small><br>則會出現以下的錯誤訊息：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">error:
+missing arguments for method sumOfCubes; follow this method with `_' if
+you want to treat it as a partially applied function</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">val s = sumOfCubes</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^</span></small><br></div><small><br><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/PartiallyAppliedFunction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

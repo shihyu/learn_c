@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/InterfaceMultiInheritance.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>介面與多重繼承</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">Java Gossip:&nbsp;介面與多重繼承</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在很多時候，又常會聽別人說，介面（interface）可以達到多重繼承的效果，這是怎麼回事？<br>
+
+      <br>
+
+
+
+其實要討論這個問題，首先您對於C++中多重繼承要先有認識，新手看了書說介面可以達到多重繼承，切莫人云亦云，尤其是沒有學過C++的新手們，如果您對
+於C++多重繼承想要有所認識，請先看看 <a href="../CppGossip/MultiInheritance1.html">多
+重繼承（一）</a>與 <a href="../CppGossip/MultiInheritance2.html">多
+重繼承（二）</a>。<br>
+
+      <br>
+
+
+
+Java不能多重繼承，但為何說Java中可以使用介面（interface）來達到多重繼承的效果，首先效果之一，就如 <a href="../CppGossip/MultiInheritance2.html">多
+重繼承（二）</a> 中描述的「
+多重繼承時通常其中一個基底類別作為private實作體，而其它的用以表現完全的抽象介面。」，在Java中這個效果可以使用介面來達到，介面此時所扮
+演的即 <a href="../CppGossip/MultiInheritance2.html">多
+重繼承（二）</a> 中的抽象類別，一個完全的抽象介面，這個效果的達成方式，如 <a href="InterfaceType.htm">介
+面（interface）型態</a>
+中所介紹的，您可以直接對應這兩個主題中的程式實作來瞭解，瞭解Java中如何使用介面（interface）來達到C++中所謂多重繼承的「一種」效
+果。<br>
+
+      <br>
+
+
+
+來看看另一個情況。<br>
+
+      <br>
+
+
+
+如果有SomeClass類別與OtherClass類別，您想要SomeAndOther類別可以同時擁有SomeClass類別與
+OtherClass類別中已定義好的操作，並可以進行多型操作，在C++中可以用多重繼承來達到，但在Java中顯然的無法使用多重繼承，怎麼辦？您可
+以在設計上先繞個彎，先使用兩個介面分別定義好SomeClass與OtherClass兩個類別的公開方法，例如：</small>
+
+
+
+
+
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>ISome.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>public interface ISome {<br>&nbsp;&nbsp;&nbsp; public void doSome();<br>}</pre>
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>IOther.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>public interface IOther {<br>&nbsp;&nbsp;&nbsp; public void doOther();<br>}</pre>
+
+
+
+      <br>
+
+      <small>
+
+接著讓Some與Other類別分別實作兩個介面：</small><br>
+
+
+      
+      <ul>
+
+        <li>Some.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre><span style="font-family: Courier New,Courier,monospace;">public class Some implements ISome {<br>&nbsp;&nbsp;&nbsp; public void doSome() {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....<br>&nbsp;&nbsp;&nbsp; }<br>}</span></pre>
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+
+
+      </span></span>
+      
+      <ul>
+
+        <li>Other.java</li>
+
+      
+      </ul>
+
+
+      <span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></span>
+      
+      <pre><span style="font-family: Courier New,Courier,monospace;">public class Other implements IOther {<br>&nbsp;&nbsp;&nbsp; public void doOther() {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....<br>&nbsp;&nbsp;&nbsp; }<br>}</span></pre>
+
+
+      <span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+
+
+      <br>
+
+
+      </span></span><small>
+SomeAndOther如何同時擁有兩個Some與Other類別已定義好的操作？並可以多型操作？SomeAndOther可以
+繼承其中之一，並擁有其中之一，例如：</small><br>
+
+
+      
+      <ul>
+
+        <li>SomeAndOther.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>public class SomeAndOther extends Some implements IOther {<br>&nbsp;&nbsp;&nbsp; private IOther other = new Other();<br><br>&nbsp;&nbsp;&nbsp; public void doOther() {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; other.doOther();<br>&nbsp;&nbsp;&nbsp; }<br>}</pre>
+
+
+      <br>
+
+      <small>
+
+雖不滿意，但至少解決了目前的問題，當然這邊只是其中一例，畢竟C++是C++，Java是Java，兩者語法並不是一對一的關係，視實際需求還可以變化
+一下。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/InterfaceMultiInheritance.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+</html>

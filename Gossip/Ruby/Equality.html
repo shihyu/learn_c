@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Equality.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>物件相等性</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 物件相等性<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在<big> </big></small><small><big><a href="Variable.html"><small>變數</small></a></big> 中談過，</small><small>在Ruby中，<span style="font-family: Courier New,Courier,monospace;">==</span>常用來比較兩個物件的實質內容是否相同。</small><small>如果想知道兩個變數是否參考同一物件，除了使用<span style="font-family: Courier New,Courier,monospace;">object_id</span>得知之外，通常還可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">equal?</span>方法。</small><small><span style="font-family: Courier New,Courier,monospace;"></span>相等比較還可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">eql?</span>方法，這個方法通常會檢查變數是否參考同一實例，若否則</small><small>比較物件是否為同一類別的實例，若是則</small><small>比較實值是否相同。</small><br>
+      <small></small><small style="font-family: Courier New,Courier,monospace;"><br><span style="font-weight: bold;">
+簡單地說，equal?測試是否為相同實例，==測試實值是否相同，eql?相當於先作equal?要作的事，再測試了是否為同一類別實例，最後進行==要作的事，不過要注意，eql?預設並不呼叫equal?或==。</span><br>
+</small><small><br>
+      </small><small style="font-family: Courier New,Courier,monospace;">Object上定義的相等比較還有個<span style="font-weight: bold;">===</span>，通常若===兩邊都是實例，</small><small style="font-family: Courier New,Courier,monospace;">預設實作會比較兩個變數是否參考同一實例，如果不是，<span style="font-weight: bold;">會再呼叫==</span>。如果左邊是類別而右且是實例，===比較實例是否由該類別所生成。使用</small><a href="CaseWhenElse.html"><small>case...when...else</small></a> <small style="font-family: Courier New,Courier,monospace;">時，就是使用===作為依據（因為===會呼叫==，所以實際上可以僅定義==來決定case..when..else的比對依據）。</small><br>
+<small style="font-family: Courier New,Courier,monospace;"><br>
+</small><small>實際上，如果你定義類別時，沒有重新定義<span style="font-family: Courier New,Courier,monospace;">==</span>、<span style="font-family: Courier New,Courier,monospace;">equal?、eql?、===</span>方法，則定義預設繼承自<span style="font-family: Courier New,Courier,monospace;">Object</span>，若要定義類別時需要定義相等性，必須依需求自行定義</small><small><span style="font-family: Courier New,Courier,monospace;">==</span>、<span style="font-family: Courier New,Courier,monospace;">equal?、eql?、===方法，而不是依賴Object的預設實作。</span></small><small><br>
+      <br>
+      </small><small style="font-family: Courier New,Courier,monospace;">
+以下討論定義物件實質相等性時要考量的一些要素。</small><small>例如，你可能如下定義了==方法：<br>
+      </small>
+      <pre>class Point<br>    attr_accessor :x, :y<br>    def initialize(x, y)<br>        @x = x<br>        @y = y<br>    end<br><br>    <span style="font-weight: bold;">def ==(that)</span><br style="font-weight: bold;"><span style="font-weight: bold;">       self.x == that.x &amp;&amp; self.y == that.y</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br>end<br></pre>
+      <small><br>
+      </small><small>如果你這麼測試：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p1 = Point.new(2, 1)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p2 = Point.new(2, 1)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts p1 == p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # true</span></small><br>
+      </div>
+      <small><br>
+      </small><small>看來似乎沒錯，<span style="font-family: Courier New,Courier,monospace;">p1與p2</span>座標都是同一點，所以</small><small>實際上指的是相同座標，但是如果你這麼測試：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">require "set"<br>
+p1 = Point.new(2, 1)<br>
+p2 = Point.new(2, 1)<br>
+set = Set.new<br>
+set &lt;&lt; p1<br>
+puts set.include?(p2) # false<br>
+puts set.size&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 1<br>
+set &lt;&lt; p2<br>
+puts set.size&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # 2</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small><br style="font-weight: bold;">
+      </div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+Set是集合，相同的資料不會重複收集，不過上例中，Set顯然不認為p1與p2是相同資料，無論是從include?或最後集合的長度，都看得出來這樣的結果。<br>
+      <br>
+      </span></small><small>事實上在許多場合，例如將物件加入<span style="font-family: Courier New,Courier,monospace;">Set</span>時，會同時利用<span style="font-family: Courier New,Courier,monospace;"></span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">eql?</span><span style="font-family: Courier New,Courier,monospace;">與</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">hash</span>來判斷是否加入的是（實質上）相同的物件：<br></small>
+      <ul>
+<li><small>在同一個應用程式執行期間，對同一物件呼叫<span style="font-family: Courier New,Courier,monospace;">hash</span>方法，必須回傳相同的整數結果。</small></li><li><small>如果兩個物件使用<span style="font-family: Courier New,Courier,monospace;">eql?</span>測試結果為相等, 則這兩個物件呼叫<span style="font-family: Courier New,Courier,monospace;">hash</span>時，必須獲得相同的整數結果。</small></li><li><small>如果兩個物件使用<span style="font-family: Courier New,Courier,monospace;">eql?</span>測試結果為不相等, 則這兩個物件呼叫<span style="font-family: Courier New,Courier,monospace;">hash</span>時，可以獲得不同的整數結果。</small></li>
+      </ul>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">以Set為例，會先使用hash得出該將物件放至哪個雜湊桶（</small><small>Hash buckets</small><small style="font-family: Courier New,Courier,monospace;">）中，如果</small><small><span style="font-family: Courier New,Courier,monospace;">雜
+湊桶有物件，再進一步使用eql?確定相等性，從而確定Set中不會有重複的物件。以下是定義了eql?與hash的Point版本：<br>
+</span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre># encoding: Big5<br>class Point<br>    attr_accessor :x, :y<br>    def initialize(x, y)<br>        @x = x<br>        @y = y<br>    end<br><br>    def ==(that)<br>       self.x == that.x &amp;&amp; self.y == that.y<br>    end<br>    <br> <span style="font-weight: bold;">   def eql?(that)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if self.equal? that</span><br style="font-weight: bold;"><span style="font-weight: bold;">            return true</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if that.is_a?(Point)</span><br style="font-weight: bold;"><span style="font-weight: bold;">            return self == that</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br style="font-weight: bold;"><span style="font-weight: bold;">        return false</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    def hash</span><br style="font-weight: bold;"><span style="font-weight: bold;">        41 * (41 + self.x) + self.y</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br>end<br><br>require "set"<br>p1 = Point.new(2, 1)<br>p2 = Point.new(2, 1)<br>set = Set.new<br>set &lt;&lt; p1<br>puts set.include?(p2) # true<br>puts set.size         # 1<br>set &lt;&lt; p2<br>puts set.size         # 1<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;">
+      <br>
+      </span></small><small><span style="font-weight: bold;">一個重要的觀念是，定義<span style="font-family: Courier New,Courier,monospace;">eql?與hash</span>時，最好
+別使用狀態會改變的資料成員</span>。你可能會想，以這個例子來說，點會移動，如果移動了就不是相同的點了，不是嗎？若<span style="font-family: Courier New,Courier,monospace;">x、y</span>是個允許會變動的成
+員，那麼就會發生這個情況：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">require "set"</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p1 = Point.new(2, 1)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">set = Set.new</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">set &lt;&lt; p1</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts set.include?(p1) # true</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p1.x = 3</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts set.include?(p1) # false</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">明
+明是記憶體中同一個物件，但置入集合後，最後跟我說不包括p1？這是因為，你改變了x，算出來的hash也就改變了，使用include?嘗試比對時，會看看新算出來的雜湊桶中是不是有物件，而根本不是在置入p1的雜湊桶中尋找，結果就是false了。<br>
+      <br>
+對Point應用於如Set的場合而言，x、y最好是不可變動的。例如：<br>
+</span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>class Point<br><span style="font-weight: bold;">    attr_reader :x, :y</span><br>    def initialize(x, y)<br>        @x = x<br>        @y = y<br>    end<br><br>    def ==(that)<br>       self.x == that.x &amp;&amp; self.y == that.y<br>    end<br>    <br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br>        if that.is_a?(Point)<br>            return self == that<br>        end<br>        return false<br>    end<br>    <br>    def hash<br>        41 * (41 + self.x) + self.y<br>    end<br>end<br></pre>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small><small style="font-family: Courier New,Courier,monospace;">暫且忽略hash。來看看在實作eql?時要遵守的約定（</small><small style="font-family: Courier New,Courier,monospace;">取自java.lang.Object的 <a href="http://java.sun.com/javase/6/docs/api/java/lang/Object.html#equals%28java.lang.Object%29">equals()
+ 說明</a> </small><small style="font-family: Courier New,Courier,monospace;">）：<br></small>
+      
+      <ul style="font-family: Courier New,Courier,monospace;">
+<li><small>反身性
+（Reflexive）：x.eql?(x)的結果要是true。</small></li><li><small>對稱性
+（Symmetric）：x.eql?(y)與y.eql?(x)的結果必須相同。</small></li><li><small>傳遞性
+（Transitive）：x.eql?(y)、y.eql?(z)的結果都是true，則x.eql?(z)的結果也必須是true。</small></li><li><small>一
+致性（Consistent）：同一個執行期間，對x.eql?(y)的多次呼叫，結果必須相同。</small></li><li><small>對
+任何非nil的x，x.eql?(nil)必須傳回false。</small></li>
+      </ul>
+
+      <br style="font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;">目前定義的Point，其eql?方法滿足以上幾個約定（你可以自行寫程式測試）。現在考慮繼承的情況，你要定義</small><small>3D</small><small style="font-family: Courier New,Courier,monospace;">的點：</small><br>
+
+      
+      <pre>class Point3D &lt; Point<br>    attr_reader :z<br>    def initialize(x, y, z)<br>        super(x, y)<br>        @z = z<br>    end<br>    <br>    def ==(that)<br>       super(that) &amp;&amp; self.z == that.z<br>    end<br><br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br>        if that.is_a?(Point3D)<br>            return self == that<br>        end<br>        return false<br>    end<br>end<br></pre>
+
+<small style="font-family: Courier New,Courier,monospace;">
+<br>
+      </small><small>這看來似乎沒什麼問題，3D的點要再比較z座標是沒錯。不過來測試一下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p1 = Point.new(2, 3)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p2 = Point3D.new(2, 3, 4)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts p1.eql?(p2)&nbsp;&nbsp; # true</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts p2.eql?(p1)&nbsp;&nbsp; # false</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      </small><small style="font-family: Courier New,Courier,monospace;">結
+果該是true或false需要討論一下。3D的點與2D的點是否相等呢？假設你考慮的是點投射在</small><small>xy</small><small style="font-family: Courier New,Courier,monospace;">平面上是否相等，那p1.eql?(p2)為true就可以接受，在此假設之下，再來看p2.eql?(p1)為false，這違反eql?對稱性的對稱性合約。如果你要滿足對稱性，則
+要作個修改：</small><br>
+      <pre>class Point3D &lt; Point<br>    attr_reader :z<br>    def initialize(x, y, z)<br>        super(x, y)<br>        @z = z<br>    end<br>    <br>    def ==(that)<br>       super(that) &amp;&amp; self.z == that.z<br>    end<br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br><span style="font-weight: bold;">        if that.is_a?(Point3D)</span><br style="font-weight: bold;"><span style="font-weight: bold;">            return self == that</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br><span style="font-weight: bold;">        if that.is_a?(Point)</span><br style="font-weight: bold;"><span style="font-weight: bold;">            return that == self</span><br style="font-weight: bold;"><span style="font-weight: bold;">        end</span><br>        return false<br>    end<br>end<br></pre>
+      <small><br>
+      </small><small>再次運行上面的測試，就可以得到都是<span style="font-family: Courier New,Courier,monospace;">true</span>的結果，但如果是這個：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p1 = Point.new(2, 3)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p2 = Point3D.new(2, 3, 4)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">p3 = Point3D.new(2, 3, 5)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts p2.eql?(p1)&nbsp; # true</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts p1.eql?(p3)&nbsp; # true</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">puts p2.eql?(p3)&nbsp; # false</span></small><br>
+      </div>
+      <small><br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">p2等於p1，p1等於p3，但p2不等於p3</span>，這違反傳遞性合約。問題點在於，2D的點並沒有z軸資訊，無論如何也沒辦法滿足傳遞性了。<br><br>一般來說，對於不同的類別實例，會將之視為不同，基本上你可以這麼設計：<br>
+      </small>
+      <pre># encoding: Big5<br>class Point<br>    attr_reader :x, :y<br>    def initialize(x, y)<br>        @x = x<br>        @y = y<br>    end<br>    def ==(that)<br>       self.x == that.x &amp;&amp; self.y == that.y<br>    end<br>    <br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br>        if that.is_a?(Point)<br>            return <span style="font-weight: bold;">clz_eql?(that)</span> &amp;&amp; self == that<br>        end<br>        return false<br>    end<br><br>    def hash<br>        41 * (41 + @x) + @y<br>    end<br>    <br>    <span style="font-weight: bold;">def clz_eql?(that)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        self.class == that.class</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br>end<br><br>class Point3D &lt; Point<br>    attr_reader :z<br>    def initialize(x, y, z)<br>        super(x, y)<br>        @z = z<br>    end<br>    <br>    def ==(that)<br>       super(that) &amp;&amp; self.z == that.z<br>    end<br>    <br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br>        if that.is_a?(Point3D)<br>            return<span style="font-weight: bold;"> clz_eql?(that) </span>&amp;&amp; self == that<br>        end<br>        return false<br>    end<br>end<br><br>p1 = Point.new(2, 3)<br>p2 = Point3D.new(2, 3, 5)<br>p3 = Point3D.new(2, 3, 5)<br>puts p2.eql?(p1)  # false<br>puts p1.eql?(p3)  # false<br>puts p2.eql?(p3)  # true<br>puts p3.eql?(p2)  # true<br></pre>
+      <small><br>
+      </small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">在繼承的情況下，若eql?兩旁運算元有一個是子類別實例，則會使用子類別的eql?版本進行比對</span>。在上面的定義之下，直接將</small><small>2D與3D</small><small style="font-family: Courier New,Courier,monospace;">的點視作不同的類型</small><small style="font-family: Courier New,Courier,monospace;">，這避免了</small><small>2D點與3D</small><small style="font-family: Courier New,Courier,monospace;">點（父、子類別）進行比較時，無法符合對稱性、傳遞性合約的問題。</small><br>
+      <small><br>
+      </small><small>不過在以下這種需求時，這樣的定義也許不符合你的需求：<br>
+require "set"<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">p1 = Point.new(2, 1)</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">p2 = Class.new(Point) {</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; def to_s</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "(#{@x}, #{@y})"</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; end</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">}.new(2, 1)</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">set = Set.new</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">set &lt;&lt; p1</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">puts set.include? p1&nbsp;&nbsp; # </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">顯示 true</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">puts set.include? p2&nbsp;&nbsp; # </small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">顯示 false，但你想顯示 true</span></small></div>
+      <small><br>
+      </small><small>之後會看到，Ruby中的類別都是<span style="font-family: Courier New,Courier,monospace;">Class</span>實例，上面的程式片段<span style="font-family: Courier New,Courier,monospace;">中，p2是繼承Point的匿名類別建構出來，</span></small><small><span style="font-family: Courier New,Courier,monospace;">在程式中某處又打算測試看看set中是否含有相同座標的點，但結果並不是顯示true，這是因為你嚴格地在eql?</span>中檢查了實例的類別名稱。<br>
+      <br>
+      </small><small>你可以將定義改為以下：<br>
+      </small>
+      <pre># encoding: Big5<br>class Point<br>    attr_reader :x, :y<br>    def initialize(x, y)<br>        @x = x<br>        @y = y<br>    end<br>    def ==(that)<br>       self.x == that.x &amp;&amp; self.y == that.y<br>    end<br>    <br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br>        if that.is_a?(Point)<br>            return <span style="font-weight: bold;">that.canEqual?(self)</span> &amp;&amp; self == that<br>        end<br>        return false<br>    end<br>    <br>    def hash<br>        41 * (41 + @x) + @y<br>    end    <br>    <br><span style="font-weight: bold;">    def canEqual?(that)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        that.is_a?(Point)</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br>end<br></pre>
+      <small><br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;">在eql?中，你不僅檢查傳入的實例是否為Point，也反過來讓傳入的實例取得self的型態進行測試</span>（這是 </small><small><a href="../DesignPattern/VisitorPattern.htm">Visitor
+模式</a> </small><small>的實現）。而在<span style="font-family: Courier New,Courier,monospace;"> Point3D </span>中：</small><br>
+      <pre>class Point3D &lt; Point<br>    attr_reader :z<br>    def initialize(x, y, z)<br>        super(x, y)<br>        @z = z<br>    end<br>    <br>    def ==(that)<br>       super(that) &amp;&amp; self.z == that.z<br>    end<br>    <br>    def eql?(that)<br>        if self.equal? that<br>            return true<br>        end<br>        if that.is_a?(Point3D)<br>            return <span style="font-weight: bold;">that.canEquals(self)</span> &amp;&amp; self == that<br>        end<br>        return false<br>    end<br>    <br><span style="font-weight: bold;">    def canEqual?(that)</span><br style="font-weight: bold;"><span style="font-weight: bold;">        that.is_a? Point3D</span><br style="font-weight: bold;"><span style="font-weight: bold;">    end</span><br>end<br></pre>
+      <small><br>
+      </small><small style="font-family: Courier New,Courier,monospace;">如果p1是Point物件，而p2是Point3D物件，p1.eql?(p2)時，</small><small style="font-family: Courier New,Courier,monospace;">由於</small><small style="font-family: Courier New,Courier,monospace;">傳入的實例可以取得self的型態進行測試，p2反過來測試p1是不是Point3D，結果不是，所以eql?傳回false，利用這個方式，讓有具體名稱的子類別實例，不會與父類別實例有相等成立的可能性。如果是直接繼承Point類別的</small><small style="font-family: Courier New,Courier,monospace;">匿名類別物件</small><small style="font-family: Courier New,Courier,monospace;">，則直接繼承canEqual?方法，由於</small><small style="font-family: Courier New,Courier,monospace;">匿名類別物件還是一種Point實例，因此eql?的結果會是true。<br>
+      <br>
+      </small><small>一個測試的結果如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">require "set"</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">p1 = Point.new(2, 1)</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">p2 = Class.new(Point) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; def to_s</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "(#{@x}, #{@y})"</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; end</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}.new(2, 1)</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">p3 = Point3D.new(2, 1, 3)</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">set = Set.new</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">set &lt;&lt; p1</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">puts set.include? p1&nbsp;&nbsp; # true</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">puts set.include? p2&nbsp;&nbsp; # true</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">puts set.include? p3&nbsp;&nbsp; # false</small><br>
+      </div>
+      <small><br>
+<br>
+<br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Equality.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

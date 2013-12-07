@@ -1,0 +1,805 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QSqlQuery.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:43 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QSqlQuery</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QSqlQuery</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>要在Qt中執行與處理SQL，可以使用QSqlQuery，假設您建立的表格如下：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">create table T_USER (</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; id bigint not null auto_increment,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; name varchar(255),</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; age bigint,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; primary key (id)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">);</span></small><br style="font-weight: bold;">
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+您可以如下使用QSqlQuery執行SQL語句：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QSqlQuery query;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">query.exec("INSERT INTO T_USER (name, age) "</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"VALUES ('bush', 9)");</span></small><br>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>這會在指定的資料庫表格中插入一筆資料，也可以直接在建構函式中指定SQL語句，這會在建構物件之後，直接執行SQL語法：</small><br>
+
+
+
+      </span>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QSqlQuery query("INSERT INTO T_USER (name, age) "</span></small><br>
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"VALUES ('bush', 9)");</span></small><br>
+
+
+
+      </div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+您可以使用numRowsAffected()傳回影響的筆數，例如：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>QSqlQuery query;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>query.exec("DELETE FROM T_USER WHERE name = 'bee'");</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>cout &lt;&lt; query.numRowsAffected() &lt;&lt; endl;</small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>如果要查詢資料，可以用next()方法移至所查得的下一筆資料，如果可以找到下一筆資料則傳回true，否則傳回false，例如：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>QSqlQuery query;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>query.exec("SELECT * FROM T_USER");</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>while (query.next()) {</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; int id = query.value(0).toInt();</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; QString name = query.value(1).toString();</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; int age = query.value(2).toInt();</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp; cout &lt;&lt; id &lt;&lt; " " &lt;&lt; qPrintable(name) &lt;&lt; " " &lt;&lt; age &lt;&lt; endl;</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>}</small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>value()方法中的引數，是您所指定的表格欄位順序，因為資料庫表格中所儲存的型態是未知的，value()方法傳回的是
+QVariants型態的物件，QVariants在Qt中用來持有各種不同型態的資料，從基本的int到物件型態都可以，使用value()方法傳回
+QVariants物件之後，再使用相關方法，如toString()、toInt()等嘗試轉為指定的型態。<br>
+
+      <br>
+
+除了next()方法之外，QSqlQuery還有previous()、seek()、first()、last()等方法，方便您進行資料檢索，但是
+效能上負擔較重，如果您只是要循序取出資料，則可以使用QSqlQuery()的setForwardOnly()設定為true，再用next()方法
+取出資料，以獲得較好的效能。<br>
+
+
+
+      <br>
+
+
+
+如果資料庫表格的欄位很多，直接使用字串的方式撰寫SQL時，在安插資料時就會有點麻煩，尤其是在需要正確escape某些字元時，而且對於大量資料安插時，將一些型態轉換為字串也有損效能，您可以用
+prepare()方法搭配佔位字元 '?' 的方式來指定資料安插處，再使用bindValue()來指定真正要安插的資料，例如：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>QSqlQuery query;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.prepare("INSERT INTO T_USER (name, age) VALUES (?, ?)");</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.addBindValue("bee");</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.addBindValue(1);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.exec();</small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>這樣的寫法是ODBC風格的寫法，另一種方式則是直接指定Oracle風格的語法，可以直接指定佔位名稱，再搭配bindValue()方法指定實際值，例如：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>QSqlQuery query;</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.prepare("INSERT INTO T_USER (name, age) VALUES (:name, :age)");</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.bindValue(":name", "justin");</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.bindValue(":age", 33);</small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>query.exec();</small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+如果資料庫支援交易（Transaction），則您可以使用Qt的交易支援，例如：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QSqlDriver *driver = QSqlDatabase::database().driver();</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">if (driver-&gt;hasFeature(QSqlDriver::Transactions)) {</span></small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp; &nbsp; QSqlDatabase::database().transaction();</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp; &nbsp; QSqlQuery query;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp; &nbsp; query.exec("INSERT .....");</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp; &nbsp; QSqlDatabase::database().commit();<br>
+
+
+
+}<br>
+
+
+
+      </span></small></span><span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+QSqlDatabase的靜態database()方法，傳回目前資料庫連結的QSqlDatabase實例，您使用其driver()傳回驅動程式實
+例，並使用hasFeature()測試是否支援交易，如果支援，則使用transaction()開啟交易，使用commit()提交執行，或使用
+rollback()方法撤消。</small><br>
+
+
+      <br>
+
+
+      <small>如果需要對多個資料庫的連結，則可以使用QSqlDatabase的addDatabase()方法時指定別名，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "DEMO2");</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">db.setHostName("localhost");</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">db.setDatabaseName("demo2");</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">db.setUserName("admin");</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">db.setPassword("123456");</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody">
+      <br>
+
+
+
+      <small>如果要傳回該資料庫連結的QSqlDatabase實例，則在使用database()方法時指定別名，並在使用QSqlQuery時，指定傳回的QSqlDatabase實例，例如：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">QSqlDatabase db = QSqlDatabase::database("DEMO2");<br>
+
+
+QSqlQuery query(db);<br>
+
+
+query.exec("....");<br>
+
+
+      <br>
+
+
+      <br style="font-weight: bold;">
+
+
+      </span></small></span><span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QSqlQuery.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:10:43 GMT -->
+</html>

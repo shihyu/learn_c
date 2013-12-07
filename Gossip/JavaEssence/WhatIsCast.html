@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/WhatIsCast.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:55 GMT -->
+<head>
+
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>別再囉嗦了</title></head><body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 別再囉嗦了</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>記得</small><small><big><a href="InheritanceWhat.html"><small>繼承了什麼？</small></a></big> 中，SwordsMan與Magician都繼承了Sprite，要建立SwordsMan與Magician，並宣告變數來參考它們，可以這麼寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = new SwordsMan();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Magician magician = new Magician();</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這是最基本的，而在 </small><small><a href="Polymorphism.html">千面人</a> 中，你知道，運用「是一種」的關係，你還可以這麼寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite1 = new SwordsMan();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite2 = new Magician();</span></small><br>
+      </div>
+      <small><br>
+這沒有問題，因為SwordsMan是一種Sprite，而Magician是一種Sprite，程式的讀法可從右往左，判別方式就是「右邊的東西是不是一種左邊的東西」。<br>
+      <br>
+你可以將自己當作編譯器，檢查程式邏輯，例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite1 = new SwordsMan();</span></small><br>
+      </div>
+      <small><br>
+      </small><small>沒問題，這會編譯成功，因為從右往左讀，SwordsMan是一種Sprite。但如果：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = new Sprite();</span></small><br>
+      </div>
+      <small><br>
+就會編譯失敗，如果你是編譯器，你會抱怨，Sprite不一定是種SwordsMan，所以就不想編譯。下面這個也是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite1 = new SwordsMan();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = sprite1;</span></small><br>
+      </div>
+      <small><br>
+第一行編譯沒問題，第二行呢？Java是靜態語言，變數宣告時會帶有型態，就編譯器的角度來說，在看到第二行時，它發現sprite1是Sprite型態，那麼由右往左看，Sprite是一種SwordsMan嗎？不一定！所以就不想編譯通過。除非你這麼寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite1 = new SwordsMan();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = <span style="color: red;">(SwordsMan)</span> sprite1;</span></small><br>
+      </div>
+      <small><br>
+一般會說，第二行作了<span style="font-weight: bold;">轉型（Cast）</span>，但白話的說法是，編譯器原本
+很囉嗦，告訴你Sprite不一定是種SwordsMan，但你要編譯器住嘴，所以在前面加上了(SwordsMain)，這相當於告訴編譯器：「我知道
+啦！Sprite不一定是種SwordsMan，不過我已經用(SwordsMan)告訴你，它就是SwordsMan，<span style="font-weight: bold;">你就別再囉嗦了</span>！」，編譯器於是：「好吧！那我就編譯囉！<span style="font-weight: bold;">後果你自己負責</span>！」<br>
+      <br>
+就上例而言，執行時也不會有問題，但是如果是下面這個：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite1 = new Magician();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = (SwordsMan) sprite1;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這會編譯成功，在第二行時，編譯器其實會發現，Sprite不一定是SwordsMan，但也發現，你加了(SwordsMan)，所以這表示你自己後果
+自負，所以就通過編譯，因此沒有編譯時期錯誤訊息。但事實上，sprite1明明就參考至Magician實例，你硬要將魔法師轉職為
+SwordsMan，後果就是<span style="font-weight: bold;">ClassCastException</span>，這是執行時期錯誤。<br>
+      <br>
+所謂的後果自負，就是執行時期出搥，這可不是編譯器的錯…XD<br>
+      <br>
+在Java中，轉型的概念基本上就是如此，只是要編譯器住嘴。<br>
+      <br>
+你可以多作一些練習：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = new SwordsMan();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite = swordsMan;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這會編譯成功，記得，對判斷是不是「是一種」</small><small>關係，</small><small>編譯器每次只看一行：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = new SwordsMan();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Sprite sprite = swordsMan;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SwordsMan swordsMan = sprite;</span></small><br>
+      </div>
+      <small><br>
+上面第三行會編譯失敗，因為就第三行來看，sprite是Sprite型態的變數，Sprite不一定是種SwordsMan，所以編譯失敗是必然的。除非你叫編譯器別囉嗦：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">SwordsMan swordsMan = new SwordsMan();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Sprite sprite = swordsMan;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">SwordsMan swordsMan = (SwordsMan) sprite;</small><br>
+      </div>
+      <small><br>
+上例編譯成功，執行也不會有錯誤，因為sprite實際上還是參考至SwordsMan實例。但下面這個就會執行時期錯誤：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">SwordsMan swordsMan = new SwordsMan();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Sprite sprite = swordsMan;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Magician magician = (Magician) sprite;</small><br>
+      </div>
+      <small><br>
+編譯可以成功，但實際上，sprite是參考至SwordsMan，執行時間你要它轉型為Magician，就會丟出ClassCastException。<br>
+      <br>
+      <span style="font-weight: bold;">要不要轉型，就看你想不想讓編譯器住嘴，一旦要它住嘴，那麼你就要自己確定執行時間沒有錯誤。</span><br>
+      </small><br>
+      <small>所以在</small> <small><big><a href="PromotionCast.html"><small>Promotion 與 Cast</small></a></big> 中，是否要轉型，也是可以如此判斷。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">float PI = 3.14;</small><br>
+      </div>
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+      </small><small>編譯器會抱怨，3.14是double型態，怎麼可以裝入float呢？如果你明確要它住嘴，那麼就可以這麼寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">float PI = (float) 3.14;</span></small><br>
+      </div>
+      <small><br>
+後果呢？就是如果精度被裁掉了，那編譯器可不管了！<br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/WhatIsCast.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:13:55 GMT -->
+</html>

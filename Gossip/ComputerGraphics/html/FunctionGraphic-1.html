@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/FunctionGraphic-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:50 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                function toRadians(angle) {
+                    return angle * Math.PI / 180;
+                }
+                var sin = Math.sin;
+                var cos = Math.cos;
+                var sqrt = Math.sqrt;
+                
+                var canvas1 = document.getElementById('canvas1');
+                var context = canvas1.getContext('2d');
+                
+                var orgX = canvas1.width / 2;
+                var orgY = canvas1.height / 2;
+                
+                var rotateX = toRadians(30);
+                var rotateY = toRadians(-30);
+                
+                var sinRotateX = Math.sin(rotateX);
+                var cosRotateX = Math.cos(rotateX);
+                var sinRotateY = Math.sin(rotateY);
+                var cosRotateY = Math.cos(rotateY);
+                
+                context.beginPath();
+                for(var z = 200; z >= -200; z-=10) {
+                    for(var x = -200; x <= 200; x++) {
+                        var y = 30*(cos(toRadians(sqrt(x * x + z * z)))
+                               + cos(toRadians(3 * sqrt(x * x + z * z))));
+
+                        // 立體旋轉，從斜角繪製，調整繪圖中心至視窗中心
+                        var pointX = parseInt(
+                              orgX + x * cosRotateY + z * sinRotateY);
+                        var pointY = parseInt(orgY - (y * cosRotateX -
+                           (-x * sinRotateY + z * cosRotateY) * sinRotateX));
+                        context.moveTo(pointX, pointY);
+                        context.lineTo(pointX + 1, pointY + 1);
+                    }
+                }
+                context.stroke();
+                context.closePath();
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="640" height="480"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/FunctionGraphic-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:50 GMT -->
+</html>

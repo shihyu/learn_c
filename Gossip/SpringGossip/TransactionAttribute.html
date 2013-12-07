@@ -1,0 +1,971 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/TransactionAttribute.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>交易的屬性介紹</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: 交易的屬性介紹</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>Spring使用AOP來完成宣告式的交易管理，因而宣告式交易是以方法為單位，Spring的交易屬性（Transaction attribute）自然就在於描述交易應用至方法上的策略，在Spring中交易屬性可設定以下的幾個參數：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>傳播行為（Propagation behavior）</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>傳播行為定義了交易應用於方法上之邊界（Boundaries），它告知何時該開始一個新的交易，或何時交易該被暫停，或者方法是否要在交易中進行。</small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+      </small>
+      <div style="margin-left: 40px;"><small>當客戶端本身不在交易中，而呼叫另一個方法時，該方法可能：</small><br>
+      </div>
+      <ul>
+        <ul>
+          <li><small>在非交易中進行</small></li>
+          <li><small>啟始新的交易並於其中執行</small></li>
+          <li><small>丟出例外</small><br>
+          </li>
+        </ul>
+      </ul>
+      <div style="margin-left: 40px;"><br>
+      <small>當客戶端本身在交易中，而呼叫另一個方法時，該方法可能：</small><br>
+      </div>
+      <ul>
+        <ul>
+          <li><small>在客戶端的交易中進行</small></li>
+          <li><small>啟始新的交易並於其中執行</small></li>
+          <li><small>暫停客戶端交易，於非交易環境中執行</small></li>
+          <li><small>丟出例外</small></li>
+        </ul>
+      </ul>
+      <div style="margin-left: 40px;"><br>
+      <small>Spring定義幾個傳播行為，可在TransactionDefinition的API文件說明上找到相對應的常數與說明，以下列出幾個：</small><small></small><br>
+      </div>
+      <br>
+
+
+
+      
+
+
+
+
+
+
+      
+      
+      
+      <div align="center">
+
+      
+      
+      
+      <table class="MsoNormalTable" style="width: 453.75pt;" border="1" cellpadding="0" width="605">
+
+
+
+
+ <tbody>
+
+
+
+          <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; background: rgb(204, 204, 204) none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial; height: 17.5pt; width: 238px;">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><b style=""><span style="font-size: 10pt; font-family: 新細明體;">交易區間策略</span></b><b style=""><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></b></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; background: rgb(204, 204, 204) none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial; height: 17.5pt; width: 347px;">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><b style=""><span style="font-size: 10pt; font-family: 新細明體;">說明</span></b><b style=""><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></b></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">REQUIRED
+  </span></td>
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">支援現在的交易，如果沒有的話就建立一個新的交易</span></td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">REQUIRES_NEW</span></td>
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">建立一個新的交易，如果現存一個交易的話就先暫停，並啟始一個新的交易來執行</span></td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">SUPPORTS
+  </span></td>
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">支援現在的交易，如果沒有的話就以非交易的方式執行</span></td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">MANDATORY</span></td>
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">方法必須在一個現存的交易中進行，否則丟出例外</span></td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">NOT_SUPPORTED</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US"></span></td>
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">指出不應在交易中進行，如果有的話就暫停現存的交易</span></td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 17.5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">NEVER</span></td>
+
+
+
+
+  <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">指出不應在交易中進行，如果有的話就丟出例外</span></td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr>
+            <td style="padding: 1.5pt; height: 17.5pt; width: 238px;"><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_NESTED</span></td>
+            <td style="padding: 1.5pt; height: 17.5pt; width: 347px;"><span style="font-size: 10pt; font-family: 新細明體;">在一個巢狀的交易中進行，如果不是的話，則同</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">PROPAGATION_REQUIRED</span></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <small><br>
+      </small><small><br>
+      </small>
+      <div style="margin-left: 40px;"><small>若客戶端本身不在交易中，而呼叫另一個方法時，依該方法設定的策略，而會有的行為對應如下：</small><br>
+      </div>
+      <ul>
+        <ul>
+          <li><small>在非交易中進行（SUPPORTS、NOT_SUPPORTED、NEVER）</small></li>
+          <li><small>啟始新的交易並於其中執行（REQUIRED、REQUIRES_NEW）</small></li>
+          <li><small>丟出例外（MANDATORY）</small></li>
+        </ul>
+      </ul>
+      <div style="margin-left: 40px;"><br>
+      <small>若</small><small>客戶端本身在交易中，而呼叫另一個方法時，</small><small>依該方法設定的策略，而會有的行為對應如下：</small></div>
+      <ul>
+        <ul>
+          <li><small>在客戶端的交易中進行（REQUIRED、SUPPORTS、MANDATORY）</small></li>
+          <li><small>暫停客戶端交易，</small><small>啟始新的交易並於其中執行（REQUIRED_NEW）</small></li>
+          <li><small>暫停客戶端交易，於非交易環境中執行（NOT_SUPPORTED）</small></li>
+          <li><small>暫停客戶端交易，於非交易環境中執行（NOT_SUPPORTED）</small></li>
+          <li><small>丟出例外（NEVER）</small></li>
+        </ul>
+      </ul>
+      <small>
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>隔離層級（Isolation level）</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>在一個應用程式中，可能有多個交易同時在進行，這些交易應當彼此之間互相不知道另一個交易的存在，好比現在整個應用程式就只有一個交易存在的樣子，由於交易彼此之間獨立，若讀取的是同一個資料的話，就容易發生問題，您可以參考&nbsp;</small><small><big><a href="../HibernateGossip/IsolationLevel.html"><small>簡
+介隔離層級</small></a> </big>的說明。</small></div>
+
+      <small><br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small>Spring提供了幾種隔離層級設定，同樣的可以在TransactionDefinition的API文件說明上找到相對應的常數與說明，以下列出幾個：</small></div>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;">
+
+      
+      
+      
+      <table class="MsoNormalTable" style="width: 446pt;" border="1" cellpadding="0" width="595">
+
+
+
+
+ <tbody>
+
+
+
+          <tr style="height: 5pt;">
+
+
+
+
+  <td style="padding: 1.5pt; background: rgb(204, 204, 204) none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial; width: 160pt; height: 5pt;" width="213">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><b style=""><span style="font-size: 10pt; font-family: 新細明體;">隔離層級</span></b><b style=""><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></b></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; background: rgb(204, 204, 204) none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial; width: 281.5pt; height: 5pt;" width="375">
+  
+            
+            
+            
+            <p class="MsoNormal" style="margin-left: 0px; width: 361px;"><b style=""><span style="font-size: 10pt; font-family: 新細明體;">說明</span></b><b style=""><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></b></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 10pt;">
+
+
+
+
+  <td style="padding: 1.5pt; width: 160pt; height: 10pt;" width="213">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">ISOLATION_DEFAULT
+  </span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; width: 281.5pt; height: 10pt;" width="375">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: 新細明體;">使用底層資料庫預設的隔離層級</span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 15.1pt;">
+
+
+
+
+  <td style="padding: 1.5pt; width: 160pt; height: 15.1pt;" width="213">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">ISOLATION_READ_COMMITTED
+  </span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; width: 281.5pt; height: 15.1pt;" width="375">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: 新細明體;">允許交易讀取其它並行的交易已經送出（</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Commit</span><span style="font-size: 10pt; font-family: 新細明體;">）的資料欄位，可以防止</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Dirty
+  read</span><span style="font-size: 10pt; font-family: 新細明體;">問題</span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 20.1pt;">
+
+
+
+
+  <td style="padding: 1.5pt; width: 160pt; height: 20.1pt;" width="213">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">ISOLATION_READ_UNCOMMITTED
+  </span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; width: 281.5pt; height: 20.1pt;" width="375">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: 新細明體;">允許交易讀取其它並行的交易還沒送出的資料，會發生</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Dirty</span><span style="font-size: 10pt; font-family: 新細明體;">、</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Nonrepeatable</span><span style="font-size: 10pt; font-family: 新細明體;">、</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Phantom
+  read</span><span style="font-size: 10pt; font-family: 新細明體;">等問題</span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 20.1pt;">
+
+
+
+
+  <td style="padding: 1.5pt; width: 160pt; height: 20.1pt;" width="213">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">ISOLATION_REPEATABLE_READ
+  </span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; width: 281.5pt; height: 20.1pt;" width="375">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: 新細明體;">要求多次讀取的資料必須相同，除非交易本身更新資料，可防止</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Dirty</span><span style="font-size: 10pt; font-family: 新細明體;">、</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Nonrepeatable
+  read</span><span style="font-size: 10pt; font-family: 新細明體;">問題</span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+ <tr style="height: 20.1pt;">
+
+
+
+
+  <td style="padding: 1.5pt; width: 160pt; height: 20.1pt;" width="213">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">ISOLATION_SERIALIZABLE</span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+  <td style="padding: 1.5pt; width: 281.5pt; height: 20.1pt;" width="375">
+  
+            
+            
+            
+            <p class="MsoNormal" style=""><span style="font-size: 10pt; font-family: 新細明體;">完整的隔離層級，可防止</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Dirty</span><span style="font-size: 10pt; font-family: 新細明體;">、</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Nonrepeatable</span><span style="font-size: 10pt; font-family: 新細明體;">、</span><span style="font-size: 10pt; font-family: Arial;" lang="EN-US">Phantom
+  read</span><span style="font-size: 10pt; font-family: 新細明體;">等問題，會鎖定對應的資料表格，因而有效能問題</span><span style="font-size: 10pt; font-family: Arial;"> </span><span style="font-family: Arial;" lang="EN-US"><o:p></o:p></span></p>
+
+
+
+
+  </td>
+
+
+
+
+ </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+      
+      
+      
+
+
+
+      </div>
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>唯讀提示（Read-only hints）</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>如果交易只進行讀取的動作，則可以利用底層資料庫在唯讀操
+作時的一些最佳化動作，由於這個動作利用到資料庫在唯讀的交易操作最佳化，因而必須在交易中才有效，也就是說您要搭配傳播行為
+PROPAGATION_REQUIRED、PROPAGATION_REQUIRES_NEW、 PROPAGATION_NESTED來設置。</small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>交易超時期間（The transaction timeout period）</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small>有的交易操作可能延續一段很長的時間，交易本身可能關聯到資料表格的鎖定，因而長時間的交易操作會有效能上的問題，對於過長的交易操作，您要考慮回滾（Roll back）交易並要求重新操作，而不是無限時的等待交易完成。</small><br>
+
+
+
+      <br>
+
+
+
+      <small>您可以設置交易超時期間，計時是從交易開始時，所以這個設置必須搭配傳播行為PROPAGATION_REQUIRED、PROPAGATION_REQUIRES_NEW、PROPAGATION_NESTED來設置。</small><br>
+
+
+
+      </div>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      <small><br>
+
+
+
+
+      </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/TransactionAttribute.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+</html>

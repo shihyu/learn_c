@@ -1,0 +1,527 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/BeanLifeCycle.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Bean 的生命週期</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip:&nbsp;Bean 的生命週期</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>
+
+
+
+
+
+
+
+
+在Spring中，從BeanFactory或ApplicationContext取得的實例為 <a href="../DesignPattern/SingletonPattern.htm">Singleton</a>，預設是每一個Bean別名維持一個實例，對單執行緒的程式來說並不會有什麼問題，但對於多執行緒的程式，您必須注意到執行緒安全，您也可以設定每次取得Bean時都產生一個新的實例，例如：<br>
+
+
+
+
+
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;bean id="helloBean" <br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; class="onlyfun.caterpillar.HelloBean" <br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; <span style="color: rgb(255, 0, 0);">singleton="false"</span>&gt;</span><br>
+
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+singleton屬性預設是true，藉由將其設定為false，每次取得Bean時都會產生一個新的實例。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+一個Bean從建立到銷毀，會歷經幾個執行階段，如果是使用BeanFactory來管理Bean的話：<br>
+
+
+
+
+      </small>
+      <ul>
+        <li><small>Bean的建立</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>由BeanFactory讀取Bean定義檔，並生成各個Bean實例。<br>
+
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>屬性注入</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>執行相關的Bean屬性依賴注入。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>BeanNameAware的setBeanName()</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>如果Bean類別有實作org.springframework.beans.factory.BeanNameAware介面，則執行它的setBeanName()方法。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>BeanFactoryAware的setBeanFactory()</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>如果Bean類別有實作org.springframework.beans.factory.BeanFactoryAware介面，則執行它的setBeanFactory()方法。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>BeanPostProcessors的processBeforeInitialization()</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>如果有任何的BeanPostProcessors實例與Bean實例關聯，則執行BeanPostProcessors實例的processBeforeInitialization()方法。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>InitializingBean的afterPropertiesSet()</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>如果Bean類別有實作org.springframework.beans.factory.InitializingBean，則執行它的afterPropertiesSet()方法。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>Bean定義檔中定義init-method</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>可以在Bean定義檔使用init-method屬性設定方法名稱，例如：<br>
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;bean id="helloBean" </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="onlyfun.caterpillar.HelloBean" <br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; <span style="color: rgb(255, 0, 0);">init-method="initBean"</span>&gt;</span><br>
+
+
+
+
+      <br>
+
+
+
+
+如果有以上設定的話，則進行至這個階段時，就會執行initBean()方法。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>BeanPostProcessors的processaAfterInitialization()</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>如果有任何的BeanPostProcessors實例與Bean實例關聯，則執行BeanPostProcessors實例的processaAfterInitialization()方法。<br>
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>DisposableBean的destroy()</small></li>
+      </ul>
+      <small>
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>在容器關閉時，如果Bean類別有實作org.springframework.beans.factory.DisposableBean，則執行它的destroy()方法。<br>
+
+
+
+
+      <br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      </small>
+      <ul>
+        <li><small>Bean定義檔中定義destroy-method</small></li>
+      </ul>
+      <small>
+
+
+
+
+      </small>
+      <div style="margin-left: 40px;"><small>在容器關閉時，可以在Bean定義檔使用destroy-method屬性設定方法名稱，例如：<br>
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;bean id="helloBean" </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="onlyfun.caterpillar.HelloBean" </span><br>
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; <span style="color: rgb(255, 0, 0);">destroy-method="destroyBean"</span>&gt;</span><br>
+
+
+
+
+      <br>
+
+
+
+
+如果有以上設定的話，則進行至這個階段時，就會執行destroyBean()方法。<br>
+
+
+
+
+      </small></div>
+      <small>
+
+
+
+      <br>
+
+
+
+
+      <br>
+
+
+
+
+如果是使用ApplicationContext來管理Bean的話，則在執行BeanFactoryAware的setBeanFactory()階段
+之後，若Bean有實作org.springframework.context.ApplicationContextAware介面，則執行其
+setApplicationContext()方法，接著才繼續進行BeanPostProcessors的
+processBeforeInitialization()及之後的流程。<br>
+
+
+
+
+      <br>
+
+
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/BeanLifeCycle.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:35 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

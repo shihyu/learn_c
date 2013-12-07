@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/CactusClientServer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:38 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>使用 Cactus（Client/Server）</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 使用 Cactus（Client/Server）<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如
+果要更貼近真實的環境，你可以實際安裝實際部署專案時所用的容器，設定Cactus的Redirect proxy，由<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>客戶
+端去請求Redirect proxy，就測試Servlet而言，只需要在web.xml中設定：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;servlet&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;ServletTestRedirector&lt;/servlet-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-class&gt;org.apache.cactus.server.ServletTestRedirector&lt;/servlet-class&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;/servlet&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;servlet-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;ServletTestRedirector&lt;/servlet-name&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;url-pattern&gt;/ServletRedirector&lt;/url-pattern&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;/servlet-mapping&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+      </div>
+      <small><br>
+客戶端<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>預
+設會請求伺服端的/ServletRedirector，如果不要這個預設，則可以設定<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">cactus.servletRedirectorName</span>屬
+性來修改（相關屬性設定與說明，可參考 <a href="http://jakarta.apache.org/cactus/integration/manual/howto_config.html">Cactus
+Configuration</a>）。<br>
+      <br>
+現在，你可以啟動容器，接著你可以在客戶端撰寫測試案例：<br>
+      </small>
+      <pre>package test.cc.openhome;<br><br>import java.io.IOException;<br>import java.net.URL;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import org.apache.cactus.ServletTestCase;<br>import org.apache.cactus.WebRequest;<br>import cc.openhome.LoginServlet;<br><br>class TestForLoginServlet extends LoginServlet {<br>    public void doTest(HttpServletRequest req, HttpServletResponse resp) <br>                    throws ServletException, IOException {<br>        doPost(req, resp);<br>    }<br>}<br><br>class DummyHttpServletRequest extends HttpServletRequestWrapper {<br>    private String forwardToPage;<br>    private boolean isForwarded;<br><br>    public DummyHttpServletRequest(HttpServletRequest request) {<br>        super(request);<br>    }<br><br>    @Override<br>    public RequestDispatcher getRequestDispatcher(String path) {<br>        forwardToPage = path;<br>        return new RequestDispatcher() {<br>            public void forward(ServletRequest req, ServletResponse resp)<br>                    throws ServletException, IOException {<br>                isForwarded = true;<br>            }<br><br>            public void include(ServletRequest req, ServletResponse resp)<br>                    throws ServletException, IOException {<br>                <br>            }<br>        };<br>    }<br><br>    public String getForwardToPage() {<br>        return forwardToPage;<br>    }<br><br>    public boolean isForwarded() {<br>        return isForwarded;<br>    }<br>}<br><br>public class LoginServletTest extends ServletTestCase {<br>    static {<br style="font-weight: bold;"><span style="font-weight: bold;">        System.setProperty(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                "cactus.contextURL", "http://localhost:8080/CactusExample");</span><br>    }<br><br>    public void beginLoginSuccess(WebRequest request) {<br>        request.addParameter("user", "justin");<br>        request.addParameter("passwd", "1234");<br>    }<br>    <br>    public void testLoginSuccess() throws Throwable {<br>        DummyHttpServletRequest dummyRequest = <br>            new DummyHttpServletRequest(request);<br>        new TestForLoginServlet().doTest(dummyRequest, response);<br>        assertTrue(dummyRequest.isForwarded());<br>        assertEquals("success.html", dummyRequest.getForwardToPage());<br>    }<br>    <br>    public void beginLoginFail(WebRequest request) {<br>        request.addParameter("user", "someone");<br>        request.addParameter("passwd", "1234");<br>    }<br>    <br>    public void testLoginFail() throws Throwable {<br>        DummyHttpServletRequest dummyRequest = <br>            new DummyHttpServletRequest(request);<br>        new TestForLoginServlet().doTest(dummyRequest, response);<br>        assertTrue(dummyRequest.isForwarded());<br>        assertEquals("login.html", dummyRequest.getForwardToPage());<br>    }<br>}<br></pre>
+      <small> <br>
+注意，<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">cactus.contextURL</span>是
+你Redirector proxy所在的應用程式根目錄，接著你就可以使用客戶端<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>來測
+試程式了。<br>
+      <br>
+Cactus附帶有伺服端<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>，
+你可以在web.xml中加以設定，以Servlet的伺服端<span style="font-family: Courier New,Courier,monospace;">TestRunner</span>來
+說：<br>
+      </small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;servlet&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;ServletTestRunner&lt;/servlet-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-class&gt;org.apache.cactus.server.runner.ServletTestRunner&lt;/servlet-class&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;/servlet&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;servlet-mapping&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;ServletTestRunner&lt;/servlet-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;url-pattern&gt;/ServletTestRunner&lt;/url-pattern&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;/servlet-mapping&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;...</span></small><br>
+      <small><small> <br>
+      </small>如此你就可以直接以瀏覽器請求/ServletTestRunner，指定suite參數為測試案例的全名：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">http://localhost:8080/CactusExample/<span style="color: red;"></span></span></small><br>
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ServletTestRunner?suite=test.cc.openhome.LoginServletTest</span></span></small><br>
+      </div>
+      <br>
+      <small>預設會以XML傳回測試結果：</small><br>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;testsuites&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;testsuite
+name="test.cc.openhome.LoginServletTest" <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tests="2" failures="0" errors="0" time="0.233"&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+&lt;testcase name="testLoginSuccess" time="0.215"/&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;testcase name="testLoginFail" time="0.008"/&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/testsuite&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/testsuites&gt;</span></small><br>
+      </div>
+      <br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">也可以直接取得
+Cactus網站上提供的<span class="Apple-converted-space">&nbsp;</span><a href="http://jakarta.apache.org/cactus/misc/cactus-report.xsl" style="color: rgb(68, 68, 68); font-weight: bold; text-decoration: none;">cactus-report.xsl</a>，
+並將之放在Web應用程式的目錄下，然後使用以下的方式來取得較易閱讀的訊息：<br>
+      </span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">http://localhost:8080/CactusExample/ServletTestRunner?</span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+suite=test.cc.openhome.LoginServletTest&amp;<span style="color: red;">xsl=cactus-report.xsl</span></span></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span></div>
+      <br>
+      <small>一個結果畫面如下所示：<br>
+      <img style="border: 1px solid ; width: 642px; height: 410px;" alt="" src="images/CactusClientServer-1.png"><br>
+      <br>
+      </small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">也可以在
+web.xml中指定cactus-report.xsl的位置，例如：<br>
+      </span></span><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;servlet&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;ServletTestRunner&lt;/servlet-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-class&gt;org.apache.cactus.server.runner.ServletTestRunner&lt;/servlet-class&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red;">&lt;init-param&gt;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;param-name&gt;xsl-stylesheet&lt;/param-name&gt;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;param-value&gt;styles/cactus-report.xsl&lt;/param-value&gt;</span><br style="color: red;">
+      <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;/init-param&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span></small> <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/servlet&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;servlet-mapping&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;ServletTestRunner&lt;/servlet-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&lt;url-pattern&gt;/ServletTestRunner&lt;/url-pattern&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &lt;/servlet-mapping&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;...</span></small><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">之後在運行測試時
+可以於網址列中如下指定：<br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">http://localhost:8080/CactusExample/ServletTestRunner?</span></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+suite=test.cc.openhome.LoginServletTest&amp;<span style="color: red;">transform=yes</span></span></span></span><br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/CactusClientServer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+</html>

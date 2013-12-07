@@ -1,0 +1,650 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/InspectObject.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:22 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>檢驗物件</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: 檢驗物件<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/ObjectInspections.html">English</a><br>
+      </div>
+      <small><br>
+通常很少直接確認物件的型態，因為JavaScript是動態語言，對於物件的操作，僅要求是否具備所需特性，而不在意所謂的類型，物件的特性偵測絕大多數情況下就足夠了。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">if(obj.someProperty) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; // 特性存在時作某些事</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">因為特性不存在的話，會傳回undefined，而在判斷式中會被作為false，若存在，則會傳回物件，在判斷式中會被作為true，這就是物件特性偵測的基本原理。</small><br>
+      <br>
+      <small>如果真得確認物件的型態，有許多方式，但基本上要不就所提供的資訊有限，要不就不可信任。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">例如</span></small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">t</span><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ypeof</span>運算子，</small><small><span style="font-family: Courier New,Courier,monospace;">傳回值是字串，對於基本資料型態，數值會傳回'number'、字串會傳回'string'、布林會傳回
+'boolean'、對於Function實例會傳回'function'、對於undefined會傳回'undefined'、<span style="font-weight: bold;">對於其它物件一律傳回'object'，包括null也是傳回'object'</span>，所以，只要是非函式實例的物件，基本上無從辨別真正型態。</span></small><small><br>
+      </small><br>
+<small style="font-family: Courier New,Courier,monospace;">你可以從物件的<span style="font-weight: bold;">constructor</span>特性來確認物件的建構式為何，因為如 </small><small style="font-family: Courier New,Courier,monospace;"><big><a href="Prototype.html"><small>函式 prototype 特性</small></a></big> 中有談過，</small><small style="font-family: Courier New,Courier,monospace;">每個函式的實例，其prototype會有個constructor特性，參考至函式本身，這是確認物件型態的方式之一，只不過，constructor是個可修改的特性，雖然沒什麼人會去修改constructor特性，但是如果是在原型鏈的情況下：</small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Person() {}<br>
+js&gt; function Car() {}<br>
+js&gt; Car.prototype.wheels = 4;<br>
+4<br>
+js&gt; function SportsCar() {}<br>
+js&gt; SportsCar.prototype = new Car();<br>
+</span>[object Object]<span style="font-weight: bold;"><br>
+js&gt; SportsCar.prototype.doors = 2;<br>
+            </span>2<span style="font-weight: bold;"><br>
+js&gt; var sportsCar = new SportsCar();<br>
+js&gt; sportsCar.doors;<br>
+            </span>2<span style="font-weight: bold;"><br>
+js&gt; sportsCar.wheels;<br>
+            </span>4<span style="font-weight: bold;"><br>
+            </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; sportsCar.constructor;<br></span>
+function Car() {<br>
+
+}<br>
+            <span style="font-weight: bold;"><br>
+            </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+      <small><small style="font-family: Courier New,Courier,monospace;"><br>
+      </small><span style="font-family: Courier New,Courier,monospace;">上
+面這個例子，是利用原型鏈查找機制，達到所謂繼承的效果。由於SportsCar.prototype設定為Car的實例，所以在查找wheels特性
+時，sportsCar所參考物件本身沒有，就到原型物件上找，也就是SportsCar.prototype所參考的物件上找，這個物件是Car的實
+例，本身也沒有wheels特性，所以就到Car實例的原型尋找，也就是Car.prototype所參考的物件，此時就找到了。</span></small><br>
+      <br>
+      <small>然而，在查找<span style="font-family: Courier New,Courier,monospace;">constructor時，依同樣的機制，所找到的其實是Car.prototype.constructor</span>特性，上例中應該再加一行才會比較正確：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SportsCar.prototype.constructor = SportsCar;</span></small><br>
+      </div>
+      <br>
+      <small>如果忘了作這個動作，所得到的就會是不正確的結果。<br>
+      <br>
+關於<span style="font-family: Courier New,Courier,monospace;">new</span>建立物件，</small><small style="font-family: Courier New,Courier,monospace;"><big><a href="Prototype.html"><small>函式 prototype 特性</small></a></big></small><small>中談過，</small><small>使用<span style="font-family: Courier New,Courier,monospace;">new</span>關鍵字時，JavaScript會先建立一個空物件，<span style="font-weight: bold;">接著設定物件的原型為函式的</span><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">prototype特性所參考的物件</span>，然後呼叫建構式並將所建立的空物件設為this。<br>
+      <br>
+      <span style="font-weight: bold;">注意，物件的原型是在建立物件之後就確立下來的，原型鏈查找特性時，是根據物件上的原型，而不是函式上的prototype。</span>例如，你可以看看以下為何無法取得特性：</span></small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Car() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; Car.prototype.wheels = 4;<br>
+&nbsp; &gt; }<br>
+js&gt; function SportsCar() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; SportsCar.prototype = new Car();<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; SportsCar.prototype.doors = 2;js<br>
+&nbsp; &gt; }<br>
+</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">
+js&gt; </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">var o = { x : 10 };<br>
+js&gt; o.propertyIsEnumerable('x');<br>
+true<br>
+js&gt; o.propertyIsEnumerable('toString');<br>
+false<br>
+js&gt; o.propertyIsEnumerable('xyz');<br>
+false<br>
+js&gt; var sportsCar = new SportsCar();<br>
+js&gt; print(sportsCar.doors);<br>
+            </span>undefined<span style="font-weight: bold;"><br>
+js&gt; print(sportsCar.wheels);<br>
+            </span>undefined<span style="font-weight: bold;"><br>
+js&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+      <small><small><small style="font-family: Courier New,Courier,monospace;"><br>
+      </small></small>這是初學者常犯的錯誤。注意，</small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">物件的原型是在建立物件之後就確立下來的</span>，所以在這行：<br>
+</span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var sportsCar = new SportsCar();</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+sportsCar就被指定了原型物件，也就是當時的SportsCar.prototype所參考的物件，預設就是具有一個constructor特性
+的Object實例，之後你在SportsCar()函式中將SportsCar.prototype指定為Car的實例，對sportsCar的原型物
+件根本沒有影響，sportsCar的原型物件仍是Object實例，而不是Car實例，自然就找不到doors特性，更別說是wheels特性了。<br>
+      <br>
+再來用實際的程式示範會更清楚，這次用非標準的__proto__來驗證：</span></small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Car() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; Car.prototype.wheels = 4;<br>
+&nbsp; &gt; }<br>
+js&gt; function SportsCar() {<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; SportsCar.prototype = new Car();<br>
+&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; SportsCar.prototype.doors = 2;<br>
+&nbsp; &gt; }<br>
+js&gt; var p = SportsCar.prototype;<br>
+js&gt; var sportsCar = new SportsCar();<br>
+js&gt; p == </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">sportsCar.__proto__</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">;<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt; </span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">sportsCar.__proto__</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"> == SportsCar.prototype;<br>
+            </span>false<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+      <small><small><small><small style="font-family: Courier New,Courier,monospace;"><br>
+      </small></small></small><span style="font-family: Courier New,Courier,monospace;">從上例中可以看到，建立物件時即設定原型，而物件上的原型最後跟SportsCar.prototype根本就不是同一個物件了。所以new建立物件時，例如：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var some = new Some();</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+可以說作了這些事：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var some = {};</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">some.__proto__ = Some.prototype;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Some.call(some);</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+事實上，<span style="font-weight: bold;">instanceof</span>也是根據物件的原型物件來判斷true或false的。例如：</span></small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; function Car() {}<br>
+js&gt; function SportsCar() {}<br>
+js&gt; SportsCar.prototype = new Car();<br>
+</span>[object Object]<span style="font-weight: bold;"><br>
+js&gt; var sportsCar = new SportsCar();<br>
+js&gt; sportsCar instanceof SportsCar;<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt; sportsCar instanceof Car;<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt; sportsCar instanceof Object;<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt;</span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+
+      <small><small><small><small><small style="font-family: Courier New,Courier,monospace;"><br>
+      </small></small></small></small>簡單地說，<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">instanceof</span><span style="font-weight: bold;">是根據原型鏈來查找</span>。明白這個機制，以下用非標準<span style="font-family: Courier New,Courier,monospace;">__proto__特性來欺騙instanceof：</span></small><small><br>
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; var o = {};<br>
+js&gt; o instanceof Array;<br>
+</span>false<span style="font-weight: bold;"><br>
+js&gt; o.__proto__ = Array.prototype;<br>
+js&gt; o instanceof Array;<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      </table>
+
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><small><small><small><small><small><br>
+      </small></small></small></small></small>上例中建立的絕不是Array的實例，不過最後欺騙了instanceof使之傳回true。</small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">或許檢驗物件的原型也是個方式，但__proto__是個非標準特性，如果你想要檢驗物件原型，可以使用<span style="font-weight: bold;">isPrototypeOf()</span>方法。例如 </small><small><big><a href="Prototype.html"><small>函式 prototype 特性</small></a> </big>中就這麼作過</small><small style="font-family: Courier New,Courier,monospace;">：</small><small><span style="font-family: Courier New,Courier,monospace;"></span></small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; var arr = [];<br>
+js&gt; Array.prototype.isPrototypeOf(arr);<br>
+</span>true<span style="font-weight: bold;"><br>
+js&gt; Function.prototype.isPrototypeOf(Array);<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt; Object.prototype.isPrototypeOf(Array.prototype);<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">其實isPrototypeOf()的作用與instanceof類似，都是透過原型鏈來確認：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; var arr = [];<br>
+js&gt; Array.prototype.isPrototypeOf(arr);<br>
+</span>true<span style="font-weight: bold;"><br>
+js&gt; Object.prototype.isPrototypeOf(arr);<br>
+            </span>true<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">在取得一個物件的特性時，會尋找原型鏈，如果想確認特性是物件本身所擁有，或是其原型上的特性，則可透過物件都具有的<span style="font-weight: bold;">hasOwnProperty()</span>方法（當然，這是Object.prototype上的一個特性）。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; var o = { x : 10 };<br>
+js&gt; o.hasOwnPrototype('x');<br>
+js&gt; o.hasOwnProperty('x');<br>
+</span>true<span style="font-weight: bold;"><br>
+js&gt; o.hasOwnProperty('toString');<br>
+            </span>false<span style="font-weight: bold;"><br>
+js&gt; o.hasOwnProperty('xyz');<br>
+            </span>false<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+      <small style="font-family: Courier New,Courier,monospace;">如果特性不是物件本身擁有，而是原型鏈上可取得，則會傳回false，尋找不到特性也是傳回false。<br>
+      <br>
+物件本身所新建的特性是可以用for in列舉的，有些內建特性無法列舉，想要知道特性是不是可用for in列舉，則可以使用<span style="font-weight: bold;">propertyIsEnumerable()</span>方法。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">js&gt; var o = { x : 10 };<br>
+js&gt; o.propertyIsEnumerable('x');<br>
+</span>true<span style="font-weight: bold;"><br>
+js&gt; o.propertyIsEnumerable('toString');<br>
+            </span>false<span style="font-weight: bold;"><br>
+js&gt; o.propertyIsEnumerable('xyz');<br>
+            </span>false<span style="font-weight: bold;"><br>
+js&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">當然，特性不存在時就無法列舉，所以會傳回false。<br>
+      <br>
+另外，</small><small>ECMAScript</small><small style="font-family: Courier New,Courier,monospace;">規格要求Object預設的toString()要傳回以下的字串：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">[object class]</span></small><br>
+      </div>
+
+      <br>
+      <small>JavaScript的內建型態基本上都會遵守這樣的規定，例如<span style="font-family: Courier New,Courier,monospace;">Object實例會傳回[object Object]、陣列會傳回[object Array]、函式會傳回[object Function]等，這也可作為判斷型態的依據，基於對標準的支持，現在一些程式庫多使用這個來作判斷。</span></small><br>
+<br>
+      <small style="font-weight: bold;">注意！在Internet Explorer中，<span style="font-family: Courier New,Courier,monospace;">alert
+()、confirm()等內建函式，或是某些物件上的方法，typeof不會正確地回報為'function'，使用instanceof看看是否為
+Function實例，結果也是false，toString()傳回的也不一定是[object Function]。</span></small><br>
+
+<br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/InspectObject.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:22 GMT -->
+</html>

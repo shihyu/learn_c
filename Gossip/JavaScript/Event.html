@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/Event.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:29 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Event 實例</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: Event 實例<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/Event.html">English</a><br>
+      </div>
+      <small><br>
+在事件發生時，會有個<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">Event</span>實例收集事件的相關資訊，不幸的是，這個實例的取得方式在標準瀏覽器與Internet Explorer<span style="font-family: Courier New,Courier,monospace;">上有所不同。在標準瀏覽器上，Event實例會作為事件處理器的的第一個參數，在Internet Explorer上，則是被window.event</span>參考。所以為了處理跨瀏覽器的差異，常看到這樣的程式碼：<br>
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">function handler(event) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; event = event || window.event;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br>
+      </div>
+
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">如果event作為第一個參數，則直接使用，否則就使用window.event。Event的差異性不僅如此，Event上的一些特性，也存在著一些差異性。例如，若要取得操作的目標物件，在標準瀏覽器上，要使用Event實例的<span style="font-weight: bold;">target</span>特性，在</span>Internet Explorer<span style="font-family: Courier New,Courier,monospace;">上，要使用Event實例的<span style="font-weight: bold;">srcElement</span>特性。<br>
+      <br>
+那麼何為操作的目標物件，如果你在按鈕上點選，那麼按鈕就是操作的目標物件，在</span></small><small><big><a href="BasicEventModel.html"><small>基本事件模型</small></a></big> 中有說明過，觸發事件時，事件處理器的<span style="font-family: Courier New,Courier,monospace;">this</span>會設定為當時的元素，那麼為何還要有特性指出操作目標物件？<br>
+      <br>
+事實上，在基本事件模型中，操作時若發生事件，並事件不僅停於操作的元素，還會從操作的元素往外傳播，若外層元素亦有設定對應的事件處理器，亦會呼叫事件處理器。這可以用下面的範例來示範：<br>
+      </small>
+      <ul>
+        <li><a href="samples/Event-1.html"><small>Event-1.html</small></a></li>
+      </ul>
+      
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function handler(event) {<br><span style="font-weight: bold;">                    event = event || window.event;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    var target = event.target || event.srcElement;</span><br>                    document.getElementById('console').innerHTML += <br>                        '&lt;br&gt;&lt;b&gt;this.id:&lt;/b&gt; ' + <span style="font-weight: bold;">this.id</span> + <br>                        ', &lt;b&gt;target.id:&lt;/b&gt; ' + <span style="font-weight: bold;">target.id</span>;<br>                }<br>                document.getElementById('bodyId').onclick = handler;<br>                document.getElementById('divId').onclick = handler;<br>                document.getElementById('btnId').onclick = handler;<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body id="bodyId"&gt;<br>        &lt;div id="divId"&gt;<br>            &lt;button id="btnId"&gt;按我&lt;/button&gt;            <br>        &lt;/div&gt;<br>        &lt;span id="console"&gt;&lt;/span&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small>
+      <br>
+      在上例中，使用了物件偵測，讓<span style="font-family: Courier New,Courier,monospace;">Event實例與目標元素的取得可以跨瀏覽器。按鈕是包括在&lt;div&gt;中，而&lt;body&gt;是&lt;div&gt;的</span>外層元素，三者都設定了事件處理器。如果你試著按下按鈕，則會看到結果如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span id="console"><b>this.id:</b> btnId, <b>target.id:</b> btnId</span><br>
+      <span id="console"><b>this.id:</b> divId, <b>target.id:</b> btnId</span><br>
+      <span id="console"><b>this.id:</b> bodyId, <b>target.id:</b> btnId</span></small>
+      
+      <br>
+      </div>
+      <small><br>
+不僅按鈕的事件處理器被呼叫，外層<span style="font-family: Courier New,Courier,monospace;">&lt;div&gt;與&lt;body&gt;</span>也依序被呼叫，這樣的行為叫作事件氣泡傳播（Event Bubbling）。事件傳播至元素並呼叫事件處理器時，<span style="font-family: Courier New,Courier,monospace;">this就設定為該元素，這可以從this.id的顯示結果觀察到，並注意到，由於操作時按下的是按鈕，所以操作目標元素就是按鈕，這可以由target.id觀察到。</span><br>
+      <br>
+事件氣泡傳播可以善用。例如在 </small><small><big><a href="ModifyNodes.html"><small>修改文件</small></a></big> 中動態新增圖片的例子，每建立一個新的<span style="font-family: Courier New,Courier,monospace;">&lt;img&gt;，就設定該&lt;img&gt;的click事件處理器，以便在點選圖片時自動移除圖片。若利用事件氣泡傳播，則可以在&lt;div&gt;上設定一次事件處理器，完成相同的結果。例如：</span></small><br>
+<small>
+      </small>
+      <ul>
+        <li><small><a href="samples/Event-2.html">Event-2.html</a><span style="font-family: Courier New,Courier,monospace;"></span></small></li>
+      </ul>
+      <small><span style="font-family: Courier New,Courier,monospace;">
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                var images = document.getElementById('images');<br><span style="font-weight: bold;">                images.onclick = function(event) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    event = event || window.event;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    var target = event.target || event.srcElement;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    this.removeChild(target);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                };</span><br>                document.getElementById('add').onclick = function() {<br>                    var img = document.createElement('img');<br>                    img.src = document.getElementById('src').value;<br>                    images.appendChild(img);<br>                };<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;input id="src" type="text"&gt;&lt;button id="add"&gt;新增圖片&lt;/button&gt;<br>        &lt;div id="images"&gt;&lt;/div&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small>如果你想要停止事件傳播，方式也存在著瀏覽器的差異，在遵守標準的瀏覽器上，必須呼叫<span style="font-family: Courier New,Courier,monospace;">Event的<span style="font-weight: bold;">stopPropagation()</span>方法，在</span>Internet Explorer<span style="font-family: Courier New,Courier,monospace;">上，則要將Event的<span style="font-weight: bold;">cancelBubble</span>設為false。例如要將第一個範例停止目標元素外的事件傳播，可以如下：<br>
+      </span></small>
+      <ul>
+        <li><small><a href="samples/Event-3.html">Event-3.html</a><span style="font-family: Courier New,Courier,monospace;"></span></small></li>
+      </ul>
+
+      
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function handler(event) {<br>                    event = event || window.event;<br>                    var target = event.target || event.srcElement;<br>                    document.getElementById('console').innerHTML += <br>                        '&lt;br&gt;&lt;b&gt;this.id:&lt;/b&gt; ' + this.id + <br>                        ', &lt;b&gt;target.id:&lt;/b&gt; ' + target.id;<br><span style="font-weight: bold;">                    if(event.stopPropagation) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        event.stopPropagation();</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    else {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        event.cancelBubble = true;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    }</span><br>                }<br>                document.getElementById('bodyId').onclick = handler;<br>                document.getElementById('divId').onclick = handler;<br>                document.getElementById('btnId').onclick = handler;<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body id="bodyId"&gt;<br>        &lt;div id="divId"&gt;&lt;button id="btnId"&gt;按我&lt;/button&gt;&lt;/div&gt;<br>        &lt;span id="console"&gt;&lt;/span&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+
+      <br><small style="font-family: Courier New,Courier,monospace;">Event實例在不同的瀏覽器中有一些特性是不相容的，這在之後介紹若有機會再提，這類的問題，通常會撰寫程式庫來封裝差異性，而跨瀏覽器執行也是許多著名程式庫的主要目標之一。</small><br>
+      <br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/Event.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:30 GMT -->
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/LoadEARModuleClass.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:33 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>EAR 模組及類別載入</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: EAR 模組及類別載入</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>一個EAR（Enterprise Archive）是一個標準的JAR（Java Archive）檔案格式，只不過其副檔名為.ear，EAR檔案中包括了部署資訊，以及應用程式所需要的各個模組：<br>
+
+      <br>
+
+      </small>
+      <div style="text-align: center;"><small><img style="width: 497px; height: 492px;" alt="" src="images/LoadEARModuleClass-1.jpg"></small><br>
+      </div>
+      <small>
+      <br>
+
+應用程式客戶端模組（Application Client Module）如同在 </small><small><a href="InjectEJB.html">使
+用 @EJB 注入 Bean（單機客戶端）</a> 看到的客戶端範例，包括了所有客戶端應用程式所必要的類別檔案與<span style="font-weight: bold;">部署描述檔（application-client.xml）</span></small><small>等資訊</small><small>，封裝後副檔名為<span style="font-weight: bold;">.jar</span>。<br>
+
+      <br>
+
+Web模組（Web Module）為JSP/Servlet應用程式，包括了Web應用程式所需的類別、<span style="font-weight: bold;">部署描述檔（web.xml）</span>等，封裝後的副檔名為<span style="font-weight: bold;">.war</span>檔案，架構內容可以參考 </small><small><a href="../JSPServlet/ServletContainer.htm">關
+於 Servlet 容器</a>。</small><br>
+
+      <small><br>
+
+EJB模組（EJB Modlue）為EJB元件，</small><small>包括了EJB元件所需的類別、<span style="font-weight: bold;">部署描述檔（ejb-jar.xml）</span>等，</small><small>副檔名為<span style="font-weight: bold;">.jar</span>，可參考 </small><small><big><a href="EJB-JAR.html"><small>封裝 EJB-JAR</small></a></big>。<br>
+
+      <br>
+
+資源配接器模組（Resource Adapter Module）包括了所有介面、類別、資源配接器<span style="font-weight: bold;">部署描述檔（ra.xml）</span>，為JAR格式，副檔名為<span style="font-weight: bold;">.rar</span>，實作了特定EIS（Enterprise Information System ）層的連接器架構。<br>
+
+      <br>
+
+      當您使用EAR進行部署時，大致會依以下的流程來判斷模組類型：<br>
+      <br>
+      <img style="width: 692px; height: 392px;" alt="" src="images/LoadEARModuleClass-2.jpg"><br>
+
+      <br>
+Java的類別載入機制，您可以先參考一下 </small><small><a href="../JavaGossip-V2/IntroduceClassLoader.htm">簡
+介
+ClassLoader</a>
+的內容，現在將之延伸至EAR模組的類別載入，基本上就是再加l應用伺服器（Application
+Server）類別載入器、EJB類別載入器與WAR類別載入器，WAR類別載入器的parent是EJB類別載入器，EJB類別載入器的parent是
+應用伺服器類別載入器，而</small><small>應用伺服器類別載入器的parent為系統（System）類別載入器，又稱之為應用程式類別載入器（App Class Loader）。<br>
+      <br>
+      </small>
+      <div style="text-align: center;"><small><img style="width: 295px; height: 451px;" alt="" src="images/LoadEARModuleClass-3.jpg"></small><br>
+      </div>
+      <small>
+      <br>
+當尋找某個類別時，一樣的會先委託類別載入器的parent先在其所設定之路徑下尋找，一路委託至最上層，若各層parent找不到才交由child類別載入器來尋找。<br>
+      <br>
+
+      </small><small><br>
+
+      </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/LoadEARModuleClass.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:38 GMT -->
+</html>

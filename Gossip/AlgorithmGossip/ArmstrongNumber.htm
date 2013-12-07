@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/ArmstrongNumber.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>阿姆斯壯數</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Algorithm Gossip: 阿姆斯壯數</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 676px; vertical-align: top;">
+      <h2>說明</h2>
+      <small>在n位的整數中，若加總每個數字的n次方後等於該整數，該整數稱為阿姆斯壯</small><small>數
+（Armstrong number），又稱自戀數（Narcissistic number）（因為各數字n次方後加總又等於本身，感覺很自戀？）</small><small>。
+例如153可以滿足1<sup>3</sup> + 5<sup>3</sup> + 3<sup>3</sup> = 153，153就是個</small><small>阿
+姆斯壯</small><small>數，阿姆斯壯數有88個，最大為39位數的
+115132219018763992565095597973971522401，已證實超過39位數不存在阿姆斯壯數。</small><br>
+      <h2>解法</h2>
+      <small>阿姆斯壯</small><small>數的尋找，基本上是在問如何將一個數字分解為個位數、十位數、百位數......，這
+只要使用除法與餘數運算就可以了，例如</small><small>要找出所有三位數</small><small>阿姆斯壯</small><small>數。</small><small>輸
+入input為n位數，則可如下分解出位數：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">個
+位 (input / 10<sup>0</sup>) % 10<br>
+十位 </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">(input
+/ 10<sup>1</sup>) % 10</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">百
+位 (input / 10<sup>2</sup>) % 10<br>
+...<br>
+n 位 </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">(input
+/ 10<sup>n-1</sup>) % 10</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small>
+      <br>
+      </div>
+      <br>
+      <small>底下列出的實作僅逐一列舉數字並判斷是否為阿姆斯壯數，位數大時求解時間會急劇拉長。可改進的方法之一：<br>
+      </small>
+      <ul>
+        <li><small>對於同樣為n位數而言，數字的n次方重複運算是不必要的，這部份可先製表而後直接查表並進行加總（像是Java實
+作中的例子）。</small></li>
+        <li><small>進行數字裁剪，將同為n位數的數劃分為數個集合，將尋找阿姆斯壯數縮剪為尋找包括阿姆斯壯數的集合。例如3位數
+中，122、212、221會屬於同一集合（因此需要搭配快速排列組合），詢問此集合是否包括1<sup>3</sup> + 2<sup>3</sup>
++ 2<sup>3</sup> = 17則答案為否（因而需要搭配有序集合以快速確認是否包括），而135、315、153屬於同一集合，</small><small>詢
+問此集合是否包括1<sup>3</sup> + 3<sup>3</sup> + 5<sup>3</sup> =
+153則答案為是，則153為阿姆斯壯數，在位數多時，可藉由集合裁剪掉大量單獨數字加總後測試的需求，從而</small><small>加快求解速
+度。</small></li>
+      </ul>
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp;
+&nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp;
+      <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp;
+      <a href="#Haskell">Haskell</a><br>
+      </h2>
+      <ul>
+        <li><a name="C"></a> C </li>
+      </ul>
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>int isNarcissistic(double);<br>void narcissistic(double*, int);<br><br>int main(void) { <br>    double armstrongs[88] = {0};<br>    narcissistic(armstrongs, 3);<br>    int i;<br>    for(i = 0; armstrongs[i] != 0; i++) {<br>        printf("%.0f\n", armstrongs[i]);<br>    }<br>    return 0; <br>} <br><br>int isNarcissistic(double number) {<br>    int digits[39] = {0};<br>    double num = number;<br>    int i;<br>    for(i = 0; num != 0; i++) {<br>        digits[i] = (int) num % 10;<br>        num = (int) (num / 10);<br>    }<br>    double sum = 0.0;<br>    int j;<br>    for(j = 0; j &lt;= i; j++) {<br>        sum += pow(digits[j], i);<br>    }<br>    return sum == number;<br>}<br><br>void narcissistic(double* armstrongs , int n) {<br>    double bound = pow(10, n &lt; 40 ? n : 39);<br>    double i;<br>    int j;<br>    for(i = 0, j = 0; i &lt; bound; i++) if(isNarcissistic(i)) {<br>        armstrongs[j] = i; j++;<br>    }<br>}<br></pre>
+      <br>
+      <ul>
+        <li> <a name="Java"></a>Java </li>
+      </ul>
+      <pre>import java.math.BigInteger;<br>import java.util.*;<br>import static java.lang.Math.*;<br><br>public class Armstrong {<br>    private static double[][] pows;<br>    <br>    public static List&lt;Double&gt; narcissistic(int n) {<br>        pows = new double[n + 1][];<br>        pows[1] = new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};<br>        for(int i = 2; i &lt;= n; i++) {<br>            pows[i] = new double[] {<br>                0, 1, pows[i - 1][2] * 2, pows[i - 1][3] * 3, <br>                pows[i - 1][4] * 4, pows[i - 1][5] * 5, <br>                pows[i - 1][6] * 6, pows[i - 1][7] * 7, <br>                pows[i - 1][8] * 8, pows[i - 1][9] * 9<br>            };<br>        }<br>    <br>        List&lt;Double&gt; armstrongs = new ArrayList&lt;&gt;();<br>        double bound = pow(10, n &lt; 40 ? n : 39);<br>        for(double i = 1; i &lt; bound; i++) if(isNarcissistic(i)) {<br>            armstrongs.add(i);<br>        }<br>        return armstrongs;<br>    }<br>    <br>    public static boolean isNarcissistic(double number) {<br>        List&lt;Integer&gt; digits = new ArrayList&lt;&gt;();<br>        double num = number;<br>        while(num != 0) {<br>            digits.add((int) num  % 10);<br>            num = floor(num / 10);<br>        }<br>        double sum = 0;<br>        for(Integer d : digits) {<br>            sum += pows[digits.size()][d];<br>        }<br>        return sum == number;<br>    }<br>    <br><br>    public static void main(String[] args) {<br>        for(Double d : narcissistic(7)) {<br>            System.out.printf("%.0f%n", d);<br>        }<br>    }<br>}</pre>
+      <br>
+      <ul>
+        <li><a name="Python"></a>Python</li>
+      </ul>
+      <pre>from functools import reduce<br><br>def toDigits(num):<br>    return [] if num == 0 else ([num % 10] + toDigits(num // 10))<br><br>def isNarcissistic(number):<br>    digits = toDigits(number)<br>    return reduce(lambda sum, d: sum + d ** len(digits), <br>               digits, 0) == number<br><br>def narcissistic(n):<br>    return [i for i in range(1, 10 ** (n if n &lt; 40 else 39)) <br>                  if isNarcissistic(i)]<br><br>print(narcissistic(3))<br></pre>
+      <br>
+      <ul>
+        <li><a name="Scala"></a>Scala</li>
+      </ul>
+      <pre>import scala.math.BigInt<br>import scala.math.pow<br><br>def toDigits(num: BigInt): List[Int] = {<br>    if(num == 0) Nil else (num % 10).toInt :: toDigits(num / 10)<br>}<br><br>def isNarcissistic(number: BigInt) = {<br>    val digits = toDigits(number)<br>    (0 /: digits) { (sum, d) =&gt; sum + pow(d, digits.size).toInt } == number<br>}<br><br>def narcissistic(n: Int) = {<br>    for(i &lt;- BigInt(1) until BigInt(10).pow(if(n &lt; 40) n else 39)<br>        if isNarcissistic(i)) yield i<br>}<br><br>narcissistic(3).foreach(println _)</pre>
+      <br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>def toDigits(num)<br>    num == 0 ? [] : ([num % 10]) + toDigits(num / 10)<br>end<br><br>def isNarcissistic(number)<br>    digits = toDigits(number)<br>    digits.reduce(0) {|sum, d| sum + d ** digits.size} == number<br>end<br><br>def narcissistic(n)<br>    (1...10 ** (n &lt; 40 ? n : 39)).select {|i| isNarcissistic(i)}<br>end<br><br>print(narcissistic(3))<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>function isNarcissistic(number) {<br>    var digits = [];<br>    var num = number;<br>    while(num != 0) {<br>        digits.push(num  % 10);<br>        num = parseInt(num / 10);<br>    }<br>    var sum = 0;<br>    for(var i = 0; i &lt; digits.length; i++) {<br>        sum += Math.pow(digits[i], digits.length);<br>    }<br>    return sum == number;<br>}<br>    <br>function narcissistic(n) {<br>    var armstrongs = [];<br>    var bound = Math.pow(10, n &lt; 40 ? n : 39);<br>    for(var i = 1; i &lt; bound; i++) if(isNarcissistic(i)) {<br>        armstrongs.push(i);<br>    }<br>    return armstrongs;<br>}<br><br>print(narcissistic(3));<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>toDigits num =<br>    if num == 0 then [] else (num `mod` 10) : toDigits (num `div` 10)<br><br>isNarcissistic number = <br>    number == (foldl (\sum d -&gt; sum + d ^ (length digits)) 0 digits)<br>    where digits = toDigits number<br><br>narcissistic n =<br>    [i | i &lt;- [1..10 ^ (if n &lt; 40 then n else 39)], isNarcissistic(i)]<br><br>main = print $ narcissistic 3<br></pre>
+      <br>
+      <br>
+      </td>
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/ArmstrongNumber.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+</html>

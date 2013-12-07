@@ -1,0 +1,737 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/ConfigFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:33 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>配置文件</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate Gossip:
+配置文件</a></h1>
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+Hibernate可以使用XML檔案或properties檔案來配置SessionFactory，預設的配置文件名稱為
+hibernate.cfg.xml或hibernate.properties，</small><small>使用下面的方式來讀入文件以配置Hibernate： </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Configuration
+config = new Configuration().configure();</span></small><br>
+
+
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></div>
+
+
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+
+
+
+
+
+      </span></small><small>當您使用new建構Configuration物件時，會讀取Classpath路徑下的
+hibernate.properties，如果您呼叫Configuration的configure()方法沒有指定路徑與檔案名稱時，則會再讀取
+Classpath路徑下的hibernate.cfg.xml，如果有與hibernate.properties相同的屬性設定，則
+hibernate.cfg.xml中的設定會覆蓋hibernate.properties中的設定。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+前幾個主題中所示範的為使用XML文件的方式，一個XML文件的例子如下： </small>
+      <br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li>hibernate.cfg.xml</li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-configuration PUBLIC<br>	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"<br>	"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"&gt;<br>	<br>&lt;hibernate-configuration&gt; <br><br>    &lt;session-factory&gt; <br>        &lt;!-- 顯示實際操作資料庫時的SQL --&gt; <br>        &lt;property name="show_sql"&gt;true&lt;/property&gt; <br>	&lt;!-- 將顯示的SQL排版，方便觀看 --&gt;<br>	&lt;property name="format_sql"&gt;true&lt;/property&gt;<br>        &lt;!-- SQL方言，這邊設定的是MySQL --&gt; <br>        &lt;property name="dialect"&gt;org.hibernate.dialect.MySQLDialect&lt;/property&gt; <br>        &lt;!-- JDBC驅動程式 --&gt; <br>        &lt;property name="connection.driver_class"&gt;com.mysql.jdbc.Driver&lt;/property&gt; <br>         &lt;!-- JDBC URL --&gt; <br>        &lt;property name="connection.url"&gt;jdbc:mysql://localhost/demo&lt;/property&gt; <br>        &lt;!-- 資料庫使用者 --&gt; <br>        &lt;property name="connection.username"&gt;caterpillar&lt;/property&gt; <br>        &lt;!-- 資料庫密碼 --&gt; <br>        &lt;property name="connection.password"&gt;123456&lt;/property&gt; <br><br>        &lt;!-- 物件與資料庫表格映射文件 --&gt; <br>        &lt;mapping resource="onlyfun/caterpillar/User.hbm.xml"/&gt; <br><br>    &lt;/session-factory&gt; <br><br>&lt;/hibernate-configuration&gt;</pre>
+
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+
+預設的XML配置文件名稱是hibernate.cfg.xml，您也可以自行指定檔案路徑與名稱，例如：<br>
+
+
+
+
+
+
+
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">Configuration config = new
+Configuration().configure("/config/db.cfg.xml");</span><br>
+
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+
+      
+      <br>
+
+
+
+
+
+      <small>在取得Configuration實例後，您還可以撰寫程式的方式來設定新的屬性，或甚至讀入另一個HBM設定檔案，例如：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Configuration config = new Configuration<br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .configure()<br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;.setProperty(Environment.FORMAT_SQL,
+"true")<br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+.addResource("onlyfun/caterpillar/Room.hbm.xml");</small><br>
+
+
+
+
+
+      </div>
+
+
+
+
+
+      <br>
+
+
+      <small>所有的屬性設定，在Hibernate中都對應於Environment類別中的一個靜態成員，例如format_sql就對
+應於Enviromnent.FORMAT_SQL，connection.driver_class就對應於Environment.DRIVER。<br>
+
+      <br>
+
+為了配置文件時更有彈性，您可以使用系統屬性來指定，例如在hibernate.cfg.xml中撰寫：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;property name="show_sql"&gt;${displaysql}&lt;/property&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;!-- 將顯示的SQL排版，方便觀看 --&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</small><br>
+
+      </div>
+
+
+      <br>
+
+      <small>如此，若在啟動Java時，加上-Ddisplaysql=true，則可觀看到產生的SQL語句。</small><br>
+
+      <br>
+
+
+
+
+
+      <small>
+
+
+使用屬性檔案進行配置時，檔案名稱是hibernate.properties，必須放置在Classpath之下，一個例子如下： </small><br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+        <li>hibernate.properties</li>
+
+
+
+
+
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      <pre>hibernate.show_sql = true<br>hibernate.format_sql = true<br>hibernate.dialect = org.hibernate.dialect.MySQLDialect <br>hibernate.connection.driver_class = com.mysql.jdbc.Driver <br>hibernate.connection.url = jdbc:mysql://localhost/demo<br>hibernate.connection.username = caterpillar <br>hibernate.connection.password = 123456<br></pre>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <small>由於properties檔案中不包括映射文件的名稱，為了要取得物件至資
+料庫表格的映射文件，您必須在程式中如下載入： <br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Configuration
+cfg = new Configuration() </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; .addClass(onlyfun.caterpillar.User.class) </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; .addClass(onlyfun.caterpillar.Room.class);</span><br>
+
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+
+第一個addClass()加入位於Classpath根目錄下的User.hbm.xml，第二個addClass()加入Room類別的映射文件，該
+文件必須位於與User類別同一個目錄，也就是onlyfun/caterpillar/Room.hbm.xml。<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+在Hibernate下載檔案中的etc目錄下，有hibernate.cfg.xml與hibernate.properties可供設定參考。</small>
+      <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      <small></small><small>Configuration的實例管理Hibernate的配置訊息，通常用於建立SessionFactory，例如：<br>
+
+
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">SessionFactory
+sessionFactory = config.buildSessionFactory();</span><br>
+
+
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+
+
+SessionFactory一旦建立，就被賦予當時Configuration的配置訊息，之後您改變Configuration並不會影響已建立的
+SessionFactory實例，如果對Configuration改動後，則要建立一個新的SessionFactory實例，新的實例中會包括新的
+配置訊息， SessionFactory是被設計為「執行緒安全的」（Thread-safe）。</small><br>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/ConfigFile.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:33 GMT -->
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/Controller.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>Controller 繼承架構</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: Controller 繼承架構</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>當
+使用者送出請求之後，實際上處理請求的是Controller，您可以實作Controller介面來完成請求處理的邏輯，在Spring中，
+Controller是受Spring IoC容器管理的一個
+Bean實例，另一方面，Spring提供了一個豐富的Controller繼承架構，讓您可以根據實際上的需求來繼承某個類別，以完成所需的
+Controller處理。<br>
+
+      <br>
+
+以下列出Spring中Controller的繼承架構：<br>
+
+      <img style="width: 627px; height: 331px;" alt="" src="images/controllerHierarchy-1.jpg"><br>
+
+      <br>
+
+      <br>
+
+以下分別簡介Controller相關類別之作用：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>AbstractController</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>AbstractController實作了
+Controller介面，並繼承了
+WebContentGenerator，提供了Session快取與同步化（synchronized）的處理，您可以直接繼承
+AbstractController，並重新定義它的handleRequestInternal()方法來實作請求的處理，例如：</small><br>
+
+      </div>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class SomeController extends AbstractController {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public ModelAndView handleRequestInternal(</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HttpServletRequest request,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletResponse response) throws Exception {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return new ModelAndView("view", "modelName", model);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ..</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+
+      </div>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>MultiActionController</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>如果為每一個請求撰寫一個Controller類別，在程
+式規模增大時，您的Controller類別將會迅速增加，可以繼承或直接使用MultiActionController類別，將數個相關的請求處理集
+中於同一個物件中加以管理，而不用每一個請求撰寫一個控制物件。</small><br>
+
+      </div>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>BaseCommandController、AbstractCommandController</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>如果您需要將使用者的請求中所提供的參數值擷取至一個
+Command物件中加以管理，則可以使用BaseCommandController類別的子類別，在Spring中，Command是一個純綷的
+JavaBean（Plain Ordinary Java Object, POJO）， BaseCommandController
+負責將請求參數擷取出來並設定至Command物件中，AbstractCommandController則定義了後續的一些處理流程，通常您會繼承
+AbstractCommandController來定義一個CommandController，一個例子如下：</small><br>
+
+      </div>
+
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class SomeCommandController </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+extends AbstractCommandController {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public SomeCommandController() {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; setCommandClass(YourCommand.class);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public ModelAndView handle(HttpServletRequest request,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HttpServletResponse response,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Object command,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BindException exception) throws Exception {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; YourCommand your = (YourCommand) command;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return new ModelAndView(..);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ..</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+
+      </div>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>AbstractFormController</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>對於表單處理，AbstractFormController中定義了一系列處理請求中參數，及表單提交成功或失敗時所要進行的頁面流程。</small><br>
+
+      </div>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>SimpleFormController</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>對於簡單的表單處理，您可以繼承的是SimpleFormController類別，您可以重新定義它的doSubmitAction()方法，如果要自己處理ModelAndView，則可以重新定義它的onSubmit()方法。</small><br>
+
+      </div>
+
+      <small><br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>AbstractWizardFormController</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>對於需要由數個表單畫面來完成一系列資料收集的網頁來說，可以繼承AbstractWizardFormController，您可以像桌面應用程式上使用精靈（Wizard）功能的方式來製作表單。</small><br>
+
+      </div>
+
+      <small><br>
+
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/Controller.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+</html>

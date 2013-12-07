@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/PrinteWriter.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>PrintWriter</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: PrintWriter</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>之前曾經介紹過 <a class="wikilink" href="PrintStream.htm">PrintStream</a>，
+它可以將Java的基本資料型態等資料，直接轉換為系統預設編碼下對應的字元，再輸出至OutputStream中，而這邊要介紹的
+PrintWriter其功能上與PrintStream類似，除了接受OutputStream之外，它還可以接受Writer物件作為輸出的對象，當
+您原先是使用Writer物件在作處理 ，而現在想要套用println()之類的方法時，使用PrintWriter會是比較方便的作法。 <br>
+
+      <br>
+
+
+
+
+
+
+
+下面這個程式顯示了PrintStream與PrintWriter兩個物件在處理相同輸出目的時的作法，程式將會在螢幕上顯示 "&#31616;体中文"
+四個字元：</small><br>
+
+
+
+      
+      <ul>
+
+        <li> StreamWriterDemo.java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*;<br> <br>public class StreamWriterDemo {<br>    public static void main(String[] args) {<br>        try { <br>            byte[] sim = {(byte)0xbc, (byte)0xf2,   // &#31616; <br>                          (byte)0xcc, (byte)0xe5,   // 体 <br>                          (byte)0xd6, (byte)0xd0,   // 中 <br>                          (byte)0xce, (byte)0xc4};  // 文 <br>            InputStreamReader inputStreamReader = <br>                new InputStreamReader( <br>                  new ByteArrayInputStream(sim), "GB2312"); <br>            PrintWriter printWriter = <br>             new PrintWriter(<br>               new OutputStreamWriter(System.out, "GB2312")); <br>            PrintStream printStream = <br>                new PrintStream(System.out, true, "GB2312");<br>  <br>            int in; <br> <br>            while((in = inputStreamReader.read()) != -1)  { <br>                printWriter.println((char)in); <br>                printStream.println((char)in); <br>            }<br>            inputStreamReader.close();<br>            printWriter.close();<br>            printStream.close();<br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            e.printStackTrace(); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+要能正確看到執行的結果，您的終端機程式必須支援GB2312簡體中文編碼的顯示。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/PrinteWriter.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

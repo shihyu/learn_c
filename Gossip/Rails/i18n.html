@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/i18n.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:01 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>簡介 i18n</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror i18n" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 簡介 i18n<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>如果一個應用程式在設計時，可以在不修改應用程式的情況下，根據不同的使用者直接採用不同的語言、數字格式、日期格式等，這樣的設計考量稱為國際化（internationalization），簡稱i18n（因為internationalization有18個字母）。</p>
+      <p>國際化的重要觀念之一是地區（Locale）資訊，地區資訊代表了特定的地理、政治或文化區，地區資訊可由一個語言編碥（Language code）與可選的區域編碼（Country code）來指定，其中語言編碼是<a
+          href="../../../ftp.ics.uci.edu/pub/ietf/http/related/iso639.html"> ISO-639</a> 定義，由兩個小寫字母代表，例如"ca"表示加拿大文（Catalan），"zh"表示中文（Chinese）。區域編碼則由兩個大寫字母表示，定義 在<a
+          href="http://www.chemie.fu-berlin.de/diverse/doc/ISO_3166.html">ISO-3166</a>，例如IT表示義大利（Italy）、TW表示台灣（Taiwan）。<br>
+      </p>
+      <p>Rails中地區（Locale）資訊可使用字串設定，若要同時指定語言與區域，慣例上使用<span class="courier">-</span>區隔，例如<span
+          class="courier">"zh-TW"</span>，應用程式預設的地區設定可用<span class="courier">I18n.default_locale</span>取得，如果沒有作任何設定，預設是<span
+          class="courier">"en"</span>，可設定config/application.rb中的<span class="courier">config.i18n.default_locale</span>選項來指定。例如：</p>
+      <p style="margin-left: 40px;"><strong><span class="courier">config.i18n.default_locale = "zh-TW</span>"</strong><br>
+      </p>
+      <p>應用程式採用的地區資訊由<span class="courier">I18n.locale</span>決定，預設值與<span
+          class="courier">I18n.default_locale</span>相同，也就是<span class="courier">"en"</span>。<br>
+      </p>
+      <p>地區資訊要搭配翻譯詞彙檔來使用，預設翻譯詞彙檔的載入路徑為config/locales，例如應用程式預設會有個en.yml如下：</p>
+      <ul>
+        <li>en.yml</li>
+      </ul>
+      <pre># Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  hello: "Hello world"<br></pre>
+      <p class="courier">舉例來說，如果要在畫面上呈現多國語言，可以如下使用I18n.t方法指定字串或Symbol：</p>
+      <p style="margin-left: 40px;" class="courier"><strong>&lt;%=t :hello %&gt;</strong><br>
+      </p>
+      <p>如果<span class="courier">I18n.locale的值是"en"</span>，那麼就會尋找en.yml中<span
+          class="courier">hello:</span>的對應伺彙，假設你有個zh-TW.yml：</p>
+      <ul>
+        <li>zh-TW.yml</li>
+      </ul>
+      <pre>zh-TW:
+  hello: "哈囉！世界！"<br></pre>
+      <p>如果你設定<span class="courier">I18n.locale</span>為<span class="courier">"zh-TW"</span>，那麼就會尋找zh-TW.yml中<span
+          class="courier">hello:</span>對應詞彙。</p>
+      <p>其實yml主檔名無關緊要，主要是yml第一層要對應地區設定，才有辦法找到對應詞彙。如果找不到對應詞彙，那就會直接使用指定的<span
+          class="courier">Symbol</span>，例如<span class="courier">:hello</span>就顯示Hello，如果是<span
+          class="courier">:hello_world</span>就會顯示Hello World，如果想指定沒有對應詞彙時的預設詞彙，可以使用<span
+          class="courier">:default</span>：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>&lt;%= t :hello, :default =&gt; "Hello!" %&gt;</strong><br>
+      </p>
+      <p><span class="courier">:default也可以設定尋找順序。例如找不到:hello就尋找:hi，要不然就使用最後指定的文字：</span></p>
+      <p style="margin-left: 40px;"><strong class="courier">&lt;%= t :hello, :default =&gt; [:hi, "Hello!"] %&gt;</strong></p>
+      <p><span class="courier">I18n.t方法可以直接指定:locale選項。</span>例如：</p>
+      <p style="margin-left: 40px;"><strong><span class="courier">&lt;%=t :hello, :locale =&gt; "en" %&gt;&lt;br&gt;<br>
+            &lt;%=t :hello, :locale =&gt; "zh-TW"%&gt;&lt;br&gt;<br>
+            &lt;%=t :hello, :locale =&gt; "zh-GB" %&gt;&lt;br&gt;</span></strong></p>
+      <p>如果也存在著<span class="courier">"zh-GB"</span>對應翻譯詞彙，這會顯示如下的結果：</p>
+      <p><img alt="i18n" src="images/i18n-1.PNG"><br>
+      </p>
+      如果你如下撰寫：<br>
+      <ul>
+        <li>en.yml</li>
+      </ul>
+      <pre>en:
+  hello: "Hello %{name}"<br></pre>
+      <br>
+      那麼<span class="courier">I18n.t方法可以直接如下指定</span><span class="courier">%{name}</span>的文字：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;"><strong>&lt;%=t :hello, :name =&gt; params[:name] %&gt;</strong><br>
+      </div>
+      <br>
+      你可以為語系設置名稱空間。例如：<br>
+      <ul>
+        <li>en.yml</li>
+      </ul>
+      <pre>en:
+  cc:
+    openhome:<br>      hello: "Hello World"<br></pre>
+      <br>
+      則以下指定方式都是相同的：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;"><strong>&lt;%= t "cc.openhome.hello" %&gt;<br>
+          &lt;%= t :hello, :scope =&gt; "cc.openhome" %&gt;<br>
+          &lt;%= t "openhome.hello", :scope =&gt; :cc %&gt;<br>
+          &lt;%= t :hello, :scope =&gt; [:cc, :openhome] %&gt;</strong><br>
+      </div>
+      <br>
+      Rails在頁面中還提供懶人查找法，如果有個app/views/books/index.html.erb，其中寫了：<br>
+      <div style="margin-left: 40px;"><span class="courier"><br>
+          <strong>&lt;%= t '.title' %&gt;</strong></span><br>
+      </div>
+      <br>
+      那相當於寫了：<br>
+      <br>
+      <div style="margin-left: 40px;"><span class="courier"><strong>&lt;%= t "books.index.title" %&gt;</strong></span><br>
+      </div>
+      <br>
+      應用程式根據不同國家的使用者，呈現不同的語言、數字格式、日期格式等，這稱之為本地化（Localization），例如，345987.246這個數字，針對法國的使用者呈現345 987,246的格式，針對德國的使用者呈現345.987,246，而針對美國的使用者則要呈現345,987.246。<br>
+      <br>
+      針對時間與日期格式的本地化，Rails提供了<span class="courier">I18n.l</span>方法，你可以下載以下的yml至config/locales：<br>
+      <ul>
+        <li><a href="#">https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/zh-TW.yml</a></li>
+      </ul>
+      如果頁面上有：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;">&lt;%= l Time.now %&gt;<br>
+      </div>
+      <br>
+      而<span class="courier">I18n.locale的值是"en"</span>，那麼會顯示「Tue, 14 Feb 2012 14:50:34 +0800」，如果是"zh-TW"，那麼會顯示「2012年2月14日 星期二 14:51:10 CST」。可觀察下載的語系檔time區段的設定：<br>
+      <ul>
+        <li>zh-TW.yml</li>
+      </ul>
+      <pre>zh-TW:<br>  略...<br>  time:
+    am: 上午
+    formats:
+      default: ! '%Y年%b%d日 %A %H:%M:%S %Z'
+      long: ! '%Y年%b%d日 %H:%M'
+      short: ! '%b%d日 %H:%M'
+    pm: 下午<br></pre>
+      <br>
+      <span class="courier">formats:的部份，預設使用default:，可以指定long:與short:。例如：</span><br>
+      <br>
+      <div class="courier" style="margin-left: 40px;"><strong>&lt;%=l Time.now, :format =&gt; :short %&gt;</strong><br>
+      </div>
+      <br>
+      這將會顯示「2月14日 15:00」。<br>
+      <br>
+      方才下載的翻譯語系檔是個可以學習語系檔如何撰寫的對象。例如模型驗證錯誤訊息就可以在其中設定，會使用以下順序查找詞彙：<strong><br>
+      </strong>
+      <div class="courier" style="margin-left: 40px;"><strong>activerecord.errors.models.[model_name].attributes.[attribute_name]<br>
+          activerecord.errors.models.[model_name]<br>
+          activerecord.errors.messages<br>
+          errors.attributes.[attribute_name]<br>
+          errors.messages</strong><br>
+      </div>
+      <br>
+      例如：<br>
+      <div class="courier" style="margin-left: 40px;"><strong>class User &lt; ActiveRecord::Base<br>
+          &nbsp;&nbsp; validates :name, :presence =&gt; true<br>
+          end</strong><br>
+      </div>
+      <br>
+      這將會依以下順序查找：<br>
+      <div class="courier" style="margin-left: 40px;"><span style="font-weight: bold;">activerecord.errors.models.user.attributes.name.blank</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">activerecord.errors.models.user.blank</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">activerecord.errors.messages.blank</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">errors.attributes.name.blank</span><br
+          style="font-weight: bold;">
+        <span style="font-weight: bold;">errors.messages.blank</span><br>
+      </div>
+      <br>
+      驗證器使用的對應訊息，可參考這邊的 <a href="http://edgeguides.rubyonrails.org/i18n.html">Rails Internationalization (I18n) API</a> 中 5.1.2 Error Message Interpolation 表格。舉例來說，方才下載的zh-TW.yml中，就有個區段是：<br>
+      <ul>
+        <li>zh-TW.yml</li>
+      </ul>
+      <pre>zh-TW:
+  略...
+  errors:
+    format: ! '%{attribute} %{message}'
+    messages:
+      accepted: 必須是可被接受的
+      blank: 不能是空白字元
+      confirmation: 不符合確認值
+      empty: 不能留空
+      equal_to: 必須等於 %{count}
+      even: 必須是偶數
+      exclusion: 是被保留的關鍵字
+      greater_than: 必須大於 %{count}
+      greater_than_or_equal_to: 必須大於或等於 %{count}
+      inclusion: 沒有包含在列表中
+      invalid: 是無效的
+      less_than: 必須小於 %{count}
+      less_than_or_equal_to: 必須小於或等於 %{count}
+      not_a_number: 不是數字
+      not_an_integer: 必須是整數
+      odd: 必須是奇數
+      record_invalid: ! '校驗失敗: %{errors}'
+      taken: 已經被使用
+      too_long: 過長（最長是 %{count} 個字）
+      too_short: 過短（最短是 %{count} 個字）
+      wrong_length: 字數錯誤（必須是 %{count} 個字）
+  略.. <br></pre>
+      <br>
+      也因此若<span class="courier">User</span>實例驗證失敗後，會顯示"不能是空白字元"的訊息。<br>
+      <br>
+      Rails預設會從config/locales載入語系詞彙檔，如果想從其它地方載入語系檔，可以設定config.i18n.load_path。例如：<br>
+      <div class="courier" style="margin-left: 40px;"><br>
+        <strong>I18n.load_path += Dir[Rails.root.join('lib', 'locale', '*.{rb,yml}')]</strong><br>
+      </div>
+      <br>
+      例如Rails預設會從config/locales載入語系詞彙檔，但不包括子目錄，如果想在config/locales下分門別類放置語系檔：<br>
+      <div class="courier" style="margin-left: 40px;">|-defaults<br>
+        |---es.rb<br>
+        |---en.rb<br>
+        |-models<br>
+        |---book<br>
+        |-----es.rb<br>
+        |-----en.rb<br>
+        |-views<br>
+        |---defaults<br>
+        |-----es.rb<br>
+        |-----en.rb<br>
+        |---books<br>
+        |-----es.rb<br>
+        |-----en.rb<br>
+        |---users<br>
+        |-----es.rb<br>
+        |-----en.rb<br>
+        |---navigation<br>
+        |-----es.rb<br>
+        |-----en.rb<br>
+      </div>
+      <br>
+      則可以如下設置：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;"><strong>config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]</strong><br>
+      </div>
+      <br>
+      如果你需要為不同語系的使用者準備不同的樣版頁面，也可以將樣版檔案命名為xxx-zh-TW.html.erb、xxx-en.html.erb等，如此就會根據不同的語系設定而使用對應的樣版檔案。<br>
+      <br>
+      更多有關Rails i18n的說明，可參考 <a href="http://edgeguides.rubyonrails.org/i18n.html">Rails Internationalization (I18n) API</a>。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/i18n.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:02 GMT -->
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/Hibernate2ToHibernate3.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>從Hibernate 2 到 Hibernate 3</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate Gossip: 從Hibernate 2 到 Hibernate 3</a></h1>
+
+
+
+
+
+這篇文件整理了一些我改寫Hibernate筆記時，從Hibernate 2到Hibernate 3中所遇過的不同點，如果發現有其它重要的改變，將隨時新增至這個文件中。<br>
+
+<h4>對 DTD 文件的引用</h4>
+
+<br>
+
+hibernate.cfg.xml中對DTD文件的引用必須改變，在Hibernate 2中是這樣：<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">...</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&lt;!DOCTYPE hibernate-configuration </span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&nbsp; &nbsp; PUBLIC <span style="color: rgb(255, 0, 0);">"-//Hibernate/Hibernate 
+Configuration DTD//EN" </span></span><br style="font-weight: bold; color: rgb(255, 0, 0);">
+
+<span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">&nbsp; &nbsp; 
+"http://hibernate.sourceforge.net/hibernate-configuration-2.0.dtd"</span>&gt;</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">...</span><br>
+
+</div>
+
+
+
+
+
+<br>
+
+在Hibernate 3中必須這樣：<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">...</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&lt;!DOCTYPE hibernate-configuration PUBLIC</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">"-//Hibernate/Hibernate Configuration DTD 3.0//EN"</span></span><br style="font-weight: bold; color: rgb(255, 0, 0);">
+
+<span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp; "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"</span>&gt;</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">...</span><br>
+
+</div>
+
+<br>
+
+<br>
+
+映射文件在Hibernate 2時是這樣：<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">...</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&lt;!DOCTYPE hibernate-mapping </span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&nbsp; &nbsp; PUBLIC <span style="color: rgb(255, 0, 0);">"-//Hibernate/Hibernate Mapping 
+DTD//EN" </span></span><br style="font-weight: bold; color: rgb(255, 0, 0);">
+
+<span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">&nbsp; &nbsp; 
+"http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd"</span>&gt;</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">...</span><br>
+
+</div>
+
+<br>
+
+在Hibernate 3中是這樣：<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">...</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&lt;!DOCTYPE hibernate-mapping </span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; PUBLIC <span style="color: rgb(255, 0, 0);">"-//Hibernate/Hibernate Mapping DTD 3.0//EN" </span></span><br style="font-weight: bold; color: rgb(255, 0, 0);">
+
+<span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp; "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"</span>&gt; </span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">...</span><br>
+
+</div>
+
+<br>
+
+<h4>package 的改變</h4>
+
+<br>
+
+Hibernate 2中API的頂層package名稱是<span style="font-weight: bold; color: rgb(255, 0, 0);">net.sf.hibernate</span>，在Hibernate 3中是<span style="font-weight: bold; color: rgb(255, 0, 0);">org.hibernate</span>，例如Hibernate 2中的net.sf.hibernate.SessionFactory在Hibernate 3中改為org.hibernate.SessionFactory。<br>
+
+<br>
+
+<h4>取消 Session 中 find()、iterate() 方法</h4>
+
+<br>
+
+Session中的<span style="font-weight: bold; color: rgb(255, 0, 0);">find()方法被取消了</span>，必須使用Session的createQuery()建立Query實例，並使用list()方法來取代。Session的<span style="font-weight: bold; color: rgb(255, 0, 0);">iterate()被取消了</span>，由Query介面上的iterator()來取代，詳請看 <a href="QueryListIterator.html">Query.list()、iterator()</a>。<br>
+
+<br>
+
+<h4>HQL 新增語句</h4>
+
+<br>
+
+新增 update 語句<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">Query query = session.createQuery("update User set age=30 where id=1");</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">query.executeUpdate();</span><br>
+
+</div>
+
+<br>
+
+新增 delete 語句<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">Query query = session.createQuery("delete User where age&lt;20");</span><br style="font-weight: bold;">
+
+<span style="font-weight: bold;">query.executeUpdate();</span><br>
+
+</div>
+
+<h4>自定義 insert、update、delete </h4>
+<br>
+Hibernate
+3的映射文件中新增了&lt;sql-insert&gt;、&lt;sql-update&gt;與&lt;sql-delete&gt;三個標籤，您
+可以在這三個標籤中使用SQL自定義您的INSERT、UPDATE、DELETE，也就是儲存、更新、刪除資料時的行為，詳請看 <a href="CustomInsertUpdateDelete.html">自定義 insert、update、delete</a>。<br>
+
+<h4>其它</h4>
+
+<ul>
+
+  <li>Expression類別雖仍可使用，但新增Restrictions類別作為Expression類別的替代。</li>
+
+  <li>新增 <a href="DetchedCriteria.html">DetchedCriteria</a>。</li>
+
+  <li>新增 <a href="DynamicModel.html">動態模型（Dynamic Model）</a>。</li>
+
+  <li>HibernateException 變為Checked exception。</li>
+
+  <li>Interceptor 新增了幾個方法。</li>
+
+  <li>Lazy Initialization預設為 true，不想使用的話，必須在映射文件中設定lazy屬性為false。</li>
+
+  <li>可透過org.hibernate.tool.instrument.InstrumentTask對.class檔進行buildtime bytecode instrumentation，實現屬性的Lazy Initialization。</li>
+
+</ul>
+
+<br>
+
+<br>
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/Hibernate2ToHibernate3.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

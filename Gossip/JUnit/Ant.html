@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Ant.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:28 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>使用 Ant</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 使用 Ant<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Ant的全名是<span style="font-weight: bold;">"Another Neat Tool"</span>，
+是由 James Duncan Davidson在Make工具無法滿足他的需求下所撰寫出來的構建（build）工具，目前由Apache
+Software Foundation持續進行開發，根據官方網站上的FAQ中"What is Apache Ant"的回答：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-style: italic;">Ant
+is a Java-based build tool. In theory, it is kind of like Make, without
+Make's wrinkles and with the full portability of pure Java code.</small><br>
+      </div>
+      <br>
+      <small>對於沒有使用過Make工具的初學者來說，想像一下如何管理原始碼？自動處理CLASSPATH的問題？在編譯之後將編譯過後
+的檔案指定至某個目 錄？包裝您的程式庫？自動執行測試並儲存測試報告？這一切都可以透過Ant來完成！您不用不斷的使用javac、copy、cd、
+java等指令來達成這些目的，只要撰寫好構建文件（buildfile），一個以XML組織的文件檔案，之後只要下達ant指令，所
+有的一切就可以完成。<br>
+      <br>
+Ant與IDE並不衝突。IDE的重點在於專案管理、提供使用者撰寫程式時的輔助（像是程式碼自動提示、自動產生等）、與伺服器的整合與設定等，Ant則
+是提供數個任務（操作）的組織與自動化，在IDE上可能要數個操作才能達到的目的，例如清除（Clean）、建構（Build）、部署（Deploy），
+則可透過Ant來完成。事實上，有些IDE的選項操作，就可整合Ant來完成（例如NetBeans）。<br>
+      <br>
+      </small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small>簡單的歸納一下Ant可以幫您自動完成的任務：<br></small><ul style="margin-top: 3px; margin-bottom: 3px;"><li><small>編譯Java原始碼</small></li><li><small>建立jar、war、zip檔案</small></li><li><small>自動測試與生成報告</small></li><li><small>從CVS等管理系統取得原始碼</small></li>
+        <li><small>其它Ant擴充任務...</small></li>
+</ul><br>
+      <small>你可以至 <a href="http://ant.apache.org/">Ant的官方網站</a> 下載Ant，要開始使用Ant，</small></span></span><small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;">在文字模式下，</span></span></small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small>必須設定JAVA_HOME、ANT_HOME與PATH等相關環境。例如在Windows中：<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </small></span></span>
+      <div style="margin-left: 40px;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">SET JAVA_HOME=C:\Program Files\Java\jdk1.6.0</span></small></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">SET ANT_HOME=C:\Winware\apache-ant-1.8.2</span></small></span></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">SET PATH=C:\Winware\apache-ant-1.8.2\bin;%PATH%</span></small></span></span><br>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"></span></span></div>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br>
+      <small>你也可以在系統環境變數中加以設定，以省去每次重開文字模式都要設定的麻煩。在主流IDE中，目前都已內建Ant支援。例如在
+Eclipse中要使用Ant，只要直接建立一個build.xml，在當中撰寫相關設定，即可在build.xml上按右鍵，執行「Run
+As/Ant Build」指令：<br>
+      <img style="width: 597px; height: 408px;" alt="" src="images/Ant-1.png"><br>
+      <br>
+      <br>
+若要改變預設的Ant執行環境，則可以執行選單上「Windows/Preferences」，在對話方塊中選擇「Ant/Runtime」，即可設定你新下載的</small></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small>Ant執行環境。<br>
+      <img style="width: 607px; height: 375px;" alt="" src="images/Ant-2.png"><br>
+</small></span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"></span></span><br>
+      <small>如果你使用NetBeans，還可以使用Free-Form Project，在建立專案的過程中，可以讓你指定建構任務：<br>
+      <img style="width: 564px; height: 348px;" alt="" src="images/Ant-3.png"><br>
+      </small><small><br>
+這可以讓你將Ant的任務與NetBeans的選單中，「Run」、「Clean」、「Build」、「Clean and Build」等指令的動作結合在一起，事實上，NetBeans本身的其它專案，也是建立預設的build.xml來執行這些任務。</small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Ant.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:31 GMT -->
+</html>

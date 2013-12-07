@@ -1,0 +1,332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/UnicodeUTF.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Unicode 與 UTF</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: Unicode 與 UTF<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>由
+於Big5用了第一個位元組的某個範圍來作為識別是否為中文字，可儲存的文字範圍就大大減少（約為一萬九千多個），如果你儲存的字元，不在
+Big5/MS950編碼範圍內，那會如何？如果是Windows中的記事本程式，會出現以下的提示，要你轉存為Unicode格式：<br>
+      <img style="width: 642px; height: 274px;" alt="" src="images/UnicodeUTF-1.png"><br>
+      <br>
+在你按下「取消」後，會出現「另存新檔」的對話框，在右下會有個「編碼」選項，下拉的話，會有Unicode、Unicode big endian與UTF-8三個選項。<br>
+      <br>
+      <a href="http://zh.wikipedia.org/wiki/Unicode">Unicode</a>
+是由The Unicode
+Consortium非營利組織所主導的編碼標準，它是一個字元對應一個數字的映射，這個數字稱之為碼點（Code point），在表達字元對應的碼點時，於「U+」之後接著一組十六進位數字來表示字元的編碼，如果使用四個
+十六進位制數字，可以表達六萬多個字元，如果使用五或六個十六進位制，則可以表達更多的字元。<br>
+      <br>
+Unicode是指字元映射至數字的概念編碼（Conceptual
+encoding），一個文字的Unicode編碼數字是固定的，而這個數字在電腦中如何用位元組來實作則有不同的方式，Unicode的實作方式就稱為
+Unicode/UCS Transformation Format，簡稱 <span style="font-weight: bold;">UTF</span>。<br>
+      <br>
+如果你直接將方才的範例選擇「Unicode」儲存，用十六進位檢視，你會看到：<br>
+      <img style="width: 543px; height: 67px;" alt="" src="images/UnicodeUTF-2.png"><br>
+      <br>
+「&#29319;」這個字的Unicode編碼是U+7287，對於Windows的記事本若選擇使用「Unicode」儲存，則使用兩個位元組來儲存，Windows的記事本選擇「Unicode」選項時，實際上採用 <a href="http://zh.wikipedia.org/wiki/UCS-2">UCS-2/UTF-16</a></small><small> 儲存，一開頭的兩個位元組（ff fe）是用來識別檔案採用的位元組順序，稱為BOM（byte order mark），之後使用兩個位元組來儲存每個Unicode字元。<br>
+      <br>
+要注意的是，</small><small>
+「&#29319;」這個字的Unicode編碼是U+7287，實際儲存時的位元組卻是87、72，也就是說，Windows記事本選擇「Unicode」儲存兩個以上位元組的資料時，是先存低位元組，再存高位元組，這樣的儲存方式，是採 <a href="http://zh.wikipedia.org/wiki/%E5%AD%97%E8%8A%82%E5%BA%8F">Little Endian</a> 的方式，也就是</small><small>Windows記事本選擇「Unicode」時，實際上採用的是UCS-2/UTF-16 Little Endian。<br>
+      <br>Unicode指定BOM編碼為U+FEFF。</small><small>如果讀取</small><small>檔</small><small>案開頭的BOM順序是0xfeff，表示檔案採用Big Endian，</small><small>如果讀取</small><small>檔</small><small>案開頭的BOM順序是0xfffe，表示檔案採用Little Endian</small><small>。</small><br>
+      <small>
+      <br>
+如果使用Windows記事本儲存時的選項是「</small><small>Unicode big endian</small><small>」，同樣儲存「&#29319;」，結果會如下：<br>
+      <img style="width: 543px; height: 67px;" alt="" src="images/UnicodeUTF-3.png"><br>
+      </small><small><br>
+      </small>
+      <small>可以看到，用來表示為Unicode檔案的兩個位元組為fe、ff，與先前的ff、fe相反，而「&#29319;」這個字現在儲存為72、87，與先前的87、72也是相反。如果儲存兩個以上位元組資料時，採先存高位元，再存低位元方式，則這樣的儲存方式，是採 </small><small><a href="http://zh.wikipedia.org/wiki/%E5%AD%97%E8%8A%82%E5%BA%8F">Big Endian</a> 的方式。<br>
+      <br>
+這會有什麼影響？如果你使用以下的Java程式來讀取一個存有「這T是e個s測t試」的文字檔案，而文字檔案採Windows記事本中的「Unicode」選項儲存，那麼你會得到亂碼：<br>
+      </small>
+      <pre>import java.io.*;<br><br>public class Main {    <br>    public static void main(String[] args) throws Exception {<br>        FileInputStream in = new FileInputStream(args[0]);<br>        byte[] data = new byte[2];<br>        while(in.read(data) != -1) {<br>            int hex = ((data[0] &lt;&lt; 8) | (data[1] &amp; 0xFF)) &amp; 0XFFFF;<br>            System.out.printf("%h ", hex); <br>            System.out.println(new String(data, <span style="font-weight: bold;">"UTF-16"</span>));<br>        }<br>        in.close();<br>    }<br>}<br></pre>
+      <small>
+      </small><small><br>
+      </small>
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main sample.txt<br>
+fffe<br>
+1990 ?<br>
+5400 ?<br>
+2f66 ?<br>
+6500 攀<br>
+b50 ?<br>
+7300 猀<br>
+2c6e ?<br>
+7400 琀<br>
+668a 暊</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td></tr></tbody>
+      
+      </table>
+
+      <small><br>
+如果</small><small>存有「這T是e個s測t試」的文字檔案，是使用Windows記事本「</small><small>Unicode big endian</small><small>」選項儲存，也就是採</small><small>UCS-2/UTF-16 Big Endian，</small><small>則以上程式可以得到正確的文字顯示：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main sample.txt<br>
+feff<br>
+9019 這<br>
+54 T<br>
+662f 是<br>
+65 e<br>
+500b 個<br>
+73 s<br>
+6e2c 測<br>
+74 t<br>
+8a66 試</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td></tr></tbody>
+      
+      </table>
+
+
+      <small><br></small><small>這是因為<span style="font-weight: bold;">JVM本身是採Big Endian的方式</span>來處理位元組，對於一個</small><small>文字檔案採Windows記事本中的「Unicode」選項儲存，則是採Little Endian，用以上的程式讀取當然會是亂碼，如果要正確讀取</small><small>Windows記事本中的「Unicode」選項儲存的文字檔案，方法之一是在Java中要自行調換位元組順序：<br>
+      </small>
+      <pre>import java.io.*;<br><br>public class Main {    <br>    public static void main(String[] args) throws Exception {<br>        FileInputStream in = new FileInputStream(args[0]);<br>        byte[] data = new byte[2];<br>        byte[] bigEndian = new byte[2];<br>        while(in.read(data) != -1) {<br>            int hex = ((data[0] &lt;&lt; 8) | (data[1] &amp; 0xFF)) &amp; 0XFFFF;<br>            System.out.printf("%h ", hex); <br>            bigEndian[0] = data[1];<br>            bigEndian[1] = data[0];<br>            System.out.println(new String(bigEndian, "UTF-16"));<br>        }<br>        in.close();<br>    }<br>}<br></pre>
+      <small><br>
+或者是指定使用UTF-16LE，例如：<br>
+      </small>
+      <pre>import java.io.*;<br><br>public class Main {    <br>    public static void main(String[] args) throws Exception {<br>        FileInputStream in = new FileInputStream(args[0]);<br>        byte[] data = new byte[2];<br>        while(in.read(data) != -1) {<br>            int hex = ((data[0] &lt;&lt; 8) | (data[1] &amp; 0xFF)) &amp; 0XFFFF;<br>            System.out.printf("%h ", hex); <br>            System.out.println(new String(data, <span style="font-weight: bold;">"UTF-16LE"</span>));<br>        }<br>        in.close();<br>    }<br>}<br></pre>
+
+      <br>
+      <small>這兩個程式，都可以正確讀取，例如：</small><br>
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main sample.txt<br>
+fffe<br>
+1990 這<br>
+5400 T<br>
+2f66 是<br>
+6500 e<br>
+b50 個<br>
+7300 s<br>
+2c6e 測<br>
+7400 t<br>
+668a 試</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+      </span></td></tr></tbody>
+      
+      </table>
+
+
+      <small><br>有關於UTF-8，則在 <a href="UTF8.html">下一篇</a> 再繼續說明....XD</small><br>
+      <small>
+<br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/UnicodeUTF.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:54 GMT -->
+</html>

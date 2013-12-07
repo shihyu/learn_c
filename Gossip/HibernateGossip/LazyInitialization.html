@@ -1,0 +1,892 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/LazyInitialization.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>延遲初始（Lazy Initialization）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip:&nbsp;延遲初始（Lazy Initialization）</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+有時候您只是想要獲得物件中某個屬性的資料，如果您的物件中包括Set等容器物件，若從資料庫中載入資料時全部載入所有的物件，卻只是為了取得某個屬性，
+顯然的這樣很沒有效率。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+以<a href="Set.html">Set</a>
+&nbsp;中的範例來說，如果您只是想取得物件之後，顯示物件的某些屬性，例如id屬性：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">Session session =
+HibernateUtil.getSessionFactory().openSession();</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;">User user = (User)
+session.load(User.class, new Integer(1));</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;">System.out.println(user.getId());</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;">session.close();</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+在這個例子中，name或email的資訊不必要從資料庫中載入，在Hibernate中支援延遲初始（Lazy
+onitialization），只有在真正需要物件中的屬性資料時，才從資料庫中取得資料，Hibernate預設會使用延遲加載的功能，使用<span style="font-weight: bold;">load()</span>方法載入實體物件時（get()方法不不會使用延遲初始），並不會載入屬性資料，也就是不會一開始就下SQL至資料庫中撈取對應的資料。<br>
+
+
+      <br>
+
+
+      </small><small>可以藉由映射文件中的lazy屬性來設定是否使用延遲初始，例如在映射文件中如下設定：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>User.hbm.xml</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" table="user" <span style="font-weight: bold;">lazy="false"</span>&gt; <br>        ....<br>        &lt;set name="emails" table="email"&gt; <br>            &lt;key column="id"/&gt; <br>            &lt;element column="address"/&gt; <br>        &lt;/set&gt; <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+由於lazy屬性被設定為false，延遲初始的功能被關閉，所以上面的程式會使用以下的SQL來查詢：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">Hibernate: select user0_.id as
+id0_, user0_.name as name0_0_ from user user0_ where user0_.id=?</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;">Hibernate: select
+emails0_.id as id0_, emails0_.address as address0_ from email emails0_
+where emails0_.id=?</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+      </small><small>除了所有的屬性資料之外，屬性中的所有的容器物件之資料也一併被查詢了，即使程式中還不會使用到容器中的物件資訊。</small><small>也可以單獨對集合物件進行設定，例如：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+        <li>User.hbm.xml</li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+      
+      
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt; <br>&lt;!DOCTYPE hibernate-mapping <br> PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" <br> "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt; <br><br>&lt;hibernate-mapping&gt; <br><br>    &lt;class name="onlyfun.caterpillar.User" table="user"<span style="font-weight: bold;"></span>&gt; <br>        ....<br>        &lt;set name="emails" table="email" <span style="font-weight: bold;">lazy="false"</span>&gt; <br>            &lt;key column="id"/&gt; <br>            &lt;element column="address"/&gt; <br>        &lt;/set&gt; <br>    &lt;/class&gt; <br><br>&lt;/hibernate-mapping&gt;</pre>
+
+
+
+
+
+      <small><br>
+
+
+
+
+      <br>
+
+
+
+
+
+在啟用延遲初始的情況下，如果如下查詢資料：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = HibernateUtil.getSessionFactory().openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user.getName());<br>
+
+
+
+
+
+Iterator iterator = user.getEmails().iterator();<br>
+
+
+
+
+
+while(iterator.hasNext()) {<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; System.out.println(iterator.next());<br>
+
+
+
+
+
+}<br style="font-weight: bold;">
+
+
+
+
+
+session.close();</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+在開啟SQL顯示的情況下，會顯示以下的內容：</small><br>
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">Hibernate: select
+user0_.id as id0_, user0_.name as name0_0_ from user user0_ where
+user0_.id=?<br>
+
+
+
+
+
+caterpillar<br>
+
+
+
+
+
+Hibernate: select emails0_.id as id0_, emails0_.address as address0_
+from email emails0_ where emails0_.id=?<br>
+
+
+
+
+
+caterpillar.onlyfun@yahoo.com<br>
+
+
+
+
+
+caterpillar.onlyfun@gmail.com</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+可以看到，只有在需要屬性或查詢容器中物件時，才會向資料庫索取資料。<br>
+
+
+      <br>
+
+
+      </small><small>使用延遲初始功能的好處之一，就是您可以只取用對應的屬性，而Hibernate只會針對相關屬性進行資料庫的SQL查詢，而另一個好處是，在只需要實體物件參考時，可以避免不必要的SQL查詢，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Session session =
+HibernateUtil.getSessionFactory().openSession();<br>
+
+
+Transaction tx = session.beginTransaction();<br>
+
+
+      <br style="font-weight: bold;">
+
+
+      </span></small><small style="font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold;">User user = (User)
+session.load(User.class, new Integer(1));</span></small><br style="font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold;">Room room = new Room();<br>
+
+
+room.setUser(user);</span></small><br style="font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold;">session.save(room);<br>
+
+
+      <br>
+
+
+tx.commit();<br>
+
+
+session.close();</span></small><br>
+
+
+      </div>
+
+
+      <small>
+
+      <br>
+
+
+
+
+
+使用延遲初始時，由於在需要資料時會向資料庫進行查詢，所以session不能關閉，如果關閉會丟出
+LazyInitializationException 例外，例如下面的程式就會丟出例外：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small><span style="font-weight: bold;">Session session =
+HibernateUtil.getSessionFactory().openSession();</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;">User user = (User)
+session.load(User.class, new Integer(1));</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;">System.out.println(user.getName());</span><br>
+
+
+
+
+
+      <span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
+
+
+
+
+
+      <span style="font-weight: bold;">session.close();</span><br>
+
+
+
+
+
+      <span style="font-weight: bold;"></span><br>
+
+
+
+
+
+      <span style="font-weight: bold;"></span><span style="font-weight: bold;">Iterator iterator =
+user.getEmails().iterator();</span><br>
+
+
+
+
+
+      <span style="font-weight: bold;">while(iterator.hasNext())
+{</span><br>
+
+
+
+
+
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;
+System.out.println(iterator.next());</span><br>
+
+
+
+
+
+      <span style="font-weight: bold;">}</span><br style="font-weight: bold;">
+
+
+
+
+
+      <span style="font-weight: bold;"></span></small></div>
+
+
+
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br>
+
+
+
+
+
+如果您使用了延遲初始，而在某些時候仍有需要在session關閉之後取得相關物件，則可以使用Hibernate.initialize()來先行載入
+相關物件，例如： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Session
+session = HibernateUtil.getSessionFactory().openSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">User
+user = (User) session.load(User.class, new Integer(1));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(user.getName());</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hibernate.initialize(user);
+// 先載入容器中的物件</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.close();</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Iterator
+iterator = user.getEmails().iterator();</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">while(iterator.hasNext())
+{</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+System.out.println(iterator.next());</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+即使啟用延遲初始，在Hibernate.initialize()該行，email容器中的物件已經被載入，所以即使關閉session也無所謂了，這
+種情況發生在某個情況下，您啟用了延遲初始，而使用者操作過程中，會在稍後一陣子才用到email容器，您不能浪費session在這段時間的等待上，所
+以您先行載入容器物件，直接關閉session以節省資源。<br>
+
+
+      <br>
+
+
+實際上，Hibernate延遲初始的功能是使用代理物件，Hibernate會在執行時期產生實體物件的子類別，所以實體物件必須有公開的建構子，不得
+有final的方法或為final類別，如果想要從load()之後的物件上取得實體物件的Class物件，則可以使用
+HibernateProxyHelper.getClassWithoutInit</small><small>除了所有的屬性資料之外，屬性中的所有的容器物件之資料也一併被查詢了，即使程式中還不會使用到容器中的物件資訊。</small><small>ializingProxy()方法。<br>
+
+
+      <br>
+
+
+在某些時候，您只是想從一個集合的屬性上得知有多少數量的物件，例如呼叫size()、contains()或isEmpty()方法，預設上呼叫這些方法都會引發資料庫的查詢，您可以設定lazy為extra，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;class name="onlyfun.caterpillar.User" table="t_user"&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; ...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;set name="emails" lazy="extra"...&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; ....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;/set&gt;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/class&gt;</small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+如此呼叫集合物件的size()、contains()或isEmpty()方法，就不會引發資料庫SQL查詢，但如果是呼叫Map或List的containKey()、get()方法，則仍會進行資料庫查詢。<br>
+
+
+      <br>
+
+
+      <br>
+
+
+      </small>
+
+ </td>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/LazyInitialization.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+</html>

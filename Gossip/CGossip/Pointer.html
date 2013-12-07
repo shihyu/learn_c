@@ -1,0 +1,1189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/Pointer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>指標與記憶體位址</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">C&nbsp;Gossip: 指標與記憶體位址</a></h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在 <a href="Variable.html">變
+數</a> 中曾經說過，
+變數（Variable）提供一個有名稱的記憶體儲存空間，一個變數關係至一個資料型態、一個變數本身的值與一個變數的位址值。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+變數資料型態決定了變數所分配到的記憶體大小；變數本身的值是指儲存於記憶體中的某個數值，而您可以透過變數名稱取得這個數值，這個數值又稱為
+rvalue或
+read
+value；而變數的位址值則是指變數所分配到的記憶體之位置，變數本身又稱為lvalue或
+location value。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+如果您想知道變數的記憶體位址為何，您可以使用&amp;運算子，&amp;是「取址運算子」（Address-of
+operator），它可以取出變數的記憶體位址，例如： <br>
+
+      </small>
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    int var = 10; <br><br>    printf("變數 var 的值：%d\n", var);<br>    printf("變數 var 的記憶體位址：%X\n", &amp;var);<br>    <br>    return 0;<br><br>}</pre>
+
+      <small><br>
+
+      </small>
+
+
+
+
+
+
+      <small>
+執行結果： </small><br>
+
+
+
+
+
+      <small> </small><small> </small><small>
+      </small><small> </small><small>
+      </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">變數 var 的值：10<br>
+
+變數 var 的記憶體位址：22FF54</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+這個程式中，您宣告了一個int整數變數var，var指向的記憶體位址是22FF54，這是記憶體位址的16進位表示法，從 22FF54後的4個位元組都是var所配置到的記憶體空間，現在這個空間中儲存值為10。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+直接存取變數即直接對所分配到的記憶體空間作存取，指標（Pointer）則提供了間接性，指標可指向特定的記憶體位址，而不直接操作變數或物件，要宣告
+一個指標，使用以下的語法：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">type
+*ptr;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+其中type是指標的型態，每一個指標都有一個相對應的型態，用以指出所指向的資料或物件之型態有所不同，編譯器根據指標型態來確定特定記憶體位址上的資
+料如何解釋，以及如何進行指標運算（Pointer arithmetic），以下是幾個指標宣告的範例：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*iptr;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">float
+*fptr;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">char
+*cptr;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+您可以使用&amp;運算子取出變數的位址值並指定給指標，例如：</small><br>
+
+      <span class="postbody"></span>
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    int var = 10; <br>    int *ptr = &amp;var ; <br><br>    printf("變數 var 的位址：%X\n", &amp;var);<br>    printf("指標 ptr 指向的位址：%X\n", ptr);<br><br>    return 0;<br><br>}</pre>
+
+      <small>
+
+
+
+執行結果： </small><br>
+
+
+
+
+
+      <small> </small><small> </small><small>
+      </small><small> </small><small>
+      </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">變數 var 的位址：22FF54<br>
+
+指標 ptr 指向的位址：22FF54</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+如以上的程式結果所示，您使用&amp;來取出變數var所指向的記憶體位址，然後將這個位址指定給指標ptr，因此ptr所儲存的值就與
+&amp;var所取出的值相同。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+指標擁有兩種操作特性，一是操作指標所儲存的位址，一是操作指標所指向位址之資料，您可以使用提取
+（Dereference）運算子*來提取指標所指向位址的資料，例如：</small>
+      <br>
+
+      <span class="postbody"></span>
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    int var = 10; <br>    int *ptr = &amp;var;<br><br>    printf("指標 ptr 儲存的值：%X\n", ptr);<br>    printf("取出 ptr 指向的記憶體位置之值：%d\n", *ptr);<br>    <br>    return 0;<br><br>}</pre>
+
+      <span class="postbody"><br>
+
+      </span><small>
+執行結果： </small><br>
+
+
+
+
+
+      <small> </small><small> </small><small>
+      </small><small> </small><small>
+      </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">指標 ptr 儲存的值：22FF54<br>
+
+取出 ptr 指向的記憶體位置之值：10</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+如果已經取得了記憶體位置，當將某個值指定給*prt時，該記憶體位置的值也會跟著改變，相當於告訴程式，將值放到ptr所指向的記憶體位址，例如： <br>
+
+      </small>
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    int var = 10; <br>    int *ptr = &amp;var ; <br><br>    printf("var = %d\n", var);<br>    printf("*ptr = %d\n", *ptr);<br><br>    *ptr = 20; <br><br>    printf("var = %d\n", var);<br>    printf("*ptr = %d\n", *ptr);<br>             <br>    return 0;<br>}</pre>
+
+      <small><br>
+
+      </small><small>
+執行結果： </small><br>
+
+
+
+
+
+      <small> </small><small> </small><small>
+      </small><small> </small><small>
+      </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">var = 10<br>
+
+
+
+
+
+*ptr = 10<br>
+
+
+
+
+
+var = 20<br>
+
+
+
+
+
+*ptr = 20</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small>
+如以上所表示的，當指標ptr所儲存的值與變數var所指向的記憶體位置相同時，當您對*ptr進行指定的動作時，就會將值直接存入該記憶體位置，因此再
+透過變數var所取出的值也就改變了。 <br>
+
+
+
+
+      <br>
+
+
+
+
+
+如果宣告指標但不指定初值，則指標指向的位址是未知的，存取未知位址的記憶體內容是危險的，例如：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*ptr; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">*ptr
+= 10;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>
+
+
+      <br>
+
+
+
+
+
+這個程式片段並未初始指標就指定值給*ptr，所以會造成不可預知的結果（通常是記憶體區段錯誤），最好為指標設定初值，如果指標一開始不指向任何的位址，則可設定初值為0，表示不指向任何位址，例如：<br>
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*iptr = 0;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+在這邊必須注意一個指標宣告常犯的錯誤，在指標宣告時，可以靠在名稱旁邊，也可以靠在關鍵字旁邊，例如： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*ptr1; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int*
+ptr2;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+這兩個宣告方式都是可允許的，一般比較傾向用第一個，因為可以避免以下的錯誤：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int*
+prt1, ptr2;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+這樣的宣告方式，初學者可能以為ptr2也是指標，但事實上並不是，以下的宣告ptr1與ptr2才都是指標：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int
+*ptr1, *ptr2;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+有時候，您只希望儲存記憶體的位址，然後將之與另一個記憶體位址作比較，這時並不需要關心型態的問題，您可以使用void*來宣告指標，例如： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void*
+ptr;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+由於void型態的指標沒有任何的型態資訊，所以只用來持有位址資訊，您不可以使用*運算子對void型態指標提取值，而必須作轉型動作至對應的型態，例
+如</small>：<br>
+
+      
+      <pre>#include &lt;stdio.h&gt;<br><br>int main(void) {<br>    int var = 10; <br>    void *vptr = &amp;var ; <br> <br>    // 下面這句不可行，void型態指標不可取值 <br>    // printf("%d\n", *vptr);<br> <br>    // 轉型為int型態指標並指定給iptr <br>    int *iptr = (int*) vptr;<br>    printf("%d\n", *iptr);<br>    <br>    return 0;<br><br>}</pre>
+
+      <span class="postbody"><br>
+
+      </span><small>
+執行結果： </small><br>
+
+
+
+
+
+      <small> </small><small> </small><small>
+      </small><small> </small><small>
+      </small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">10</span><span style="color: rgb(255, 255, 255);"></span></small></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <small><br>
+
+順便來看一下const宣告的變數，被const宣告的變數一但被指定值，就不能再改變變數的值，</small><small>
+
+
+
+但是以下這樣是可以改變變數值的：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">const int var = 10;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">int *vptr = &amp;var;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">*vptr = 20;<br>
+
+printf("%d\n", var);<br>
+
+      </small></div>
+
+      <small><br>
+
+以上的程式會顯示20，如果您不想要該記憶體位置的值被改變，則可以用const宣告指標，例如：</small><small>
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">const
+int var = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">const
+int *vptr =
+&amp;var;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small>
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">*vptr
+= 20; // error,
+assignment of read-only location </span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+另外還有指標常數，也就是您一旦指定給指標值，就不能指定新的記憶體位址值給它，例如：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">int x = 10;<br>
+
+int y = 20;<br>
+
+int* const vptr = &amp;x;<br>
+
+vptr = &amp;y;&nbsp; // error,&nbsp; assignment of read-only variable `vptr'</span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><span style="font-style: italic;"><span style="font-weight: bold;"></span></span></small><br>
+
+      <span class="postbody"><br>
+
+      <br>
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+       <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CGossip/Pointer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/SimpleTable.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:18 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>簡單的表格</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">JSF Gossip:&nbsp;簡單的表格 </a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>很多資料經常使用表格來表現，JSF提供&lt;h:dataTable&gt;標籤讓您得以列舉資料並使用表格方式來呈現，舉個實際的例子來看，假設您撰寫了以下：</small><br>
+
+
+      
+      <ul>
+
+        <li>UserBean.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class UserBean {<br>    private String name;<br>    private String password;<br><br>    public UserBean() {<br>    }<br>    <br>    public UserBean(String name, String password) {<br>        this.name = name;<br>        this.password = password;<br>    }<br>    <br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br><br>    public String getPassword() {<br>        return password;<br>    }<br><br>    public void setPassword(String password) {<br>        this.password = password;<br>    }<br>}</pre>
+
+
+
+
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li> TableBean.java</li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br><br>public class TableBean {<br>    private List userList;<br>    <br>    public List getUserList() {<br>        if(userList == null) {<br>            userList = new ArrayList();<br>            userList.add(<br>                new UserBean("caterpillar", "123456"));<br>            userList.add(<br>                new UserBean("momor", "654321"));<br>            userList.add(<br>                new UserBean("becky", "7890"));<br>        }<br>        <br>        return userList;<br>    }<br>}</pre>
+
+
+      <br>
+
+      <small>
+在TableBean中，我們假設getUserList()方法實際上是從資料庫中查詢出UserBean的內容，之後傳回List物件，若我們的 faces-config.xml如下：</small><br>
+
+
+      
+      <ul>
+
+        <li>faces-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE faces-config PUBLIC "-//Sun Microsystems, <br>   Inc.//DTD JavaServer Faces Config 1.0//EN"<br>   "http://java.sun.com/dtd/web-facesconfig_1_0.dtd"&gt;<br><br>&lt;faces-config&gt;<br>    &lt;managed-bean&gt;<br>        &lt;managed-bean-name&gt;tableBean&lt;/managed-bean-name&gt;<br>        &lt;managed-bean-class&gt;<br>            onlyfun.caterpillar.TableBean<br>        &lt;/managed-bean-class&gt;<br>        &lt;managed-bean-scope&gt;request&lt;/managed-bean-scope&gt;<br>    &lt;/managed-bean&gt;<br>    &lt;managed-bean&gt;<br>        &lt;managed-bean-name&gt;userBean&lt;/managed-bean-name&gt;<br>        &lt;managed-bean-class&gt;<br>            onlyfun.caterpillar.UserBean<br>        &lt;/managed-bean-class&gt;<br>        &lt;managed-bean-scope&gt;request&lt;/managed-bean-scope&gt;<br>    &lt;/managed-bean&gt;<br>&lt;/faces-config&gt;</pre>
+
+
+      <br>
+
+      <small>
+我們可以如下使用&lt;h:dataTable&gt;來產生表格資料：</small><br>
+
+
+      
+      <ul>
+
+        <li>index.jsp</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %&gt;<br>&lt;%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %&gt;<br>&lt;html&gt;<br>&lt;body&gt;<br>&lt;f:view&gt;<br>    &lt;h:dataTable value="#{tableBean.userList}" var="user"&gt;<br>        &lt;h:column&gt;<br>            &lt;h:outputText value="#{user.name}"/&gt;<br>        &lt;/h:column&gt;<br>        &lt;h:column&gt;<br>            &lt;h:outputText value="#{user.password}"/&gt;<br>        &lt;/h:column&gt;<br>    &lt;/h:dataTable&gt;<br>&lt;/f:view&gt;<br>&lt;/body&gt;	<br>&lt;/html&gt;</pre>
+
+
+      <br>
+
+      <small>
+&lt;h:dataTable&gt;的value值綁定tableBean的userList方法，它會一個一個取出
+List中的資料並設定給var設定的user，之後在每一個column中我們可以顯示所列舉出的user.name與user.password，程
+式的結果會如下所示：<br>
+
+      <br>
+
+      <img style="width: 123px; height: 72px;" alt="" src="images/simpleTable-1.jpg"><br>
+
+      <br>
+
+
+所產生的HTML表格標籤如下：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;table&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;tbody&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;tr&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;td&gt;caterpillar&lt;/td&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;td&gt;123456&lt;/td&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/tr&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;tr&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;td&gt;momor&lt;/td&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;td&gt;654321&lt;/td&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/tr&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;tr&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;td&gt;becky&lt;/td&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;td&gt;7890&lt;/td&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/tr&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/tbody&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&lt;/table&gt;</span><br>
+
+
+      </small></div>
+
+
+      <small><br>
+
+
+
+&lt;h:dataTable&gt;的value值綁定的對象可以是以下的型態：<br>
+
+      </small>
+
+      
+      <ul>
+
+        <li><small> 陣列
+  </small></li>
+
+        <li><small> java.util.List的實例
+  </small></li>
+
+        <li><small> java.sql.ResultSet的實例
+  </small></li>
+
+        <li><small> javax.servlet.jsp.jstl.sql.Result的實例
+  </small></li>
+
+        <li><small> javax.faces.model.DataModel的實例
+  </small></li>
+
+      
+      </ul>
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/SimpleTable.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:18 GMT -->
+</html>

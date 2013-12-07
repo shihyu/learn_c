@@ -1,0 +1,408 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ImmutableString.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>不可變的（immutable）字串</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 不可變的（immutable）字串</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>一個字串物件一旦被配置，它的內容就是固定<span style="font-weight: bold;">不可變的（immutable）</span>，例如下面這個宣告：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str = "caterpillar"; </span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+這個宣告會配置一個長度為11的字串物件，您無法改變它的內容；別以為下面這個宣告就是改變一個字串物件的內容：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str =&nbsp;"just"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">str = "justin"; </span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+事實上，在這個程式片段中，會有兩個字串物件，一個是"just"，長度為4，一個是"justin"，長度為6，它們兩個是不同的字串物件，您並不是在 "just"字串後加上"in"字串，而是讓str名稱參考至新的字串物件，如下所示：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">原來參考至此</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">str --------&gt; "just"</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">重新指定後</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">str ---------&gt; "justin"</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">參考新的字串物件</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+在Java中，使用 = 將一個字串物件指定給一個名稱，其意義為改變名稱的參考物件，原來的字串物件若沒有其它名稱來參考它，就會在適當的時機被Java的<span style="font-weight: bold;">「垃圾回收」（Garbage collection）</span>機制回收，在Java中，程式設計人員通常不用關心無用物件的資源釋放問題，Java會檢查物件是否不再被參考，如果沒有任何名稱參考的物件將會被回收。<br>
+
+      <br>
+
+
+
+如果您在程式中使用下面的方式來宣告，則實際上是指向同一個字串物件：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str1 = "flyweight";</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str2 = "flyweight"; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(str1 == str2);</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+程式的執行結果會顯示true，在Java中，會維護一個<span style="font-weight: bold;">String Pool</span>，對於一些可以共享的字串物件，會先在String Pool中查找是否存在相同的String內容（字元相同），如果有就直接傳回，而不是直接創造一個新的String物件，以減少記憶體的耗用。<br>
+
+      <br>
+
+
+
+再來個一看例子，String的<span style="font-weight: bold;">intern()</span>方法，來看看它的API說明的節錄：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Returns a canonical representation for the string object.</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">A pool of strings, initially empty, is maintained privately by the class String.</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">When the intern
+method is invoked, if the pool already contains a string equal to this
+String object as determined by the equals(Object) method, then the
+string from the pool is returned. Otherwise, this String object is
+added to the pool and a reference to this String object is returned.</span><br>
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+
+這段話其實說明了 <a class="wikilink" href="../DesignPattern/FlyweightPattern.htm">Flyweight
+模式</a> 的運作方式，來用個實例來說明會更清楚：</small><br>
+
+
+
+
+      
+      <ul>
+
+        <li> StringIntern.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>public class StringIntern { <br>    public static void main(String[] args) { <br>        String str1 = "fly"; <br>        String str2 = "weight"; <br>        String str3 = "flyweight"; <br>        String str4; <br><br>        str4 = str1 + str2; <br>        System.out.println(str3 == str4); <br><br>        str4 = (str1 + str2).intern(); <br>        System.out.println(str3 == str4); <br>    } <br>} <br></pre>
+
+
+
+
+      
+      <p><br>
+
+      <small>
+
+在程式中第一次比較str3與str4物件是否為同一物件時，您知道結果會是false，而intern()方法會先檢查
+String
+Pool中是否存在字元部份相同的字串物件，如果有的話就傳回，由於程式中之前已經有"flyweight"字串物件，intern()在String
+Pool中發現了它，所以直接傳回，這時再進行比較，str3與str4所指向的其實是同一物件，所以結果會是true。<br>
+
+      </small>
+
+
+      </p>
+
+      <small>
+
+
+注意到了嗎？== 運算在Java中被用來比較兩個名稱是否參考至同一物件，所以<span style="font-weight: bold;">不可以用==來比較兩個字串的內容是否相同</span>，例如：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str1 = new String("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str2 = new String("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(str1 == str2);</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+&nbsp;<br>
+
+
+
+上面會顯示false的結果，因為str1與str2是分別參考至不同的字串物件，如果<span style="font-weight: bold;">要比較兩個（字串）物件是否相同，您要使用equals()方法</span>，例如：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str1 = new String("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">String str2 = new String("caterpillar");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(str1.equals(str2));</span><span style="font-weight: bold; font-style: italic;"></span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+這樣子結果才會顯示所想要的比較結果：true。</small><br>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ImmutableString.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

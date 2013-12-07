@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Encoding2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <title>亂碼 1／2（下）常見字元編碼處理方式</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 亂碼 1／2（下）常見字元編碼處理方式<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=74545">亂碼 1／2（下）常見字元編碼處理方式</a><br>
+      <br>
+      如果對上一篇文章談到的基礎沒有認識，又對程式處理字元編碼的方式不甚瞭解，別說程式執行出現亂碼，有時連編譯或直譯都無法成功，更別說多個程式彼此合作時出現亂碼會有能力解決。<br>
+      <br>
+      <dl>
+        <dt>你的原始碼檔案編碼為何？</dt>
+      </dl>
+      <br>
+      一個字元可以有多種編碼方式，編譯器或直譯器必須知道程式碼中的字元編碼為何，才能正確地解讀程式，得知編碼的方式可能是使用預設字元集、程式引數、環境或全域變數設定、在原始碼中使用魔法註解（Magic comments）等。<br>
+      <br>
+      有些編譯器會使用作業系統預設編碼，讓開發者以為它能會聰明地分辨原始碼檔案編碼為何，例如Java。如果在正體中文Windows中用記事本編輯純文字檔案，預設使用MS950編碼；在Ubuntu使用vi編輯純文字，預設使用UTF-8；Java原始碼若含有中文字串，編譯器在Windows中預設使用MS950解讀原始碼，在Ubuntu中預設使用UTF-8。如果在Windows因為中文字串包括了「犇」，記事本要求轉存為「Unicode」，而存檔時選擇「Unicode big endian」編碼，編譯時沒有指定-encoding告知編譯器檔案編碼為UTF-16，就會發生編譯錯誤。<br>
+      <br>
+      有些編譯器或直譯器預設原始碼會使用特定字元集，通常是ASCII字元集，如果使用了範圍外的字元，必須明確告知編譯器或直譯器檔案編碼為何。例如原始碼檔案撰寫中文而編碼為UTF-8時，Ruby 1.8必須指定<span
+        class="courier">$KCODE</span>為<span class="courier">'u'</span>或在執行直譯器時指定<span
+        class="courier">-Ku</span>引數，Ruby 1.9必須在檔案開頭撰寫<span class="courier"># encoding: UTF-8</span>；Python 2.x必須在檔案開頭撰寫<span
+        class="courier"># -*- coding: UTF-8 -*-</span>，Python 3.x則預設使用UTF-8字元集，原始碼檔案撰寫時必須使用UTF-8編碼，也就不用在檔案開頭撰寫魔法註解。<br>
+      <br>
+      網頁應用程式經常處理亂碼問題，最常面對的對象之一就是JavaScript如何處理編碼問題。現代瀏覽器會假設載入的.js編碼與HTML網頁編碼相同。如果.js檔案與網頁編碼不同，例如網頁編碼為Big5而.js檔案為UTF-8時，.js檔案中ASCII範圍以外字元就會有亂碼問題。如果.js檔案與網頁的編碼不同，可以在<span
+        class="courier">&lt;script&gt;</span>上使用<span class="courier">charset</span>指定引入的.js編碼為何，例如<span
+        class="courier">&lt;script charset="UTF-8" src="xxx.js"&gt;&lt;/script&gt;</span>，瀏覽器才會知道要以UTF-8解讀.js檔案。<br>
+      <br>
+      如果將HTML檔案當作原始碼，那麼瀏覽器如何知道檔案是何種編碼呢？可以傳送HTML前使用Content-Type標頭指定，如果是靜態網頁，可在<span
+        class="courier">&lt;head&gt;</span>中使用<span class="courier">&lt;meta&gt;</span>指定，像是<span
+        class="courier">&lt;meta http-equiv="Content-Type" content="text/html; charset=Big5"&gt;</span>。<br>
+      <br>
+      <dl>
+        <dt>程式執行時採通用字元集或字集獨立處理？</dt>
+      </dl>
+      <br>
+      瞭解原始碼檔案編碼並正確告知編譯器與直譯器只是避免亂碼的第一步，接下來得瞭解程式運行時採用通用字元集（Universal Character Set）或字元集獨立（Character Set Independent）處理。<br>
+      <br>
+      以Java為例，其採用通用字元集處理方式，執行時期字元的內部編碼（Internal Encoding）固定採用UTF-16 Big Endian，每個字元實際上都是兩個位元組，字元不會有其他編碼資訊；由於外部字元資料的編碼，可能與內部編碼不一致，採通用字元集的程式，都會提供編碼轉換方法，例如Java的<span
+        class="courier">String</span>提供<span class="courier">getBytes()</span>方法，可將代表字元UTF-16編碼的位元組，轉換為指定編碼的位元組，使用<span
+        class="courier">Reader</span>、<span class="courier">Writer</span>等類別處理字元輸入輸出時，也可以指定外部編碼（External Encoding）資訊，以正確地將字元的位元組讀入並轉換為UTF-16，或將UTF-16正確地轉換為目的地編碼的位元組。<br>
+      <br>
+      為了簡化通用字元集編碼轉換問題，這類程式在執行時期通常可指定預設外部編碼，例如Java執行時可指定系統屬性file.encoding，作為<span
+        class="courier">String</span>的<span class="courier">getBytes()</span>方法或<span
+        class="courier">FileReader</span>、<span class="courier">FileWriter</span>等API預設的外部編碼轉換依據。<br>
+      <br>
+      採字元集獨立方式處理沒有外部與內部編碼轉換問題，字元集獨立方式下，字元在程式執行時只是原始的位元組集合。例如Ruby 1.8採字元集獨立方式，原始碼若使用UTF-8撰寫的中文字元佔了三個位元組，那在程式運行時也是佔三個位元組，原始碼若使用Big5撰寫中文字元，在程式運行時就是佔兩個位元組。雖然沒有外部與內部編碼轉換問題，但因為實際上字元只是原始位元組集合，要完成如計算字元長度或使用規則表示式（Regular expression）處理時就比較麻煩。<br>
+      <br>
+      Ruby 1.9也是採字元集獨立方式，不過允許指定預設內部編碼與外部編碼，在讀取或寫入外部資料時若沒有額外指定編碼，會使用預設內部編碼與外部編碼作為轉換依據，不過字串也允許擁有個別編碼資訊，而不一定要採用內部編碼。雖然採字元集獨立方式，不過Ruby 1.9加強了編碼轉換API，像是透過字串取得長度時，傳回的是字元長度而不是位元組長度，編碼轉換也可以透過<span
+        class="courier">encode()</span>等方法來完成。<br>
+      <br>
+      <dl>
+        <dt>Ajax代表更多編碼系統間的轉換</dt>
+      </dl>
+      <br>
+      Ajax代表多個系統之間的互動（瀏覽器跟JavaScript環境，JavaScript跟伺服器），這表示更多外部編碼與內部編碼間的轉換，系統間其中之一沒有搞清楚編碼，亂碼問題就會出現。<br>
+      <br>
+      舉例來說，開發者可從非同步物件的<span class="courier">responseText</span>取得伺服端回應文字，伺服端回應時若沒有使用標頭指明編碼（例如Content-Type: text/html; charset=Big5之類），預設會使用UTF-8解讀傳回的文字並設定給<span
+        class="courier">responseText</span>。<br>
+      <br>
+      在前一篇文章中談過URL編碼，如果透過表單發送請求，瀏覽器會自動進行URL編碼並將空白字元編碼為+。如果透過Ajax以非同步物件發送請求，有的瀏覽器會進行URL編碼，有的瀏覽器不會，最保險方式還是自行處理URL編碼，再透過非同步物件發送請求。JavaScript可以使用<span
+        class="courier">encodeURIComponent()</span>作字元編碼，結果大致上是編碼為%hexhex，不過空白字元是編碼為%20，而不是HTTP規範的+，所以程式中要再將%20取代為+，以符合HTTP規範。<br>
+      <br>
+      JavaScript內部使用Unicode處理字元，實作上採用UTF-8，只要可以在瀏覽器正確顯示的字元，使用JavaScript取得的就會是正確的UTF-8字元，傳入<span
+        class="courier">encodeURIComponent()</span>的字串是以UTF-8編碼，若將<span
+        class="courier">encodeURIComponent()</span>後的URL編碼字串透過非同步物件發送，伺服端必須以UTF-8來處理接收到的URL編碼。<br>
+      <br>
+      如果非同步物件的<span class="courier">responseText</span>收到了<span class="courier">'&amp;#29319'</span>，那要如何設定給文字輸入欄位呢？<span
+        class="courier">document.getElementById('input1').value = '&amp;#29319'</span>行不通，因為會在瀏覽器上直接看到&amp;#29319，而不是「犇」，這是因為處理HTML實體編號的是瀏覽器，不是JavaScript。不過，開發者可以使用<span
+        class="courier">innerHTML</span>作弊（這個特性在HTML5終於標準化），指定給<span class="courier">innerHTML</span>的字串會被瀏覽器當作HTML剖析，實體編號也就會正確地被解釋為「犇」，所以投機方式之一，就是建立一個隱藏的<span
+        class="courier">&lt;span&gt;</span>，將<span class="courier">'&amp;#29319'</span>設給它的<span
+        class="courier">innerHTML</span>，然後再取得它的<span class="courier">innerHTML</span>。<br>
+      <br>
+      <dl>
+        <dt>亂碼出在哪個環節？</dt>
+      </dl>
+      <br>
+      有些開發者會有像是「系統全面採用UTF-8不就可以解決問題了？」的論調，問到什麼是UTF-8或為何要採用UTF-8則無從回答，「全面採用」這四個字也有些模糊，全面是指哪些程式？如何採用？開發者如果對系統中每個環節編碼沒有基本認識，如何得知全面採用要設定哪些地方？或某些選項設定後影響的對象？例如Rails 3.1預設採用UTF-8，那它當中哪些對象採用了UTF-8？不是說預設為UTF-8嗎？又為什麼在.rb檔案寫個中文就爆炸了？<br>
+      <br>
+      有時亂碼出現未必是整個系統，而是某個環節，此時應逐一確認哪個環節前是正確字元，哪個環節後開始發生亂碼。例如看到資料庫撈出的資料在主控台（Console）出現亂碼，會是在哪個環節出錯？瀏覽器送出的請求參數正確嗎？伺服端接收請求參數時正確嗎？將資料儲存至資料庫前正確嗎？或是資料庫編碼為UTF-8，而主控台只能顯示Big5（這感覺就像是鍵盤沒反應，只是忘了接上插頭一樣）？某天在資料庫中發現的&amp;#29319真的是亂碼嗎？還是會想到表單網頁其實是Big5編碼呢？<br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Encoding2.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

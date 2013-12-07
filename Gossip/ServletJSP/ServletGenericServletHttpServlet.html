@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ServletGenericServletHttpServlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:11 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Servlet、GenericServlet、HttpServlet</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: Servlet、GenericServlet、HttpServlet<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>對於Web容器來說，所有Servlet都必須有的行為，規範在<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Servlet</span>介面中：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package javax.servlet;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.io.IOException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public interface Servlet {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void init(ServletConfig config) throws ServletException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public ServletConfig getServletConfig();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void service(ServletRequest req, ServletResponse res) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+throws ServletException, IOException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public String getServletInfo();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void destroy();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+      </div>
+      <small><br>
+當一個實作<span style="font-family: Courier New,Courier,monospace;">Servlet</span>介面的類別被容器載入之後，容器會建立該類別的實例，根據Servlet設定資訊（定義在標註或web.xml）建立實作<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">ServletConfig</span>介面的實例（之後再介紹<span style="font-family: Courier New,Courier,monospace;">ServletConfig</span>介面），呼叫Servlet的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">init()</span>方法並傳入<span style="font-family: Courier New,Courier,monospace;">ServletConfig</span>實例完成初始化Servlet的初始化。<br>
+      <br>
+在完成Servlet初始化後，如果有請求將由某個Servlet處理，則容器會呼叫該Servlet的<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">service()</span>方法，傳入<span style="font-weight: bold;">ServletRequest</span>、<span style="font-weight: bold;">ServletResponse</span>實例，注意這兩個介面並非以Http名稱作開頭，</span></small><small><span style="font-family: Courier New,Courier,monospace;">ServletRequest、ServletResponse的套件亦是<span style="font-weight: bold;">javax.servlet</span></span>，這是由於最初設計Servlet時，並不限定它只能用在HTTP上（雖然最後Servlet還是只用在HTTP上）。</small><br>
+      <br>
+      <small>當一個Servlet將不被容器管理前，容器會呼叫它的<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">destroy()</span>方法，以執行一些資源回收的動作。<br>
+      <br>
+實作Servlet介面的類別是<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">GenericServlet</span>類別，這是一個抽象類別：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">package javax.servlet;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.io.IOException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.util.Enumeration;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public abstract class GenericServlet </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; <span style="color: red;">implements Servlet</span>, ServletConfig, java.io.Serializable</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; private transient ServletConfig config;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public GenericServlet() {</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void destroy() {</span></small><small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small><small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public String getInitParameter(String name) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return getServletConfig().getInitParameter(name);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public Enumeration&lt;String&gt; getInitParameterNames() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; return getServletConfig().getInitParameterNames();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; </span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;  </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public ServletConfig getServletConfig() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; return config;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public ServletContext getServletContext() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; return getServletConfig().getServletContext();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public String getServletInfo() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return "";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void init(ServletConfig config) throws ServletException {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; this.config = config;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.init();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void init() throws ServletException {</span></small><small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void log(String msg) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; getServletContext().log(getServletName() + ": "+ msg);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public void log(String message, Throwable t) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; getServletContext().log(getServletName() + ": " + message, t);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public abstract void service(ServletRequest req, ServletResponse res)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: red;">
+      <small style="color: red;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;&nbsp; throws ServletException, IOException;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; public String getServletName() {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return config.getServletName();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+      </div>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">GenericServlet</span>實作了<span style="font-family: Courier New,Courier,monospace;">Servlet</span>介面，其中接受<span style="font-family: Courier New,Courier,monospace;">ServletConfig的init()方法，會將傳入的ServletConfig實例設定給類別成員config，之後呼叫無參數的init()方法</span>，所以<span style="font-weight: bold;">若你要定義Servlet的初始化，不建議直接重新定義接受</span><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServletConfig的init()方法，而是重新定義無參數的init()方法</span>。</span></small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">GenericServlet對Servlet介面的service()方法沒有實作，僅標示為<span style="font-weight: bold;">abstract</span>，service()方法的實作由子類別<span style="font-weight: bold;">HttpServlet</span>來完成：<br></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+package javax.servlet.http;</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+略...</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+public abstract class HttpServlet <span style="color: red;">extends GenericServlet</span> {</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp; public HttpServlet() {}</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; 略...</small><br style="font-weight: bold;">
+      <br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;<span style="color: red;"> @Override</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp; public void service(ServletRequest req, ServletResponse res)</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException {</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+      </small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HttpServletRequest&nbsp; request;</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HttpServletResponse response;</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try {</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; request = (HttpServletRequest) req;</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; response = (HttpServletResponse) res;</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } catch (ClassCastException e) {</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throw new ServletException("non-HTTP request or response");</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; service(request, response);</small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp; <span style="color: red;">protected void service(HttpServletRequest req, HttpServletResponse resp)</span></small><br style="font-weight: bold; color: red;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throws ServletException, IOException {</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String method = req.getMethod();</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (method.equals(METHOD_GET)) {</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; long lastModified = getLastModified(req);</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (lastModified == -1) {</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; doGet(req, resp);</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 略...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  </small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+}</small><br>
+      </div>
+      <small style="font-family: Courier New,Courier,monospace;">
+      </small><br>
+      <small style="font-family: Courier New,Courier,monospace;">HttpServlet是基於</small><small>HTTP</small><small style="font-family: Courier New,Courier,monospace;">服務的一個類別，注意其套件是<span style="font-weight: bold;">javax.servlet.http</span>，它實作了GenericServlet未實作的service()方法，如果是在</small><small>Web</small><small style="font-family: Courier New,Courier,monospace;">容器，實作上傳入的請求、回應物件是實作<span style="font-weight: bold;">HttpServletRequest</span>、<span style="font-weight: bold;">HttpServletResponse</span>介面，它們分別是ServletRequest、ServletResponse的子介面，增加了一些</small><small>HTTP</small><small style="font-family: Courier New,Courier,monospace;">相關操作的行為，HttpServletRequest、HttpServletResponse的套件亦歸類在<span style="font-weight: bold;">javax.servlet.http</span>。</small><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">HttpServlet
+實作了GenericServlet未實作的service()方法，將傳入的ServletRequest、ServletResponse轉換為
+HttpServletRequest、HttpServletResponse，並呼叫自己定義的、接受HttpServletRequest、
+HttpServletResponse作為參數的service()方法，在這個service()方法中，根據</small><small>HTTP</small><small style="font-family: Courier New,Courier,monospace;">請求方式，決定該呼叫doGet()、doPost()等方法。你可以參考 </small><small><a href="DoGetDoPost.html">doGet()、doPost()...</a> </small><small style="font-family: Courier New,Courier,monospace;">的內容。 </small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ServletGenericServletHttpServlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:11 GMT -->
+</html>

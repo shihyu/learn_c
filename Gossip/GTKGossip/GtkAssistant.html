@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkAssistant.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:16 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>GtkAssistant</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkAssistant</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在應用程式安裝或是使用者註冊、設定時，可以提供使用者「精靈」（Wizard）進行一些選項設定與資訊填寫，在Step by Step的過程中，提示使用者完成所有必要的選項設定或資訊填寫，精靈可以使用GtkAssistant類別來提供</small><small>這個功能。<br>
+
+
+
+      <br>
+
+      </small><small>GtkAssistant</small><small>中每一步的畫面，要參考至一個GtkWidget，所以您</small><small>可
+以事先設計好一個GtkWidget，當中進行元件置放、設定版面管理、設定圖片、標題等，接著使用gtk_assistant_append_page
+()附加為GtkAssistant的一個頁面，接著要使用gtk_assistant_set_page_type()設定好頁面類型：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>GTK_ASSISTANT_PAGE_CONTENT：一般內容頁面</small></li>
+
+        <li><small>GTK_ASSISTANT_PAGE_INTRO：簡介頁面，通常是精靈的開始</small></li>
+
+        <li><small>GTK_ASSISTANT_PAGE_CONFIRM：確認頁面，通常是精靈的結束</small></li>
+
+        <li><small>GTK_ASSISTANT_PAGE_SUMMARY：顯示使用者的變更資訊</small></li>
+
+        <li><small>GTK_ASSISTANT_PAGE_PROGRESS：進度頁面，通常是精靈中的某個步驟</small></li>
+
+      
+      </ul>
+
+      <small><br>
+
+每個頁面預設的「下一步」（例如GTK_ASSISTANT_PAGE_INTRO或GTK_ASSISTANT_PAGE_PROGRESS等）或「套
+用」（例如GTK_ASSISTANT_PAGE_CONFIRM）預設是無法作用的，您要使用
+gtk_assistant_set_page_complete()並設定complete參數為TRUE，「下一步」或「套用」按鈕才會有作用。<br>
+
+      <br>
+
+
+
+      下面這個程式是個簡單的示範，程式中將用GtkAssistant建立精靈：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>gtkassistant_demo.c</li>
+
+      
+      </ul>
+
+      <small>
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">GtkWidget* gtk_assistant_page_new(GtkWidget *assistant, </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                  GtkWidget *widget, </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                  gchar *title,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                  gchar *image,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                  GtkAssistantPageType type) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_append_page(GTK_ASSISTANT(assistant), widget);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_set_page_title(GTK_ASSISTANT(assistant), widget, title);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_set_page_side_image(GTK_ASSISTANT(assistant), </span><br style="font-weight: bold;"><span style="font-weight: bold;">             widget, gdk_pixbuf_new_from_file(image, NULL));</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_set_page_type(GTK_ASSISTANT(assistant), widget, type);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_set_page_complete(GTK_ASSISTANT(assistant), widget, TRUE);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    return assistant;</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br style="font-weight: bold;"><br style="font-weight: bold;">int main(int argc, char *argv[]) {<br><span style="font-weight: bold;">    GtkWidget *assistant;</span><br>    GtkWidget *label;<br><br>    gtk_init (&amp;argc, &amp;argv);<br><br><span style="font-weight: bold;">    assistant = gtk_assistant_new();</span><br>    gtk_window_set_title(GTK_WINDOW(assistant), "GtkAssistant");<br>    gtk_window_set_default_size(GTK_WINDOW(assistant), 300, 180);<br><br><span style="font-weight: bold;">    gtk_assistant_page_new(assistant, gtk_label_new("簡介"), </span><br style="font-weight: bold;"><span style="font-weight: bold;">         "精靈開始", "caterpillar.jpg", GTK_ASSISTANT_PAGE_INTRO);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_page_new(assistant, gtk_label_new("說明內容或元件"), </span><br style="font-weight: bold;"><span style="font-weight: bold;">         "精靈第二頁", "caterpillar.jpg", GTK_ASSISTANT_PAGE_PROGRESS);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_page_new(assistant, gtk_label_new("說明內容或元件"), </span><br style="font-weight: bold;"><span style="font-weight: bold;">         "精靈第三頁", "caterpillar.jpg", GTK_ASSISTANT_PAGE_PROGRESS);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_assistant_page_new(assistant, gtk_label_new("說明內容或元件"), </span><br style="font-weight: bold;"><span style="font-weight: bold;">         "精靈結束", "caterpillar.jpg", GTK_ASSISTANT_PAGE_CONFIRM);</span><br style="font-weight: bold;">                                       <br><span style="font-weight: bold;">    g_signal_connect(GTK_OBJECT(assistant), "cancel",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     G_CALLBACK(gtk_main_quit), NULL);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    </span><br style="font-weight: bold;">    gtk_widget_show_all(assistant);<br>    <br>    gtk_main(); <br><br>    return 0;<br>}</pre>
+
+      <br>
+
+
+
+      <span class="postbody"><small>一個執行的結果如下所示：</small><br>
+
+      <br>
+
+      <img style="width: 353px; height: 232px;" alt="" src="images/GtkAssistant-1.jpg"><br>
+
+      <br>
+
+      <br>
+
+
+
+      </span> </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+      <br>
+
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+      </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<span class="postbody"><br>
+
+
+
+<br>
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkAssistant.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:20 GMT -->
+</html>

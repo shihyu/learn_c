@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/RMI.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:15 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>RMI</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: RMI</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>RMI
+（Remote Method Invocation）是從JDK
+1.1開始就出現的API功能，它讓客戶端在使用遠端物件所提供的服務時，就如何使用本地物件一樣，然而RMI在使用時必須一連串繁複的手續，像是服務介
+面在定義時必須繼承java.rmi.Remote介面、服務Server在實作時必須繼承java.rmi.UnicastRemoteObject類
+別、必須使用rmic指令產生stub與skeleton等，設定上手續繁雜。<br>
+
+      <br>
+
+您可以在Spring中透過org.springframework.remoting.rmi.RmiServiceExporter來簡化使用RMI
+的手續，來實際看看例子，了解Spring在RMI上的使用與簡化，首先來看一下RMI伺服端的撰寫，首先定義一個服務物件的介面：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>ISomeService.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public interface ISomeService { <br>    public String doSomeService(String some);<br>    public int doOtherService(int other);<br>} </pre>
+
+      <small><br>
+
+服務物件的介面不用繼承java.rmi.Remote介面，而在實作ISomeService時也不用繼承java.rmi.UnicastRemoteObject類別，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>SomeService.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class SomeServiceImpl implements ISomeService {<br>    public String doSomeService(String some) {<br>        return some + " is processed";<br>    } <br>    <br>    public int doOtherService(int other) {<br>        return ++other;<br>    }<br>} </pre>
+
+      <small><br>
+
+這個實作只是個簡單的示範，兩個方法都只是傳回一個已經修改過的值，接下來您只要在Bean定義檔中定義，讓Spring管理、生成Bean實例，如此即可註冊、啟動RMI服務，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>rmi-server.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt; <br>    &lt;bean id="someService" <br>          class="onlyfun.caterpillar.SomeServiceImpl"/&gt;<br><br>    &lt;bean id="serviceExporter" <br>          class="org.springframework.remoting.<br>                   &rarr; rmi.RmiServiceExporter"&gt;<br>        &lt;property name="service"&gt;<br>            &lt;ref bean="someService"/&gt;<br>        &lt;/property&gt;<br>        &lt;property name="serviceName"&gt;<br>            &lt;value&gt;SomeService&lt;/value&gt;<br>        &lt;/property&gt;<br>        &lt;property name="serviceInterface"&gt;<br>            &lt;value&gt;onlyfun.caterpillar.ISomeService&lt;/value&gt;<br>        &lt;/property&gt;        <br>    &lt;/bean&gt;<br>    <br>&lt;/beans&gt;</pre>
+
+      <small><br>
+
+很簡單，只要告訴org.springframework.remoting.rmi.RmiServiceExporter服務物件、名稱（注意在
+"serviceName"屬性上設定為"SomeService"）與要代理的介面，之後Spring讀取完定義檔並生成Bean實例後，RMI服務就
+會啟動，來撰寫一個簡單的RMIServer類別，以啟動RMI服務：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>RMIServer.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.BufferedReader;<br>import java.io.IOException;<br>import java.io.InputStreamReader;<br>import org.springframework.context.<br>       support.FileSystemXmlApplicationContext;<br><br>public class RMIServer {<br>    public static void main(String[] args) <br>                           throws IOException {<br><br>        new FileSystemXmlApplicationContext("rmi-server.xml");<br>        <br>        System.out.println("啟動 RMI Server..");<br>        System.out.println("請輸入 exit 關閉 Server: ");<br>        <br>        BufferedReader reader = <br>            new BufferedReader(<br>                    new InputStreamReader(System.in));<br>        <br>        while(true) {<br>            if(reader.readLine().equals("exit")) {<br>                System.exit(0);<br>            }<br>        }<br>        <br>    }<br>} </pre>
+
+      <small><br>
+
+在運行上面的程式之後，RMI服務就會啟動，Spring會自動使用另一個執行緒來執行RMI服務，所以您不用關心執行緒的處理問題，您可以輸入
+"exit"直接離開程式，接著來看一下，如何實作一個RMI客戶端以向RMI伺服器要求服務，首先要記得的是，客戶端是依賴於抽象的介面，也就是先前的
+ISomeService介面之.class檔也必須在客戶端有一份。<br>
+
+      <br>
+
+在客戶端需要RMI服務時，只要透過org.springframework.remoting.rmi.RmiProxyFactoryBean，並告
+知服務的URL（對應至先前設定的"SomeService"名稱）、代理的介面即可，在撰寫程式時就好像在使用本地端管理的服務一樣，例如Bean定義
+檔可以如下撰寫：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>rmi-client.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt; <br>    &lt;bean id="someServiceProxy" <br>          class="org.springframework.remoting.<br>                   &rarr; rmi.RmiProxyFactoryBean"&gt;<br>        &lt;property name="serviceUrl"&gt;<br>            &lt;value&gt;rmi://localhost/SomeService&lt;/value&gt;<br>        &lt;/property&gt;<br>        &lt;property name="serviceInterface"&gt;<br>            &lt;value&gt;onlyfun.caterpillar.ISomeService&lt;/value&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+      <small><br>
+
+注意到"serviceUrl"屬性的設定，它是以"rmi://"開頭，接著指定伺服器位址與服務名稱，來撰寫個簡單的客戶端程式以使用RMI伺服器上的服務：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>RMIClient.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import org.springframework.context.ApplicationContext;<br>import org.springframework.context.<br>              support.FileSystemXmlApplicationContext;<br><br>public class RMIClient {<br>    public static void main(String[] args) {<br>        ApplicationContext context =<br>            new FileSystemXmlApplicationContext(<br>                    "rmi-client.xml");<br><br>        ISomeService service = <br>            (ISomeService) context.getBean("someServiceProxy");<br><br>        String result1 = service.doSomeService("Some request");<br>        System.out.println(result1);<br><br>        int result2 = service.doOtherService(1);<br>        System.out.println(result2);<br>    }<br>} </pre>
+
+      <small><br>
+
+在程式的實作中，您完全不需要處理到有關服務連結的種種細節，代理物件會自動幫您完成這些細節，單從程式來看，您根本不會注意到您正在取得遠端伺服器上的服務。<br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/RMI.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:15 GMT -->
+</html>

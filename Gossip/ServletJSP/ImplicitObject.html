@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ImplicitObject.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:37 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>隱含物件</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 隱含物件<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在之前的範例當中，曾經在Scriptlet中寫下<span style="font-family: Courier New,Courier,monospace;">out與request</span>等字眼，然後直接操作一些方法。像<span style="font-family: Courier New,Courier,monospace;">out、request</span>這樣的字眼，在轉譯為Servlet之後，會直接對應於Servlet中的某個物件，例如<span style="font-family: Courier New,Courier,monospace;">request就對應HttpServletRequest物件。像out、request</span>這樣的字眼，通常稱之為<span style="font-weight: bold;">隱含物件（Implicit Object）</span>或<span style="font-weight: bold;">隱含變數（Implicit Variable）</span>。<br>
+      </small><br>
+      <small>以下先列表對照JSP中的隱含物件與轉譯後的型態，有一些部份也許是你第一次看到的型態，將在稍後詳加說明：<br>
+      </small>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>out</small></li>
+      </ul>
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small>轉譯後對應JspWriter物件，其內部關聯一個PrintWriter物件。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>request</small></li>
+      </ul>
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small>轉譯後對應HttpServletRequest物件。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>response</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>轉譯後對應HttpServletResponse物件。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>config</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>轉譯後對應ServletConfig物件。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>application</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>轉譯後對應ServletContext物件。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>session</small></li>
+      </ul>
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small>轉譯後對應HttpSession物件。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>pageContext</small></li>
+      </ul>
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace;"><small>轉譯後對應PageContext物件，它提供了JSP頁面資源的封裝，並可設定頁面範圍屬性。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>exception</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>轉譯後對應<span style="font-family: Courier New,Courier,monospace;">Throwable</span>物件，代表由其它JSP頁面丟出的例外物件，只會出現於JSP錯誤頁面（<span style="font-family: Courier New,Courier,monospace;">isErrorPage設定為true</span>的JSP頁面）。</small></div>
+      <br>
+      <ul style="font-family: Courier New,Courier,monospace;">
+        <li><small>page</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>轉譯後對應this。</small><br>
+      </div>
+      <small><br>
+大部份的隱含物件，在轉譯後所對應的Servlet相關物件，先前講解Servlet的文件都有作過說明。<span style="font-family: Courier New,Courier,monospace;">page</span>隱含物件則是對應於轉譯後Java類別中的<span style="font-family: Courier New,Courier,monospace;">this</span>物件，主要是讓不熟悉Java的網頁設計師，在必要時可以用較直覺的<span style="font-family: Courier New,Courier,monospace;">page</span>名稱來存取。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">exception</span>隱含物件將在之後談到JSP錯誤處理時時再加以說明。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">至於out、pageContext、exception這些隱含物件，轉譯後的型態你可能是第一次看到，以下先針對這些隱含物件進行說明。<br>
+      <br>
+out隱含物件不直接對應於先前說明Servlet時，由HttpServletResponse所取得的PrintWriter物件。out隱含物件在轉譯之後，會對應於<span style="font-weight: bold;">javax.servlet.jsp.JspWriter</span>類別的實例，JspWriter則直接繼承java.io.Writer類別。JspWriter主要模擬了BufferedWriter與PrintWriter的功能。</span><br style="font-family: Courier New,Courier,monospace;">
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">JspWriter在內部也是使用PrintWriter來進行輸出，但JspWriter具有緩衝區功能。當使用JspWriter的print()或println()進行回</span>應輸出時，如果JSP頁面沒有緩衝，則直接建立<span style="font-family: Courier New,Courier,monospace;">PrintWriter</span>來輸出回應，如果JSP頁面有作緩衝，則只有在出清（flush）緩衝區時，才會真正建立<span style="font-family: Courier New,Courier,monospace;">PrintWriter</span>物件進行輸出。<br>
+      <br>
+會對頁面進行緩衝處理，表示在緩衝區滿的時候，可能有兩種處理方式：<br>
+      </small>
+      <ul>
+        <li><small>累積緩衝區的容量後再一次輸出回應，所以緩衝區滿了就直接出清。</small></li>
+        <li><small>你也許是想控制輸出的量在緩衝區容量之內，所以緩衝區滿了表示有錯誤，此時要丟出例外。</small></li>
+      </ul>
+      <small><br>
+在撰寫JSP頁面時，可以透過<span style="font-family: Courier New,Courier,monospace;">page
+指示元素的buffer屬性來設定緩衝區的大小，預設是8kb。緩衝區滿了之後該採取哪種行為，則是由autoFlush屬性決定，預設是true，表示
+滿了就直接出清。如果設定為false，則要自行呼叫JspWriter的flush()方法來出清緩衝區，如果緩衝區滿了卻還沒呼叫flush()資料
+送出至客戶端，呼叫println()時將會丟出IOException例外。<br>
+      <br>
+接著說明pageContext隱含物件。pageContext隱含物件轉譯後對應於<span style="font-weight: bold;">javax.servlet.jsp.PageContext</span>型態之物件，這個物件將</span>所有JSP頁面的資訊封裝起來，轉譯後的Servlet可透過<span style="font-family: Courier New,Courier,monospace;">PageContext</span>來取得所有的JSP頁面資訊。例如在轉譯後的Servlet程式碼當中，要取得對應JSP頁面的<span style="font-family: Courier New,Courier,monospace;">ServletContext、ServletConfig、HttpSession與JspWriter物件</span>時，是透過以下的程式碼來取得：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">application = pageContext.getServletContext();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">config = pageContext.getServletConfig();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">session = pageContext.getSession();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">out = pageContext.getOut();</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+所有的隱含物件都可以藉由<span style="font-family: Courier New,Courier,monospace;">pageContext</span>來取得。除了封裝所有的JSP頁面資訊之外，還可以使用<span style="font-family: Courier New,Courier,monospace;">pageContext</span>來設定頁面範圍屬性。在先前的文件中，你知道Servlet中可以設定屬性的物件有<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest、HttpSession與ServletContext</span>，可分別用來設定請求範圍、會話範圍與應用程式範圍屬性。在學到JSP時，你則會多認識一個用<span style="font-family: Courier New,Courier,monospace;">pageContext來設定的頁面範圍屬性，同樣是使用setAttrubute()、getAttribute()與removeAttribute()</span>來進行設定。預設是可設定或取得頁面範圍屬性，頁面範圍屬性表示作用範圍僅限同一頁面之中。<br>
+      <br>
+來舉自行設定頁面範圍屬性的一個例子。你想要先檢查頁面範圍屬性中，是否曾被設定過某個屬性，如果有就直接取用，如果沒有就直接生成，且設定為頁面屬性。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; Some some = pageContext.getAttribute("some");</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if(some == null) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; some = new Some();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; pageContext.setAttribute("some", some);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">%&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">事實上，你可以透過pageContext設定四種範圍屬性，而不用使用個別的pageContext、request、 session、application來進行設定。以pageContext</span>提供單一的API來管理屬性作用範圍，你可以使用以下的方法來進行設定：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">getAttribute(String name, int scope)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">setAttribute(String name, Object value, int scope)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">removeAttribute(String name, int scope)</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">其中的scope可以使用以下的常數來進行指定：<span style="font-weight: bold;">pageContext.PAGE_SCOPE</span>、<span style="font-weight: bold;">pageContext.REQUEST_SCOPE</span>、<span style="font-weight: bold;">pageContext.SESSION_SCOPE</span>、 <span style="font-weight: bold;">pageContext.APPLICATION_SCOPE</span>，分別表示頁面、請求、會話與應用程式範圍。例如要設定會話範圍的屬性：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">pageContext.setAttribute("login", "caterpillar",</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> pageContext.SESSION_SCOPE);</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+&nbsp;要取得會話範圍的屬性時，可以使用以下的方式：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String attr = <br>
+&nbsp;&nbsp;&nbsp;&nbsp; (String) pageContext.getAttribute("login",</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"> pageContext.SESSION_SCOPE);</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">當不知道屬性的範圍時，也可以使用pageContext的<span style="font-weight: bold;">findAttribute()</span>方法來找出屬性，只要指定屬性名稱即可。findAttribute()會依序從頁面、請求、會話、應用程式範圍尋找看看有無對應的屬性，先找到就傳回。例如：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">Object attr = pageContext.findAttribute("attr");</span></small><br style="font-family: Courier New,Courier,monospace;">
+      </div>
+      <small><br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ImplicitObject.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:37 GMT -->
+</html>

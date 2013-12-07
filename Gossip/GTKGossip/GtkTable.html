@@ -1,0 +1,719 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkTable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:15 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkTable</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkTable</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在進行元件排版的時候，將元件以類似表格的方式排放也是很常見的排版方式，在GTK中，您可以使用GtkTable，您可以使用gtk_table_new()函式來建立：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkWidget *table = gtk_table_new(3, 3, TRUE);</span></small><br>
+
+
+      </div>
+
+
+      <br>
+
+
+      <small>上面的程式碼片段也建立3列（row）、3行（column）的表格，第三個參數則設定表格中的空間是否平均分配，所以若設定為TRUE，每一格的空間將取決於置於其中最大的元件。<br>
+
+
+      <br>
+
+
+要將元件置於表格之中，可以使用gtk_table_attach()函式：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void gtk_table_attach( GtkTable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *table,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkWidget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *child,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+left_attach,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+right_attach,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+top_attach,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+bottom_attach,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkAttachOptions xoptions,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkAttachOptions yoptions,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+xpadding,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ypadding );</span></small><br>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+      <small>這個函式中的left_attach、right_attach、top_attach、bottom_attach，決定了元件將佔據的空間，例如若是3X3表格：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span class="postbody"><small>&nbsp;<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;3</span></small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>0+----------+----------+</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>----------+</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>1+----------+----------+</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>----------+</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>2+----------+----------+</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>----------+<br>
+      </small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</small></span><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>3+----------+----------+</small></span><span style="font-family: Courier New,Courier,monospace; font-weight: bold;" class="postbody"><small>----------+</small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><br>
+
+
+      <small>若要讓元件佔據左上格空間，則</small></span><span class="postbody"><small>left_attach為0、right_attach為1、top_attach為0、bottom_attach為1，若要讓元件佔據右下格空間，則</small></span><span class="postbody"></span><span class="postbody"><small>left_attach為1、right_attach為2、top_attach為1、bottom_attach為2，</small></span><span class="postbody"><small>若要讓元件佔據底下兩格空間，則</small></span><span class="postbody"></span><span class="postbody"><small>left_attach為0、right_attach為2、top_attach為1、bottom_attach為2，依此類推。<br>
+
+
+      <br>
+
+
+xoptions與yoptions為元件佔據空間的方式，可以指定以下的值，可以使用OR結合值：<br>
+
+
+      </small></span>
+      
+      
+      <ul>
+
+
+        <li><span class="postbody"><small>GTK_FILL：若元件原本小於可用空間，則元件會填滿可用空間。</small></span></li>
+
+
+        <li><span class="postbody"><small>GTK_SHRINK：</small></span><span class="postbody"><small>若元件原本大於可用空間，則元件會縮小以符合可用空間。</small></span></li>
+
+
+        <li><span class="postbody"><small>GTK_EXPAND：表格會擴展以符合元件大小。</small></span></li>
+
+
+      
+      
+      </ul>
+
+
+      <span class="postbody"><small><br>
+
+
+您可以使用gtk_table_attach_defaults()函式，預設選項為GTK_FILL | GTK_EXPAND，padding都設為0：<br>
+
+
+      </small></span>
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">void gtk_table_attach_defaults( GtkTable&nbsp; *table,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GtkWidget *widget,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; left_attach,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; right_attach,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; top_attach,</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+guint&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bottom_attach );</span></small></span><br>
+
+
+      <span class="postbody"></span></div>
+
+
+      <span class="postbody"><small><br>
+
+
+下面的程式先示範簡單的GtkTable使用方式：<br>
+
+
+      </small></span>
+      
+      
+      <ul>
+
+
+        <li><small>gtk_table_demo.c</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *table;</span><br>    GtkWidget *label;<br><br>    const char *text[] = {"One", "Two", "Three",<br>                          "Four", "Five", "Six",<br>                          "Seven", "Eight", "Nine"};<br>    int i, j, k;<br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkTable");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 250, 150);<br><br><span style="font-weight: bold;">    table = gtk_table_new(3, 3, TRUE);</span><br>    for(i = 0, k = 0; i &lt; 3; i++, k = k + 3) {<br>        for(j = 0; j &lt; 3; j++) {<br>            label = gtk_label_new(text[k + j]);<br><span style="font-weight: bold;">            gtk_table_attach_defaults(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                 GTK_TABLE(table), label, j, j + 1, i, i + 1);</span><br>        }<br>    }<br>    <br><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(window), table);</span><br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+      <small><br>
+
+
+程式執行時的參考畫面如下：</small><br>
+
+
+      <span class="postbody"><br>
+
+
+      <img style="width: 268px; height: 184px;" alt="" src="images/GtkTable-1.jpg"><br>
+
+
+      <br>
+
+
+      </span><span class="postbody"><small>GtkTable的left_attach、right_attach、top_attach、bottom_attach指定方式，可以讓您方便的達到元件跨數格的方式，在<a href="http://library.gnome.org/devel/gtk-tutorial/stable/x442.html">Table Packing Example</a>中有個例子，您也可以再參考 </small></span><small><a href="http://library.gnome.org/devel/gtk-tutorial/stable/x390.html">Packing Using Tables</a> </small><span class="postbody"><small>中有關GtkTable的說明。 &nbsp;<br>
+
+
+      <br>
+
+
+      </small></span><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkTable.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:17 GMT -->
+</html>

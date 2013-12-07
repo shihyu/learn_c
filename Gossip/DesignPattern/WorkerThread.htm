@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/WorkerThread.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:46 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Worker Thread 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Worker Thread 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+   <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br><br>   <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>每
+個執行緒處理一個請求，每次執行緒執行完請求後，再次嘗試取得下一個請求並執行，這是Worker
+Thread的基本概念，對於一些需要冗長計算或要在背景執行的請求，可以採用Worker Thread。<br>
+      <br>
+在 </small><small><a href="ThreadPerMessage.htm">Thread-Per-Message
+模式 </a>中，其實已經有點Worker
+Thread的概念，在Service物件接收到資料後，以匿名方式建立執行緒來處理資料，那個建立的執行緒就是Worker
+Thread，只不用過就丟了。<br>
+      <br>
+Worker Thread可以應用在不同的場合，例如在 </small><small><a href="GuardedSuspension.htm">Guarded
+Suspension 模式</a>
+的範例，是使用一個執行緒來處理請求佇列中的請求，如果請求不斷來到，且請求中可能有冗長的處理，則請求佇列中的請求可能會來不及消化。<br>
+      <br>
+您可以為請求佇列中的每個請求配給一個執行緒來處理，不過實際上，只要建立足夠多的執行緒即可，在以下的範例中，可以指定請求佇列預先建立的執行緒數量，
+每個執行緒會取出一個請求來執行。<br>
+      </small>
+      <pre>import java.util.*;<br><br>interface Request {<br>    void execute();<br>}<br><br>class Worker implements Runnable {<br>    private RequestQueue queue;<br>    Worker(RequestQueue queue) {<br>        this.queue = queue;<br>    }<br>    public void run() {<br>        while(true) {<br>            queue.get().execute();<br>        }<br>    }<br>}<br><br>class RequestQueue {<br>    private LinkedList&lt;Request&gt; requests;<br>    <br>    RequestQueue(int workers) {<br>        requests = new LinkedList&lt;Request&gt;();<br>        for(int i = 0; i &lt; workers; i++) {<br>            (new Thread(new Worker(this))).start();<br>        }<br>    }<br><br>    synchronized Request get() {<br>        while(requests.size() == 0) {<br>            try {<br>                wait();<br>            }<br>            catch(InterruptedException e) {<br>                e.printStackTrace();<br>            }<br>        }<br>        return requests.removeFirst();<br>    }<br><br>    synchronized void put(Request request) {<br>        requests.addLast(request);<br>        notifyAll();<br>    }<br>} <br><br>// 模擬 Client 置入請求<br>class Client implements Runnable {<br>    private RequestQueue queue;<br>    Client(RequestQueue queue) {<br>        this.queue = queue;<br>    }<br>    public void run() {<br>        while(true) {<br>            Request request = new Request() {<br>                public void execute() {<br>                   System.out.println("執行客戶請求...XD");<br>                   try {<br>                       Thread.sleep((int) (Math.random() * 3000)); <br>                   }<br>                   catch(InterruptedException e) {<br>                       e.printStackTrace();<br>                   }<br>                }<br>            };<br>            queue.put(request);<br>            try {<br>                Thread.sleep((int) (Math.random() * 3000)); <br>            }<br>            catch(InterruptedException e) {<br>                e.printStackTrace();<br>            }<br>        }<br>    }<br>}<br><br>public class Main {<br>    public static void main(String[] args) {<br>        RequestQueue queue = new RequestQueue(5);<br>        for(int i = 0; i &lt; 5; i++) {<br>            (new Thread(new Client(queue))).start();<br>        }    <br>    }<br>}</pre>
+      <small><br>
+在這個範例中，</small><small>&nbsp;Worker Thread有請求來了就作，如果沒有請求，則所有的Worker
+Thread就等待，直到有新的工作進來而通知它們，取得請
+求的WorkerThread要作的工作，就直接定義在execute()中。 </small><small><br>
+      <br>
+以順序圖來表示這個範例：<br>
+      <img style="width: 651px; height: 439px;" alt="" src="images/WorkerThread-1.jpg"><br>
+若使用Python來示範的：<br>
+      </small>
+      <pre>import threading<br>import time<br>import random<br><br>class Worker(threading.Thread):<br>    def __init__(self, queue):<br>        threading.Thread.__init__(self)<br>        self.queue = queue<br>    <br>    def run(self):<br>        while True:<br>            self.queue.get()()<br>        <br>class RequestQueue:<br>    def __init__(self, workers):<br>        self.requests = []<br>        self.condition = threading.Condition()<br>        for i in range(workers):<br>            Worker(self).start()<br><br>    def get(self):<br>        self.condition.acquire()<br>        while not self.requests:<br>            self.condition.wait()<br>        request = self.requests.pop(0)<br>        self.condition.release()<br>        return request<br>   <br>    def put(self, request):<br>        self.condition.acquire()<br>        self.requests.append(request)<br>        self.condition.notify()<br>        self.condition.release()<br><br>class Client(threading.Thread):<br>    def __init__(self, queue):<br>        threading.Thread.__init__(self)<br>        self.queue = queue<br>        <br>    def run(self):<br>        while True:<br>            second = int(random.random() * 3) # 隨機模擬請求的執行時間<br>            request = lambda: print("執行客戶請求...XD"); time.sleep(second)<br>            self.queue.put(request)<br>            time.sleep(int(random.random() * 3))<br>            <br>queue = RequestQueue(5)<br>for i in range(5):<br>    Client(queue).start()<br>        <br>while True:<br>    try:<br>        time.sleep(1)<br>    except KeyboardInterrupt:<br>        exit()</pre>
+      <small><br>
+      </small><br>
+      <small><br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/WorkerThread.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:48 GMT -->
+</html>

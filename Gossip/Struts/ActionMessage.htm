@@ -1,0 +1,472 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ActionMessage.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>&lt;html:messages&gt;</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: &lt;html:messages&gt;</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+ActionMessages是Struts 1.1後所新增的類別，它變成了ActionErrors的父類別，同樣的，ActionMessage也是Struts 1.1新增的類別，ActionError則已經不建議使用。<br>
+
+      <br>
+
+
+
+ActionMessages搭配Struts的&lt;html:messages&gt;標籤，在管理訊息時就更為簡易，以 <a href="ServerSideValidate.htm">伺服端表單驗證</a> 這篇為例，如果能使用ActionMessages搭配&lt;html:messages&gt;標籤，那麼訊息管理會很方便，例如 UserForm.java可以改為：</small>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>UserForm.java</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import javax.servlet.http.*; <br>import org.apache.struts.action.*;<br>import org.apache.struts.Globals;<br>import org.apache.struts.util.MessageResources;<br> <br>public class UserForm extends ActionForm {<br>    private String username;<br>    private String password;<br>    <br>    public void setUsername(String username) { <br>        this.username = username; <br>    } <br>    <br>    public void setPassword(String password) { <br>        this.password = password; <br>    } <br>    <br>    public String getUsername() { <br>        return username; <br>    }<br>    <br>    public String getPassword() {<br>        return password;<br>    } <br>    <br>    public void reset(ActionMapping mapping, <br>                      HttpServletRequest req) {<br>        username = null;<br>        password = null;<br>    }<br>    <br>    public ActionErrors validate(ActionMapping mapping, <br>                                HttpServletRequest request) {<br><br>        ActionErrors errors = new ActionErrors();<br>        if(getUsername() == null || <br>                getUsername().length() &lt; 1) {<br><br>            errors.add(ActionMessages.GLOBAL_MESSAGE, <br>                new ActionMessage("error.invalidUsername")); <br>        }<br>        <br>        if(getPassword() == null || <br>                getPassword().length() &lt; 1) {<br><br>            errors.add(ActionMessages.GLOBAL_MESSAGE, <br>                new ActionMessage("error.invalidPassword"));<br>        }<br>        <br>        return errors;<br>    }<br>}</pre>
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span><small>ActionMessage中的字串（例如 error.invalidUsername）對應於訊息檔案中的鍵值。LoginAction.java可以修改如下：</small><br>
+
+
+
+      
+      <ul>
+
+        <li>LoginAction.java</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br> import javax.servlet.http.*; <br> import org.apache.struts.action.*; <br> import org.apache.commons.beanutils.PropertyUtils;<br> <br> public class LoginAction extends Action {<br>    public ActionForward execute(ActionMapping mapping,<br>                               ActionForm form,<br>                               HttpServletRequest request, <br>                               HttpServletResponse response) <br>                                  throws Exception { <br>        <br>        String username = (String) <br>          PropertyUtils.getSimpleProperty(form, "username"); <br>        String password = (String) <br>          PropertyUtils.getSimpleProperty(form, "password"); <br>        <br>        request.setAttribute("username", username);<br>        <br>        if(username.equals("caterpillar") &amp;&amp; <br>                  password.equals("1234")) {<br>            return mapping.findForward("helloUser"); <br>        }<br>        <br>        ActionMessages messages = new ActionMessages();<br>        messages.add(ActionMessages.GLOBAL_MESSAGE, <br>          new ActionMessage("message.namePasswordMismatched")<br>          );<br><br>        addMessages(request, messages);<br>        <br>        return mapping.findForward("loginFail"); <br>    }<br>}</pre>
+
+
+
+      <br>
+
+      <small>
+
+最後配合&lt;html:messages&gt;標籤，可以輸出ActionMessages的內容，來修改一下fail.jsp：</small><br>
+
+
+
+      
+      <ul>
+
+        <li>fail.jsp</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>&lt;%@ taglib uri="/tags/struts-html" prefix="html" %&gt;<br>&lt;%@ taglib uri="/tags/struts-bean" prefix="bean" %&gt;<br>&lt;html&gt;<br>&lt;head&gt; <br>&lt;title&gt;Sorry!&lt;/title&gt; <br>&lt;/head&gt; <br> &lt;body&gt;<br>    &lt;H1&gt;<br><br>    &lt;html:messages id="error"&gt; <br>        &lt;bean:write name="error"/&gt; <br>    &lt;/html:messages&gt;<br><br>    &lt;html:messages id="message" message="true"&gt; <br>        &lt;bean:write name="message"/&gt; <br>    &lt;/html:messages&gt;<br>    <br>    &lt;/H1&gt;<br>    &lt;p&gt;<br>    &lt;a href='/strutsapp/html/form.htm'&gt;Login&lt;/a&gt;<br> &lt;/body&gt; <br><br>&lt;/html&gt;</pre>
+
+
+
+      <br>
+
+      <small>
+
+&lt;html:messages&gt;的message屬性如果不設定為true，會輸出ActionErrors中所儲存的訊息，Error代表的是一個操作方面的錯誤，例如錯誤操作導致使用者名稱或密碼為空（當然也許也是故意的）。<br>
+
+      <br>
+
+
+
+&lt;html:messages&gt;的message屬性如果設定為true，會輸出ActionMessages中所儲存的訊息，
+Message表示一個提示訊息，也許使用者輸入了不正確的資訊，例如在輸入名稱與密碼時打錯了字，程式要提示使用者他們輸入了不正確的訊息。<br>
+
+      <br>
+
+
+
+在國際化訊息方面，&lt;html:messages&gt;標籤是根據session中的Locale物件來決定要顯示區域訊息，您可以在 Action中使用setLocale()方法來改變Locale物件，例如：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Locale locale = new Locale("zh", "CN");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">setLocale(request, locale);</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+&nbsp;<br>
+
+
+
+如上設定，&lt;html:messages&gt;會找messages_zh_CN.properties中的簡體中文訊息來顯示。現在的問題是，那ActionForm中的訊息呢？來看一下setLocale()中的原始碼您就知道怎麼作了：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">protected void setLocale(HttpServletRequest request, </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Locale locale) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; HttpSession session = request.getSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (locale == null) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; locale = Locale.getDefault();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; session.setAttribute(Globals.LOCALE_KEY, locale);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+&nbsp;<br>
+
+
+
+所以如果您要一開始進行 ActionForm 驗證時就使用區域化訊息，則可以在reset()或validate()方法中加入：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">HttpSession session = request.getSession();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">session.setAttribute(Globals.LOCALE_KEY, locale);</span><br>
+
+
+
+      </small></div>
+
+      <small>
+
+&nbsp;<br>
+
+
+
+或者您可以在必要的地方加入以上這段訊息，像是Servlet Filter等地方，這就看您的需求而定了。</small> </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/ActionMessage.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

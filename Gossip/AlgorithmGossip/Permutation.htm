@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/Permutation.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>排列組合</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 排列組合</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+      
+      <h2>說明</h2>
+
+      <small>
+將一組數字、字母或符號進行排列，以得到不同的組合順序，例如1 2 3這三個數的排列組合有：1 2 3、1 3 2、2 1 3、2 3 1、3 1 2、3 2 1。</small><br>
+
+
+      
+      <h2>解法</h2><small>如果是1 2，將兩個旋轉就得到新組合2 1。如果是 1 2 3，想到得2開頭的新組合，可以從1 2 3將2拿到前頭得到2 1 3，想得到3開頭的新組合，可以將3拿到前頭，得到3開頭的3 1 2。<br>
+      <br>
+可以觀察到，從1 2 3得到2 1 3，其實就是將開頭的1 2旋轉，從1 2 3得到3 1 2，就是將1 2
+3旋轉。如果這樣的旋轉可以得到新排列，那麼對於1 2 3、2 1 3、3 1 2的尾數列2 3、1 3、1
+2也作相同旋轉處理，不就也可以得到尾數列的新排列。也就是：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">1 </span><span style="font-family: Courier New,Courier,monospace; text-decoration: underline;">2 3</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;">1 </span><span style="font-family: Courier New,Courier,monospace; text-decoration: underline;"></span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace; text-decoration: underline;">3 2</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-weight: bold; color: red;"><span style="font-family: Courier New,Courier,monospace;">2 </span><span style="font-family: Courier New,Courier,monospace; text-decoration: underline;">1 3</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-family: Courier New,Courier,monospace;">2 </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace; text-decoration: underline;">3 1</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span><span style="font-family: Courier New,Courier,monospace; color: red;">3 <span style="text-decoration: underline;">1 2</span></span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;"></span></small><small><span style="font-family: Courier New,Courier,monospace;">3 </span></small><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace; text-decoration: underline;">2 1</span></small><br>
+      <small><span style="font-weight: bold;"></span></small></div>
+      <br>
+      <small>以上紅色部份表示對整個數列作旋轉處理，底線表示對尾數列作旋轉處理，也就是對尾數列進行相同動作，這在程式上就是遞迴處理。因此對於任意長度的符號數列排列組合時，可對傳入數列作旋轉處理，旋轉間隔一開始是0，逐步增加，對旋轉過後的每個數列之尾數列再作排列組合。</small><small>例如對於 1 2 3 4：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold;">1 2 3 4 -&gt; 旋轉 1 為 1，遞迴處理2 3 4</span><span style="font-weight: bold;"><br>
+2 1 3 4 -&gt; 旋轉 1 2 為 2 1，遞迴處理1 3 4</span><span style="font-weight: bold;"><br>
+3 1 2 4 -&gt; 旋轉 1 2 3 為 3 1 2，遞迴處理1 2 4</span><span style="font-weight: bold;"><br>
+4 1 2 3 -&gt; 旋轉 1 2 3 4 為 4 1 2 3，遞迴處理 1 2 3</span></small>
+
+
+      <br>
+
+
+      </div>
+
+
+
+      <br>
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br>#define N 4 <br><br>void perm(int*, int, void (*)(int*));<br>void rotate(int*, int, int);<br>void copy(int*, int*);<br>void print(int*);<br><br>int main(void) { <br>    int num[N] = {1, 2, 3, 4};<br>    perm(num, 0, print); <br>    return 0; <br>} <br><br>void perm(int* num, int i, void (*take)(int*)) { <br>    if(i &lt; N) { <br>        int j;<br>        for(j = i; j &lt; N; j++) {<br>            int to[N];<br>            copy(num, to);<br>            rotate(to, i, j);<br>            perm(to, i + 1, take); <br>        } <br>    } else { take(num); }<br>}  <br><br>void rotate(int* num, int i, int j) {<br>    int tmp = num[j]; <br>    int k;<br>    for(k = j; k &gt; i; k--) {<br>        num[k] = num[k - 1]; <br>    }<br>    num[i] = tmp;<br>}<br><br>void copy(int* from, int* to) {<br>    int i;<br>    for(i = 0; i &lt; N; i++) {<br>        to[i] = from[i];<br>    }<br>}<br><br>void print(int* num) {<br>    int i;<br>    for(i = 0; i &lt; N; i++) {<br>        printf("%d ", num[i]); <br>    }<br>    printf("\n"); <br>}<br></pre>
+
+
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>import java.util.*;<br><br>public class Permutation {<br>    public static &lt;T&gt; List&lt;T&gt; rotatedTo(int i, List&lt;T&gt; list) {<br>        List&lt;T&gt; rotated = new ArrayList&lt;&gt;();<br>        rotated.add(list.get(i));<br>        rotated.addAll(list.subList(0, i));<br>        rotated.addAll(list.subList(i + 1, list.size()));<br>        return rotated;<br>    }<br><br>    public static &lt;T&gt; List&lt;List&lt;T&gt;&gt; allRotated(List&lt;T&gt; list) {<br>        List&lt;List&lt;T&gt;&gt; allRotated = new ArrayList&lt;&gt;();<br>        for(int i = 0; i &lt; list.size(); i++) {<br>            allRotated.add(rotatedTo(i, list));<br>        }<br>        return allRotated;<br>    }<br>            <br>    public static &lt;T&gt; List&lt;List&lt;T&gt;&gt; perm(List&lt;T&gt; list) {<br>        List&lt;List&lt;T&gt;&gt; pls = new ArrayList&lt;&gt;();<br>        <br>        if(list.isEmpty()) {<br>            pls.add(new ArrayList&lt;T&gt;());<br>        } else {<br>            for(List&lt;T&gt; lt : allRotated(list)) {<br>                for(List&lt;T&gt; tailPl : perm(lt.subList(1, lt.size()))) {<br>                    List&lt;T&gt; pl = new ArrayList&lt;&gt;();<br>                    pl.add(lt.get(0));<br>                    pl.addAll(tailPl);<br>                    pls.add(pl);<br>                }<br>            }<br>        }<br>        <br>        return pls;<br>    }<br>                  <br>    public static void main(String[] args) {<br>        for(List&lt;Integer&gt; pl : perm(Arrays.asList(1, 2, 3, 4))) {<br>            System.out.println(pl);<br>        }<br>    }<br>}<br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>from functools import reduce<br><br>def allRotated(list):<br>    def rotatedTo(i):<br>        return [list[i]] + list[0:i] + list[i + 1:]<br>    return [rotatedTo(i) for i in range(len(list))]<br>   <br>def perm(list):<br>    if list == []:<br>        return [[]]<br>    else:<br>        lts = allRotated(list)<br>        return reduce(lambda a, b: a + b, <br>            [[[lt[0]] + pl for pl in perm(lt[1:])] for lt in lts])<br>   <br>for list in perm([1, 2, 3, 4]):<br>    print(list)</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>def allRotated[T](list: List[T]) = {<br>    def rotatedTo(i: Int) = {<br>        list(i) :: (list.take(i) ++ list.drop(i + 1))<br>    }<br>    (for(i &lt;- 0 until list.size) yield rotatedTo(i)).toList<br>}<br><br><br>def perm[T](list: List[T]): List[List[T]] = {<br>    if(list.isEmpty) List(Nil)<br>    else {<br>        val lts = allRotated(list)<br>        (for(lt &lt;- lts) yield <br>            (for(pl &lt;- perm(lt.tail)) yield lt.head :: pl)).reduce(_ ++ _)<br>    }<br>}<br><br>perm(List(1, 2, 3, 4)).foreach(println)<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>def allRotated(list)<br>    rotatedTo = -&gt;(i) {<br>        [list[i]] + list.take(i) + list.drop(i + 1)<br>    }<br>    <br>    (0...list.size).map {|i| rotatedTo.call(i)}<br>end<br>   <br>def perm(list)<br>    if list == []<br>        [[]]<br>    else<br>        lts = allRotated(list)<br>        lts.map {|lt| <br>            perm(lt.drop(1)).map {|pl| [lt[0]] + pl}<br>        }.reduce(:+)<br>    end<br>end<br>   <br>perm([1, 2, 3, 4]).each do |list|<br>    printf("%s\n", list)<br>end<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>function allRotated(list) {<br>    function rotatedTo(i) {<br>        var rotated = [];<br>        rotated.push(list[i]);<br>        return rotated.concat(list.slice(0, i))<br>                      .concat(list.slice(i + 1, list.length));<br>    }<br><br>    var all = [];<br>    for(var i = 0; i &lt; list.length; i++) {<br>        all.push(rotatedTo(i));<br>    }<br>    return all;<br>}<br><br>function perm(list) {<br>    var pls = [];<br>    if(list.length == 0) {<br>        pls.push([]);<br>    } else {<br>        allRotated(list).forEach(function(lt) {<br>            perm(lt.slice(1, lt.length)).forEach(function(tailPl) {<br>                var pl = [];<br>                pl.push(lt[0]);<br>                pls.push(pl.concat(tailPl));<br>            });<br>        });<br>    }<br>    return pls;<br>}<br><br>perm([1, 2, 3, 4]).forEach(function(lt) {<br>    print(lt);<br>});<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>allRotated list = [rotatedTo i | i &lt;- [0..(length list) - 1]]<br>    where rotatedTo i = (list !! i) : <br>            ((take i list) ++ (drop (i + 1) list))<br><br>perm list =<br>    if list == [] then [[]]<br>    else<br>        let lts = allRotated list<br>        in foldl1 (++) [[head lt : pl | pl &lt;- perm $ tail lt] | lt &lt;- lts]<br>        <br>main = sequence [print lt | lt &lt;- perm [1, 2, 3, 4]]<br></pre>
+<br>
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>  
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/Permutation.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:53 GMT -->
+</html>

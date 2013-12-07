@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/HelloWorld.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <title>Hello World 的試煉</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer helloworld" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: Hello World 的試煉<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=73204">Hello World 的試煉</a><br>
+      <br>
+      第一個Hello World範例的出現，據稱是在Brian Kernighan寫的"A Tutorial Introduction to the Language B"書籍中，自此之後成為許多程式語言教學的第一個範例程式。隨著時代更迭與技術演進，Hello World的示範漸漸有了另一種意涵，如何用最簡潔程式碼來顯示Hello World，似乎就代表了該語言的能力？<br>
+      <br>
+      <dl>
+        <dt>語法簡潔性僅技術能力的一個面向</dt>
+      </dl>
+      <br>
+      《人月神話：軟體專案管理之道》書籍作者Frederick P. Brooks說過：「一位程式設計師，在固定時間內產出的程式碼行數，不管使用哪種程式語言，都是固定的。」支持語言越簡潔越好的開發者常以此為根據，聲稱越簡潔程式語法可越快達到開發目的，每天可達到的產能也就越高？<br>
+      <br>
+      就顯示Hello World來說，若是Python或Ruby，可以只寫<span class="courier">print('Hello World')</span>，若是Java得寫成<span
+        class="courier">System.out.println("Hello World")</span>，簡潔性上的差異一目瞭然，若每天待解決的問題都是Hello World，Java自然遜色許多。不少文件或書籍常以此論調，鼓舞其他開發者投入具有更簡潔語法的語言。<br>
+      <br>
+      語法簡潔性常以隱藏複雜度來換取，被隱藏的複雜度會以另一種代價在某處呈現。<br>
+      <br>
+      例如動態語言無需宣告變數型態，在語法上得以簡化，但失去了型別檢查優點，代表程式間必須有更多慣例約束，處理執行時期錯誤的負擔更重，程式碼測試必須更為全面，輔助工具的製作較為困難，效能上也存在一定瓶頸。<br>
+      <br>
+      某些語言允許開發者擴充語法，讓開發者可以得到更符合問題情境的語言，然而若為求語法簡潔而大量擴充符號，為了看懂程式碼，得先瞭解擴充語法的過程為何，語法上過度簡化，反而造成日後維護的問題。<br>
+      <br>
+      語法只是解決問題時考量的元素之一，現實中要解決的問題絕不只是Hello World，就算是Hello World，也可進一步放大需求來考量。若要取得使用者名稱來說聲Hello，這個語言會怎麼作？身為中文世界的開發者，要取得與顯示中文該如何進行？一個檔案可以完成的程式拆為兩個檔案要如何撰寫？有兩個以上的原始碼或可執行檔案時要怎麼管理？要封裝或引用程式庫又當如何？指令漸趨繁多之後有無適當輔助工具可以使用？...<br>
+      <br>
+      在感受語法簡潔性帶來的快感之餘，可嘗試更多Hello World式簡易範例的可行性，藉此挖掘出語法以外，附加在語言身上更多必須考量的要素，甚至被隱藏的複雜度。<br>
+      <br>
+      <dl>
+        <dt>嘗試各種Hello World的可行性</dt>
+      </dl>
+      <br>
+      以Java為例，在執行過第一個顯示Hello World的程式後，可以想一下，若要輸出中文「哈囉世界」可行嗎？若是Java，將字串改為中文就可以了。若程式編譯出來的HelloWorld.class是在C:\workspace中，而你要在另一路徑執行程式呢？其中一個可行的方式是...<br>
+      <div style="margin-left: 40px;"><strong><span class="courier">&gt; java -classpath C:\workspace HelloWorld</span></strong></div>
+      <br>
+      在得知如何執行以上指令的過程，會先學習到java指令其實是啟動Java虛擬機器（JVM），也就是Java程式的作業系統，.class就是JVM的可執行檔案，而-classpath引數是在告知JVM可執行檔案的搜尋路徑，更進一步瞭解Java技術以JVM抽象化作業系統的重要事實。<br>
+      <br>
+      若要根據使用者輸入來說聲Hello呢？相關的程式片段也許是：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>java.io.Console console = System.console();</span></strong><strong><span><br>
+          </span></strong><strong><span>System.out.print("Input your name: ");</span></strong><strong><span><br>
+          </span></strong><strong><span>System.out.println("Hello " + console.readLine());</span></strong></div>
+      <br>
+      在寫出以上程式碼的過程中，得接觸使用套件（package）管理類別名稱空間的概念，也許你可為HelloWorld類別加上套件名稱，瞭解編譯與執行時必要的目錄結構與類別名稱全名指定，思考到編譯出來的.class有檔案名稱衝突問題，那麼原始碼.java也有同樣問題，從而進一步認識編譯時-sourcepath引數的存在與意義，瞭解原始碼檔案管理，初步認識Java專案結構的基本概念。<br>
+      <br>
+      接著可以再想一下，一個檔案可寫完的程式拆為兩個檔案如何撰寫？在目前程式中，System與Console類別是哪邊提供的？在找到rt.jar中封裝了Java標準API後，就知道Java發佈或部署程式庫時會運用JAR封裝.class檔案，也許可試著將自行撰寫、編譯好的.class封裝為JAR檔案，也許在這一連串嘗試，對下達繁複指令感到厭煩之後，從而認識了各種成熟的建構工具或整合開發環境，相關指令與工具之間又是如何對照。<br>
+      <br>
+      這一連串嘗試過程，主題都可以是Hello World，不用艱難目標，不用複雜語法，卻可從中認識Java語法外的幾個面向，像是抽象作業系統的JVM概念、套件式的名稱空間管理、原始碼與位元碼管理、專案結構基本概念、API的封裝與發佈、建構工具與IDE的使用。<br>
+      <br>
+      <dl>
+        <dt>用各種Hello World知新而溫故</dt>
+      </dl>
+      <br>
+      在學習另一種程式語言時，類似Hello World的探索過程，可引導出語法層面外許多議題，更可與原本已知曉的語言交相印證。<br>
+      <br>
+      以Ruby為例，在成功顯示Hello World後，可將字串改為中文「哈囉世界」嘗試執行，很不幸地立即出現invalid multibyte char (US-ASCII)錯誤（Ruby 1.9之後），這個嘗試反映出Ruby文化中對字串編碼的特有認知，使用與字元集無關的（Character Set Independent, CSI）處理方式，將字串單純視為位元組序列，這其實與Ruby誕生於編碼方式紛亂的日本有關，認為語言本身對編碼的任何預設都有其困擾。無論如何，若使用非西歐字元，Ruby要你一開始就面對編碼議題。若使用UTF-8文字檔案，那麼得在原始碼中告知直譯器：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong># encoding: UTF-8</strong></span><span><strong></strong></span><span><br>
+        </span><span><strong></strong></span><span><strong>print '哈囉世界'</strong></span></div>
+      <br>
+      依使用環境不同，在繼續進行簡單的Hello World輸入輸出時，也許還會遇到其它編碼問題（若環境不是一致地採用UTF-8的話），從而認識Ruby中外部編碼、內部編碼與字串編碼的存在。若只看第一個Hello World程式，怎會認識到這些問題呢？或許此時你會反思，為什麼Java沒有這個問題？為什麼以前撰寫Java原始碼時，從沒意識到原始碼檔案的編碼問題呢？Java內部編碼又是什麼？由於語言文化不同，會讓你回頭對原本熟悉的語言有更深刻認識，從而發掘出以往沒有過的思考方向。<br>
+      <br>
+      你也許想寫個.rb檔案負責取得簡單輸入，另一個.rb檔案負責簡單輸出，兩個檔案放在不同的目錄，因此認識了-I引數與require的使用，你想到Java中的-classpath與import，但它們並不相同也稱不上類似，進一步地，你會認識Ruby模組可以達到Java中套件的類似功能，但名稱空間管理還是有所不足；你想要將目前幾個簡單的檔案封裝、發佈，從而認識到RubyGem的使用，你也許回頭想想Java中JAR機制跟RubyGem有何不同，從而認識JAR檔案本身版本控管能力不足的問題，知道RubyGem與Java生態中Maven工具的相似性。<br>
+      <br>
+      通常對於原有語言的熟悉度，會引導你寄望所接觸的另一門語言也有對應或類似特性，這會是很有趣的過程，不僅可得知另一門語言的概略架構，也讓你反思原本熟悉語言的相關議題。<br>
+      <br>
+      <dl>
+        <dt>不同語言解決不同面向的問題</dt>
+      </dl>
+      <br>
+      不同語言會有不同語法，不同語法根據不同模型，也許不同模型解決的問題集合有所重疊，但是不同模型擅長解決的問題集合並不相同，甚至有其誕生時的文化背景與待解決的特定問題。<br>
+      <br>
+      使用組合語言也能解決顯示Hello World的問題，但拿來與Python、Ruby相比並不合情合理。靜態語言在變數型態的要求有其編譯時期檢查優點，然而語法上就沒有動態語言的簡潔。Ruby、JavaScript這類偏重物件個體性的語言，可以輕易賦予物件不同的特性，快速堆砌想建構的功能，但容易造成維護上的混亂，在必須應用在工程性為重的場合，往往得以包裹器對物件的個體性加以約束；反觀Java這類重於工程性的語言，使用類別規範所有物件行為，在重維護的場合較具優勢，但語法彈性相較上自然顯得不足。<br>
+      <br>
+      通常在推廣或說服其他開發者投入另一門語言時，為了馬上端出牛肉給開發者眼睛為之一亮，自然不會有這一連串Hello World範例來呈現背後複雜度或架構的過程，然而身為接受資訊的開發者本身，在瞭解語法之餘，可自行嘗試各種簡易範例的可行性，挖掘出語言外概略的複雜度、文化，更可進一步瞭解到語言想要或擅於解決的問題集合。<br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/HelloWorld.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

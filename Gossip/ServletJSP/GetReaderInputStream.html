@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/GetReaderInputStream.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>getReader()、getInputStream()</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: getReader()、getInputStream()<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><span style="font-family: Courier New,Courier,monospace;">HttpServletRequest上定義有<span style="font-weight: bold;">getReader()</span></span>方法，可以讓你取得一個<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">BufferedReader</span>，透過該BufferedReader</span>，可以讓你讀取請求的本體（Body）資料。例如：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="BodyView", urlPatterns={"/body.view"})<br>public class BodyView extends HttpServlet {<br>    protected void processRequest(HttpServletRequest req, <br>            HttpServletResponse resp) throws ServletException, IOException {<br><span style="font-weight: bold;">        BufferedReader reader = req.getReader();</span><br>        String input = null;<br>        String requestBody = "";<br>        while((input = reader.readLine()) != null) {<br>            requestBody = requestBody + input + "&lt;br&gt;";<br>        }<br>        PrintWriter out = resp.getWriter();<br>        out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Servlet BodyView&lt;/title&gt;");<br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br>        out.println(requestBody);<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>    } <br><br>    @Override<br>    protected void doGet(HttpServletRequest req, HttpServletResponse resp)<br>    throws ServletException, IOException {<br>        processRequest(req, resp);<br>    } <br><br>    @Override<br>    protected void doPost(HttpServletRequest req, HttpServletResponse resp)<br>    throws ServletException, IOException {<br>        processRequest(req, resp);<br>    }<br>}<br></pre>
+      <br>
+      <small>試著對這個Servlet以下列表單發出請求：<br>
+      </small><small></small>
+      <pre>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;title&gt;&lt;/title&gt;<br>        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;form action="body.view" <span style="font-weight: bold;">method="post"</span><br>              enctype="application/x-www-form-urlencoded"&gt;<br>            Username: &lt;input type="text" name="user"&gt;&lt;br&gt;<br>            Password: &lt;input type="password" name="passwd"&gt;&lt;br&gt;<br>            &lt;input type="submit" name="login"&gt;<br>        &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+則你在網頁上會看到以下內容，因為POST時，查詢字串（Query string）是放在請求本體之中發送：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">user=caterpillar&amp;passwd=123456&amp;login=%E9%80%81%E5%87%BA%E6%9F%A5%E8%A9%A2</span></small><br>
+      </div>
+      <small><br>
+如果上傳的是檔案，你必須知道如何處理<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">multipart/form-data</span>，原理可以參考 <a href="http://www.javaworld.com.tw/jute/post/view?bid=6&amp;id=56147&amp;sty=1&amp;tpg=2&amp;age=0">HTTP檔案上傳機制解析</a> 的內容。如果你使用以下的表單選擇一個檔案發送：<br>
+      </small>
+      <pre>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;title&gt;&lt;/title&gt;<br>        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;form action="body.view" <span style="font-weight: bold;">method="post"</span><br style="font-weight: bold;"><span style="font-weight: bold;">              enctype="multipart/form-data"</span>&gt;<br>              Select File :&lt;input type="file" name="filename" value="" /&gt;&lt;br&gt;<br>            &lt;input type="submit" value="Upload" name="upload" /&gt;<br>        &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;  <br></pre>
+      <small><br>
+例如發送一個JPG圖檔，則在網頁上會看到：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">-----------------------------195582364627982</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Content-Disposition: form-data; name="filename"; filename="caterpillar.jpg"</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Content-Type: image/jpeg</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">一堆奇奇怪怪的字元，這些字元是實際的檔案內容</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">-----------------------------195582364627982</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Content-Disposition: form-data; name="upload"</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Upload</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">-----------------------------195582364627982--</small><br>
+      </div>
+      <small><br>
+所以你要取得上傳的檔案，就是判斷檔案的開始與結束區段，你可以使用<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest的<span style="font-weight: bold;">getInputStream()</span></span>取得<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ServletInputStream</span>，它是InputStream的子類別，代表請求本體的串流物件，你可以利用它來處理上傳的檔案區段。例如：<br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name = "UploadServlet", urlPatterns = {"/upload.do"})<br>public class UploadServlet extends HttpServlet {<br>    @Override<br>    protected void doPost(HttpServletRequest req, HttpServletResponse resp)<br>            throws ServletException, IOException {<br>        String contentType = req.getContentType();<br>        int formDataLength = req.getContentLength();<br><br>        // 讀取請求本體<br>        DataInputStream dataStream =<br>                new DataInputStream(<span style="font-weight: bold;">req.getInputStream()</span>);<br>        byte datas[] = new byte[formDataLength];<br>        int totalBytes = 0;<br>        while (totalBytes &lt; formDataLength) {<br>            int bytes = dataStream.read(datas, totalBytes, formDataLength);<br>            totalBytes += bytes;<br>        }<br><br>        // 取得所有本體內容的字串表示<br>        String reqBody = new String(datas, "ISO-8859-1");<br>        // 取得上傳的檔案名稱<br>        String filename = reqBody.substring(<br>                reqBody.indexOf("filename=\"") + 10);<br>        filename = filename.substring(0, filename.indexOf("\n"));<br>        filename = filename.substring(<br>                filename.lastIndexOf("\\") + 1, filename.indexOf("\""));<br><br>        // 取得檔案區段邊界資訊<br>        String boundary = contentType.substring(<br>                contentType.lastIndexOf("=") + 1, contentType.length());<br><br>        // 取得實際上傳檔案的起始與結束位置<br>        int pos;<br>        pos = reqBody.indexOf("filename=\"");<br>        pos = reqBody.indexOf("\n", pos) + 1;<br>        pos = reqBody.indexOf("\n", pos) + 1;<br>        pos = reqBody.indexOf("\n", pos) + 1;<br>        int boundaryLoc = reqBody.indexOf(boundary, pos) - 4;<br>        int startPos = ((reqBody.substring(0, pos))<br>                             .getBytes("ISO-8859-1")).length;<br>        int endPos = ((reqBody.substring(0, boundaryLoc))<br>                             .getBytes("ISO-8859-1")).length;<br><br>        // 輸出至檔案<br>        FileOutputStream fileOutputStream =<br>                new FileOutputStream("c:/workspace/" + filename);<br>        fileOutputStream.write(datas, startPos, (endPos - startPos));<br>        fileOutputStream.flush();<br>        fileOutputStream.close();<br>    }<br>}<br></pre>
+      <small><br>
+你可以利用這個表單來選擇檔案上傳：<br>
+      </small>
+      <pre>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;title&gt;&lt;/title&gt;<br>        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;form <span style="font-weight: bold;">action="upload.do"</span> <span style="font-weight: bold;">method="post"</span><br style="font-weight: bold;"><span style="font-weight: bold;">              enctype="multipart/form-data"</span>&gt;<br>              Select File :&lt;input type="file" name="filename" value="" /&gt;&lt;br&gt;<br>            &lt;input type="submit" value="Upload" name="upload" /&gt;<br>        &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+      <br><small style="font-family: Courier New,Courier,monospace;">在同一個請求期間，getReader()與getInputStream()只能擇一呼叫，若同一請求期間兩者都有呼叫，則會丟出IllegalStateException例外。</small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/GetReaderInputStream.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:53 GMT -->
+</html>

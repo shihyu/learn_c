@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/SimpleTagAttrBody.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:58 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>處理標籤屬性與本體</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 處理標籤屬性與本體<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果自訂標籤時，本體的內容需要執行多次該如何處理？例如原本JSTL的<span style="font-family: Courier New,Courier,monospace;">&lt;c:forEach&gt;標籤之功能，必須依所設定的陣列或Collection</span>物件長度，以決定本體中的內容顯示次數。以下就來使用Simple Tag實作<span style="font-family: Courier New,Courier,monospace;">&lt;f:forEach&gt;標籤以模彷&lt;c:forEach&gt;的功能。這個&lt;f:forEach&gt;標籤會是這麼使用：</span><br style="font-weight: bold;">
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;f:forEach var="name" items="${names}"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ${name}&lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/f:forEach&gt;</span></small><br>
+      </div>
+      <small><br>
+為了簡化範例，先不考慮<span style="font-family: Courier New,Courier,monospace;">items</span>屬性上EL的運算結果是陣列的情況，而只考慮<span style="font-family: Courier New,Courier,monospace;">Collection物件。&lt;f:forEach&gt;標籤可以設定var屬性來決定每次從Collection取得物件時，應使用哪個名稱在標籤本體中取得該物件，var只接受字串方式來設定名稱。來看看如何實作標籤處理器。</span><br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.util.Collection;<br>import javax.servlet.jsp.JspException;<br>import javax.servlet.jsp.tagext.SimpleTagSupport;<br><br>public class ForEachTag extends SimpleTagSupport {<br>    private String var;<br>    private Collection items;<br><br>    @Override<br>    public void doTag() throws JspException {<br>        try {<br>            for(Object o : items) {<br>                this.getJspContext().setAttribute(var, o);<br>                this.getJspBody().invoke(null);<br>                this.getJspContext().removeAttribute(var);<br>            }<br>        } catch (java.io.IOException ex) {<br>            throw new JspException("ForEachTag 執行錯誤", ex);<br>        }<br>    }<br><br>    public void setVar(String var) {<br>        this.var = var;<br>    }<br><br>    public void setItems(Collection items) {<br>        this.items = items;<br>    }<br>} <br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">在屬性的設定上，
+由於var屬性會是字串方式設定，所以宣告為String型態。items運算的結果可接受Collection物件，所以型態宣告為
+Collection。標籤本體可接受的EL名稱，事實上是取得PageContext後使用其setAttribute()進行設定。&lt;f:
+forEach&gt;標籤本體內容必須執行多次，則是透過多次呼叫invoke()來達成，簡單地說，在doTag()中每呼叫一次invoke()，
+則會執行一次本體內容。由於不想讓setAttribute()設定的屬性，在標籤本體之外還能使用，所以最後使用removeAttribute()移除屬性。</span><br>
+      </small><small><br>
+接著同樣地，要在TLD檔案中定義自訂標籤相關資訊：<br>
+      </small>
+      <ul>
+        <li><small>f.tld</small></li>
+      </ul>
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"<br> xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br> xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee<br> web-jsptaglibrary_2_0.xsd"&gt;<br>    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;<br>    &lt;short-name&gt;f&lt;/short-name&gt;<br>    &lt;uri&gt;http://openhome.cc/jstl/fake&lt;/uri&gt;<br>    // 略...<br>    &lt;tag&gt;<br>        &lt;name&gt;forEach&lt;/name&gt;<br>        &lt;tag-class&gt;cc.openhome.ForEachTag&lt;/tag-class&gt;<br>        &lt;body-content&gt;scriptless&lt;/body-content&gt;<br>        &lt;attribute&gt;<br>            &lt;name&gt;var&lt;/name&gt;<br>            &lt;required&gt;true&lt;/required&gt;<br>            &lt;type&gt;java.lang.String&lt;/type&gt;<br>        &lt;/attribute&gt;<br>        &lt;attribute&gt;<br>            &lt;name&gt;items&lt;/name&gt;<br>            &lt;required&gt;true&lt;/required&gt;<br>            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;<br>            &lt;type&gt;java.util.Collection&lt;/type&gt;<br>        &lt;/attribute&gt;<br>    &lt;/tag&gt;<br>&lt;/taglib&gt;  <br></pre>
+      <small><br>
+Simple Tag的本體內容，也就是<span style="font-family: Courier New,Courier,monospace;">&lt;body-content&gt;</span>屬性與Tag File類似，除了<span style="font-family: Courier New,Courier,monospace;">scriptless</span>之外，還可以設定<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">empty</span>或<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">tagdependent</span>。<span style="font-family: Courier New,Courier,monospace;">empty</span>表示一定沒有本體內容。<span style="font-family: Courier New,Courier,monospace;">tagdependent</span>表示將本體中的內容當作純文字處理，也就是如果本體中有出現Scriptlet、EL或自訂標籤，也只是當作純文字輸出，不會作任何的運算或轉譯。由於<span style="font-family: Courier New,Courier,monospace;">var</span>屬性只接受字串設定，所以不需要設定<span style="font-family: Courier New,Courier,monospace;">&lt;rtexprvalue&gt;</span>標籤，不設定時預設就是<span style="font-family: Courier New,Courier,monospace;">false</span>，也就是不接受執行時期的運算值作為屬性設定值。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">到目前為止都是透
+過SimpleTagSupport的getJspBody()取得JspFragment，並在呼叫invoke()時傳入null，先前解釋過，這表
+示將使用PageContext取得預設的JspWriter物件來作輸出回應，也就是預設會輸出回應至使用者的瀏覽器。</span><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">如果在呼叫時傳入一個自訂的Writer物件，則標籤本體內容的處理結果，就會使用所指定的Writer物件進行輸出，在需要將處理過後的本體內容再作進一步處理時，就會採取這樣的作法。</span>例如，可以開發一個將本體執行結果全部轉大寫的簡單標籤：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.StringWriter;<br>import javax.servlet.jsp.JspException;<br>import javax.servlet.jsp.tagext.SimpleTagSupport;<br><br>public class ToUpperCaseTag extends SimpleTagSupport {<br>    @Override<br>    public void doTag() throws JspException {<br>        try {<br>            StringWriter writer = new StringWriter();<br>            this.getJspBody().invoke(writer);<br>            String upper = writer.toString().toUpperCase();<br>            this.getJspContext().getOut().print(upper);<br>        } catch (java.io.IOException ex) {<br>            throw new JspException("ToUpperCaseTag 執行錯誤", ex);<br>        }<br>    }<br>}<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">在這個標籤處理器
+中執行invoke()後，標籤本體執行的結果將輸出至StringWriter物件，此時再呼叫StringWriter物件的toString()取
+得輸出的字串結果，並呼叫toUpperCase()方法將結果轉為大寫。如果這個轉換大寫後的字串結果要輸出至使用者瀏覽器，則再透過
+PageContext的getOut()取得JspWriter物件，而後呼叫print()方法輸出結果。</span><br style="font-family: Courier New,Courier,monospace;">
+      <br>
+記得在TLD檔案中加入這個自訂標籤的定義：<br>
+      </small>
+      <ul>
+        <li><small>f.tld</small></li>
+      </ul>
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"<br> xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br> xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee<br> web-jsptaglibrary_2_0.xsd"&gt;<br>    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;<br>    &lt;short-name&gt;f&lt;/short-name&gt;<br>    &lt;uri&gt;http://openhome.cc/jstl/fake&lt;/uri&gt;<br>    // 略...<br>    &lt;tag&gt;<br>        &lt;name&gt;toUpperCase&lt;/name&gt;<br>        &lt;tag-class&gt;cc.openhome.ToUpperCaseTag&lt;/tag-class&gt;<br>        &lt;body-content&gt;scriptless&lt;/body-content&gt;<br>    &lt;/tag&gt;<br>&lt;/taglib&gt;  <br></pre>
+      <small><br>
+可以如下使用這個標籤，執行的結果是<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">items</span>設定的字串都會被轉為大寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;f:toUpperCase&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;f:forEach var="name" items="${names}"&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${name} &lt;br&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/f:forEach&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/f:toUpperCase&gt;</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+還記得 </small><small><big><a href="SimpleTagAPILifeCycle.html"><small>了解生命週期與架構</small></a></big> </small><small>那段轉譯後的內部<span style="font-family: Courier New,Courier,monospace;">Helper</span>類別嗎？如果呼叫<span style="font-family: Courier New,Courier,monospace;">invoke()方法時設定了一個Writer物件，則會呼叫pageContext的<span style="font-weight: bold;">pushBody()</span>方法並傳入該物件，這會將pageContext的getOut()方法所取得的物件設定為該Writer物件，並在堆疊中記錄先前
+的JspWriter物件。</span><br></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+JspWriter out = null;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+if( writer != null ) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp; out = this.jspContext.pushBody(writer);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+} else {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+&nbsp;&nbsp;&nbsp; out = this.jspContext.getOut();</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+}</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br><span style="font-family: Courier New,Courier,monospace;">所以若標籤本體內容中還有內層標籤，透過getOut()所取得的就是所設定的Writer物件（除非內層標籤在呼叫invoke()時，也設定了自己的
+Writer物件）。pushBody()傳回的是BodyContent物件，為JspWriter的子類別，包裹了所傳入的Writer物件。因為
+BodyContent實例被out參考，而執行結果都透過out所參考的物件輸出，所以最後BodyContent將會包括所有標籤本體的執行結果（包
+括內層標籤），而這些結果，將再寫入BodyContent所包裹的Writer物件。</span><br style="font-family: Courier New,Courier,monospace;"><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">在invoke()結束前會呼叫pageContext的<span style="font-weight: bold;">popBody()</span>方法，從堆疊中恢復原本getOut()所應傳回的JspWriter物件。</span><br>
+      <br>
+      <br>
+      <br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/SimpleTagAttrBody.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:58 GMT -->
+</html>

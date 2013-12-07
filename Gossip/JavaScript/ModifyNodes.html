@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/ModifyNodes.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:25 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>修改文件</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: 修改文件<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/UpdatingDOMTree.html"><small>English</small></a><br>
+      </div>
+      <small><br>
+瀏覽器剖析完HTML後，建立的DOM元素會組成樹狀結構，瀏覽器上呈現的畫面，就是根據DOM樹繪製出來，你只要改變DOM樹，瀏覽器就會根據改變後的DOM樹重繪畫面，而這就構成動態修改文件的基本原理。</small><br>
+      <br>
+      <small>底下這個範例示範如何動態新增與刪除圖片：<br>
+      </small>
+      <ul>
+        <li><a href="samples/ModifyNodes-1.html"><small>ModifyNodes-1.html</small></a></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>            <br>                document.getElementById('add').onclick = function() {<br>                    var images = document.getElementById('images');<br>                    <br>                    var img = document.<span style="font-weight: bold;">createElement</span>('img');<br>                    img.src = document.getElementById('src').value;<br>                    img.onclick = function() {<br>                        images.<span style="font-weight: bold;">removeChild</span>(this);<br>                    };<br>                    <br>                    images.<span style="font-weight: bold;">appendChild</span>(img);<br>                };<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;input id="src" type="text"&gt;&lt;button id="add"&gt;新增圖片&lt;/button&gt;<br>        &lt;div id="images"&gt;&lt;/div&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">在原本的</span>HTML<span style="font-family: Courier New,Courier,monospace;">中，並沒有任何的&lt;img&gt;元素，當你在文字方塊中輸入圖片的網址並按下按鈕時，會使用document的<span style="font-weight: bold;">createElement()</span>來動態建立元素，此時這個元素並沒有繫結至</span>DOM<span style="font-family: Courier New,Courier,monospace;">樹，所以還不會出現在畫面上，接著你設定建立的圖片元素src為輸入的網址，並註冊按下圖片時，使用<span style="font-weight: bold;">removeChild()</span>將圖片本身（this）從id為images的&lt;div&gt;中移除，最後，將這個動態建立的圖片元素使用<span style="font-weight: bold;">appendChild()</span>附加至id為images的&lt;div&gt;元素成為其子元素，此時瀏覽器根據</span>DOM<span style="font-family: Courier New,Courier,monospace;">樹結構重繪畫面。<br>
+      <br>
+      </span>當你使用JavaScript動態改變DOM樹時，在瀏覽器的檢視網頁原始碼中，是看不到動態調整後的HTML（那是一開始載
+入的靜態HTML），你要使用DOM Inspector之類的工具，才能看到動態的DOM畫面。例如Firebug的DOM Inspector：<br>
+      <img style="border: 1px solid ; width: 615px; height: 461px;" alt="" src="images/ModifyNodes-1.png"><br>
+      <span style="font-family: Courier New,Courier,monospace;"></span></small><br>
+      <small>每個節點都只能有一個父節點，如果你直接取得DOM樹中既有的節點，並使用<span style="font-family: Courier New,Courier,monospace;">appendChild()</span>將之附加至另一個節點，則表示節點會從原有的父節點脫離，再附加至另一節點。例如：</small><br>
+      <ul>
+        <li><a href="samples/ModifyNodes-2.html"><small>ModifyNodes-2.html</small></a></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                document.getElementById('image').onclick = function() {<br>                    var container1 = document.getElementById('container1');<br>                    var container2 = document.getElementById('container2');<br>                    if(this.parentNode === container1) {<br><span style="font-weight: bold;">                        container2.appendChild(this);</span><br>                    }<br>                    else {<br><span style="font-weight: bold;">                        container1.appendChild(this);</span><br>                    }<br>                };<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        容器一：&lt;div id="container1"&gt;<br>        &lt;img id="image" src=<br>      "http://caterpillar.onlyfun.net/Gossip/images/caterpillar_small.jpg"/&gt;<br>                &lt;/div&gt;&lt;br&gt;<br>        容器二：&lt;div id="container2"&gt;&lt;/div&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">在這個例子中，點選圖片，會將圖片來回附加於兩個&lt;div&gt;之間，由於一個節點只能有一個父節點，所以appendChild()的動作，會使被附加的節點從原父節點脫離。<br>
+      <br>
+createElement()是用來建立標籤對應的元素，如果要建立文字節點，則必須使用createTextNode()，如果要動態建立屬性，則使
+用createAttribute()（少用）。例如，若有個&lt;div
+id="console"&gt;&lt;/div&gt;，你想要在其中附加文字，則要如下：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">var text = document.createTextNode('your text ....');</span></small><br style="font-weight: bold;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">document.getElementById('console').appendChild(text);</span></small><br>
+      </div>
+      <br>
+      <small>你也可以使用<span style="font-family: Courier New,Courier,monospace;">insertBefore()、replaceChild()</span>等方法來調整DOM樹上的節點，各種方法的說明可以參考：<br>
+      </small>
+      <ul>
+        <li><small><a href="http://www.w3schools.com/dom/dom_document.asp">DOM Document</a></small></li>
+      </ul>
+      <br>
+      <small>要注意的是，只要你將節點附加至DOM，瀏覽器就會重繪畫面，所以若你有大量的節點要建立，並附加至DOM樹，則會有效能的問題。建議在背景準備好節點樹片段，等樹片段準備好，再將樹片段的根節點繫結至DOM樹，如此會有比較好的效能。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">除了自行建立片段之外，也可以使用createDocumentFragment()來建立DocumentFragment，利用它在背景作樹片段組織，再一次將DocumentFragment附加至DOM樹。</span></small><br>
+      <br>
+      <small>DOM元素有個非標準的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">innerHTML</span>特性，你可以用之取得標籤中內含的HTML，也可以指定字串給<span style="font-family: Courier New,Courier,monospace;">innerHTML</span>，瀏覽器會剖析這個字串，並建立對應的DOM元素安插至元素中，雖然不是標準特性，但幾乎每個瀏覽器都支援，事實上，<span style="font-weight: bold;">HTML 5已將innerHTML納入標準。</span>例如，要在上面提及的<span style="font-family: Courier New,Courier,monospace;">&lt;div&gt;中建立&lt;b&gt;哈囉&lt;/b&gt;</span>，可以如下：</small><br>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">document.getElementById('console').innerHTML = '&lt;b&gt;哈囉&lt;/b&gt;';</span></small><br>
+      </div>
+      <br>
+      <small>在Internet Explorer中要注意，<span style="font-family: Courier New,Courier,monospace;">&lt;select&gt;很神奇地不支援innerHTML特性的指定。</span></small><br style="font-family: Courier New,Courier,monospace;">
+<br>
+      <small></small><small><br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/ModifyNodes.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:26 GMT -->
+</html>

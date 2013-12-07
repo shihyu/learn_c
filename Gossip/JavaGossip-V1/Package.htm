@@ -1,0 +1,718 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/Package.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>套件（package）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 套件（package）</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>隨著程式碼撰寫越來越多，程式內容越來越大，您會發現管理程式中的變數名稱、方法名稱、類別名稱也會是一件麻煩的事，尤其是一些同名問題的發生，例如在程
+式中，您也許會定義一個Point類別代表2維空間的點，也許在程式的某個地方，您也會定義一個
+Point類別來表示一個3維空間的點，其它像函式同名、共用變數同名的情況也可能發生，當這種情況發生時，其中一個定義就可能將另一個定義給覆寫掉了。<br>
+
+
+      <br>
+
+
+
+
+
+Java提供<span style="font-weight: bold;">package機制</span>，它就像是一個管理容器，可以將您所
+定義的名稱區隔管理在package下，而不會有相互衝突的發生，例如您定義了一個
+dimension2d與dimension3d的package，在它們之下都有一個Point類別，但由於屬於不同的package，所以這兩個名稱
+並不會有所衝突。<br>
+
+
+      <br>
+
+
+
+
+
+Java的package被設計為與檔案系統結構相對應，如果您的<span style="font-weight: bold;">package設定是only.caterpillar，則該類別應該在指定目錄（或jar）的onlyfun/caterpillar下可以找到</span>，為了要能建立與package相對應的檔案系統結構，您在編譯時可以加入<span style="font-weight: bold;">-d</span> 參數，並指定要建立在哪一個目錄之下。<br>
+
+
+      <br>
+
+
+
+
+
+下面這個程式使用<span style="font-weight: bold;">"package"關鍵字</span>來建立package以管理我們所定義的類別： </small>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> UsePackage.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class UsePackage { <br>    public static void main(String[] args) { <br>        System.out.println("Hello! World!"); <br>    } <br>} <br></pre>
+
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+
+在編譯時要使用以下的指令： <br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">$ javac -d . UsePackage.java </span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+在編譯時使用 "-d" 參數，並指定在現行目錄 "." 中建立檔案與系統結構，則編譯完成之後，在現行目錄中會出現onlyfun/caterpillar目錄，而當中有一個UsePackage.class 檔案，在編譯完成之後，<span style="font-weight: bold;">package的指定就成為class名稱的一部份了</span>，在執行時可以這麼下指令：<br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">$ java onlyfun.caterpillar.UsePackage </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hello! World! </span><br>
+
+
+
+
+
+      </small></div>
+
+
+      <small>
+
+
+&nbsp;<br>
+
+
+
+
+
+可以為類別建立package管理，舉下面的例子來說： </small><br>
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> Point2D.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      <pre>package onlyfun.caterpillar; <br> <br>public class Point2D { <br>    private int x, y;<br> <br>    public Point2D() {x = 0; y = 0;} <br>    public Point2D(int x, int y) {this.x = x; this.y = y;} <br>    public int getX() {return x;} <br>    public int getY() {return y;} <br>} <br></pre>
+
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+
+這個類別建立在Point2D.java檔案中，可以先用以下的指令來編譯它： <br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">$ javac -d .&nbsp; Point2D.java</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+之前說過，package名稱為類別名稱的一部份，除非您重新編譯類別，否則的話無法改變這個名稱，為了要使用這個類別，方法之一是使用<span style="font-weight: bold;">完全吻合（Fully qualified）名稱</span>，也就是完整的指出package與類別名稱，例如：</small><br>
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> UsePackage.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      <pre>public class UsePackage { <br>    public static void main(String[] args) { <br>        onlyfun.caterpillar.Point2D p1 = new <br>            onlyfun.caterpillar.Point2D(10, 20);<br> <br>        System.out.printf("p1: (x, y) = (%d, %d)%n",<br>            p1.getX(), p1.getY()); <br>    } <br>} <br></pre>
+
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+
+當然這個方法在使用上不是很方便，您可以使用<span style="font-weight: bold;">"import"關鍵字</span>，告知編譯器要使用的類別是位於哪一個package之下，如此可以少打一些
+字，讓編譯器多作一些事，例如</small>：<br>
+
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> UsePackage.java
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      <pre>import onlyfun.caterpillar.Point2D;<br> <br>public class UsePackage { <br>    public static void main(String[] args) { <br>        Point2D p1 = new Point2D(10, 20);<br> <br>        System.out.printf("p1: (x, y) = (%d, %d)%n",<br>            p1.getX(), p1.getY()); <br>    } <br>} <br></pre>
+
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+
+您在使用"import"時可以指定類別的完整描述，如果您會使用到某個package下的許多類別，您可以<span style="font-weight: bold;">使用
+'*'</span>，表示您可能使用到某個package下的某些類別，再讓編譯器作更多事，例如：</small><br>
+
+
+
+
+
+
+      
+      
+      <ul>
+
+
+        <li> UsePackage.java<br>
+
+
+
+
+
+  </li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      <pre>import onlyfun.caterpillar.*;<br> <br>public class UsePackage { <br>    public static void main(String[] args) { <br>        Point2D p1 = new Point2D(10, 20);<br> <br>        System.out.printf("p1: (x, y) = (%d, %d)%n",<br>            p1.getX(), p1.getY()); <br>    } <br>}<br></pre>
+
+
+
+
+
+
+      <br>
+
+
+      <small>
+
+
+但要注意的是，如果您import之後，出現類別名稱有同名衝突時，編譯器就不知道如何處理了，例如：<br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import java.util.Arrays;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">import onlyfun.caterpillar.Arrays;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">public class SomeClass {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+
+      </small></div>
+
+
+      <small>
+
+
+&nbsp;<br>
+
+
+      <br>
+
+
+
+
+
+在這個例子中，編譯器發現有兩個Arrays類別，它不確定若遇到Arrays時您要使用的是java.util.Arrays，或是 onlyfun.caterpillar.Arrays，它只好回報以下訊息：<br>
+
+
+      </small>
+
+
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">java.util.Arrays is already defined in a single-type import</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">import onlyfun.caterpillar.Arrays;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">^</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">1 error</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+這個時候您就要考慮換一下類別名稱了（如果您有權更動那些類別的話），或者是不使用"import"，直接使用完整描述；在"import"時儘量不使用 '*' 也可以減少這種情況發生。<br>
+
+
+      <br>
+
+
+
+
+
+注意如果您提供的類別若不位於相同的package中，您的類別必須宣告為"public"，若不宣告則類別預設只能於同一個package中被存取，例如將之前Point2D類別的public拿掉，則編譯UsePackage.java檔案時，會出現以下的錯誤：<br>
+
+
+      </small>
+
+
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace; color: rgb(255, 0, 0);">UsePackage.java:5: caterpillar.demo.Point2D is not public in caterpillar.demo; cannot be accessed from outside package</span><br>
+
+
+
+
+      <span style="font-style: italic;"><span style="font-weight: bold;"></span></span></small></div>
+
+
+
+
+      <small><span style="font-style: italic;"><span style="font-weight: bold;"><br>
+
+
+
+      </span></span>如果定義類別成員時沒有指定public、protected或private的存取修飾，則為預設（Default）權
+限，成員將只能於同一個package中被直接存取，通常稱之為package-friendly或package-private，且該成員將無法於子
+類別中被直接存取。<span style="font-style: italic;"><br>
+
+
+
+      <span style="font-weight: bold;"><br>
+
+
+
+
+      </span></span>
+要存取package的class也與CLASSPATH的設定有關，建議您也看看官方網站上的文章，您對package的瞭解會更深入：<br>
+
+
+      </small>
+
+
+      
+      
+      <ul>
+
+
+        <li><small><a href="http://java.sun.com/j2se/1.5.0/docs/tooldocs/windows/classpath.html">Setting the class path (Windows)</a></small></li>
+
+
+        <li><small><a href="http://java.sun.com/j2se/1.5.0/docs/tooldocs/solaris/classpath.html">Setting the class path (Solaris and Linux)&nbsp;</a></small></li>
+
+
+      
+      
+      </ul>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+Java平台的classes是被儲存在Java安裝目錄的<span style="font-weight: bold;">jre/lib/下的rt.jar</span>，另外額外的第三元件（Third- party）可以放在<span style="font-weight: bold;">/jre/lib/ext/</span>中，在之前的例子中，使用"import"就是在告知編譯器我們的類別位於哪一個package下，這些類別必須設定好CLASSPATH才可以被編譯器找到，<span style="font-weight: bold;">預設上是jre/lib/下的rt.jar、jre/lib/ext/中相關擴充元件與現行工作目錄</span>。</small><br>
+
+
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/Package.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+</html>

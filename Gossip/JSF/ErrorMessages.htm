@@ -1,0 +1,728 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/ErrorMessages.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:15 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>錯誤訊息處理</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JSF Gossip:&nbsp;錯誤訊息處理 </a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+在使用標準轉換器或驗證器時，當發生錯誤時，會有一些預設的錯誤訊息顯示，這些訊息可以使用&lt;h:
+messages&gt;或&lt;h:message&gt;標籤來顯示出來，而這些預設的錯誤訊息也是可以修改的，您所要作的是提供一個訊息資源檔
+案，例如</small>：<br>
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> messages.properties</li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <pre>javax.faces.component.UIInput.CONVERSION=Format Error.<br>javax.faces.component.UIInput.REQUIRED=Please input your data.<br>.... </pre>
+
+
+
+
+
+
+
+      <br>
+
+      <small>
+javax.faces.component.UIInput.CONVERSION是用來設定當轉換器發現錯誤時顯示的訊息，而
+javax.faces.component.UIInput.REQUIRED是在標籤設定了required為true，而使用者沒有在欄位輸入時顯
+示的錯誤訊息。<br>
+
+      <br>
+
+
+您要在faces-config.xml中告訴JSF您使用的訊息檔案名稱，例如：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li>faces-config.xml</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;?xml version="1.0"?&gt;<br>&lt;!DOCTYPE faces-config PUBLIC<br> "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"<br> "http://java.sun.com/dtd/web-facesconfig_1_0.dtd"&gt;<br><br>&lt;faces-config&gt;<br>    &lt;application&gt;<br>        &lt;local-config&gt;<br>            &lt;default-locale&gt;en&lt;/default-locale&gt;<br>            &lt;supported-locale&gt;zh_TW&lt;/supported-locale&gt;<br>        &lt;/local-config&gt;<br>        &lt;message-bundle&gt;messages&lt;/message-bundle&gt;<br>    &lt;/application&gt;<br>    .....<br><br>&lt;/faces-config&gt;</pre>
+
+
+      <br>
+
+      <small>
+在這邊我們設定了訊息檔案的名稱為messages_xx_YY.properties，其中xx_YY是根據您的Locale來決定，轉換器或驗證器的錯誤訊息如果有設定的話，就使用設定值，如果沒有設定的話，就使用預設值。<br>
+
+      <br>
+
+
+驗證器錯誤訊息，除了上面的javax.faces.component.UIInput.REQUIRED之外，還有以下的幾個：</small>
+      <br>
+
+
+
+      
+      <table border="1" width="100%">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>訊息識別 </small></td>
+
+
+
+      <td align="left" valign="top"><small>預設訊息 </small></td>
+
+
+
+      <td align="left" valign="top"><small>用於 </small></td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>javax.faces.validator.NOT_IN_RANGE </small></td>
+
+
+
+      <td align="left" valign="top"><small>Validation Error: Specified
+attribute is not between the expected values of {0} and {1}. </small></td>
+
+
+
+      <td align="left" valign="top"><small>DoubleRangeValidator與
+LongRangeValidator，{0}與{1}分別代表minimum與maximum所設定的屬性 </small></td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>javax.faces.validator.DoubleRangeValidator.MAXIMUM、
+javax.faces.validator.LongRangeValidator.MAXIMUM </small></td>
+
+
+
+      <td align="left" valign="top"><small>Validation Error: Value is greater
+than allowable maximum of '{0}'. </small></td>
+
+
+
+      <td align="left" valign="top"><small>DoubleRangeValidator或
+LongRangeValidator，{0}表示maximum屬性 </small></td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>javax.faces.validator.DoubleRangeValidator.MINIMUM、
+javax.faces.validator.LongRangeValidator.MINIMUM </small></td>
+
+
+
+      <td align="left" valign="top"><small>Validation Error: Value is less
+than allowable minimum of '{0}'. </small></td>
+
+
+
+      <td align="left" valign="top"><small>DoubleRangeValidator或
+LongRangeValidator，{0}代表minimum屬性 </small></td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>javax.faces.validator.DoubleRangeValidator.TYPE、
+javax.faces.validator.LongRangeValidator.TYPE </small></td>
+
+
+
+      <td align="left" valign="top"><small>Validation Error: Value is not of
+the correct type. </small></td>
+
+
+
+      <td align="left" valign="top"><small>DoubleRangeValidator或
+LongRangeValidator </small></td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>javax.faces.validator.LengthValidator.MAXIMUM
+      </small></td>
+
+
+
+      <td align="left" valign="top"><small>Validation Error: Value is greater
+than allowable maximum of ''{0}''. </small></td>
+
+
+
+      <td align="left" valign="top"><small>LengthValidator，{0}代表maximum </small></td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td align="left" valign="top"><small>javax.faces.validator.LengthValidator.MINIMUM
+      </small></td>
+
+
+
+      <td align="left" valign="top"><small>Validation Error: Value is less
+than allowable minimum of ''{0}''. </small></td>
+
+
+
+      <td align="left" valign="top"><small>LengthValidator，{0}代表minimum屬性 </small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+      
+      <p><small>在您提供自訂訊息的時候，也可以提供{0}或{1}來設定顯示相對的屬性值，以提供詳細正確的錯誤提示訊息。<br>
+
+
+      <br>
+
+
+訊息的顯示有概述訊息與詳述訊息，如果是詳述訊息，則在識別上加上 "_detail"，例如：<br>
+
+
+      </small></p>
+
+
+      
+      <div style="margin-left: 40px; font-weight: bold; font-family: Courier New,Courier,monospace;"><small>&nbsp;javax.faces.component.UIInput.CONVERSION=Error.<br>
+
+
+&nbsp;javax.faces.component.UIInput.CONVERSION_detail= Detail Error.<br>
+
+
+&nbsp;....&nbsp;<br>
+
+
+      </small></div>
+
+
+      
+      <p><small>除了在訊息資源檔中提供訊息，您也可以在程式中使用FacesMessage來提供訊息，例如在 自訂驗證器 中我們就這麼用過：<br>
+
+
+      </small></p>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(password.length() &lt; 6) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FacesMessage message = new FacesMessage(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FacesMessage.SEVERITY_ERROR, </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "字元長度小於6", </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "字元長度不得小於6");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throw new ValidatorException(message);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;</span><br>
+
+
+      </small></div>
+
+
+      
+      <p><small>最好的方法是在訊息資源檔中提供訊息，這麼一來如果我們要修改訊息，就只要修改訊息資源檔的內容，而不用修改程式，來看一個簡單的例子，假設我們的訊息資源檔中有以下的內容：&nbsp;<br>
+
+
+      </small></p>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;onlyfun.caterpillar.message1=This is message1.</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;onlyfun.caterpillar.message2=This is message2 with {0} and {1}.</span><br>
+
+
+      </small></div>
+
+
+      
+      <p><small>&nbsp;則我們可以在程式中取得訊息資源檔的內容，例如：<br>
+
+
+      </small></p>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;package onlyfun.caterpillar;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;import java.util.Locale;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;import java.util.ResourceBundle;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;import javax.faces.context.FacesContext;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;improt javax.faces.component.UIComponent;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;import javax.faces.application.Application;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;import javax.faces.application.FacesMessage;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; public void xxxMethod(FacesContext context, </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+UIComponent component, </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Object obj) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 取得應用程式代表物件</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Application application = context.getApplication();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 取得訊息檔案主名稱</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String messageFileName = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+application.getMessageBundle();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 取得當前 Locale 物件</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Locale locale = context.getViewRoot().getLocale();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 取得訊息綁定 ResourceBundle 物件</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ResourceBundle rsBundle = </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ResourceBundle.getBundle(messageFileName, locale);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String message = rsBundle.getString(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"onlyfun.caterpillar.message1");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FacesMessage facesMessage = new FacesMessage(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FacesMessage.SEVERITY_FATAL, message, message);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; ....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;....</span><br>
+
+
+      </small></div>
+
+
+      
+      <p><small>&nbsp;<br>
+
+
+接下來您可以將FacesMessage物件填入ValidatorException或
+ConverterException後再丟出，FacesMessage建構時所使用的三個參數是嚴重程度、概述訊息與詳述訊息，嚴重程度有
+SEVERITY_FATAL、SEVERITY_ERROR、SEVERITY_WARN與SEVERITY_INFO四種。<br>
+
+
+      <br>
+
+
+如果需要在訊息資源檔中設定{0}、{1}等參數，則可以如下：<br>
+
+
+      </small></p>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;....</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;String message = rsBundle.getString(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"onlyfun.caterpillar.message2");</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;Object[] params = {"param1", "param2"};</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;message = java.text.MessageFormat.format(message, params);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;FacesMessage facesMessage = new FacesMessage(</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FacesMessage.SEVERITY_FATAL, message, message);</span><br>
+
+
+      </small></div>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">.... </span><br>
+
+
+      </small></div>
+
+
+      
+      <p><small>&nbsp;<br>
+
+
+如此一來，在顯示訊息時，onlyfun.caterpillar.message2的{0}與{1}的位置就會被"param1"與"param2"所取代。</small></p>
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/ErrorMessages.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:15 GMT -->
+</html>

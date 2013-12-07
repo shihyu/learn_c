@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/PerfectNumber.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>完美數</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip:&nbsp;完美數</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+      
+      <h2>說明</h2>
+
+      <small>
+
+如果有一數n，其真因數（Proper factor）的總和等於n，則稱之為完美數（Perfect Number），例如以下幾個數都是完美數：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px; font-weight: bold;"><small><span style="font-family: Courier New,Courier,monospace;">6 = 1 + 2 + 3</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;">
+28 = 1 + 2 + 4 + 7 + 14</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-family: Courier New,Courier,monospace;">
+496 = 1 + 2 + 4 + 8 + 16 + 31 + 62 + 124 + 248</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+程式基本上不難，第一眼看到時會想到使用迴圈求出所有真因數，再進一步求因數和，不過若n值很大，則此法會花費許多時間在迴圈測試上，十分沒有效率，例如求小於10000的所有完美數。</small><br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+如何求小於10000的所有完美數？並將程式寫的有效率？基本上有三個步驟：<br>
+
+      </small>
+
+      
+      <ol>
+
+        <li><small>求出一定數目的質數表</small></li>
+
+        <li><small>利用質數表求指定數的因式分解</small></li>
+
+        <li><small>利用因式分解求所有真因數和，並檢查是否為完美數</small></li>
+
+      
+      </ol>
+
+
+
+      <small><br>
+
+      <a href="EratosthenesPrime.htm">步驟一</a> 與 <a href="GCDPNumber.htm">步驟二</a> 在之前討論過了，問題在步驟三，如何求真因數和？方法很簡單，要先知道將所有真因數和加上該數本身，會等於該數的兩倍，例如：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">2 * 28 = 1 + 2 + 4 + 7 + 14 + 28</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+等式後面可以化為：<br>
+
+      </small>
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">2 * 28 = (2</span><sup style="font-weight: bold; font-family: Courier New,Courier,monospace;">0</sup><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> + 2</span><sup style="font-weight: bold; font-family: Courier New,Courier,monospace;">1</sup><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> + 2</span><sup style="font-weight: bold; font-family: Courier New,Courier,monospace;">2</sup><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">) * (7</span><sup style="font-weight: bold; font-family: Courier New,Courier,monospace;">0</sup><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> + 7</span><sup style="font-weight: bold; font-family: Courier New,Courier,monospace;">1</sup><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">)</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+所以只要求出因式分解，就可以利用迴圈求得等式後面的值，將該值除以2就是真因數和了；等式後面第一眼看時可能想到使用等比級數公式來解，不過會使用到次方運算，可以在迴圈走訪因式分解陣列時，同時計算出等式後面的值，這在下面的實作中可以看到。 </small><br>
+
+
+
+
+
+
+      <br>
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala&nbsp;</a>&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>#define P 10000<br>#define N 5000<br><br>void create(int*);             // 建立質數表<br>void filter(int*, int);<br>void factor(int, int*, int*);  // 因數分解<br>int isPerfect(int, int*);      // 判斷完美數<br><br>int main(void) { <br>    int primes[N + 1] = {0};<br>    create(primes);<br>    <br>    int i;<br>    for(i = 2; i &lt;= P; i++) if(isPerfect(i, primes)) {<br>        printf("Perfect Number%5d\n", i);         <br>    }<br><br>    return 0; <br>} <br><br>void create(int* primes) {<br>    primes[2] = primes[3] = primes[5] = 1;<br>    <br>    int i;<br>    for(i = 1;6 * i + 5 &lt;= N; i++) {<br>        primes[6 * i + 1] = primes[6 * i + 5] = 1; <br>    }<br>    if(6 * i + 1 &lt;= N) { primes[6 * i + 1] = 1; }<br>    <br>    int n;<br>    for(n = 0;(6 * n + 5) * (6 * n + 5) &lt;= N; n++) {<br>        filter(primes, 6 * n + 1);<br>        filter(primes, 6 * n + 5);<br>    }     <br>    if((6 * n + 1) * (6 * n + 1) &lt;= N) { filter(primes, 6 * n + 1); }  <br>}<br><br>void filter(int* primes, int i) {<br>    if(primes[i]) { <br>        int j;<br>        for(j = 2; j * i &lt;= N; j++) {<br>            primes[j * i] = 0; <br>        }<br>    }<br>}<br><br>void factor(int num, int* factors, int* primes) { <br>    int i, j;<br>    for(i = 2, j = 0; i * i &lt;= num;) if(primes[i] &amp;&amp; num % i == 0) {<br>        factors[j++] = i;<br>        num /= i;<br>    } else { i++; }<br>    factors[j] = num;<br>}<br><br>int isPerfect(int num, int* primes) {  <br>    int factors[N / 2 + 1] = {0};<br>    factor(num, factors, primes); <br><br>    int s = 1; <br>    int i = 0;<br>    while(factors[i] != 0) { <br>        int r = 1; <br>        int q = 1;<br>        do { <br>            r *= factors[i]; <br>            q += r; <br>            i++; <br>        } while(factors[i - 1] == factors[i]); <br>        s *= q;<br>    } <br>    <br>    return s / 2 == num; <br>}  <br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>// 使用 <a href="EratosthenesPrime.htm">Eratosthenes 篩選求質數</a> 中的 Prime<br>// 使用 <a href="GCDPNumber.htm">因數分解</a> 中的 Factor <br><br>import java.util.*;<br><br>public class Perfect {<br>    public static List&lt;Integer&gt; perfectLe(int n) {<br>         List&lt;Integer&gt; primes = Prime.create(n / 2);<br>         List&lt;Integer&gt; perfects = new ArrayList&lt;&gt;();<br>         for(int i = 2; i &lt;= n; i++) if(isPerfect(i, primes)) {<br>             perfects.add(i);<br>         }<br>         return perfects;<br>    }<br>    <br>    public static boolean isPerfect(int num, List&lt;Integer&gt; primes) {  <br>        List&lt;Integer&gt; factors = Factor.factor(num, primes);<br>        factors.add(0);<br>        <br>        int s = 1; <br>        int i = 0;<br>        while(factors.get(i) != 0) { <br>            int r = 1; <br>            int q = 1;<br>            do { <br>                r *= factors.get(i); <br>                q += r; <br>                i++;<br>            } while(factors.get(i - 1).equals(factors.get(i))); <br>            s *= q; <br>        }   <br><br>        return s / 2 == num; <br>    }<br><br>    <br>    public static void main(String[] args) {<br>        for(Integer n : perfectLe(100000)) {<br>            System.out.printf("Perfect number %5d%n", n);<br>        }<br>    }<br>}</pre>
+
+
+
+      <br><ul><li><a name="Python"></a>Python</li></ul><pre>from functools import reduce # 未使用質數表<br>def perfectLe(number):<br>    return [i for i in range(1, number) if 2 * i == reduce( \<br>            lambda sum, k: sum + k if i % k == 0 else sum, range(1, i + 1))]<br>print(perfectLe(10000))</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>def perfectLe(number: Int) = { // 未使用質數表<br>  for(<br>    i &lt;- 1 to number<br>    if 2 * i == (0 /: (1 to i)){(sum, k) =&gt; if(i % k == 0) sum + k else sum}<br>  ) yield i<br>}<br>perfectLe(10000) foreach(p =&gt; print(p + " "))<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby<br>
+        </li>
+      </ul>
+      <pre>class Range<br>    def comprehend(&amp;block)<br>        return self if block.nil?<br>        self.collect(&amp;block).compact<br>    end<br>end<br><br>def perfectLe(number)<br>    (1..number - 1).comprehend { |i|<br>        i if 2 * i == (1..i).reduce { |sum, k| i % k == 0 ? sum + k : sum }<br>    }<br>end<br><br>p perfectLe(10000)<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>function range(start, end) {<br>    var r = [];<br>    var n = start;<br>    for(var i = 0; n &lt; end; i++, n++) { r[i] = n; }<br>    return r;<br>}<br><br>function perfectLe(number) {<br>    return range(1, number).map(function(i) {<br>        var r = range(1, i + 1);<br>        var sum = r[0];<br>        for(var j = 1; j &lt; r.length; j++) {<br>            sum = i % r[j] === 0 ? sum + r[j] : sum;<br>        }<br>        if(2 * i === sum) { return i; }<br>    }).filter(function(elem) { return elem !== undefined; });<br>}<br><br>print(perfectLe(10000));<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>perfectLe number = <br>    [i | i &lt;- [1..number - 1], (2 * i) == <br>        (foldl1 (\s k -&gt; if i `mod` k == 0 then s + k else s) [1..i])]<br><br>main = print $ perfectLe 10000<br></pre>
+      <br>
+<br>
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+<br>
+
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/PerfectNumber.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+</html>

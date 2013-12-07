@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/SingleTableInheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:20 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>單表繼承映射</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror single-table inheritance" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 單表繼承映射 </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>如果採取的是物件模型的方式來設計程式，那麼繼承關係可能就會在程式設計中出現，然而關聯式資料庫的關聯模型與物件模型並不匹配，例如若模型有以下的繼承關係：<br>
+      </p>
+      <p class="courier" style="margin-left: 40px;"><strong># user.rb<br>
+          class User &lt; ActiveRecord::Base<br>
+          end</strong></p>
+      <p class="courier" style="margin-left: 40px;"><strong># nobody.rb<br>
+          class Nobody &lt; User<br>
+          end<br>
+        </strong></p>
+      <p class="courier" style="margin-left: 40px;"><strong># sombody.rb<br>
+          class Somebody &lt; User<br>
+          end</strong><br>
+      </p>
+      <p>為了映射物件模型與關聯模型，來看看繼承關係映射至關聯式資料庫的方式之一：Single-Table Inheritance。這種方式使用一個表格儲存同一個繼承階層的所有類別，並使用額外的欄位來表示所記錄的是哪一個子類別的資料，具體來說，對於繼承<span
+          class="courier">User類別的Nobody及Somebody</span>，可以設計以下的表格來儲存資料：</p>
+      <div class="courier" style="margin-left: 40px;"> <strong>class CreateUsers &lt; ActiveRecord::Migration<br>
+          &nbsp; def change<br>
+          &nbsp;&nbsp;&nbsp; create_table :users do |t|<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :name<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.integer :age<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :nobody_prop<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :somebody_prop<br>
+        </strong><strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :type&nbsp; # 必須有個type欄位<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.timestamps<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          &nbsp; end<br>
+          end<br>
+        </strong></div>
+      <br>
+      最主要的是多了一個type欄位，如果要儲存的資料是來自<span class="courier">Nobody</span>，則在type記下一個型態說明"Nobody"字串，表示該筆資料為<span
+        class="courier">Nobody</span>的對應資料。如果要儲存的資料是來自<span class="courier">Somebody</span>，則在type記下一個型態說明"Somebody"字串，表示該筆資料為<span
+        class="courier">Somebody</span>的對應資料。如果要儲存的資料是來自<span class="courier">User</span>，則在type為空。<br>
+      <br>
+      當模型有繼承關係時，Rails預設就是採取Single-Table Inheritance對應，假設分別儲存了<span class="courier">User、Nobody與Somebody</span>實例，例如：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;"><strong>User.create(:name =&gt; "caterpillar", :age =&gt; 35)<br>
+          Nobody.create(:name =&gt; "Justin", :age =&gt; 36, :nobody_prop =&gt; "Nobody...XD")<br>
+          Somebody.create(:name =&gt; "Momor", :age =&gt; 32, :somebody_prop =&gt; "Somebody...XD")<br>
+        </strong></div>
+      <br>
+      那麼資料表格會如下所示：
+      <p><img alt="Table inheritance" src="images/SingleTableInheritance-1.PNG"><br>
+      </p>
+      <p>缺點就是，因子類別屬性的不同，對映儲存時會有許多欄位為空，較浪費資料庫空間，但查詢效率較好，例如查詢所有<span class="courier">User</span>類型的資料時，只需一次SQL，例如：</p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>irb(main):001:0&gt; User.all<br>
+              &nbsp; User Load (0.6ms)&nbsp; SELECT "users".* FROM "users" <br>
+              =&gt; [#&lt;User id: 1, name: "caterpillar", age: 35, nobody_prop: nil, somebody_prop: nil, type: nil, created_at: "2012-02-15 02:46:18", updated_at: "2012-02-15 02:46:18"&gt;, ...略]<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      可以看到<span class="courier">User.all</span>只會下一次的SQL語句。如果是查詢個別子類型資料，則會以WHERE子句比對type型態，例如：<br>
+      <br>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>irb(main):002:0&gt; Somebody.all<br>
+              &nbsp; Somebody Load (2.0ms)&nbsp; SELECT "users".* FROM "users" WHERE "users"."type" IN ('Somebody')<br>
+              =&gt; [#&lt;Somebody id: 4, name: "Momor", age: 32, nobody_prop: nil, somebody_prop: "Somebody...XD", type: "Somebody", created_at: "2012-02-15 02:47:32", updated_at: "2012-02-15 02:47:32"&gt;]<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      如果實際上<span class="courier">User</span>不允許實例化，只是作為共同屬性定義的抽象父類別。例如：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span># user.rb<br>
+            class User &lt; ActiveRecord::Base<br>
+            &nbsp;&nbsp;&nbsp; self.abstract_class = true<br>
+            end<br>
+            <br>
+            # nobody.rb<br>
+            class Nobody &lt; User<br>
+            end<br>
+            <br>
+            # sombody.rb<br>
+            class Somebody &lt; User<br>
+            end</span></strong><br>
+      </div>
+      <br>
+      那麼就不能使用單表繼承映射，<span class="courier">Nobody與Somebody</span>必須有自己的nobodies與somebodies表格。例如：<br>
+      <br>
+      <div class="courier" style="margin-left: 40px;"><strong>class CreateNobodies &lt; ActiveRecord::Migration<br>
+          &nbsp; def change<br>
+          &nbsp;&nbsp;&nbsp; create_table :nobodies do |t|<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :name<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.integer :age<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :nobody_prop<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.timestamps<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          &nbsp; end<br>
+          end<br>
+          <br>
+          class CreateSomebodies &lt; ActiveRecord::Migration<br>
+          &nbsp; def change<br>
+          &nbsp;&nbsp;&nbsp; create_table :somebodies do |t|<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :name<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.integer :age<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.string :somebody_prop<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t.timestamps<br>
+          &nbsp;&nbsp;&nbsp; end<br>
+          &nbsp; end<br>
+          end</strong><br>
+      </div>
+      <p> </p>
+      <p></p>
+      因為<span class="courier">User</span>不能實例化，所以不用建立users表格，這樣的實作策略為Table per Concrete Class，給予每個具體子類別一個表格，雖不會浪費欄位在不同子類別屬性上，但每個表格中有一些語義相同的欄位，例如name欄位，當領域模型物件修改時，這些相同語義的欄位就要同時跟著修改，多個表格共用相同語義，將造成維護上的困難，而且也無法進行<span
+        class="courier">User.all</span>的多型查詢。<br>
+      <br>
+      Rails並不支援多表繼承策略，僅能就需求作某種程度的模擬，例如使用 <a href="PolymorphicAssociations.html">多型關聯</a> 概念來模擬，像是 <a
+        href="http://mediumexposure.com/multiple-table-inheritance-active-record/">Multiple Table Inheritance with ActiveRecord</a> 中的例子，在設計上將父類別中的共用定義抽出為共同參考的模型，並透過<span
+        class="courier">include</span>將共同定義含括（<span class="courier">include</span>就某種意義上，也算是一種繼承概念）。<br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/SingleTableInheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:20 GMT -->
+</html>

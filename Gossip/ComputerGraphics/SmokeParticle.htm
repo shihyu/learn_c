@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/SmokeParticle.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:01 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>煙粒子</title></head><body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics:&nbsp;煙粒子</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+
+
+粒子系統的製作理念都是相同的，難是難在物理或化學等模擬，煙粒子就是如此，輕飄飄的煙動向不定，受周遭的環境而影響運動，例如風吹，在這邊是利用煙粒子重量當作風吹時的受動因子。<br>
+
+      <br>
+
+
+您可以先 看看 <a href="applet/Smoke.html">範例</a>。</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li> Smoke.java
+  </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package cc.openhome.particle;<br><br>import java.awt.*;<br>import java.applet.*;<br><br>import static java.lang.Math.*;<br><br>public class Smoke extends Applet implements Runnable {<br>    private final int MAX = 1000;<br>    private SmokeParticle[] particles; // 煙粒子<br>    private int xCenter, yCenter;<br>    private Image offScreen;<br>    private Graphics gOffScreen;<br><br>    public void init() {<br>        setSize(640, 480);<br>        setBackground(Color.black); // 背景為黑色<br><br>        particles = new SmokeParticle[MAX]; // 建立粒子<br><br>        // 煙初始位置<br>        xCenter = getWidth() / 2;<br>        yCenter = 2 * getHeight() / 3;<br>        for (int i = 0; i &lt; MAX; i++) {<br>            particles[i] = new SmokeParticle();<br>        }<br><br>        // 建立次畫面<br>        offScreen = createImage(getWidth(), getHeight());<br>        gOffScreen = offScreen.getGraphics();<br>    }<br><br>    public void start() {<br>        new Thread(this).start();<br>    }<br><br>    public void update(Graphics g) {<br>        paint(g);<br>    }<br><br>    public void paint(Graphics g) {<br>        g.drawImage(offScreen, 0, 0, this);<br>    }<br><br>    public void run() {<br>        int windTime = 0;<br>        double windX = 0;<br>        while (true) {<br>            if (windTime &lt;= 0) {<br>                windX = 30 * random() - 15; // 風速 x<br>                windTime = (int) (20 * random());  // 風吹時間<br>            }<br><br>            gOffScreen.clearRect(0, 0, getWidth(), getHeight());<br>            for (SmokeParticle particle : particles) {<br>                if (particle.isAlive()) {<br>                    // 受風動的效果不一<br>                    double wx = windX / particle.getWeight();<br>                    double x = particle.getPoint().getX();<br>                    double y = particle.getPoint().getY();<br>                    particle.getPoint().setLocation(x + wx, y);<br><br>                    x = particle.getPoint().getX();<br>                    y = particle.getPoint().getY();<br><br>                    gOffScreen.setColor(particle.getColor());<br>                    gOffScreen.fillOval((int) x, (int) y, 4, 4);<br>                    particle.nextState();<br>                }<br>            }<br><br>            for (SmokeParticle particle : particles) {<br>                if (!particle.isAlive()) {<br>                    particle.setLife((int) (255 * random()));<br>                    particle.resume(xCenter, yCenter);<br>                }<br>            }<br><br>            // 重繪畫面<br>            repaint();<br><br>            try {<br>                Thread.sleep(150);<br>            } catch (InterruptedException e) {<br>                e.printStackTrace();<br>            }<br><br>            windTime--;<br>        }<br>    }<br>}<br><br>class SmokeParticle {<br>    private Point position = new Point(); // 位置<br>    private double vx, vy;  // 水平與垂直速度<br>    private double weight;  // 重量<br>    private int life;       // 生命週期<br><br>    void resume(int x, int y) {<br>        position.setLocation(x, y);<br>        vx = 0;<br>        vy = -1;<br>        weight = 10 * random() + 1;<br>    }<br><br>    void setLife(int life) {<br>        this.life = life;<br>    }<br><br>    void setWeight(double weight) {<br>        this.weight = weight;<br>    }<br><br>    Point getPoint() {<br>        return position;<br>    }<br><br>    double getWeight() {<br>        return weight;<br>    }<br><br>    Color getColor() {<br>        return new Color(life, life, life);<br>    }<br><br>    boolean isAlive() {<br>        return life != 0;<br>    }<br><br>    void nextState() {<br>        position.setLocation(position.getX(), position.getY() + vy);<br>        life--;<br>    }<br>}<br></pre><br>
+      <small>以下是使用HTML5 Canvas的方式（如果瀏覽器支援HTML5 Canvas，例如最新版的Firexfox、Chrome、IE9等，可以直接將下面的內容存為HTML或按下檔名連結，直接載入瀏覽器執行觀看結果：<br>
+      </small>
+      <ul>
+        <li><small><a href="html/SmokeParticle-1.html">SmokeParticle-1.html</a></small></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                function Color(r, g, b) {<br>                    this.r = r;<br>                    this.g = g;<br>                    this.b = b;<br>                    this.toString = function() {<br>                        return 'rgb(' + <br>                           [this.r, this.g, this.b].join() + ')';<br>                    };<br>                }<br>                <br>                function Point(x, y) {<br>                    this.x = x || 0;<br>                    this.y = y || 0;<br>                    this.setLocation = function(x, y) {<br>                        this.x = x;<br>                        this.y = y;<br>                    };<br>                }<br>                <br>                function SmokeParticle() {<br>                    var position = new Point();  // 位置<br>                    var vx = vy = 0;             // 水平與垂直速度<br>                    this.weight = 0;              // 重量 <br>                    this.life = 0;                // 生命週期<br><br>                    this.resume = function(x, y) {<br>                        position.setLocation(x, y);<br>                        vx = 0;<br>                        vy = -1;<br>                        this.weight = 10 * Math.random() + 1;<br>                    };<br><br>                    this.getPoint = function() {<br>                        return position;<br>                    };<br><br>                    this.getColor = function() {<br>                        return new Color(this.life, this.life, this.life);<br>                    };<br><br>                    this.isAlive = function() {<br>                        return this.life &gt; 0;<br>                    };<br><br>                    this.nextState = function() {<br>                        position.setLocation(position.x, position.y + vy);<br>                        this.life--;<br>                    };<br>                }<br>                <br>                var canvas1 = document.getElementById('canvas1');<br>                var canvas2 = document.getElementById('canvas2');<br>                var context1 = canvas1.getContext('2d');<br>                var context2 = canvas2.getContext('2d');<br>                <br>                var MAX = 1000;<br>                var particles = []; // 建立粒子<br>                // 煙初始位置<br>                var xCenter = canvas1.width / 2;<br>                var yCenter = 2 * canvas1.height / 3;<br>                for(var i = 0; i &lt; MAX; i++) {<br>                    particles[i] = new SmokeParticle();<br>                }<br>                <br>                var windTime = 0;<br>                var windX = 0;<br>                <br>                var context = context2;<br>                setTimeout(function() {<br>                    if(windTime &lt;= 0) {<br>                        windX = 30 * Math.random() - 15; // 風速 x<br>                        windTime = 20 * Math.random();  // 風吹時間<br>                    }<br><br>                    context.fillStyle = 'rgb(0, 0, 0)';<br>                    context.fillRect(0, 0, canvas1.width, canvas1.height);<br>                    for(var i in particles) {<br>                        if (particles[i].isAlive()) {<br>                            // 受風動的效果不一<br>                            var particle = particles[i];<br>                            var wx = windX / particle.weight;<br>                            var x = particle.getPoint().x;<br>                            var y = particle.getPoint().y;<br>                            particle.getPoint().setLocation(x + wx, y);<br><br>                            x = particle.getPoint().x;<br>                            y = particle.getPoint().y;<br><br>                            context.fillStyle = <br>                                particle.getColor().toString();<br>                            context.beginPath();<br>                            context.arc(x, y, 1, 0, 2 * Math.PI, true);<br>                            context.closePath();<br>                            context.fill();<br>                            particle.nextState();<br>                        }<br>                    }<br><br>                    if(context === context2) {<br>                        document.body.replaceChild(canvas2, canvas1);<br>                        context = context1;<br>                    }<br>                    else {<br>                        document.body.replaceChild(canvas1, canvas2);<br>                        context = context2;<br>                    }                        <br>                    <br>                    for(var i in particles) {<br>                        var particle = particles[i];<br>                        if(!particle.isAlive()) {<br>                            particle.life = parseInt(255 * Math.random());<br>                            particle.resume(xCenter, yCenter);<br>                        }<br>                    }<br><br>                    windTime--;<br>                                    <br>                    setTimeout(arguments.callee, 150);<br>                }, 150);<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;       <br>        &lt;canvas id="canvas1" width="640" height="480"&gt;&lt;/canvas&gt;<br>        &lt;canvas id="canvas2" width="640" height="480"&gt;&lt;/canvas&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+      </small>
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/SmokeParticle.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:01 GMT -->
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/MultiActionController1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>MultiActionController與ParameterMethodNameResolver</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: MultiActionController與ParameterMethodNameResolver</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>如
+果您的應用程式的規模越來越大，若您為每一個請求的處理撰寫一個Controller類別，很快的，您發現到Web應用程式中有越來越多的
+Controller類別，而事實上當中的一些職責是可以組織在一個類別，例如與資料庫操作相關的list()、add()、delete()等方法，就
+可以組織在一個類別來加以管理。<br>
+
+      <br>
+
+您可以使用AbstractController類別的一個子類別：
+org.springframework.web.servlet.mvc.multiaction.MultiActionController。它可
+以讓您在一個Controller類別中定義多個方法，並根據使用者的請求來呼叫當中的某個方法來執行。<br>
+
+      <br>
+
+要使用MultiActionController，您要配合一個
+org.springframework.web.servlet.mvc.multiaction.MethodNameResolver的實例，
+MultiActionController預設使用的MethodNameResolver類別是
+org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver，
+這個類別可以根據您所給的網址最後的檔案名稱來判斷要執行Controller中的哪一個方法，例如若請求的/test.do的請求會執行test
+(HttpServletRequest,
+HttpServletResponse)方法，但通常不會使用InternalPathMethodNameResolver，因為這就失去了使用
+MultiActionController的一些優點，像是依使用者所附帶的請求參數來決定所要呼叫的方法。<br>
+
+      <br>
+
+通常在使用MultiActionController時會搭配使用
+org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver
+或是
+org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver，
+兩個類別都是根據一個請求參數，以參數來決定要執行Controller類別中的哪一個方法，這邊先以
+ParameterMethodNameResolver為例，例如可以在Bean定義檔中這麼撰寫：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>mvc-config.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE beans PUBLIC <br> "-//SPRING/DTD BEAN/EN" <br> "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt;   <br>    &lt;bean id="urlMapping" <br>          class="org.springframework.web.servlet.<br>                    &rarr; handler.SimpleUrlHandlerMapping"&gt; <br>        &lt;property name="mappings"&gt; <br>            &lt;props&gt; <br>                &lt;prop key="/book.do"&gt;bookController&lt;/prop&gt; <br>            &lt;/props&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>    <br>    &lt;bean id="viewResolver" <br>          class="org.springframework.web.servlet.<br>                    &rarr; view.InternalResourceViewResolver"&gt; <br>        &lt;property name="prefix"&gt; <br>            &lt;value&gt;/WEB-INF/jsp/&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="suffix"&gt; <br>            &lt;value&gt;.jsp&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br><br>    &lt;bean id="paraMethodResolver" <br>          class="org.springframework.web.servlet.mvc.<br>                    &rarr; multiaction.ParameterMethodNameResolver"&gt; <br>        &lt;property name="paramName"&gt;<br>            &lt;value&gt;action&lt;/value&gt;<br>        &lt;/property&gt; <br>        &lt;property name="defaultMethodName"&gt;<br>            &lt;value&gt;list&lt;/value&gt;<br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>        <br>    &lt;bean id="bookController" <br>          class="onlyfun.caterpillar.BookController"&gt; <br>        &lt;property name="methodNameResolver"&gt; <br>            &lt;ref bean="paraMethodResolver"/&gt; <br>        &lt;/property&gt; <br>        &lt;property name="testPage"&gt; <br>            &lt;value&gt;test&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>&lt;/beans&gt;</pre>
+
+      <small><br>
+
+在paraMethodResolver的Bean定義中，使用"paramName"屬性定義在HTTP請求中使用"action"參數來指定所要呼叫
+的方法，若是請求中沒有指定"action"參數，則會使用"defaultMethodName"屬性所指定的方法，這邊指定的是list()方法。<br>
+
+      <br>
+
+BookController是個繼承MultiActionController的類別，當中可以定義在"action"參數指定下所要呼叫的方法，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>BookController.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar; <br><br>import javax.servlet.http.*; <br>import org.springframework.web.servlet.ModelAndView;<br>import org.springframework.web.servlet.mvc.<br>                 multiaction.MultiActionController;<br><br><br>public class BookController extends MultiActionController { <br>    private String testPage; <br>    <br>    public ModelAndView list(HttpServletRequest req, <br>                          HttpServletResponse res) { <br>        return new ModelAndView(<br>                        this.getTestPage(),"executed", "list"); <br>    } <br>    <br>    public ModelAndView add(HttpServletRequest req, <br>                           HttpServletResponse res) { <br>        return new ModelAndView(<br>                        this.getTestPage(),"executed", "add"); <br>    } <br>    <br>    public ModelAndView delete(HttpServletRequest req, <br>                             HttpServletResponse res) { <br>        return new ModelAndView(<br>                       this.getTestPage(),"executed", "delete"); <br>    } <br>    <br>    public String getTestPage() { <br>        return testPage; <br>    } <br>    <br>    public void setTestPage(String testPage) { <br>        this.testPage = testPage; <br>    } <br>} </pre>
+
+      <small><br>
+
+注意到在定義的方法中，必須包括HttpServletRequest與HttpServletResponse的參數，您也可以使用帶有第三個參數HttpSession的版本。<br>
+
+      <br>
+
+以上所定義的BookController類別只是一個簡單的範例，用於測試MultiActionController的運作，它所作的處理只是設定一個字串，表示目前所執行的方法名稱，可以設計一個測試用的JSP網頁，用以顯示使用者所請求的方法，例如：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>test.jsp</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;%@page contentType="text/html"%&gt;<br>&lt;%@page pageEncoding="UTF-8"%&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" <br>              content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;MultiAction Test Page&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;H1&gt; "${executed}" method is executed.&lt;/H1&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; </pre>
+
+      <small><br>
+
+      <br>
+
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/MultiActionController1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:09 GMT -->
+</html>

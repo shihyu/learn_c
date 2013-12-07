@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/CustomWidget.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:23 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>自訂 Widget</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip:&nbsp;<small>自訂 Widget</small></a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>我們之前都是將整個QWidget物件或其衍生物件，利用setMainWidget()將之設為主Widget，這會使得QWidget物件填滿整個視窗，這邊我們來看看如何自訂自己的Widget，並設定當中的QWidget位置。 </small>
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <pre>#include &lt;qapplication.h&gt;<br>#include &lt;qpushbutton.h&gt;<br><br>class MyWidget : public QWidget {<br>public:<br>    MyWidget(QWidget *parent=0, const char *name=0);<br>};<br><br>MyWidget::MyWidget(QWidget *parent, const char *name)<br>        : QWidget(parent, name) {<br>    setMinimumSize(240, 120);<br>    setMaximumSize(240, 120);<br><br>    QPushButton *btn = new QPushButton("Push me", this, "btn");<br>    btn-&gt;setGeometry(42, 40, 150, 50);<br><br>    connect(btn, SIGNAL(clicked()), qApp, SLOT(quit()));<br>}<br><br>int main(int argc, char **argv) {<br>    QApplication a(argc, argv);<br><br>    MyWidget w;<br>    w.setGeometry(200, 200, 240, 120);<br>    a.setMainWidget(&amp;w);<br>    w.show();<br>    return a.exec();<br>}<br></pre>
+
+
+      <br>
+
+
+      <small><br>
+
+
+首先我們繼承QWidget： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">class MyWidget : public QWidget { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; MyWidget(QWidget *parent=0, const char *name=0); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}; </span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+而我們利用建構函式（constructor）來進行一些初始化的動作，</small><small>接下來我們實作建構函式內容，setMinimumSize()與setMaximumSize()是用來設定Widget的最大與最小長寬，設定為相同時表示這個Widget無法變動大小：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">setMinimumSize(240, 120); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">setMaximumSize(240, 120); </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+接下來的程式碼中：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">QPushButton *btn = new QPushButton("Push me", this, "btn"); </small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">btn-&gt;setGeometry(42, 40, 150, 50); </small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+我們配置QPushButton，設定其顯示為"Push
+me"，新的Widget其父類別為本身（this），而我們給這個Widget一個名稱"btn"，它只是剛好與物件名稱btn相同而已，而這個名稱與
+顯示文字也沒有關係；setGeometry()設定btn的右上角座標為(42, 40)，而其長寬為(150, 50)。 <br>
+
+
+      </small><small><br>
+
+
+接下來我們連接Signal與Slot：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">connect(btn, SIGNAL(clicked()), qApp, SLOT(quit())); </small><br>
+
+
+      </div>
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><br>
+
+
+      </small><small>由於目前還不知道應用程式物件是誰，我們必須先將之連接至Qt的公用指標qApp，qApp還提供了許多公用方法，這之後還會遇到。 <br>
+
+
+      <br>
+
+
+再來</small><small>設定Qt視窗的位置與大小：</small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">w.setGeometry(200, 200, 240, 120); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+我們的Qt視窗左上角將會在(200, 200)的位置，長寬為(240, 120)；接下來的部份都相同了。<br>
+
+
+      <br>
+
+
+下圖為執行後的結果：<br>
+
+
+      <br>
+
+
+      </small><img style="width: 248px; height: 147px;" alt="" src="images/CustomWidget-1.jpg"><br>
+
+
+      <br>
+
+
+
+
+
+
+      <small></small><span class="postbody"><br>
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/CustomWidget.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:23 GMT -->
+</html>

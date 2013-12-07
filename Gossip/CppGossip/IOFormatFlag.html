@@ -1,0 +1,510 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/IOFormatFlag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  
+  <title>I/O 格式化旗標</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index.html">C++
+Gossip: I/O 格式化旗標</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: top; width: 713px;"><small>I/O格式控制器可以對當時正在處理的串流改變格式，如果想要在程式進行過程中，讓所有的串流都維持您所指定的格式，則您可以使用格式化旗標，格式化旗標定義了一些值，您可以使用setf()與unsetf()來設定與取消格式化旗標。 <br>
+
+
+      <br>
+
+
+以下先列出一些常用的格式化旗標： </small><br>
+
+
+
+
+      
+      
+      <table style="text-align: left; width: 675px;" border="1" cellpadding="2" cellspacing="2">
+
+
+        <tbody>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::boolalpha</small></td>
+
+
+            <td style="width: 450px;"><small>將真與假以true與false顯示</small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::dec</small></td>
+
+
+            <td style="width: 450px;"><small>10進位顯示 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::fixed</small></td>
+
+
+            <td style="width: 450px;"><small>正常方式顯示（非科學記號）</small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::hex</small></td>
+
+
+            <td style="width: 450px;"><small>16進位顯示 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::left</small></td>
+
+
+            <td style="width: 450px;"><small>靠左</small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::oct</small></td>
+
+
+            <td style="width: 450px;"><small>8進位顯示 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::scientific</small></td>
+
+
+            <td style="width: 450px;"><small>科學記號 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::showbase</small></td>
+
+
+            <td style="width: 450px;"><small>顯示基底 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::showpoint</small></td>
+
+
+            <td style="width: 450px;"><small>顯示小數點 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::showpos</small></td>
+
+
+            <td style="width: 450px;"><small>正數顯示+</small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::skipws</small></td>
+
+
+            <td style="width: 450px;"><small>忽略空白字元 </small></td>
+
+
+          </tr>
+
+
+          <tr>
+
+
+            <td style="width: 205px;"><small>ios::uppercase</small></td>
+
+
+            <td style="width: 450px;"><small>字母大寫 </small></td>
+
+
+          </tr>
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+      <small><br>
+
+
+您可以一次設定一個格式化旗標，如果要設定兩個格式化旗標，則可以使用 | 來連結，例如： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">cout.setf(ios::showbase | ios::hex); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+下面這個程式顯示一些基本的格式化旗標作用： <br>
+
+      </small>
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() { <br>    cout.unsetf(ios::dec); // 取消10進位顯示 <br>    cout.setf(ios::hex | ios::scientific); // 16進位顯示或科學記號顯示 <br>    cout &lt;&lt; 12345 &lt;&lt; "  " &lt;&lt; 100 &lt;&lt; endl; <br>                                                                                <br>    cout.setf(ios::showpos | ios::showpoint); // 正數顯示 + 號且顯示小數點 <br>    cout &lt;&lt; 10.0 &lt;&lt; ": " &lt;&lt; -10.0 &lt;&lt; endl; <br><br>    return 0; <br>}</pre>
+
+      <small>
+      <br>
+
+
+      </small><span class="postbody"><small>
+執行結果：</small></span><br>
+
+
+
+
+
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+          <tr>
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">3039&nbsp; 64<br>
+
++1.000000e+001: -1.000000e+001<br>
+
+
+            </span></small><span style="color: rgb(255, 255, 255);">
+
+
+            </span></td>
+
+
+
+
+
+          </tr>
+
+
+
+
+
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+
+      <small>在程式中我們先解除了ios::dec格式旗標，這個動作並不是一定需要，但在某些編譯器中，這個旗標會覆蓋其它的旗標，所以我們仍先清除比較保險。 <br>
+
+      <br>
+
+ios類別的成員函式flags()會傳回目前串流的格式化設定值，如果傳遞參數給它，則它會設定參數所指定的格式，並傳回上一個格式設定： <br style="font-weight: bold;">
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">fmtflags flags(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">fmtflags flags(fmtflags);</span></small><br>
+
+      </div>
+
+      <small><br>
+
+下面這個程式可以用來測試串流的格式設定： <br>
+
+      </small>
+      
+      <pre>#include &lt;iostream&gt; <br>using namespace std; <br><br>int main() { <br>    ios::fmtflags f; <br><br>    cout.unsetf(ios::dec); <br>    cout.setf(ios::oct | ios::showbase); <br><br>    f = cout.flags(); <br><br>    if(f &amp; ios::left) {<br>        cout &lt;&lt; "left flag on\n"; <br>    }<br>    else {<br>        cout &lt;&lt; "left flag off\n"; <br>    }<br><br>    if(f &amp; ios::dec) {<br>        cout &lt;&lt; "dec flag on\n";<br>    }<br>    else {<br>        cout &lt;&lt; "dec flag off\n"; <br>    }<br><br>    if(f &amp; ios::showbase) {<br>        cout &lt;&lt; "showbase flag on\n"; <br>    }<br>    else {<br>        cout &lt;&lt; "showbase flag off\n"; <br>    }<br><br>    if(f &amp; ios::oct) {<br>        cout &lt;&lt; "oct flag on\n"; <br>    }<br>    else {<br>        cout &lt;&lt; "left flag off\n"; <br>    }<br><br>    return 0; <br>}</pre>
+
+      <small><br>
+
+執行結果：<br>
+
+      </small>
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+        <tbody>
+
+          <tr>
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">left flag off<br>
+
+dec flag off<br>
+
+showbase flag on<br>
+
+oct flag on<br>
+
+
+            </span></small><span style="color: rgb(255, 255, 255);">
+
+
+            </span></td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      <br>
+
+      <small>下面這個程式片段告訴您，如何使用flags()一次設定所有指定的格式旗標： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ios::fmtflags f = ios::showpos | ios::showbase | ios::oct | ios::right; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cout.flags(f); </span></small><br>
+
+      </div>
+
+      <small><br>
+
+      <br>
+
+
+      </small></td>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/IOFormatFlag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

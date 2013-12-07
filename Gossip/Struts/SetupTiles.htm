@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/SetupTiles.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>設置 Tiles 模版引擎</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 設置 Tiles 模版引擎</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+在網頁上最常用來處理版面的是表格，透過將表格邊框設定為0，可以用它來切割版面，並在當中置入內容，然而一大堆版面配置的標籤將與內容夾雜在一起，如果以後要更改內容或版面配置，會是一個麻煩。<br>
+      <br>
+
+
+在視窗程式的設計中存在有版面管理員（Layout
+Manager）機制，我們可以選擇一個版面管理機制，之後直接在視窗容器上添加元件而不用處理版面配置細節，而由版面管理員來自己處理元件的版面配置，
+如果想要改變版面配置，則只要直接更換版面管理員，所有的元件將自動依新的管理員而重新配置版面。<br>
+      <br>
+
+
+Tiles提供一個類似於視窗程式版面管理的機制，透過定義檔，您可以定義版面配置，以及當中所要置入的內容網頁，內容與版面配置的標籤可以分離，您可以隨時抽換每一個內容網頁，也可以重用每一個版面配置。<br>
+      <br>
+
+
+Tiles隨著Struts一同發佈，您可以直接從struts-blank中開始設定，當中已經包括了Tiles必要的檔案與設定，如果您要自行設定
+Tiles，您必須要有commons-beanutils.jar、commons-logging.jar、commons-
+collections.jar、commons-digester.jar、struts.jar四個檔案在您的/WEB-INF/lib目錄中，並且
+在struts-config.xml中加入以下的內容：</small>
+
+
+
+
+
+      <br>
+
+
+      <ul>
+        <li>struts-config.xml</li>
+      </ul>
+
+
+      <pre>...<br>&nbsp;&lt;plug-in className="org.apache.struts.tiles.TilesPlugin" &gt; <br>&nbsp;&nbsp;&nbsp; &lt;set-property property="definitions-config" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value="/WEB-INF/conf/tiles-defs.xml" /&gt; <br>&nbsp;&nbsp;&nbsp; &lt;set-property property="moduleAware" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value="true" /&gt; <br>&nbsp;&nbsp;&nbsp; &lt;set-property property="definitions-parser-validate" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value="true" /&gt; <br>&nbsp; &lt;/plug-in&gt;<br>...</pre>
+
+
+      <br>
+      <small>
+
+在Struts 1.1後，您只要使用 Plugin
+就可以掛上Tiles的功能。definitions-config屬性中的tiles-defs.xml是Tiles的定義檔，Tiles提供了一個處
+理請求的 RequestProcessor，可以進行一些forward與include的額外動作：<br>
+      </small>
+
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;controller</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; processorClass="org.apache.struts.tiles.TilesRequestProcessor"/&gt;</span><br>
+
+
+      </small></div>
+      <small>
+
+&nbsp;<br>
+
+
+您可以參考struts-blank中的設定，將上面兩個設定加入struts-config.xml中；最後，您要將
+struts-tiles.tld放置在/WEB-INF/tld下，並在web.xml中定義，這樣可以使用Tiles標籤，例如在web.xml中是
+這麼設定的：</small><br>
+
+
+      <ul>
+        <li>web.xml&nbsp;</li>
+      </ul>
+
+
+ 
+      <pre>...<br>&nbsp; &lt;taglib&gt; <br>&nbsp;&nbsp;&nbsp; &lt;taglib-uri&gt;/tags/struts-tiles&lt;/taglib-uri&gt; <br>&nbsp;&nbsp;&nbsp; &lt;taglib-location&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /WEB-INF/tld/struts-tiles.tld<br>&nbsp;&nbsp;&nbsp; &lt;/taglib-location&gt; <br>&nbsp; &lt;/taglib&gt;<br>...</pre>
+
+
+      <br>
+      <small>
+
+完成以上之後，您就可以開始使用Tiles的功能了，Tiles的定義檔可以使用XML或JSP頁面來完成。</small> </td>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Struts/SetupTiles.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>

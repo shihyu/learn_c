@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/MessageTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:00 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>訊息標籤</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: 訊息標籤<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </script></center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>要使用JSTL的i18n相容格式標籤庫，必須在JSP網頁上使用<span style="font-family: Courier New,Courier,monospace;">taglib指示元素定義前置名稱與uri參考，</span>慣例上使用i18n相容格式標籤庫時，會使用fmt作為前置名稱，JSTL 1.1格式標籤庫的uri參考則為http://java.sun.com/jsp/jstl/fmt。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%&gt;</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">首先來看到最基本的&lt;fmt:bundle&gt;、&lt;fmt:message&gt;</span>如何使用，假設你準備了一個messages1.properties檔案如下：<br>
+      </small>
+      <pre>cc.openhome.title=Welcome<br>cc.openhome.forGuest=Hello! Guest! <br></pre>
+      <small><br>
+這個.properties檔案必須放在Web應用程式的/WEB-INF/classes中，接著如下建立JSP檔案：<br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;fmt:bundle basename="messages1"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>               content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;&lt;fmt:message key="cc.openhome.title" /&gt;&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>	    &lt;h1&gt;&lt;fmt:message key="cc.openhome.forGuest" /&gt;&lt;/h1&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br>&lt;/fmt:bundle&gt;  <br></pre>
+      <small><br>
+&nbsp;首先，<span style="font-family: Courier New,Courier,monospace;">使用taglib指示元素定義前置名稱與uri，然後使用&lt;fmt:bundle&gt;指定basename屬性為"messages1"</span>，這表示預設的訊息檔案為messages1.properties，這邊先討論如何置換訊息檔案或其內容，國際化的問題稍後再討論，使用<span style="font-family: Courier New,Courier,monospace;">&lt;fmt:message&gt;的key屬性則指定訊息檔案中的哪條訊息</span>。下圖為執行時的一個參考畫面：<br>
+      <img style="width: 464px; height: 78px;" alt="" src="images/MessageTag-1.png"><br>
+      <br>
+如果你將&lt;fmt:bundle&gt;的basename改設定為"messages2"，並且另外準備一個messages2.properties：<br>
+      </small>
+      <pre>cc.openhome.title=Aloha<br>cc.openhome.forGuest=Hi! New Guest! <br></pre>
+      <small><br>
+ 那麼顯示出來的畫面中，訊息內容就是來自messages2.properties，如下圖所示：<br>
+      <img style="width: 463px; height: 66px;" alt="" src="images/MessageTag-2.png"><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">你也可以使用&lt;fmt:setBundle&gt;標籤設置basename屬性，設置的效力預設是整個頁面都有作用，如果額外有&lt;fmt:bundle&gt;設置，則會以&lt;fmt:bundle&gt;的設置為主，例如：</span><br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;fmt:setBundle basename="messages1"/&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>               content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;&lt;fmt:message key="cc.openhome.title" /&gt;&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>	    &lt;h1&gt;&lt;fmt:message key="cc.openhome.forGuest" /&gt;&lt;/h1&gt;<br>	    &lt;fmt:bundle basename="messages2"&gt;<br>	        &lt;h1&gt;&lt;fmt:message key="cc.openhome.forGuest" /&gt;&lt;/h1&gt;<br>	    &lt;/fmt:bundle&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <small><br>
+這個JSP一開始使用<span style="font-family: Courier New,Courier,monospace;">&lt;fmt:setBundle&gt;設置basename為"messages1"，所以第一個&lt;fmt:message&gt;取得的訊息就是來自</span>messages1.properties，另一個被<span style="font-family: Courier New,Courier,monospace;">&lt;fmt:bundle&gt;包括的&lt;fmt:message&gt;</span>，取得的訊息就是來自messages2.properties。<br>
+      <br>
+如果訊息中有些部份必須動態決定，則可以使用佔位字符先代替，例如：<br>
+      </small>
+      <pre>cc.openhome.title=Hello<br>cc.openhome.forUser=Hi! {0}! It is {1, date, long} and {2, time ,full}. <br></pre>
+      <small><br>
+在上面的訊息檔案中，粗體字部份就是佔位字符，號碼從0開始，分別代表第幾個佔位字符，在指定時可以指定型態與格式，所使用的格式是由<span style="font-family: Courier New,Courier,monospace;">java.text.MessageFormat所定義，可參考java.text.MessageFormat</span>的API文件說明。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">如果想設置佔位字符的真正內容，則是使用&lt;fmt:param&gt;標籤，例如：</span><br>
+      </small>
+      <pre>&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%&gt;<br>&lt;jsp:useBean id="now" class="java.util.Date"/&gt;<br>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" <br>  "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;fmt:setBundle basename="messages3"/&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>                content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;&lt;fmt:message key="cc.openhome.title" /&gt;&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;fmt:message key="cc.openhome.forUser"&gt;<br>        &lt;fmt:param value="${param.username}"/&gt;<br>        &lt;fmt:param value="${now}"/&gt;<br>        &lt;fmt:param value="${now}"/&gt;<br>    &lt;/fmt:message&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <small><br>
+在這個JSP中，使用<span style="font-family: Courier New,Courier,monospace;">&lt;jsp:useBean&gt;建立Date</span>物件以取得目前系統時間，並設置為屬性，訊息檔案的基礎名稱設定為"messages3"，而訊息檔案中每個佔位字元，則使用<span style="font-family: Courier New,Courier,monospace;">&lt;fmt:param&gt;</span>逐一設置，執行的結果畫面如下所示：<br>
+      <img style="width: 467px; height: 49px;" alt="" src="images/MessageTag-3.png"><br>
+      <br>
+      <br>
+      <br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/MessageTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:00 GMT -->
+</html>

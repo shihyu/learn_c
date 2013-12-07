@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/YieldGenerator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>yield 產生器</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: yield 產生器<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small><span style="font-family: Courier New,Courier,monospace;">你可以在函式中包括<span style="font-weight: bold;">yield</span>來「產生」值，表面上看來，yield就像是return會傳回值，但又不中斷函式的執行：</span></small><small><br></small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; def myrange(n):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 0<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; while True:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; yield x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x += 1<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if x == n:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break<br>
+...<br>
+&gt;&gt;&gt; for i in myrange(10):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(i, end='')<br>
+... print()<br>
+</span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">...</span></span></small><br>
+            <small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span>0123456789<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+      <br>
+      <small>上面的程式模擬了內建函式<span style="font-family: Courier New,Courier,monospace;">range()</span>的作用。表面上看來，你在<span style="font-family: Courier New,Courier,monospace;">myrange()函式中使用yield傳回值，然後執行for in迴圈，接著再使用myrange()傳回下一個值，再執行for in迴圈，就好似myrange()執行過後沒有結束似的。</span></small><br>
+      <br>
+      <small>實際上，在<span style="font-family: Courier New,Courier,monospace;">def</span>所定義的本體中，若包括<span style="font-family: Courier New,Courier,monospace;">yield</span>運算式，則Python會將之編譯為一個產生器（Generator）。例如：</small><br>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; myrange(10)<br>
+</span>&lt;generator object myrange at 0x01C98440&gt;<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; dir(myrange(10))<br>
+            </span>['__class__', '__delattr__', '__doc__', '__eq__', '__format__', '__ge__', '__get<br>
+attribute__', '__gt__', '__hash__', '__init__', '__iter__', '__le__', '__lt__',<br>
+'__name__', '__ne__', '__new__', '__next__', '__reduce__', '__reduce_ex__', '__r<br>
+epr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'close', 'gi<br>
+_code', 'gi_frame', 'gi_running', 'send', 'throw']<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;<br>
+            </span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>產生器物件是個具有迭代器（Iterator）介面的物件，也就是說，它具有<span style="font-family: Courier New,Courier,monospace;">__next__()方法，可以使用next()函式來取出下一個值，若無法產生下一個值，則會丟出StopIteration物件。例如：</span></small><br>
+
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; g = myrange(3)<br>
+&gt;&gt;&gt; next(g)<br>
+</span>0<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>1<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>2<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>Traceback (most recent call last):<br>
+&nbsp; File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>
+StopIteration<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"><br>
+      </span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+      <br>
+      <small>這也就是為何在第一個例子中，在<span style="font-family: Courier New,Courier,monospace;">for in迴圈呼叫myrange()</span>會有那樣的結果。一個函式若包括<span style="font-family: Courier New,Courier,monospace;">yield</span>，則會傳回產生器物件，而該函式基本上可以包括<span style="font-family: Courier New,Courier,monospace;">return</span>，不過不可以指明傳回值（也就是只能傳回<span style="font-family: Courier New,Courier,monospace;">None</span>）。<span style="font-family: Courier New,Courier,monospace;">return</span>只是用來結束函式的執行流程。例如：<br>
+      </small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; def myrange(n):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 0<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; while True:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; yield x<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return<br>
+...<br>
+&gt;&gt;&gt; g = myrange(3)<br>
+&gt;&gt;&gt; next(g)<br>
+</span>0<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>Traceback (most recent call last):<br>
+&nbsp; File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>
+StopIteration<br style="font-weight: bold;">
+<span style="font-weight: bold;">&gt;&gt;&gt;</span><span style="font-weight: bold;"><br>
+      </span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">在上例中，第一個next(g)後，函式的執行流程就因return而結束了，嘗試再執行next(g)，就函式定義來看，無法再執行到yield運算式，所以就函式定義來看，StopIteration是因為無法執行到yield運算式而丟出的。</small><br>
+      <small><br>
+先前談過 </small><small><big><a href="ForComprehension.html"><small>for 包含式（Comprehension）</small></a></big>，實際上，<span style="font-family: Courier New,Courier,monospace;">for</span>包含式與迭代器都是一個叫產生器運算式的語言特性。在<big> </big></small><small><small><big><big><a href="ForComprehension.html"><small>for 包含式（Comprehension）</small></a></big> 中最後一個例子也有提到，使用<span style="font-family: Courier New,Courier,monospace;">()與for</span>包含式時，實際上是建立一個產生器。例如：</big></small></small><small><br>
+      </small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; (i ** 2 for i in range(3))<br>
+&lt;generator object &lt;genexpr&gt; at 0x01C98440&gt;<br>
+&gt;&gt;&gt; g = (i ** 2 for i in range(3))<br>
+&gt;&gt;&gt; next(g)<br>
+</span>0<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>1<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>4<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>Traceback (most recent call last):<br>
+&nbsp; File "&lt;stdin&gt;", line 1, in &lt;module&gt;<br>
+StopIteration<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; for p in (i ** 2 for i in range(3)):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; print(p)<br>
+...<br>
+            </span>0<br>
+1<br>
+4<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"><br>
+      </span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>從Python 2.5開始，<span style="font-family: Courier New,Courier,monospace;">yield從陳述改為運算式，也就是yield除了「產生」指定的值之外，會有一個運算結果，yield運算結果預設是None，你可以透過產生器的<span style="font-weight: bold;">send()</span>方法傳入一個值，這個值就成為yield的運算結果。這給了你一個與產生器溝通的機會。例如：</span></small><small><br>
+      </small>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+<tbody><tr><td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; def myrange(n):<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; x = 0<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; while True:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; val = (yield x)<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if val is not None:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = val<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x += 1<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if x &gt;= n:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break<br>
+</span>...<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; g = myrange(10)<br>
+&gt;&gt;&gt; next(g)<br>
+            </span>0<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>1<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>2<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; g.send(0)<br>
+            </span>0<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>1<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>2<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; g.send(5)<br>
+            </span>5<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>6<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; next(g)<br>
+            </span>7<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"><br>
+      </span></span></small><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><small><br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/YieldGenerator.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

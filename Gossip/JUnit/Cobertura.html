@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Cobertura.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:14 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>簡介 Cobertura</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 簡介 Cobertura<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在進行測試時，你預期方法呼叫後的傳回值或該有的結果，藉以了解在傳入某參數或物件某狀態下，方法執行的結果是否正確，通常這是你所需要的，在這樣的情況下，執行的測試是接近所謂黑箱</small><small>（Block box）</small><small>測試。<br>
+      <br>
+然而程式實際撰寫時，並非只有輸入、狀態、傳回值、執行結果，方法的演算中會有其它要考慮的部份，像是分支判斷、例外等，理想的情況下，測試必須涵蓋每條流程、每行程式碼，了解程式碼運行是否正常或正確，這時你進行的，是接近於所謂白箱（White box）測試。<br>
+      <br>
+然而就算你針對演算流程進行了測試，單憑肉眼或腦袋，很難計算出測試覆蓋率（Test coverage），因而有著一些工具，可以協助進行評估。<br>
+      <br>
+      <a href="http://cobertura.sourceforge.net/">Coberture</a> 是個評估測試覆蓋率的工具，它針對.class進行修改，於運行時評估運行的程式碼與次數，提供測試覆蓋率數據，並可產生文件作為參考。<br>
+      <br>
+在這邊先示範文字模式下的指令，了解Coberture的基本操作，這邊以 </small><small><big><a href="DatabaseUnitTest.html"><small>資料庫單元測試</small></a></big> 中的例子為對象。假設專案中...<br>
+      </small>
+      <ul>
+        <li><small>lib：放置jar檔</small><br>
+        </li>
+        <li><small>src：放置原始碼</small></li>
+        <li><small>bin：放置編譯好的類別</small></li>
+        <li><small>instrumented：放置Coberture修改後的類別</small></li>
+        <li><small>reports：放置測試報告</small></li>
+      </ul>
+      <small><br>
+首先確定你的PATH中包括了Coberture的目錄，接著執行以下的指令：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cobertura-instrument --destination instrumented bin\cc\openhome</span></small><br>
+      </div>
+      <small><br>
+這會將cc\openhome資料夾下包括子資料夾中所有.class讀入修改，修改後的.class會放至instrumented資料夾中，並產生一個<span style="font-weight: bold;">cobertura.ser</span>的檔案，這個檔案記錄了原有類別的一些資訊。接著執行以下指令：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">java -cp lib\mysql-connector-java-5.1.7-bin.jar;lib\junit-4.8.2.jar;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; lib\cobertura.jar;instrumented;bin<br>
+&nbsp; -Dnet.sourceforge.cobertura.datafile=cobertura.ser </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; org.junit.runner.JUnitCore test.cc.openhome.BookmarkDAOImplTest</span></small><br>
+      </div>
+      <small><br>
+注意，這些指令是連在一起不換行的。這會使用運行測試，並產生報告來更新<span style="font-weight: bold;">cobertura.ser</span>檔案中的資訊，接著可以執行以下的指令產生報表：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cobertura-report --format html --datafile cobertura.ser --destination reports src</span></small><br>
+      </div>
+      <small><br>
+產生的報告如下圖：<br>
+      <img style="border: 1px solid ; width: 665px; height: 221px;" alt="" src="images/Cobertura-1.png"><br>
+      <br>
+點選每個類別，可以看到此次測試的每行程式碼執行次數：<br>
+      <img style="border: 1px solid ; width: 526px; height: 497px;" alt="" src="images/Cobertura-2.png"><br>
+      <br>
+在Eclipse IDE中，可以安裝 <a href="http://ecobertura.johoop.de/">eCobertura</a> ，接著只要在測試類別時執行「Cover as/JUnit Test」，就會以不同顏色顯示有執行與未執行的程式碼。例如：<br>
+      <img style="border: 1px solid ; width: 636px; height: 697px;" alt="" src="images/Cobertura-3.png"><br>
+      <br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Cobertura.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:20 GMT -->
+</html>

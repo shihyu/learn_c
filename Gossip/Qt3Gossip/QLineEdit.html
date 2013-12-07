@@ -1,0 +1,698 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QLineEdit.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:58 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QLineEdit 輸入欄位</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: QLineEdit 輸入欄位</a></h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>QLineEdit提供一個文字輸入欄位，可以輸入文字或數字，我們可以對輸入作驗證，或是設定為一般顯示、密碼顯示等等；這邊的範例來自Qt的線上說明文件，可展示QLineEdit的一些基本功能。 <br>
+
+
+      <br>
+
+
+首先編輯lineedits.h定義檔： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>linedits.h</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#ifndef LINEDITS_H<br>#define LINEDITS_H<br><br>#include &lt;qgroupbox.h&gt;<br><br>class QLineEdit;<br>class QComboBox;<br><br>class LineEdits : public QGroupBox<br>{<br>    Q_OBJECT<br><br>public:<br>    LineEdits( QWidget *parent = 0, const char *name = 0 );<br><br>protected:<br>    QLineEdit *lined1, *lined2, *lined3, *lined4;<br>    QComboBox *combo1, *combo2, *combo3, *combo4;<br><br>protected slots:<br>    void slotEchoChanged( int );<br>    void slotValidatorChanged( int );<br>    void slotAlignmentChanged( int );<br>    void slotReadOnlyChanged( int );<br>};<br><br>#endif </pre>
+
+
+      <small><br>
+
+
+再來編輯lineedits.cpp： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>lineedits.cpp</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include "lineedits.h"<br><br>#include &lt;qlineedit.h&gt;<br>#include &lt;qcombobox.h&gt;<br>#include &lt;qframe.h&gt;<br>#include &lt;qvalidator.h&gt;<br>#include &lt;qlabel.h&gt;<br>#include &lt;qlayout.h&gt;<br>#include &lt;qhbox.h&gt;<br><br>/*<br>* Constructor<br>*<br>* Creates child widgets of the LineEdits widget<br>*/<br><br>LineEdits::LineEdits( QWidget *parent, const char *name )<br>    : QGroupBox( 0, Horizontal, "Line edits", parent, name )<br>{<br>    setMargin( 10 );<br><br>    QVBoxLayout* box = new QVBoxLayout( layout() );<br>   <br>    QHBoxLayout *row1 = new QHBoxLayout( box );<br>    row1-&gt;setMargin( 5 );<br><br>    // Create a Label<br>    QLabel* label = new QLabel( "Echo Mode: ", this);<br>    row1-&gt;addWidget( label );<br><br>    // Create a Combobox with three items...<br>    combo1 = new QComboBox( FALSE, this );<br>    row1-&gt;addWidget( combo1 );<br>    combo1-&gt;insertItem( "Normal", -1 );<br>    combo1-&gt;insertItem( "Password", -1 );<br>    combo1-&gt;insertItem( "No Echo", -1 );<br>    // ...and connect the activated() SIGNAL <br>    // with the slotEchoChanged() SLOT to be able<br>    // to react when an item is selected<br>    connect( combo1, SIGNAL( activated( int ) ),<br>              &nbsp;this, SLOT( slotEchoChanged( int ) ) );<br><br>    // insert the first LineEdit<br>    lined1 = new QLineEdit( this );<br>    box-&gt;addWidget( lined1 );<br><br>    // another widget which is used for layouting<br>    QHBoxLayout *row2 = new QHBoxLayout( box );<br>    row2-&gt;setMargin( 5 );<br><br>    // and the second label<br>    label = new QLabel( "Validator: ", this );<br>    row2-&gt;addWidget( label );<br><br>    // A second Combobox with again three items...<br>    combo2 = new QComboBox( FALSE, this );<br>    row2-&gt;addWidget( combo2 );<br>    combo2-&gt;insertItem( "No Validator", -1 );<br>    combo2-&gt;insertItem( "Integer Validator", -1 );<br>    combo2-&gt;insertItem( "Double Validator", -1 );<br>    // ...and again the activated() SIGNAL gets connected with a SLOT<br>    connect( combo2, SIGNAL( activated( int ) ), <br>              this, SLOT( slotValidatorChanged( int ) ) );<br><br>    // and the second LineEdit<br>    lined2 = new QLineEdit( this );<br>    box-&gt;addWidget( lined2 );<br><br>    // yet another widget which is used for layouting<br>    QHBoxLayout *row3 = new QHBoxLayout( box );<br>    row3-&gt;setMargin( 5 );<br><br>    // we need a label for this too<br>    label = new QLabel( "Alignment: ", this );<br>    row3-&gt;addWidget( label );<br><br>    // A combo box for setting alignment<br>    combo3 = new QComboBox( FALSE, this );<br>    row3-&gt;addWidget( combo3 );<br>    combo3-&gt;insertItem( "Left", -1 );<br>    combo3-&gt;insertItem( "Centered", -1 );<br>    combo3-&gt;insertItem( "Right", -1 );<br>    // ...and again the activated() SIGNAL gets connected with a SLOT<br>    connect( combo3, SIGNAL( activated( int ) ), <br>             this, SLOT( slotAlignmentChanged( int ) ) );<br><br>    // and the third lineedit<br>    lined3 = new QLineEdit( this );<br>    box-&gt;addWidget( lined3 );<br><br>    // last widget used for layouting<br>    QHBox *row4 = new QHBox( this );<br>    box-&gt;addWidget( row4 );<br>    row4-&gt;setMargin( 5 );<br><br>    // last label<br>    (void)new QLabel( "Read-Only: ", row4 );<br><br>    // A combo box for setting alignment<br>    combo4 = new QComboBox( FALSE, row4 );<br>    combo4-&gt;insertItem( "False", -1 );<br>    combo4-&gt;insertItem( "True", -1 );<br>    // ...and again the activated() SIGNAL gets connected with a SLOT<br>    connect( combo4, SIGNAL( activated( int ) ), <br>             this, SLOT( slotReadOnlyChanged( int ) ) );<br><br>    // and the last lineedit<br>    lined4 = new QLineEdit( this );<br>    box-&gt;addWidget( lined4 );<br><br>    // give the first LineEdit the focus at the beginning<br>    lined1-&gt;setFocus();<br>}<br><br>/*<br>* SLOT slotEchoChanged( int i )<br>*<br>* i contains the number of the item which the user has been chosen in the<br>* first Combobox. According to this value, we set the Echo-Mode for the<br>* first LineEdit.<br>*/<br><br>void LineEdits::slotEchoChanged( int i )<br>{<br>    switch ( i ) {<br>    case 0:<br>   lined1-&gt;setEchoMode( QLineEdit::Normal );<br>        break;<br>    case 1:<br>   lined1-&gt;setEchoMode( QLineEdit::Password );<br>        break;<br>    case 2:<br>   lined1-&gt;setEchoMode( QLineEdit::NoEcho );<br>        break;<br>    }<br><br>    lined1-&gt;setFocus();<br>}<br><br>/*<br>* SLOT slotValidatorChanged( int i )<br>*<br>* i contains the number of the item which the user has been chosen in the<br>* second Combobox. According to this value, we set a validator for the<br>* second LineEdit. A validator checks in a LineEdit each character which<br>* the user enters and accepts it if it is valid, else the character gets<br>* ignored and not inserted into the lineedit.<br>*/<br><br>void LineEdits::slotValidatorChanged( int i )<br>{<br>    switch ( i ) {<br>    case 0:<br>   lined2-&gt;setValidator( 0 );<br>        break;<br>    case 1:<br>   lined2-&gt;setValidator( new QIntValidator( lined2 ) );<br>        break;<br>    case 2:<br>   lined2-&gt;setValidator( new QDoubleValidator( -999.0, 999.0, 2,<br>                      lined2 ) );<br>        break;<br>    }<br><br>    lined2-&gt;setText( "" );<br>    lined2-&gt;setFocus();<br>}<br><br><br>/*<br>* SLOT slotAlignmentChanged( int i )<br>*<br>* i contains the number of the item which the user has been chosen in<br>* the third Combobox.  According to this value, we set an alignment<br>* third LineEdit.<br>*/<br><br>void LineEdits::slotAlignmentChanged( int i )<br>{<br>    switch ( i ) {<br>    case 0:<br>   lined3-&gt;setAlignment( QLineEdit::AlignLeft );<br>        break;<br>    case 1:<br>   lined3-&gt;setAlignment( QLineEdit::AlignCenter );<br>        break;<br>    case 2:<br>   lined3-&gt;setAlignment( QLineEdit::AlignRight );<br>        break;<br>    }<br><br>    lined3-&gt;setFocus();<br>}<br><br><br>/*<br>* SLOT slotReadOnlyChanged( int i )<br>*<br>* i contains the number of the item which the user has been chosen in<br>* the fourth Combobox.  According to this value, we toggle read-only.<br>*/<br><br>void LineEdits::slotReadOnlyChanged( int i )<br>{<br>    switch ( i ) {<br>    case 0:<br>        lined4-&gt;setReadOnly( FALSE );<br>        break;<br>    case 1:<br>        lined4-&gt;setReadOnly( TRUE );<br>        break;<br>    }<br><br>    lined4-&gt;setFocus();<br>} </pre>
+
+
+      <small><br>
+
+
+最後是主函式main.cpp： <br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>main.cpp</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>#include "lineedits.h"<br>#include &lt;qapplication.h&gt;<br><br>int main( int argc, char **argv )<br>{<br>    QApplication a( argc, argv );<br><br>    LineEdits lineedits;<br>    lineedits.setCaption( "Qt Example - Lineedits" );<br>    a.setMainWidget( &amp;lineedits );<br>    lineedits.show();<br><br>    return a.exec();<br>}</pre>
+
+
+      <small><br>
+
+
+其中有關於QComboBox，上一個範例已經介紹過了，這邊不再多作介紹；這個例子是使用QComboBox來設定QLineEdit的顯示與功能，基本上非常簡單，我們說明重要的幾個片段。 <br>
+
+
+      <br>
+
+
+      </small><small>在這個例子中重要的是QComboBox的Signal -
+activated(int)，當ComboBox的一個項目被選取時，Signal -
+activated(int)會發出並帶有選項的數值訊息，選項的索引是由0開始，在下後的程式中，我們就可以使用switch來比對並作對應的動作：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">connect( combo1, SIGNAL( activated( int ) ), <br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;this, SLOT( slotEchoChanged( int ) ) ); </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small>我們使用switch來比對Signal -
+activated(int)所傳來的整數訊息，並作出對應的處理，setEchoMode()可以設定輸入文字的顯示方式，有一般顯示
+（Normal）、密碼顯示（Password）與不回應文字輸入（NoEcho），密碼顯示會使用*來回應使用者的輸入：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">void LineEdits::slotEchoChanged( int i ) </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">{ </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; switch ( i ) { </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; case 0: </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp; lined1-&gt;setEchoMode( QLineEdit::Normal ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; case 1: </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp; lined1-&gt;setEchoMode( QLineEdit::Password ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; case 2: </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp; lined1-&gt;setEchoMode( QLineEdit::NoEcho ); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; } </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; lined1-&gt;setFocus(); </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">} </small><br>
+
+
+      </div>
+
+
+      <small></small><small><br>
+
+
+setValidator()設定是否對欄位的輸入進行驗證，設定為0表示不作驗證，QIntValidator用於設定整數的驗
+證方式，父類別為line2，QDoubleValidator用於浮點數的驗證，範圍為-999.0至+999.0，小數位數為2位（線上手冊是這麼寫
+的，但是實際測試卻只能驗證是否為浮點數，不能限制上下限與小數位數？）：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void LineEdits::slotValidatorChanged( int i ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; switch ( i ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 0: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; lined2-&gt;setValidator( 0 ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 1: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; lined2-&gt;setValidator( new QIntValidator( lined2 ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 2: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; lined2-&gt;setValidator( new QDoubleValidator( -999.0, 999.0, 2, </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lined2 ) ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; lined2-&gt;setText( "" ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; lined2-&gt;setFocus(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+      </small><small><br>
+
+
+設定QLineEdit的文字對齊方式，有置左對齊（AlignLeft）、置中對齊（AlignCenter）與置右對齊（AlignRight）：</small><br>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void LineEdits::slotAlignmentChanged( int i ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; switch ( i ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 0: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; lined3-&gt;setAlignment( QLineEdit::AlignLeft ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 1: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;lined3-&gt;setAlignment( QLineEdit::AlignCenter ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 2: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;lined3-&gt;setAlignment( QLineEdit::AlignRight ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; lined3-&gt;setFocus(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+      <br>
+
+
+      </small><small>setReadOnly()設定QLineEdit的欄位是否可編輯：</small><br style="font-weight: bold;">
+
+
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void LineEdits::slotReadOnlyChanged( int i ) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">{ </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; switch ( i ) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 0: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;lined4-&gt;setReadOnly( FALSE ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; case 1: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;lined4-&gt;setReadOnly( TRUE ); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; } </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; lined4-&gt;setFocus(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+程式很簡單，以下是執行的結果：<br>
+
+
+      <img style="width: 274px; height: 264px;" alt="" src="images/QLineEdit-1.jpg"><br>
+
+
+      <br>
+
+
+      </small>
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QLineEdit.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:23:01 GMT -->
+</html>

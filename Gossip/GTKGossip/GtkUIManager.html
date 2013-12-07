@@ -1,0 +1,795 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkUIManager.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:08 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkUIManager</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkUIManager</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>使用撰寫程式的方式來建構選單、工具列等使用者介面，過程有時過於繁瑣，您可以使用GtkUIManager從一個或多個使用者介面定義檔讀取介面定義，並自動建立相對應的Gtk元件，使用者介面定義檔是一個XML檔案。<br>
+
+
+
+      <br>
+
+
+
+舉個實際的例子來說，可以改寫一下 </small><small><big><a href="GtkMenuBarGtkMenuGtkMenuItem.html"><small>GtkMenuBar、GtkMenu 與 GtkMenuItem</small></a> </big>中的範例，使用GtkUIManager與XML定義檔來作出相同的效果，若XML定義檔如下所示：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>gtk_ui_manager.xml</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>&lt;ui&gt;<br>  &lt;menubar name="MenuBar"&gt;<br>    &lt;menu action="File"&gt;<br>      &lt;menuitem action="Open"/&gt;<br>      &lt;menuitem action="Save"/&gt;<br>      &lt;separator/&gt;<br>      &lt;menuitem action="Close"/&gt;<br>    &lt;/menu&gt;<br>    &lt;menu action="Edit"&gt;<br>      &lt;menuitem action="Cut"/&gt;<br>      &lt;menuitem action="Copy"/&gt;<br>      &lt;menuitem action="Paste"/&gt;<br>    &lt;/menu&gt;<br>    &lt;menu action="Help"&gt;<br>      &lt;menuitem action="About"/&gt;<br>    &lt;/menu&gt;<br>  &lt;/menubar&gt;<br>&lt;/ui&gt;</pre>
+
+
+
+      <br>
+
+
+
+      <small>"name"屬性可以讓您在建構程式的時候，依名稱來取得相對應的Gtk元件，而"action"將對應於GtkAction，您可以使用GtkActionEntry來建構GtkAction，GtkActionEntry的定義如下：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">typedef struct {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; const gchar&nbsp;&nbsp;&nbsp;&nbsp; *name;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; const gchar&nbsp;&nbsp;&nbsp;&nbsp; *stock_id;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; const gchar&nbsp;&nbsp;&nbsp;&nbsp; *label;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; const gchar&nbsp;&nbsp;&nbsp;&nbsp; *accelerator;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; const gchar&nbsp;&nbsp;&nbsp;&nbsp; *tooltip;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; GCallback&nbsp; callback;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">} GtkActionEntry;</small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+第一個name成員即對應定義檔中的"name"屬性，其它則為圖示、文字、快速鍵、提示與callback函式，一個設定範例如下：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">static GtkActionEntry entries[] = {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "File", NULL, "_File" },</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Open", GTK_STOCK_OPEN, "Open",</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; "&lt;control&gt;O", "Open File", G_CALLBACK(itemPressed)},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Save", GTK_STOCK_SAVE, "Save",</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; "&lt;control&gt;S", "Save File", G_CALLBACK(itemPressed)},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Close", GTK_STOCK_QUIT, "Close",</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp; "&lt;control&gt;Q", "Close File", G_CALLBACK(gtk_main_quit)},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Edit", NULL, "_Edit" },</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Cut", NULL, "Copy"},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Copy", NULL, "Copy"},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Paste", NULL, "Paste"},</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "Help", NULL, "_Help" },</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp; { "About", NULL, "About" }</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">};</span></small></div>
+
+
+
+      <small><br>
+
+
+
+GtkAction被組織為GtkActionGrouop，定義了GtkActionEntry之後，您可以使用gtk_action_group_add_actions()函式將之加入GtkActionGroup之中：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gtk_action_group_add_actions(actionGroup, entries, 10, NULL);</span></small><br style="font-weight: bold;">
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+接著建構GtkUIManager，並使用</small><small>gtk_ui_manager_insert_action_group()加入GtkActionGroup，然後使用</small><small>gtk_ui_manager_add_ui_from_file()讀取使用者介面定義檔：</small><br>
+
+
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">GtkUIManager *ui = gtk_ui_manager_new();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">gtk_ui_manager_insert_action_group(ui, actionGroup, 0);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">gtk_ui_manager_add_ui_from_file(ui, "gtk_ui_manager.xml", NULL);</small><br>
+
+
+
+      </div>
+
+
+
+      <br>
+
+
+
+      <small>GtkUIManager將會自動建構相對應的Gtk元件，並依"action"設定建立相對應的GtkAction。<br>
+
+
+
+      <br>
+
+
+
+若要從GtkUIManager中取得元件，則可以使用gtk_ui_manager_get_widget()並依"name"屬性之設定來取得，例如取得"MenuBar"並加入GtkVBox中：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">GtkWidget *vbox = gtk_vbox_new(FALSE, 5);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gtk_box_pack_start(GTK_BOX(vbox), </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; gtk_ui_manager_get_widget(ui, "/MenuBar"), FALSE, FALSE, 2);</span></small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+下面的程式是個完整的範例：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>gtk_ui_manager_demo.c</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>void itemPressed(GtkMenuItem *menuItem, gpointer data) {<br>    g_print("%s\n", gtk_action_get_name(GTK_ACTION(menuItem)));<br>}<br><br style="font-weight: bold;"><span style="font-weight: bold;">static GtkActionEntry entries[] = {</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "File", NULL, "_File" },</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Open", GTK_STOCK_OPEN, "Open", </span><br style="font-weight: bold;"><span style="font-weight: bold;">           "&lt;control&gt;O", "Open File", G_CALLBACK(itemPressed)},</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Save", GTK_STOCK_SAVE, "Save", </span><br style="font-weight: bold;"><span style="font-weight: bold;">           "&lt;control&gt;S", "Save File", G_CALLBACK(itemPressed)},</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Close", GTK_STOCK_QUIT, "Close", </span><br style="font-weight: bold;"><span style="font-weight: bold;">           "&lt;control&gt;Q", "Close File", G_CALLBACK(gtk_main_quit)},</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Edit", NULL, "_Edit" },</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Cut", NULL, "Copy"},</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Copy", NULL, "Copy"},</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Paste", NULL, "Paste"},</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "Help", NULL, "_Help" },</span><br style="font-weight: bold;"><span style="font-weight: bold;">  { "About", NULL, "About" }</span><br style="font-weight: bold;"><span style="font-weight: bold;">};</span><br style="font-weight: bold;"><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkActionGroup *actionGroup;</span><br><span style="font-weight: bold;">    GtkUIManager *ui;</span><br>    GtkWidget *vbox;<br><br>    gtk_init(&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkUIManager");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 300, 200);<br><br><span style="font-weight: bold;">    actionGroup = gtk_action_group_new("Actions");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_action_group_add_actions(actionGroup, entries, 10, NULL);</span><br style="font-weight: bold;"><span style="font-weight: bold;">   </span><br style="font-weight: bold;"><span style="font-weight: bold;">    ui = gtk_ui_manager_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_ui_manager_insert_action_group(ui, actionGroup, 0);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_ui_manager_add_ui_from_file(ui, "gtk_ui_manager.xml", NULL);</span><br style="font-weight: bold;"><br style="font-weight: bold;">    vbox = gtk_vbox_new(FALSE, 5);<br><span style="font-weight: bold;">    gtk_box_pack_start(GTK_BOX(vbox), </span><br style="font-weight: bold;"><span style="font-weight: bold;">          gtk_ui_manager_get_widget(ui, "/MenuBar"), FALSE, FALSE, 2);</span><br style="font-weight: bold;"><br>    gtk_container_add(GTK_CONTAINER(window), vbox);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+一個執行的畫面如下所示：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 319px; height: 236px;" alt="" src="images/GtkUIManager-1.jpg"><br>
+
+
+
+      <br>
+
+
+
+      </small><small>更詳細的GtkUIManager使用，可以參考文件 <a href="http://library.gnome.org/devel/gtk/stable/GtkUIManager.html">GtkUIManager</a>，或是gtk-demo中的UI Manager範例。</small>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkUIManager.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:09 GMT -->
+</html>

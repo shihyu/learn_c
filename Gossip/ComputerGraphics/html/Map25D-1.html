@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/Map25D-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:53 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript">
+            window.onload = function() {
+                var maze = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1],
+        [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1],
+        [1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1],
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+        [1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1],
+        [1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1],
+        [1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1],
+        [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1],
+        [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1],
+        [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
+            
+                function Sprite(x, y, maze) {
+                    var i = y;
+                    var j = x;
+    
+                    function isMovable(i, j) {
+                        if (i < 0 || j < 0 || j >= maze[0].length ||
+                                i >= maze.length) {
+                            return false;
+                        }
+
+                        if (maze[i][j] == 0) {
+                            return true;
+                        }
+                        return false;
+                    }
+    
+                    this.moveUp = function() {
+                        if (isMovable(i - 1, j)) {
+                            i--;
+                        }
+                    };
+
+                    this.moveDown = function() {
+                        if (isMovable(i + 1, j)) {
+                            i++;
+                        }
+                    };
+
+                    this.moveRight = function() {
+                        if (isMovable(i, j + 1)) {
+                            j++;
+                        }
+                    };
+
+                    this.moveLeft = function() {
+                        if (isMovable(i, j - 1)) {
+                            j--;
+                        }
+                    };
+    
+                    this.getX = function() {
+                        return j;
+                    };
+
+                    this.getY = function() {
+                        return i;
+                    };
+                }            
+            
+                var sprite = new Sprite(0, 1, maze);
+                
+                var character = document.getElementById('character');
+                var floor = document.getElementById('floor');
+                var block = document.getElementById('block');
+                document.body.removeChild(character);
+                document.body.removeChild(floor);
+                document.body.removeChild(block);
+                
+                var canvas1 = document.getElementById('canvas1');
+                var canvas2 = document.getElementById('canvas2');
+                var context1 = canvas1.getContext('2d');
+                var context2 = canvas2.getContext('2d');
+                
+                document.body.removeChild(canvas2);
+                
+                var halfWidth = 32 / 2;    // 地板圖片寬 32
+                var halfHeight = 16 / 2;   // 地板圖片高 16
+
+                var startX = canvas1.width / 2;
+                var startY = canvas2.width / 8;
+                
+                var characterImageX = 0;
+                
+                var context = context2;
+                
+                // 繪製地板                
+                function drawFloor() {
+                    for(var j = 0; j < maze.length; j++) {
+                        for (var i = 0; i < maze[0].length; i++) {
+                            var x = startX - i * halfWidth + j * halfWidth;
+                            var y = startY + i * halfHeight + j * halfHeight;
+                            context.drawImage(floor, x, y);
+                        }
+                    }                
+                }
+                
+                // 繪製牆與人物
+                function drawBlockAndCharacter() {
+                    for(var j = 0; j < maze.length; j++) {
+                        for (var i = 0; i < maze[0].length; i++) {
+                            var x = startX - i * halfWidth + j * halfWidth;
+                            var y = startY - 10 + 
+                                   i * halfHeight + j * halfHeight;
+
+                            if(maze[i][j] == 1) {
+                                context.drawImage(block, x, y);
+                            }
+
+                            if (sprite.getX() == j &&
+                                sprite.getY() == i) {
+                                context.drawImage(character,
+                                            characterImageX, 0, 50, 50,
+                                            x, y, 25, 25);
+                            }
+                        }                
+                    }
+                }
+
+               document.onkeydown = function(event) {
+                    switch (event.which) {
+                        case 39: // 右
+                            sprite.moveUp();
+                            break;
+                        case 37: // 左    
+                            sprite.moveDown();
+                            break;
+                       case 38: // 上
+                            sprite.moveLeft();
+                            break;
+                       case 40: // 下
+                            sprite.moveRight();
+                            break;
+                    }
+                };
+                
+                setTimeout(function() {
+                    drawFloor();
+                    drawBlockAndCharacter();
+
+                    if(context === context2) {
+                        document.body.replaceChild(canvas2, canvas1);
+                        context = context1;
+                    }
+                    else {
+                        document.body.replaceChild(canvas1, canvas2);
+                        context = context2;
+                    }
+                    
+                    context.clearRect(0, 0, canvas1.width, canvas1.height);
+                    
+                    characterImageX += 50;
+                    if (characterImageX >= 300) {
+                        characterImageX = 0;
+                    }
+                    
+                    setTimeout(arguments.callee, 250);
+                }, 250);
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="600" height="400"></canvas>
+        <canvas id="canvas2" width="600" height="400"></canvas>
+        <img id="character" src="images/character2.gif" 
+                            style="visibility: hidden"/>
+        <img id="floor" src="images/floor.gif" 
+                            style="visibility: hidden"/>
+        <img id="block" src="images/block3.gif" 
+                            style="visibility: hidden"/>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/Map25D-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:55 GMT -->
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Cookie.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:58 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Cookie</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: Cookie<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Web應用程式會話管理的基本方式，就是在此次請求中，將下一次請求時伺服器所應知道的資訊，先回應給瀏覽器，由瀏覽器在之後的請求再一併發送給應用程式，如此應用程式就可以「得知」多次請求間的相關資料。<br>
+      <br>
+Cookie是在瀏覽器儲存訊息的一種方式，伺服器可以回應瀏覽器<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">set-cookie</span>標頭，瀏覽器收到這個標頭與數值後，會將之儲存為電腦上的一個檔案，這個檔案就稱之為Cookie。你可以設定給Cookie一個存活期限，保留一些有用的訊息在客戶端，如果關閉瀏覽器之後，再度開啟瀏覽器並連接伺服器，而Cookie仍在有效期限中，瀏覽器會使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">cookie</span>標頭自動將Cookie發送給伺服器，伺服器就可以得知一些先前瀏覽器請求的相關訊息。</small><br>
+      <br>
+      <img style="width: 662px; height: 276px;" alt="" src="images/Cookie-1.png"><br>
+      <small><br>
+Cookie可以設定存活期限，所以在客戶端儲存的資訊可以活得更久一些（除非使用者主動清除Cookie資訊）。有些購物網站常使用Cookie來記錄
+使用者的瀏覽歷程，雖然使用者沒有實際購買商品，但在下次使用者造訪時，仍可以根據Cookie中所儲存的瀏覽歷程為使用者建議購物清單。<br>
+      <br>
+Servlet本身提供了建立、設定與讀取Cookie的API。如果你要建立Cookie，可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Cookie</span>類別，建立時指定Cookie中的名稱與數值，並使用<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse的<span style="font-weight: bold;">addCookie()</span>方法在回應中新增Cookie物件</span>。例如：</small><br>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">Cookie cookie = new Cookie("user", "caterpillar");</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">cookie.setMaxAge(7 * 24 * 60 * 60); // 一星期內有效</small><br>
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">response.addCookie(cookie);</small><br>
+      </div>
+      <br>
+      <small>HTTP中<span style="font-family: Courier New,Courier,monospace;">Cookie的設定是透過set-cookie標頭，所以你必須在實際回應瀏覽器之前使用addCookie()來新增Cookie</span>實例，在瀏覽器輸出HTML回應之後再執行<span style="font-family: Courier New,Courier,monospace;">addCookie()</span>是沒有作用的。</small><br>
+      <br>
+      <small>如範例中所示，<span style="font-family: Courier New,Courier,monospace;">建立Cookie之後，你可以使用<span style="font-weight: bold;">setMaxAge()</span>來設定Cookie的有效期限</span>，設定的單位是<span style="font-weight: bold;">「秒」</span>。預設是關閉瀏覽器之後Cookie就失效。如果你要取得瀏覽器上儲存的Cookie，則可以從<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest的<span style="font-weight: bold;">getCookies()</span></span>來取得，這可取得屬於該網頁所屬網域（domain）的所有Cookie，所以傳回值是<span style="font-family: Courier New,Courier,monospace;">Cookie[]</span>陣列。取得<span style="font-family: Courier New,Courier,monospace;">Cookie物件後，可以使用Cookie的getName()與getValue()</span>方法，分別取得Cookie的名稱與數值。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">Cookie[] cookies = request.getCookies();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">if(cookies != null) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; for(Cookie cookie : cookies) {</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String name = cookie.getName();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String value = cookie.getValue();</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</small><br>
+      </div>
+      <small><br>
+運用Cookie的另一個常見應用就是實作使用者自動登入（Login）功能。在使用者登入表單上，你應該經常看到有個自動登入的選項，登入時若有核取該選項，下次再造訪同一網頁，就不再需要輸入名稱密碼，而可以直接登入網頁。<br>
+      </small><small><br>
+以下將實作一個簡單的範例來示範Cookie API的使用。當使用者造訪首頁時，會檢查使用者先前是否允許自動登入，如果是的話，就直接將轉送至使用者頁面。</small><br>
+      <pre> package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="Index", urlPatterns={"/index.view"})<br>public class Index extends HttpServlet {<br>    protected void processRequest(HttpServletRequest request,<br>                                HttpServletResponse response)<br>                       throws ServletException, IOException {<br><br>        <span style="font-weight: bold;">Cookie[] cookies = request.getCookies();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        if(cookies != null) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            for(Cookie cookie : cookies) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                String name = cookie.getName();</span><br style="font-weight: bold;"><span style="font-weight: bold;">                String value = cookie.getValue();</span><br style="font-weight: bold;"><span style="font-weight: bold;">                if("user".equals(name) &amp;&amp; "caterpillar".equals(value)) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    request.setAttribute(name, value);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    request.getRequestDispatcher("/user.view")</span><br style="font-weight: bold;"><span style="font-weight: bold;">                            .forward(request, response);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    return;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                }</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br><br>        response.sendRedirect("login.html");<br>    }<br><br>    @Override<br>    protected void doGet(HttpServletRequest request,<br>                         HttpServletResponse response)<br>                             throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br><br>    @Override<br>    protected void doPost(HttpServletRequest request,<br>                          HttpServletResponse response)<br>                            throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br>} <br></pre>
+      <small><br>
+當使用者造訪首頁時，會先取得所有的Cookie。然後一個一個檢查是否有Cookie儲存名稱<span style="font-family: Courier New,Courier,monospace;">"user"而值為"caterpillar"</span>，如果是的話，表示先前使用者登入時，曾經核取「自動登入」的選項，因此直接轉發至使用者網頁。如果沒有對應的Cookie，則表示使用者是初次造訪，或者先前沒有核取「自動登入」的選項，此時轉發至登入表單：<br>
+</small>
+      <ul>
+        <li><small>login.html</small></li>
+      </ul>
+      <pre>&lt;html&gt;<br>    &lt;body&gt;<br>        &lt;form action="login.do" method="post"&gt;<br>            名稱：&lt;input type="text" name="user"&gt;&lt;br&gt;<br>            密碼：&lt;input type="password" name="passwd"&gt;&lt;br&gt;<br>            自動登入：&lt;input type="checkbox" name="login" value="auto"&gt;&lt;br&gt;<br>            &lt;input type="submit" value="送出"&gt;<br>        &lt;/form&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small>
+      <br>
+登入表單會發送至負責處理登入請求的Servlet，其實作如下所示：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="Login", urlPatterns={"/login.do"})<br>public class Login extends HttpServlet {<br>    @Override<br>    protected void doPost(HttpServletRequest request,<br>                         HttpServletResponse response)<br>                      throws ServletException, IOException {<br>        String user = request.getParameter("user");<br>        String passwd = request.getParameter("passwd");<br>        if("caterpillar".equals(user) &amp;&amp; "123456".equals(passwd)) {<br>            String login = request.getParameter("login");<br>            if ("auto".equals(login)) {<br><span style="font-weight: bold;">                Cookie cookie = new Cookie("user", "caterpillar");</span><br style="font-weight: bold;"><span style="font-weight: bold;">                cookie.setMaxAge(7 * 24 * 60 * 60);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                response.addCookie(cookie);</span><br>            }<br>            request.setAttribute("user", user);<br>            request.getRequestDispatcher("user.view")<br>                    .forward(request, response);<br>        }<br>        else {<br>            response.sendRedirect("login.html");<br>        }<br>    }<br>} <br></pre>
+      <small><br>
+程式很簡單，當登入名稱與密碼正確時，轉發至使用者頁面，否則，要求瀏覽器重新導向至首頁。接下來是使用者頁面的實作：</small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name = "User", urlPatterns = {"/user.view"})<br>public class User extends HttpServlet {<br>    protected void processRequest(HttpServletRequest request,<br>            HttpServletResponse response)<br>            throws ServletException, IOException {<br>        response.setContentType("text/html;charset=UTF-8");<br><br>        if(request.getAttribute("user") == null) {<br>            response.sendRedirect("index.view");<br>        }<br><br>        PrintWriter out = response.getWriter();<br>        out.println("&lt;html&gt;");<br>        out.println("&lt;head&gt;");<br>        out.println("&lt;title&gt;Servlet User&lt;/title&gt;");<br>        out.println("&lt;/head&gt;");<br>        out.println("&lt;body&gt;");<br>        out.println("&lt;h1&gt;"<br>                + request.getAttribute("user") + "已登入&lt;/h1&gt;");<br>        out.println("&lt;/body&gt;");<br>        out.println("&lt;/html&gt;");<br>        out.close();<br>    }<br><br>    @Override<br>    protected void doGet(HttpServletRequest request,<br>            HttpServletResponse response)<br>            throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br><br>    @Override<br>    protected void doPost(HttpServletRequest request,<br>            HttpServletResponse response)<br>            throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br>}  <br></pre>
+      <small><br>
+如果使用者有核取「自動登入」選項，則請求中會帶有<span style="font-family: Courier New,Courier,monospace;">login參數且值為auto</span>，一旦檢查到有這個請求參數，建<span style="font-family: Courier New,Courier,monospace;">立Cookie實例、設定Cookie</span>有效期限並加入回應之中。如此下次使用者再請求方才示範的<span style="font-family: Courier New,Courier,monospace;">Index</span>程式時，就可以取得對應的Cookie值，因此就可以實現自動登入的流程。</small><br>
+      <br>
+      <small>在Servlet 3.0中，<span style="font-family: Courier New,Courier,monospace;">Cookie類別新增了<span style="font-weight: bold;">setHttpOnly()</span></span>方法，可以讓你將<span style="font-family: Courier New,Courier,monospace;">Cookie</span>標示為僅用於HTTP，也就是在<span style="font-family: Courier New,Courier,monospace;">set-cookie標頭上附加<span style="font-weight: bold;">HttpOnly</span></span>屬性，在瀏覽器支援的情況下，這個Cookie將不會被客戶端腳本（例如JavaScript）所讀取，你可以使用<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">isHttpOnly()</span>來得知一個Cookie是否被setHttpOnly()</span>標示為僅用於HTTP。</small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/Cookie.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:00 GMT -->
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/RequestBody.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>讀取請求本體</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror request body raw_post" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 讀取請求本體<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>如果你要取得請求的本體資訊，可以使用<span class="courier">request.body</span>方法，這會取得 <a
+          href="http://www.ruby-doc.org/stdlib-1.9.2/libdoc/stringio/rdoc/StringIO.html">StringIO</a> 實例，例如若在 <a
+          href="file:///D:/Documents/Gossip/Rails/CRUD.html">基本 CRDE 程式</a> 中新增書籤，若在控制器的<span
+          class="courier">create</span>方法中加上：</p>
+      <p style="font-weight: bold; margin-left: 40px;"><span class="courier">print request.body.read(request.content_length)</span></p>
+      <p>在發送表單之後，可以看到放在POST本體中的以下訊息：<br>
+      </p>
+      <p style="margin-left: 40px;"><span class="courier">utf8=%E2%9C%93&amp;authenticity_token=zktCaU6Faf4OQ708RMh24m49bvoMwVWzyrTLwJS8KLg%3D&amp;page%5Btitle%5D=Openhome&amp;<br>
+          page%5Burl%5D=http%3A%2F%2Fopenhome.cc&amp;page%5Bdescription%5D=caterpillar%27s+learning+notes&amp;commit=Create</span><br>
+      </p>
+      <p><span class="courier">若實際上不需要使用到StringIO中讀寫等方法，而只是想一次取得請求本體的原始內容，可以使用request.raw_post方法取得的本體（</span><span
+          class="courier">編碼為ASCII-8BIT字串</span><span class="courier">）。例如以上程式片段可置換為以下，執行結果相同：</span></p>
+      <p style="margin-left: 40px;"><span class="courier"><span style="font-weight: bold;">print request.raw_post</span><br>
+        </span></p>
+      <p><span class="courier">實際上你查看ActionDispatch::Request的raw_post的原始碼，可以發現也是使用body方法來讀取資料：</span></p>
+      <p style="margin-left: 40px;"><span><strong class="courier"># File actionpack/lib/action_dispatch/http/request.rb, line 192<br>
+            def raw_post<br>
+            &nbsp; unless @env.include? 'RAW_POST_DATA'<br>
+            &nbsp;&nbsp;&nbsp; @env['RAW_POST_DATA'] = body.read(@env['CONTENT_LENGTH'].to_i)<br>
+            &nbsp;&nbsp;&nbsp; body.rewind if body.respond_to?(:rewind)<br>
+            &nbsp; end<br>
+            &nbsp; @env['RAW_POST_DATA']<br>
+            end</strong></span><br>
+      </p>
+      <p>如果上傳的是檔案，你必須知道如何處理multipart/form-data，原理可以參考 <a href="http://www.javaworld.com.tw/jute/post/view?bid=6&amp;id=56147&amp;sty=1&amp;tpg=2&amp;age=0">HTTP檔案上傳機制解析</a> 的內容。如果你使用以下的表單選擇一個檔案發送：</p>
+      <pre>&lt;h1&gt;Upload File&lt;/h1&gt;  
+&lt;%= form_tag "upload", :multipart =&gt; true do %&gt;  
+    &lt;%= label_tag "file", "File: " %&gt;&lt;%= file_field_tag "image" %&gt;
+    &lt;br&gt;&lt;br&gt;  
+    &lt;%= submit_tag "Upload" %&gt;  
+&lt;% end %&gt;<br></pre>
+      <p>這會產生以下的HTML表單：</p>
+      <p style="margin-left: 40px;"><span class="courier">&lt;h1&gt;Upload File&lt;/h1&gt;<br>
+          &lt;form accept-charset="UTF-8" action="/test/upload"<strong> enctype="multipart/form-data"</strong> method="post"&gt;<br>
+          &nbsp;&nbsp;&nbsp; &lt;div style="margin:0;padding:0;display:inline"&gt;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input name="utf8" type="hidden" value="&amp;#x2713;" /&gt;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;input name="authenticity_token" type="hidden" <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value="zktCaU6Faf4OQ708RMh24m49bvoMwVWzyrTLwJS8KLg=" /&gt;<br>
+          &nbsp;&nbsp;&nbsp; &lt;/div&gt;&nbsp; <br>
+          &nbsp;&nbsp;&nbsp; &lt;label for="file"&gt;File: &lt;/label&gt;&lt;input id="image" name="image" type="file" /&gt;<br>
+          &nbsp;&nbsp;&nbsp; &lt;br&gt;&lt;br&gt;&nbsp; <br>
+          &nbsp;&nbsp;&nbsp; &lt;input name="commit" type="submit" value="Upload" /&gt;&nbsp; <br>
+          &lt;/form&gt;</span><br>
+      </p>
+      注意！為了避免 <a href="http://guides.rubyonrails.org/security.html#cross-site-request-forgery-csrf">跨站偽照請求</a>，預設Rails對於非GET的請求，都要求有個<span
+        class="courier">authenticity_token</span>參數，如果不想要有這個限制，可以在控制器中消取這個限制：<br>
+      <div style="margin-left: 40px; font-weight: bold;"><span class="courier">class SomeController &lt; ApplicationController<br>
+          &nbsp; skip_before_filter :verify_authenticity_token<br>
+          end<br>
+        </span></div>
+      <br>
+      所有的控制器預設會防止跨站偽照請求，其實是在<span class="courier">ApplicationController</span>中定義：<br>
+      <ul>
+        <li>applicaton_controller.rb</li>
+      </ul>
+      <pre>class ApplicationController &lt; ActionController::Base
+<strong>    protect_from_forgery</strong>
+end</pre>
+      <br>
+      （如果透過Rails的表單輔助方法，會自動產生<span class="courier">authenticity_token</span>參數，如果是非GET的表單發送，控制器會檢查<span
+        class="courier">authenticity_token參數值是否等於form_authenticity_token的傳回值，如果不是，會執行reset_session</span>方法，更多細節，將在之後談到安全時討論。）<br>
+      <br>
+      如果選取檔案後發送表單，則請求本體會如下：<br>
+      <div class="courier" style="margin-left: 40px;"> <span>-----------------------------7949692161345836601876864355<br>
+          Content-Disposition: form-data; name="utf8"<br>
+          <br>
+          ✓</span> <span><br>
+          -----------------------------7949692161345836601876864355<br>
+          Content-Disposition: form-data; name="authenticity_token"<br>
+          <br>
+          zktCaU6Faf4OQ708RMh24m49bvoMwVWzyrTLwJS8KLg=</span> <span><br>
+          -----------------------------7949692161345836601876864355<br>
+          Content-Disposition: form-data; name="file[image]"; filename="caterpillar.jpg"<br>
+          Content-Type: image/jpeg<strong><br>
+            <br>
+          </strong><strong>一些奇奇怪怪的字元，其實是實際的檔案內容<br>
+          </strong> -----------------------------7949692161345836601876864355</span> <span><strong><br>
+          </strong>Content-Disposition: form-data; name="commit"<br>
+          <br>
+          Upload</span> <span><br>
+          -----------------------------7949692161345836601876864355--</span><br>
+      </div>
+      <br>
+      所以你要取得上傳的檔案，就是判斷檔案的開始與結束區段，也就是上面粗體字的部份，不過要親自處理這些細節是有點麻煩（可以參考 <a href="../ServletJSP/GetReaderInputStream.html">這個文件</a>），實際上，可以從<span
+        class="courier">params</span>中取得<span class="courier">ActionDispatch::Http::UploadedFile</span> 實例，操作它來取得檔案內容。例如若要將上傳的檔案儲存下來，可以這麼撰寫：<br>
+      <p></p>
+      <p class="courier" style="font-weight: bold; margin-left: 40px;"><span>filename = params[:image].original_filename<br>
+          open("/home/caterpillar/" + filename, "wb") do |file|<br>
+          &nbsp;&nbsp;&nbsp; file.write(params[:image].read)<br>
+          end<br>
+        </span></p>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p> </p>
+      <p></p>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/RequestBody.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:59 GMT -->
+</html>

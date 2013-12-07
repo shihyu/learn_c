@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkRuler.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:16 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>GtkRuler</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkRuler</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>GtkRuler
+可以是一個垂直或水平外觀的尺規元件，您可以設定它的上下界，也可以讓它上面的游標跟隨滑鼠的移動，您可以使用gtk_hruler_new()或
+gtk_vruler_new()來建立水平或垂直尺規元件，使用gtk_ruler_set_metric()可以設定度量單位，可以設定的值有
+GTK_PIXELS（像素）、GTK_INCHES（英吋）、GTK_CENTIMETERS（公釐）。<br>
+      <br>
+您可以設定GtkRuler的範圍：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void gtk_ruler_set_range(GtkRuler *ruler,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gdouble lower,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gdouble upper,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gdouble position,</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gdouble max_size);</small><br>
+      </div>
+      <br>
+      <small>lower與upper用來設定尺規的上下界，position設定目前尺規上小游標的顯示位置，max_size則是用來計算尺規上可以顯示刻度及數字的詳細程度時使用，設定越小的數字，尺規刻度或數字會越細，設定越大的數字，尺規刻度或數字範圍會越大。<br>
+      <br>
+若要讓尺規上的游標跟隨滑鼠的位置而移動，首先滑鼠移動範圍的元件必須能接受滑鼠移動事件，例如設定GtkWindow接受滑鼠移動事件：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gtk_widget_set_events(window, GDK_POINTER_MOTION_MASK |</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GDK_POINTER_MOTION_HINT_MASK);</span></small><br>
+      </div>
+      <br>
+
+
+
+      <span class="postbody"><small>而滑鼠移動的motion_notify_event信號，必須連接到GtkRuler的motion_notify_event函式，例如：<br>
+      </small></span>
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">#define EVENT_METHOD(i, x) GTK_WIDGET_GET_CLASS(i)-&gt;x</span></small></span><br>
+      <span class="postbody"></span></div>
+      <span class="postbody"><small><br>
+      </small></span>
+      <div style="margin-left: 40px;"><span class="postbody"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">g_signal_connect_swapped(G_OBJECT(window), "motion_notify_event",</small></span><br>
+      <span class="postbody"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+G_CALLBACK(EVENT_METHOD(hrule, motion_notify_event)),</small></span><br>
+      <span class="postbody"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+hrule);</small></span><br>
+      <span class="postbody"></span></div>
+      <span class="postbody"><br>
+      <small>下面的範例示範如何讓GtkRuler跟隨滑鼠在GtkWindow上的移動，GtkRuler的位置則是利用 <a href="GtkTable.html">GtkTable</a> 的放置：<br>
+      </small></span>
+      <ul>
+        <li>gtkruler_demo.c</li>
+      </ul>
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">#define EVENT_METHOD(i, x) GTK_WIDGET_GET_CLASS(i)-&gt;x</span><br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *table;<br><span style="font-weight: bold;">    GtkWidget *hrule;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GtkWidget *vrule;</span><br><br>    gtk_init (&amp;argc, &amp;argv);<br><br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW (window), "GtkRuler");<br>    gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);<br>    <br><span style="font-weight: bold;">    gtk_widget_set_events(window, GDK_POINTER_MOTION_MASK |</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                  GDK_POINTER_MOTION_HINT_MASK);</span><br>    <br>    table = gtk_table_new (2, 2, FALSE);<br>    gtk_container_add(GTK_CONTAINER(window), table);<br><br><span style="font-weight: bold;">    hrule = gtk_hruler_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_ruler_set_metric(GTK_RULER(hrule), GTK_PIXELS);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_ruler_set_range(GTK_RULER(hrule), 7, 13, 0, 20);                   </span><br style="font-weight: bold;"><span style="font-weight: bold;">    g_signal_connect_swapped(G_OBJECT(window), "motion_notify_event",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                             G_CALLBACK(EVENT_METHOD(hrule, motion_notify_event)),</span><br style="font-weight: bold;"><span style="font-weight: bold;">                             hrule);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_table_attach(GTK_TABLE(table), hrule, 1, 2, 0, 1,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     GTK_EXPAND|GTK_SHRINK|GTK_FILL, GTK_FILL, 0, 0);</span><br style="font-weight: bold;"><br><span style="font-weight: bold;">    vrule = gtk_vruler_new();</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_ruler_set_metric(GTK_RULER(vrule), GTK_PIXELS);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_ruler_set_range(GTK_RULER(vrule), 0, 400, 10, 400);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    g_signal_connect_swapped(G_OBJECT(window), "motion_notify_event",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                             G_CALLBACK(EVENT_METHOD(vrule, motion_notify_event)),</span><br style="font-weight: bold;"><span style="font-weight: bold;">                             vrule);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_table_attach(GTK_TABLE(table), vrule, 0, 1, 1, 2,</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     GTK_FILL, GTK_EXPAND|GTK_SHRINK|GTK_FILL, 0, 0);</span><br style="font-weight: bold;"><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br>    gtk_widget_show_all(window);<br>    gtk_main(); <br><br>    return 0;<br>}</pre>
+      <span class="postbody"><small><br>
+一個執行的結果畫面如下所示：<br>
+      <br>
+      <img style="width: 624px; height: 439px;" alt="" src="images/GtkRuler-1.jpg"><br>
+      </small><br>
+      <br>
+      <br>
+
+
+
+      </span> </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+      <br>
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+      </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<span class="postbody"><br>
+
+
+
+<br>
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkRuler.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:16 GMT -->
+</html>

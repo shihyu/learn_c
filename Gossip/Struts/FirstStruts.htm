@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Struts/FirstStruts.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>第一個 Struts 程式</title></head>
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Struts Gossip: 第一個 Struts 程式</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+
+
+
+
+
+
+
+
+
+
+使用Struts來撰寫一個基於 <a href="MVCPattern.htm">MVC</a> 架構的Web程式是簡單的，以下用一個簡單的實例來示範如何使用Struts，您也可以從中瞭解到具體的MVC工作流程。<br>
+
+      <br>
+
+
+
+
+
+首先請至 <a href="http://struts.apache.org/">Struts 官方網站</a>
+下載Struts，這邊下載的是jakarta-struts-1.2.4.zip，解開後您可以在lib目錄下找到struts.jar以及一些相依的
+jar檔 ，對於第一個Struts程式來說，您需要以下的jar檔，請將這些檔案複製至您的Web應用程式的/WEB-INF/lib目錄下：<br>
+
+      </small>
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li><small>struts.jar</small></li>
+
+        <li><small>commons-beanutils.jar</small></li>
+
+        <li><small>commons-digester.jar</small></li>
+
+        <li><small>commons-collections.jar</small></li>
+
+        <li><small>commons-logging.jar</small></li>
+
+      
+      </ul>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+值得一提的是，在Struts的下載檔案中，/webapps目錄是一些Struts的範例，將來您可以參考這些範例中的一些設定與設計方式來開發程式，
+其中struts-blank.war是一個開發Struts的基礎，具備了Struts的基礎設定檔案及設定，您可以用它來開速開發Web應用程式。<br>
+
+      <br>
+
+
+
+
+
+在Struts中，擔任Front Controller角色的是<span style="font-weight: bold;">ActionServlet</span>，理想上所有客戶端請求都透過它來完成轉發，必須在/WEB- INF/web.xml中設定： </small>
+
+
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li>web.xml</li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;<br>&lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee" <br>&nbsp;&nbsp;&nbsp; xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <br>&nbsp;&nbsp;&nbsp; xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee <br>&nbsp;&nbsp;&nbsp; http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" <br>&nbsp;&nbsp;&nbsp; version="2.4"&gt;<br>&nbsp;&lt;!-- 注意，xsi那行是沒換行的，排版關係才作了換行 --&gt;<br>&nbsp;&lt;!-- 如果您是直接拷貝這個設定，請自行接上該行 --&gt;<br>&nbsp;&nbsp;&nbsp; &lt;description&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Struts Web Application<br>&nbsp;&nbsp;&nbsp; &lt;/description&gt;<br><br>&nbsp;&nbsp;&nbsp; &lt;display-name&gt;Struts Web Application&lt;/display-name&gt;<br><br>&nbsp;&nbsp;&nbsp; &lt;!-- Standard Action Servlet Configuration --&gt; <br>&nbsp;&nbsp;&nbsp; &lt;servlet&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;servlet-name&gt;action&lt;/servlet-name&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;servlet-class&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; org.apache.struts.action.ActionServlet<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/servlet-class&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;init-param&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-name&gt;config&lt;/param-name&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;param-value&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /WEB-INF/conf/struts-config.xml<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/param-value&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/init-param&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;load-on-startup&gt;2&lt;/load-on-startup&gt; <br>&nbsp;&nbsp;&nbsp; &lt;/servlet&gt; <br><br>&nbsp;&nbsp;&nbsp; &lt;!-- Standard Action Servlet Mapping --&gt; <br>&nbsp;&nbsp;&nbsp; &lt;servlet-mapping&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;servlet-name&gt;action&lt;/servlet-name&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;url-pattern&gt;*.do&lt;/url-pattern&gt; <br>&nbsp;&nbsp;&nbsp; &lt;/servlet-mapping&gt;<br><br>&lt;/web-app&gt;</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span><br>
+
+      <small>
+
+
+
+org.apache.struts.action.ActionServlet的設定中，設定<span style="font-weight: bold;">config參數</span>的作用是設定<span style="font-weight: bold;">struts-config.xml</span>的檔案來源，struts-config.xml中包括了所有Struts的相關請求轉發，以及一些資源設定。<br>
+
+      <br>
+
+
+
+
+
+在ActionServlet的servlet-mapping設定中，將所有以*.do結尾的請求交給ActionServlet來處理。<br>
+
+      <br>
+
+
+
+
+
+接下來看看struts-config.xml的設定：</small>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li>struts-config.xml</li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;<br><br>&lt;!DOCTYPE struts-config PUBLIC<br>&nbsp;"-//Apache Software Foundation//DTD Struts Configuration 1.2//EN"<br>&nbsp;"http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd"&gt;<br>&nbsp;&lt;struts-config&gt; <br>&nbsp;&nbsp;&nbsp; &lt;action-mappings&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;action <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; path="/hello" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type="onlyfun.caterpillar.HelloAction"&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;forward<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name="helloUser" <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; path="/WEB-INF/pages/hello.jsp"/&gt; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/action&gt; <br>&nbsp;&nbsp;&nbsp; &lt;/action-mappings&gt; <br>&lt;/struts-config&gt;</pre>
+
+
+
+
+
+      <br>
+
+      <small>
+在struts-config.xml中，定義了&lt;action-mappings&gt;，這當中關係到請求與資源的轉發設定對應，&lt;
+action&gt;中設定了path為/hello，這表示請求的資源若是/hello.do，則會呼叫HelloAction
+來處理這個請求（type屬性設定的），&lt;forward&gt;設定則是HelloAction處理完畢之後的轉發對象，一個&lt;
+action&gt;中可以有多個
+&lt;forward&gt;，在Action物件中將根據&lt;forward&gt;上的name來查找並返回對應的ActionForward
+物件，ActionServlet會根據 <a href="ActionClass.htm">Action</a> 傳回的ActionForward來將請求轉發至指定的對象。<br>
+
+      <br>
+
+
+
+
+
+來看看HelloAction，在Struts中，一個Action物件必須繼承org.apache.struts.action.Action，並覆寫其execute()方法，看看HelloAction是如何撰寫的：</small>
+
+
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li>HelloAction.java</li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br>import javax.servlet.http.*;<br>import org.apache.struts.action.*; <br><br>public class HelloAction extends Action {<br>    public ActionForward execute(<br>                             ActionMapping mapping, <br>                             ActionForm form, <br>                             HttpServletRequest request, <br>                             HttpServletResponse response) <br>                                  throws Exception {<br><br>        // get information from request object<br>        String username = request.getParameter("user");<br><br>        // prepare model<br>        Map model = new HashMap();<br>        if(username != null)<br>            model.put("username", username);<br>        else<br>            model.put("username", "nobody");<br><br>        // pass information to View by using reqeust object<br>        request.setAttribute("userInfo", model);<br><br>        return mapping.findForward("helloUser");<br>    }<br>}</pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+這邊先關心一些execute()中傳入的request與response，而暫不理會另兩個參數，request與
+response是HttpServletRequest及HttpServletResponse的實例，就如何在一個簡單的Servlet一樣，您可
+以使用這兩個物件來分別取得請求與回應的相關資源。<br>
+
+      <br>
+
+
+
+
+
+Action物件是Controller角色，如您在程式中所看到的，在Action物件中，您所要作的是：<br>
+
+      </small>
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li><small>取得請求中的相關參數</small></li>
+
+        <li><small>驗證資料的邏輯正確性</small></li>
+
+        <li><small>將請求參數複製給商務物件</small></li>
+
+        <li><small>取得執行結果並準備結果</small></li>
+
+        <li><small>轉發給View物件</small></li>
+
+      
+      </ul>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+第一個Struts程式很簡單，所以暫且沒有使用到商務物件，在真正的程式中，您會使用到商務物件（Model）來處理商務，而您的Action中之邏輯應該只包括請求資訊的收集、轉交商務請求給業務物件、準備View所需要的資料等有關。<br>
+
+      <br>
+
+
+
+
+
+在View所需要的物件準備上，程式中使用了Map物件，在實際的程式中，您可以設計自己的資料Model物件。您可以看到，Struts會使用標準
+JSP/Servlet相關物件的setAttribute()與getAttribute()方法來向View傳遞Model，在程式中使用的是
+request物件的setAttribute()。<br>
+
+      <br>
+
+
+
+
+
+在Web
+MVC中，使用者的請求相關資訊就到Action中就要結束了，所有的相關訊息必須複製為資料傳輸物件再設定給商務物件，而不是直接將請求相關物件或訊息
+直接傳遞至商務層，這樣作可以使得Web層不會與接下來的商務層緊密耦合。另一方面，View層的資料要透過資料Model物件來取得，而不是直接從使用
+者的請求物件中獲得。<br>
+
+      <br>
+
+
+
+
+
+在execute()方法中傳入的ActionMapping物件，代表了struts-config.xml中&lt;action-
+mappings&gt;的設定物件，findForward()方法會尋找指定的forward資源name名稱，如果找到，就傳回一個
+ActionForward物件，當中包括了轉發的目的物件，目的地即path屬性設定的路徑。<br>
+
+      <br>
+
+
+
+
+
+回顧一下struts-config.xml，注意到"helloUser"的forward目的地是/WEB-
+INF/pages/hello.jsp，將資源放在/WEB-INF目錄下，使用者就只能透過Controller的轉發來取得資源，這是一個較具安全
+性的作法。<br>
+
+      <br>
+
+
+
+
+
+hello.jsp如下：</small>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li>hello.jsp</li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>&lt;html&gt; <br>&lt;head&gt; <br>&lt;title&gt;Hello, ${userInfo["username"]} !&lt;/title&gt; <br>&lt;/head&gt; <br>&lt;body&gt;<br><br>    &lt;H1&gt;Hello, ${userInfo["username"]} !&lt;/H1&gt; <br><br>&lt;/body&gt; <br>&lt;/html&gt;</pre>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+在這邊先使用JSP 2.0所提供的Express Language新功能來取得設定於request中的Model物件之資料，Struts提供有一組可以與其配合的標籤庫（Tag Library），如果您的View層技術使用的是JSP資源，也可以善加利用。<br>
+
+      <br>
+
+
+
+
+
+來檢驗一下第一個Struts的成果，啟動您的Web Container，並在瀏覽器輸入：<br>
+
+      </small>
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">http://localhost:8080/strutsapp/hello.do?user=Justin</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+您將會得到以下的內容：<br>
+
+      </small>
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;html&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;head&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;title&gt;Hello, Justin !&lt;/title&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/head&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;body&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;H1&gt;Hello, Justin !&lt;/H1&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/body&gt; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/html&gt;</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/Struts/FirstStruts.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:20:23 GMT -->
+</html>

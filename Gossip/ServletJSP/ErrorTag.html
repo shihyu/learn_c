@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ErrorTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>錯誤處理標籤</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 錯誤處理標籤<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+</td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在</small> <small><big><a href="ELABC.html"><small>簡介 EL</small></a></big> 中曾使用一個簡單的加法網頁來示範。在該範例中使用了<span style="font-family: Courier New,Courier,monospace;">errorPage="error.jsp"</span>設定當錯誤發生時，轉發至error.jsp顯示錯誤，若使用者輸入的並非數字時，EL無法進行剖析為基本型態進行加法時，就會發生錯誤，而轉發error.jsp。<br>
+      <br>
+如果你不想在錯誤發生時，轉發其它網頁來顯示錯誤訊息，而打算在目前網頁捕捉例外，並顯示相關訊息，那該如何進行？<br>
+      <br>
+這個問題的答案似乎很簡單，撰寫Scriptlet，在當中使用Java的<span style="font-family: Courier New,Courier,monospace;">try-catch</span>語法捕捉例外就可以解決這個需求。不過可以的話實在不希望再出現Scriptlet，那該怎麼辦？ <br>
+      <br>
+你可以使用JSTL的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;c:catch&gt;</span>標籤：<br>
+      </small>
+      <pre>&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%&gt;<br>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"<br>   "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>                 content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;加法網頁&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;c:catch var="error"&gt;<br>            ${param.a} + ${param.b} = ${param.a + param.b}<br>        &lt;/c:catch&gt;<br>        &lt;c:if test="${error != null}"&gt;<br>            &lt;br&gt;&lt;span style="color: red;"&gt;${error.message}&lt;/span&gt;<br>            &lt;br&gt;${error}<br>        &lt;/c:if&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <small><br>
+如果要在發生例外的網頁直接捕捉例外物件，可以使用<span style="font-family: Courier New,Courier,monospace;">&lt;c:catch&gt;</span>將可能產生例外的網頁段落包起來。若例外真的發生，這個例外物件會設定給<span style="font-family: Courier New,Courier,monospace;">var</span>屬性所指定的名稱，這樣才有機會使用這個例外物件。例如範例中，使用了<span style="font-family: Courier New,Courier,monospace;">&lt;c:if&gt;</span>標籤<span style="font-family: Courier New,Courier,monospace;">測試error是否參考至例外物件，如果是的話，由於例外都是Throwable的子類別，都擁有getMessage()方法，因此才能透過${error.message}的方式取得例外相關訊息。</span><br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">注意！只有設定isErrorPage="true"的JSP網頁才會有exception隱含物件，代表錯誤發生的來源網頁所傳進來的Throwable物件，所以不可以在上面的範例中，直接使用exception隱含物件。</span><br>
+      <br>
+      <br>
+      </small>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/ErrorTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+</html>

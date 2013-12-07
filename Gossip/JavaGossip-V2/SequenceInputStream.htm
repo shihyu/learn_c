@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/SequenceInputStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>SequenceInputStream</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: SequenceInputStream</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>您將一個檔案分割為數個檔案，接下來要將之再度組合還原為原來的檔案，最基本的作法是使用數個
+FileInputStream來開啟分割後的檔案，然後一個一個檔案的讀取，並連續寫入至同一個FileOutputStream中，在這中間，您必須
+要自行判斷每一個分割檔案的讀取是否完畢，如果完畢就換讀取下一個檔案。<br>
+
+      <br>
+
+
+如果您使用SequenceInputStream就不用這麼麻煩，SequenceInputStream可以看作是數個
+InputStream物件的組合，當一個InputStream物件的內容讀取完畢後，它就會取出下一個InputStream物件，直到所有的
+InputStream物件都讀取完畢為止。<br>
+
+      <br>
+
+
+下面這個程式是SequenceInputStream的使用示範，它可以將指定的檔案進行分割，也可以將分割後的檔案還原為一個檔案： </small>
+
+      <br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> SequenceStreamDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.*;<br>import java.io.*;<br><br>public class SequenceStreamDemo {<br>    public static void main(String[] args) {<br>        try { <br>            // args[0]: 指定分割（s）或連接（c）<br>            switch (args[0].charAt(1)) {<br>                case 's':<br>                    // args[1]: 每個分割檔案的大小<br>                    int size = Integer.parseInt(args[1]);<br>                    // args[2]: 指定要被分割的檔案名稱<br>                    seperate(args[2], size); <br>                    break;<br>                case 'c':<br>                    // args[1]: 指定要被組合的檔案個數<br>                    int number = Integer.parseInt(args[1]);<br>                    // args[2]: 組合後的檔案名稱<br>                    concatenate(args[2], number); <br>                    break;<br>            }<br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            System.out.println(<br>                "Using: java UseSequenceStream [-s/-c]" + <br>                " (size/number) filename"); <br>            System.out.println("-s: 分割檔案\n-c: 組合檔案"); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    }<br><br>    // 分割檔案<br>    public static void seperate(String filename, int size) <br>                                    throws IOException { <br>        FileInputStream fileInputStream = <br>            new FileInputStream(new File(filename)); <br>        BufferedInputStream bufInputStream = <br>            new BufferedInputStream(fileInputStream); <br><br>        byte[] data = new byte[1]; <br>        int count = 0;  <br>        // 從原檔案大小及指定分割的大小<br>        // 決定要分割為幾個檔案 <br>        if(fileInputStream.available() % size == 0) <br>            count = fileInputStream.available() / size; <br>        else <br>            count = fileInputStream.available() / size + 1; <br> <br>        // 開始進行分割<br>        for(int i = 0; i &lt; count; i++) { <br>            int num = 0; <br>            // 分割的檔案加上底線與編號<br>            File file = new File(filename + "_" + (i + 1));<br>            BufferedOutputStream bufOutputStream = <br>                new BufferedOutputStream( <br>                       new FileOutputStream(file)); <br> <br>            while(bufInputStream.read(data) != -1) { <br>                bufOutputStream.write(data); <br>                num++; <br>                if(num == size) { // 分割出一個檔案<br>                    bufOutputStream.flush(); <br>                    bufOutputStream.close(); <br>                    break; <br>                } <br>            } <br> <br>            if(num &lt; size) { <br>                bufOutputStream.flush(); <br>                bufOutputStream.close(); <br>            } <br>        } <br> <br>        System.out.println("分割為" + count + "個檔案"); <br>    } <br><br>    // 連接檔案<br>    public static void concatenate(String filename, <br>                          int number) throws IOException {<br>        // 收集檔案用的List<br>        List&lt;InputStream&gt; list = <br>                new ArrayList&lt;InputStream&gt;();<br>        <br>        for(int i = 0; i &lt; number; i++) {<br>            // 檔案名必須為底線加上編號<br>            File file = new File(filename + "_" + (i+1));<br>            list.add(i, new FileInputStream(file));<br>        }<br>        <br>        final Iterator&lt;InputStream&gt; iterator = list.iterator();<br>        <br>        // SequenceInputStream 需要一個Enumeration物件來建構<br>        Enumeration&lt;InputStream&gt; enumation = <br>            new Enumeration&lt;InputStream&gt;() {<br>                public boolean hasMoreElements() {<br>                    return iterator.hasNext();<br>                }<br><br>                public InputStream nextElement() {<br>                    return iterator.next();<br>                }<br>            };<br> <br>        // 建立SequenceInputStream<br>        // 並使用BufferedInputStream<br>        BufferedInputStream bufInputStream = <br>            new BufferedInputStream( <br>                    new SequenceInputStream(enumation), <br>                    8192); <br><br>        BufferedOutputStream bufOutputStream = <br>                    new BufferedOutputStream( <br>                       new FileOutputStream(filename), 8192); <br><br>        byte[] data = new byte[1]; <br>        // 讀取所有檔案資料並寫入目的地檔案<br>        while(bufInputStream.read(data) != -1) <br>            bufOutputStream.write(data); <br><br>        bufInputStream.close(); <br>        bufOutputStream.flush(); <br>        bufOutputStream.close(); <br>        System.out.println("組合" + number + "個檔案 OK!!"); <br>    } <br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+分割檔案時的範例如下：</small><span class="postbody"></span><br>
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java onlyfun.caterpillar.SequenceStreamDemo -s 1048576 test.zip<br>
+
+
+分割為6個檔案</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+
+      <small>
+組合檔案時的範例如下：</small><span class="postbody"></span><br>
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">java onlyfun.caterpillar.SequenceStreamDemo -c 6 test.zip<br>
+
+
+組合6個檔案 OK!!</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+      <br>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+         <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/SequenceInputStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

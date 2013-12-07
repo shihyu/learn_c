@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/CommandPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:26 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>Command 模式</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Design Pattern:&nbsp;Command 模式</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+      <br>
+      <center>
+       <br>
+      </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>您們團隊在開發影像編輯軟體，您負責的是開發影像處理API，例如：<br>
+      </small>
+      <pre>class Drawing {<br>    void processSome() {<br>        System.out.println("    - 對圖片作 Some 處理");<br>    }<br>    void processOther() {<br>        System.out.println("    - 對圖片作 Other 處理");<br>    }<br>    void processAnother() {<br>        System.out.println("    - 對圖片作 Another 處理");<br>    }<br>}</pre>
+      <small><br>
+A同事告訴您，他想要有個現成的A特效指令，可以組合某幾個</small><small>影像處理API</small><small>來完成，所以您
+提供了一個ImageService，當作特效指令的執行器：<br>
+      </small>
+      <pre>class ImageService {<br>    private Drawing drawing = new Drawing();<br>    void doAEffect() {<br>        System.out.println("作 A 特效");<br>        drawing.processSome();<br>        drawing.processOther();<br>    }<br>}</pre>
+      <small><br>
+      </small><small>B同事告訴您，他也想要有個現成的B特效指令，可以組合某幾個</small><small>影像處理API</small><small>來
+完成，所以您也提供了：</small><br>
+      <pre>class ImageService {<br>    private Drawing drawing = new Drawing();<br>    void doAEffect() {<br>        System.out.println("作 A 特效");<br>        drawing.processSome();<br>        drawing.processOther();<br>    }<br>    void doBEffect() {<br>        System.out.println("作 B 特效");<br>        drawing.processOther();<br>        drawing.processAnother();<br>    }<br>}</pre>
+      <br>
+      <small>C
+同事告訴您，他也想要有個C特效指令，D同事告訴您他要D特效指令...所以您在ImageService中加入了doCEffect()、
+doDEffect
+()...這樣下去會沒完沒了，問題很明顯，您的ImageService的公開協定越來越多了，因為這樣的ImageService同時了負責特效指令
+的建
+立與執行，只要有新的特效指令，您就需要修改ImageService。<br>
+      <br>
+您沒有辦法預測哪些同事會有哪些特效指令需求，您應該將特效指令的建立職責交給他們，您只負責執行特效指令。採取以下的設計會比較好：</small>
+      <pre>import java.util.*;<br><br>interface Drawing {<br>    void processSome();<br>    void processOther();<br>    void processAnother();<br>}<br><br>class DrawingImpl implements Drawing{<br>    public void processSome() {<br>        System.out.println("    - 對圖片作 Some 處理");<br>    }<br>    public void processOther() {<br>        System.out.println("    - 對圖片作 Other 處理");<br>    }<br>    public void processAnother() {<br>        System.out.println("    - 對圖片作 Another 處理");<br>    }<br>}<br><br>interface Command {<br>    void execute(Drawing drawing);<br>}<br><br>class ImageService {<br>    private Map&lt;String, Command&gt; commands = new HashMap&lt;String, Command&gt;();<br>    private Drawing drawing = new DrawingImpl();<br>    void addCommand(String effect, Command command) {<br>        commands.put(effect, command);<br>    }<br>    void doEffect(String effect) {<br>        commands.get(effect).execute(drawing);<br>    }<br>}</pre>
+      <small><br>
+每個同事可以各自設計自己想要的特效指令：<br>
+      </small>
+      <pre>class AEffectCommand implements Command {<br>    public void execute(Drawing drawing) {<br>        System.out.println("作 A 特效");<br>        drawing.processSome();<br>        drawing.processOther();<br>    }<br>}<br><br>class BEffectCommand implements Command {<br>    public void execute(Drawing drawing) {<br>        System.out.println("作 B 特效");<br>        drawing.processOther();<br>        drawing.processAnother();<br>    }<br>}<br><br>class CEffectCommand implements Command {<br>    public void execute(Drawing drawing) {<br>        System.out.println("作 C 特效");<br>        drawing.processOther();<br>        drawing.processSome();<br>        drawing.processAnother();<br>    }<br>}</pre>
+      <small><br>
+影像編輯軟體現在將特效指令逐一加入您提供的ImageService指令執行器，並在需要的時候指定使用該特效：<br>
+      </small>
+      <pre>public class Main {<br>    public static void main(String[] args) {<br>        ImageService service = new ImageService();<br>        service.addCommand("AEffect", new AEffectCommand());<br>        service.addCommand("BEffect", new BEffectCommand());<br>        service.addCommand("CEffect", new CEffectCommand());<br>        // 在需要時指定使用某特效<br>        service.doEffect("AEffect");<br>        service.doEffect("BEffect");<br>        service.doEffect("CEffect");<br>    }<br>}</pre>
+      <small><br>
+使用Python來示範程式範例：<br>
+      </small>
+      <pre>class Drawing:<br>    def processSome(self):<br>        print("    - 對圖片作 Some 處理")<br>    def processOther(self):<br>        print("    - 對圖片作 Other 處理")<br>    def processAnother(self):<br>        print("    - 對圖片作 Another 處理")<br><br>class ImageService:<br>    def __init__(self):<br>        self.commands = {}<br>        self.drawing = Drawing()<br>    <br>    def addCommand(self, effect, command):<br>        self.commands[effect] = command<br>    <br>    def doEffect(self, effect):<br>        self.commands[effect].execute(self.drawing)<br><br>class AEffectCommand:<br>    def execute(self, drawing):<br>        print("作 A 特效")<br>        drawing.processSome()<br>        drawing.processOther()<br><br>class BEffectCommand:<br>    def execute(self, drawing):<br>        print("作 B 特效")<br>        drawing.processOther()<br>        drawing.processAnother()<br><br>class CEffectCommand:<br>    def execute(self, drawing):<br>        print("作 C 特效")<br>        drawing.processOther()<br>        drawing.processSome()<br>        drawing.processAnother()<br><br>service = ImageService()<br>service.addCommand("AEffect", AEffectCommand())<br>service.addCommand("BEffect", BEffectCommand())<br>service.addCommand("CEffect", CEffectCommand())<br><br>service.doEffect("AEffect")<br>service.doEffect("BEffect")<br>service.doEffect("CEffect")</pre>
+      <small><br>
+這
+是Command設計模式的一個實現，其主要精神在於<span style="font-weight: bold;">將指令的建立與執行分離</span>，
+要分離的原因可能有多種：<br>
+      </small>
+      <ul>
+        <li><small>事先無法預測或不想規範指令執行器的客戶端之指令內容。</small></li>
+        <li><small>隔離（客戶端）建立指令時必須的參數（物件）。</small></li>
+        <li><small>隔離</small><small>（執行器端）執行指令物件時必要的資源。</small></li>
+        <li><small>…<br>
+          </small></li>
+      </ul>
+      <small><br>
+      <span style="font-weight: bold;">一般對Command模式的誤解，是將重點放在指令執行器的實現方式</span>（多
+數誤解為執行器的實現就是一個指令對應一個名稱）<span style="font-weight: bold;">。</span>Command的
+重點是觀察原本同時擔任指令建立與執行職責的指令執行器，嘗試建立指令物件的公開介面，將指令的建立職責從原本的指令執行器中分離出來，因此指令執行器的
+實現方式不會是重點，原本</small><small>同時負有雙重職責的的指令執行器形式不同，重構為Command模式後的執行器就會有所不同。</small><br>
+      <small><br>
+所以實現Command模式的指令執行器，其接受指令與執行的方式，未必像上例ImageService的實現方式。<br>
+      <br>
+例如Java的視窗程式，在設計視窗程式框架時，設計
+人員不可能知道某個事件發生後，使用者想要執行的動作是什麼的，他們採用了Command模式，一個接受指令物件（也就是具事件處理器的物件）的範例可能
+像是這個樣子：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">menuCut.addActionListener(
+      </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+new ActionListener() { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public void actionPerformed(ActionEvent e) { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// textArea 是 JTextArea的一個實例 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+textArea.cut();&nbsp;&nbsp; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+} </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+});</span><br>
+      </small></div>
+      <small>&nbsp;<br>
+而執行指令的方式，則是在相關事件發生時，經由事件派遣器來呼叫註冊的指令物件。menuCut是JMenuItem的實例，一但這個JMenuItem
+被按下，它就會呼叫actionPerformed()方法，以執行您所建立的指令，UML 類別圖如下所示：</small><small><br>
+      <img style="width: 578px; height: 282px;" alt="" src="images/Command-1.jpg"><br>
+      <br>
+JUnit則是將註冊的測試指令物件逐一取出執行，而非前述ImageService一個指令對應一個名稱的方式，可參考 </small><a href="../JUnit/TestCommand.html" style="color: rgb(68, 68, 68); font-weight: bold; text-decoration: none; font-family: serif; font-size: medium; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(255, 255, 255);"><small>你
+來寫，我來跑</small></a> <small>的內容。</small><br>
+      <small><br>
+下圖以更一般的結構來表示JMenuItem等實現的Command模式。可區分接受Command物件Invoker，被封裝在Command物件中，
+在執行指令時真正處理相關事情的Receiver，以及建立Command物件的客戶端：<br>
+      <img style="width: 607px; height: 288px;" alt="" src="images/Command-2.jpg"><br>
+      <br>
+這是將Receiver封裝在Command的情況（就像ActionListener實作物件封裝了JTextArea實例）；Receiver不一定
+會直接封裝在Command物件中，也有可能是執行指令時，由指令執行器給予。以先前ImageService的範例來說，ImageService相當
+於Invoker角色，傳入Command物件execute()方法的Drawing實例，就是Receiver的角色了。<br>
+      <br>
+      </small><small>Command
+模式是個相當常見的模式，除了先前談過的例子之外，現在許多Web框架也都採用Command模式來設計，以Struts
+1.2.x為例，ActionServlet就相當於Invoker，而Action則相當於Command的角色，至於Receiver角色就是您封裝
+在實作的Action執行的物
+件<br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/DesignPattern/CommandPattern.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:27 GMT -->
+</html>

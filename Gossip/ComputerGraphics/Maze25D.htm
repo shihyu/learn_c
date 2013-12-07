@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/Maze25D.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:00 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>迷宮（斜角地圖實例）</title></head><body>
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Computer Graphics:&nbsp;迷宮（斜角地圖實例）</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+
+
+
+這個程式就不多作解釋了，所有的觀念前面都講過了，繪圖時使用迴圈走訪陣列，所以深度問題也自然獲得解決，<a href="applet/Maze25D.html">連結</a> 看看效果。 </small><br>
+
+
+
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> Maze25D.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package cc.openhome;<br><br>import java.awt.*;<br>import java.awt.event.KeyEvent;<br>import java.awt.event.KeyListener;<br>import javax.swing.JApplet;<br><br>public class Maze25D extends JApplet implements KeyListener {<br>    // 1: Wall 2: Penguin<br>    private int[][] maze = {<br>        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},<br>        {0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1},<br>        {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1},<br>        {1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1},<br>        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1},<br>        {1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1},<br>        {1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1},<br>        {1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1},<br>        {1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1},<br>        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1},<br>        {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1},<br>        {1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1},<br>        {1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1},<br>        {1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1},<br>        {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},<br>        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};<br>    <br>    private Image offScreen, lawnImage;<br>    private Image block, floor, character2;<br>    private Sprite25D sprite;<br>    private int halfWidth, halfHeight;<br>    private int startX, startY;<br>    private int characterImageX;<br>    private Graphics gOffScreen;<br><br>    public void init() {<br>        addKeyListener(this);<br><br>        setBackground(Color.white);<br><br>        //取得影像<br>        MediaTracker mediaTracker = new MediaTracker(this);<br>        floor = getImage(getDocumentBase(), "floor.gif");<br>        block = getImage(getDocumentBase(), "block3.gif");<br>        character2 = getImage(getDocumentBase(), "character2.gif");<br>        mediaTracker.addImage(floor, 0);<br>        mediaTracker.addImage(block, 0);<br>        mediaTracker.addImage(character2, 0);<br><br>        try {<br>            showStatus("影像載入中(Loading Images)...");<br>            mediaTracker.waitForAll();<br>        } catch (InterruptedException e) {<br>            e.printStackTrace();<br>        }<br><br>        //建立次畫面<br>        lawnImage = createImage(getWidth(), getHeight());<br>        Graphics lawnGraphics = lawnImage.getGraphics();<br><br>        offScreen = createImage(getWidth(), getHeight());<br>        gOffScreen = offScreen.getGraphics();<br><br>        halfWidth = floor.getWidth(this) / 2;<br>        halfHeight = floor.getHeight(this) / 2;<br><br>        startX = getWidth() / 2;<br>        startY = getHeight() / 8;<br><br>        // 繪製地板<br>        for (int j = 0; j &lt; maze.length; j++) {<br>            for (int i = 0; i &lt; maze[0].length; i++) {<br>                int x = startX - i * halfWidth + j * halfWidth;<br>                int y = startY + i * halfHeight + j * halfHeight;<br>                lawnGraphics.drawImage(floor, x, y, this);<br>            }<br>        }<br><br>        sprite = new Sprite25D(0, 1, maze);<br><br>        new Thread() {<br>            public void run() {<br>                while (true) {<br>                    repaint();<br>                    // 人物走動動畫<br>                    characterImageX += 50;<br>                    if (characterImageX &gt;= 300) {<br>                        characterImageX = 0;<br>                    }<br>                    try {<br>                        Thread.sleep(250);<br>                    } catch (InterruptedException e) {<br>                        e.printStackTrace();<br>                    }<br>                }<br>            }<br>        }.start();<br>    }<br><br>    public void update(Graphics g) {<br>        paint(g);<br>    }<br><br>    public void paint(Graphics g) {<br>        gOffScreen.drawImage(lawnImage, 0, 0, this);<br><br>        // 繪製牆與人物<br>        for (int j = 0; j &lt; maze.length; j++) {<br>            for (int i = 0; i &lt; maze[0].length; i++) {<br>                int x = startX - i * halfWidth + j * halfWidth;<br>                int y = startY - 10 + i * halfHeight + j * halfHeight;<br><br>                if (maze[i][j] == 1) {<br>                    gOffScreen.drawImage(block, x, y, this);<br>                }<br><br>                if (sprite.getX() == j &amp;&amp;<br>                        sprite.getY() == i) {<br>                    gOffScreen.drawImage(character2,<br>                            x, y, x + 25, y + 25,<br>                            characterImageX, 0,<br>                            characterImageX + 50, 50, this);<br>                }<br>            }<br>        }<br>        //將次畫面貼到主畫面中<br>        g.drawImage(offScreen, 0, 0, this);<br>    }<br><br>    //=====實作KeyListener介面 =====<br>    public void keyPressed(KeyEvent e) {<br>        switch (e.getKeyCode()) {<br>            case KeyEvent.VK_RIGHT:<br>                sprite.moveUp();<br>                break;<br>            case KeyEvent.VK_LEFT:<br>                sprite.moveDown();<br>                break;<br>            case KeyEvent.VK_UP:<br>                sprite.moveLeft();<br>                break;<br>            case KeyEvent.VK_DOWN:<br>                sprite.moveRight();<br>                break;<br>        }<br><br>        repaint();<br>    }<br><br>    public void keyReleased(KeyEvent e) {}<br>    public void keyTyped(KeyEvent e) {}<br>}<br><br>class Sprite25D {<br>    private int i, j;<br>    private int maze[][];<br><br>    Sprite25D(int x, int y, int[][] maze) {<br>        this.i = y;<br>        this.j = x;<br>        this.maze = maze;<br>    }<br><br>    void moveUp() {<br>        if (isMovable(i - 1, j)) {<br>            i--;<br>        }<br>    }<br><br>    void moveDown() {<br>        if (isMovable(i + 1, j)) {<br>            i++;<br>        }<br>    }<br><br>    void moveRight() {<br>        if (isMovable(i, j + 1)) {<br>            j++;<br>        }<br>    }<br><br>    void moveLeft() {<br>        if (isMovable(i, j - 1)) {<br>            j--;<br>        }<br>    }<br><br>    private boolean isMovable(int i, int j) {<br>        if (i &lt; 0 || j &lt; 0 || j &gt;= maze[0].length ||<br>                i &gt;= maze.length) {<br>            return false;<br>        }<br><br>        if (maze[i][j] == 0) {<br>            return true;<br>        } else {<br>            return false;<br>        }<br>    }<br><br>    public int getX() {<br>        return j;<br>    }<br><br>    public int getY() {<br>        return i;<br>    }<br>}<br></pre><br><small>以下是使用HTML5 Canvas的方式（如果瀏覽器支援HTML5 Canvas，例如最新版的Firexfox、Chrome、IE9等，可以直接將下面的內容存為HTML或按下檔名連結，直接載入瀏覽器執行觀看結果：</small><small><br>
+      </small>
+      <ul>
+        <li><small><a href="html/Map25D-1.html">Maze25D-1.html</a></small></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                var maze = [<br>        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],<br>        [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1],<br>        [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1],<br>        [1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1],<br>        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],<br>        [1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1],<br>        [1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1],<br>        [1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1],<br>        [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1],<br>        [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1],<br>        [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1],<br>        [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],<br>        [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],<br>        [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],<br>        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],<br>        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];<br>            <br>                function Sprite(x, y, maze) {<br>                    var i = y;<br>                    var j = x;<br>    <br>                    function isMovable(i, j) {<br>                        if (i &lt; 0 || j &lt; 0 || j &gt;= maze[0].length ||<br>                                i &gt;= maze.length) {<br>                            return false;<br>                        }<br><br>                        if (maze[i][j] == 0) {<br>                            return true;<br>                        }<br>                        return false;<br>                    }<br>    <br>                    this.moveUp = function() {<br>                        if (isMovable(i - 1, j)) {<br>                            i--;<br>                        }<br>                    };<br><br>                    this.moveDown = function() {<br>                        if (isMovable(i + 1, j)) {<br>                            i++;<br>                        }<br>                    };<br><br>                    this.moveRight = function() {<br>                        if (isMovable(i, j + 1)) {<br>                            j++;<br>                        }<br>                    };<br><br>                    this.moveLeft = function() {<br>                        if (isMovable(i, j - 1)) {<br>                            j--;<br>                        }<br>                    };<br>    <br>                    this.getX = function() {<br>                        return j;<br>                    };<br><br>                    this.getY = function() {<br>                        return i;<br>                    };<br>                }            <br>            <br>                var sprite = new Sprite(0, 1, maze);<br>                <br>                var character = document.getElementById('character');<br>                var floor = document.getElementById('floor');<br>                var block = document.getElementById('block');<br>                document.body.removeChild(character);<br>                document.body.removeChild(floor);<br>                document.body.removeChild(block);<br>                <br>                var canvas1 = document.getElementById('canvas1');<br>                var canvas2 = document.getElementById('canvas2');<br>                var context1 = canvas1.getContext('2d');<br>                var context2 = canvas2.getContext('2d');<br>                <br>                document.body.removeChild(canvas2);<br>                <br>                var halfWidth = 32 / 2;    // 地板圖片寬 32<br>                var halfHeight = 16 / 2;   // 地板圖片高 16<br><br>                var startX = canvas1.width / 2;<br>                var startY = canvas2.width / 8;<br>                <br>                var characterImageX = 0;<br>                <br>                var context = context2;<br>                <br>                // 繪製地板                <br>                function drawFloor() {<br>                    for(var j = 0; j &lt; maze.length; j++) {<br>                        for (var i = 0; i &lt; maze[0].length; i++) {<br>                            var x = startX - i * halfWidth + j * halfWidth;<br>                            var y = startY + i * halfHeight + j * halfHeight;<br>                            context.drawImage(floor, x, y);<br>                        }<br>                    }                <br>                }<br>                <br>                // 繪製牆與人物<br>                function drawBlockAndCharacter() {<br>                    for(var j = 0; j &lt; maze.length; j++) {<br>                        for (var i = 0; i &lt; maze[0].length; i++) {<br>                            var x = startX - i * halfWidth + j * halfWidth;<br>                            var y = startY - 10 + <br>                                   i * halfHeight + j * halfHeight;<br><br>                            if(maze[i][j] == 1) {<br>                                context.drawImage(block, x, y);<br>                            }<br><br>                            if (sprite.getX() == j &amp;&amp;<br>                                sprite.getY() == i) {<br>                                context.drawImage(character,<br>                                            characterImageX, 0, 50, 50,<br>                                            x, y, 25, 25);<br>                            }<br>                        }                <br>                    }<br>                }<br><br>               document.onkeydown = function(event) {<br>                    switch (event.which) {<br>                        case 39: // 右<br>                            sprite.moveUp();<br>                            break;<br>                        case 37: // 左    <br>                            sprite.moveDown();<br>                            break;<br>                       case 38: // 上<br>                            sprite.moveLeft();<br>                            break;<br>                       case 40: // 下<br>                            sprite.moveRight();<br>                            break;<br>                    }<br>                };<br>                <br>                setTimeout(function() {<br>                    drawFloor();<br>                    drawBlockAndCharacter();<br><br>                    if(context === context2) {<br>                        document.body.replaceChild(canvas2, canvas1);<br>                        context = context1;<br>                    }<br>                    else {<br>                        document.body.replaceChild(canvas1, canvas2);<br>                        context = context2;<br>                    }<br>                    <br>                    context.clearRect(0, 0, canvas1.width, canvas1.height);<br>                    <br>                    characterImageX += 50;<br>                    if (characterImageX &gt;= 300) {<br>                        characterImageX = 0;<br>                    }<br>                    <br>                    setTimeout(arguments.callee, 250);<br>                }, 250);<br>            };<br>        &lt;/script&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;       <br>        &lt;canvas id="canvas1" width="600" height="400"&gt;&lt;/canvas&gt;<br>        &lt;canvas id="canvas2" width="600" height="400"&gt;&lt;/canvas&gt;<br>        &lt;img id="character" src="images/character2.gif" <br>                            style="visibility: hidden"/&gt;<br>        &lt;img id="floor" src="images/floor.gif" <br>                            style="visibility: hidden"/&gt;<br>        &lt;img id="block" src="images/block3.gif" <br>                            style="visibility: hidden"/&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/Maze25D.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:00 GMT -->
+</html>

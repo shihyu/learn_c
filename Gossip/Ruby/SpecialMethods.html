@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/SpecialMethods.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>特殊方法定義</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 特殊方法定義<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+ 
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ruby中可以定義特定操作或</small><small>運算操作</small><small>的行為，例如<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">initialize</span>可以定義建立實例之後初始化的流程，<span style="font-family: Courier New,Courier,monospace;">+、-、*、/</span>、<span style="font-family: Courier New,Courier,monospace;">==</span>等操作行為也可以使用方法定義，例如</small><small>自行定義一個有理數類別：<br>
+      </small>
+      <pre># encoding: Big5<br>class RationalNumber<br>    attr_accessor :numer, :denom<br>    def initialize(n, d) # 物件建立之後所要建立的初始化動作<br>        @numer = n<br>        @denom = d<br>    end<br>    <br>    def to_s             # 定義物件的字串描述<br>        "#{@numer}/#{@denom}"<br>    end<br>    <br>    def +(that)          # 定義 + 運算<br>        RationalNumber.new(self.numer * that.denom + that.numer * self.denom, <br>                     self.denom * that.denom)<br>    end<br>    <br>    def -(that)          # 定義 - 運算<br>        RationalNumber.new(self.numer * that.denom - that.numer * self.denom,<br>                     self.denom * that.denom)<br>    end<br>    <br>    def *(that)          # 定義 * 運算<br>        RationalNumber.new(self.numer * that.numer, <br>                     self.denom * that.denom)<br>    end<br>    <br>    def /(that)          # 定義 / 運算<br>        RationalNumber.new(self.numer * that.denom,<br>                     self.denom * that.denom)<br>    end<br>    <br>    def ==(that)          # 定義 == 運算<br>        self.numer * that.denom == that.numer * self.denom<br>    end<br>end<br><br>x = RationalNumber.new(1, 2)<br>y = RationalNumber.new(2, 3)<br>z = RationalNumber.new(2, 3)<br><br>puts x       # 1/2<br>puts y       # 2/3<br>puts x + y   # 7/6<br>puts x - y   # -1/6<br>puts x * y   # 2/6<br>puts x / y   # 3/6<br>puts x == y  # false<br>puts y == z  # true<br></pre>
+      <small><br>
+      </small><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">initialize</span>定義物件建立後要執行的初始化過程。常見的+、-、*、/、==等操作，<span style="font-weight: bold;"></span>可分別由</span></small><small><span style="font-family: Courier New,Courier,monospace;">+、-、*、/、==等方法</span></small><small><span style="font-family: Courier New,Courier,monospace;">定義，呼叫這些方法時，可以不用.操作，而呼叫方法有</span>Ruby<span style="font-family: Courier New,Courier,monospace;">中，括號可以視情況省略，因此看來就像是其它語言中的所謂的運算子。<br>
+      <br>
+</span></small><small><span style="font-family: Courier New,Courier,monospace;">self代表（參考）至訊息接收者，</span></small><small><span style="font-family: Courier New,Courier,monospace;">實例方法中撰寫self時，self代表（參考）至實例，也就是運算操作左邊的物件。<br>
+      <br>
+      <span style="font-weight: bold;">to_s</span>用來定義傳回物件描述字串，通常用來描述的字串是對使用者友善的說明文字，有些方法會對物件呼叫to_s來取得物件的字串描述，像是puts、print、p等方法（</span>irb<span style="font-family: Courier New,Courier,monospace;">中也是使用to_s取得字串描述）</span></small><small><span style="font-family: Courier New,Courier,monospace;">，如果雙引號字串中包括\忽略</span></small><small><span style="font-family: Courier New,Courier,monospace;">（</span>Escape<span style="font-family: Courier New,Courier,monospace;">）</span></small><small><span style="font-family: Courier New,Courier,monospace;">字元，</span><span style="font-family: Courier New,Courier,monospace;">puts與print會忽略下一個字元，而p則不會忽略直接輸出。<br>
+      <br style="font-family: Courier New,Courier,monospace;">
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;">與to_s類似的是<span style="font-weight: bold;">to_str</span>方法</span>，在運算操作時（</small><small>例如串接字串</small><small>）如果需要從物件取得字串，若沒有指定方法操作，則會呼叫<span style="font-family: Courier New,Courier,monospace;">to_str而不是to_s</span>。例如：</small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def to_s<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "Some_to_s"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def to_str<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "Some_to_str"<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; s = Some.new<br>
+            </span>=&gt; Some_to_s<span style="font-weight: bold;"><br>
+&gt;&gt; "Text" + s<br>
+            </span>=&gt; "TextSome_to_str"<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">上例中同時定義了to_s與to_str，可以清楚看到irb中使用的是to_s，而串接字串時會使用to_str。<br>
+      <br>
+在某些操作場合，需要從物件取得陣列（例如串接陣列），若沒有指定方法操作，則通常預設會呼叫<span style="font-weight: bold;">to_ary</span>。例如：</span></small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def to_ary<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ["S", "o", "m", "e"]<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+=&gt; nil<br>
+&gt;&gt; s = Some.new<br>
+=&gt; #&lt;Some:0x258c018&gt;<br>
+&gt;&gt; [1, 2, 3] + s<br>
+=&gt; [1, 2, 3, "S", "o", "m", "e"]<br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      <small><span style="font-family: Courier New,Courier,monospace;"></span>
+      <br>
+實例變數的設值方法，可以使用<span style="font-family: Courier New,Courier,monospace;">name=</span>來定義，其中<span style="font-family: Courier New,Courier,monospace;">name</span>為實例變數名稱。類似地，</small><small><span style="font-family: Courier New,Courier,monospace;">[]運算操作的行為，可用[]與[]=方法來定義。例如：</span></small><small><br></small>
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def initialize<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @inner = {}<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def []=(name, value)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @inner[name] = value<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def [](name)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @inner[name]<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; s = Some.new<br>
+            </span>=&gt; #&lt;Some:0x2a02820 @inner={}&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; s[0] = 100<br>
+            </span>=&gt; 100<span style="font-weight: bold;"><br>
+&gt;&gt; s["Justin"] = "Message"<br>
+            </span>=&gt; "Message"<span style="font-weight: bold;"><br>
+&gt;&gt; s[0]<br>
+            </span>=&gt; 100<span style="font-weight: bold;"><br>
+&gt;&gt; s["Justin"]<br>
+            </span>=&gt; "Message"<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      </table>
+
+
+
+      <br>
+      <small>單元運算的方法名稱比較特殊，為運算字元後加上<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">@</span>。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; class Some<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; attr_accessor :value<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def initialize(value)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @value = value<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; def -@<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Some.new(-value)<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; end<br>
+&gt;&gt; end<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; s = Some.new(10)<br>
+            </span>=&gt; #&lt;Some:0x26a1e90 @value=10&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; s.value<br>
+            </span>=&gt; 10<span style="font-weight: bold;"><br>
+&gt;&gt; s2 = -s<br>
+            </span>=&gt; #&lt;Some:0x24ce568 @value=-10&gt;<span style="font-weight: bold;"><br>
+&gt;&gt; s2.value<br>
+            </span>=&gt; -10<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+
+      <small style="font-family: Courier New,Courier,monospace;">要注意，=不能
+使用方法定義，所以其它如+=、-=...等也不能使用方法定義，&amp;&amp;與||具有捷徑運算，你也無法用方法定義，因此&amp;
+&amp;=與||=也無法使用方法定義。可以使用方法定義的運算操作有+、-、*、/、%、[]、[]=、&lt;&lt;、&gt;&gt;、==、
+&gt;、&lt;、&gt;=、&lt;=、===、&amp;、|、^、~、!。<br>
+      </small><br>
+      <small>在<a href="IteratorBlock.html"><small> <big>迭代器與程式區塊</big></small></a><small><big> 中談過，可以<span style="font-family: Courier New,Courier,monospace;">為物件定義迭代器，如果某個物件上擁有each迭代方法</span>，也就可以使用<span style="font-family: Courier New,Courier,monospace;">for</span>語法。例如陣列就擁有<span style="font-family: Courier New,Courier,monospace;">each</span>方法，可以<span style="font-family: Courier New,Courier,monospace;">使用each方法迭代元素，也可以使用for迭代元素</span>：</big></small></small><br>
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; [1, 2, 3].each do |element|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; print element<br>
+&gt;&gt; end<br>
+</span>123=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>&gt;&gt; for element in [1, 2, 3]<br>
+&gt;&gt;&nbsp;&nbsp;&nbsp;&nbsp; print element<br>
+&gt;&gt; end<br>
+</span>123=&gt; [1, 2, 3]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      </table>
+      <br>
+      <small><small><big><br>
+      </big></small></small>
+      <small>
+      <br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/SpecialMethods.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

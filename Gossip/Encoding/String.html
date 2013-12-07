@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/String.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Java 的字串</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: Java 的字串<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </script></center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>任
+何一本Java入門的書都會談到，Java的字串是Unicode，所以你寫下一個英文字元或寫下一個中文字元，都是兩個位元組，那麼你是否想過，明明你
+的文字編輯器是使用MS950編碼，為什麼會寫下的字串在JVM中會是Unicode？如果你在一個Main.java中寫下以下的程式碼並編譯：<br>
+      </small>
+      <pre>public class Main {<br>    public static void main(String[] args) {<br>        System.out.println("Test");<br>        System.out.println("測試");<br>    }<br>}<br></pre>
+      <small><br>
+如果你的作業系統預設編碼是MS950，而你的文字編輯器是使用MS950編碼，那麼你如下執行編譯：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;javac Main.java<br>
+</span></small></td></tr></tbody>
+      </table>
+      <small><br>產生的.class檔案，使用任何的反組譯工具還原回來的程式碼中，你可能會看到以下的內容：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">import java.io.PrintStream;</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">public class Main</span></small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"> {</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public Main()</span></small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">{</span></small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; public static void main(String args[])</span></small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"> {</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("Test");</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("\u6E2C\u8A66");</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; }</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">}</span></small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+      </div>
+      <small><br>
+其中"\u6E2C\u8A66"就是"測試"的Unicode編碼表示，JVM在載入.class之後，就是讀取Unicode編碼並產生對應的字串物件，而不是最初你在原始碼中寫下的"測試"。<br>
+<br>
+      那麼編譯器怎麼知道要將中文字元轉為哪個Unicode編碼？正如 </small><small><a href="SourceFile.html">你的原始碼是什麼編碼？</a> 談過的，</small><small>當你使用javac指令沒有指定-encoding選項時，會使用作業系統預設編碼，如果你的文字編譯器是使用UTF-8編碼，那麼你編譯時就要指定-encoding為UTF-8，如此編譯器才會知道用何種編譯讀取.java的內容。例如：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;javac -encoding UTF-8 Main.java</span></small></td></tr></tbody>
+      </table>
+
+      <br>
+      <small>那麼啟動JVM之後，字串為什麼會佔兩個位元組？這是因為JVM使用的是UTF-16 Big Endian，用兩個位元組來儲存字元，如果你想要取得字串的位元組資料，可以使用<span style="font-family: Courier New,Courier,monospace;">String的getBytes()</span>方法。例如：<br>
+      </small>
+      <pre>public class Main {<br>    public static void main(String[] args) throws Exception {<br>        byte[] binary = "測試".getBytes("UTF-16");<br>        System.out.printf("UTF-16\t%h %h %h %h %h %h%n", <br>            binary[0] &amp; 0x00FF, binary[1] &amp; 0x00FF,<br>            binary[2] &amp; 0x00FF, binary[3] &amp; 0x00FF,<br>            binary[4] &amp; 0x00FF, binary[5] &amp; 0x00FF);<br>        <br>        binary = "測試".getBytes("UTF-8");<br>        System.out.printf("UTF-8\t%h %h %h %h %h %h%n", <br>            binary[0] &amp; 0x00FF, binary[1] &amp; 0x00FF, binary[2] &amp; 0x00FF,<br>            binary[3] &amp; 0x00FF, binary[4] &amp; 0x00FF, binary[5] &amp; 0x00FF);<br>        <br>        binary = "測試".getBytes("Big5");<br>        System.out.printf("Big5\t%h %h %h %h%n", <br>            binary[0] &amp; 0x00FF, binary[1] &amp; 0x00FF,<br>            binary[2] &amp; 0x00FF, binary[3] &amp; 0x00FF);<br><br>        binary = "測試".getBytes();<br>        System.out.printf("Default\t%h %h%n", <br>            binary[0] &amp; 0x00FF, binary[1] &amp; 0x00FF,<br>            binary[2] &amp; 0x00FF, binary[3] &amp; 0x00FF);<br>    }<br>}<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">getBytes()</span>在
+使用時，可以指定用哪個編碼取得字串的位元組序列，上面這個程式，分別將「測試」以UTF-16、UTF-8、Big5三種編碼取得位元組序列，結果如
+下，你可以用十六進位編輯器來印證「測試」在這幾種編碼下，位元組序列是不是與執行結果相同（注意UTF-16開頭的fe、ff是BOM）：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main<br>
+UTF-16&nbsp; fe ff 6e 2c 8a 66<br>
+UTF-8&nbsp;&nbsp; e6 b8 ac e8 a9 a6<br>
+Big5&nbsp;&nbsp;&nbsp; b4 fa b8 d5<br>
+Default b4 fa</span></small></td></tr></tbody>
+      </table>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">getBytes()</span>可以不指定編碼呼叫，此時會用 <a href="JVMEncoding.html">JVM預設編碼</a>，在啟動JVM沒有任何指定的情況下，就會與作業系統預設編碼一致，上面的執行結果是在正體中文Windows下執行的，所以<span style="font-family: Courier New,Courier,monospace;">getBytes()</span>預設取得就Big5的位元組序列。</small><br>
+      <br>
+      <small>如果你有一個位元組陣列，可以用來建構字串，建構時可指定以何種編碼方式來解釋所提供的位元組陣列。例如：<br>
+      </small>
+      <pre>public class Main {<br>    public static void main(String[] args) throws Exception {<br>        byte[] binary = {(byte) 0xfe, (byte) 0xff, (byte)0x6e,<br>                         (byte) 0x2c, (byte) 0x8a, (byte)0x66};<br>        System.out.println(new String(binary, "UTF-16"));<br>        <br>        binary = new byte[] {(byte) 0xe6, (byte) 0xb8, (byte) 0xac,<br>                             (byte) 0xe8, (byte) 0xa9, (byte) 0xa6};<br>        System.out.println(new String(binary, "UTF-8"));<br>        <br>        binary = new byte[] {(byte) 0xb4, (byte) 0xfa,<br>                             (byte) 0xb8, (byte) 0xd5};<br>        System.out.println(new String(binary, "Big5"));<br>        System.out.println(new String(binary));<br>    }<br>}<br></pre>
+      <small><br>
+在使用位元組陣列建構字串時，如果不指定編碼，則會使用JVM</small><small>預設編碼，</small><small>在啟動JVM沒有任何指定的情況下，就會與作業系統預設編碼一致，下面的執行結果是在正體中文Windows下執行的，所以最後一個字串建構就是使用Big5：</small><small><br>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main<br>測試<br>
+測試<br>
+測試<br>
+測試</span></small></td></tr></tbody>
+      </table>
+      <br>
+      <small>現在有一個簡單的問題，如果你在UTF-8下檢視某個檔案內容有亂碼，例如看到「</small><span class="javascript" id="text282136">&#174;&#245;&#164;s&#189;Y￥&#219;±&#208;·|</span><small>」的亂碼，你知道這個亂碼本來應該是某段Big5正體中文，那要如何找回原來正確的中文字串？<br>
+      <br>
+你可以將以下的原始碼存為UTF-8：<br>
+</small>
+      <pre>import java.nio.charset.Charset;<br><br>public class Main {<br>    public static void main(String[] args) {<br>        for (String encoding : Charset.availableCharsets().keySet()) {<br>            try {<br>                // 當初是哪個位元組陣列被解釋為 UTF-8 的？一個一個嘗試！<br>                byte[] binary = "&#174;&#245;&#164;s&#189;Y￥&#219;±&#208;·|".getBytes(encoding);<br>                System.out.printf("%s %s%n", <br>				    encoding, new String(binary, "Big5"));<br>            } catch (Exception e) {<br>            }<br>        }<br>    }<br>}<br></pre>
+      <br>
+      <small>編譯與執行後，嘗試從結果中看到可辨識的文字：</small><br>
+      <small>
+      </small>
+
+
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;javac -encoding UTF-8 Main.java<br>
+</span></small><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">C:\workspace&gt;java Main</span></small><br>
+            <small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);">略...<br>
+            <span style="font-weight: bold;">ISO-8859-1 泰山磐石教會</span><br>
+ISO-8859-13 泰山磐???會<br>
+略...<br>
+            <span style="font-weight: bold;">windows-1252 泰山磐石教會</span><br>
+windows-1253 ?山磐??會<br>
+windows-1254 泰山磐石?會<br>
+略...<br>
+            </span></small></td></tr></tbody>
+      </table>
+      <br>
+      <small>當使用ISO-8859-1或windows-1252嘗試取回的位元組陣列，可用Big5編碼解釋來建立</small><small>可辨識的字串結果。如果這是資料庫的某個欄位，現在可以直接撰寫程式取得其它欄位字串結果，使用</small><small>ISO-8859-1（或windows-1252，不過這比較不可能）取得位元組陣列，再用以建立Big5字串，看看結果是否都是可辨識的，如果確認是的話，就可以重新將這些欄位用正確的編碼寫回資料庫。</small><br>
+      <br>
+      <small>PS. 上面這個範例來自 <a href="http://www.javaworld.com.tw/jute/post/view?bid=21&amp;id=282136&amp;tpg=1&amp;ppg=1&amp;sty=1&amp;age=0#282136">JWorld@TW 的討論文章</a>。</small><br>
+<br>
+      <small><br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/String.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+</html>

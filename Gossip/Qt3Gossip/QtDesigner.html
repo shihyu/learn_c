@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QtDesigner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:24:20 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>使用 Qt Designer 設計視窗</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: 使用 Qt Designer 設計視窗</a></h1>
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在開發Qt視窗程式時，我們可以使用Qt Designer的所視即所得環境，協助我們進行視窗外觀的設計，並透過指令產生對應的*.h與*.cpp檔案，這邊介紹Qt Designer的一些簡單的使用方法。 <br>
+
+      <br>
+
+首先開啟Qt Designer，執行選單中的[File/New]指令（或按Ctrl+N）新增要使用的視窗類型，如下圖所示：</small><br>
+
+      <img style="width: 415px; height: 282px;" alt="" src="images/QtDesigner-1.jpg"><br>
+
+      <br>
+
+      <small>接下來的畫面與Visual Basic很像，我們在左邊的Toolbox選擇元件，在中間的表單區域以拖拉的方式配置元件，在右邊的Property Editor設定相關屬性，假設我們的元件如下配置： <br>
+
+      </small><img style="width: 549px; height: 383px;" alt="" src="images/QtDesigner-2.jpg"><br>
+
+      <br>
+
+      <small>接下來我們進行簡單的Signals - Slots連結，執行選單中的[Tools/Connect Signal/Slots]指令（或按F3），然後選擇發出Signal的元件，接著會出現以下視窗，在這邊我們簡單的設定按下按鈕後關閉視窗：</small><br>
+
+      <img style="width: 488px; height: 311px;" alt="" src="images/QtDesigner-3.jpg"><br>
+
+      <br>
+
+      <small>您可以執行選單中的[Preview/Preview
+Form]指令（或按Crtl+T）來預覽配置成果，接下來我們執行[File/Save]指令（或按Ctrl+S），將之儲存為form1.ui檔，這
+個檔案一堆描述元件屬性的標籤所組成，我們可以使用下面的指令來產生*.h檔： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">uic -o form1.h form1.ui </span></small><br>
+
+      </div>
+
+      <small><br>
+
+然後我們使用下面的指令產生*.cpp檔： <br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">uic -i form1.h -o form1.cpp form1.ui </small><br>
+
+      </div>
+
+      <small><br>
+
+您可以直接開啟這兩個檔案來看看它們的內容，並根據實際需求再作些修改，下面是我們產生的*.h檔內容： <br>
+
+      <br>
+
+      </small>
+      
+      <pre>/****************************************************************************<br>** Form interface generated from reading ui file 'form1.ui'<br>**<br>** Created: 銝&#65533;  7&#65533;&#65533;21 11:11:59 2003<br>**      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)<br>**<br>** WARNING! All changes made in this file will be lost!<br>****************************************************************************/<br><br>#ifndef FORM1_H<br>#define FORM1_H<br><br>#include &lt;qvariant.h&gt;<br>#include &lt;qwidget.h&gt;<br><br>class QVBoxLayout;<br>class QHBoxLayout;<br>class QGridLayout;<br>class QPushButton;<br>class QLabel;<br><br>class Form1 : public QWidget<br>{<br>    Q_OBJECT<br><br>public:<br>    Form1( QWidget* parent = 0, const char* name = 0, WFlags fl = 0 );<br>    ~Form1();<br><br>    QPushButton* pushButton1;<br>    QLabel* textLabel1;<br><br>protected:<br><br>protected slots:<br>    virtual void languageChange();<br><br>};<br><br>#endif // FORM1_H</pre>
+
+      <small><br>
+
+下面是產生的*.cpp內容： <br>
+
+      </small>
+      
+      <pre>/****************************************************************************<br>** Form implementation generated from reading ui file 'form1.ui'<br>**<br>** Created: 銝&#65533;  7&#65533;&#65533;21 11:12:43 2003<br>**      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)<br>**<br>** WARNING! All changes made in this file will be lost!<br>****************************************************************************/<br><br>#include "form1.h"<br><br>#include &lt;qvariant.h&gt;<br>#include &lt;qpushbutton.h&gt;<br>#include &lt;qlabel.h&gt;<br>#include &lt;qlayout.h&gt;<br>#include &lt;qtooltip.h&gt;<br>#include &lt;qwhatsthis.h&gt;<br><br>/*<br>*  Constructs a Form1 as a child of 'parent', with the<br>*  name 'name' and widget flags set to 'f'.<br>*/<br>Form1::Form1( QWidget* parent, const char* name, WFlags fl )<br>    : QWidget( parent, name, fl )<br>{<br>    if ( !name )<br>   setName( "Form1" );<br><br>    pushButton1 = new QPushButton( this, "pushButton1" );<br>    pushButton1-&gt;setGeometry( QRect( 80, 130, 131, 31 ) );<br><br>    textLabel1 = new QLabel( this, "textLabel1" );<br>    textLabel1-&gt;setGeometry( QRect( 50, 50, 191, 51 ) );<br>    QFont textLabel1_font(  textLabel1-&gt;font() );<br>    textLabel1_font.setPointSize( 18 );<br>    textLabel1-&gt;setFont( textLabel1_font );<br>    textLabel1-&gt;setAlignment( int( QLabel::AlignCenter ) );<br>    languageChange();<br>    resize( QSize(293, 215).expandedTo(minimumSizeHint()) );<br>    clearWState( WState_Polished );<br><br>    // signals and slots connections<br>    connect( pushButton1, SIGNAL( clicked() ), this, SLOT( close() ) );<br>}<br><br>/*<br>*  Destroys the object and frees any allocated resources<br>*/<br>Form1::~Form1()<br>{<br>    // no need to delete child widgets, Qt does it all for us<br>}<br><br>/*<br>*  Sets the strings of the subwidgets using the current<br>*  language.<br>*/<br>void Form1::languageChange()<br>{<br>    setCaption( tr( "Form1" ) );<br>    pushButton1-&gt;setText( tr( "Click me" ) );<br>    textLabel1-&gt;setText( tr( "Qt Designer" ) );<br>} </pre>
+
+      <small><br>
+
+我們使用下面這個main.cpp程式來測試成果： <br>
+
+      </small>
+      
+      <ul>
+
+        <li>main.cpp</li>
+
+      
+      </ul>
+
+      
+      <pre>#include "form1.h"<br>#include &lt;qapplication.h&gt;<br><br>int main(int argc, char **argv) {<br>    QApplication app(argc, argv);<br><br>    Form1 *fm = new Form1();<br>    app.setMainWidget(fm);<br>    fm-&gt;show();<br><br>    return app.exec();<br>} </pre>
+
+      <small><br>
+
+下圖為執行結果，按下按鈕會關閉視窗： </small><br>
+
+      <img style="width: 301px; height: 242px;" alt="" src="images/QtDesigner-4.jpg"><br>
+
+
+
+
+
+
+
+
+
+      <small></small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QtDesigner.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:24:31 GMT -->
+</html>

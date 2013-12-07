@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/GET.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>使用 GET 請求</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JavaScript Essence: 使用 GET 請求<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <div style="text-align: right;"><a href="http://openhome.cc/eGossip/JavaScript/GET.html">English</a><br>
+      </div>
+      <small><br>
+HTTP定義GET來取得所需的資源，</small><small>GET用於<span style="font-weight: bold;">等冪（idempotent）</span>操作，也就是多次GET操作，都必須傳回相同的結果，GET請求顧名思義，原則上不影響伺服端的狀態。<br>
+      <br>
+如果使用傳統表單發送GET請求，GET的請求參數會出現在網址列並更新頁面，但使用非同步物件時，GET的請求參數並不會影響網址列，所以無法讓使用者以請求參數作為書籤之用。<br>
+      <br>
+要使用非同步物件透過GET發送請求參數，只要在第二個<span style="font-family: Courier New,Courier,monospace;">url參數中以請求參數格式附加，而send()時不傳入引數設為null即</span>可。一個例子如下：<br>
+</small>
+      <ul>
+        <li><small><a href="samples/GET-1.html">GET-1.html</a></small></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                var xhr = window.XMLHttpRequest &amp;&amp; <br>                      (window.location.protocol !== 'file:' <br>                          || !window.ActiveXObject) ?<br>                       function() {<br>                           return new XMLHttpRequest();<br>                       } :<br>                       function() {<br>                          try {<br>                             return new ActiveXObject('Microsoft.XMLHTTP');<br>                          } catch(e) {<br>                             throw new Error('XMLHttpRequest not supported');<br>                          }<br>                       };<br>                       <br>                document.getElementById('category').onchange = function() {<br>                    var request = xhr();<br>                    request.onreadystatechange = function() {<br>                        if(request.readyState === 4) {<br>                            if(request.status === 200) {<br>                                document.getElementById('book').innerHTML = <br>                                    request.responseText;<br>                            }<br>                        }<br>                    };<br>                    request.open('GET', <span style="font-weight: bold;">'GET-1.php?category=' </span><span style="font-weight: bold;">+ this.value</span> + <br>                         <span style="font-weight: bold;">'&amp;time=' + new Date().getTime()</span>); <span style="font-weight: bold;">// 避免GET被快取</span><br>                    request.send(null);<br>                };<br>            };<br>        &lt;/script&gt;        <br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        圖書：&lt;br&gt;<br>        &lt;select id="category"&gt;<br>            &lt;option&gt;-- 選擇分類 --&lt;/option&gt;<br>            &lt;option value="theory"&gt;理論基礎&lt;/option&gt;<br>            &lt;option value="language"&gt;程式語言&lt;/option&gt;<br>            &lt;option value="web"&gt;網頁技術&lt;/option&gt;<br>        &lt;/select&gt;&lt;br&gt;&lt;br&gt;<br>        採購：&lt;div id="book"&gt;&lt;/div&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><small>
+      <br>
+      </small>這個例子是連動選單，下一個下拉選單的選項是根據上一個下拉選單的選擇而定，事先不在網頁中寫死第二個選單的選項，而是根據上一個選單所發送的請求參數而定，例如若請求參數為<span style="font-family: Courier New,Courier,monospace;">category=theory</span>，則會傳回以下的HTML片段：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;select&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;option value="algorithm"&gt;常見演算&lt;/option&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;option value="graphic"&gt;電腦圖學&lt;/option&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;option value="pattern"&gt;設計模式&lt;/option&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/select&gt;</span></small><br>
+      </div>
+
+      <br>
+      <small>當然，直接傳回HTML片段，並不是很好的方式，因為伺服端綁死了客戶端的頁面設計。這個範例只是用來示範GET的請求發送，之後會看到若傳回XML或JSON等其它資料格式，客戶端將有彈性自行決定頁面設計方式。<br>
+      <br>
+另外要注意的是，GET請求時若URL相同，瀏覽器可能會作快取（尤其是Internet Explorer），為了避免取得舊的資料，你可以在URL上附加時間戳記，讓每次URL不同，以避免瀏覽器作快取的動作。<br>
+      <br>
+Web的世界中，故事往往不會這樣就結束。GET在發送請求時，必須注意編碼的問題，因為/、?、@、空白等字元，在URL中是保留字，<a href="http://tools.ietf.org/html/rfc3986">RFC 3986</a> 規範了哪些字作為保留字，如果你要在URL表達這些保留字或一些非ASCII字元，必須使用<span style="font-weight: bold;">%hexhex</span>編碼形式</small><small>。例如</small><small>http://caterpillar.onlyfun.net/add.php?<span style="font-weight: bold;">url=http://openhome.cc</span>，若要在URL中表示，必須如此處理</small><small>：</small><br>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">http://caterpillar.onlyfun.net/add.php?http%3A%2F%2Fopenhome.cc</span></small><br>
+      </div>
+      <small><br>
+其中</small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">%3A%2F%2F</span>分別就是<span style="font-weight: bold;">://</span>三個字元編碼處理後的結果<span style="font-weight: bold;">。</span></small><br>
+      <small><br>在JavaScript中，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">encodeURIComponent()</span>為你作這些字元的編碼，編碼後的結果是遵守RFC 3986的規範，然而在RFC 3986之前，HTTP亦規範了GET與POST在發送請求參數時的編碼，大致上也是編碼為%hexhex，<span style="font-weight: bold;">不過空白字元是編碼為 + 而不是RFC 3986的%20</span>。</small><small>如果直接透過瀏覽器按下發送按鈕來送出表單，則瀏覽器會自動處理編碼（依網頁上指定的編碼來處理），並將空白字元編碼為+，但透過非同步物件發送請求參數時，必須自行處理。<br>
+      <br>
+      </small><small>發送請求參數時，若使用<span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()</span>編碼後，<span style="font-weight: bold;">要再將%20取代為+</span>，以符合HTTP的規範</small><small>。</small><small>要注意的是，JavaScript在內部是使用Unicode處理字元，實作上採用UTF-8，所以傳入</small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()的字串都是以</span>UTF-8進行編碼，若將</small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()透過非同步物件發送出去，</span></small><small>伺服端必須以UTF-8來處理接收到的字串。<br>
+      <br>
+如果你沒有透過</small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()</span>編碼，就直接透過非同步物件送出非ASCII字元，例如中文，那非同步物件會如何處理編碼，依不同的瀏覽器而有所不同，因此，建議還是</small><small>使用<span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()</span>編碼後將%20取代為+再送出，避免不同瀏覽器的問題。</small><br>
+      <small><br>
+      </small><small>
+下面這個範例是GET的另一個示範，在新增書籤時，若URL已重複（已有的書籤是http://caterpillar.onlyfun.net與http://openhome.cc）則以訊息提示：<br>
+      </small>
+      <ul>
+        <li><small><a href="samples/GET-2.html">GET-2.html</a></small></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                var xhr = window.XMLHttpRequest &amp;&amp; <br>                      (window.location.protocol !== 'file:' <br>                          || !window.ActiveXObject) ?<br>                       function() {<br>                           return new XMLHttpRequest();<br>                       } :<br>                       function() {<br>                          try {<br>                             return new ActiveXObject('Microsoft.XMLHTTP');<br>                          } catch(e) {<br>                             throw new Error('XMLHttpRequest not supported');<br>                          }<br>                       };<br><br><span style="font-weight: bold;">                // 組合與編碼請求參數</span><br><span style="font-weight: bold;">                function param(obj) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    var pairs = [];</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    for(var name in obj) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        var pair = encodeURIComponent(name) + '=' + </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                   encodeURIComponent(obj[name]);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        pairs.push(pair.replace('/%20/g', '+'));</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    return pairs.join('&amp;');</span><br style="font-weight: bold;"><span style="font-weight: bold;">                }</span><br>                <br>                document.getElementById('url').onblur = function() {<br>                    var request = xhr();<br>                    request.onreadystatechange = function() {<br>                        if(request.readyState === 4) {<br>                            if(request.status === 200) {<br>                                var message = '';<br>                                if(request.responseText === 'urlExisted') {<br>                                    message = 'URL 已存在';<br>                                }<br>                                document.getElementById('message')<br>                                        .innerHTML = message;<br>                            }<br>                        }<br>                    };<br>                    var params = param(<br>                       <span style="font-weight: bold;">{ url : document.getElementById('url').value }</span><br>                    );<br>                    request.open('GET', 'GET-2.php?' + params +<br>                         <span style="font-weight: bold;">'&amp;time=' + new Date().getTime()</span>); <span style="font-weight: bold;">// 避免GET被快取</span><br>                    request.send(null);<br>                };<br>            };<br>        &lt;/script&gt;        <br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        新增書籤：&lt;br&gt;<br>        網址：&lt;input id="url" type="text"&gt;<br>        &lt;span id="message" style="color:red"&gt;&lt;/span&gt;&lt;br&gt;<br>        名稱：&lt;input type="text"&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+若URL已存在，則傳回<span style="font-family: Courier New,Courier,monospace;">'urlExisted'</span>的字串，此時將訊息設定為「URL 已存在」。<br>
+      <small><br>
+      </small></small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JavaScript/GET.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:43 GMT -->
+</html>

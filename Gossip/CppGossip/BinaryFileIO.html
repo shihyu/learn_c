@@ -1,0 +1,530 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/BinaryFileIO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>二進位檔案 I/O</title>
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index.html">C++ Gossip: 二進位檔案 I/O</a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"><small>使用二進位模式開啟檔案，在寫入或讀取檔案時並不會發生字元轉換，數值在記憶體中的位元是如何，寫入檔案時就是如何，而讀入時也是相同。 
+      <br>
+
+
+
+      <br>
+
+
+
+下面這個程式可以讀入任意檔案，每次讀入一個位元組，並將讀入的資料以16進位數顯示，若讀入的資料前導位元為1，為了輸出的對齊，則使用其補數加以顯示： 
+      <br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;fstream&gt; <br>#include &lt;iomanip&gt; <br>using namespace std; <br><br>int main(int argc, char* argv[]) { <br>    char ch; <br>    int count = 0; <br><br>    if(argc != 2) { <br>        cout &lt;&lt; "指令: read &lt;filename&gt;" &lt;&lt; endl; <br>        return 1; <br>    } <br><br>    ifstream fin(argv[1], ios::in | ios::binary); <br>    if(!fin) { <br>        cout &lt;&lt; "無法讀取檔案" &lt;&lt; endl; <br>        return 1; <br>    } <br><br>    while(!fin.eof()) { <br>        fin.get(ch); <br>        if(ch &lt; 0) <br>            ch = ~ch; // 負數取補數 <br>        cout &lt;&lt; setw(2) &lt;&lt; hex &lt;&lt; (int)ch &lt;&lt; " "; <br>        count++; <br>        if(count &gt; 16) {  // 換行 <br>            cout &lt;&lt; endl; <br>            count = 0; <br>        } <br>    } <br>    cout &lt;&lt; endl; <br><br>    fin.close(); <br><br>    return 0; <br>}</pre>
+
+
+
+      <br>
+
+
+
+      <small>執行結果： </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">read main.cpp <br>
+
+
+
+23 69 6e 63 6c 75 64 65 20 3c 69 6f 73 74 72 65 61 <br>
+
+
+
+6d 3e&nbsp; a 23 69 6e 63 6c 75 64 65 20 3c 66 73 74 72 <br>
+
+
+
+65 61 6d 3e&nbsp; a 23 69 6e 63 6c 75 64 65 20 3c 69 6f <br>
+
+
+
+6d 61 6e 69 70 3e&nbsp; a 75 73 69 6e 67 20 6e 61 6d 65 <br>
+
+
+
+73 70 61 63 65 20 73 74 64 3b&nbsp; a&nbsp; a 69 6e 74 20 6d <br>
+
+
+
+61 69 6e 28 69 6e 74 20 61 72 67 63 2c 20 63 68 61 <br>
+
+
+
+略....</span></small></td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+      <br>
+
+
+
+      <small>下面這個程式可以讓您將任意的檔案複製至另一個指定的名稱： <br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;fstream&gt; <br>using namespace std; <br><br>int main(int argc, char* argv[]) { <br>    char ch; <br><br>    if(argc != 3) { <br>        cout &lt;&lt; "指令: copy &lt;input&gt; &lt;output&gt;" &lt;&lt; endl; <br>        return 1; <br>    } <br><br>    ifstream fin(argv[1], ios::in | ios::binary); <br>    ofstream fout(argv[2], ios::out | ios::binary); <br><br>    if(!fin) { <br>        cout &lt;&lt; "檔案讀入失敗" &lt;&lt; endl; <br>        return 1; <br>    } <br><br>    if(!fout) { <br>        cout &lt;&lt; "檔案輸出失敗" &lt;&lt; endl; <br>        return 1; <br>    } <br><br>    while(!fin.eof()) { <br>        fin.get(ch); <br>        if(!fin.eof()) <br>            fout.put(ch); <br>    } <br><br>    fin.close(); <br>    fout.close(); <br><br>    return 0;<br>}<br></pre>
+
+
+
+      <br>
+
+
+
+      <small>在寫入或讀取檔案時，我們也可以用read()與write()函式以區塊的方式寫入，它們的函式雛型如下： <br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">istream &amp;read(char *buf, streamsize num); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">ostream &amp;write(const char* buf, streamsize num); </span></small><br style="font-weight: bold;">
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+其中num是所要寫入的資料位元組數目，通常使用read()或write()函式時，都會使用二進位模式來存取檔案；下面這個程式則示範如何將陣列資料寫入檔案，然後再將之讀出： <br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;iostream&gt; <br>#include &lt;fstream&gt; <br>using namespace std; <br><br>int main(int argc, char* argv[]) { <br>    ofstream fout("temp", ios::out | ios::binary); <br>    if(!fout) { <br>        cout &lt;&lt; "無法讀取檔案" &lt;&lt; endl; <br>        return 1; <br>    } <br><br>    int arr[5] = {1, 2, 3, 4, 5}; <br>    fout.write((char*) arr, sizeof(arr)); <br>    fout.close(); <br><br>    ifstream fin("temp", ios::in | ios::binary); <br>    if(!fin) { <br>        cout &lt;&lt; "無法讀取檔案" &lt;&lt; endl; <br>        return 1; <br>    } <br>    <br>    fin.read((char*) arr, sizeof(arr)); <br>    cout &lt;&lt; "arr: "; <br>    for(int i = 0; i &lt; 5; i++) <br>        cout &lt;&lt; arr[i] &lt;&lt; ' '; <br>    cout &lt;&lt; endl; <br><br>    fin.close(); <br><br>    return 0; <br>}</pre>
+
+
+
+      <br>
+
+
+
+      <small>執行結果：</small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">arr: 1 2 3 4 5</span></small></td>
+
+
+
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+       <br>
+
+      </center>
+
+ </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/BinaryFileIO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

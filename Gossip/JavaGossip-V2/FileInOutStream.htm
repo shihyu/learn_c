@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/FileInOutStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>FileInputStream、 FileOutputStream</title></head><body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: FileInputStream、 FileOutputStream</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>FileInputStream是InputStream的子類，由名稱上就可以知道， FileInputStream主要就是從指定的檔案中讀取資料至目的地。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+FileOutputStream是OutputStream的子類，顧名思義，FileOutputStream主要就是從來源地寫入資料至指定的檔案中。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+標準輸入輸出串流物件在程式一開始就會開啟，但只有當您建立一個FileInputStream或FileOutputStream的實例時，實際的串流才會開啟，而不使用串流時，也必須自行關閉串流，以釋放與串流相依的系統資源。<br>
+
+
+
+
+      <br>
+
+
+
+
+
+下面這個程式可以複製檔案，程式先從來源檔案讀取資料至一個位元緩衝區中，然後再將位元陣列的資料寫入目的檔案： </small>
+
+
+      <br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li> FileStreamDemo.java </li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*; <br> <br>public class FileStreamDemo {<br>    public static void main(String[] args) {<br>        try { <br>            byte[] buffer = new byte[1024]; <br><br>            FileInputStream fileInputStream = <br>                new FileInputStream(new File(args[0])); <br>            FileOutputStream fileOutputStream = <br>                new FileOutputStream(new File(args[1])); <br><br>            System.out.println("複製檔案：" + <br>                    fileInputStream.available() + "位元組"); <br>                    <br>            int length = -1;<br>            // 從來源檔案讀取資料至緩衝區 <br>            while((length = fileInputStream.read(buffer)) != -1) { <br>                // 將陣列資料寫入目的檔案 <br>                fileOutputStream.write(buffer, 0, length);<br>            } <br><br>            // 關閉串流 <br>            fileInputStream.close(); <br>            fileOutputStream.close(); <br><br>            System.out.println("複製完成"); <br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            System.out.println(<br>                      "using: java FileStreamDemo src des"); <br>            e.printStackTrace(); <br>        } <br>        catch(IOException e) { <br>            e.printStackTrace(); <br>        } <br>    }<br>}<br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+      <small><span class="postbody">這個程式示範了兩個 <span style="font-weight: bold;">read() </span>方法，一個可以讀入指定長度的資料至陣列，一個一次可以讀入一個位元組，每次讀取之後，讀取的指標都會往前進，您使用<span style="font-weight: bold;">available()</span>方
+法獲得還有多少位元組可以讀取，在這邊則是在進行讀取前，使用available()來先取得總共可讀取的位元數，也就是剛好等於檔案大小；除了使用
+File來建立FileInputStream、FileOutputStream的實例之外，您也可以直接使用字串指定路徑來建立。<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+不使用串流時，記得使用<span style="font-weight: bold;">close()</span>方法自行關閉串流，以釋放與串流相依的系統資源。</span></small> </td>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+<br>
+
+
+
+
+
+</span>
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/FileInOutStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

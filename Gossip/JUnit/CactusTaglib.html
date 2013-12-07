@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/CactusTaglib.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>測試 Taglib</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 測試 Taglib<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在
+測試JSP時，除了繼承<span style="font-family: Courier New,Courier,monospace;">ServletTestCase</span>之
+外，你還可以選擇繼承<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">JspTestCase</span>，
+這方便你使用JSP的隱含物件（Implicit object）來進行相關測試。例如 </small><small><big><a href="CactusJSP.html"><small>測試 JSP</small></a> </big>中的測試，也可以改為以下</small><small>：<br>
+      </small>
+      <pre>package test.cc.openhome;<br><br>import java.io.*;<br>import java.util.Arrays;<br>import java.util.List;<br>import org.apache.cactus.JspTestCase;<br>import org.apache.cactus.WebRequest;<br>import org.apache.cactus.WebResponse;<br><br>public class AddJSPTest extends <span style="font-weight: bold;">JspTestCase</span> {<br>    static {<br>        System.setProperty(<br>                "cactus.contextURL", "http://localhost:8080/CactusExample");<br>    }<br>    // 測試沒有錯誤時的狀態，也就是第一次造訪JSP頁面時<br>    public void testNoError() throws Exception {<br><span style="font-weight: bold;">        pageContext.forward("add.jsp");</span><br>    }<br>    public void endNoError(WebResponse resp) throws Exception {<br>        String html = getContent(resp);<br>        assertTrue(!html.contains("&lt;h1&gt;新增書籤失敗&lt;/h1&gt;"));<br>    }<br>    <br>    // 測試表單驗證失敗，回到JSP頁面時<br>    public void testErrors() throws Exception {<br>        List&lt;String&gt; errors = Arrays.asList("錯誤一", "錯誤二", "錯誤三");<br>        request.setAttribute("errors", errors);<br>        pageContext.forward("add.jsp");<br>    }<br>    public void endErrors(WebResponse resp) throws Exception {<br>        String html = getContent(resp);<br>        assertTrue(html.contains("&lt;h1&gt;新增書籤失敗&lt;/h1&gt;"));<br>        assertTrue(html.contains("&lt;li&gt;錯誤一&lt;/li&gt;"));<br>        assertTrue(html.contains("&lt;li&gt;錯誤二&lt;/li&gt;"));<br>        assertTrue(html.contains("&lt;li&gt;錯誤三&lt;/li&gt;"));<br>    }<br>    <br>    // 測試表單驗證失敗，回到JSP頁面時測試請求參數回填<br>    public void beginParameters(WebRequest req) throws Exception {<br>        req.addParameter("url", "http://test");<br>        // 客戶端是 UTF-8 編碼，Tomcat 預設使用 ISO-8859-1 處理請求參數<br>        req.addParameter("title", <br>                new String("測試".getBytes("UTF-8"), "ISO-8859-1"), "POST");<br>        <br>    } <br>    public void testParameters() throws Exception {<br>        // 指定使用 UTF-8 處理請求參數<br>        request.setCharacterEncoding("UTF-8");<br>        pageContext.forward("add.jsp");<br>    }<br>    public void endParameters(WebResponse resp) throws Exception {<br>        String html = getContent(resp);<br>        assertTrue(html.contains("http://test"));<br>        assertTrue(html.contains("測試"));<br>    }<br>    <br>    // 測試分類顯示<br>    public void testCategories() throws Exception {<br><span style="font-weight: bold;">        pageContext.setAttribute("bookmarkService", </span><br style="font-weight: bold;"><span style="font-weight: bold;">                new BookmarkService(), pageContext.APPLICATION_SCOPE);</span><br>        pageContext.forward("add.jsp");<br>    }<br>    public void endCategories(WebResponse resp) throws Exception {<br>        String html = getContent(resp);<br>        assertTrue(html.contains("&lt;option value=\"分類一\"&gt;分類一&lt;/option&gt;"));<br>        assertTrue(html.contains("&lt;option value=\"分類二\"&gt;分類二&lt;/option&gt;"));<br>        assertTrue(html.contains("&lt;option value=\"分類三\"&gt;分類三&lt;/option&gt;"));<br>    }<br><br>    // 伺服端用UTF-8傳回<br>    private String getContent(WebResponse resp) throws Exception {<br>        InputStream input = resp.getInputStream();<br>        StringWriter writer = new StringWriter();<br>        byte[] data = new byte[2048];<br>        int length = -1;<br>        while((length = input.read(data)) != -1) {<br>            writer.write(new String(data, 0, length, "UTF-8"));<br>        }<br>        input.close();<br>        writer.close();<br>        return writer.toString();<br>    }<br>}<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">JspTestCase</span>預
+設的Redirect proxy網址是<span style="font-weight: bold;">/JspRedirector</span>，
+你要將Cactus提供的</small><small><span style="font-weight: bold;">jspRedirector.jsp</span>複
+製至Web應用程式中，並在web.xml中如下設定：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;servlet&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;JspRedirector&lt;/servlet-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;jsp-file&gt;/jspRedirector.jsp&lt;/jsp-file&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;/servlet&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;servlet-mapping&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;servlet-name&gt;JspRedirector&lt;/servlet-name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;url-pattern&gt;/JspRedirector&lt;/url-pattern&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;/servlet-mapping&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br>
+      </div>
+      <small><br>
+使用<span style="font-family: Courier New,Courier,monospace;">JspTestCase</span>也
+可以測試Taglib，例如在 </small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><a href="../ServletJSP/TagBody.html" style="color: rgb(68, 68, 68); font-weight: bold; text-decoration: none;"><small>處
+理本體執行結果</small></a> <small>中，</small></span></span><small>測試<span style="font-family: Courier New,Courier,monospace;">ToUpperCaseTag需要
+PageContext與BodyContent物件，雖然JspTestCase不直接提供BodyContent，但可以呼叫
+pageContext.pushBody()來取得BodyContent。例如：</span></small><br>
+      <pre>package test.cc.openhome;<br><br>import javax.servlet.jsp.tagext.BodyContent;<br>import javax.servlet.jsp.tagext.Tag;<br>import org.apache.cactus.JspTestCase;<br>import cc.openhome.ToUpperCaseTag;<br><br>public class ToUpperCaseTagTest extends JspTestCase {<br>    static {<br>        System.setProperty(<br>                "cactus.contextURL", "http://localhost:8080/CactusExample");<br>    }<br>    public void testDoEndTag() throws Exception {<br><span style="font-weight: bold;">        ToUpperCaseTag toUpperCaseTag = new ToUpperCaseTag();</span><br><br><span style="font-weight: bold;">        toUpperCaseTag.setPageContext(pageContext);</span><br><br><span style="font-weight: bold;">        // 內層標籤執行後的輸出結果</span><br style="font-weight: bold;"><span style="font-weight: bold;">        BodyContent innerBodyContent = pageContext.pushBody();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        innerBodyContent.append("test");<br></span><span style="font-weight: bold;">        toUpperCaseTag.setBodyContent(innerBodyContent);</span><br style="font-weight: bold;">        <br><span style="font-weight: bold;">        // ToUpperCaseTag 的 doEndTag() 中，pageContext.getOut() 取得的物件</span><br style="font-weight: bold;"><span style="font-weight: bold;">        BodyContent toUpperCaseBodyOut = pageContext.pushBody();</span><span style="font-weight: bold;"></span><br style="font-weight: bold;">        <br><span style="font-weight: bold;">        assertEquals(Tag.EVAL_PAGE, toUpperCaseTag.doEndTag());</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals("TEST", toUpperCaseBody</span><span style="font-weight: bold;">Out</span><span style="font-weight: bold;">.getString());</span><br>    }<br>}<br></pre>
+      <small><br>
+由於Taglib擁有更多的生命周期狀態，這些本來都會是由容器維護，相對來說，測試Taglib必須了解容器作了哪些事，並在測試案例中加以模擬，必要
+時，觀察JSP轉譯後的Servlet，了解容器對Taglib作了哪些處理，會有助於了解如何進行Taglib的測試。<br>
+      <br>
+      <br>
+      <br>
+      </small></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/CactusTaglib.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+</html>

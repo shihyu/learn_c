@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Convention.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>用慣例管理複雜度，形成一致文化</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 用慣例管理複雜度，形成一致文化<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=74764">用慣例管理複雜度，形成一致文化</a><br>
+      <br>
+      在已熟悉一門語言的情況下，短時間瞭解另一血統相近語言的語法實為可能，然而短時間要瞭解新語言的慣例（Convention）並非易事，畢竟慣例是語言長期應用下的經驗集合，反映了技術生態圈管理複雜度時的特有方式，可以促進程式具有一致的文化，而文化本身並非短時間內足以吸納的事物。<br>
+      <br>
+      <dl>
+        <dt>慣例定義語言的非正式語義</dt>
+      </dl>
+      <br>
+      每個語言通常都有個基本但鬆散的命名慣例，規範整個語言技術生態圈的基本命名風格，這類慣例通常傾向指出名稱代表什麼或可以作什麼，減少開發人員間一再詢問「這是什麼」的需求。舉例來說，Java在類別命名採大駝峰式（Upper camel case），變數命名採小駝峰式（Lower camel case），若開發者對慣例有一致共識，只要看到名稱大寫開頭，表示是個類別，若之後跟隨點運算子（Dot operator）來操作方法，表示該方法是靜態（static）；雖然使用開頭小寫變數來呼叫方法，語法上並非錯誤，但在慣例上卻暗示該方法是個實例（Instance）方法，不遵守慣例的情況下，易誤導程式的閱讀者，增加了維護的複雜度。<br>
+      <br>
+      基本命名慣例通常定義了語言未正式規範的語義，有時因慣例上這類未正式規範的語義至關重要，語言本身也會納入成為正式語法。例如一般語言慣例中，常數通常使用大寫字母，Ruby語法則直接規定常數必須以首字大寫字母作開頭，類別與模組名稱也是一種常數，所以在Ruby中，類別名稱必然以大寫字母作開頭，否則就會直譯錯誤。<br>
+      <br>
+      命名慣例目的無非就是在程式碼中，透過特定名稱形式來提高可讀性。例如Java變數或方法採用駝峰式，常數則採全大寫、底線區隔字母，目的就是要讓開發者易於區別名稱中每個單字；有些語言則偏好使用全小寫、底線區隔字母來命名變數或方法，也是相同的道理。基於提高可讀性的出發點，不同開發團隊會有更特定的命名慣例，會因不同開發文化或面對的領域而有極大差異，這類命名慣例會更接近行話（Jargon），目的是在程式碼中傳達特定團隊或領域資訊。<br>
+      <br>
+      除了程式碼本身會有命名慣例外，檔案名稱、程式庫資源、專案檔案佈局也會有其慣例，這也是提高可讀性的一種表現，只不過可讀性層次並非展現在程式碼，而是表現在應用程式所需資源、與其他專案整合性或環境部署。整合開發工具通常會有預設的程式庫資源與專案檔案佈局，有些建構（Build）工具也直接規範了專案結構，目的都是在維持一致的專案慣例。例如Java領域中Maven發展目的之一，就是為了統一專案資源相關架構，以解決Ant自由度過高而產生的不一致問題。<br>
+      <br>
+      <dl>
+        <dt>慣例用以傳達重要訊息</dt>
+      </dl>
+      <br>
+      任何語言都會強調，變數命名時要採有意義的名稱，讓人一眼就看出變數本身代表什麼，若能讓變數之間命名時遵守某種慣例，就可讓變數名稱之間傳達更多重要訊息，像是防止可能的安全問題，或是增加底層行為的可預測性。<br>
+      <br>
+      在「約耳續談軟體」書中舉了個變數命名慣例「讓錯的程式看得出錯」，約耳舉例來自使用者的請求字串必須指定給<span class="courier">us</span>（代表Unsafe）開頭的變數，而經過編碼後的字串才能指定給s（代表Safe）開頭的變數，形成的慣例結果是<span
+        class="courier">usName=Request("name")</span>、<span class="courier">sName=Encode(usName)</span>與<span
+        class="courier">Write(sName)</span>為正確且安全，如果有人寫出了<span class="courier">sName=Request("name")</span>、<span
+        class="courier">sName=usName</span>或<span class="courier">Write(usName)</span>，雖然<span
+        class="courier">usName</span>與<span class="courier">sName</span>形態上相同，編譯器或直譯器不會給任何警告，但在慣例上可看出這樣的程式碼會在安全上的隱憂。<br>
+      <br>
+      透過慣例讓名稱代表何種變數（What kind of，而不是What type of，像是<span class="courier">s</span>代表安全變數，<span
+        class="courier">us</span>代表不安全變數，但它們都是字串型態），就能讓程式碼傳達許多重要訊息。例如在無法以語法直接定義常數的語言中，以全大寫字母作為常數慣例，如果試圖對已經有值的此種變數作指定就視同錯誤；簡單迴圈中可以使用<span
+        class="courier">i、j、k</span>作為索引名稱，但在迴圈外或複雜迴圈邏輯中使用<span class="courier">i、j、k</span>這類的變數可視同錯誤；約耳在「讓錯的程式看得出錯」文中也為匈牙利命名法（Hungarian notation）作了平反，認為應用匈牙利（Apps Hungarian）命名法仍有其價值，人們反對的往往是系統匈牙利（Systems Hungarian）命名法。<br>
+      <br>
+      透過慣例增加底層行為的可預測性可舉Ruby為例，在Ruby中若方法名稱以!結尾，通常表示為有副作用的方法，開發者必須特別注意其副作用為何，而且通常會提供無!結尾的對應方法，讓開發者可以進一步思考應當採取的操作。例如Ruby的<span
+        class="courier">String</span>是可變動的（Mutable），轉大寫有<span class="courier">upcase!</span>與<span
+        class="courier">upcase</span>方法，前者會直接修改字串內容，後者會以新字串傳回<span class="courier">upcase</span>運算的結果；另一範例是Ruby中區塊的寫法，<span
+        class="courier">{}</span>與<span class="courier">do..end</span>有很大部份是類似的，慣例上在一行中可寫完執行動作或有傳回值的區塊可使用<span
+        class="courier">{}</span>，<span class="courier">do..end</span>通常用於具有副作用的程式區塊。<br>
+      <br>
+      <dl>
+        <dt>慣例用以突顯語言優點或彌補語言缺陷</dt>
+      </dl>
+      <br>
+      有時語言特性會使得開發者樂於使用某種編碼慣例。舉例來說，具備一級函式特性的語言使用者，在走訪陣列之類物件時，並不愛用for迴圈，而偏好可突顯一級函式特性的<span
+        class="courier">each</span>方法。例如雖然JavaScript可以使用以下方式走訪陣列：<br>
+      <div class="courier" style="margin-left: 40px;"><strong><span>for(i = 0; i &lt; elems.length; i++) {</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; elem = elems[i];</span></strong><strong><span><br>
+          </span></strong><strong><span>&nbsp;&nbsp;&nbsp; ... </span></strong><strong><span><br>
+          </span></strong><strong><span>}</span></strong><strong><span><br>
+          </span></strong></div>
+      <br>
+      但JavaScript開發者更樂於使用以下寫法：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>elems.forEach(function(elem) {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; ... </strong></span><span><strong><br>
+          </strong></span><span><strong>})</strong></span><strong><br>
+        </strong></div>
+      <br>
+      Java開發者若在沒有探索JavaScript慣例的情況下，帶著舊有習慣來撰寫JavaScript程式，可能會選擇使用for迴圈的版本，因而就無法瞭解JavaScript中一級函式的特性與應用方式，從而無法善用JavaScript的真正優點，因而不建議懷抱著「我的開發人員都有使用過X的經驗，只要花個兩三天學習Y語法，就可以用Y開發一下應用程式」的心態。程式語言本身在不斷應用的過程中，許多特性會逐漸被善用，形成多數開發人員的習慣用法，瞭解這些慣例將有助於善用語言本身良好的特性。<br>
+      <br>
+      也許更重要的是，在語言不斷應用的過程中也會發現許多不良特性，慣例通常也迴避了這些語言缺陷或補強了弱點。像是上例中<span class="courier">forEach</span>的版本，<span
+        class="courier">elem</span>會是匿名函式中的區域變數，而一開始<span class="courier">for</span>版本的<span
+        class="courier">elem</span>會是迴圈所在範圍中都可見（因為JavaScript沒有區塊範圍）；其他還有像是透過命名強調出相關項目的關係，讓C語言透過命名慣例在精神上實現物件導向的概念，或者在原型基礎的JavaScript中透過某種方式模擬類別基礎的封裝、繼承概念。<br>
+      <br>
+      <dl>
+        <dt>不同慣例代表了不同管理文化</dt>
+      </dl>
+      <br>
+      沒有慣例的程式碼必然是複雜的，也代表程式本身缺乏正式或非正式的管理文化，存在多種慣例的程式碼也是複雜的，這也許代表系統在不同時空歷經多組人馬又沒有適當管理的結果，甚至造成明明使用同一種語言，看來卻像是不同語言拼湊而成的程式。將某語言的慣例與習慣未經消化，直接拿來套用在另一語言上也不適當，這會使得用後者撰寫而成的程式，完全沒有應有的風格與功能，有時甚至可看出某段程式曾由某技術陣營的開發者撰寫。<br>
+      <br>
+      慣例是用來管理複雜度，形成一致文化的工具，具體來說，慣例是附加在語言或技術本身的非正式限制。慣例可以是自然形成或是正式的文件規範，也有可能僅存在於程式碼之中，必須透過閱讀程式碼來發掘歸納，重要的是程式碼中必得要有慣例存在的事實。良好的慣例管理會使得程式的風格一致，看來就像是同一開發者撰寫，相對來說，開發者得知的慣例越多，就越容易融入程式之中，好似程式就是自己撰寫，也就越易於在程式碼中擷取或傳遞語法外的資訊，善用或限制語言的特性。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Convention.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkAboutDialog.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:34 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>GtkAboutDialog</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: GtkAboutDialog</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>GtkAboutDialog是GtkDialog的子類別，提供您在製作應用程式「關於 XXX」時的內建對話方塊，直接以程式實例來看看它的一些功能：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>gtk_about_dialog_demo.c</small></li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"></span>
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">void button_clicked(GtkWidget *button, gpointer data) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GtkWidget *dialog;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GdkPixbuf *logo;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    GError *error = NULL;</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    dialog = gtk_about_dialog_new();</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    // 載入 LOGO 圖檔</span><br style="font-weight: bold;"><span style="font-weight: bold;">    logo = gdk_pixbuf_new_from_file("caterpillar.gif", &amp;error);</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    if(error == NULL) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), logo);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    else {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        g_print("Error: %s\n", error-&gt;message);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        g_error_free (error);</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_about_dialog_set_name(GTK_ABOUT_DIALOG (dialog), "良葛格學習筆記");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), "2.0");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_about_dialog_set_comments(</span><br style="font-weight: bold;"><span style="font-weight: bold;">          GTK_ABOUT_DIALOG(dialog), "C/C++、Java、Open Source");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_about_dialog_set_copyright(</span><br style="font-weight: bold;"><span style="font-weight: bold;">          GTK_ABOUT_DIALOG(dialog),"(C) 2008 caterpillar");</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_about_dialog_set_license(</span><br style="font-weight: bold;"><span style="font-weight: bold;">          GTK_ABOUT_DIALOG(dialog), "轉載請標示出處！Orz...");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_about_dialog_set_website(</span><br style="font-weight: bold;"><span style="font-weight: bold;">          GTK_ABOUT_DIALOG(dialog), "http://caterpillar.onlyfun.net");</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_dialog_run(GTK_DIALOG(dialog));</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_widget_destroy(dialog);</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *button;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "GtkAboutDialog");<br><br>    button = gtk_button_new_with_label("按我");<br>    gtk_container_add(GTK_CONTAINER(window), button);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br>    g_signal_connect(GTK_OBJECT(button), "clicked",<br>                     G_CALLBACK(button_clicked), window);<br><br>    gtk_widget_show(window);<br>    gtk_widget_show(button);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+      <span class="postbody"><br>
+
+      <small>要設定對話方塊的圖檔，可以使用gtk_about_dialog_set_logo()函式，這會需要GdkPixbuf型
+態的引數，您可以使用gdk_pixbuf_new_from_file()來載入圖檔，若載入時發生錯誤，會將錯誤相關資訊設定給GError引數，剩
+下的函式之作用，直接來看執行的畫面即可了解：<br>
+
+      <br>
+
+      <img style="width: 266px; height: 241px;" alt="" src="images/GtkAboutDialog-1.jpg"><br>
+
+      <br>
+
+      <br>
+
+「授權條款」按鈕的功能是gtk_about_dialog_set_license()函式所設定的，按下該鈕後會出現以下的畫面：<br>
+
+      <br>
+
+      <img style="width: 330px; height: 234px;" alt="" src="images/GtkAboutDialog-2.jpg"><br>
+
+      <br>
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/GtkAboutDialog.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:36 GMT -->
+</html>

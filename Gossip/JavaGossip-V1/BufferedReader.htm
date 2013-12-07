@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/BufferedReader.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>使用 BufferedReader 取得輸入</title></head>
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">Java Gossip: 使用
+BufferedReader 取得輸入</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+
+使用Scanner來取得使用者的輸入很方便，但是它以空白來區隔每一個輸入字串，在某些時候並不適用，因為使用者可能輸入一個字串，中間會包括空白字
+元，而您希望取得完整的字串。<br>
+
+      <br>
+
+
+
+您可以使用<span style="font-weight: bold;">BufferedReader</span>類
+別，它是<span style="font-weight: bold;">java.io</span>套件
+中所提供的一個類別，所以使用這個類別時必須先import
+java.io套件；使用BufferedReader物件的readLine()方法必須處理<span style="font-weight: bold;">IOException</span>例外
+（exception），例外處理機制是Java提
+供給程式設計人員捕捉程式中可能發生的錯誤所提供的機制，現階段您處理IOException的方法是在main()方法後，加上 <span style="font-weight: bold;">throws</span>
+IOException，這在以後會再詳細討論為何要這麼作。<br>
+
+      <br>
+
+
+
+BufferedReader在建構時接受一個<span style="font-weight: bold;">Reader</span>物
+件，在
+讀取標準輸入串流時，會使用<span style="font-weight: bold;">InputStreamReader</span>，
+它
+繼承了 Reader類別，您使用以下的方法來為標準輸入串流建立緩衝區物件： <br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px; font-weight: bold;"><small><span style="font-family: Courier New,Courier,monospace;">BufferedReader
+buf = new BufferedReader(</span><br style="font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new InputStreamReader(System.in));</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+"new"關鍵字表示您要建構一個物件為您所用，BufferedReader
+buf表示宣告一個型態為BufferedReader的物件變數，而new
+BufferedReader()表示以BufferedReader類別建構一個物件，new
+InputStreamReader(System.in)表示接受一個System.in物件來建構一個InputStreamReader物件。<br>
+
+      <br>
+
+
+
+您可以在學過物件導向觀念之後再來看這段，現階段若您比較難理解，就記得上面的緩衝區讀取物件建立方式，通常要使用BufferedReader來取得使
+用者的輸入都是這麼寫的。<br>
+
+      <br>
+
+
+
+下面這個程式可以在文字模式下取得使用者輸入（可包括空白字元輸入），並重新顯示在主控台中：</small>
+
+
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li>Echo.java</li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>import java.io.*; <br><br>public class Echo { <br>    public static void main(String[] args) throws IOException { <br>        BufferedReader buf = new BufferedReader(<br>                                   new InputStreamReader(System.in)); <br>        System.out.print("請輸入一列文字: "); <br>        String text = buf.readLine(); <br>        System.out.println("您輸入的文字: " + text); <br>    } <br>} </pre>
+
+
+
+      <br>
+
+
+
+      <small><span class="postbody">readLine()方法會傳回使用者在按下Enter鍵之前的所有字元輸
+入，不包括最後按下的
+Enter返回字元，程式的執行範例如下所示：</span></small><br>
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">請輸入一列文字: This is a test!<br>
+
+
+
+您輸入的文字: This is a test!</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+      </span></td>
+
+
+
+    </tr>
+
+
+
+  
+        
+        </tbody>
+      
+      </table>
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/BufferedReader.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

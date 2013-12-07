@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QCheckBoxQRadioButton.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:55 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>QCheckBoxQRadioButton</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: QCheckBox 與 QRadioButton</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>核
+取方塊（CheckBox）是可以進行選項複選的元件，單選鈕（RadioButton）是只能進行選項單選的元件，在Qt中分別使用QCheckBox
+與QRadioButton來負責，QRadioButton必須使用QGroupBox來加以群組，來表示哪些選項為一個群組，彼此互斥，同時間只能選
+擇一個。<br>
+
+
+
+      <br>
+
+
+
+以下是個簡單的元件配置示範：<br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QWidget&gt;<br>#include &lt;QButtonGroup&gt;<br>#include &lt;QCheckBox&gt;<br>#include &lt;QRadioButton&gt;<br>#include &lt;QGroupBox&gt;<br>#include &lt;QVBoxLayout&gt;<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br><br>    QWidget *window = new QWidget;<br>    window-&gt;setWindowTitle("QCheckBox &amp; QRadioButton");<br>    window-&gt;resize(350, 100);<br>    <br>    QVBoxLayout *windowLayout = new QVBoxLayout;<br><br>    // 核取方塊<br>    QCheckBox *check1 = new QCheckBox;<br>    check1-&gt;setChecked(true);<br>    check1-&gt;setText("Java is good!");<br>    QCheckBox *check2 = new QCheckBox("C++ is good!");<br>    QCheckBox *check3 = new QCheckBox("Well! Nothing is good!");<br>    check3-&gt;setTristate(true);<br>    <br>    windowLayout-&gt;addWidget(check1);<br>    windowLayout-&gt;addWidget(check2);<br>    windowLayout-&gt;addWidget(check3);<br><br>    // 單選鈕<br>    QGroupBox *box = new QGroupBox("Favorite OS");<br>    QRadioButton *radio1 = new QRadioButton("Linux OS");<br>    QRadioButton *radio2 = new QRadioButton("Windows OS");<br>    QRadioButton *radio3 = new QRadioButton("Mac OS");<br>    QVBoxLayout *radioLayout = new QVBoxLayout;<br>    radioLayout-&gt;addWidget(radio1);<br>    radioLayout-&gt;addWidget(radio2);<br>    radioLayout-&gt;addWidget(radio3);<br>    // 三個單選鈕為一個群組<br>    box-&gt;setLayout(radioLayout);<br><br>    windowLayout-&gt;addWidget(box);<br>    <br>    window-&gt;setLayout(windowLayout);<br>    window-&gt;show();<br>     <br>    return app.exec();<br>}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>QCheckBox除了預設的核取與非核取狀態之外，還可以第三個狀態，這可以使用setTristate()方法來設定，而
+單選鈕的配置部份，首先將單選鈕元件加入QVBoxLayout中作版面配置，然後設定其為QGroupBox的版面管理，如此一來，
+QVBoxLayout中的三個單選鈕就是在同一個群組之中。<br>
+
+
+
+      <br>
+
+
+
+下圖為執行的參考畫面，其中第三個核取方塊為第三個選中狀態，預設的核取與非核取狀態可以使用isChecked()來得知，第三個選中狀態可以使用isTristate()來得知：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 366px; height: 225px;" alt="" src="images/QCheckBoxQRadioButton-1.jpg"><br>
+
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/QCheckBoxQRadioButton.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:55 GMT -->
+</html>

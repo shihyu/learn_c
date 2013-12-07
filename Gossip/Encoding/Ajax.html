@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/Ajax.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:04 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Ajax 請求與回應</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: Ajax 請求與回應<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </script></center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>使用Ajax，</small><small>你可以從非同步物件的<span style="font-family: Courier New,Courier,monospace;">responseText</span>取得伺服端的回應文字，不過要注意，</small><small>伺服端回應時若沒有指明編碼（例如<span style="font-family: Courier New,Courier,monospace;">Content-Type: text/html; charset=Big5</span>之類），</small><small><span style="font-family: Courier New,Courier,monospace;">responseText預設</span>會使用UTF-8編碼來解讀傳回的文字。如果回應是XML，則可以使用<span style="font-family: Courier New,Courier,monospace;">responseXML</span>取得剖析後的DOM物件。<br>
+      <br>
+在 </small><small><big><a href="URLEncoding.html"><small>URL 編碼</small></a></big>
+中介紹過如何為請求參數進行編碼，如果你是透過表單發送請求，則瀏覽器會自動為你進行URL編碼，但如果你是透過Ajax方式，以非同步物件發送請求參
+數，有的瀏覽器會為你進行URL編碼，有的瀏覽器則不會，為了跨瀏覽器，最保險的方式，就是自行處理URL編碼，再透過非同步物件發送請求。<br>
+      <br>
+      </small><small>在JavaScript中，可以使用<span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()</span>為你作這些字元的編碼，編碼後的結果是遵守RFC 3986的規範，但正如 </small><small><big><a href="URLEncoding.html"><small>URL 編碼</small></a></big> 中介紹過的，</small><small>在RFC 3986之前，HTTP亦規範了GET與POST在發送請求參數時的編碼，大致上也是編碼為%hexhex，不過空白字元是編碼為 + 而不是RFC 3986的%20。</small><small>如果直接透過瀏覽器按下發送按鈕來送出表單，則瀏覽器會自動處理編碼（依網頁上指定的編碼來處理），並將空白字元編碼為+，但透過非同步物件發送請求參數時，必須自行處理。<br>
+      <br>
+      </small><small>發送請求參數時，若使用<span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()</span>編碼後，要再將%20取代為+，以符合HTTP的規範</small><small>。</small><small>要注意的是，JavaScript在內部是使用Unicode處理字元，實作上採用UTF-8，所以傳入</small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()的字串都是以</span>UTF-8進行編碼，若將</small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()透過非同步物件發送出去，</span></small><small><span style="font-weight: bold;">伺服端必須以UTF-8來處理接收到的字串</span>。<br>
+      <br>
+      </small><small>下面這個範例是GET的一個示範，在新增書籤時，若URL已重複（已有的書籤是http://caterpillar.onlyfun.net與http://openhome.cc）則以訊息提示：<br>
+      </small>
+      <ul>
+        <li><a href="samples/Ajax-1.html"><small>Ajax-1.html</small></a></li>
+      </ul>
+      <pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta content="text/html; charset=Big5" http-equiv="content-type"&gt;<br>        &lt;script type="text/javascript"&gt;<br>            window.onload = function() {<br>                var xhr = window.XMLHttpRequest &amp;&amp; <br>                      (window.location.protocol !== 'file:' <br>                          || !window.ActiveXObject) ?<br>                       function() {<br>                           return new XMLHttpRequest();<br>                       } :<br>                       function() {<br>                          try {<br>                             return new ActiveXObject('Microsoft.XMLHTTP');<br>                          } catch(e) {<br>                             throw new Error('XMLHttpRequest not supported');<br>                          }<br>                       };<br>                <br><span style="font-weight: bold;">                function param(obj) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    var pairs = [];</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    for(var name in obj) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        var pair = encodeURIComponent(name) + '=' + </span><br style="font-weight: bold;"><span style="font-weight: bold;">                                   encodeURIComponent(obj[name]);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                        pairs.push(pair.replace('/%20/g', '+'));</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    }</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    return pairs.join('&amp;');</span><br style="font-weight: bold;"><span style="font-weight: bold;">                }</span><br>                <br>                document.getElementById('url').onblur = function() {<br>                    var request = xhr();<br>                    request.onreadystatechange = function() {<br>                        if(request.readyState === 4) {<br>                            if(request.status === 200) {<br>                                var message = '';<br>                                if(request.responseText === 'urlExisted') {<br>                                    message = 'URL 已存在';<br>                                }<br>                                document.getElementById('message')<br>                                        .innerHTML = message;<br>                            }<br>                        }<br>                    };<br>                    var params = param(<br>                       { url : document.getElementById('url').value}<br>                    );<br>                    request.open('GET', 'Ajax-1.php?' + params + <br>                         '&amp;time=' + new Date().getTime()); // 避免GET被快取<br>                    request.send(null);<br>                };<br>            };<br>        &lt;/script&gt;        <br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        新增書籤：&lt;br&gt;<br>        網址：&lt;input id="url" type="text"&gt;<br>        &lt;span id="message" style="color:red"&gt;&lt;/span&gt;&lt;br&gt;<br>        名稱：&lt;input type="text"&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <small><br>
+      </small><small>如果要發送POST，則記得要使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">setRequestHeader()</span>設定內容類型，因為POST要發送的資料會放在請求的本體中，所以你必須告知發送的資料類型為何，</small><small>例如發送表單類型資料時，必須</small><small>設置</small><small>請求標頭<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">'Content-Type'</span>為<span style="font-weight: bold;">'application/x-www-form-urlencoded'</span></span>，如果是XML，</small><small><span style="font-family: Courier New,Courier,monospace;">設定請求標頭的'Content-Type'為'text/xml'，如果是</span>JSON<span style="font-family: Courier New,Courier,monospace;">，</span></small><small><span style="font-family: Courier New,Courier,monospace;">請求標頭'Content-Typ'建議設為'application/json'</span>。</small><small>以下是個示範：</small><small><br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...<br>
+var url = 'somewhere';</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">var queryString = 'a=10&amp;b=20';</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">xmlHttp.open('POST', url);</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">xmlHttp.setRequestHeader('Content-Type',&nbsp; 'application/x-www-form-urlencoded');</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">xmlHttp.send(queryString); </span></small><br>
+      </div>
+
+      <small>
+      </small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;">既然提到了encodeURIComponent()，這邊順便比較一下與encodeURI()及escape()的差別。<br>
+      <br>
+      </span>正如先前所言，</small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()可使用在編碼請求參數，它不編碼的字元有英文字母、數字、-、_、.、!、~、*、'、(、)。<br>
+      <br>
+      </span></small><small><span style="font-family: Courier New,Courier,monospace;">encodeURI()與encodeURIComponent()類似，傳入的字串會以</span>UTF-8<span style="font-family: Courier New,Courier,monospace;">處理，不編碼的字元除了</span></small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()不編碼的字元之外，對;、,、/、:、@、&amp;、=、+、$也不加以編碼，所以像</span>URL<span style="font-family: Courier New,Courier,monospace;">重新導向之類的需求，必須使用encodeURI()，例如：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">location.href=encodeURI("http://openhome.cc");</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">escape()事實上是一個不建議再被使用的函式</span>，它對0到255以外的字元，是編碼為「%u****」型式，而不是URL編碼，</small><small><span style="font-family: Courier New,Courier,monospace;">不編碼的字元除了</span></small><small><span style="font-family: Courier New,Courier,monospace;">encodeURIComponent()不編碼的字元之外，對@、*、/、+也不加以編碼。<br>
+      <br>
+      </span></small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/Ajax.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:04 GMT -->
+</html>

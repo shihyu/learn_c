@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/UpperboundLowerboundViewbound.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>上界（Upper bound）、下界（Lower bound）、視界（View bound）</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 上界（Upper bound）、下界（Lower bound）、視界（View bound）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在定義型態參數時，可以定義可參數化型態的上界（Upper bound）與下界（Low bound）。例如：<br></small><pre>class Animal<br>class Human extends Animal<br>class Toy<br><br>class Duck[<span style="font-weight: bold;">T &lt;: Animal</span>]<br><br>val ad = new Duck[Animal]<br>val hd = new Duck[Human]<br>val td = new Duck[Toy]     // 編譯錯誤，不符型態邊界</pre><small><br>在上例中，使用 &lt;: 定義型態參數化時，必須是Animal的子類（也就是以Animal為上界），你可以使用Animal與Human參數化型態，但不可以使用Toy參數化型態，因為Toy的上界不是Animal（也就是非Animal的子類）。<br><br>一個實際應用可以用 <a href="../AlgorithmGossip/QuickSort3.htm#Scala">快速排序法</a> 中的例子來說明：<br></small><pre>def quick(list: List[Int]): List[Int] = {<br>    list match {<br>        case Nil =&gt; Nil     <br>        case x::xs =&gt;        <br>        val (before,after) = xs partition (_ <span style="font-weight: bold;">&lt;</span> x)<br>        quick(before) ++ (x :: quick(after))<br>    }<br>}</pre><br><small>在這個例子中，是以Int來示範演算法的實作，如果要讓這個函式更一般化，可以排序任何型態的物件，則該型態必須具備 &lt; 方法，一個方式是要求要排序的物件具有 <a href="http://www.scala-lang.org/docu/files/api/scala/Ordered.html">scala.Ordered[A]</a> 特徵。所以可以修改函式定義如下：<br></small><pre>def quick[<span style="font-weight: bold;">T &lt;: Ordered[T]</span>](list: List[T]): List[T] = {<br>    list match {<br>        case Nil =&gt; Nil     <br>        case x::xs =&gt;        <br>        val (before,after) = xs partition (_ &lt; x)<br>        quick(before) ++ (x :: quick(after))<br>    }<br>}</pre><small><br>如果你定義了一個類別，具有scala.Ordered[A]特徵，則可以使用這個quick()函式來進行排序，例如：<br></small><pre>class Ball(val radius: Int) <span style="font-weight: bold;">extends Ordered[Ball]</span> {<br>    def volume = 4 * Math.Pi * Math.pow(radius, 3) / 3<br>    def compare(that: Ball) = this.radius - that.radius<br>    override def equals(a: Any) = a match {<br>        case that: Ball =&gt; this.radius == that.radius;<br>        case _ =&gt; false<br>    }<br>    override def hashCode = 41 * radius<br>    override def toString = "Ball(" + radius + ")"<br>}<br><br>val bs = List(new Ball(3), new Ball(2), new Ball(4), new Ball(1))<br>quick(bs).foreach(println)</pre><small><br>你可以使用 <span style="font-weight: bold;">&lt;:</span> 來定義上界，也可以使用 <span style="font-weight: bold;">&gt;:</span> 來定義下界。例如：<br></small><pre>class Alien<br>class Kryptonian extends Alien<br><br>class Earthman<br>class Spiderman extends Earthman<br><br>class Superman[<span style="font-weight: bold;">T &gt;: Kryptonian</span>]<br><br>val s1 = new Superman[Kryptonian]<br>val s2 = new Superman[Alien]<br>val s3 = new Superman[Spiderman]  // 編譯錯誤，不符型態邊界</pre><small><br>在這邊先附帶一提的是，如果你試圖在上面所定義quick()函式上使用Int、Double、String等型態，會發生編譯錯誤：<br></small><pre>def quick[T &lt;: Ordered[T]](list: List[T]): List[T] = {<br>    list match {<br>        case Nil =&gt; Nil     <br>        case x::xs =&gt;        <br>        val (before,after) = xs partition (_ &lt; x)<br>        quick(before) ++ (x :: quick(after))<br>    }<br>}<br><br>val list = List(3, 1, 2, 4)<br>quick(list).foreach(println)</pre><small><br>以上例而言，是因為Int並沒有</small><small>scala.Ordered
+[A]特徵。你應該記得，當試圖使用如 1 &lt; 2 這樣的比較時，會透過隱式轉換（Implicit
+conversion）將Int的1轉換為RichInt來包裹1，然後使用其&lt;方法來取得比較結果。如果你想要上例也可以作用於具隱式轉換函式的
+型態，則可以改寫為以下：<br></small><pre>def quick[<span style="font-weight: bold;">T &lt;% Ordered[T]</span>](list: List[T]): List[T] = {<br>    list match {<br>        case Nil =&gt; Nil     <br>        case x::xs =&gt;        <br>        val (before,after) = xs partition (_ &lt; x)<br>        quick(before) ++ (x :: quick(after))<br>    }<br>}<br><br>val list1 = List(3, 1, 2, 4)<br>quick(list1).foreach(println)<br>val list2 = List("xyz", "xab", "abc", "cde")<br>quick(list2).foreach(println)</pre><small><br>注意！粗體字的部份中將原先的&lt;:改為&lt;%，&lt;:是規範上界，&gt;:是規範下界，<span style="font-weight: bold;">&lt;%其實規範視界（View bound）</span>。原先使用 T &lt;: Ordered[T] 的quick()，其型態參數的意義是：「<span style="font-weight: bold;">T 可以是任何Ordered[T]的子型態！</span>」，而使用 T&lt;% Ordered[T] 的quick()，其型態參數讀法是：「<span style="font-weight: bold;">T 可以是任何可被視為Ordered[T]型態的物件！</span>」所以</small><small style="font-weight: bold;"> T&lt;% Ordered[T] 可以表示的型態更廣，除了可以是Ordered[T]的子型態之外，還可以是可隱式轉換至</small><small><span style="font-weight: bold;">Ordered[T]的型態。</span>關於隱式轉換，之後還會詳加介紹。<br></small><small><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/UpperboundLowerboundViewbound.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

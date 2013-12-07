@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/CustomFormatter.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:57 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>自訂 Formatter</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: 自訂 Formatter</a></h1>
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>除了XMLFormatter與SimpleFormatter之外，您也可以自訂自己的記錄輸出格式，只要繼承抽象類別<span style="font-weight: bold;">Formatter</span>，並重新定義其<span style="font-weight: bold;">format()</span>方法即可，format()方法會傳入一個LogRecord物件作為參數，您可以使用它來取得一些與程式執行有關的資訊。<br>
+
+      <br>
+
+
+下面這個程式是個簡單的示範，自訂一個簡單的TableFormatter：</small>
+      <br>
+
+
+      
+      <ul>
+
+        <li> TableFormatter.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.util.logging.*; <br><br>public class TableFormatter extends Formatter {<br>    public String format(LogRecord logRecord) {<br>        return<br>        "LogRecord info: " + logRecord.getSourceClassName() + "\n" +<br>        "Level\t|\tLoggerName\t|\tMessage\t|\n" +<br>        logRecord.getLevel() + "\t|\t" +<br>        logRecord.getLoggerName() + "\t|\t" +<br>        logRecord.getMessage() + "\t|\n\n";<br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+再來就是使用Handler的<span style="font-weight: bold;">setFormatter()</span>方法設定Formatter物件，例如：</small><br>
+
+
+
+      
+      <ul>
+
+        <li> FormatterDemo.java </li>
+
+      
+      </ul>
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.util.logging.*;<br> <br>public class FormatterDemo {<br>    public static void main(String[] args) {<br>        Logger logger = Logger.getLogger("formatterDemo");<br>        <br>        try {<br>            for(Handler h : logger.getParent().getHandlers()) {<br>                if(h instanceof ConsoleHandler) {<br>                    h.setFormatter(new TableFormatter());<br>                }<br>            }<br>            <br>            logger.info("測試訊息1");<br>            logger.warning("測試訊息2");<br>        } catch (SecurityException e) {<br>            e.printStackTrace();<br>        }<br>    }<br>} <br></pre>
+
+
+
+      <br>
+
+      <small>
+您取得預設的root
+Logger，並取得其ConsoleHandler，之後設定它的Formatter為自訂的TableFormatter，其執行結果如下：</small><br>
+
+
+
+
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">LogRecord info: onlyfun.caterpillar.FormatterDemo<br>
+
+
+&nbsp;Level&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
+LoggerName&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;|&nbsp;&nbsp;&nbsp;
+Message&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;|<br>
+
+
+&nbsp;INFO&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; formatterDemo&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; 測試訊息1&nbsp;&nbsp;&nbsp; |<br>
+
+
+      <br>
+
+
+&nbsp;LogRecord info: onlyfun.caterpillar.FormatterDemo<br>
+
+
+&nbsp;Level&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;|&nbsp;&nbsp;&nbsp; LoggerName&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; Message&nbsp;&nbsp;&nbsp; &nbsp; |<br>
+
+
+&nbsp;WARNING|&nbsp;&nbsp;&nbsp; formatterDemo&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; 測試訊息2&nbsp;&nbsp;&nbsp; |</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/CustomFormatter.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:57 GMT -->
+</html>

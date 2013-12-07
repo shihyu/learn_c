@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/Servlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>Servlet 中文處理（Tomcat）</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Encoding Gossip: Servlet 中文處理（Tomcat）<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>身為非西歐語系的國家，總是得處理編碼的問題，例如，你的使用者會發送中文，那你要如何正確處理請求參數，才可以得到正確的中文字元呢？在 </small><small><big><a href="URLEncoding.html"><small>URL 編碼</small></a></big> </small><small>曾經談過URL編碼的問題，這是你正確處理請求參數前必須知道的基礎。<br>
+      <br>
+請求參數的編碼處理，基本上必須分POST與GET的情況來說明，我們先來看POST的情況…<br>
+      <br>
+如果客戶端沒有在Content-Type標頭中設定字元編碼資訊（例如瀏覽器可以設定Content-Type: text/html; charset=UTF-8），此時使用<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest的getCharacterEncoding()傳回值會是null</span>，在這個情況下，容器若使用的預設編碼處理是<a href="http://www.w3schools.com/tags/ref_entities.asp">ISO-8859-1</a>（大部份瀏覽器預設的字元集），而你的客戶端使用UTF-8發送非ASCII字元的請求參數，而你的Servlet直接使用<span style="font-family: Courier New,Courier,monospace;">getParameter()</span>等取得該請求參數值，就會是不正確的結果也就是得到亂碼。<br>
+      <br>
+可以用另一種方式，來簡略表示出為何這個過程會出現亂碼，假設網頁編碼是UTF-8，透過表單使用POST發出「林」這個中文字元，則依第1章的說明，會將「林」作URL編碼為「%E6%9E%97」再送出，也就是瀏覽器相當於作了這個動作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String text = java.net.URLEncoder.encode("林", "UTF-8");</span></small><br>
+      </div>
+      <small><br>
+在Servlet中取得請求參數時，容器若預設使用ISO-8859-1來處理編碼，則相當於作了這個動作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">String text = java.net.URLDecoder.decode("%E6%9E%97", "ISO-8859-1");</small><br>
+      </div>
+      <small><br>
+這樣作的話，你顯示出來的中文字元就不正確了。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">你可以使用HttpServletRequest的setCharacterEncoding()</span>方法指定取得POST請求參數時使用的編碼。例如若瀏覽器以UTF-8來發送請求，則你接收時也要使用UTF-8編碼字串，則可以在取得任何請求值之「前」，執行以下陳述：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">request.setCharacterEncoding("UTF-8");</span></small><br style="font-weight: bold;">
+      </div>
+      <small><br>
+這相當於要求容器作這個動作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String text = java.net.URLDecoder.decode("%E6%9E%97", "UTF-8");</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">如此你就可以取得正確的「林」中文字元了。記得，一定要在取得任何請求參數前執行setCharacterEncoding()方法才有作用，在取得請求參數之後，再呼叫setCharacterEncoding()是沒有任何作用的。</span><br>
+      <br>
+在<span style="font-family: Courier New,Courier,monospace;">HttpServletRequest的API</span>文件中，對<span style="font-family: Courier New,Courier,monospace;">setCharacterEncoding()的說明清楚提到：</span><br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Overrides the name of the character encoding used in the body of this request.</span></small><br>
+      </div>
+      <small><br>
+也就是說，這個方法對於請求本體中的字元編碼才有作用，也就是基本上這個方法只對POST產生作用，當請求是用GET發送時則沒有定義這個方法是否會影響Web容器處理編碼的方式（究其原因，是因為處理URL的是HTTP伺服器，而非Web容器）。<br>
+      <br>
+例如Tomcat在GET時，使用<span style="font-family: Courier New,Courier,monospace;">setCharacterEncoding()方法設定編碼就不會有作用，取得請求參數時仍會產生亂碼。</span><br>
+      <br>
+若你使用Tomcat並採用GET，<span style="font-family: Courier New,Courier,monospace;">或你沒有設定setCharacterEncoding()，且已取得一個請求參數字串，另外一個處理編碼的方式，則是透過String的getBytes()指定編碼來取得該字串的位元組陣列，然後再重新建構為正確編碼的字串。<br>
+      <br>
+      </span>例如若瀏覽器使用UTF-8處理字元，Web容器預設使用ISO-8859-1編碼，則正確處理編碼的方式為：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">String name = req.getParameter("name");</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small style="font-weight: bold; font-family: Courier New,Courier,monospace;">String name = new String(name.getBytes("ISO-8859-1"), "UTF-8");</small><br>
+      </div>
+      <small><br>
+舉例來說，在UTF-8的網頁中，對「林」這個字元，若使用表單發送GET請求，瀏覽器相當於作了這個動作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String text = java.net.URLEncoder.encode("林", "UTF-8");</span></small><br>
+      </div>
+      <small><br>
+在Servlet中取得請求參數時，容器若預設使用ISO-8859-1來處理編碼，則相當於作了這個動作：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">String text = java.net.URLDecoder.decode("%E6%9E%97", "ISO-8859-1");</span></small><br>
+      </div>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">你使用getParameter()取得的字串就是上例text參考的字串，你可以依下面的編碼轉換來得到正確的「林」字元：</span><br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">text = new String(name.getBytes("ISO-8859-1"), "UTF-8");</span></small><br>
+      </div>
+      <small><br>
+以上是有關於取得中文請求參數，接下來看如何輸出中文內容。<br>
+      <br>
+在沒有設定任何內容型態或編碼之前，<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse</span>使用的字元編碼預設是ISO-8859-1，也就是說，如果你直接輸出中文，在瀏覽器上就會看到亂碼。有幾個方式可以影響<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse輸出的編碼處理。<br>
+      <br>
+瀏覽器如果有發送</span>Accept-Language<span style="font-family: Courier New,Courier,monospace;">標
+頭，則可以使用HttpServletRequest的getLocale()來取得一個Locale物件，代表客戶端可接受的語系。你可以使用
+HttpServletResponse的setLocale()來設定地區（Locale）資訊，地區資訊就包括了語系與編碼資訊。語系資訊通常透過回
+應標頭</span>Content-Language<span style="font-family: Courier New,Courier,monospace;">來設定，而setLocale()也會設定</span>HTTP回應的Content-Language標頭。例如：<span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">response.setLocale(Locale.TAIWAN);</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+      </span>這會將HTTP回應的Content-Language設定為zh-TW，而字元編碼處理設定為BIG5。你可以使用<span style="font-family: Courier New,Courier,monospace;">HttpServletResponse的getCharacterEncoding()方法取得編碼設定。<br>
+      <br>
+      </span>你可以在web.xml中設定預設的區域與編碼對應。例如：<span style="font-family: Courier New,Courier,monospace;"><br>
+      </span></small>
+      <div style="margin-left: 40px;"><small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">...</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&lt;locale-encoding-mapping-list&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;locale-encoding-mapping&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;locale&gt;zh_TW&lt;/locale&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;encoding&gt;UTF-8&lt;/encoding&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/locale-encoding-mapping&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">&lt;/locale-encoding-mapping-list&gt;</span></small><br style="font-weight: bold;">
+      <small style="font-weight: bold;"><span style="font-family: Courier New,Courier,monospace;">...</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+設定好以上資訊後，若使用response.setLocale(Locale.TAIWAN)，或者是response.setLocale(new
+Locale("zh",
+"TW"))，那麼HttpServletResponse的字元編碼處理就採UTF-8，getCharacterEncoding()取得的結果就是
+"UTF-8"。<br>
+      <br>
+你也可以呼叫HttpServletResponse的setCharacgerEncoding()設定字元編碼：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">response.setCharacterEncoding("UTF-8");</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+或者是在使用HttpServletResponse的setContentType()時，指定charset，charset的值會自動用來呼叫
+setCharacterEncoding()。例如以下不僅設定內容類型為text/html，也會自動呼叫setCharacterEncoding
+()，設定編碼為"UTF-8"：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">response.setContentType("text/html; charset=UTF-8");</span></span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+如果使用了setCharacterEncoding()或setContentType()時指定了charset，則setLocale()就會被忽略。<br>
+      <br>
+要注意的是，如果你要接收中文請求參數並在回應時於瀏覽器正確顯示中文，必須同時設定HttpServletRequest的
+setCharacterEncoding()以及HttpServletResponse的setCharacterEncoding()或
+setContentType()為正確的編碼。<br>
+      <br>
+      </span><br>
+      <br>
+
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Encoding/Servlet.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+</html>

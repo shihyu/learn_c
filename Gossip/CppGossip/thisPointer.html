@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/thisPointer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>this 指標</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip: this 指標</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>考慮下面這個類別：</small><br>
+
+
+
+      
+      
+      <ul>
+
+
+        <li>Ball.h</li>
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <pre>#include &lt;string&gt;<br>using namespace std;<br><br>class Ball { <br>public: <br>    Ball(); <br>    Ball(double, const char*); <br>    Ball(double, string&amp;); <br> <br>    double radius() {<br>        return _radius;<br>    }<br> <br>    string&amp; name() {<br>        return _name; <br>    }<br> <br>    void radius(double radius) {<br>        _radius = radius;<br>    } <br> <br>    void name(const char *name) {<br>        _name = name;<br>    }<br> <br>    void name(string&amp; name) {<br>        _name = name;<br>    }<br> <br>    double volumn() {<br>        return (4 / 3 * 3.14159 * _radius * _radius * _radius); <br>    }<br> <br>private:<br>    double _radius; // 半徑 <br>    string _name; // 名稱 <br>};</pre>
+
+
+
+      <br>
+
+
+      <small>
+當您使用Ball類別新增兩個物件b1(1, "RBall")與b2(2,
+"GBall")時，b1與b2會各自擁有自己的_radius與_name資料成員，然而函式成員卻只有一份。 <br>
+
+
+      <br>
+
+
+
+當您使用b1.name()方法取回_name的名稱，它會傳回"RBall"名稱，而使用b2.name()時，它會傳回"GBall"名稱，即然類別
+的函式成員只有一份，name()如何知道它傳回的_name是b1物件的，還是b2物件的呢？ <br>
+
+
+      <br>
+
+
+
+其實您使用物件名稱來呼叫函式成員時，程式會將物件記憶體位址告知函式成員，而在函式中，一個類別資料成員其實會隱含一個this指標，這個this指標
+會儲存傳遞進來的物件指標，當您呼叫name()函式時，其實相當於執行： <br>
+
+
+      </small>
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">string&amp;
+name() {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+return this-&gt;_name; </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+b1呼叫name()方法時，this儲存的就是b1的記憶體位址，而使用b2呼叫name()方法時，this儲存的就是b2的記憶體位址，所以
+name()總是可以正確的得知該傳回哪一個物件的_name資料。 <br>
+
+
+      <br>
+
+
+
+每一個類別的函式成員都會隱含一個this指標，用來指向呼叫它的物件，當您在函式中使用資料成員時，都會隱含的使用this指標，當然您也可以明確的指
+定，例如在函式定義時使用： <br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+name(string&amp;
+name) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+this-&gt; _name = name;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+這麼作在這個例子中是多此一舉，只是更明確的在程式碼中撰寫而已，然而這種寫法在某些時機是需要的，例如參數名稱與資料成員名稱相同時，為了識別是參數或
+是資料成員，您必須明確的使用this指標來指定，例如： <br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">void
+name(string&amp;
+name) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+this-&gt;&nbsp;name = name; // 假設name是類別成員之一</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small>
+
+      <br>
+
+
+
+      </div>
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/thisPointer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

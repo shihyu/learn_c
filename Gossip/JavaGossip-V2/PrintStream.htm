@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/PrintStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>PrintStream</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: PrintStream</a></h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>之前所介紹過的Stream輸出物件，都是直接將記憶體中的資料寫出至目的地（例如一個檔案），舉個例子來說，如果您將 int 整數 1 使用之前介紹的Stream物件輸出至檔案，則檔案中所儲存的是 int 整數 1 在記憶體中的值，例如： </small><br>
+
+
+
+
+
+
+      
+      <ul>
+
+        <li> FileStream.java 
+  </li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*;<br> <br>public class FileStreamDemo { <br>    public static void main(String[] args) <br>                            throws IOException { <br>        FileOutputStream file = <br>            new FileOutputStream(<br>                 new File("test.txt")); <br>        file.write(1); <br>        file.close(); <br>    } <br>}  <br></pre>
+
+
+      <br>
+
+      <small>
+由於您使用<span style="font-weight: bold;">write()</span>方法，這會將 1 在記憶體中的值之低位元組0000001寫入檔案中，所以如果您使用文字編輯軟體（像vi或UltraEdit）觀看test.txt的16進位表示，其結果會顯示 01（16進位表示）。 <br>
+
+
+
+      <br>
+
+
+有時候您所想要儲存的結果是轉換為字元之後的結果，例如若程式的執行結果是3.14159，您會希望使用字元來儲存3.14159，也就是俗稱的儲存為純文字檔案，如此當您使用簡單的純文字編輯器觀看時，就可以直接看到程式執行的結果。 <br>
+
+      <br>
+
+
+例如您若想使用純文字檔案看到test.txt的顯示結果是1，則必須先將記憶體中的整數1，也就是二進位00000000 00000000 00000000 00000001轉換為對應的字元編碼，也就是0x31（十進位表示49）並加以儲存。 <br>
+
+      <br>
+
+
+使用PrintStream可以自動為您進行字元轉換的動作，它會使用作業系統的預設編碼來處理對應的字元轉換動作，直接使用下面這個例子來作示範： </small>
+
+
+
+      <br>
+
+
+
+      
+      <ul>
+
+        <li> PrintStreamDemo.java
+  </li>
+
+      
+      </ul>
+
+
+      
+      <pre>package onlyfun.caterpillar;<br> <br>import java.io.*;<br> <br>public class PrintStreamDemo {<br>    public static void main(String[] args) <br>                           throws FileNotFoundException {<br>        PrintStream printStream = new PrintStream( <br>                new FileOutputStream(<br>                        new File("pi.txt")));<br> <br>        printStream.print("PI = "); <br>        printStream.println(Math.PI);<br> <br>        printStream.close();<br>    }<br>} <br></pre>
+
+
+      <br>
+
+      <small>
+執行程式之後使用純文字編輯器開啟pi.txt，其內容會是PI =
+3.141592653589793，print()或println()接受int、char、String、double等等資料型態，
+println()會在輸出之後加上換行字元，而print()則不會。 <br>
+
+      <br>
+
+
+注意在檔案儲存上實際並沒有二進位檔案或是純文字檔案的分別，所有的檔案所儲存的都是二進位的資料，您俗稱的純文字檔案，其實正確的說，是指儲存的結果是經過字元轉換，例如將 int 整數 1轉換為字元 '1' 的編碼結果並加以儲存。</small>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V2/PrintStream.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:19 GMT -->
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/HtmlUnit.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>使用 HtmlUnit</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 使用 HtmlUnit<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在</small> <small><big><a href="CactusJSP.html"><small>測試 JSP</small></a> </big>中，
+你對add.jsp獨立進行測試，假設現在整個應用程式已部署，你要針對add.jsp在實際與應用程式其它元件結合後，是否功能正常，你也許會打開瀏覽
+器連接add.jsp，然後按下表單按鈕，看看是否回到add.jsp並有錯誤訊息，你也許輸入表單中其中一個欄位，看看回到add.jsp後，該表單欄
+位值是否回填，你也許正確填寫每個欄位，發送看看是否新增資料成功。<br>
+      <br>
+由於你是測試實際應用程式部署之後，功能是否正常，你是在執行功能測試（Functional test），且由於你是針對應用程式的介面進行測試，而非元件實際的撰寫內容，所以你是在執行黑箱測試（Block box test）。<br>
+      <br>
+你不用親自打開瀏覽器，一一手動進行測試，你可以使用 <a href="http://htmlunit.sourceforge.net/">HtmlUnit</a>，它可以用來模擬瀏覽器，某些程度上，你可以將HtmlUnit看作是一個沒有畫面的瀏覽器，你可以使用程式撰寫瀏覽器上的操作過程，接下來就可以自動執行操作。例如：<br>
+      </small>
+      <pre>package test.cc.openhome;<br><br>import static org.junit.Assert.*;<br><br>import org.junit.Before;<br>import org.junit.After;<br>import org.junit.Test;<br><br>import com.gargoylesoftware.htmlunit.WebClient;<br>import com.gargoylesoftware.htmlunit.html.HtmlForm;<br>import com.gargoylesoftware.htmlunit.html.HtmlPage;<br>import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;<br>import com.gargoylesoftware.htmlunit.html.HtmlTextInput;<br><br>public class AddJSPTest {<br><span style="font-weight: bold;">    private WebClient webClient;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private HtmlPage page;</span><br>    <br>    @Before<br>    public void setUp() throws Exception {<br><span style="font-weight: bold;">        // WebClient 代表一個瀏覽器</span><br><span style="font-weight: bold;">        webClient = new WebClient();<br>        // 指定 URL 取得 HTML 結果<br style="font-weight: bold;"></span><span style="font-weight: bold;">        page = webClient.getPage(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                "http://localhost:8080/BookmarkOnline/add.jsp");</span><br style="font-weight: bold;">    }<br>    <br>    @After<br>    public void tearDown() throws Exception {<br><span style="font-weight: bold;">        // 關閉所有瀏覽視窗</span><br><span style="font-weight: bold;">        webClient.closeAllWindows();</span><br>    }<br>    <br>    @Test<br>    public void testNoError() throws Exception {<br><span style="font-weight: bold;">        // 測試初次造訪頁面</span><br><span style="font-weight: bold;">        // 以標準 DOM API 取得頁面元素進行斷言</span><br><span style="font-weight: bold;">        assertEquals(0, page.getElementsByTagName("h1").size());</span><br>    }<br>    <br>    @Test<br>    public void testError() throws Exception {<br>        <span style="font-weight: bold;">// 取得表單元素</span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlForm form = page.getForms().get(0);<br>        // 取得發送按鈕<br style="font-weight: bold;"></span><span style="font-weight: bold;">        HtmlSubmitInput button = form.getInputByValue("送出");<br><br></span><span style="font-weight: bold;">        // 發送表單，取得回應頁面</span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlPage page2 = button.click();<br></span><span style="font-weight: bold;">        // 以標準 DOM API 取得頁面元素進行斷言</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals("新增書籤失敗", </span><br style="font-weight: bold;"><span style="font-weight: bold;">                page2.getElementsByTagName("h1")</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     .item(0).getFirstChild().getNodeValue());</span><br>    }<br>    <br>    @Test<br>    public void testParameters() throws Exception {<br><span style="font-weight: bold;">        // 測試欄位回填功能</span><br><span style="font-weight: bold;">        String title = "測試";</span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlForm form = page.getForms().get(0);<br>        // 取得輸入欄位<br style="font-weight: bold;"></span><span style="font-weight: bold;">        HtmlTextInput textField = form.getInputByName("title");<br>        // 在欄位填值<br style="font-weight: bold;"></span><span style="font-weight: bold;">        textField.setValueAttribute(title);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlSubmitInput button = form.getInputByValue("送出");</span><br style="font-weight: bold;"><span style="font-weight: bold;">        </span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlPage page2 = button.click();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals(title, </span><br style="font-weight: bold;"><span style="font-weight: bold;">                page2.getElementsByName("title")</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     .get(0).getAttribute("value"));</span><br style="font-weight: bold;">    }<br>    <br>    @Test<br>    public void testSubmitSuccess() throws Exception {<br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlForm form = page.getForms().get(0);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        form.getInputByName("url").setValueAttribute("http://test");</span><br style="font-weight: bold;"><span style="font-weight: bold;">        form.getInputByName("title").setValueAttribute("測試");</span><br style="font-weight: bold;"><span style="font-weight: bold;">        form.getSelectByName("category").getOption(1).setSelected(true);</span><br style="font-weight: bold;"><span style="font-weight: bold;"></span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlSubmitInput button = form.getInputByValue("送出");<br><br style="font-weight: bold;"></span><span style="font-weight: bold;">        // 假設發送成功的回應頁面標題為"新增書籤功成功"</span><br style="font-weight: bold;"><span style="font-weight: bold;">        HtmlPage page2 = button.click();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals("新增書籤成功", page2.getTitleText());</span><br>    }<br>}<br></pre>
+      <small><br>
+上面的例子說明了幾個模擬瀏覽器操作的方式，你也可以模擬Firefox或Internet Explorer特定版本。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);</small><br>
+      </div>
+      <br>
+      <small>在撰寫文件的此時，可模擬的瀏覽器有：<br>
+      </small>
+      <ul style="font-weight: bold;">
+        <li><small>Firefox 2：<span style="font-family: Courier New,Courier,monospace;">BrowserVersion.FIREFOX_2（不建議使用）</span></small></li>
+        <li><small>Firefox 3：<span style="font-family: Courier New,Courier,monospace;">BrowserVersion.FIREFOX_3</span></small></li>
+        <li><small>Firefox 3.6：</small><small><span style="font-family: Courier New,Courier,monospace;">BrowserVersion.FIREFOX_3_6</span></small></li>
+        <li><small>Internet Explorer 6：<span style="font-family: Courier New,Courier,monospace;">BrowserVersion.INTERNET_EXPLORER_6</span></small></li>
+        <li><small>Internet Explorer 7：<span style="font-family: Courier New,Courier,monospace;">BrowserVersion.INTERNET_EXPLORER_7</span></small></li>
+        <li><small>Internet Explorer 8：<span style="font-family: Courier New,Courier,monospace;">BrowserVersion.INTERNET_EXPLORER_8</span></small></li>
+      </ul>
+      <br>
+      <small>在Cactus 1.8之後，HtmlUnit可與Cactus結合，只要在Classpath中包括HtmlUnit的相關程式庫，在Cactus的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">endXXX()</span>方法中，就可以使用<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">com.gargoylesoftware.htmlunit.WebResponse</span>來取代org.apache.cactus.WebResponse</span>（Cactus 1.2後到1.7可以換用 <a href="http://httpunit.sourceforge.net/">HttpUnit</a> 的<span style="font-family: Courier New,Courier,monospace;">com.meterware.httpunit.WebResponse</span>）。<br>
+      <br>
+      HtmlUnit的使用十分直覺，關於頁面元素的取得，或相關動作的模擬（例如滑鼠點選、鍵盤鍵入等），都可以使用DOM標準API。如果連外需要透過代理伺服器，則可以如下：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; "http://proxyserver",&nbsp;
+port);<br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 設定連接代理伺服器時的名稱、密碼</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; DefaultCredentialsProvider credentialsProvider = <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (DefaultCredentialsProvider) webClient.getCredentialsProvider();</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; credentialsProvider.addProxyCredentials("username", "password");</span><br>
+      </small><br>
+<br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/HtmlUnit.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+</html>

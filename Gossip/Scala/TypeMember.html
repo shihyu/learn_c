@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/TypeMember.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>型態（type）成員</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 型態（type）成員</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在類別中可使用type關鍵字來宣告型態成員，其應用之一，就是為某些形態取別名，例如：<br></small><pre><span style="font-weight: bold;">type</span> Text = String<br><br>def doSome(text: Text) {<br>    println(text)<br>}<br><br>val text: Text = "Justin"<br>doSome(text)    // Justin</pre><br><small>在上例中，Text成了String的別名，之後你可以使用Text這個名稱來代替String進行宣告。會使用type來為型態取別名，通常是為了用個更簡潔的名稱。例如，在</small><small>未匯入</small><small>scala.collection.mutable.Set時，你程式中所使用的Set名稱所參考的物件，其實是定義在scala.Predef中：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">package scala</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">object Predef {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp;type Map[A,&nbsp;B] = collection.immutable.Map[A, B]</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp;&nbsp;type Set[A] = collection.immutable.Set[A]</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; val Map = collection.immutable.Map</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; val Set = collection.immutable.Set</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br></small><small>val宣告了Map與Set分別參考至collection.immutable.Set與</small><small>collection.immutable.Map物件，而type為</small><small>collection.immutable.Set[A]與</small><small>collection.immutable.Map[A, B]建立了別名Set[A]與Map[A, B]。<br><br>type宣告可以是抽象的，也就是暫不指定別名，例如：<br></small><pre>trait Something {<br><span style="font-weight: bold;">    type T        // 抽象的 type 成員</span><br>    val value: T<br>    def doSome(t: T): T<br>}</pre><small><br>在實作Something的類別中，再指定上例中T實際為哪個型態的別名：<br></small><pre>class SomethingImpl extends Something {<br><span style="font-weight: bold;">    type T = String</span><br>    val value = "orz"<br>    def doSome(t: T) = t + value<br>}</pre><small><br>如果為了程式碼清楚起見，也可以在實作時使用實際型態名稱：<br></small><pre>class SomethingImpl extends Something {<br><span style="font-weight: bold;">    type T = String</span><br>    val value = "orz"<br>    def doSome(s: <span style="font-weight: bold;">String</span>) = s + value<br>}</pre><small><br>在宣告抽象的type成員時，你可以使用</small><small><span style="font-weight: bold;"> &lt;: </span>或 <span style="font-weight: bold;">&gt;: </span></small><small>限制實際指定的型態，例如：<br></small><pre>class Some<br>class SomeBody extends Some<br>   <br>trait Something {<br> <span style="font-weight: bold;">   type T &lt;: Some    // T 只能是 Some 或其子類別</span><br>    val value: T<br>}<br><br>class SomethingImpl extends Something {<br>    type T = SomeBody<br>    val value = new SomeBody<br>}</pre><small><br>如上例，T只能是Some或其子類別，否則就會編譯錯誤，如果使用 <span style="font-weight: bold;">&gt;:</span> 的話則相反，只能是Some或其父類別。<br><br>以下為可能使用抽象type成員的情境，原先也許你設計了以下的類別：<br></small><pre>class Food<br><br>abstract class Animal {<br>    def eat(food: Food)<br>}</pre><small><br>每個動物都會吃東西，所以你定義了一個抽象類別Animal，規範了eat()方法，你也許這麼實作：<br></small><pre>class Fish extends Food {<br>    override def toString = "魚"<br>}<br><br>class Grass extends Food {<br>    override def toString = "草"<br>}<br><br>class Cat extends Animal {<br>    def eat(food: Food) {<br>        food match {<br>            case fish: Fish =&gt; println("吃" + fish)<br>            case _  =&gt; throw new IllegalArgumentException("這隻貓只吃魚")<br>        }<br>    }<br>}<br><br>class Cow extends Animal {<br>    def eat(food: Food) {<br>        food match {<br>            case grass: Grass =&gt; println("吃" + grass)<br>            case _  =&gt; throw new IllegalArgumentException("這隻牛只吃草")<br>        }<br>    }<br>}</pre><br><small>由於eat()接受的是Food型態的物件，為了避免動物亂吃東西，你得記得在程式中自行實作比對，看看傳入的食物是不是正確的食物，所以：<br></small><pre>val cat = new Cat<br>cat.eat(new Fish)    // 吃魚<br>cat.eat(new Grass)   // 丟出例外</pre><small><br>這樣的作法基本上沒錯，但程式設計人員最好得記得要處理例外的狀況，另一方面，如果程式設計人員沒有記得要在程式中執行比對，</small><small>那就會發生貓吃草的奇怪行為</small><small>：<br></small><pre>class Cat extends Animal {<br>    def eat(fish: Food) {<br>        println("吃" + fish)<br>    }<br>}<br>val cat = new Cat<br>cat.eat(new Fish)    // 吃魚<br>cat.eat(new Grass)   // 吃草</pre><br><small>如果這不是你所希望看到的結果，你可以考慮改為以下的設計：<br></small><pre>abstract class Animal {<br>    type F &lt;: Food<br>    def eat(f: F)<br>}</pre><br><small>F是抽象type成員，必須是Food或其子類別。實作Animal時：<br></small><pre>class Cat extends Animal {<br><span style="font-weight: bold;">    type F = Fish</span><br>    def eat(fish: <span style="font-weight: bold;">Fish</span>) {<br>        println("吃" + fish)<br>    }<br>}<br><br>class Cow extends Animal {<br><span style="font-weight: bold;">    type F = Grass</span><br>    def eat(grass: <span style="font-weight: bold;">Grass</span>) {<br>        println("吃" + grass)<br>    }<br>}</pre><small><br>就可以指定動物實際上到底要吃什麼食物，不用執行時期比對，現在動物可以吃東西了：<br></small><pre>val cat = new Cat<br>cat.eat(new Fish)   // 吃魚<br>val cow = new Cow<br>cow.eat(new Grass)  // 吃草</pre><br><small>如果你亂餵東西，那編譯時期就會回報錯誤：<br></small><pre>val cat = new Cat<br>cat.eat(new Grass)   // 編譯錯誤，type mismatch<br>val cow = new Cow<br>cow.eat(new Fish)    // 編譯錯誤，type mismatch</pre><br><small>這樣的作法，是將執行時期的型態比對，轉為編譯時期的型態檢查，另一方面，你等於放棄eat()的執行時期多型，選擇了編譯時期多型。例如以下這個執行時期多型你就不能作了：<br></small><pre>val animal: <span style="font-weight: bold;">Animal</span> = new Cat<br>animal.eat(new Fish)   // 編譯錯誤，type mismatch</pre><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/TypeMember.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

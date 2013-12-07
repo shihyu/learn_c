@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/autoPtr.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>auto_ptr 自動管理配置資源</title></head><body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index.html">C++
+Gossip:&nbsp;auto_ptr 自動管理配置資源</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+對於使用new動態配置的資源，在不使用時必須記得delete，以釋放記憶體空間，然而動態記憶體配置很容易發生忘了delete，或是對同一個記憶體
+位址delete兩次（例如一個物件被指定給兩個指標），或是對一個已經被delete的位址再作讀寫動作。<br>
+
+
+      <br>
+
+
+
+C++標準函式庫中提供auto_ptr，可以協助您動態管理new而建立的物件，要使用auto_ptr，您要含入memory表頭檔，例如：<br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">#include
+&lt;memory&gt;</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+auto_ptr可以指向一個以new建立的物件，當auto_ptr的生命週期結束後，所指向的物件之資源也會被釋放，在建立auto_ptr時必須指
+定目標物件之型態，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;int&gt;
+iPtr (new int(100));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;string&gt;
+sPtr (new string("caterpillar"));</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+操作auto_ptr就像操作沒有使用auto_ptr的指標一樣，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">cout
+&lt;&lt; *iPtr
+&lt;&lt; endl; // 顯示100<br>
+
+
+
+if(sPtr-&gt;empty())<br>
+
+
+
+&nbsp; &nbsp; cout &lt;&lt; "字串為空" &lt;&lt;
+endl;</span><span style="font-weight: bold; font-style: italic;"><br>
+
+
+
+      </span></small></div>
+
+
+
+      <small><br>
+
+
+
+您也可以建立一個未指向任何物件的auto_ptr，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;int&gt;
+iPtr;</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+未指向任何物件的auto_ptr不可以取值，否則會發生不可預期之結果，既然不可取值，如何判斷它是否有指向物件呢？您可以使用get()函式，它會傳
+回所指向物件的位址，如果傳回0，表示不指向任何物件，如果不指向任何物件，您可以使用reset()來讓它指向一個物件，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">if(iPtr.get()
+== 0) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&nbsp;
+iPtr.reset(new int(100));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+reset()可以接受一個指標或是0表示不指向任何物件，reset()會先delete目前指向的物件，然後重新指向新的物件，您也可以使用
+release()釋放auto_ptr管理所指向物件的職責。<br>
+
+
+      <br>
+
+
+
+auto_ptr可以使用另一個auto_ptr來建立，這會造成所有權的轉移，例如：<br>
+
+
+      </small>
+
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;SafeArray&gt;
+ptr1(new SafeArray(19));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;SafeArray&gt;
+ptr2(ptr1);</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+當使用ptr1來建立ptr2時，ptr1不再對所指向物件的資源釋放負責，職責交給了ptr2，在使用指定運算時，也有類似的行為，例如：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;SafeArray&gt;
+ptr1(new SafeArray(19));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">auto_ptr&lt;SafeArray&gt;
+ptr2(new SafeArray(20));</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">ptr2
+= ptr1;</span><br>
+
+
+
+      </small></div>
+
+
+
+      <small><br>
+
+
+
+ptr2所指向的物件會先被delete，然後ptr1的屬性會複製至ptr2，也就是ptr1所指向的物件，現在由ptr2指向它了，ptr1不再負責
+所指向物件的資源釋放。<br>
+
+
+      <br>
+
+
+
+auto_ptr的資源維護動作是以inline的方式來完成，也就是在編譯時會被擴展開來，所以使用auto_ptr並不會犧牲效率。<br>
+
+
+      <br>
+
+
+
+最後要注意的是，auto_ptr不能用來管理動態配置而來的陣列，如果用它來管理動態配置而來的陣列，結果是不可預期的。</small>
+
+      <br>
+
+
+
+ </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+      <br>
+      <center>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+      </center>
+
+ </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+      <br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/CppGossip/autoPtr.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:08 GMT -->
+</html>

@@ -1,0 +1,848 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/TranslateApplication.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:09 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>翻譯應用程式</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: 翻譯應用程式</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>您可以在應用程式中的一些文字位置撰寫預設語系文字，例如英語系文字，若要改變整個應用程式中的文字為另一個語系的文字，</small><small>再提供qm檔來進行翻譯</small><small>，</small><small>要擁有這個功能，首要條件是在您的應用程式中：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ol>
+
+
+
+        <li><small>所有要翻譯的文字，都必須撰寫在QObject::tr()函式之中</small></li>
+
+
+
+        <li><small>實例化QTranslator，載入.qm檔案</small></li>
+
+
+
+        <li><small>為QApplication安裝QTranslator</small></li>
+
+
+
+      
+      
+      
+      </ol>
+
+
+
+      <small><br>
+
+
+
+以 </small><a href="DisplayChinese.html"><small>簡
+單的顯示</small><small>中文（</small><small>使用 Unicode
+轉換）</small></a> <small>為例，示範如何讓它擁有置換.qm檔即可翻譯應用程式：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>main.cpp</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>#include &lt;QApplication&gt;<br>#include &lt;QLabel&gt;<br>#include &lt;QTranslator&gt;<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br><span style="font-weight: bold;">    QTranslator translator;</span><br style="font-weight: bold;"><span style="font-weight: bold;">    translator.load("hello");</span><br style="font-weight: bold;"><span style="font-weight: bold;">    app.installTranslator(&amp;translator);</span><br>    <br>    QLabel *label = new QLabel;<br>    label-&gt;setText(<br>             <span style="font-weight: bold;">QObject::tr("&lt;center&gt;&lt;h1&gt;Qt4 Gossip&lt;/h1&gt;&lt;/center&gt;")</span>);<br>    label-&gt;setWindowTitle(<br>             <span style="font-weight: bold;">QObject::tr("caterpillar")</span>);<br>    <br>    label-&gt;resize(200, 50);<br>    label-&gt;show();<br> <br>    return app.exec();<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+要翻譯的文字，一定要直接撰寫在tr()之中，tr()之中不得使用變數，因為稍後使用lupdate工具程式處理時，會無法找出需要翻譯的文字，例如以下的寫法就不行：<br style="font-weight: bold;">
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">QString name = "caterpillar";</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">label-&gt;setWindowTitle(name);</span></small><br>
+
+
+
+      </div>
+
+
+
+      <small><br>
+
+
+
+QTranslator的load()方法設置為hello，這預設會去尋找hello.qm檔，檔案中包括要進行翻譯的文字，</small><small>上面的應用程式已經可以執行，在不提供.qm檔案時，預設就是顯示原始程式碼中的文字：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 216px; height: 88px;" alt="" src="images/TranslateApplication-1.jpg"><br>
+
+
+
+      </small><small><br>
+
+
+
+接著，確定在您的.pro檔案中，設置原始檔案名稱與即將產生的.ts檔案名稱：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">SOURCES += main.cpp</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">TRANSLATIONS += hello.ts</span></small><br>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>如此就可以直接使用Qt附的lupdate工具程式來自動產生.ts檔案，指令為：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">lupdate -verbose yourApp.pro</span></small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>.ts檔案的格式內容為XML檔案，您可以直接編輯它：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&lt;!DOCTYPE TS&gt;&lt;TS version="1.1"&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&lt;context&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;name&gt;QObject&lt;/name&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;message&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;location filename="main.cpp" line="15"/&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;source&gt;&amp;lt;center&amp;gt;&amp;lt;h1&amp;gt;Qt4
+Gossip&amp;lt;/h1&amp;gt;&amp;lt;/center&amp;gt;&lt;/source&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;translation type="unfinished"&gt;&lt;/translation&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/message&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;message&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;location filename="main.cpp" line="17"/&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;source&gt;caterpillar&lt;/source&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;translation type="unfinished"&gt;&lt;/translation&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/message&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&lt;/context&gt;</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&lt;/TS&gt;</span></small></span><br style="font-weight: bold;">
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+但更簡單的方法是使用Qt附的linguist：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">linguist hello.ts</span></small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>這會出現linguist視窗程式，若要中文，可以執行「Edit/Translation File Settings」，設定為中文語系編輯：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 362px; height: 168px;" alt="" src="images/TranslateApplication-2.jpg"><br>
+
+
+
+      </small><br>
+
+
+
+      <small>接著可以在右上窗格進行翻譯的文字編輯，例如：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 662px; height: 505px;" alt="" src="images/TranslateApplication-3.jpg"><br>
+
+
+
+      </small><br>
+
+
+
+      <small>修改所有要翻譯的文字之後進行儲存，原本的.ts檔將修改為如下：<br>
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;!DOCTYPE TS&gt;&lt;TS version="1.1" language="zh_TW"&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;defaultcodec&gt;&lt;/defaultcodec&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;context&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;name&gt;QObject&lt;/name&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;message&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;location filename="main.cpp" line="15"/&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;source&gt;&amp;lt;center&amp;gt;&amp;lt;h1&amp;gt;Qt4
+Gossip&amp;lt;/h1&amp;gt;&amp;lt;/center&amp;gt;&lt;/source&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;translation&gt;&amp;lt;center&amp;gt;&amp;lt;h1&amp;gt;Qt4
+學習筆記&amp;lt;/h1&amp;gt;&amp;lt;/center&amp;gt;&lt;/translation&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/message&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;message&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;location filename="main.cpp" line="17"/&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;source&gt;caterpillar&lt;/source&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;translation&gt;良葛格&lt;/translation&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/message&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/context&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/TS&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <br>
+
+
+
+接著使用Qt的lrelease工具程式，將.ts檔轉換為.qm檔：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-weight: bold; font-family: Courier New,Courier,monospace;" class="postbody"><small>lrelease hello.ts</small></span><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>接著啟動應用程式，QTranslator可以載入hello.qm檔的內容，並將所有tr()中的文字作置換，畫面如下：<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 216px; height: 88px;" alt="" src="images/TranslateApplication-4.jpg"><br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      </small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/TranslateApplication.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:13 GMT -->
+</html>

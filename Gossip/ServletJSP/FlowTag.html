@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/FlowTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>流程處理標籤</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 流程處理標籤<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>當JSP網頁必須根據某個條件來安排網頁輸出時，則可以使用流程標籤。例如想要依使用者輸入的名稱、密碼請求參數，來決定是否顯示某個畫面，或是想要用表格輸出十筆資料等。<br>
+      <br>
+首先介紹<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;c:if&gt;</span>標籤的使用（假設標籤前置使用"<span style="font-family: Courier New,Courier,monospace;">c</span>"），這個標籤可根據某個運算式的結果，決定是否顯示本體內容。直接來看個範例：<br>
+      </small>
+      <pre>&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;<br><span style="font-weight: bold;">&lt;%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%&gt;</span><br>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"<br>   "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>                  content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;登入頁面&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br><span style="font-weight: bold;">        &lt;c:if test="${param.name == 'momo' &amp;&amp; param.password == '1234'}"&gt;</span><br>            &lt;h1&gt;${param.name} 登入成功&lt;/h1&gt;<br><span style="font-weight: bold;">        &lt;/c:if&gt;</span><br>    &lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">&lt;c:if&gt;標籤的test</span>屬性中可以放置EL運算式或JSP運算元素（<span style="font-family: Courier New,Courier,monospace;">&lt;%= %&gt;</span>），如果運算式的結果是<span style="font-family: Courier New,Courier,monospace;">true，則會將&lt;c:if&gt;本體</span>輸出。就上面這個範例來說，如果使用者發送的請求參數中，使用者名稱與密碼正確，就會顯示使用者名稱與登入成功的訊息。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">&lt;c:if&gt;標籤僅在test的結果為true時顯示本體內容，不過並沒有相對應的&lt;c:else&gt;標籤。如果想在某條件式成立時顯示某些內容，不成立就顯示另一內容，則可以使用<span style="font-weight: bold;">&lt;c:choose&gt;</span>、<span style="font-weight: bold;">&lt;c:when&gt;</span>及<span style="font-weight: bold;">&lt;c:otherwise&gt;</span>標籤。同樣以實例來說明：</span><br style="font-family: Courier New,Courier,monospace;">
+      </small>
+      <pre>&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%&gt;<br>&lt;jsp:useBean id="user" class="cc.openhome.User"  /&gt;<br>&lt;jsp:setProperty name="user" property="*" /&gt;<br>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"<br>   "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>                content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;登入頁面&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;c:choose&gt;<br>            &lt;c:when test="${user.valid}"&gt;<br>                &lt;h1&gt;<br>                    &lt;jsp:getProperty name="user" property="name"/&gt;登入成功<br>                &lt;/h1&gt;<br>            &lt;/c:when&gt;<br>            &lt;c:otherwise&gt;<br>                 &lt;h1&gt;登入失敗&lt;/h1&gt;<br>            &lt;/c:otherwise&gt;<br>        &lt;/c:choose&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt; <br></pre>
+      <br>
+      <small>這個範例改寫自</small> <small><big><a href="JspUseBeanSetPropertyGetProperty.html"><small>簡介 &lt;jsp:useBean&gt;、&lt;jsp:setProperty&gt; 與 &lt;jsp:getProperty&gt;</small></a></big> 中的使用者登入網頁範例。在當時使用了Scriptlet撰寫Java程式碼，判斷使用者是否發送正確名稱密碼，以分別顯示登入成功或失敗的畫面。在學到<span style="font-family: Courier New,Courier,monospace;">&lt;c:choose&gt;、&lt;c:when&gt;及&lt;c:otherwise</span>&gt;標籤之後，就可以不使用Scriptlet而實現這個需求。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">&lt;c:when&gt;
+及&lt;c:otherwise&gt;必須放在&lt;c:choose&gt;之中。當&lt;c:when&gt;的test運算結果為true
+時，會輸出&lt;c:when&gt;的本體內容，而不理會&lt;c:otherwise&gt;的內容。&lt;c:choose&gt;中可以有
+多個&lt;c:when&gt;標籤，此時會從上往下進行測試，如果有個&lt;c:when&gt;標籤的test運算結果為true就輸出其本體內
+容，之後的&lt;c:when&gt;就不會作測試。如果所有&lt;c:when&gt;測試都不成立，則會輸出&lt;c:
+otherwise&gt;的內容。</span><br>
+      <br>
+如果打算使用迴圈來產生一連串的資料輸出。例如你有個簡單的留言版程式，使用JavaBean從資料庫中取得留言，留言可能有數十則，以陣列方式傳回：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>public class MessageService {<br>    private Message[] fakeMessages;<br>    public MessageService() {<br>        // 放些假資料，假裝這些資料是來自資料庫<br>        fakeMessages = new Message[3];<br>         fakeMessages[0] = <br>             new Message("caterpillar", "caterpillar's message!");<br>        fakeMessages[1] = <br>             new Message("momor", "momor's message!");<br>        fakeMessages[2] = <br>             new Message("hamimi", "hamimi's message!");<br>    }<br>    public Message[] getMessages() {<br>        return fakeMessages;<br>    }<br>} <br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">Message物件有name與text屬性</span>，分別表示留言者名稱與留言文字。你打算在網頁上使用表格來顯示每一則留言。若不想使用Scriptlet撰寫Java程式碼的for迴圈，則可以使用JSTL的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;c:forEach&gt;</span>標籤來實現這項需求。例如：<br>
+      </small>
+      <pre>&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;<br>&lt;%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%&gt;<br>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"<br>   "http://www.w3.org/TR/html4/loose.dtd"&gt;<br>&lt;jsp:useBean id="messageService" class="cc.openhome.MessageService"/&gt;<br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type"<br>                    content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;留言版&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br>        &lt;table style="text-align: left; width: 100%;" border="1"&gt;<br>            &lt;tr&gt;<br>                &lt;td&gt;名稱&lt;/td&gt;&lt;td&gt;訊息&lt;/td&gt;<br>            &lt;/tr&gt;<br>            &lt;c:forEach var="message" items="${messageService.messages}"&gt;<br>                &lt;tr&gt;<br>                    &lt;td&gt;${message.name}&lt;/td&gt;&lt;td&gt;${message.text}&lt;/td&gt;<br>                &lt;/tr&gt;<br>            &lt;/c:forEach&gt;<br>        &lt;/table&gt;<br>    &lt;/body&gt;<br>&lt;/html&gt;  <br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">&lt;c:forEach&gt;
+標籤的items屬性可以是陣列或Collection物件，每次會循序取出陣列或Collection物件中的一個元素，並指定給var屬性所設定的變
+數，之後就可以在&lt;c:forEach&gt;標籤本體中，使用var屬性所設定的變數來取得該元素。<br>
+      <br>
+再來簡單地介紹一下&lt;c:forTokens&gt;的使用。如果你想要在</span>JSP<span style="font-family: Courier New,Courier,monospace;">網頁上，將某個字串切割為數個字符（</span>Token<span style="font-family: Courier New,Courier,monospace;">），就可以使用<span style="font-weight: bold;">&lt;c:forTokens&gt;</span>。例如：<br>
+      </span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;c:forTokens&nbsp; var="token"</span></span></small> <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">delims="," items="Java,C++,C,JavaScript"&gt;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; ${token} &lt;br&gt;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;/c:forTokens&gt;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+這個簡單的片段，會將"Java,C++,C,JavaScript"這個字串，依指定的delims進行切割，所以分出來的字符分別是"Java"、"C++"、"C"與"JavaScript"四個字串。<br>
+      <br>
+      <br>
+      </span><br>
+      </small><br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/FlowTag.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+</html>

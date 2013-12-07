@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/CactusFilter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>測試 Filter</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 測試 Filter<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><span style="font-family: Courier New,Courier,monospace;">如果想測試Filter，可以繼承<span style="font-weight: bold;">FilterTestCase</span>，
+這個類別可以使用一些由容器管理的物件，request、
+response、config、filterChain可以分別取得HttpServletRequestWrapper、
+HttpServletResponseWrapper、org.apache.cactus.server.FilterConfigWrapper
+（繼承自FilterConfig）與FilterChain物件。</span><br>
+      <br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;">直接來看個實例，
+假設要撰寫一個可以過濾字元的<span style="font-family: Courier New,Courier,monospace;">Filter</span>，
+其中字元過濾清單可以由一個文字檔案設定。例如：<br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span>
+      <pre>&lt;	&amp;#60;<br>&gt;	&amp;#62;<br></pre>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+文字檔案會放在Web應用程式之中，並可在web.xml中設定Filter初始參數來告知檔案的路徑，你的<span style="font-family: Courier New,Courier,monospace;">Filter</span>可能設計如
+下：<br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import java.util.*;<br>import java.util.logging.Level;<br>import java.util.logging.Logger;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br><br>public class CharacterFilter implements Filter {<br>    private Map&lt;String, String&gt; escapeMap;<br>    <br>    <span style="font-weight: bold;">private class CharacterRequestWrapper extends HttpServletRequestWrapper {</span><br style="font-weight: bold;"><span style="font-weight: bold;">        CharacterRequestWrapper(HttpServletRequest request) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            super(request);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">        @Override</span><br style="font-weight: bold;"><span style="font-weight: bold;">        public String getParameter(String name) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            return doEscape(this.getRequest().getParameter(name));</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><br style="font-weight: bold;"><span style="font-weight: bold;">        private String doEscape(String parameter) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            if(parameter == null) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                return null;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">            String result = parameter;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            for(String origin : escapeMap.keySet()) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                String escape = escapeMap.get(origin);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                result = result.replaceAll(origin, escape);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">            return result;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br>    <br>    public void init(FilterConfig filterConfig)<br>                  throws ServletException {<br>        BufferedReader reader = null;<br>        try {<br>            String escapeListFile = filterConfig<br>                        .getInitParameter("ESCAPE_LIST");<br>            reader = new BufferedReader(<br>                    new InputStreamReader(<br>                        filterConfig.getServletContext()<br>                            .getResourceAsStream(escapeListFile)));<br>            String input = null;<br>            escapeMap = new HashMap&lt;String, String&gt;();<br>            while ((input = reader.readLine()) != null) {<br>                String[] tokens = input.split("\t");<br>                escapeMap.put(tokens[0], tokens[1]);<br>            }<br>        } catch (IOException ex) {<br>            Logger.getLogger(CharacterFilter.class.getName())<br>                    .log(Level.SEVERE, null, ex);<br>        }<br>        finally {<br>            try {<br>                reader.close();<br>            } catch (IOException ex) {<br>                Logger.getLogger(CharacterFilter.class.getName())<br>                        .log(Level.SEVERE, null, ex);<br>            }<br>        }<br>    }<br><br>    public void doFilter(ServletRequest request, ServletResponse response,<br>              FilterChain chain) throws IOException, ServletException {<br><span style="font-weight: bold;">        HttpServletRequest requestWrapper =</span><br style="font-weight: bold;"><span style="font-weight: bold;">                new CharacterRequestWrapper((HttpServletRequest) request);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        chain.doFilter(requestWrapper, response);</span><br style="font-weight: bold;">    }<br><br>    public Map&lt;String, String&gt; getEscapeMap() {<br>        return escapeMap;<br>    }<br><br>    public void destroy() {<br>    }<br>}<br></pre>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+如果要對這個Filter進行測試，可以繼承<span style="font-family: Courier New,Courier,monospace;">FilterTestCase，
+在這邊要測試的對象有兩個，一個是CharacterFilter的init()是否能正確載入文字檔案，生成過濾用的Map物件，另一個是測試
+CharacterFilter的doFilter()後續元件，是否取得的請求參數都是經過濾的結果。</span>以下是個測試案例的示範：<br>
+      </span></span><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"></span></span>
+      <pre>package test.cc.openhome;<br><br>import java.io.IOException;<br>import java.util.HashMap;<br>import java.util.Map;<br><br>import javax.servlet.FilterChain;<br>import javax.servlet.ServletException;<br>import javax.servlet.ServletRequest;<br>import javax.servlet.ServletResponse;<br><br><br>import org.apache.cactus.FilterTestCase;<br>import org.apache.cactus.WebRequest;<br><br>import cc.openhome.CharacterFilter;<br><br>public class CharacterFilterTest extends FilterTestCase {<br>    static {<br>        System.setProperty(<br>                "cactus.contextURL", "http://localhost:8080/CactusExample");<br>    }<br>    <br>    private CharacterFilter filter;<br>    <br>    @Override<br>    protected void setUp() throws Exception {<br><span style="font-weight: bold;">        config.setInitParameter("ESCAPE_LIST", "/WEB-INF/escapelist.txt");</span><br style="font-weight: bold;"><span style="font-weight: bold;">        filter = new CharacterFilter();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        filter.init(config);</span><br>    }<br>    <br>    public void testInit() throws Exception {<br>        Map&lt;String, String&gt; expected = new HashMap&lt;String, String&gt;();<br>        expected.put("&lt;","&amp;#60;");<br>        expected.put("&gt;","&amp;#62;");<br style="font-weight: bold;"><span style="font-weight: bold;">        Map&lt;String, String&gt; result = filter.getEscapeMap();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals(expected, result);</span><br>    }<br>    <br>    public void beginDoFilter(WebRequest req) {<br><span style="font-weight: bold;">        req.addParameter("param", "&lt;test&gt;test&lt;/test&gt;");</span><br>    }<br>    <br>    public void testDoFilter() throws Exception {<br><span style="font-weight: bold;">        final String[] result = new String[1];</span><br style="font-weight: bold;"><span style="font-weight: bold;">        FilterChain chain = new FilterChain() {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            @Override</span><br style="font-weight: bold;"><span style="font-weight: bold;">            public void doFilter(ServletRequest req, ServletResponse resp)</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    throws IOException, ServletException {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                result[0] = req.getParameter("param");</span><br style="font-weight: bold;"><span style="font-weight: bold;">            }</span><br style="font-weight: bold;"><span style="font-weight: bold;">        };</span><br style="font-weight: bold;"><span style="font-weight: bold;">        filter.doFilter(request, response, chain);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        assertEquals("&amp;#60;test&amp;#62;test&amp;#60;/test&amp;#62;", result[0]);</span><br style="font-weight: bold;">    }<br>}<br></pre>
+      <span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; font-size: 13px; text-align: left;"><br>
+      <span style="font-family: Courier New,Courier,monospace;">FilterTestCase
+預設會請求<span style="font-weight: bold;">/FilterRedirector</span></span>，這要
+對應一個作為Redirect proxy的<span style="font-family: Courier New,Courier,monospace;">Filter</span>，你要於
+web.xml中如下設定：<br>
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;...</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;filter&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&lt;filter-name&gt;FilterRedirector&lt;/filter-name&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&lt;filter-class&gt;org.apache.cactus.server.FilterTestRedirector&lt;/filter-class&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;/filter&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;filter-mapping&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&lt;filter-name&gt;FilterRedirector&lt;/filter-name&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&lt;url-pattern&gt;/FilterRedirector&lt;/url-pattern&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;/filter-mapping&gt;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;...</span><br>
+      <br>
+      <br>
+      <br>
+      <br>
+      </span></span></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/CactusFilter.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:39 GMT -->
+</html>

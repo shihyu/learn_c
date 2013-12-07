@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/AutoBoxingUnBoxing.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>autoboxing、 unboxing</title>
+</head>
+
+
+<body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip: autoboxing、 unboxing</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>在Java中，所有您要處理的東西「幾乎」都是<span style="font-weight: bold;">物件（Object）</span>，例如您之前所使用的Scanner是物件，字串（String）是物件，您之後還會看到更多的物件。<br>
+
+      <br>
+
+
+
+
+然而有些是例外，基本（Primitive）資料型態不是物件，也就是您使用int、double、boolean等宣告的變數，以及您在程式中直接寫下的字面常量。<br>
+
+      <br>
+
+
+
+
+使用Java有一段時間的人都知道，有些時候您需要將基本型態轉換為物件，例如使用Map時，要使用put()方法時需要的是物件而不是基本型態。<br>
+
+      <br>
+
+
+
+
+您要使用<span style="font-weight: bold;">包裹型態（Wrapper Types）</span>才能將基本資料型態包裝為物件，例如在 <a href="http://java.sun.com/j2se/1.4.2/download.html">J2SE 1.4.2</a>&nbsp;之前，您要如下才能將int包裝為一個Integer物件：<br>
+
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer integer = new Integer(10);</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+在 <a href="http://java.sun.com/j2se/1.5.0/download.jsp">J2SE 5.0</a> 之後您可以這麼寫：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer integer = 10;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+事實上編譯器在背後自動根據您寫下的陳述，為您進行<span style="font-weight: bold;">自動裝箱（Autoboxing）</span>動
+作，同樣的動作可以適用於
+boolean、byte、short、char、long、float、double等基本型態，分別會使用對應的包裹型態（Wrapper
+Types）Boolean、Byte、Short、Character、Integer、Long、Float或Double。<br>
+
+      <br>
+
+
+
+
+自動裝箱運用的方法還可以如下：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int i = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer integer = i;</span><br>
+
+
+      </small></div>
+
+      <small>
+&nbsp;<br>
+
+
+
+
+您也可以使用更一般化的Number，例如：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Number number = 3.14f;</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+3.14f會先被自動裝箱為Float，然後指定給number。<br>
+
+      <br>
+
+
+
+
+J2SE 5.0中可以自動裝箱，也可以<span style="font-weight: bold;">自動拆箱（Unboxing）</span>，例如下面這樣寫是可以的：<br>
+
+      </small>
+
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer fooInteger = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int fooPrimitive = fooInteger;</span><br>
+
+
+
+
+      </small></div>
+
+      <small>
+
+
+&nbsp;<br>
+
+
+
+
+在運算時，也可以自動裝箱與拆箱，例如：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Integer i = 10;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(i + 10);</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(i++);</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+上例中會顯示20與10，編譯器會自動幫您進行自動裝箱與拆箱，即10會先被裝箱，然後在i + 10時會先拆箱，進行加法運算；i++該行也是先拆箱再進行遞增運算。再來看一個例子：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Boolean boo = true;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">System.out.println(boo &amp;&amp; false);</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+同樣的，先將boo拆箱，再與false進行AND運算，結果會顯示false。</small><br>
+
+
+
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/AutoBoxingUnBoxing.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:16 GMT -->
+</html>

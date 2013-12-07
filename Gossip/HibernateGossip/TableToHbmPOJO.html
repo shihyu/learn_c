@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/TableToHbmPOJO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>從資料表生成映射文件與POJO</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Hibernate
+Gossip: 從資料表生成映射文件與POJO</a></h1>
+
+
+
+
+
+
+<table style="text-align: left; height: 32px; width: 957px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: top; width: 694px;"> <small>如果您已經設計好資料表格，您可以使用Hibernate Tool自動從表格中生成映射文件或POJO，甚至是標上了Annotation的實體類別，您需要Hibernate Core、Hibernate Annotation、</small><small>Freemaker、jTidy的JAR檔案</small><small>，請將之存放至專案的lib資料夾中，並假設產生的相關xml與.java將放在src資料夾中。<br>
+
+
+
+      <br>
+
+
+
+首先，請建立一個example.db.properties，當中包括了資料庫的連接訊息：<br>
+
+
+
+      </small>
+      
+      
+      
+      <ul>
+
+
+
+        <li>example.db.properties</li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      
+      
+      
+      <pre>hibernate.dialect = org.hibernate.dialect.MySQLDialect<br>hibernate.connection.driver_class = com.mysql.jdbc.Driver<br>hibernate.connection.url = jdbc:mysql://localhost/demo<br>hibernate.connection.username = caterpillar<br>hibernate.connection.password = 123456</pre>
+
+
+
+      <br>
+
+
+
+      <small>接著撰寫Ant建構檔案，相關的註解標示於其中：</small><br>
+
+
+      
+      
+      <ul>
+
+
+        <li>build.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;project name="Hello World Reverse" default="compile" basedir="."&gt;<br><br>    &lt;property name="proj.name"      value="Reverse example"/&gt;<br>    &lt;property name="proj.shortname" value="example-reverse"/&gt;<br>    &lt;property name="version"        value="1.0"/&gt;<br><br>    &lt;property name="src.java.dir"           value="src/java"/&gt;<br>    &lt;property name="lib.dir"                value="lib"/&gt;<br><br>    &lt;path id="project.classpath"&gt;<br>        &lt;fileset dir="${lib.dir}"&gt;<br>            &lt;include name="**/*.jar"/&gt;<br>            &lt;include name="**/*.zip"/&gt;<br>        &lt;/fileset&gt;<br>    &lt;/path&gt;<br><br>    &lt;!-- 使用HibernateToolTask --&gt;<br>    &lt;taskdef name="hibernatetool"<br>             classname="org.hibernate.tool.ant.HibernateToolTask"<br>             classpathref="project.classpath"/&gt;<br><br>    &lt;!-- 從資料庫產生HBM、Hibernate設定檔等XML --&gt;<br>    &lt;target name="reveng.hbmxml"<br>            description="Read database, generate XML mapping files"&gt;<br><br>        &lt;hibernatetool destdir="${src.java.dir}"&gt;<br>            &lt;jdbcconfiguration<br>                propertyfile="${basedir}/example.db.properties"<br>                revengfile="${basedir}/example.reveng.xml"/&gt;<br>            &lt;hbm2hbmxml/&gt; &lt;!-- 從資料表產生HBM --&gt;<br>            &lt;hbm2cfgxml/&gt; &lt;!-- 產生hibernate.cfg.xml --&gt;<br>        &lt;/hibernatetool&gt;<br><br>    &lt;/target&gt;<br><br>    &lt;!-- 從HBM產生POJO --&gt;<br>    &lt;target name="reveng.pojos"<br>            description="Read XML mapping files, generate POJOs"&gt;<br><br>        &lt;hibernatetool destdir="${src.java.dir}"&gt;<br>            &lt;configuration&gt;<br>                &lt;fileset dir="${src.java.dir}"&gt;<br>                    &lt;include name="**/*.hbm.xml"/&gt;<br>                &lt;/fileset&gt;<br>            &lt;/configuration&gt;<br>            &lt;hbm2java/&gt; &lt;!-- 產生POJO --&gt;<br>        &lt;/hibernatetool&gt;<br><br>    &lt;/target&gt;<br><br>    &lt;!-- 從資料表產生Annotation的實體類別 --&gt;<br>    &lt;target name="reveng.entities"<br>            description="Read database, generate Java entity beans"&gt;<br><br>        &lt;hibernatetool destdir="${src.java.dir}"&gt;<br>            &lt;jdbcconfiguration<br>                propertyfile="${basedir}/example.db.properties"<br>                revengfile="${basedir}/example.reveng.xml"/&gt;<br>            &lt;hbm2java jdk5="true" ejb3="true"/&gt;<br>            &lt;hbm2cfgxml ejb3="true"/&gt;<br>        &lt;/hibernatetool&gt;<br><br>    &lt;/target&gt;<br><br>&lt;/project&gt;</pre>
+
+
+      <br>
+
+
+      <small>按照上列內容，可以看到，還需要一個example.reveng.xml：</small><br>
+
+
+      
+      
+      <ul>
+
+
+        <li>example.reveng.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;!DOCTYPE hibernate-reverse-engineering<br>SYSTEM "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd"&gt;<br><br>&lt;hibernate-reverse-engineering&gt;<br>    &lt;table-filter match-name=".*" <br>                  package="onlyfun.caterpillar"/&gt;<br>&lt;/hibernate-reverse-engineering&gt;</pre>
+
+
+      <br>
+
+
+      <small>在這邊簡單的設定&lt;table-filter&gt;，match-name用regression expression來設定所要match的表格名稱，package設定Java的套件名稱。</small><br>
+
+
+      <br>
+
+
+      <small>如果建構時指定target為reveng.hbmxml，則會產生以下的TUser.hbm.xml及hibernate.cfg.xml：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>TUser.hbm.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0"?&gt;<br>&lt;!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"<br>"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt;<br>&lt;!-- Generated 2007/6/26 ?U?? 12:26:43 by Hibernate Tools 3.2.0.beta8 --&gt;<br>&lt;hibernate-mapping&gt;<br>    &lt;class name="onlyfun.caterpillar.TUser" table="t_user" catalog="demo"&gt;<br>        &lt;comment&gt;&lt;/comment&gt;<br>        &lt;id name="id" type="long"&gt;<br>            &lt;column name="id" /&gt;<br>            &lt;generator class="assigned" /&gt;<br>        &lt;/id&gt;<br>        &lt;property name="name" type="string"&gt;<br>            &lt;column name="name"&gt;<br>                &lt;comment&gt;&lt;/comment&gt;<br>            &lt;/column&gt;<br>        &lt;/property&gt;<br>        &lt;property name="age" type="java.lang.Long"&gt;<br>            &lt;column name="age"&gt;<br>                &lt;comment&gt;&lt;/comment&gt;<br>            &lt;/column&gt;<br>        &lt;/property&gt;<br>    &lt;/class&gt;<br>&lt;/hibernate-mapping&gt;</pre>
+
+
+      <small><br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>hibernate.cfg.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="utf-8"?&gt;<br>&lt;!DOCTYPE hibernate-configuration PUBLIC<br>"-//Hibernate/Hibernate Configuration DTD 3.0//EN"<br>"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"&gt;<br>&lt;hibernate-configuration&gt;<br>    &lt;session-factory&gt;<br>        &lt;property <br>         name="hibernate.connection.driver_class"&gt;com.mysql.jdbc.Driver&lt;/property&gt;<br>        &lt;property <br>          name="hibernate.connection.password"&gt;123456&lt;/property&gt;<br>        &lt;property <br>          name="hibernate.connection.url"&gt;jdbc:mysql://localhost/demo&lt;/property&gt;<br>        &lt;property <br>          name="hibernate.connection.username"&gt;caterpillar&lt;/property&gt;<br>        &lt;property <br>         name="hibernate.dialect"&gt;org.hibernate.dialect.MySQLDialect&lt;/property&gt;<br>        &lt;mapping resource="onlyfun/caterpillar/TUser.hbm.xml" /&gt;<br>    &lt;/session-factory&gt;<br>&lt;/hibernate-configuration&gt;</pre>
+
+
+      <small><br>
+
+
+如果進一步執行reveng.pojos這個target，則會產生以下的POJO：</small><br>
+
+
+      
+      
+      <ul>
+
+
+        <li>TUser.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br>// Generated 2007/6/26 下午 01:00:39 by Hibernate Tools 3.2.0.beta8<br><br>/**<br> * TUser generated by hbm2java<br> */<br>public class TUser  implements java.io.Serializable {<br><br>    // Fields    <br><br>     private long id;<br>     private String name;<br>     private Long age;<br><br>     // Constructors<br><br>    /** default constructor */<br>    public TUser() {<br>    }<br><br>	/** minimal constructor */<br>    public TUser(long id) {<br>        this.id = id;<br>    }<br>    /** full constructor */<br>    public TUser(long id, String name, Long age) {<br>       this.id = id;<br>       this.name = name;<br>       this.age = age;<br>    }<br>   <br>    // Property accessors<br>    public long getId() {<br>        return this.id;<br>    }<br>    <br>    public void setId(long id) {<br>        this.id = id;<br>    }<br>    public String getName() {<br>        return this.name;<br>    }<br>    <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>    public Long getAge() {<br>        return this.age;<br>    }<br>    <br>    public void setAge(Long age) {<br>        this.age = age;<br>    }<br>}</pre>
+
+
+      <br>
+
+
+      <small>如果進一步執行reveng.entities這個target，則會產生以下的實體類別：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>TUser.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br>// Generated 2007/6/26 下午 01:02:01 by Hibernate Tools 3.2.0.beta8<br><br>import javax.persistence.Column;<br>import javax.persistence.Entity;<br>import javax.persistence.Id;<br>import javax.persistence.Table;<br><br>/**<br> * TUser generated by hbm2java<br> */<br>@Entity<br>@Table(name="t_user"<br>    ,catalog="demo"<br>    , uniqueConstraints = {  }<br>)<br>public class TUser  implements java.io.Serializable {<br><br>    // Fields    <br><br>     private long id;<br>     private String name;<br>     private Long age;<br><br>     // Constructors<br><br>    /** default constructor */<br>    public TUser() {<br>    }<br><br>	/** minimal constructor */<br>    public TUser(long id) {<br>        this.id = id;<br>    }<br>    /** full constructor */<br>    public TUser(long id, String name, Long age) {<br>       this.id = id;<br>       this.name = name;<br>       this.age = age;<br>    }<br>   <br>    // Property accessors<br>     @Id<br>    <br>    @Column(name="id", unique=true, <br>            nullable=false, insertable=true, updatable=true)<br>    public long getId() {<br>        return this.id;<br>    }<br>    <br>    public void setId(long id) {<br>        this.id = id;<br>    }<br>    <br>    @Column(name="name", unique=false, <br>            nullable=true, insertable=true, updatable=true)<br>    public String getName() {<br>        return this.name;<br>    }<br>    <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>    <br>    @Column(name="age", unique=false, <br>            nullable=true, insertable=true, updatable=true)<br>    public Long getAge() {<br>        return this.age;<br>    }<br>    <br>    public void setAge(Long age) {<br>        this.age = age;<br>    }<br>}</pre>
+
+
+      <br>
+
+
+      <small><br>
+
+
+      </small>
+      <small><br>
+
+
+
+      </small>
+
+ </td>
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+ </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/HibernateGossip/TableToHbmPOJO.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:44 GMT -->
+</html>

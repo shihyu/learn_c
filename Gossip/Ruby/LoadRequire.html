@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/LoadRequire.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+  
+    <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+    <link rel="stylesheet" href="css/print.css" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>load 與 require</title></head><body>
+    <h3><a href="../index.html">From
+        Gossip@Openhome</a></h3>
+    <h1><a href="index-2.html">Ruby Gossip: load 與 require<br>
+      </a></h1>
+    <table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top; width: 250px; text-align: center;">
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+          </td>
+          <td style="vertical-align: top; width: 690px; text-align: left;"><small>你
+              可以在.rb檔案中撰寫Ruby程式碼，實際程式開發不會只在一個.rb中撰寫應用程式所有程式碼，而會依功能，在不同的.rb中撰寫程式。<br>
+              <br>
+              如果要在一個.rb檔案中，使用另一個.rb中撰寫的程式碼，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">load</span>方
+              法與<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">require</span>方
+              法，兩者應用場合略有不同。先來看到load方法的使用。例如，你可以撰寫以下的utility.rb檔案：<br>
+            </small>
+            <ul>
+              <li>utility.rb</li>
+            </ul>
+            <pre>puts "load " + __FILE__<br></pre>
+            <small><br>
+              其中<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">__FILE__</span>可
+              取得程式碼所在的檔名，在相同目錄中，接著撰寫main.rb<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre>puts "Begin " + __FILE__<br>load "utility.rb"<br>puts "Continue " + __FILE__<br>load "utility.rb"</pre>
+            <small><br>
+              如果執行main.rb，可以看到以下結果：</small><br>
+            <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">puts
+                        "Begin main.rb"<br>
+                        load "utility.rb"<br>
+                        puts "Continue main.rb"<br>
+                        load "utility.rb"<span style="font-weight: bold;"><br>
+                        </span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"></span></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>可以看到，每執行一次<span style="font-family: Courier New,Courier,monospace;">load</span>方
+              法，被載入的.rb檔就會執行一次。<span style="font-family: Courier New,Courier,monospace;">load</span>方
+              法也可以使用相對路徑或絕對路徑，指定要載入的.rb檔案。例如：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">load "../utility.rb"<br>
+                </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">load "C:/workspace/utility.rb"</span></small><br>
+            </div>
+            <br>
+            <small><span style="font-family: Courier New,Courier,monospace;">load</span>是
+              個方法，這代表你可以將它放在判斷式中，依條件決定是否載入某個.rb檔案，由於<span style="font-family: Courier New,Courier,monospace;">load</span>每
+              載入.rb檔案一次，就會重新執行.rb檔案的內容，因此.rb檔案的內容若有變動，執行時就會套用變動後的程式碼。<br>
+              <br>
+              <span style="font-family: Courier New,Courier,monospace;">require與
+                load類似</span>，不過使用時可不加上.rb副檔名。例如：<br>
+            </small>
+            <ul>
+              <li>main.rb<br>
+              </li>
+            </ul>
+            <pre>puts "Begin " + __FILE__<br>require "utility"<br>puts "Continue " + __FILE__<br>require "utility"<br></pre>
+            <br>
+            <small><span style="font-family: Courier New,Courier,monospace;">require</span>是
+              個方法，這代表你可以將它放在判斷式中，依條件決定是否載入某個.rb檔。</small><small style="font-family: Courier New,Courier,monospace;">與
+              load不同的是，require載入過的檔案，再次require並不會重複執行，require也可以使用相對或絕對路徑方式。例如：</small><br>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">require"../utility"</span></small><br>
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">
+                </span></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">require "C:/workspace/utility"</span></small><br>
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"></span></small></div>
+            <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+              </span></small><small><span style="font-family: Courier New,Courier,monospace;"></span></small><small style="font-family: Courier New,Courier,monospace;">以術語來說，<span style="font-weight: bold;">load
+                要求載入一個檔案，而require要求某個</span></small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">功
+              能</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">特
+              性（</small><small style="font-weight: bold;">Feature</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">）</small><small style="font-family: Courier New,Courier,monospace;">。在指定相對路徑或不指定路徑
+              情況下，load與require會從預設路徑尋找指定載入的檔案或特性。可以從<span style="font-weight: bold;">$:</span>變
+              數取得這些路徑，必要時，</small><small>可以在啟用ruby時加上-I指定路徑</small><small style="font-family: Courier New,Courier,monospace;">：</small><br>
+            <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">C:\workspace&gt;ruby
+                        -e 'puts $:'<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/bcrypt-ruby-3.0.1-x86-mingw32/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/color-1.4.1/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/fastercsv-1.5.4/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/json-1.6.1/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/orm_adapter-0.0.5/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/rack-1.3.4/bin<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/rack-1.3.4/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/rake-0.9.2/bin<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/rake-0.9.2/lib<br>
+C:/winware/ruby191/lib/ruby/gems/1.9.1/gems/warden-1.0.6/lib<br>
+                        C:/winware/ruby191/lib/ruby/site_ruby/1.9.1<br>
+                        C:/winware/ruby191/lib/ruby/site_ruby/1.9.1/i386-msvcrt<br>
+                        C:/winware/ruby191/lib/ruby/site_ruby<br>
+                        C:/winware/ruby191/lib/ruby/vendor_ruby/1.9.1<br>
+C:/winware/ruby191/lib/ruby/vendor_ruby/1.9.1/i386-msvcrt<br>
+                        C:/winware/ruby191/lib/ruby/vendor_ruby<br>
+                        C:/winware/ruby191/lib/ruby/1.9.1<br>
+                        C:/winware/ruby191/lib/ruby/1.9.1/i386-mingw32<br>
+                        .<br>
+                        <span style="font-weight: bold;"> </span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"></span></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>注意最後一行的點符號，那代表目前路徑。你可以要求<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">rbconfig</span>特
+              性，使用其中的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">Config::CONFIG</span>物
+              件，這是一個雜湊（Hash）物件，可以指定名稱作為鍵（Key），取得相對應的值，<span style="font-family: Courier New,Courier,monospace;">Config::CONFIG</span>物
+              件記錄了Ruby安裝時的一些資訊。例如：<br>
+            </small>
+            <ul>
+              <li>dirinfo.rb</li>
+            </ul>
+            <pre>require "rbconfig"<br>puts "-- bin dir --"<br>puts Config::CONFIG["bindir"]<br>puts "-- ruby standard library dir --"<br>puts Config::CONFIG["rubylibdir"]<br>puts "-- c extensions dir --"<br>puts Config::CONFIG["archdir"]<br>puts "-- site ruby dir --"<br>puts Config::CONFIG["sitedir"]<br>puts "-- vendor ruby dir-- "<br>puts Config::CONFIG["vendordir"]<br></pre>
+            <small><br>
+              執行結果如下：</small><br>
+            <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">--
+                        bin dir --<br>
+                        C:/winware/ruby191/bin<br>
+                        -- ruby standard library dir --<br>
+                        C:/winware/ruby191/lib/ruby/1.9.1<br>
+                        -- c extensions dir --<br>
+                        C:/winware/ruby191/lib/ruby/1.9.1/i386-mingw32<br>
+                        -- site ruby dir --<br>
+                        C:/winware/ruby191/lib/ruby/site_ruby<br>
+                        -- vendor ruby dir--<br>
+                        C:/winware/ruby191/lib/ruby/vendor_ruby<br>
+                        <span style="font-weight: bold;"> </span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"></span></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Config::CONFIG["bindir"]</span>可
+              取得</small><small>Ruby安裝中bin</small><small style="font-family: Courier New,Courier,monospace;">資
+              料夾目錄。<span style="font-weight: bold;">Config::CONFIG["rubylibdir"]</span>可
+              取得</small><small>Ruby撰寫的</small><small style="font-family: Courier New,Courier,monospace;">標
+              準程式庫（</small><small>Library</small><small style="font-family: Courier New,Courier,monospace;">）
+              目錄</small><small style="font-family: Courier New,Courier,monospace;">。<span style="font-weight: bold;">Config::CONFIG["archdir"]</span>可取得</small><small>C
+              撰寫的擴充（Extensions）</small><small style="font-family: Courier New,Courier,monospace;">，
+              這些擴充可以使用require在程式中要求取得功能特性。<span style="font-weight: bold;">以術語來
+                說，如果說你寫了一個擴充，通常是指它用C撰寫，如果說你寫了一個程式庫，通常是指它用Ruby撰寫</span>。</small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Config::CONFIG["sitedir"]</span>通
+              常放置可信任第三方程式庫的目錄，</small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Config::CONFIG["vendordir"]</span>則是放
+              置廠商程式庫。</small><br>
+            <small><br>
+              先前還可以看到gems等目錄，<a href="http://rubygems.org/">RubyGem</a>
+              是包裝、散佈Ruby程式庫的標準</small><small>方式，如果使用gem工具程
+              式安裝的程式庫，就會放在gems等目錄中，可參考 </small><small><a href="http://guides.rubygems.org/">RubyGems
+                Guides</a> 的說明</small><small>。<br>
+              <br>
+              在啟動ruby程式時，也可以使用-r指定要求的特性。例如：</small><br>
+            <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby -rrbconfig -e
+                          'puts Config::CONFIG["archdir"]'</span><br>
+                        C:/winware/ruby191/lib/ruby/1.9.1/i386-mingw32<br>
+                        <br>
+                        <span style="font-weight: bold;"> &gt;</span><br>
+                        <span style="font-weight: bold;"> </span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"></span></td>
+                </tr>
+              </tbody>
+            </table>
+            <small></small><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"><br>
+              </span></small><br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+  </body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/LoadRequire.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/StructuralTyping.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>結構型態（Structural typing）</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 結構型態（Structural typing）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>對於物件所共用擁有的行為，如果是同一種物件，可以將共同行為抽離設計至父類別，由子類別實作共同行為，對於非同種物件，可以將之抽離出來設計為特徵（Trait），讓不同的類別之間實作該特徵。<br><br>然而有時候，你就是有像這樣的需求</small><small>：<br></small><pre>class Duck {<br>    def quack = "呱...呱..."<br>}<br><br>class Man {<br>    def quack = "呱~~呱~~"<br>}</pre><small><br></small><small>也許這個人是穿著鴨子吉祥物服裝要呱呱叫也說不一定，你如何設計一個方法，讓鴨子與人都可以呱呱叫？如果你並不想大費周章，設計一個具有quack方法的特徵的話！<br><br></small><small>如果是動態語言，如JavaScript、Python、Ruby等，會採用 <a href="http://en.wikipedia.org/wiki/Duck_typing">鴨子型態（Duck typing）</a>，也就是<span style="font-weight: bold;">「如果它走路像個鴨子，游起來像個鴨子，叫聲也像鴨子，那它就是鴨子！」</span>在Scala中，你可以使用結構型態（Structural typing）來達到類似鴨子型態的目的：<br></small><pre>def doQuack(d: <span style="font-weight: bold;">{def quack: String}</span>) {<br>    println(d.quack)<br>}<br><br>doQuack(new Duck)  // "呱...呱...<br>doQuack(new Man)   // "呱~~~呱~~~</pre><small><br>在
+上例中，doQuack()方法接受任何型態的物件，只要它具有quack的行為，即使Duck與Man彼此沒有關係，但它們確實都具有quack的行
+為，所以可以傳入doQuack()方法之中。正如上例所示，結構型態正是在解決物件間即不是同一種物件，也非實作某個特徵，但又確實擁有共同行為的情
+況。<br><br>你可以在{ } 之間定義任何的方法外觀，例如：<br></small><pre>class Duck {<br>    def quack = "呱...呱..."<br>    def swim  = "划...划..."<br>}<br><br>class Man {<br>    def quack = "呱~~~呱~~~"<br>    def swim  = "划~~~划~~~"<br>}<br><br>def doQuack(d: <span style="font-weight: bold;">{def quack: String; def swim: String}</span>) {<br>    println(d.quack)<br>    println(d.swim)<br>}<br><br>doQuack(new Duck)  <br>doQuack(new Man)   </pre><small><br>如果要定義的方法較多時，可以使用type為結構型態取個別名：<br></small><pre>class Duck {<br>    def quack = "呱...呱..."<br>    def swim  = "划...划..."<br>    def walk  = "搖...搖..."<br>}<br><br>class Man {<br>    def quack = "呱~~~呱~~~"<br>    def swim  = "划~~~划~~~"<br>    def walk  = "搖~~~搖~~~"<br>}<br><br><span style="font-weight: bold;">type DuckLike = {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def quack: String</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def swim : String</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def walk : String</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>def doQuack(d: <span style="font-weight: bold;">DuckLike</span>) {<br>    println(d.quack)<br>    println(d.swim)<br>    println(d.walk)<br>}<br><br>doQuack(new Duck)  <br>doQuack(new Man)   </pre><small><br>你也可以限制必須是某個類別的子類別，例如：<br></small><pre>class Animal<br><br>class Man extends Animal {<br>    def quack = "呱~~~呱~~~"<br>}<br><br>class ToyDuck {<br>    def quack = "呱***呱***"<br>}<br><br><span style="font-weight: bold;">type DuckLike = Animal {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    def quack: String</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>def doQuack(d: DuckLike) {<br>    println(d.quack)<br>}<br><br>doQuack(new Man)      <br>doQuack(new ToyDuck)   // 編譯錯誤，type mismatch</pre><small><br>在上例中，限制必須是動物才可以丟入doQuack()呱呱叫，玩具鴨不是動物，所以不可以丟入doQuack()中。有趣的是，結構型態也可以進行擴充：<br></small><pre>type Quacklike = { def quack: String }<br>type Ducklike = Quacklike { def swim: String; def walk: String }</pre><small><br>在上例中，Ducklike將必須是具有quack、swim、walk的型態。如果已給定結構型態別名，則擴充時所使用的語法為使用with：<br></small><pre>type Quacklike = { def quack: String }<br>type Walklike  = { def walk: String }<br>type Swimlike  = { def swim: String }<br>type Ducklike = Quacklike with Walklike with Swimlike</pre><small><br>結構型態就是一種型態，自然也就可以用來對陣列或群集（Collection）作參數化，例如</small><small>在下面的ducks陣列中，可以放入任何種類的物件，只要它們具有quack的行為就可以</small><small>：<br></small><pre>class Duck {<br>    def quack = "呱...呱..."<br>}<br><br>class Toy {<br>    def quack = "呱...呱..."<br>}<br><br>class Man {<br>    def quack = "呱~~~呱~~~"<br>}<br><br>type DuckLike = {<br>    def quack: String<br>}<br><br>val ducks: Array[DuckLike] = Array[DuckLike](new Duck, new Toy, new Man)<br>ducks.foreach(d =&gt; println(d.quack))</pre><small><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/StructuralTyping.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

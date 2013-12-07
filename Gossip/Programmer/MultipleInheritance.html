@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/MultipleInheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <title>受限多重繼承的演進</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: 受限多重繼承的演進<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=74030">受限多重繼承的演進</a><br>
+      <br>
+      在觀察到兩個以上類別具有重複定義時，可考慮將重複部份抽出至新類別，使用新類別的方式之一是透過繼承，這是由下而上的繼承思考方式；如果觀察到類別已定義某些功能，為了避免在新類別中重複定義，方式之一就是繼承該類別，這是由上而下的繼承思考方式。無論程式語言是直接支援多重繼承，或為了避免結構複雜化與衝突而提供受限多重繼承，思考重點都在於由下而上抽取出的重複，或是由上而下繼承的定義是否過於具體。<br>
+      <br>
+      <dl>
+        <dt>解決多重繼承複雜問題的規則過於複雜</dt>
+      </dl>
+      <br>
+      <span class="courier">若觀察A、B類別具有重複定義x，因而提取x至Px類別，由A、B類別繼承，若觀察B、C類別亦有重複定義y，因而提取y至Py類別，由B、C類別繼承，此時B同時繼承了Px、Py類別，如此由下而上思考產生的多重繼承似乎再自然不過。</span><br>
+      <br>
+      <span class="courier">然而允許多重繼承容易使得繼承結構複雜化，若上述A、B、C亦有重複定義z，那麼提取z至Pz類別，此時Pz該由Px、Py繼承，還是由A、B、C直接繼承？如果是前者的情況，那麼B類別查找定義的順序，應該是Px、Pz、Py，還是Py、Pz、Px，或是Px、Py、Pz，亦或是其它規則？如果Pz定義的z在Px與Py中都重新定義，那麼繼承了Px、Py的B，到底使用的是Px定義的z，還是Py重新定義的z？</span><br>
+      <br>
+      直接允許多重繼承顯然會有繼承結構複雜化、繼承順序與功能衝突等問題，當然透過語法規則都可嘗試解決問題，像是在標識優先順序、明確指定使用哪個類別繼承而來的定義、發生衝突時要求開發者明確重新定義等，然而多重繼承的問題重點之一，在於原本為了解決複雜問題的規則過於複雜，人們使用規則時又造成其它問題，像是選用的規則過於寬鬆而易於破壞既有程式，或是過於嚴格而使得日後彈性受限，更多時候是對規則的誤解或忽略而產生的程式臭蟲。<br>
+      <br>
+      <dl>
+        <dt>受限多重繼承用以輔助單一繼承</dt>
+      </dl>
+      <br>
+      如果繼承來源只有一個，繼承時由下而上觀察是個線性關係，繼承結構因而單純，由於是線性繼承關係，也就沒有繼承順序與功能衝突問題，<span
+        class="courier">然而若有如前述情況，B類別的x與y，分別與A、C類別中的定義重複</span>，僅提供單一繼承架構並無法解決重複問題，而必須提供某種型式的受限多重繼承。<br>
+      <br>
+      以Java為例，實作的繼承來源只能有一個，但可以有多個規格的繼承來源，在繼承實作時使用<span class="courier">extends</span>關鍵字指定類別，而繼承規格時使用<span
+        class="courier">implements</span>指定介面，介面就是Java提供的受限多重繼承機制。<span
+        class="courier">以上述問題來說，或可為y定義Iy介面，由C類別實作，B類別可繼承Px、實作Iy並包含C實例，實作y時將操作委託給C實例執行</span>，也就是實現合成（Composition）來取代原先多重繼承的需求。<br>
+      <br>
+      Java藉由捨棄繼承多個實作來源的可能性，規避了多重繼承下實作衝突等問題，但也因此捨棄了部份程式碼重用的可能性，許多情況下程式碼重複無可避免。<span
+        class="courier">例如若Ball實例需要有比較大小的功能，而Comparable介面定義了notEquals()、lessThan()等方法，或許Ball類別可如下實作Comparable：</span><br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>public class Ball implements Comparable&lt;Ball&gt; {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; public boolean notEquals(Ball that) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this.radius - that.radius; </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; }</strong></span><span><strong><br>
+            <br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; // 底下都是根據notEquals()實作</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; public boolean lessThan(Ball that) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this.notEquals(that) &lt; 0; </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; public boolean lessOrEquals(Ball that) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this.lessThan(that) || this.notEquals(that) == 0; </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; public boolean greaterThan(Ball that) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return !this.lessOrEquals(that); </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp; ...</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <span class="courier">如果Cube實例也要有比較大小的功能，在實作Comparable時除了notEquals()必須根據長寬高計算外，lessThan()、lessOrEquals()等方法是相同的</span>，在Java受限的多重繼承下，就算使用合成來解決，也必然會出現一定程度的程式碼重複。<br>
+      <br>
+      <dl>
+        <dt>根據抽象的共用實作輔助單一繼承</dt>
+      </dl>
+      <br>
+      Java對於規格可以有多個繼承來源，但限制實作只能有一個繼承來源，然而有些實作分明是可以共享，直接引入多重繼承又會面臨解決複雜問題的複雜規則，有無折衷方法呢？<br>
+      <br>
+      JDK8提案預計在介面中增加的預設方法（Default method）特性，有限度地放寬了繼承時實作來源的限制，也就是繼承時實作來源可以是根據抽象的共用實作。具體來說，介面中將允許方法有預設實作：<br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>public interface Comparable&lt;T&gt; {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; boolean notEquals(T that);</strong></span><span><strong><br>
+            <br>
+          </strong></span><span><strong>&nbsp; boolean lessThan(T that) default { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this.notEquals(that) &lt; 0; /* 同Ball中實作 */</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; }</strong></span><span><strong><br>
+            <br>
+          </strong></span><span><strong>&nbsp; boolean lessOrEquals(T that) default { /* 同Ball中實作 */ }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; boolean greaterThan(T that) default { /* 同Ball中實作 */ }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; ...</strong></span><strong><br>
+        </strong></div>
+      <br>
+      <span class="courier">在Comparable介面中，並沒有實作notEquals()，而被標示為default的方法都是根據抽象的notEquals()撰寫樣版流程，任何物件需要比較功能，只需實作Comparable的notEquals()方法：</span><br>
+      <div class="courier" style="margin-left: 40px;"><span><strong>public class Ball implements Comparable&lt;Ball&gt; {</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; public boolean notEquals(Ball that) { </strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this.radius - that.radius;</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; }</strong></span><span><strong><br>
+          </strong></span><span><strong>&nbsp; ...</strong></span><strong><br>
+        </strong></div>
+      &nbsp; <br>
+      這有點像是設計模式中的樣版方法（Template method），差別在於並非使用繼承方式實作抽象方法，而且實作預設方法時不能有狀態（屬性）陳述出現，完全就是根據抽象而實作。<br>
+      &nbsp; <br>
+      從另一角度來看，Java現階段使用合成達到多重繼承的作法，其實也是根據物件外觀進行實作，預設方法的引入與合成其實是類似的使用概念。預設方法就是一種受限的多重繼承，雖然可繼承的共用實作是根據抽象，但畢竟就實作類別來說，又因此而有了多個實作的繼承來源，如此就會引發一些與多重繼承相似的問題，像是實作衝突問題，例如父類別的實作方法與介面預設方法衝突時應以誰為主？若多個介面中有預設方法發生衝突又該如何取捨？這些問題自然又得定下一堆規則來解決，只不過相對於直接多重繼承還有狀態繼承問題，可繼承根據抽象的共用實作時必須瞭解的規則，算是勉強在可接受的範圍。<br>
+      <br>
+      <dl>
+        <dt>思考繼承來源是否過於具體而不抽象</dt>
+      </dl>
+      <br>
+      Java現階段限制實作的繼承來源只能有一個，免除了實作衝突等問題，一旦引入了預設方法，雖然解決衝突的規則可循，但衝突再所難免，也必然會有不經意破壞既有程式功能的可能性，這可在現階段已支援類似功能的語言中看到端倪。例如Ruby支援Mixin，<span
+        class="courier">如果模組M1中定義x方法呼叫a方法，模組M2中定義y方法呼叫a方法，而M1與M2中兩個a方法實作並不相同，如果有類別先後包括了M1與M2模組，那呼叫類別實例的x方法時，結果可能就會令人驚喜了。</span><br>
+      <br>
+      多重繼承會引發問題，可繼承抽象的共用實作的受限多重繼承也會引發問題，那為什麼Ruby要有Mixin、Scala要有Trait，JDK8要引入預設方法？為什麼Python、C++仍支援多重繼承？真正問題也許不是多重繼承本身，而是繼承的誤用或濫用，仔細思考多重繼承或受限多重繼承的問題，多半都在於實作上的衝突，這尤其發生在由上而下使用繼承時，開發者若只是為了可擁有某類別的既有功能而使用繼承，而無視於繼承架構的合理性，即使是單一繼承，也會引發繼承濫用問題。<br>
+      <br>
+      無論是多重繼承、可共用抽象實作的受限多重繼承或單一繼承，其問題發生原因多半在於繼承來源過於具體而不抽象。Java一開始限制介面沒有實作，就是強制在語法上限制多重繼承來源只能是抽象而不能有實作，Ruby的Mixin、Scala的Trait，JDK8的預設方法雖然放寬限制，但仍要求必須根據抽象進行實作，目的也是強制思考繼承來源是否過於具體。<br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/MultipleInheritance.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/CustomLayoutManager.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:36 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>自訂版面配置管理員（Layout Manager）</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: 自訂版面配置管理員（Layout Manager）</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>您可以繼承QLayout來自訂版面配置管理員，您要有一個儲存QLayoutItem的容器，例如QList，每個QLayoutItem代表一個被加入版面配置的Widget元件。並且您要重新定義QLayout的幾個方法：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>addItem()</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>定義元件如何加入Layout之中，通常是定義元件如何加入容器（例如QList）。</small></div>
+
+      
+      <ul>
+
+        <li>count()</li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>加入Layout的元件個數。</small></div>
+
+      
+      <ul>
+
+        <li><small>setGeometry()</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>定義元件實際的位置與大小配置方式。</small></div>
+
+      
+      <ul>
+
+        <li><small>sizeHint()</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>設定Layout的偏好尺寸（preferred size）。</small></div>
+
+      
+      <ul>
+
+        <li><small>itemAt()</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>定義如何根據索引取得QLayoutItem。</small></div>
+
+      
+      <ul>
+
+        <li><small>takeAt()</small></li>
+
+      
+      </ul>
+
+      
+      <div style="margin-left: 40px;"><small>定義如何根據索引取得並從容器中移除QLayoutItem。</small></div>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+      <small>除了以上幾個關於版面配置的方法必須實作之外，如果</small></span><span class="postbody"><small>不想讓您的整個版面縮小至會覆蓋當中的元件的話，</small></span><span class="postbody"><small>建議也實作minimumSize()，定義您的整個版面配置最小尺寸。<br>
+
+      <br>
+
+也可以看是否重新定義hasHeightForWidth()，傳回true或false，表示是否根據元件的寬度來設定版面配置的高度，如果hasHeightForWidth()傳回true就會呼叫</small></span><span class="postbody"><small>heightForWidth()</small></span><span class="postbody"><small>，您可以重新定義它，這讓整個版面有足夠的高度來顯示所有的元件。<br>
+
+      <br>
+
+另外，重新定義expandingDirections()，如果必要的話，決定是否可使用比sizeHint()更大的額外空間，預設是Qt::
+Vertical | Qt::Horizontal，表示必要的話，可以往水平或垂直方向自動擴展Layout空間，或傳回0表示不擴展。<br>
+
+      <br>
+
+關於自訂Layout的程式碼示範，可以參考Qt線上文件的範例</small></span><small><a href="http://doc.trolltech.com/4.3.3/layouts-flowlayout.html"> Flow Layout</a> </small>或<small> <a href="http://doc.trolltech.com/4.3.3/layouts-borderlayout.html">Border Layout</a></small><span class="postbody"><small>，當中有完整的程式碼示範。<br>
+
+      <br>
+
+當您自訂Widget時，如果使用版面管理員來配置child元件，則版面管理員會自動幫您配置Widget相關的版面屬性，如果您沒有使用版面管理員，
+而是自訂child元件的版面配置，則最好重新定義QWidget的相關方法以定義其在parent元件中的版面配置，像是sizeHint()以設定自
+訂Widgt的偏好尺寸，重新定義QWidget的minimunSize()以設定Widget的最小尺寸等。<br>
+
+      <br>
+
+定義版面配置，基本上不是件易事，可以的話，儘量使用Qt現有的版面配置管理，如果有需要自訂版面配置，建議參考一下Qt線上文件的 </small></span><small><a href="http://doc.trolltech.com/4.3.3/layout.html">Layout Management</a></small>。<br>
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><!-- adsense for content-->
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+
+
+
+
+<!-- adsense for content end--><br>
+
+
+
+
+
+
+
+
+
+
+
+<!-- adsense for content-->
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><!-- adsense for content end--></td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/CustomLayoutManager.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:09:36 GMT -->
+</html>

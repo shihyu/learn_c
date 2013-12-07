@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Scala/RulesForImplicits.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>轉換規則</title></head>
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Scala Gossip: 轉換規則</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Scala的字串直接使用 <a href="http://java.sun.com/javase/6/docs/api/java/lang/String.html">java.lang.String</a>，本身並沒有安插字串至原字串的方法，所以下面的程式會編譯錯誤：<br></small><pre>val old = "oz"<br>val young = old.insert(1, "r")   // 編譯錯誤<br>println(young)</pre><br><small>如果你想要有insert()方法可以使用，也許可以考慮使用 <a href="http://java.sun.com/javase/6/docs/api/java/lang/StringBuilder.html">java.lang.StringBuilder</a>，例如：<br></small><pre>val old = "oz"<br>val young = new StringBuilder(old).insert(1, "r")<br>println(young)   // orz</pre><br><small>這樣的程式看起來較為冗長，如果你想要讓insert()方法看起來更像是字串本身所內建的方法，則可以使用隱式轉換（Implicit conversion），例如：<br></small><pre><span style="font-weight: bold;">implicit</span> def stringToBuilder(s: String) = new StringBuilder(s)<br><br>val old = "oz"<br>val young = old.insert(1, "r")<br>println(young)    // orz</pre><br><small>上面這段程式可以順利編譯並執行，由於你將stringToBuilder()標示為<span style="font-weight: bold;">implicit</span>，它就變成隱式函式。當編譯器在執行程式時，發現old是個字串，本身並沒有insert()方法，它試著找看看名稱空間範圍（Scope）內是否有接受字串型態的函式，如果就套用該函式。也就是說，上面的程式，最後編譯器會將之變為以下：<br></small><pre>implicit def stringToBuilder(s: String) = new StringBuilder(s)<br><br>val old = "oz"<br>val young = stringToBuilder(old).insert(1, "r")<br>println(young)</pre><br><small>所以實際上，young變數的型態是java.lang.StringBuilder。事實上，在Scala中，如果你使用字串時，呼叫了java.lang.String所沒有的方法時，卻會有對應的結果，就是套用了隱式轉換，例如：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; "12345".foreach(print)<br>12345<br>scala&gt; "12345".reverse<br>res2: scala.runtime.RichString = 54321<br><br>scala&gt;<br></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+<br><small>注意到foreach與reverse都不是字串本身具有的方法，reverse所傳回的型態是 <a href="http://www.scala-lang.org/docu/files/api/scala/runtime/RichString.html">scala.runtime.RichString</a>，這是因為在 <a href="http://www.scala-lang.org/docu/files/api/scala/Predef$object.html">scala.Predef</a> 中定義了隱式函式stringWrapper()將字串轉為RichString：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">package scala</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">object Predef {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; implicit def stringWrapper(x: String) = new runtime.RichString(x)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp; &nbsp; ....</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></small><br></div><small><br>由於</small><small>預設import了</small><small>scala.Predef（也就是每個程式都相當於有import scala.Predef._），所以上面的例子，相當於：</small><small><br></small><table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">scala&gt; stringWrapper("12345").foreach(print)<br>12345<br>scala&gt; stringWrapper("12345").reverse<br>res4: scala.runtime.RichString = 54321<br><br>scala&gt;<br></span></small><span style="color: rgb(255, 255, 255);">
+
+
+
+
+            </span></td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+<br><small><br><br>在這邊其實已看到幾個編譯器套用隱式轉換的規則，首先就是<span style="font-weight: bold;">必須是被標示為implicit的函式或變數，才有機會被編譯器用於隱式轉換。再來是可套用的隱式轉換，必須在當時名稱空間範圍中，可以獨立識別（Single identifier）使用之函式或變數。</span>舉例來說，下面的程式會編譯失敗：<br></small><pre>object ImplicitUtil {<br>    implicit def stringToBuilder(s: String) = new StringBuilder(s)<br>}<br><br>val old = "oz"<br>val young = old.insert(1, "r") // 編譯錯誤<br>println(young)</pre><br><small>因為在這個程式中，無法以stringToBuilder()來呼叫函式，而必須使用ImplicitUtil.stringToBuilder()，這樣就不算是獨立識別，你可以使用import：<br></small><pre>object ImplicitUtil {<br>    implicit def stringToBuilder(s: String) = new StringBuilder(s)<br>}<br><br><span style="font-weight: bold;">import ImplicitUtil._</span><br><br>val old = "oz"<br>val young = old.insert(1, "r")<br>println(young)     // orz</pre><br><small>在</small> <small><big><a href="SingletonObject.html"><small>單
+例物件</small></a></big> 中看過</small><small>伴侶物件（Companion object），<span style="font-weight: bold;">編譯器也會搜尋轉換來源型態的伴侶物件，看看其中是否有定義符合的隱式轉換函式或變數，這是唯一不用符合獨立識別原則的情況。</span>例如：<br></small><pre>object <span style="font-weight: bold;">Some</span> {<br>    implicit def someToOther(s: <span style="font-weight: bold;">Some</span>) = new Other(s)<br>}<br><br>class Some<br>class Other(s: Some) {<br>    def doOther = "XD"<br>}<br><br>val s = new Some<br>println(s.doOther)   // XD</pre><small><br></small><small><span style="font-weight: bold;">如果在範圍內，你定義的隱式轉換來源型態與目的地型態，與另一個隱式轉換函式定義重複，那麼編譯器會不知道要套用哪個隱式轉換，因而發生編譯錯誤</span>。例如：<br></small><pre>implicit def stringToBuilder(s: String) = new runtime.RichString(s)<br>"12345".foreach(print)   // 編譯錯誤</pre><small><br>編譯這個程式時，會發生以下的錯誤：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">error: type mismatch;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;found&nbsp;&nbsp; : java.lang.String</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;required: ?{val foreach: ?}</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Note that implicit conversions are not applicable because they are ambiguous:&nbsp;both method <span style="color: red;">stringToRich</span> of type (String)scala.runtime.RichString&nbsp;and method <span style="color: red;">stringWrapper</span>
+in object Predef of type (String)scala.runtime.RichString&nbsp;are
+possible conversion functions from java.lang.String to <span style="color: red;">?{val foreach: ?}</span></span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">"12345".foreach(print)</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;^</span></small><br></div><small><br>記得先前提過，scala.Predef中定義了stringWrapper()隱式函式，它是將String轉為RichString，而你又定義了一個stringToRich()，也</small><small>是將String轉為RichString，編譯器沒辦法知道你要套用哪一個函式，直接回報錯誤！從這點也可以得知，<span style="font-weight: bold;">隱式轉換根據的是來源與目的地型態，而不是隱式函式或變數名稱，而且目的地型態，不是指隱式轉換的傳回值型態，而是指目的</span></small><small><span style="font-weight: bold;">物件的 </span><a href="StructuralTyping.html">結構型態（Structural typing）</a></small><small>。例如上例中，來源型態是字串，目的型態是<span style="font-weight: bold;">?{val foreach: ?}</span>。<br><br><span style="font-weight: bold;">隱式轉換一次只會套用一次</span>，也就是說，即使轉換後可以再套用另一個轉換，編譯器也不會對 x + y 作如 convert(convert1(x)) + y 連續套用的動作。<span style="font-weight: bold;">為了避免改變既有程式的運作，只要既有程式可以運作，編譯器也不會作隱式轉換的動作</span>。<br><br><br></small><small><br><br></small><br></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Scala/RulesForImplicits.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

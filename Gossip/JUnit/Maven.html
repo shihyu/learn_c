@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Maven.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:32 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>使用 Maven</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 使用 Maven<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在
+使用Ant時，你所需要作的，就是準備好相關的目錄架構、定義建構檔案、定義建構流程、自行管理程式庫的相依性、定義各種變數名稱、定義
+Classpath等，你的目錄要命名為什
+麼？你的建構流程順序為何？流程間的相依性為何？目標名稱為何？變數名稱為何？這些都可以自行決定，一切都很自由！<br>
+      <br>
+      <span style="font-weight: bold;">Ant提供給你的是建立建構環境（Build
+Environment）的工具</span>，因而以上的自定義彈性是Ant的優點，</small><small>彈性的另一面帶來的就是設定上的瑣
+碎與麻煩，</small><small>專案有時會出現某些固定的範例，所以經常地，另一個新的類似專案開始時，你可能會複製原有的某個專案，修改部份
+設定、修改建構流程等！你所需要的是一定的慣例，而不是花時間在瑣碎的設定上時，Ant也許不會是最好的選擇。<br>
+      <br>
+      <span style="font-weight: bold;">Maven提供你的是建構環境，或說是建構環境的框架
+（Framework）</span>。Maven的主要精神有：<br>
+      </small>
+      <ul style="font-weight: bold;">
+        <li><small>慣例先於設定（Convention over configuration）</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>舉例來說，在Maven中認為，專案開發遵循應某些慣例，
+這些慣例像是固定目錄的名稱與架構、固定變數的名稱、固定的<span style="font-weight: bold;">建構生命周期
+（Build lifecycle）</span>等。Maven認為你不應花費時間在這些慣例的設定上，而要將精神放在更重要的工作上。</small><br>
+      </div>
+      <small><br>
+      </small>
+      <ul style="font-weight: bold;">
+        <li><small>集中管理相依性（Dependency management）</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>正如在 </small><small><a href="Ivy.html">簡介 Apache Ivy</a> 中提到的，程式庫的相依性管理是個頭痛的問題，Maven使用集中式管理，提供<span style="font-weight: bold;">集中式的貯藏室（Central repository）</span>，你要在設定檔案宣告
+相依的程式庫等資訊，Maven會為你下載相關的檔案。<br>
+      </small></div>
+      <br>
+      <ul style="font-weight: bold;">
+        <li><small>plugin 為基礎的架構</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>Maven
+提供固定的建構生命周期，像是Default、Clean、Site等。在每個生命周期中，又會分作一些<span style="font-weight: bold;">階段（Phase）</span>，
+像是Default生命周期中，會有Validate、Compile、Test、Package、Integration
+test、Verify、Install、Deploy等階段，每個階段會有一些相繫結的plugin，Maven本身會有一些預設的plugin，你也
+可以在設定檔中依需求宣告想使用的plugin，Maven會自動取得plugin。</small><br>
+      </div>
+      <br>
+      <ul style="font-weight: bold;">
+        <li><small>專案物件模型（Project Object Model）</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>在Ant中使用build.xml來定義建構過程中的所有
+資訊，在Maven中與之對應的是<span style="font-weight: bold;">pom.xml</span>，不過
+pom.xml主要的目的是提供專案資訊，像是專案名稱、組織名稱、相依資訊等。例如：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;project&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;groupId&gt;cc.openhome&lt;/groupId&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;artifactId&gt;example&lt;/artifactId&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;packaging&gt;jar&lt;/packaging&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;name&gt;example&lt;/name&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;url&gt;http://maven.apache.org&lt;/url&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;properties&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;/properties&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;dependencies&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;dependency&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;groupId&gt;junit&lt;/groupId&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;artifactId&gt;junit&lt;/artifactId&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;version&gt;3.8.1&lt;/version&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;scope&gt;test&lt;/scope&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;
+&lt;/dependency&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;
+&lt;/dependencies&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/project&gt;</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+      </span>你不用像在Ant中提供建構動作等資訊。<span style="font-family: Courier New,Courier,monospace;">事實上，相關的建構資訊都是由一個父</span>POM<span style="font-family: Courier New,Courier,monospace;">繼承下來，事實上，你也可以定義POM繼
+承自另一個POM，像是相依性設定、</span>plugin<span style="font-family: Courier New,Courier,monospace;">設定等，這是其為何命名為POM的原因，
+就像是物件會有繼承關係，這樣的設定文件模型也可以有著繼承關係。</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"><br>
+      </span></small></div>
+      <br>
+      <small>先來直接使用Maven建構簡單的專案作為開始，你可以至 </small><a href="http://maven.apache.org/">http://maven.apache.org/</a> <small>下載
+Maven，將檔案解開後，在文字模式下設定<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">M2_HOME</span>環
+境變數為Maven的目錄，並在PATH中加入Maven目錄的bin目錄。要建立第一個Maven專案，可以如下執行指令：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;
+mvn archetype:create -DgroupId=cc.openhome -DartifactId=example<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">[INFO] Scanning for projects...<br>
+Downloading:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-clean-<br>
+plugin/2.4.1/maven-clean-plugin-2.4.1.pom<br>
+Downloaded:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-clean-p<br>
+lugin/2.4.1/maven-clean-plugin-2.4.1.pom (5 KB at 1.3 KB/sec)<br>
+Downloading:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugin<br>
+...略<br>
+[INFO] Parameter: groupId, Value: cc.openhome<br>
+[INFO] Parameter: packageName, Value: cc.openhome<br>
+[INFO] Parameter: package, Value: cc.openhome<br>
+[INFO] Parameter: artifactId, Value: example<br>
+[INFO] Parameter: basedir, Value: C:\workspace<br>
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT<br>
+[INFO] ********************* End of debug info from resources from
+generated POM<br>
+&nbsp;***********************<br>
+[INFO] project created from Old (1.x) Archetype in dir:
+C:\workspace\example<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] BUILD SUCCESS<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] Total time: 2:09.095s<br>
+[INFO] Finished at: Mon Jan 24 16:15:18 CST 2011<br>
+[INFO] Final Memory: 6M/15M<br>
+[INFO]
+------------------------------------------------------------------------</span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br class="Apple-interchange-newline">
+      <small>在這邊使用<span style="font-weight: bold;">mvn</span>指令呼叫了<span style="font-weight: bold;">maven-archetype-plugin</span>建立新專案，這是一個用來描述專
+案架構的plugin，如果這個plugin不存在，mvn會先下載相關檔案，</small><small>預設會下載至使用者目錄的.m2資料夾中，</small><small>然
+後依plugin的描述建立專案相關檔案與資料夾，依慣例，原始碼會放在<span style="font-weight: bold;">src/main/java</span>中，
+而測試相關原始碼會放在<span style="font-weight: bold;">test/java</span>中：<br>
+      <img style="border: 1px solid ; width: 491px; height: 250px;" alt="" src="images/Maven-1.png"><br>
+      </small><small><br>
+預設會在src/main/java</small><small>（加上你的套件名稱的資料夾）</small><small>中建立一個
+App.java，並在test/java</small><small>（加上你的套件名稱的資料夾）中建立一個AppTest.java，在建立的新
+專案根目錄中，還有個<span style="font-weight: bold;">pom.xml</span>，內容就如上面所列的XML，與
+Ant的build.xml不同的是，接下來要編譯、執行、打包程式，暫時都不用理會pom.xml，因為都有著既定的慣例（如果是Ant，接著你得先設
+定build.xml了）。<br>
+      <br>
+在建立新專案時，指定了<span style="font-weight: bold;">groupId</span>，這用來設定你的組織名稱，這
+會成為預設的套件名稱。在Maven的專案中管理各種的專案<span style="font-weight: bold;">製品
+（artifact）</span>，<span style="font-weight: bold;">artifactId</span>指的是這
+些製品的識別名稱，這將成為你存放製品的資料夾名稱，通常就是專案名稱。<br>
+      <br>
+App.java的內容只是個簡單的Hello World!：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>/**<br> * Hello world!<br> *<br> */<br>public class App<br>{<br>    public static void main( String[] args )<br>    {<br>        System.out.println( "Hello World!" );<br>    }<br>} <br></pre>
+      <small><br>
+如果想要編譯程式，可以如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;
+example&gt;mvn compile<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">[INFO] Scanning for projects...<br>
+[INFO]<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] Building example 1.0-SNAPSHOT<br>
+[INFO]
+------------------------------------------------------------------------<br>
+Downloading:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resour<br>
+ces-plugin/2.4.3/maven-resources-plugin-2.4.3.pom<br>
+Downloaded:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resourc<br>
+es-plugin/2.4.3/maven-resources-plugin-2.4.3.pom (6 KB at 1.8 KB/sec)<br>
+...略<br>
+[INFO] Compiling 1 source file to C:\workspace\example\target\classes<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] BUILD SUCCESS<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] Total time: 1:04.216s<br>
+[INFO] Finished at: Mon Jan 24 16:33:32 CST 2011<br>
+[INFO] Final Memory: 5M/15M<br>
+[INFO]
+------------------------------------------------------------------------<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>這呼叫了Maven的<span style="font-weight: bold;">maven-compiler-plugin</span>，
+如果還沒下載過這個plugin，同樣會先進行下載，然後進行編譯，編譯出來的東西，會放在<span style="font-weight: bold;">target\classes</span>中。<br>
+      <br>
+如果要指定某個具程式進入點的主類別執行程式，可以如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;
+mvn exec:java -Dexec.mainClass=cc.openhome.App<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">[INFO] Scanning for projects...<br>
+Downloading:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-surefi<br>
+re-plugin/2.7.1/maven-surefire-plugin-2.7.1.pom<br>
+Downloaded:
+http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-surefir<br>
+e-plugin/2.7.1/maven-surefire-plugin-2.7.1.pom (10 KB at 5.7 KB/sec)<br>
+...略<br>
+[INFO]<br>
+[INFO] --- exec-maven-plugin:1.2:java (default-cli) @ example ---<br>
+Hello World!<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] BUILD SUCCESS<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] Total time: 0.762s<br>
+[INFO] Finished at: Mon Jan 24 16:41:49 CST 2011<br>
+[INFO] Final Memory: 4M/15M<br>
+[INFO]
+------------------------------------------------------------------------<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>這會使呼叫Maven的<span style="font-weight: bold;">exec-maven-plugin</span>，
+你使用<span style="font-weight: bold;">exec.mainClass</span>來指定執行程式的主類別。<br>
+      <br>
+如果要包裝程式為JAR，可以如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;
+mvn package<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">[INFO] Scanning for projects...<br>
+[INFO]<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] Building example 1.0-SNAPSHOT<br>
+...略<br>
+[INFO] Compiling 1 source file to
+C:\workspace\example\target\test-classes<br>
+...略<br>
+-------------------------------------------------------<br>
+&nbsp;T E S T S<br>
+-------------------------------------------------------<br>
+Running cc.openhome.AppTest<br>
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015
+sec<br>
+            <br>
+Results :<br>
+            <br>
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0<br>
+...略<br>
+[INFO] Building jar:
+C:\workspace\example\target\example-1.0-SNAPSHOT.jar<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] BUILD SUCCESS<br>
+[INFO]
+------------------------------------------------------------------------<br>
+[INFO] Total time: 45.107s<br>
+[INFO] Finished at: Mon Jan 24 16:44:44 CST 2011<br>
+[INFO] Final Memory: 8M/21M<br>
+[INFO]
+------------------------------------------------------------------------<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);"></span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>在這邊，雖然你指定了包裝JAR，但Maven的建構生命周期有其相依順序，每個階段（Phase）前可能有必須先執行的階
+段，階段有點像Ant的目標（Target），在使用Ant時，你必須自行指定目標的相依性，但Maven中，階段與階段間的相依性有預設的慣例，如上所
+看到的，你必須先經過Compile階段、測試階段然後到包裝階段，包裝完成的JAR檔會放在<span style="font-weight: bold;">target</span>目錄中。</small><br>
+      <small><br>
+      <br>
+      </small><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/Maven.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:33 GMT -->
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/CustomELFunction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>自訂 EL 函式</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 自訂 EL 函式<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+</td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small> 如果你設計了一個<span style="font-family: Courier New,Courier,monospace;">Util</span>類別，當中有個<span style="font-family: Courier New,Courier,monospace;">length()</span>靜態方法可以將所傳入的<span style="font-family: Courier New,Courier,monospace;">Collection</span>長度傳回。例如原先可能這麼使用它：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;%= Util.length(reqeust.getAttribute("someList")) %&gt;</span></small><br>
+      </div>
+      <small><br>
+如果<span style="font-family: Courier New,Courier,monospace;">someList</span>實際上是個List介面實作，而其長度為10，這會傳回結果10。<br>
+      <br>
+如果函式的部份也可以使用EL來呼叫，以下也許是你想要的撰寫方式：<br>
+      </small>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">${ util:length(requestScope.someList)&nbsp; }</span></small><br>
+      </div>
+      <small><br>
+這樣的寫法著實簡潔許多，如果這是你想要的需求，則可以自訂EL函式來滿足這項需求。自訂EL函式的第一步是撰寫類別，它必須是個公開（public）類別，而想要呼叫的方法必須是公開且為靜態方法。例如你的<span style="font-family: Courier New,Courier,monospace;">Util</span>類別可能是這麼撰寫的：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.util.Collection;<br><br>public class Util {<br>    public static int length(Collection collection) {<br>        return collection.size();<br>    }<br>}<br></pre>
+      <br><small>
+Web容器必須知道如何將這個類別中的length()方法當作EL函式來使用，所以你必須撰寫一個<span style="font-weight: bold;">標籤程式庫描述檔（Tag Library Descriptor, TLD）</span>檔案，這個檔案是個XML文件，副檔名為<span style="font-weight: bold;">*.tld</span>。例如：</small><br>
+      <ul>
+        <li>openhome.tld</li>
+      </ul>
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;taglib version="2.1" xmlns="http://java.sun.com/xml/ns/javaee" <br>    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee<br>    http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"&gt;<br>  &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;<br>  &lt;short-name&gt;openhome&lt;/short-name&gt;<br><span style="font-weight: bold;">  &lt;uri&gt;http://openhome.cc/util&lt;/uri&gt;</span><br>  &lt;function&gt;<br>    &lt;description&gt;Collection Length&lt;/description&gt;<br><span style="font-weight: bold;">    &lt;name&gt;length&lt;/name&gt;</span><br><span style="font-weight: bold;">    &lt;function-class&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        cc.openhome.Util</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/function-class&gt;</span><br><span style="font-weight: bold;">    &lt;function-signature&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        int length(java.util.Collection)</span><br style="font-weight: bold;"><span style="font-weight: bold;">    &lt;/function-signature&gt;</span><br>  &lt;/function&gt;<br>&lt;/taglib&gt;<br></pre>
+      <br>
+      <small>在TLD檔案中，重要的部份已在程式碼中直接標示。<span style="font-family: Courier New,Courier,monospace;">${util.length(...)}的例子中，length名稱就對應於<span style="font-weight: bold;">&lt;name&gt;</span>標籤的設定，而實際上length名稱背後執行的類別與真正的靜態方法，則分別由<span style="font-weight: bold;">&lt;function-class&gt;</span>與<span style="font-weight: bold;">&lt;function-signature&gt;</span>來設定。至於<span style="font-weight: bold;">&lt;uri&gt;</span></span>標籤則是在JSP網頁中會使用到，稍後就會了解其作用。<br>
+      </small><br>
+      <small>你可以將這個TLD檔案直接放在WEB-INF資料夾下，如此容器會自動找到TLD檔案並載入。如果要放在JAR檔案中，設定的方式之後還會作說明。在這邊為了簡化，先將TLD檔案放在WEB-INF資料夾下。接著可以撰寫一個JSP來使用這個自訂EL函式。例如：<br>
+      </small>
+      <pre>&lt;%@page contentType="text/html" pageEncoding="UTF-8"%&gt;<br><span style="font-weight: bold;">&lt;%@taglib prefix="util" uri="http://openhome.cc/util"%&gt;</span><br>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"<br>   "http://www.w3.org/TR/html4/loose.dtd"&gt;<br><br>&lt;html&gt;<br>    &lt;head&gt;<br>        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>        &lt;title&gt;自訂EL函式&lt;/title&gt;<br>    &lt;/head&gt;<br>    &lt;body&gt;<br><span style="font-weight: bold;">        ${ util:length(requestScope.someList) }</span><br>    &lt;/body&gt;<br>&lt;/html&gt;<br></pre>
+      <br>
+      <small>在這邊使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">taglib</span>指示元素告訴容器，在轉譯這個JSP時，會用到對應<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">uri</span>屬性的自訂EL函式，容器會尋找讀入的TLD中，<span style="font-family: Courier New,Courier,monospace;">&lt;uri&gt;標籤設定中有對應uri屬性的名稱</span>，這就是剛才在openhome.tld中定義<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;uri&gt;</span>標籤的目的。至於<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">prefix</span>屬性則是設定前置名稱，如此若JSP中有多個來自不同設計者的EL自訂函式時，就可以避免名稱衝突的問題，所以要使用這個自訂EL函式時，就可以用<span style="font-family: Courier New,Courier,monospace;">${util:length(...)}</span>的方式。</small><br>
+      <br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/CustomELFunction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:54 GMT -->
+</html>

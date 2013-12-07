@@ -1,0 +1,843 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/CustomCallback.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>自訂 callback 函式</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">GTK Gossip: 自訂 callback 函式</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>您可以自訂callback函式，使用g_signa_connect()函式連接，在指定的Signal發生時呼叫自訂的callback函式，自訂的callback函式原型基本上是以下的形式：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px; font-family: Courier New,Courier,monospace; font-weight: bold;"><small>void func_name(GtkWidget *widget, ..., gpointer user_data);</small></div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+      第一個參數是發出信號的Widget指標，第二個參數是呼叫callback函式時，所要傳遞給callback函式的相關資料，舉個實際的例子，下面這個範例會有一個按鈕，當按下按鈕時，會在主控台下顯示指定的訊息：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+        <small>
+        </small><li><small>callback_demo.c</small></li>
+
+
+
+        <small>
+      </small>
+      
+      
+      
+      </ul>
+
+
+
+
+      
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">// 自訂Callback函式</span><br style="font-weight: bold;"><span style="font-weight: bold;">void button_clicked(GtkWidget *button, gpointer data) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    g_print("按鈕按下：%s\n", (char *) data);</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br><span style="font-weight: bold;">    GtkWidget *button;</span><br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br><br><span style="font-weight: bold;">    button = gtk_button_new_with_label("按我");</span><br><span style="font-weight: bold;">    gtk_container_add(GTK_CONTAINER(window), button);</span><br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><span style="font-weight: bold;">    g_signal_connect(GTK_OBJECT(button), "clicked",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     G_CALLBACK(button_clicked), "哈囉！按鈕！");</span><br><br>    gtk_widget_show(window);<br><span style="font-weight: bold;">    gtk_widget_show(button);</span><br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+
+      <small>
+      </small>
+
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>這個範例是以 </small></span><small><big><a href="SignalConnect.html"><small>使用 Signal&nbsp;關閉視窗</small></a></big>
+為基礎，增加了一個按鈕，程式中注意的是Callback函式的定義，而要產生一個具有文字的按鈕，可以使用
+gtk_button_new_with_label()函式，由於GtkWindow是GtkContainer的子類，所以它可以容納其它的
+Widget元件，在這邊使用gtk_container_add()函式將GtkButton加入GtkWindow之中，目前沒有設置任何版面配置，
+所以按鈕就填滿整個視窗。<br>
+
+
+
+
+      <br>
+
+
+
+
+要連接自訂的Callback函式，一樣使用g_signal_connect()，注意到雖然G_CALLBACK巨集會將函式指標轉換為無參數無傳回
+值的型態，但這不代表Callback函式不可以傳回值或帶有參數，實際操作時是依當時所連接的函式型態而定，在這邊，g_signal_connect()最後一個參數將傳遞給button_clicked()函式的data參數。<br>
+
+
+
+
+      <br>
+
+
+
+
+要顯示加入的GtkButton，在這邊再次使用gtk_widget_show()，您也可以直接使用gtk_widget_show_all()，將所有在指定的GtkContainer中的元件都顯示出來：<br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gtk_widget_show_all(window);</span></small><br>
+
+
+
+
+      </div>
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+
+      <small>一個執行時的畫面如下所示：<br>
+
+
+
+
+      <img style="width: 588px; height: 465px;" alt="" src="images/CustomSignal-1.jpg"><br>
+
+
+
+
+      <br>
+
+
+
+
+另一個較少使用的Signal連結函式是g_signal_connect_swapped()，它實際上也是個巨集，方便使用g_signal_connect_data()函式，定義如下：<br>
+
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">#define g_signal_connect_swapped(instance, detailed_signal, c_handler, data) \</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small>
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">g_signal_connect_data</span> ((instance), (detailed_signal), (c_handler), (data), NULL, G_CONNECT_SWAPPED)</span></small></span><br style="font-weight: bold;">
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><small>
+      <br>
+
+
+
+
+      它所對應的Callback函式應如下定義：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">void func_name(</small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">gpointer user_data, ..., </small><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">GtkWidget *widget);</small><br>
+
+
+
+      </div>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+
+      簡單的說，就是兩個參數對調，g_signal_connect_swapped()常用來接結僅接受一個單獨Widget作為參數的callback函式，舉個例子來說，像 <a href="http://library.gnome.org/devel/gtk/unstable/GtkWidget.html#gtk-widget-destroy">gtk_widget_destroy()</a> 函式：</small><br>
+
+
+
+      </span>
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;" class="postbody"><span style="font-weight: bold;">void gtk_widget_destroy(GtkWidget *widget);</span></span></small><br>
+
+
+
+      <span class="postbody"></span></div>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <small>這個函式會消除指定的Widget，若您在程式中，想要指定消除一個Widget，則可以使用這個函式，舉例來說，若要按下按鈕後，消除GtkWindow，則可以如下：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <ul>
+
+
+
+        <li><span class="postbody"><small>callback_demo.c</small></span></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *button;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br><br>    button = gtk_button_new_with_label("按我");<br>    gtk_container_add(GTK_CONTAINER(window), button);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><span style="font-weight: bold;">    g_signal_connect_swapped(GTK_OBJECT(button), "clicked",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                             G_CALLBACK(gtk_widget_destroy), window);</span><br><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+這個程式在按下按鈕後，會消去window所儲存的GtkWindow，由於這是唯一個GtkWindow，消除後程式也就跟著結束。您也可以如前一個範例，在自訂的button_clicked()函式中呼叫gtk_widget_destroy()：<br>
+
+
+
+      </small></span>
+      
+      
+      
+      <ul>
+
+
+
+        <li><small>callback_demo.c</small></li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+      <span class="postbody"></span>
+      
+      
+      
+      <pre>#include &lt;gtk/gtk.h&gt;<br><br><span style="font-weight: bold;">// 自訂Callback函式</span><br style="font-weight: bold;"><span style="font-weight: bold;">void button_clicked(GtkWidget *button, gpointer data) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">    gtk_widget_destroy((GtkWidget*) data);</span><br style="font-weight: bold;"><span style="font-weight: bold;">}</span><br><br>int main(int argc, char *argv[]) {<br>    GtkWidget *window;<br>    GtkWidget *button;<br><br>    gtk_init(&amp;argc, &amp;argv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    gtk_window_set_title(GTK_WINDOW(window), "哈囉！GTK+！");<br><br>    button = gtk_button_new_with_label("按我");<br>    gtk_container_add(GTK_CONTAINER(window), button);<br><br>    g_signal_connect(GTK_OBJECT(window), "destroy",<br>                     G_CALLBACK(gtk_main_quit), NULL);<br><span style="font-weight: bold;">    g_signal_connect(GTK_OBJECT(button), "clicked",</span><br style="font-weight: bold;"><span style="font-weight: bold;">                     G_CALLBACK(button_clicked), NULL);</span><br style="font-weight: bold;"><br>    gtk_widget_show_all(window);<br><br>    gtk_main();<br><br>    return 0;<br>}</pre>
+
+
+
+      <span class="postbody"><small><br>
+
+
+
+雖然程式的執行也可以透過按下按鈕消除GtkWindow，但直接使用g_signal_connect_swapped()會是比較直接的方式。<br>
+
+      <br>
+
+另也還有個g_signal_connect_after()函式值得注意，它實際也是巨集，定義如下：<br style="font-weight: bold;">
+
+      </small></span>
+      
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">#define g_signal_connect_after(instance, detailed_signal, c_handler, data) \</span></small></span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+      <span style="font-family: Courier New,Courier,monospace;" class="postbody"><small><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">g_signal_connect_data</span> ((instance), (detailed_signal), (c_handler), (data), NULL, G_CONNECT_AFTER)</span></small></span><br style="font-weight: bold;">
+
+      <span class="postbody"></span></div>
+
+      <span class="postbody"><small><br>
+
+
+
+      若您使用g_signal_connect_after()來連接callback函式，則該callback函式，會在所有使用g_signal_connect()設定的callback函式執行之後再執行。</small><br>
+
+      <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script><script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/GTKGossip/CustomCallback.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:12 GMT -->
+</html>

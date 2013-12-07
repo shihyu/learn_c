@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+    
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/ForestCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:56 GMT -->
+<head>
+        <meta content="text/html; charset=Big5" http-equiv="content-type">
+        <script type="text/javascript" src="js/turtle.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                function toRadians(angle) {
+                    return angle * Math.PI / 180;
+                }
+                
+                var ANGLE = 86.0, K1 = 1.5, K2 = 1.0, LENG = 2.0;
+                var K = 1.0 / (K1 + 2 *  K2 + 
+                    2 * (K1 +  K2) * Math.cos(toRadians(ANGLE)));
+                
+                function woods(leng) {
+                    if (leng > LENG) {
+                        turtle.move(leng);
+                        turtle.warp(-leng);
+                        
+                        // 實心倒影
+                        fillForest(leng); 
+                        
+                        woods(K * K1 * leng);
+                        turtle.turn(ANGLE);
+                        woods(K * K1 * leng);
+                        turtle.turn(-2 * ANGLE);
+                        woods(K * K1 * leng);
+                        turtle.turn(ANGLE);
+                        woods(K * leng);
+                        turtle.turn(ANGLE);
+                        woods(K *  K2 * leng);
+                        turtle.turn(-2 * ANGLE);
+                        woods(K *  K2 * leng);
+                        turtle.turn(ANGLE);
+                        woods(K *  K2 * leng);
+                    } else {
+                        turtle.warp(leng);
+                    }
+                } 
+                
+                function Point(x, y) {
+                    this.x = x;
+                    this.y = y;
+                }
+                
+                // 實心倒影
+                function fillForest(leng) {
+                    var p = [];
+                    // 畫主幹
+                    turtle.warp(K * K1 * leng);
+                    p[0] = new Point(turtle.currentX, turtle.currentY);
+                    turtle.turn(ANGLE);
+                    turtle.warp(K * K1 * leng);
+                    p[1] = new Point(turtle.currentX, turtle.currentY);
+                    turtle.turn(-2 * ANGLE);
+                    turtle.warp(K * K1 * leng);
+                    p[2] = new Point(turtle.currentX, turtle.currentY);
+                    turtle.polygon(p);
+                    
+                    // 畫右支幹
+                    turtle.turn(ANGLE);
+                    turtle.warp(K * leng);
+                    p[0] = new Point(turtle.currentX, turtle.currentY);
+                    turtle.turn(ANGLE);
+                    turtle.warp(K * K2 * leng);
+                    p[1] = new Point(turtle.currentX, turtle.currentY);
+                    turtle.turn(-2 * ANGLE);
+                    turtle.warp(K * K2 * leng);
+                    p[2] = new Point(turtle.currentX, turtle.currentY);
+                    turtle.polygon(p);
+                    
+                    // 支幹退回
+                    turtle.warp(-K * K2 * leng);
+                    turtle.turn(2 * ANGLE);
+                    turtle.warp(-K * K2 * leng);
+                    turtle.turn(-ANGLE);
+                    turtle.warp(-K * leng);
+                    turtle.turn(-ANGLE);
+                    // 主幹退回
+                    turtle.warp(-K * K1 * leng);
+                    turtle.turn(2 * ANGLE);
+                    turtle.warp(-K * K1 * leng);
+                    turtle.turn(-ANGLE);
+                    turtle.warp(-K * K1 * leng);
+                }                
+                
+                var canvas1 = document.getElementById('canvas1');
+                var context = canvas1.getContext('2d');
+
+                var turtle = new Turtle(context);
+                
+                turtle.window(0, 0, canvas1.width, canvas1.height);
+                
+                turtle.view(0, 0, canvas1.width, canvas1.height);
+                turtle.setPoint(10, canvas1.height / 2);
+                turtle.setAngle(0);
+                
+                woods(400);
+            };
+        </script>
+    </head>
+    <body>       
+        <canvas id="canvas1" width="420" height="400"></canvas>
+    </body>
+
+<!-- Mirrored from openhome.cc/Gossip/ComputerGraphics/html/ForestCurves-1.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:33:56 GMT -->
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/ThreeColorsFlags.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:33 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>三色旗</title></head><body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 三色旗</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+      
+      <h2>&nbsp;說明</h2>
+
+      <small>
+
+三色旗的問題最早由E.W.Dijkstra所提出，他所使用的用語為Dutch Nation Flag(Dijkstra為荷蘭人)，而多數的作者則使用Three-Color Flag來稱之。<br>
+
+      <br>
+
+
+
+假設有一條繩子，上面有紅、白、藍三種顏色的旗子，起初繩子上的旗子顏色並沒有順序，您希望將之分類，並排列為藍、白、紅的順序，要如何移動次數才會最少，注意您只能在繩子上進行這個動作，而且一次只能調換兩個旗子。</small>
+
+      <br>
+
+
+
+      
+      <h2>解法</h2>
+
+      <small>
+
+在一條繩子上移動，在程式中也就意味只能使用一個陣列，而不使用其它的陣列來作輔助，問題的解法很簡單，您可以自己想像一下在移動旗子，從繩子開頭進行，遇到藍色往前移，遇到白色留在中間，遇到紅色往後移，如下所示： </small><br>
+
+
+
+
+
+
+      
+      <div style="text-align: center;"><img style="width: 504px; height: 208px;" alt="三色旗" title="三色旗" src="images/threeColorsFlags-1.jpg"><br>
+
+
+
+      </div>
+
+      <small>
+
+
+
+
+只是要讓移動次數最少的話，就要有些技巧：<br>
+
+      </small>
+
+      
+      <ol>
+
+        <li><small>如果圖中W所在的位置為白色，則W+1，表示未處理的部份移至至白色群組。</small></li>
+
+        <li><small>如果W部份為藍色，則B與W的元素對調，而B與W必須各+1，表示兩個群組都多了一個元素。</small></li>
+
+        <li><small>如果W所在的位置是紅色，則將W與R交換，但R要減1，表示未處理的部份減1。</small></li>
+
+      
+      </ol>
+
+
+
+      <small><br>
+
+
+
+注意B、W、R並不是三色旗的個數，它們只是一個移動的指標；什麼時候移動結束呢？一開始時未處理的R指標會是等於旗子的總數，當R的索引數減至少於W的索引數時，表示接下來的旗子就都是紅色了，此時就可以結束移動，如下所示： </small><br>
+
+
+
+      
+      <div style="text-align: center;"><img style="width: 502px; height: 236px;" alt="三色旗" title="三色旗" src="images/threeColorsFlags-2.jpg"></div>
+
+
+
+      <br>
+      <small>如果可以使用雙向鏈結的話，則B可以再省去，在W遞增時，若遇到藍色，則將藍色移至鏈結前端且W+1，若遇到白色則W+1，若遇到紅色，則將紅色移至鏈結尾端且R-1。</small><br>
+
+
+
+      
+      <h2> 演算法</h2>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <pre>Procedure MOVE(Flags[]) <br>    w = 0<br>    b = 0<br>    r = LENGTH(Flags) - 1<br><br>    WHILE(Flags[w] == 'B' &amp;&amp; w &lt; LENGTH(Flags)) <br>        b = b + 1<br>        w = w + 1<br>    <br>    WHILE(Flags[r] == 'R' &amp;&amp; r &gt; 0)<br>        r = r - 1<br><br>    WHILE(w &lt;= r)<br>        IF(Flags[w] == 'W')<br>            w = w + 1<br>        ELSE IF(Flags[w] == 'B')<br>            SWAP(Flags[], b, w)<br>            b = b + 1<br>            w = w + 1<br>        ELSE<br>            SWAP(Flags[], r, w)<br>            r = r - 1<br></pre>
+
+
+
+
+
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><br>
+      </h2>
+
+
+
+
+
+      
+      <ul>
+
+        <li><a name="C"></a> C
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br>#include &lt;string.h&gt; <br><br>#define SWAP_FLAGS(x, y) { char temp; \<br>                     temp = flags[x]; \<br>                     flags[x] = flags[y]; \<br>                     flags[y] = temp; }<br><br>void printFlags(char* flags) {<br>    int i; <br>    for(i = 0; i &lt; strlen(flags); i++) {<br>        printf("%c ", flags[i]); <br>    }<br>    printf("\n");     <br>}<br><br>void adjust(char* flags) {<br>    int w = 0;<br>    int b = 0;<br>    int r = strlen(flags) - 1;<br>    while(flags[w] == 'B' &amp;&amp; w &lt; strlen(flags)) { b++; w++; }<br>    while(flags[r] == 'R' &amp;&amp; r &gt; 0) { r--; }<br>    while(w &lt;= r) switch(flags[w]) {<br>        case 'W':<br>               w++;<br>               break;<br>        case 'B':<br>               SWAP_FLAGS(b, w);<br>               b++; w++;<br>               break;<br>        case 'R':<br>               SWAP_FLAGS(r, w);<br>               r--;<br>    }<br>}<br><br>int main() {<br>    char flags[] = {'R', 'W', 'B', 'W', 'W', <br>                    'B', 'R', 'B', 'W', 'R', '\0'}; <br><br>    printFlags(flags);<br>    adjust(flags);<br>    printFlags(flags);<br><br>    return 0; <br>} <br></pre>
+
+
+
+
+      <br>
+
+
+
+
+      
+      <ul>
+
+        <li><a name="Java"></a> Java
+  </li>
+
+      
+      </ul>
+
+
+
+
+      
+      <pre>import java.util.*;<br><br>public class Flags {<br>    private static void swap(char[] arr, int x, int y) {<br>        char tmp = arr[x]; arr[x] = arr[y]; arr[y] = tmp;<br>    }<br>    <br>    public static String adjust(String flags) {<br>        char[] fs = flags.toCharArray();<br>        <br>        int b = 0, w = 0, r = fs.length - 1;<br>        while(fs[w] == 'B' &amp;&amp; w &lt; fs.length) { b++; w++; }<br>        while(fs[r] == 'R' &amp;&amp; r &gt; 0) { r--; }<br>        while(w &lt;= r) switch(fs[w]) {<br>            case 'W': <br>                w++;<br>                break;<br>            case 'B': <br>                swap(fs, b, w);<br>                b++; w++; <br>                break;<br>            case 'R': <br>                swap(fs, r, w);<br>                r--;<br>        }<br>        <br>        return new String(fs);<br>    }<br>    <br>    public static void main(String[] args) {<br>        System.out.println(adjust(args[0]));<br>    }<br>}</pre>
+
+
+
+      <br><ul><li><a name="Python"></a>Python</li></ul><pre>def adjust(flags):<br>    w = 0<br>    r = len(flags) - 1<br>    while flags[w] == "B" and w &lt; len(flags):<br>        w += 1<br>    while flags[r] == "R" and r &gt; 0:<br>        r -= 1<br>    while w &lt;= r:<br>        if flags[w] == "W":<br>            w += 1<br>        elif flags[w] == "B":<br>            flags.insert(0, flags.pop(w))<br>            w += 1<br>        elif flags[w] == "R":<br>            flags.append(flags.pop(w))<br>            r -= 1<br>    return flags<br><br>flags = list(input("輸入三色旗順序（ex. RWBBWRWR）："))<br>flags = adjust(flags)<br>print("移動順序後：", str(flags))</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>def adjust(flags: List[Char]) = {<br>    def categorize(bw: List[Char], remain: List[Char], <br>                   r: List[Char]): List[Char] = remain match {<br>                   <br>        case Nil   =&gt; bw ++ r<br>        case x::xs =&gt; x match {<br>            case 'W' =&gt; categorize(bw ++ List(x), xs, r)<br>            case 'B' =&gt; categorize(x::bw, xs, r)<br>            case 'R' =&gt; categorize(bw, xs, x::r)<br>        }<br>        <br>    }<br>    categorize(Nil, flags, Nil)<br>}<br><br>print("輸入三色旗順序（ex. RWBBWRWR）：")<br>adjust(readLine.toList).foreach(print)<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre># encoding: big5<br>def adjust(flags)<br>    w = 0<br>    r = flags.length - 1<br>    while flags[w] == "B" &amp;&amp; w &lt; r<br>        w += 1<br>    end<br>    while flags[r] == "R" &amp;&amp; r &gt; 0<br>        r -= 1<br>    end<br>    while w &lt;= r<br>        case flags[w]<br>        when "W"<br>            w += 1<br>        when "B"<br>            flags.insert(0, flags.slice!(w))<br>            w += 1<br>        when "R"<br>            flags &lt;&lt; flags.slice!(w)<br>            r -= 1<br>        end<br>    end<br>    <br>    flags<br>end<br><br>print "輸入三色旗順序（ex. RWBBWRWR）："<br>flags = gets.chomp!<br>flags = adjust(flags)<br>print "移動順序後：#{flags} \n"<br></pre>
+      <span style="font-family: &quot;Courier New&quot;,Courier,monospace;"><br>
+      </span>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>function adjust(flags) {<br>    var fs = flags.split("");<br>    var w = 0;<br>    var r = fs.length - 1;<br>    while(fs[w] === 'B' &amp;&amp; w &lt; fs.length) { w++; }<br>    while(fs[r] === 'R' &amp;&amp; r &gt; 0) { r--; }<br>    while(w &lt;= r) switch(fs[w]) {<br>        case 'W':<br>            w++; <br>            break;<br>        case 'B':<br>            fs.unshift(fs.splice(w, 1));<br>            w++;<br>            break;<br>        case 'R':<br>            fs.push(fs.splice(w, 1));<br>            r--;<br>    }<br>    return fs.join("");<br>    <br>}<br><br>print(adjust("RWBWRWBW").toString());<br></pre>
+      <span style="font-family: &quot;Courier New&quot;,Courier,monospace;"><br>
+</span>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>adjust flags = categorize [] flags []<br>               where categorize bw [] r = bw ++ r<br>                     categorize bw (x:xs) r = case x of <br>                             'W' -&gt; categorize (bw ++ [x]) xs r<br>                             'B' -&gt; categorize (x:bw) xs r<br>                             'R' -&gt; categorize bw xs (x:r)<br>               <br>main = print $ adjust "WBRRWBWRBWW"<br></pre>
+      <span style="font-family: &quot;Courier New&quot;,Courier,monospace;">
+<br>
+      </span></td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br><br>
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/ThreeColorsFlags.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:35 GMT -->
+</html>

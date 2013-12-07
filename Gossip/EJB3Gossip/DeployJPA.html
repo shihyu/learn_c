@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/DeployJPA.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:59 GMT -->
+<head>
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+  
+  
+  <title>部署 JPA</title>
+</head>
+
+
+<body>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 部署 JPA</a></h1>
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+      </td>
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>部署JPA時，必須存在persistence.xml設定檔，其必須位於類別路徑中META-INF資料夾之中，也就是說，若是封裝為EJB-JAR，則persistence.xml必須在EJB-JAR根目錄的META-INF資料夾中，</small><small>若是封裝為WAR，則persistence.xml必須在WEB-INF/classes/META-INF資料夾中，若是封裝為EAR，</small><small>則persistence.xml必須在EAR根目錄的META-INF資料夾中。<br>
+
+      <br>
+
+在Java EE模組中，Persistence Unit會有個獨一無二名稱，容器會以該名稱建立EntityManagerFactory，並用其建立</small><small>EntityManager，一個persistence.xml中可以定義多個</small><small>Persistence Unit，以名稱作為區隔。<br>
+
+      <br>
+
+若您是將Persistence Unit定義在EJB-JAR或WAR模組中，則</small><small>Persistence Unit的可見範圍僅在該模組之中，若您是將之定義在EAR中，則</small><small>Persistence Unit的可見範圍為整個應用程式。</small><br>
+
+      <small><br>
+
+以EJB-JAR為例，若要部署JPA，則其JAR檔案中的結構應類似以下黃色區塊部份：<br>
+
+      <br>
+
+      <img style="width: 483px; height: 373px;" alt="" src="images/DeployJPA-1.jpg"><br>
+
+      <br>
+
+orm.xml是選擇性使用，若您不使用Annotation來標註Entity類別，則可以將對應關係定義在orm.xml中，例如 </small><a href="FirstContainManagedJPA.html"><small>第一個 JPA（容器管理）</small></a><small> 的例子中，可以將User.java中所有的Annotation移除，在META-INF下建立一個orm.xml，程式亦可執行：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>orm.xml</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;entity-mappings <br>  version="1.0" xmlns="http://java.sun.com/xml/ns/persistence/orm"<br>  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"&gt;<br>   <br>   &lt;entity class="onlyfun.caterpillar.User" access="PROPERTY"&gt;<br>     &lt;table name="T_USER"/&gt;<br>      &lt;attributes&gt;<br>         &lt;id name="id"&gt;<br>             &lt;generated-value strategy="AUTO"/&gt;<br>         &lt;/id&gt;<br>      &lt;/attributes&gt;<br>   &lt;/entity&gt;<br>&lt;/entity-mappings&gt;</pre>
+
+      <small><br>
+
+orm.xml中可以定義多個&lt;entity&gt;，您也可以在persistence.xml中，使用&lt;mapping-
+file&gt;指定對應的XML檔案名稱，或是使用&lt;jar-file&gt;、&lt;class&gt;等來指定JAR或類別檔案以取得對應
+之訊息，例如：<br>
+
+      </small>
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">xsi:schemaLocation="http://java.sun.com/xml/ns/persistence </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &lt;persistence-unit name="sample" transaction-type="JTA"&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;jta-data-source&gt;jdbc/sample&lt;/jta-data-source&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &lt;mapping-file&gt;</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">user.xml&lt;/mapping-file&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &lt;mapping-file&gt;</small><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">room.xml&lt;/mapping-file&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &lt;exclude-unlisted-classes/&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &lt;jar-file&gt;some.jar&lt;/jar-file&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &nbsp; &lt;class&gt;onlyfun.caterpillar.Some&lt;/class&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;properties&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="toplink.ddl-generation" </small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value="drop-and-create-tables"/&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp;&nbsp;&nbsp; &lt;/properties&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&nbsp; &lt;/persistence-unit&gt;</small><br style="font-family: Courier New,Courier,monospace; font-weight: bold;">
+
+      <small style="font-family: Courier New,Courier,monospace; font-weight: bold;">&lt;/persistence&gt;</small><br>
+
+      </div>
+
+      <small><br>
+
+      </small></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/DeployJPA.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:01 GMT -->
+</html>

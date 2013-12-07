@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/DataSource.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>DataSource 注入</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: DataSource 注入</a></h1>
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>對於不同的資料連接來源需求，Spring提供了javax.sql.DataSource注入，更換資料來源只要在Bean定義檔中修改配置，而不用修改任何一行程式。<br>
+
+
+      <br>
+
+
+因應不同的系統，應用程式可能使用不同的資料來源，例如純綷的使用JDBC、透過連接池、或是透過JNDI等等，資料來源的更動是底層的行為，這些行為不
+應影響到上層的業務邏輯，為此，您可以在需要取得連接來源的Bean物件上保留一個Datasource注入的操作介面，
+Spring提供org.springframework.jdbc.datasource.DriverManagerDataSource來取得它的
+實例，DriverManagerDataSource實作了javax.sql.DataSource，您可以在Bean定義檔中這麼撰寫：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;beans&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;bean id="dataSource" </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; class="org.springframework.jdbc.</span></small><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">datasource.DriverManagerDataSource"&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="driverClassName"&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="url"&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;jdbc:mysql://localhost:3306/demo&lt;/value&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="username"&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;caterpillar&lt;/value&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property name="password"&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;123456&lt;/value&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/property&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; &lt;/bean&gt; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; ...</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;/beans&gt;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      </div>
+
+
+      <small><br>
+
+
+其中"driverClassName"、"url"、"username"、"password"四個屬性分別用來設定JDBC驅動程式類別、資料庫URL協定、使用者名稱、密碼。<br>
+
+
+      <br>
+
+
+在這邊實際使用一個程式來作為DataSource注入的示範，並也示範一下之前有關於DAO介紹的實作，假設您定義了一個DAO的操作介面如下：</small><br>
+
+
+      
+      
+      <ul>
+
+
+        <li>IUserDAO.java</li>
+
+
+      
+      
+      </ul>
+
+
+      <small></small>
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public interface IUserDAO {<br>    public void insert(User user);<br>    public User find(Integer id);<br>}</pre>
+
+
+      <br>
+
+
+      <small>這邊關於DAO的介面定義只有insert()與find()兩個方法。在這個介面中所使用到的User類別則如下定義：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>User.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class User {<br>    private Integer id;<br>    private String name;<br>    private Integer age;<br><br>    public Integer getId() {<br>        return id;<br>    }<br><br>    public void setId(Integer id) {<br>        this.id = id;<br>    }<br><br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>    <br>    public Integer getAge() {<br>        return age;<br>    }<br><br>    public void setAge(Integer age) {<br>        this.age = age;<br>    }<br>}</pre>
+
+
+      <small><br>
+
+
+接著您可以定義一個UserDAO類別，它實作了IUserDAO介面，是實際進行資料庫存取服務的物件，如下所示：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>UserDAO.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.sql.Connection;<br>import java.sql.ResultSet;<br>import java.sql.SQLException;<br>import java.sql.Statement;<br><br>import javax.sql.DataSource;<br><br>public class UserDAO implements IUserDAO {<br>    private DataSource dataSource;<br>    <br>    public void setDataSource(DataSource dataSource) {<br>        this.dataSource = dataSource;<br>    }<br>    <br>    public void insert(User user) {<br>       String name = user.getName();<br>       int age = user.getAge().intValue();<br>       <br>       Connection conn = null;<br>       Statement stmt = null;<br>       <br>        try {<br>            conn = dataSource.getConnection();<br>            stmt = conn.createStatement();<br>            stmt.execute("INSERT INTO user (name,age) " <br>                 + "VALUES('" + name + "'," + age + ")");<br>        } catch (SQLException e) {<br>            e.printStackTrace();<br>        }<br>        finally {<br>            if(stmt != null) {<br>                try {<br>                    stmt.close();<br>                }   <br>                catch(SQLException e) {<br>                    e.printStackTrace();<br>                }<br>            }<br>            if(conn != null) {<br>                try {<br>                    conn.close();<br>                }<br>                catch(SQLException e) {<br>                    e.printStackTrace();<br>                }<br>            }<br>        } <br>    }<br><br>    public User find(Integer id) {<br>        Connection conn = null;<br>        Statement stmt = null;<br>        <br>         try {<br>             conn = dataSource.getConnection();<br>             stmt = conn.createStatement();<br>             <br>             ResultSet result = stmt.executeQuery(<br>                 "SELECT * FROM user WHERE id=" + id.intValue());<br>             if(result.next()) {<br>                 Integer i = new Integer(result.getInt(1));<br>                 String name = result.getString(2);<br>                 Integer age = new Integer(result.getInt(3));<br>                 // 封裝為 User 物件<br>                 User user = new User();<br>                 user.setId(i);<br>                 user.setName(name);<br>                 user.setAge(age);<br>                 <br>                 return user;<br>             }<br>         } catch (SQLException e) {<br>             e.printStackTrace();<br>         }<br>         finally {<br>             if(stmt != null) {<br>                 try {<br>                     stmt.close();<br>                 }   <br>                 catch(SQLException e) {<br>                     e.printStackTrace();<br>                 }<br>             }<br>             if(conn != null) {<br>                 try {<br>                     conn.close();<br>                 }<br>                 catch(SQLException e) {<br>                     e.printStackTrace();<br>                 }<br>             }<br>         }    <br>         <br>         return null;<br>    }<br>}</pre>
+
+
+      <small><br>
+
+
+UserDAO類別上宣告了一個setDataSource()方法，可以讓您注入DataSource的實例，您可以在Bean定義檔中進行依賴注入的定義，如下所示：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>beans-config.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br>  "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br><br>&lt;beans&gt; <br>    &lt;bean id="dataSource" <br>          class="org.springframework.jdbc.datasource.DriverManagerDataSource"&gt;  <br>        &lt;property name="driverClassName"&gt; <br>            &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="url"&gt; <br>            &lt;value&gt;jdbc:mysql://localhost:3306/demo&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="username"&gt; <br>            &lt;value&gt;caterpillar&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="password"&gt; <br>            &lt;value&gt;123456&lt;/value&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>    <br>    &lt;bean id="userDAO" <br>          class="onlyfun.caterpillar.UserDAO"&gt;<br>        &lt;property name="dataSource"&gt;<br>            &lt;ref bean="dataSource"/&gt;<br>        &lt;/property&gt;<br>    &lt;/bean&gt;<br>&lt;/beans&gt;</pre>
+
+
+      <small><br>
+
+
+可以撰寫一個簡單的測試程式來操作UserDAO的實例，看看是否能進行資料的儲存與查詢：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>SpringDAODemo.java</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import org.springframework.context.ApplicationContext;<br>import org.springframework.context.<br>              support.FileSystemXmlApplicationContext;<br><br>public class SpringDAODemo {<br>    public static void main(String[] args) {<br>        ApplicationContext context = <br>            new FileSystemXmlApplicationContext(<br>                    "beans-config.xml");<br>        <br>        User user = new User();<br>        <br>        user.setName("caterpillar");<br>        user.setAge(new Integer(30));<br>        <br>        IUserDAO userDAO = <br>            (IUserDAO) context.getBean("userDAO");<br><br>        userDAO.insert(user);<br>        <br>        user = userDAO.find(new Integer(1));<br>        <br>        System.out.println("name: " + user.getName());<br>    }<br>} </pre>
+
+
+      <small><br>
+
+
+在進行程式的測試之前，當然的您要先開啟資料庫服務，並將beans-config.xml中相關的驅動程式類別、資料庫URL、使用者名稱與密碼等修改為您的設定，在這邊我所使用的是MySQL資料庫，而我所建立的user表格是使用以下的SQL來建立的：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">CREATE TABLE user (</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; id INT(11) NOT NULL auto_increment PRIMARY KEY,</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; name VARCHAR(100) NOT NULL default '',</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; age INT</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">);</span></small><br>
+
+
+      </div>
+
+
+      <small><br>
+
+
+程式的執行結果會先在資料庫的user表格中存入一筆資料，接著根據id值查詢出先前所存入的資料，最後結果會顯示"name: caterpillar"的文字。<br>
+
+
+      <br>
+
+
+您需要spring-core.jar、spring-beans.jar、spring-context.jar、spring-dao.jar與
+spring-jdbc.jar這幾個檔案，如果您使用的是spring.jar，當中已經包括了相關API，另外也需要相依的commons-
+logging.jar，當然，為了使用JDBC，您必須要有JDBC驅動程式的jar檔。<br>
+
+
+      <br>
+
+
+
+      </small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/DataSource.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+</html>

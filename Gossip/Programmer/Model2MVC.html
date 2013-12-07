@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Model2MVC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>MVC 與 Model 2 的變異與結合</title>
+    <meta content="caterpillar" name="author">
+    <meta content="Programmer" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">程式人專欄: MVC 與 Model 2 的變異與結合<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article"> iThome 網站首載：<a href="http://www.ithome.com.tw/itadm/article.php?c=77330">MVC 與 Model 2 的變異與結合</a><br>
+      <br>
+      MVC是開發者耳熟能詳的軟體架構模式，然而由於Web應用程式的流行，今日多數開發者談及MVC聯想到的其實是Model 2，MVC與Model 2基本上都是將系統劃分為Model、View和Controller三個部份，最大不同在於Model與View間的互動方式，隨著軟、硬體技術的進化與應用程式規模的擴展，MVC/Model 2的應用方式也在調整、改變與結合，藉由探討MVC與Model 2本質上的異同，有助於瞭解MVC/Model 2的演進與變化方向。<br>
+      <br>
+      <dl>
+        <dt>傳統桌面MVC模式</dt>
+      </dl>
+      <br>
+      MVC模式最早由Trygve Reenskaug在1974年提出，為Xerox PARC為Smalltalk創造的軟體設計模式，最早是應用於桌面應用程式開發。在MVC中最易理解的部份是使用者可見與操作的View，具體實例之一是視窗畫面，MVC基本工作流程之一從使用者在畫面上操作開始，此操作對Controller發出請求，Controller根據請求的類型與參數，將請求轉發（或呼叫）對應Model進行處理，之後Controller可轉發請求至View，View會提取Model資料呈現結果；另一個可行工作流程是Model處理後狀態有變，通知對Model狀態有興趣並曾註冊的View，由View提取Model資料以呈現最新結果。<br>
+      <br>
+      MVC模式的好處：<br>
+      <ol>
+        <li>藉由Controller居中協調，View不會直接對Model作出任何變更操作，View只負責呈現邏輯（Presentation logic），也就是根據Model資料呈現結果，相關操作對應的商務邏輯（Business logic）不存在View中。</li>
+        <li>Controller負責商務邏輯中請求參數的收集與驗證，更複雜的商務邏輯轉交Model處理，這使得Controller維持輕巧，Model也具有較高的重用性，Controller也負責調配對應的View，所以Model不會與View耦合。</li>
+        <li>Model不會知道或決定View實際呈現方式，View可以獨立於Model自由變化。</li>
+        <li>Model狀態有變化時，曾向Model註冊過的多個View都可獲得通知而得到同步更新效果。</li>
+      </ol>
+      第三項也許是最重要的優點，相較於Controller與Model來說，View相對來說最常變化，畢竟使用者往往對操作畫面要求最多也最善變，將Model與View切割後，Model就可以相對穩定地進行發展；而且View往往會由專門的使用者介面設計者負責，可能是專門的美術或設計師，未必擅長實際採用的技術，但可透過工具進行介面設計，讓View可以獨立於技術成份重的Model自由變化，有助於團隊成員間的分工合作。<br>
+      <br>
+      <dl>
+        <dt>基於HTTP的Model 2模式</dt>
+      </dl>
+      <br>
+      實際上MVC模式本身並沒有明確定義，因而採納MVC模式中最大特徵「將系統劃分為Model、View和Controller三個部份」，並將三個部份的互動流程因實際應用場合進行調整，都可說是一種MVC模式，其中最為人熟悉的就是Web應用程式經常採用的Model 2，又稱Web MVC，或由於過於流行而直接稱MVC了。<br>
+      <br>
+      Web應用程式先天就會被物理性劃分Model、View和Controller三個部份，View通常是客戶端的瀏覽器依取得的HTML繪製畫面，Controller會位於Web伺服器，與資料庫互動的部份則是Model；傳統MVC模式實作的桌面應用程式，MVC三個部份通常位於同一台電腦，或者是透過持續性網路連線進行互動，然而對於基於HTTP的Web應用程式來說，由於HTTP基於請求/回應（Request/Response）模型，沒有請求就不會有回應，因此無法實現傳統MVC中Model主動通知View的流程，如果View想根據Model最新狀態來呈現畫面，基本作法之一是透過持續性地主動詢問（Poll）伺服端Model來達成。<br>
+      <br>
+      基於HTTP限制而調整傳統MVC互動流程，得到的模式稱之為Model 2，除了Model無法主動View之外，基本上Model 2的優點與上述傳統MVC的前三項優點是相同的。Model 2概念最早出現在1998年JSP規格書0.92版中，規格書中提及兩個模型，第一個模型稱為Model 1（因為文件提及的順序），第二個模型稱為Model 2。1999年Govind Seshadri在Javaworld發表了《Understanding JavaServer Pages Model 2 architecture》文章，其影響之一是將Model 2界定為架構模式，第二個影響是確立Model 2為Web應用程式提供了一種MVC架構。<br>
+      <br>
+      Model 1中通常會將請求發給某個網頁動態元件（例如JSP或Servlet），由它處理請求參數收集、驗證、商務處理以及畫面回應，有些商務邏輯亦可能會封裝成Model（例如JavaBean），然而前端元件亦要處理請求參數收集、驗證與畫面回應，程式碼與畫面設計勢必形成義大利麵式的混亂，也因而Model 1通常應用在規模較小、任務簡單的Web應用程式。<br>
+      <br>
+      <dl>
+        <dt>MVC與Model 2的異同</dt>
+      </dl>
+      <br>
+      儘管由於HTTP模型限制，使得Model 2無法達成傳統MVC中Model主動通知View的流程，然而MVC與Model 2有許多相似點，除了系統同被劃分為Model、View和Controller三個部份之外，Model 2中通常根據URL模式（Pattern）決定哪個Controller要接收View發送的請求參數，實際上在傳統MVC中，Controller名稱與方法簽署（Method signature）就相當於Model 2的URL模式，而方法的參數名稱與實際接收的引數，就相當HTTP請求中的參數名稱與值。<br>
+      <br>
+      舉例來說，在實現Model 2時可定義從/messages/view?bid=34&amp;id=123，決定使用<span class="courier">MessagesController</span>的<span
+        class="courier">view</span>方法來處理bid與id請求參數；相對地，若有個桌面應用程式，畫面操作時若呼叫<span
+        class="courier">messagesController.view(bid, id)</span>，則<span class="courier">messagesController</span>變數結合<span
+        class="courier">view</span>方法簽署，就相當於Model 2中URL模式，而<span class="courier">bid</span>與<span
+        class="courier">id</span>變數就相當於請求參數。Web應用程式的網頁會設定發送表單的動作（action）對象，桌面應用程式會設定按鈕操作時呼叫的Controller與方法，兩者意義實際相同。<br>
+      <br>
+      隨著Ajax技術被廣泛地應用，以及伺服端非同步處理技術的進步，由於HTTP模型而造成的限制亦逐漸被克服。Web應用程式中為了取得Model最新狀態，即使使用傳統的持續詢問方式，已不再需要重清（Refresh）整個頁面，可利用Ajax在背景取得代表Model狀態的中性資料，而後用JavaScript更新畫面上相應的即可。如果要作到更接近主動通知的概念，也就是在Model狀態有變化時View可立即得到更新，伺服端可保留一定數量非同步請求暫不回應，一旦Model狀態變化再進行回應，效果上就可達到傳統MVC模型中Model主動通知View的流程。<br>
+      <br>
+      <dl>
+        <dt>職責轉變多樣化的MVC/Model 2</dt>
+      </dl>
+      <br>
+      隨著JavaScript、DOM、Ajax應用越來越廣泛，甚至HTML5新API的推波助瀾，同一Web應用程式中同時實現傳統MVC與Model 2的場合越來越常見。<br>
+      <br>
+      傳統Web應用程式中View原本由伺服端產生相關畫面，現在轉移給瀏覽器進行更動態的呈現方式，瀏覽器中亦可有自成一體的應用程式，由HTML、DOM、CSS作為View的實現，JavaScript用以實現Controller與Model，就能在瀏覽器中實現傳統MVC模式應有流程，瀏覽器中JavaScript撰寫的Model，可將伺服端比擬為資料庫，向伺服端取得資料，就像是對資料庫進行查詢，Ajax是與伺服端溝通的機制，伺服端傳回資料可能是中性資料格式、HTML或CSS組成的畫面片段，甚至是一段待執行的JavaScript程式碼。<br>
+      <br>
+      無論如何，傳統Model 2中View的職責減輕了，這有助於開發者職責的劃分。過去由伺服端產生所有回應畫面的情境下，網頁設計師雖可獨立於Model設計畫面，但使用的元件仍會與伺服端技術有關（像是JSTL自訂標籤等），如果採用的伺服端技術不同，設計師就得學習使用不同的元件。當原本伺服端的View將組織畫面的職責卸下，交給瀏覽器處理之後，設計師可專心使用瀏覽器上的JavaScript、DOM、CSS等相關技術，只要協調好與伺服端的資料交換格式，設計師甚至可以先行製作假資料，完全獨立於伺服端工作進度之外完成自身任務。<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <p></p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Programmer/Model2MVC.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:20 GMT -->
+</html>

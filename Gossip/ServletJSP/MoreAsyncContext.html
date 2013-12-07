@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/MoreAsyncContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:28 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>更多 AsyncContext</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 更多 AsyncContext<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>如果你的Servlet或過濾器的<span style="font-family: Courier New,Courier,monospace;">asyncSupported被標示為true，則它們支援非同步請求處理，在不支援非同步處理的</span>Servlet<span style="font-family: Courier New,Courier,monospace;">或過濾器中呼叫startAsync()，會丟出</span></small><small><span style="font-family: Courier New,Courier,monospace;">IllegalStateException。</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+當你在支援非同步處理的</span>Servlet<span style="font-family: Courier New,Courier,monospace;">或過濾器中呼叫請求物件的startAsync()</span>方法時，該次請求會離開容器所分配的執行緒，這意謂著必須回應處理流程會返回，也就是若有過濾器，也會依序返回（也就是各自完成<span style="font-family: Courier New,Courier,monospace;">FilterChain的doFilter()</span>方法），但最終的回應被延遲。<br>
+      <br>
+你可以呼叫<span style="font-family: Courier New,Courier,monospace;">AsyncContext的complete()方法完成回應，而是呼叫<span style="font-weight: bold;">forward()</span></span>方法，將回應轉發給別的Servlet/JSP處理，<span style="font-family: Courier New,Courier,monospace;">AsyncContext的forward()</span>就如同 </small><small><big><a href="DispatchRequest.html"><small>調派請求</small></a></big> 中所介紹的功能，將請求的回應權派送給別的頁面來處理，所給定的路徑是相對於<span style="font-family: Courier New,Courier,monospace;">ServletContext</span>的路徑。你不可以自行在同一個<span style="font-family: Courier New,Courier,monospace;">AsyncContext上同時呼叫complete()與forward()，這會丟出IllegalStateException。<br>
+      <br>
+不可以在兩個非同步處理的</span>Servlet<span style="font-family: Courier New,Courier,monospace;">間派送前，連續呼叫兩次startAsync()，否則會丟出</span></small><small><span style="font-family: Courier New,Courier,monospace;">IllegalStateException。</span></small><br>
+      <small><span style="font-family: Courier New,Courier,monospace;"><br>
+將請求從支援非同步處理的</span>Servlet<span style="font-family: Courier New,Courier,monospace;">（</span></small><small><span style="font-family: Courier New,Courier,monospace;">asyncSupported被標示為true</span></small><small><span style="font-family: Courier New,Courier,monospace;">）派送至一個同步處理的</span>Servlet<span style="font-family: Courier New,Courier,monospace;">是可行的（</span></small><small><span style="font-family: Courier New,Courier,monospace;">asyncSupported被標示為false</span></small><small><span style="font-family: Courier New,Courier,monospace;">），此時，容器會負責呼叫AsyncContext的complete()。<br>
+      </span><br>
+如果從一個同步處理的Servlet派送至一個支援非同步處理的Servlet，在</small><small>非同步處理的Servlet中呼叫<span style="font-family: Courier New,Courier,monospace;">AsyncContext的startAsync()，將會丟出IllegalStateException。<br>
+      <br>如果你對AsyncContext的啟始、完成、逾時或錯誤發生等事件有興趣，可以實作<span style="font-weight: bold;">AsyncListener</span>：<br>
+</span></small>
+      <div style="margin-left: 40px;"><small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">package javax.servlet;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import java.io.IOException;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">import java.util.EventListener;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">public interface AsyncListener extends EventListener {</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; void onComplete(AsyncEvent event) throws IOException;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; void onTimeout(AsyncEvent event) throws IOException;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; void onError(AsyncEvent event) throws IOException;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; void onStartAsync(AsyncEvent event) throws IOException;</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">}</span></span></small><br style="font-weight: bold;">
+      <small><span style="font-family: Courier New,Courier,monospace;"></span></small></div>
+      <small><span style="font-family: Courier New,Courier,monospace;">
+      </span></small>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">AsyncContext有個<span style="font-weight: bold;">addListener()</span>方法，可以讓你加入AsyncListener的實作物件，在對應的事件發生時會呼叫AsyncListener實作物件的對應方法。</small><br>
+<br><small style="font-family: Courier New,Courier,monospace;">如果呼叫AsyncContext的dispatch()，將請求調派給別的</small><small>Servlet</small><small style="font-family: Courier New,Courier,monospace;">，則可以透過請求物件的getAttribute()取得以下的屬性：</small><br>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      javax.servlet.async.request_uri</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+javax.servlet.async.context_path</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+javax.servlet.async.servlet_path</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+javax.servlet.async.path_info</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+javax.servlet.async.query_string</span></small><br>
+      </div>
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">這幾個屬性的值，分別等於呼叫HttpServletRequest的getRequestURI()、getContextPath()、getServletPath()、getPathInfo()與getQueryString()。<br>
+      <br>
+      </small>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table><br>
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/MoreAsyncContext.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:28 GMT -->
+</html>

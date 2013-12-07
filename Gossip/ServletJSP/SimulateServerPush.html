@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/SimulateServerPush.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:28 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>模擬伺服器推播</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Servlet/JSP Gossip: 模擬伺服器推播<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>HTTP是基於請求、回應模型，HTTP伺服器無法直接對客戶端（瀏覽器）直接傳送訊息，因為沒有請求就不會有回應。在這種請求、回應模型下，如果客戶端想要獲得伺服端應用程式的最新狀態，必須以定期（或不定期）方式發送請求，查詢伺服端的最新狀態。<br>
+      <br>
+持續發送請求以查詢伺服端最新狀態，這種方式的問題在於耗用網路流量，如果多次的請求過程，伺服端應用程式狀態並沒有變化，那這多次的請求所耗用的流量就是浪費的。<br>
+      <br>
+一個解決的方式是，伺服端將每次請求的回應延後，直到伺服端應用程式狀態有變化時再行回應，當然如此的話，客戶端將會處於等待回應狀態，如果是瀏覽器，可
+以搭配Ajax非同步請求技術，而使用者將不會因此而被迫停止網頁的操作。然而伺服端延後請求的話，若是Servlet/JSP技術，等於該請求佔用一個
+執行緒，若客戶端很多，每個請求都佔用執行緒，將會造成伺服端極度的效能負擔。<br>
+      <br>
+如 </small><small><big><a href="AsyncContext.html"><small>簡介 AsyncContext</small></a></big> 中介紹的，</small><small>Servlet 3.0中所提供的非同步處理技術，可以解決每個請求佔用執行緒的問題，若搭配瀏覽器端Ajax非同步請求技術，就可達到類似伺服端主動通知瀏覽器的行為，也就是所謂的伺服端推播（Server push）。<br>
+      <br>
+以下是實際的例子，模擬應用程式會不定期產生最新資料，這是實作在<span style="font-family: Courier New,Courier,monospace;">ServletContextListener</span>，在應用程式啟動時進行：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.util.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.WebListener;<br><br>@WebListener()<br>public class WebInitListener implements ServletContextListener {<br>   // 所有非同步請求的AsyncContext將儲存至這個List<br><span style="font-weight: bold;">    private List&lt;AsyncContext&gt; asyncs = new ArrayList&lt;AsyncContext&gt;();</span><br>    @Override<br>    public void contextInitialized(ServletContextEvent sce) {<span style="font-weight: bold;"></span><br><span style="font-weight: bold;">        sce.getServletContext().setAttribute("asyncs", asyncs);</span><br>        new Thread(new Runnable() {<br>            @Override<br>            public void run() {<br>                while (true) {<br>                    try {<br>                        // 模擬不定時<br>                        Thread.sleep((int) (Math.random() * 10000));<br>                        // 隨機產生數字<br>                        double num = Math.random() * 10;<br>                        synchronized (asyncs) {<br>                            // 逐一完成非同步請求<br style="font-weight: bold;"><span style="font-weight: bold;">                            for (AsyncContext ctx : asyncs) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                ctx.getResponse().getWriter().println(num);</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                ctx.complete();</span><br style="font-weight: bold;"><span style="font-weight: bold;">                            }</span><br>                            asyncs.clear();<br>                        } <br>                    } catch (Exception e) {<br>                        e.printStackTrace();<br>                    }<br>                }<br>            }<br>        }).start();<br>    }<br><br>    @Override<br>    public void contextDestroyed(ServletContextEvent sce) {<br>    }<br>}<br></pre>
+      <small><br>
+      <span style="font-family: Courier New,Courier,monospace;">在這個ServletContextListener中，有個List會儲存所有非同步請求的AsyncContext，並在產生數字後，逐一對客戶端回應，並呼叫AsyncContext的complete()來完成請求。</span><br>
+      <br>
+負責接受請求的Servlet，一收到請求，就將之加入<span style="font-family: Courier New,Courier,monospace;">List</span>之中：<br>
+      </small>
+      <pre>package cc.openhome;<br><br>import java.io.*;<br>import java.util.*;<br>import javax.servlet.*;<br>import javax.servlet.annotation.*;<br>import javax.servlet.http.*;<br><br>@WebServlet(name="AsyncNumServlet", urlPatterns={"/asyncNum.do"},<br>             asyncSupported = true)<br>public class AsyncNumServlet extends HttpServlet {<br> <span style="font-weight: bold;">   private List&lt;AsyncContext&gt;  asyncs;</span><br>    <br>    @Override<br>    public void init() throws ServletException {<br><span style="font-weight: bold;">        asyncs = (List&lt;AsyncContext&gt;) getServletContext()</span><br style="font-weight: bold;"><span style="font-weight: bold;">                                        .getAttribute("asyncs");</span><br>    }<br><br>    @Override<br>    protected void doGet(HttpServletRequest request,<br>                                 HttpServletResponse response)<br>    throws ServletException, IOException {<br><span style="font-weight: bold;">        AsyncContext ctx = request.startAsync();</span><br style="font-weight: bold;"><span style="font-weight: bold;">        synchronized(asyncs) {</span><br style="font-weight: bold;"><span style="font-weight: bold;">            asyncs.add(ctx);</span><br style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br style="font-weight: bold;">    } <br>}<br></pre>
+      <br>
+      <small>可以使用一個簡單的HTML，其中使用Ajax技術，發送非同步請求至伺服端，這個請求會被延遲，直到伺服端完成回應後，更新網頁上對應的資料，並再度發送非同步請求：<br>
+      </small>
+      <pre>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;<br>&lt;html&gt;<br>  &lt;head&gt;<br>    &lt;title&gt;即時資料&lt;/title&gt;<br>    &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;<br>    &lt;script type="text/javascript"&gt;<br>        function asyncUpdate() {<br>            var xhr;<br>            if(window.XMLHttpRequest) {<br>                xhr = new XMLHttpRequest();<br>            }<br>            else if(window.ActiveXObject) {<br>                xhr = new ActiveXObject('Microsoft.XMLHTTP');<br>            }<br>            <br>            xhr.onreadystatechange = function() {<br>                if(xhr.readyState == 4) {<br>                    if(xhr.status == 200) {<br>                        document.getElementById('data')<br>                                      .innerHTML = xhr.responseText;<br>                        asyncUpdate();<br>                    }<br>                }<br>            };<br>            xhr.open('GET', 'asyncNum.do?timestamp=' + new Date().getTime());<br>            xhr.send(null);<br>        }<br>        <br>        window.onload = asyncUpdate;<br>    &lt;/script&gt;<br>  &lt;/head&gt;<br>  &lt;body&gt;<br>      即時資料: &lt;span id="data"&gt;0&lt;/span&gt;<br>  &lt;/body&gt;<br>&lt;/html&gt;  <br></pre>
+      <br>
+      <small>可以試著使用多個瀏覽器視窗來請求這個頁面，你會看到每個瀏覽器視窗的資料都是同步的。</small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/ServletJSP/SimulateServerPush.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:17:28 GMT -->
+</html>

@@ -1,0 +1,1039 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/CGossip/MallocFree.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>malloc()、free()、calloc() 與 realloc()</title></head><body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">C&nbsp;Gossip: malloc()、free()、calloc() 與 realloc()</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>
+到目前為止，您都是事先宣告好所要使用的變數，當程式開始執行時，這些變數就會自動被配置記憶體空間。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+然而有時有些變數並不知道何時會被使用，您希望在使用到的時候再配置空間給變數，並在變數不使用的時候，將變數所佔有的空間還給記憶體，這時候我們可以使
+用malloc()與free()函式。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+舉個簡單的例子來說，您可以在程式中以動態的方式來配置一個int型態大小的記憶體，例如： <br>
+
+
+
+
+
+      </small>
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int *ptr = malloc(sizeof(int));</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+在這段程式中，malloc()運算子會配置一個int所需要的空間，並傳回該空間的位址，所以您使用指標ptr來儲存這個位址，這段程式只配置空間但不初始空間中
+的儲存值<span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">。<br>
+
+
+
+      <br>
+
+
+
+      </span></span></small><small>以下使用一個簡單的程式來示範動態配置的使用：<br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h&gt;<br><br>int main(void) {<br>    int *ptr = malloc(sizeof(int)); <br><br>    printf("空間位置:%X\n", ptr);<br>    printf("空間儲存值：%d\n", *ptr);<br><br>    *ptr = 200; <br><br>    printf("空間位置:%X\n", ptr);<br>    printf("空間儲存值：%d\n", *ptr);<br><br>    free(ptr);<br>        <br>    return 0;<br>}</pre>
+
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span><small>
+執行結果：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">空間位置:A31330<br>
+
+
+
+空間儲存值：10717912<br>
+
+
+
+空間位置:A31330<br>
+
+
+
+空間儲存值：200</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>
+使用malloc()函式動態配置的空間，在整個程式結束前並不會自動歸還給記憶體，您必須使用free()函式將這個空間還給記憶體，如上面的程式在結束前所作的動
+作，在這個程式中，雖然顯示完畢後程式也就結束，但這邊還是 示free() 的用法，而這也是個好習慣，日後您的程式在持續執行過程中若大量使用malloc()而
+沒有適當的使用free()的話，由於空間一直沒有歸還，最後將導致整個記憶體空間用盡。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+接下來看一個簡單的動態記憶體配置的應用，您知道陣列使用的一個缺點，就是陣列的大小必須事先決定好，然而有時候您無法知道我們會使用多大的陣列，或者希
+望由使用者自行決定陣列大小，這時候您就可以使用動態記憶體配置加上指標運算來解決這個問題，先說明陣列動態配置的方式，如下所示： <br>
+
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">int *arr = malloc(1000 * sizeof(int));</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+
+這段程式碼動態配置了1000個int大小的空間，並傳回空間的第一個位址，配置後的空間資料是未知的，您可以使用calloc()來宣告空間配置，例如：<br>
+
+
+
+      </small>
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace; font-weight: bold;">int *arr = calloc(1000, sizeof(int));</small><br>
+
+
+
+      </div>
+
+
+
+      <small>
+
+      <br>
+
+
+
+這個程式將宣告1000個int大小的空間，並將所有的空間值初始為0。同樣的，使用malloc()或calloc()配置得來的空間，在不使用時應該使用free()歸還給記憶體，方法如下： <br>
+
+
+
+
+
+      </small>
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">free(arr);</span><br>
+
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+
+      <small>
+
+      <br>
+
+
+
+
+
+
+下面這個程式是個陣列動態配置的簡單示範： <br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h&gt;<br><br>int main(void) {<br>    int size = 0; <br><br>    printf("請輸入陣列長度："); <br>    scanf("%d", &amp;size); <br>    int *arr = malloc(size * sizeof(int));<br><br>    int i;<br>    <br>    printf("顯示元素值：\n");<br>    for(i = 0; i &lt; size; i++) {<br>        printf("arr[%d] = %d\n", i, *(arr+i));<br>    } <br>        <br>    printf("指定元素值：\n"); <br>    for(i = 0; i &lt; size; i++) { <br>        printf("arr[%d] = ", i); <br>        scanf("%d" , arr + i); <br>    } <br><br>    printf("顯示元素值：\n");<br>    for(i = 0; i &lt; size; i++) {<br>        printf("arr[%d] = %d\n", i, *(arr+i));<br>    } <br><br>    free(arr); <br>    <br>    return 0;<br>}</pre>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      </span><small>
+執行結果：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">顯示元素值：<br>
+
+
+
+arr[0] = 25892816<br>
+
+
+
+arr[1] = 8983344<br>
+
+
+
+arr[2] = 0<br>
+
+
+
+arr[3] = 0<br>
+
+
+
+指定元素值：<br>
+
+
+
+arr[0] = 1<br>
+
+
+
+arr[1] = 2<br>
+
+
+
+arr[2] = 3<br>
+
+
+
+arr[3] = 4<br>
+
+
+
+顯示元素值：<br>
+
+
+
+arr[0] = 1<br>
+
+
+
+arr[1] = 2<br>
+
+
+
+arr[2] = 3<br>
+
+
+
+arr[3] = 4</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>
+您也可以使用指標來模擬二維陣列，只要清楚二維陣列中的兩個維度的索引值之位移量就可以了，這在 <a href="TwoDimArray.html">二維陣列</a> 中有談到了，下面這個程式是個簡單的示範： <br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h&gt;<br><br>int main(void) {<br>    int m = 0;<br>    int n = 0; <br><br>    printf("輸入二維陣列維度(m*n)："); <br>    scanf("%d*%d", &amp;m, &amp;n); <br><br>    int *ptr = malloc(m * n * sizeof(int)); <br> <br>    int i, j;<br>    for(i = 0; i &lt; m; i++) {<br>        for(j = 0; j &lt; n; j++) {<br>            *(ptr + n*i + j) = i + j; <br>        }<br>    }<br><br>    for(i = 0; i &lt; m; i++) { <br>        for(j = 0; j &lt; n; j++) {<br>            printf("%d\t", *(ptr+n*i+j)); <br>        } <br>        putchar('\n');<br>    } <br><br>    free(ptr); <br>        <br>    return 0;<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+      </small><small>
+執行結果：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">輸入二維陣列維度(m*n)：2*3<br>
+
+
+
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br>
+
+
+
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+      <small>如果要改變先前配置的記憶體大小，則可以使用realloc()，您必須先使用malloc()、calloc()或realloc()配置記憶體，而後使用所得到的位址來使用realloc()重新配置記憶體大小，例如：</small><small><br>
+
+
+
+      </small>
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h&gt;<br><br>int main(void) {<br>    int size = 0; <br><br>    printf("請輸入陣列長度："); <br>    scanf("%d", &amp;size); <br>    int *arr1 = malloc(size * sizeof(int));<br><br>    int i;<br>            <br>    printf("指定元素值：\n"); <br>    for(i = 0; i &lt; size; i++) { <br>        printf("arr1[%d] = ", i); <br>        scanf("%d" , arr1 + i); <br>    } <br><br>    printf("顯示元素值：\n");<br>    for(i = 0; i &lt; size; i++) {<br>        printf("arr1[%d] = %d\n", i, *(arr1+i));<br>    } <br><br><span style="font-weight: bold;">    int *arr2 = realloc(arr1, sizeof(int) * size * 2);</span><br>    printf("顯示元素值：\n");<br>    for(i = 0; i &lt; size * 2; i++) {<br>        printf("arr2[%d] = %d\n", i, *(arr2+i));<br>    }<br>	<br>    printf("arr1 address: %d\n", arr1);<br>    printf("arr2 address: %d\n", arr2);<br>	<br>    free(arr2);<br><br>    return 0;<br>}</pre>
+
+
+
+      <small><br>
+
+
+
+      </small><small>
+執行結果：</small><br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+
+
+          <tr>
+
+
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">請輸入陣列長度：2<br>
+
+
+指定元素值：<br>
+
+
+arr1[0] = 1<br>
+
+
+arr1[1] = 2<br>
+
+
+顯示元素值：<br>
+
+
+arr1[0] = 1<br>
+
+
+arr1[1] = 2<br>
+
+
+顯示元素值：<br>
+
+
+arr2[0] = 1<br>
+
+
+arr2[1] = 2<br>
+
+
+arr2[2] = 1599361871<br>
+
+
+arr2[3] = 1128613955<br>
+
+
+arr1 address: 5771032<br>
+
+
+arr2 address: 5771032</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+
+            </span></td>
+
+
+
+
+
+
+          </tr>
+
+
+
+
+
+
+        
+        
+        
+        
+        
+        </tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+      <small>在這邊要注意的是，</small><small>上例中，arr1與arr2的位址相同並不保證，</small><small>realloc
+()會需要複製資料來改變記憶體的大小，若原位址有足夠的空間，則使用原位址調整記憶體的大小，若空間不足，則重新尋找足夠的空間來進行配置，</small><small>在這個情況下，realloc()前舊位址的空間會被釋放掉，</small><small>因此，您必
+須使用realloc()所傳回的新位址，而不該使用舊位址，若realloc()失敗，則傳回空指標（null）。最好是進行檢查：<br></small><div style="margin-left: 40px;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">int *arr2 = realloc(arr1, sizeof(int) * size * 2);</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">if(!arr2) arr1 = arr2;</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">....</small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-weight: bold; font-family: Courier New,Courier,monospace;">free(arr1);</small><br></div><small>
+
+
+      </small><br>
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      
+      
+       <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       <br>
+
+
+
+      </center>
+
+
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/CGossip/MallocFree.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:08:06 GMT -->
+</html>

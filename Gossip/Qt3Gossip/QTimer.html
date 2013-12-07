@@ -1,0 +1,837 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QTimer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:37 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>使用 QTimer 製作數位時鐘</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index.html">Qt3 Gossip: 使用 QTimer 製作數位時鐘</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>這個範例改寫自Qt的線上範例，利用Timer定時發出QTimerEvent事件，以製作一個LCD數位時鐘。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+首先編輯dclock.h定義檔： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>dclock.h</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <small>
+      </small>
+      
+      
+      
+      
+      
+      <pre>#ifndef DCLOCK_H<br>#define DCLOCK_H<br><br>#include &lt;qlcdnumber.h&gt;<br><br>class DigitalClock : public QLCDNumber {<br>    Q_OBJECT<br>public:<br>    DigitalClock(QWidget *parent=0, const char *name=0);<br><br>protected:<br>    void timerEvent(QTimerEvent *);<br><br>private slots:<br>    void showTime();<br><br>private:<br>    bool showingColon;<br>};<br><br>#endif<br></pre>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+再來是編輯dclock.cpp實作定義檔的內容： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>dclock.cpp</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <small>
+      </small>
+      
+      
+      
+      
+      
+      <pre>#include "dclock.h"<br>#include &lt;qdatetime.h&gt;<br><br>DigitalClock::DigitalClock(QWidget *parent, const char *name)<br>    : QLCDNumber(parent, name) {<br>    showingColon = FALSE;<br>    setFrameStyle(QFrame::Panel | QFrame::Raised);<br>    setLineWidth(2);<br>    showTime();<br>    QObject::startTimer(500);<br>}<br><br>void DigitalClock::timerEvent(QTimerEvent *e) {<br>    showTime();<br>}<br><br>void DigitalClock::showTime() {<br>    showingColon = !showingColon;<br>    QString s = QTime::currentTime().toString().left(5);<br>    if (!showingColon)<br>        s[2] = ' ';<br>    if (s[0] == '0')<br>        s[0] = ' ';<br>    display(s);<br>}<br></pre>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+最後是主程式main.cpp： <br>
+
+
+
+
+      </small>
+      
+      
+      
+      
+      <ul>
+
+
+
+
+        <li>main.cpp</li>
+
+
+
+
+      
+      
+      
+      
+      </ul>
+
+
+
+
+      <small>
+      </small>
+      
+      
+      
+      
+      
+      <pre>#include "dclock.h"<br>#include &lt;qapplication.h&gt;<br><br>int main(int argc, char **argv) {<br>    QApplication app(argc, argv);<br><br>    DigitalClock *clock = new DigitalClock;<br><br>    clock-&gt;resize(170, 80);<br>    clock-&gt;setCaption("Digital Clock");<br><br>    app.setMainWidget(clock);<br><br>    clock-&gt;show();<br><br>    return app.exec();<br>}<br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small>接下來我們逐一說明這個程式中新遇到的類別、函式與主要的邏輯。</small><small>Qt中的QTimer會定時發出QTimerEvent事件，我們設定了timerEvent(QTimerEvent *)來接收這個事件，一旦接收到QTimerEvent事件，timerEvent()的內容就會被執行：</small><br style="font-weight: bold;">
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">protected: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; void timerEvent(QTimerEvent *); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">private slots: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; void showTime(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">private: </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; bool showingColon; </span></small><br>
+
+
+
+
+
+      </div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+showTime()是個自訂的Slot，我們將在這個函式中實作顯示時間的程式，showingColon用來表示是否顯示數位時鐘的秒數冒號：<br>
+
+
+
+
+
+      </small>
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">DigitalClock::DigitalClock(QWidget *parent, const char *name) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; : QLCDNumber(parent, name) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; showingColon = FALSE; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; setFrameStyle(QFrame::Panel | QFrame::Raised); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; setLineWidth(2); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; showTime(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QObject::startTimer(500); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <br style="font-weight: bold;">
+
+
+
+
+
+      </div>
+
+
+
+
+
+      <small>實作DigitalClock類別的建構函式，用來初始一些變數、視窗樣式與啟動QTimer等，setFrameStyle
+()設定了QLCDNumber的外框樣式，並使用setLineWidth()設定外框為2個像素寬，QObject::startTimer
+(500)表示啟動QTimer，並設定每500毫秒（0.5秒）發出QTimerEvent事件，在建構函式中，我們也使用showTime()初次取
+得系統時間。 <br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      </small><small>當接收到QTimerEvent時，這個函式就會被執行，而它目前只有一個陳述句，就是呼叫showTime()：</small><br style="font-weight: bold;">
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void DigitalClock::timerEvent(QTimerEvent *e) { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; showTime(); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br>
+
+
+
+
+
+      </div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      </small><small>QTimer::currentTime()會取得系統時間，我們使用toString()將之轉換為QString字串，並使用left
+(5)取字串中的左邊5個字元；showingColon只有兩種狀態，TRUE或FALSE，如果為TRUE，就顯示冒號，否則就將字串中冒號的位置設
+為空白，如此就會有一閃一閃的效果：</small><br style="font-weight: bold;">
+
+
+
+
+
+      
+      
+      
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">void DigitalClock::showTime() { </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; showingColon = !showingColon; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; QString s = QTime::currentTime().toString().left(5); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if (!showingColon) </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s[2] = ' '; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; if (s[0] == '0') </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s[0] = ' '; </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp; display(s); </span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+
+      <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">} </span></small><br>
+
+
+
+
+
+      </div>
+
+
+
+
+
+      <small><br>
+
+
+
+
+
+程式的執行結果就如下圖所示： <br>
+
+
+
+
+
+      <img style="width: 178px; height: 107px;" alt="" src="images/QTimer-1.jpg"><br>
+
+
+
+
+
+      </small><span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+      <br>
+      <br>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt3Gossip/QTimer.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:22:38 GMT -->
+</html>

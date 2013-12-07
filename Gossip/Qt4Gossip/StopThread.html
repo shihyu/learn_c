@@ -1,0 +1,520 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/StopThread.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:08 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>執行緒的停止</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Qt4 Gossip: 執行緒的停止</a></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>如果想要停止執行緒，QThread有個terminate()方法，但是這個方法並不建議使用，因為執行緒會直接停止正在進行的程式流程，無論現在是在流程的哪個位置，這會使得一些資源的善後工作無法完成，或因程式流程嘎然中止而導致不可預期的程式錯誤。<br>
+
+      <br>
+
+一個執行緒要停止，基本上就是執行完run()方法，讓它進入完成（Finished），</small><small>簡單的說，如果您想要停止一個執行緒的執行，就要提供一個方式讓執行緒可以執行完run()，而這也是您自行實作執行緒停止的基本概念。<br>
+
+      <br>
+
+      </small><small>如果執行緒的run()方法中執行的是一個重複執行的迴圈，您可以提供一個flag來控制迴圈是否執行，藉此讓迴圈有可能終止、執行緒可以離開 run()方法以終止執行緒，以下面的實例來說，您提供一個bool的stopped變數：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>MessageThread.h</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#ifndef MESSAGETHREAD_H<br>#define MESSAGETHREAD_H<br><br>#include &lt;QThread&gt;<br><br>class MessageThread : public QThread {<br>    Q_OBJECT<br>    <br>public:<br>    MessageThread();<br>    void setMessage(const QString &amp;message);<br>    void stop();<br>    <br>protected:<br>    void run();<br>    <br>private:<br>    QString msg;<br>    bool stopped;<br>};<br><br>#endif</pre>
+
+      <small><br>
+
+在這個類別中，您可以藉由setMessage()設定要顯示的訊息文字，在run()方法中，while迴圈由stopped變數判斷是否繼續迴圈：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>MessageThread.cpp</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include "MessageThread.h"<br>#include &lt;iostream&gt;<br>using namespace std;<br><br>MessageThread::MessageThread() {<br>    this-&gt;stopped = false;<br>}<br><br>void MessageThread::setMessage(const QString &amp;msg) {<br>    this-&gt;msg = msg;<br>}<br><br>void MessageThread::stop() {<br>    stopped = true;<br>}<br><br>void MessageThread::run() {<br>    while (!stopped) {<br>        cerr &lt;&lt; qPrintable(msg) &lt;&lt; endl;<br>        QThread::sleep(1);<br>    }<br>}</pre>
+
+      <small><br>
+
+      </small><small>若要停止執行緒，可以呼叫stop()方法，這會使得stopped變數設為true，而使得while迴圈可以結束，從而可以讓執行緒執行完run()而進入完成。<br>
+
+      <br>
+
+要判斷執行緒是否正在執行，可以使用QThread的isRunning()方法，要判斷執行緒是否完成，可以使用QThread的isFinished()，以下可以寫個簡單的程式來使用以上的MessageThread：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>DemoDialog.h</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#ifndef DEMODIALOG_H<br>#define DEMODIALOG_H<br><br>#include "MessageThread.h"<br>#include &lt;QDialog&gt;<br><br>class QWidget;<br>class QPushButton;<br>class QCloseEvent;<br><br>class DemoDialog : public QDialog {<br>    Q_OBJECT<br>    <br>public:<br>	DemoDialog(QWidget *parent = 0);<br><br>public slots:<br>    void startOrStop();<br>	<br>protected:<br>    void closeEvent(QCloseEvent *event);<br><br>private:<br>    QPushButton *btn;<br>    MessageThread thread;<br>};<br><br>#endif</pre>
+
+      <small></small>
+
+
+
+
+
+
+
+
+
+      <span class="postbody"><br>
+
+      <small>程式中會有個按鈕，按下後可以啟動另一個執行緒，並設定按鈕文字為「Stop」，若再按下，則會呼叫
+MessageThread的stop()停止執行緒，此時設定按鈕文字為「Finished」，並設定按鈕為不可按下，執行緒完成後，再呼叫其
+start()方法是沒有作用的：</small><br>
+
+      </span>
+      
+      <ul>
+
+        <li><small>DemoDialog.cpp</small></li>
+
+      
+      </ul>
+
+      
+      <pre>#include "DemoDialog.h"<br>#include "MessageThread.h"<br>#include &lt;QPushButton&gt;<br>#include &lt;QVBoxLayout&gt;<br>#include &lt;QCloseEvent&gt;<br><br><br>DemoDialog::DemoDialog(QWidget *parent) : QDialog(parent) {<br>    btn = new QPushButton("Start", this);<br>    QVBoxLayout *layout = new QVBoxLayout;<br>    layout-&gt;addWidget(btn);<br>    this-&gt;setLayout(layout);<br>    <br>    thread.setMessage("message....");<br>    <br>    connect(btn, SIGNAL(clicked()), this, SLOT(startOrStop()));<br>}<br><br>void DemoDialog::startOrStop() {<br>    if(<span style="font-weight: bold;">thread.isRunning()</span>) {<br><span style="font-weight: bold;">        thread.stop();</span><br>        btn-&gt;setText("Finished");<br>        btn-&gt;setEnabled(false);<br>    }<br>    else {<br><span style="font-weight: bold;">        thread.start();</span><br>        btn-&gt;setText("Stop");<br>    }<br>}<br><br>void DemoDialog::closeEvent(QCloseEvent *event) {<br>    thread.stop();<br><span style="font-weight: bold;">    thread.wait();</span><br>    event-&gt;accept();<br>}</pre>
+
+      <span class="postbody"><br>
+
+      <small>QThread的wait()方法，可以確實的等待執行緒完成，再進行接下來的動作，您也可以指定wait()的時間，在時間到時，無論如何就進行接下來的動作。<br>
+
+      <br>
+
+可以撰寫以下的簡單程式來使用DemoDialog：<br>
+
+      </small></span>
+      
+      <ul>
+
+        <li><span class="postbody"><small>main.cpp</small></span></li>
+
+      
+      </ul>
+
+      
+      <pre>#include &lt;QApplication&gt;<br>#include "DemoDialog.h"<br><br>int main(int argc, char *argv[]) {<br>    QApplication app(argc, argv);<br>    <br>    DemoDialog *demoDialog = new DemoDialog;<br>    demoDialog-&gt;setWindowTitle("Thread Demo");<br>    demoDialog-&gt;resize(200, 50);<br>    demoDialog-&gt;show();<br>    <br>    return app.exec();<br>}</pre>
+
+      <span class="postbody"><br>
+
+      </span><small>
+
+
+有關於執行緒的終止，還可以參考 <a href="../DesignPattern/TwoPhaseTermination.htm">Two-phase Termination 模式</a>。</small><br>
+
+      <span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+      </span> </td>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+
+      <br>
+      
+      <center>
+      
+      
+      
+      
+       <br>
+
+
+
+
+
+      </center>
+
+
+
+
+
+ </td>
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<span class="postbody"><br>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+</span>
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/Qt4Gossip/StopThread.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:08 GMT -->
+</html>

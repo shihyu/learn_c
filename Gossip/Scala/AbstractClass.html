@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  
+<!-- Mirrored from openhome.cc/Gossip/Scala/AbstractClass.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+<head>
+    <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+    <link rel="stylesheet" href="css/print.css" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>抽象類別</title>
+  </head>
+  <body>
+    <h3><a href="../index.html">From
+        Gossip@Openhome</a></h3>
+    <h1><a href="index-2.html">Scala Gossip: 抽象類別</a></h1>
+    <table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0"
+      cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top; width: 250px; text-align: center;">
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+          </td>
+          <td style="vertical-align: top; width: 690px; text-align: left;"><small>定
+              義類別，本身就是在進行抽象化，如果一個類別定義時不完整，有些狀態或行為必須留待子類別來具體實現，則它是個<span style="font-weight: bold;">抽
+                象類別（Abstract Class）</span>。例如，在定義銀行帳戶時，你也許想將一些帳戶的共同狀態與行為定義在父類別中：<br>
+            </small>
+            <pre><span style="font-weight: bold;">abstract</span> class Account {<br><span
+style="font-weight: bold;">    protected var bal: Int</span><br style="font-weight: bold;"><span
+style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    def id: String</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">    def name: String</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">    def withdraw(amount: Int)</span><span
+style="font-weight: bold;">    </span><br style="font-weight: bold;"><span style="font-weight: bold;">    protected def balance_=(bal: Int)</span><br
+style="font-weight: bold;"><br>    def balance = bal<br>    <br>    def deposit(amount: Int) {<br>        require(amount &gt; 0)<br>        <span
+style="font-weight: bold;">balance =</span> balance - amount<br>    }<br>    <br>    override def toString = "Id:\t\t" + id + <br>                            "\nName:\t\t" + name +<br>                            "\nBalance:\t" + balance<br>}</pre>
+            <small><br>
+              在
+              上面的類別中，粗體字中的定義都是未完成的，例如bal沒有指定值，在Scala中，宣告參考名稱之後一定要明確指定值，除非它是在抽象類別
+              中的資料成
+              員；方法id、name、withdraw()與balance_=()都是未實作的，定義中僅表示，這個類別中將會有這些行為（方法）可以
+              操作，例如在
+              deposit()中，就操作了balance_=()方法。<br>
+              <br>
+              由於上面的Account定義是未完成的，因此在類別宣告上加上<span style="font-weight: bold;">abstract</span>關
+              鍵字，表示這是個抽象類別（如果你熟悉Java，會注意到與Java不同的地方是，未實作的方法並不用加上abstract關鍵字）。<br>
+              <br>
+              你可以繼承Account類別並實作抽象方法以及具體定義抽象資料成員。例如：<br>
+            </small>
+            <pre>class SavingAccount(<span style="font-weight: bold;">val id: String</span>, <span
+style="font-weight: bold;">val name: String</span>) extends Account {<br><span style="font-weight: bold;">    protected var bal = 0</span><br>    <br><span
+style="font-weight: bold;">    protected def balance_=(bal: Int) {</span><br style="font-weight: bold;"><span
+style="font-weight: bold;">        this.bal = bal</span><br style="font-weight: bold;"><span
+style="font-weight: bold;">    }</span><br><br><span style="font-weight: bold;">    def withdraw(amount: Int) = {</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">        require(amount &gt; 0)</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">        if(amount &lt;= bal) {</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">            bal -= amount</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">        else {</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">            throw new RuntimeException("餘額不足")</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">        }</span><br
+style="font-weight: bold;"><span style="font-weight: bold;">    }</span><br style="font-weight: bold;">}</pre>
+            <small><br>
+              如
+              果在父類別中是抽象成員，在實作同名方法時，並不用加上override關鍵字，例如上例中的balance_=()、withdraw()
+              方法實作，由
+              於方法與資料成員屬於同一個名稱空間，若你願意，也可以將父類別中同名的方法改定義為val定義，如上例中的id與name。<br>
+              <br>
+              你可以如下使用以上的類別定義：<br>
+            </small>
+            <pre>val acct = new SavingAccount("123-456-789", "Justin Lin")<br>acct.deposit(5000)<br>acct.withdraw(1000)<br>println(acct)<br><br>// 多型操作<br><span
+style="font-weight: bold;">val account: Account = acct </span><br>account.deposit(5000)<br>account.withdraw(1000)<br>println(account)</pre>
+            <small><br>
+              在
+              上例中，Scala自動推斷出acct為SavingAccount，如果要指定類型，就如同上例中account的宣告，由於
+              account參考的實例
+              也「是一種」（is a）Account，因此可透過Account型態的變數account來操作。另一個例子則是：<br>
+            </small>
+            <pre>val acct = new SavingAccount("123-456-789", "Justin Lin")<br>doSome(acct)<br>println(acct)<br><br>// 多型操作<br>def doSome(<span
+style="font-weight: bold;">account: Account</span>) {<br>    account.deposit(5000)<br>    account.withdraw(1000)<br>}</pre>
+            <small><br>
+              <br>
+            </small><small></small></td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+    <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+
+<!-- Mirrored from openhome.cc/Gossip/Scala/AbstractClass.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:11:14 GMT -->
+</html>

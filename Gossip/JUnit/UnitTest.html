@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/UnitTest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:20 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>單元測試</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">JUnit Gossip: 單元測試<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>JUnit是個<span style="font-weight: bold;">單元測試（Unit test）</span>框
+架，單元測試指的是測試一個工作單元（a unit of
+work）的行為。舉例來說，對於建築橋墩而言，一個螺絲釘、一根鋼筋、一條鋼索甚至一公斤的水泥等，都可謂是一個工作單元，驗證這些工作單元行為或功能
+（硬度、張力等）是否符合預期，方可確保最後橋墩安全無虞。<br>
+      <br>
+      </small><small>測試</small><small>一個單元，基本上要與其它的單元獨立，否則你會在同時測試兩個單元的正確
+性，或是兩個單元之間的合作行為。就軟體測試而言，或支援物件導向的程式而言，例如Java，「通常」單元測試指的是測試某個方法，你給予該方法某些輸
+入，預期該方法會產生某種輸出，例如傳回預期的值、產生預期的檔案、新增預期的資料等。<br>
+      <br>
+      以 </small><small><big><a href="TestResult.html"><small>收集測試結果</small></a> </big>中的例子來說：<br>
+      </small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp;&nbsp; private Calculator calculator;</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;<span class="Apple-converted-space">&nbsp;</span></small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; @Override</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; protected void setUp() {</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; calculator = new Calculator();</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; @Override</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; protected void tearDown() {</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; calculator = null;</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; public void testPlus() {</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int expected = 5;</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int result = calculator.plus(3, 2);</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; assertEquals(expected, result);</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><span class="Apple-converted-space"></span></small><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><br>
+&nbsp;&nbsp;&nbsp; ...<br>
+</small></span></span><small>
+      <br>
+      你所測試的是給予<span style="font-family: Courier New,Courier,monospace;">Calculator</span>的<span style="font-family: Courier New,Courier,monospace;">plus()</span>方法兩個數字，並預期其傳回相加後的結果。在「某些狀態」下，輸入會產生不同的輸出，單元測試不依賴前一次的單元操作，不考慮之後的單元操作，所謂在某些狀態下，指的是你必須將物件置於該狀態，再進行輸入以進行單元操作，在該狀態下預期操作結果。以上例而言，是利用<span style="font-family: Courier New,Courier,monospace;">setUp()</span>在每次單元操作前，建立新物件，將物件置於最初始狀態，再進行<span style="font-family: Courier New,Courier,monospace;">plus()、minus()等</span>的測試。<br>
+      <br>
+單元操作不理會單元的實作，就輸入預期輸出，所以進行單元操作，僅在測試某方法符合API的定義，也因為如此，單元測試前，只要制定好API合約，就可以開始撰寫測試程式，無需等到API實作完成。舉個例子來說：<br>
+      </small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; public void testMultiply() {</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int expected = 6;</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int result = calculator.multiply(3, 2);</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; assertEquals(expected, result);</small><br style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;">&nbsp;&nbsp;&nbsp; }</small><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><span class="Apple-converted-space"></span></small><small style="font-weight: bold; font-family: 'Courier New',Courier,monospace;"><br>
+&nbsp;&nbsp;&nbsp; ...</small></span></span><br>
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">假設一開始
+Calculator尚未實作multiply()方法，但仍可以先撰寫好以上的單元測試，當然，對Java而言，這個程式連編譯都過不了，因為實際上
+Calculator中還不存在multiply()方法，但要符合編譯器的要求很簡單，只要在Calculator中撰寫：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...<br>
+public int multiply(int a, int b) {</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; return 0;</span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}<br>
+...<br>
+      </span></small></div>
+      <br>
+      <small>如此編譯就可以通過，而你就可以開始先運行測試（有些工具甚至可以自動為你產生以上的程式），當然一開始測試結果會是失敗的，只要<span style="font-family: Courier New,Courier,monospace;">multiply()</span>實作完成，就可以通過測試：<br>
+      </small>
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">...</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+public int multiply(int a, int b) {</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small>
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; return a * b;</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+      <small>
+<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span></small><br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+...</span></small><br>
+      </div>
+      <br>
+      <small>這樣的概念稱為<span style="font-weight: bold;">測試驅動（Test Driven）</span>，一旦實作完成，馬上就可進行測試，驗證實作的正確性，測試程式等於就是API合約的另一種文件形式，就算日後因某種原因，必須修改實作本身，也無需擔心影響了原有的功能，因為有測試程式可馬上驗證。<br>
+      <br>
+測試本身已不容易，單元測試工具或框架本身必須易於使用，無需為了本身已夠複雜的測試，再去學習一個複雜的測試工具。單元測試也必須容易設定、易於組合、
+進行自動化，例如只要按下一個鍵，就可以自動執行所要的測試，可能是幾百個、幾千個或上萬個測試，過程中自動收集相關訊息，並以方便檢視的方式提供最終結
+果。<br>
+      <br>
+在先前論述的幾個故事中：<br>
+      </small>
+      <ul>
+<li><a href="TestCommand.html"><small>你來寫，我來測</small></a></li><li><a href="TestComposite.html"><small>自由組合測試</small></a></li><li><a href="TestTemplate.html"><small>建立測試案例</small></a><br>
+</li><li><a href="TestResult.html"><small>收集測試結果</small></a></li>
+      </ul>
+      <br>
+      <small>其實已點出了測試工具或框架的所需：<br>
+      </small>
+      <ul>
+        <li><small>易於撰寫測試</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>只要撰寫<span style="font-family: Courier New,Courier,monospace;">testXXX()</span>方法，程式會自動找出並進行測試，事實上，經由設計，在JDK 5以上，還可以使用標註（Annotation）來標示測試方法，JUnit 4.x就可以如此設定。</small><br>
+      </div>
+      <br>
+      <ul>
+        <li><small>易於組合測試</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>可指定測試單一<span style="font-family: Courier New,Courier,monospace;">testXXX()</span>方法，可 自動發掘測試案例（Test case）中的所有<span style="font-family: Courier New,Courier,monospace;">testXXX()方法，可以自由組合TestSuite等</span>。</small><br>
+      </div>
+      <br>
+      <ul>
+        <li><small>讓單元測試彼此獨立</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>在先前的幾篇文件實作中，你也可以發現，每個<span style="font-family: Courier New,Courier,monospace;">testXXX()方法是封裝在一個TestCase</span>的實例中運行，所以單元測試與單元測試間是彼此獨立的，如果單元測試有前置狀態，你也可以利用<span style="font-family: Courier New,Courier,monospace;">setUp()、tearDown()</span>來使之處於前置狀態。</small><br>
+      </div>
+      <br>
+      <ul>
+        <li><small>自動收集並產生結果</small></li>
+      </ul>
+      <div style="margin-left: 40px;"><small>經由適當的組合，你可以一次運行所指定的任意個單元測試，過程中會自動收集結果，最後可用指定的方式（Test runner）來呈現結果，事實上，藉由Ant或Maven之類的工作，你還可以進一步產生各種類型的測試報告並郵寄至相關人等。</small><br>
+      </div>
+      <br>
+      <small><br>
+      <br>
+      </small><br>
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/UnitTest.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:20 GMT -->
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Encoding.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+<head>
+
+  
+    <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+    <link rel="stylesheet" href="css/print.css" type="text/css">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>關於編碼</title></head><body>
+    <h3><a href="../index.html">From
+        Gossip@Openhome</a></h3>
+    <h1><a href="index-2.html">Ruby Gossip: 關於編碼<br>
+      </a></h1>
+    <table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top; width: 250px; text-align: center;">
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+            <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+            <br>
+            <center>
+               </center>
+          </td>
+          <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ruby
+              1.8，程式中所有字串，其實都是原始位元組集合，如果原始碼中撰寫了非西歐字元，</small><small>可支援的編碼僅有
+              Shift-JIS（啟動ruby時指定-Ks）、EUC-JP（啟動ruby時指定-Ke）、UTF-8（啟動ruby時指定-Ku）。<br>
+              <br>
+              如果要在原始碼中撰寫中文，方式之一是使用Big5的原始碼檔案，並在啟動ruby時指定-Ks或-Ke，使用與Big5編碼類似的
+              Shift-JIS或
+              EUC-JP，或者是使用UTF-8的原始碼檔案，並在啟動ruby時，指定-Ku，如此才可以取得字串正確的位元組集合。<br>
+              <br>
+              由於在Ruby 1.8中，程式中所有字串都是原始位元組集合，因此在有許多場合，必須要親自處理編碼轉換。例如在Ruby
+              1.8中，若為UTF-8原始碼檔案，啟動ruby時指定-Ku：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre>puts "良".length<br></pre>
+            <small><br>
+              程式會顯示3而不是1，這是因為Ruby 1.8中字串的<span style="font-family: Courier New,Courier,monospace;">length
+                或size</span>方法，傳回的都是位元組長度而不是字元長度，為了得到字元長度，有幾種不同的方式，像是使用規則表示式
+              （Regular Expression）搭配API來處理。</small><small>網路上有不少文件在討論Ruby
+              1.編碼方面的問題，亦有不少程式碼支援編碼轉換。<br>
+              <br>
+              接下來談的，都是Ruby 1.9.2有關中文編碼的處理。<br>
+              <br>
+              在Ruby原始碼中如果要撰寫中文，可於檔案開頭用註解提示直譯器檔案編碥為何，</small><small>例如在作業系統預設編碼為
+              Big5的環境，使用Big5格式編輯檔案，可以如下</small><small>：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: Big5<br>puts "哈囉! 良葛格!"<br></pre>
+            <small><br>
+              檔案一開始的註解還可以寫為：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"># coding: Big5</span></small><br>
+            </div>
+            <small><br>
+              或寫為：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;"># -*- coding: Big5 -*-</span></small><br>
+            </div>
+            <small><br>
+              或寫為：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#!/usr/bin/env ruby -w</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">#
+                  encoding: Big5</span></small><br>
+            </div>
+            <small><br>
+              如果主控台顯示編碼為Big5，則執行結果如下：<br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          main.rb</span><br>
+                        哈囉! 良葛格!<br>
+                        <br>
+                        <span style="font-weight: bold;">&gt;</span><br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>在Ruby 1.9中，字串的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">size</span>或<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">length</span>方
+              法，傳回的是字元數而不是位元組數目。<br>
+              <br>
+              如果</small><small>在作業系統預設編碼為Big5的環境，使用UTF-8格式編輯檔案如下</small><small>：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>puts "哈囉! 良葛格!"<br></pre>
+            <small><br>
+            </small><small>如果主控台顯示編碼為Big5，則執行結果如下：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          main.rb</span><br>
+                        ?历?! ?航???<br>
+                        <br>
+                        <span style="font-weight: bold;">&gt;</span><br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <small><br>
+            </small> <small>出現亂碼了？<span style="font-family: Courier New,Courier,monospace;"></span>直
+              譯器會使用UTF-8來解釋字串（如果沒設定#encoding，預設就是US-ASCII），<span style="font-weight: bold;">字
+                串編碼</span>預設就會是UTF-8，</small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">STDOUT</span><span style="font-weight: bold;">預設只會忠實地將字串的位元組輸出</span>，</small><small>如
+              果你的主控台不是用UTF-8顯示，那麼UTF-8的位元組輸出就會是亂碼。如果想要字串</small><small>使用UTF-8，而
+              輸出的外部編碼使用Big5，方法之一是使用字串的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">encode</span>方
+              法，將文字編碼為Console的編碼，再給<span style="font-family: Courier New,Courier,monospace;">puts</span>等
+              方法輸出。例如在中文Windows中的主控台，可以指定為Big5：</small><br>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>puts "哈囉! 良葛格!".encode("Big5")<br></pre>
+            <small><br>
+              如此執行時就可以正確看到中文，不過這樣必須每個字串都使用<span style="font-family: Courier New,Courier,monospace;">encode</span>方
+              法，另一個方法是使用<span style="font-family: Courier New,Courier,monospace;">STDOUT</span>的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">set_encoding</span>方
+              法。例如：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>STDOUT.set_encoding("Big5")<br>puts "哈囉! 良葛格!"<br></pre>
+            <small> </small><small><br>
+              這會設定STDOUT的<strong>外部編碼（External encoding）</strong>為Big5，如此執行時會自動將
+              字串編碼轉換為指定的<span style="font-family: Courier New,Courier,monospace;">STDOUT</span>外
+              部編碼，就可以正確顯示中文，還有方法是執行ruby時，指定<span style="font-weight: bold;">-EBig5:UTF-8</span>，-E
+              是指Encoding，冒號前是指定外部編碼，冒號後是指定<strong>內部編碼（Internal encoding）</strong>。
+              例如：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          -EBig5:UTF-8 main.rb</span><br>
+                        哈囉! 良葛格!<br>
+                        <br>
+                        <span style="font-weight: bold;">&gt;</span><br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <small><small><br>
+              </small>到這邊可以知道，在Ruby中會有三個關於編碼的資訊，內部編碼、字串編碼與外部編碼。上例也可以改寫為：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>puts "哈囉! 良葛格!"<br></pre>
+            <small> </small><small></small><small><br>
+              執行時可以如下指定，就可以顯示中文：<br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          -EBig5:UTF-8 main.rb</span><br>
+                        哈囉! 良葛格!<br>
+                        <br>
+                        <span style="font-weight: bold;">&gt;</span><br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <small><small></small></small><small><br>
+              若有以下程式：</small><br>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>puts STDOUT.internal_encoding<br>puts STDOUT.external_encoding<br>puts "哈囉! 良葛格!".encoding<br></pre>
+            <small><small><br>
+              </small>執行時若沒有指定-EBig5:UTF-8選項，<span style="font-family: Courier New,Courier,monospace;">STDOUT</span>並
+              沒有外部編碼與內部編碼資訊，而字串編碼會是UTF-8，</small><small>執行時若有指定-EBig5:UTF-8選項，<span style="font-family: Courier New,Courier,monospace;">STDOUT</span>外
+              部編碼會是Big5，內部編碼會是UTF-8，而字串編碼會是UTF-8：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          main.rb<br>
+                          <br>
+                          <br>
+                        </span>UTF-8<br>
+                        <span style="font-weight: bold;"><br>
+                          &gt;ruby -EBig5:UTF-8 main.rb<br>
+                        </span> UTF-8<br>
+                        Big5<br>
+                        UTF-8<span style="font-weight: bold;"><br>
+                          <br>
+                          &gt;</span><span style="font-weight: bold;"></span><br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>若使用<span style="font-family: Courier New,Courier,monospace;">STDOUT.set_encoding("Big5",
+                "UTF-8")</span>，</small><small><span style="font-family: Courier New,Courier,monospace;">STDOUT</span>外
+              部編碼會是Big5，內部編碼會是UTF-8。可以使用字串的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">encoding</span>取
+              得字串編碼，使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">bytesize</span>取
+              得字串使用的位元組長度，使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">bytes</span>取
+              得位元組。例如：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>text = "哈囉"<br>puts text.encoding<br>puts text.bytesize<br>puts "%X %X %X %X %X %X" % text.bytes.to_a, "\n"<br><br>text = text.encode("Big5")<br>puts text.encoding<br>puts text.bytesize<br>puts "%X %X %X %X" % text.bytes.to_a      </pre>
+            <br>
+            <small>執行結果如下：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          main.rb<br>
+                        </span> UTF-8<br>
+                        6<br>
+                        E5 93 88 E5 9B 89<br>
+                        <br>
+                        Big5<br>
+                        4<br>
+                        AB A2 C5 6F<span style="font-weight: bold;"><br>
+                        </span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
+                        &gt;<br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>在irb中，會使用作業系統預設編碼作為字串編碼，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">force_encoding</span>來
+              改變編碼，但不變動原字串位元組內容，可以使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">valid_encoding?</span>來
+              看看位元組與編碼是否合法，可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Encoding.compatible?</span>來
+              測試兩個字串編碼是否相容，如果不相容就傳回<span style="font-family: Courier New,Courier,monospace;">nil</span>，
+              也就不可以使用<span style="font-family: Courier New,Courier,monospace;">+</span>串
+              接在一起。例如：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;
+                          text = "哈囉"<br>
+                        </span>=&gt; "哈囉"<span style="font-weight: bold;"><br>
+                          &gt;&gt; text2 = "哈囉"<br>
+                        </span>=&gt; "哈囉"<span style="font-weight: bold;"><br>
+                          &gt;&gt; text.encoding.name<br>
+                        </span>=&gt; "Big5"<span style="font-weight: bold;"><br>
+                          &gt;&gt; text2.encoding.name<br>
+                        </span>=&gt; "Big5"<span style="font-weight: bold;"><br>
+                          &gt;&gt; Encoding.compatible?(text, text2)<br>
+                        </span>=&gt; #&lt;Encoding:Big5&gt;<span style="font-weight: bold;"><br>
+                          &gt;&gt; text.bytesize<br>
+                        </span>=&gt; 4<span style="font-weight: bold;"><br>
+                          &gt;&gt; text.force_encoding("UTF-8")<br>
+                        </span>=&gt; "\xAB\xA2\xC5o"<span style="font-weight: bold;"><br>
+                          &gt;&gt; text.encoding.name<br>
+                        </span>=&gt; "UTF-8"<span style="font-weight: bold;"><br>
+                          &gt;&gt; text.bytesize<br>
+                        </span>=&gt; 4<span style="font-weight: bold;"><br>
+                          &gt;&gt; Encoding.compatible?(text, text2)<br>
+                        </span>=&gt; nil<span style="font-weight: bold;"><br>
+                          &gt;&gt; text + text2<br>
+                        </span>Encoding::CompatibilityError: incompatible
+                        character encodings: UTF-8 and Big5<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):23<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from
+                        C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<span style="font-weight: bold;"><br>
+                          &gt;&gt; text.valid_encoding?<br>
+                        </span>=&gt; false<span style="font-weight: bold;"><br>
+                          &gt;&gt; text2.valid_encoding?<br>
+                        </span>=&gt; true<span style="font-weight: bold;"><br>
+                          &gt;&gt;</span><br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>在Ruby 1.8中，字串的<span style="font-family: Courier New,Courier,monospace;">each</span>方
+              法傳回的是位元組，在Ruby 1.9中，<span style="font-family: Courier New,Courier,monospace;">each</span>已
+              經被移除，改用更明確的<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">each_line</span>、<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">each_byte</span>、<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">each_char</span>等
+              方法。</small><br>
+            <br>
+            <small>在開啟檔案時，如果沒有指定檔案物件的外部編碼與內部編碼，則</small><small>檔案物件</small><small>外
+              部編碼會使用作業系統預設編碼，</small><small>檔案物件</small><small>取得的字串也會使用外部編碼，</small><small>檔
+              案物件</small><small>內部編碼則沒有設定。例如：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># Encoding: UTF-8<br>print "File name: "<br>name = gets.chomp<br>file = open(name, "r")<br>puts file.external_encoding<br>puts file.internal_encoding<br>puts file.gets.encoding<br>puts "哈囉".encoding<br>file.close<br></pre>
+            <br>
+            <small>執行結果如下：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          main.rb<br>
+                        </span>File name: main.rb<br>
+                        Big5<br>
+                        <br>
+                        Big5<br>
+                        UTF-8<br>
+                        <br>
+                        &gt;<br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>可以在讀入檔案時，指定</small><small>檔案物件</small><small>外部編碼，取得的字串編碼與</small><small>檔
+              案物件</small><small>外部編碼相同。例如：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># Encoding: UTF-8<br>print "File name: "<br>name = gets.chomp<br>file = open(name, <span style="font-weight: bold;">"r:big5"</span>)<br>puts file.external_encoding<br>puts file.internal_encoding<br>puts file.gets.encoding<br>puts "哈囉".encoding<br>file.close<br></pre>
+            <small><br>
+              也可以同時指定檔案物件外部編碼與內部編碼，如果指定了檔案物件內部編碼，則取得的字串編碼與檔案物件內部編碼相同：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># Encoding: UTF-8<br>print "File name: "<br>name = gets.chomp<br>file = open(name, <span style="font-weight: bold;">"r:big5:utf-8"</span>)<br>puts file.external_encoding<br>puts file.internal_encoding<br>puts file.gets.encoding<br>puts "哈囉".encoding<br>file.close<br></pre>
+            <br>
+            <small>執行結果如下：</small><small><br>
+            </small>
+            <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;ruby
+                          main.rb<br>
+                        </span>File name: main.rb<br>
+                        Big5<br>
+                        UTF-8<br>
+                        UTF-8<br>
+                        UTF-8<br>
+                        <br>
+                        &gt;<br>
+                      </span></small></td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <small>如果是寫出資料至檔案，預設就是忠實地將字串的位元組資料寫至檔案中，也可以指輸出至檔案時的編碼，例如：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>print "File name: "<br>name = gets.chomp<br>open(name, <span style="font-weight: bold;">"w:big5"</span>) do |file|<br>    text = "哈囉"<br>    puts text.encoding          # 顯示 UTF-8<br>    puts file.external_encoding # 顯示 Big5<br>    file.print text<br>end<br></pre>
+            <small><br>
+              如上指定之後，雖然字串編碼為UTF-8，但輸出至檔案時會編碼為Big5，你打開檔案時，看到的就會是Big5編碼的正確中文，也可以同時
+              指定外部編碼與內部編碼。例如：<br>
+            </small>
+            <ul>
+              <li>main.rb</li>
+            </ul>
+            <pre># encoding: UTF-8<br>print "File name: "<br>name = gets.chomp<br>open(name, <span style="font-weight: bold;">"w:big5:utf-8"</span>) do |file|<br>    text = "哈囉"<br>    puts text.encoding          # 顯示 UTF-8<br>    puts file.external_encoding # 顯示 Big5<br>    puts file.internal_encoding # 顯示 UTF-8<br>    file.print text<br>end      </pre>
+            <br>
+            <small>可以使用以下設定輸入輸出物件的預設外部編碼與內部編碼：<br>
+            </small>
+            <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Encoding.default_external =
+                  Encoding.find("Big5")</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+              <small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Encoding.default_internal
+                  = Encoding.find("UTF-8")</span></small><br>
+            </div>
+            <br>
+            <small>先前執行ruby指令時使用-EBig5:UTF-8的選項，其實也就是在指定輸入輸出物件的外部編碼與內部編碼。<br>
+              <br>
+              如果想知道Ruby 1.9所支援的編碼，可以透過<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">Encoding.name_list</span>得
+              知。<br>
+              <br>
+              <br>
+            </small><br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+  </body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Encoding.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:07:56 GMT -->
+</html>

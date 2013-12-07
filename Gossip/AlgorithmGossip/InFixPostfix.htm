@@ -1,0 +1,955 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/InFixPostfix.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>中序式轉後序式（前序式）</title></head><body>
+
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Algorithm Gossip: 中序式轉後序式（前序式）</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 676px; vertical-align: top;"> 
+
+
+
+
+      
+      
+      
+      <h2>說明</h2>
+
+
+
+      <small>
+
+平常所使用的運算式，主要是將運算元放在運算子的兩旁，例如a+b/d這樣的式子，這稱之為中序（Infix）表示式，對於人類來說，這樣的式子很容易理
+解，但由於電腦執行指令時是有順序的，遇到中序表示式時，無法直接進行運算，而必須進一步判斷運算的先後順序，所以必須將中序表示式轉換為另一種表示方
+法。<br>
+
+
+
+      <br>
+
+
+
+
+
+可以將中序表示式轉換為後序（Postfix）表示式，後序表示式又稱之為逆向波蘭表示式（Reverse polish notation），它是由波蘭的數學家盧卡謝維奇提出，例如(a+b)*(c+d)這個式子，表示為後序表示式時是ab+cd+*。</small>
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      <h2>解法</h2>
+
+
+
+      <small>
+
+用手算的方式來計算後序式的話，可以使用括號法，將運算子兩旁的運算元依先後順序全括號起來，然後將所有的右括號取代為左邊最接近的運算子（從最內層括號開始），最後去掉所有的左括號就可以完成後序表示式，例如：<br>
+
+
+
+      </small>
+
+      
+      
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">a+b*d+c/d &nbsp; =&gt;&nbsp; &nbsp; ((a+(b*d))+(c/d)) -&gt; abd*+cd/+</span><br>
+
+
+
+
+
+      </small></div>
+
+
+
+
+
+      <small><br>另一個方式是使用堆疊法進行中序轉後序，演算法直接敘述的話就是使用迴圈，取出中序式的字元，遇運算元直接輸出；堆疊運算子與左括號；
+堆疊中運算子優先順序若大於等於讀入的運算子優先順序的話，直接輸出堆疊中的運算子，再將讀入的運算子置入堆疊；遇右括號輸出堆疊中的運算子至左括號。 </small><br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      
+      
+      <h2> 演算法</h2>
+
+
+
+      <small>
+
+
+以下是虛擬碼的運算法，\0表示中序式讀取完畢：</small> <br>
+
+
+
+
+
+
+      
+      
+      
+      <pre>Procedure Postfix(infix) [<br>    Loop [<br>        op = infix(i) <br>        case [<br>            :x = '\0': <br>                while (stack not empty) <br>                     // output all elements in stack <br>                end <br>                return <br>             :x = '(': <br>                 // put it into stack <br>             :x is operator: <br>                  while (priority(stack[top]) &gt;= <br>                         priority(op)) [<br>                       // out a element from stack <br>                  ]<br>                  // save op into stack <br>             :x = ')': <br>                   while ( stack(top) != '(' ) [<br>                       // out a element from stack <br>                   ]<br>                   top = top - 1  // not out '( <br>             :else: <br>                   // output current op <br>        ]<br>        i++; <br>    ]<br>] <br></pre>
+
+
+
+
+
+
+      <br>
+
+
+
+      <small>
+
+例如(a+b)*(c+d)這個式子，依演算法的輸出過程如下：</small> 
+      
+      
+      
+      <table border="1" width="50%">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>OP </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>STACK </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>OUTPUT </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>( </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>( </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>- </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>a </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>( </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>a </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>+ </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>(+ </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>a </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>b </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>(+ </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>) </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>- </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+ </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>* </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>* </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+ </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>( </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>*( </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+ </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>c </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>*( </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+c </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>+ </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>*(+ </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+c </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>d </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>*(+ </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+cd </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>) </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>* </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+cd+ </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>- </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>- </small></td>
+
+
+
+
+
+
+      <td align="left" valign="top"><small>ab+cd+* </small></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+
+
+
+      <small>
+
+如果要使用堆疊法將中序式轉為前序式，則</small><small>使用迴圈</small><small>由後往前</small><small>取出中序式的字元，遇運算元直接輸出；堆疊運算子與右括號；
+堆疊中運算子優先順序若大於讀入的運算子優先順序的話，直接輸出堆疊中的運算子，再將讀入的運算子置入堆疊；遇左括號輸出堆疊中的運算子至右括號。前面整個演算過程中被</small><small>輸出的字元再反序列出，就是前序表示式。 </small><br>
+
+
+
+
+
+      
+      
+      
+      <h2> 實作：<a href="#C">C</a>&nbsp;&nbsp; &nbsp;<a href="#Java">Java</a>&nbsp;&nbsp; &nbsp;<a href="#Python">Python</a>&nbsp;&nbsp; &nbsp;<a href="#Scala">Scala</a>&nbsp;&nbsp;&nbsp; <a href="#Ruby">Ruby</a>&nbsp;&nbsp;&nbsp; <a href="#JavaScript">JavaScript</a>&nbsp;&nbsp;&nbsp; <a href="#Haskell">Haskell</a><a href="#Scala"><br>
+      </a></h2>
+
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li><a name="C"></a> C
+  </li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      <pre>#include &lt;stdio.h&gt; <br>#include &lt;stdlib.h&gt; <br><br>#define MAX 80<br><br>void inToPostfix(char*, char*); // 中序轉後序 <br>int priority(char); // 運算子優先權<br><br>int main(void) { <br>    char infix[MAX] = {'\0'}; <br>    char postfix[MAX]= {'\0'}; <br><br>    printf("中序運算式："); <br>    scanf("%s", infix); <br>    inToPostfix(infix, postfix);<br>    <br>    int i;<br>    for(i = 0; postfix[i] != '\0'; i++) {<br>        printf("%c", postfix[i]); <br>    }<br><br>    return 0; <br>} <br><br>void inToPostfix(char* infix, char* postfix) { <br>    char stack[MAX] = {'\0'};<br>    int i, j, top;<br>    for(i = 0, j = 0, top = 0; infix[i] != '\0'; i++) switch(infix[i]) { <br>        case '(':              // 運算子堆疊 <br>            stack[++top] = infix[i]; <br>            break; <br>        case '+': case '-': case '*': case '/': <br>            while(priority(stack[top]) &gt;= priority(infix[i])) { <br>                postfix[j++] = stack[top--];<br>            } <br>            stack[++top] = infix[i]; // 存入堆疊 <br>            break; <br>        case ')': <br>            while(stack[top] != '(') { // 遇 ) 輸出至 ( <br>                postfix[j++] = stack[top--];<br>            } <br>            top--;  // 不輸出 ( <br>            break; <br>        default:  // 運算元直接輸出 <br>            postfix[j++] = infix[i];<br>    }<br>    while(top &gt; 0) { <br>        postfix[j++] = stack[top--];<br>    }<br>} <br><br>int priority(char op) { <br>    switch(op) { <br>        case '+': case '-': return 1;<br>        case '*': case '/': return 2;<br>        default:            return 0;<br>    } <br>} <br></pre>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+      
+      
+      
+      <ul>
+
+
+
+        <li><a name="Java"></a> Java
+  </li>
+
+
+
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+      
+      
+      
+      <pre>import java.util.*;<br>import static java.lang.System.out;<br><br>public class Infix {<br>    private static int priority(char c) {<br>        return c == '+' || c == '-' ? 1 : c == '*' || c == '/' ? 2 : 0;<br>    }<br>    <br>    private static String toPostfix(String infix, boolean isPost) {<br>        String expr = isPost ? <br>            infix : new StringBuffer(infix).reverse().toString();<br>        LinkedList&lt;Character&gt; stack = new LinkedList&lt;&gt;();<br>        StringBuilder output = new StringBuilder();<br>        char toStack = isPost ? '(' : ')';<br>        char toOutput = isPost ? ')' : '(';<br>        for(char c : expr.toCharArray()) {<br>            if(c == toStack) { stack.add(c); }<br>            else if("+-*/".indexOf(c) != -1) {<br>                while(!stack.isEmpty() &amp;&amp; <br>                       priority(stack.getLast()) &gt;= priority(c)) { <br>                    output.append(stack.removeLast());<br>                } <br>                stack.add(c);<br>            }<br>            else if(c == toOutput) {<br>                while(stack.getLast() != toStack) { <br>                    output.append(stack.removeLast());<br>                } <br>                stack.removeLast();<br>            }<br>            else { output.append(c); }<br>        }<br>        <br>        while(!stack.isEmpty()) { output.append(stack.removeLast()); }<br>        <br>        return isPost ? output.toString() : output.reverse().toString();<br>    }<br>    <br>    public static String toPostfix(String infix) {<br>        return toPostfix(infix, true);<br>    }<br>    <br>    public static String toPrefix(String infix) {<br>        return toPostfix(infix, false);<br>    }<br>    <br>    public static void main(String[] args) {<br>        String infix = "(a+b)*(c+d)";<br>        out.println(toPostfix(infix));<br>        out.println(toPrefix(infix));<br>    }<br>}  <br></pre><br><ul><li><a name="Python"></a>Python</li></ul><pre>def priority(op):<br>    return 1 if op in "+-" else 2 if op in "*/" else 0<br>    <br>def toPostfix(infix, isPost = True):<br>    toStack, toOutput = ('(', ')') if isPost else (')', '(')<br>    <br>    def procOpt(c, stack, output):<br>        if stack == "" or priority(stack[-1]) &lt; priority(c):<br>            return (stack + c, output)<br>        else:<br>            return procOpt(c, stack[0:-1], output + stack[-1])<br>    <br>    def procPhs(stack, output):<br>        if stack[-1] == toStack:<br>            return (stack[0:-1], output)<br>        else:<br>            return procPhs(stack[0:-1], output + stack[-1])<br>            <br>    def procExpr(expr, stack = "", output = ""):<br>        if expr == "":<br>            return output + stack[::-1]<br>        elif expr[0] == toStack:<br>            return procExpr(expr[1:], stack + expr[0], output)<br>        elif expr[0] in "+-*/":<br>            return procExpr(expr[1:], *procOpt(expr[0], stack, output))<br>        elif expr[0] == toOutput:<br>            return procExpr(expr[1:], *procPhs(stack, output))<br>        else:<br>            return procExpr(expr[1:], stack, output + expr[0])<br>    <br>    output = procExpr(infix if isPost else infix[::-1])<br>    return output if isPost else output[::-1]<br><br>def toPrefix(infix):<br>    return toPostfix(infix, False)<br>    <br>infix = "(a+b)*(c+d)"<br>print(toPostfix(infix))<br>print(toPrefix(infix))</pre><br><ul><li><a name="Scala"></a>Scala</li></ul><pre>def priority(op: Char) = op match {<br>    case '+' | '-' =&gt; 1<br>    case '*' | '/' =&gt; 2<br>    case _         =&gt; 0<br>}<br><br>def toPostfix(infix: String, isPost: Boolean = true) = {<br>    val (toStack, toOutput) = if(isPost) ('(', ')') else (')', '(')<br>    <br>    def procOpt(c: Char, stack: String, output: String): (String, String) = {<br>        if(stack == "" || priority(stack.last) &lt; priority(c)) {<br>            (stack + c, output)<br>        } else procOpt(c, stack.init, output + stack.last)<br>    }<br>    <br>    def procPhs(stack: String, output: String): (String, String) = {<br>        if(stack.last == toStack) (stack.init, output)<br>        else procPhs(stack.init, output + stack.last)<br>    }<br>    <br>    def procExpr(expr: String, so: (String, String) = ("", "")): String = {<br>        val (stack, output) = so<br>        if(expr == "") { <br>            output + stack.reverse<br>        } else if(expr.head == toStack) {<br>            procExpr(expr.tail, (stack + expr.head, output))<br>        } else if("+-*/".contains(expr.head)) {<br>            procExpr(expr.tail, procOpt(expr.head, stack, output))<br>        } else if(expr.head == toOutput) { <br>            procExpr(expr.tail, procPhs(stack, output))<br>        } else procExpr(expr.tail, (stack, output + expr.head))<br>    }<br>    <br>    val output = procExpr(if(isPost) infix else infix.reverse)<br>    if(isPost) output else output.reverse<br>}<br>    <br>def toPrefix(infix: String) = toPostfix(infix, false)<br><br>val infix = "(a+b)*(c+d)"<br>println(toPostfix(infix))<br>println(toPrefix(infix))<br></pre><br>
+      <ul>
+        <li><a name="Ruby"></a>Ruby</li>
+      </ul>
+      <pre>def priority(op)<br>    "+-".include?(op) ? 1 : "*/".include?(op) ? 2 : 0<br>end<br><br>def toPostfix(infix, isPost = true)<br>    toStack, toOutput = isPost ? ['(', ')'] : [')', '(']<br>    <br>    procOpt = -&gt;(c, stack, output) {<br>        if stack == "" || priority(stack[-1]) &lt; priority(c)<br>            [stack + c, output]<br>        else<br>            procOpt.call(c, stack[0...-1], output + stack[-1])<br>        end<br>    }<br>    <br>    procPhs = -&gt;(stack, output) {<br>        if stack[-1] == toStack<br>            [stack[0...-1], output]<br>        else<br>            procPhs.call(stack[0...-1], output + stack[-1])<br>        end<br>    }<br>    <br>    procExpr = -&gt;(expr, stack = "", output = "") {<br>        if expr == ""<br>            output + stack.reverse<br>        elsif expr[0] == toStack<br>            procExpr.call(expr[1..-1], stack + expr[0], output)<br>        elsif "+-*/".include? expr[0]<br>            procExpr.call(expr[1..-1], *procOpt.call(expr[0], stack, output))<br>        elsif expr[0] == toOutput<br>            procExpr.call(expr[1..-1], *procPhs.call(stack, output))<br>        else<br>            procExpr.call(expr[1..-1], stack, output + expr[0])<br>        end<br>    }<br>    <br>    output = procExpr.call(isPost ? infix : infix.reverse)<br>    isPost ? output : output.reverse<br>end<br><br>def toPrefix(infix)<br>    toPostfix(infix, false)<br>end<br>    <br>infix = "(a+b)*(c+d)"<br>puts(toPostfix(infix))<br>puts(toPrefix(infix))<br></pre>
+      <br>
+      <ul>
+        <li><a name="JavaScript"></a>JavaScript</li>
+      </ul>
+      <pre>Array.prototype.getLast = function() {<br>    return this[this.length - 1];<br>};<br><br>Array.prototype.isEmpty = function() {<br>    return this.length == 0;<br>};<br><br>function priority(c) {<br>    return c === '+' || c === '-' ? 1 : c === '*' || c === '/' ? 2 : 0;<br>}<br><br>function toPostfix(infix, isPost) {<br>    isPost = isPost === undefined ? true : false;<br>    var expr = isPost ? infix.split('') : infix.split('').reverse();<br>    var stack = [];<br>    var output = [];<br>    var toStack = isPost ? '(' : ')';<br>    var toOutput = isPost ? ')' : '(';<br>    expr.forEach(function(c) {<br>        if(c === toStack) { stack.push(c); }<br>        else if('+-*/'.indexOf(c) !== -1) {<br>            while(!stack.isEmpty() &amp;&amp; <br>                   priority(stack.getLast()) &gt;= priority(c)) {<br>                output.push(stack.pop());<br>            }<br>            stack.push(c);<br>        }<br>        else if(c === toOutput) {<br>            while(stack.getLast() !== toStack) {<br>                output.push(stack.pop());<br>            }<br>            stack.pop();<br>        }<br>        else { output.push(c); }<br>    });<br>    <br>    while(!stack.isEmpty()) { output.push(stack.pop()); }<br>    <br>    return isPost ? output.join('') : output.reverse().join('');<br>}<br><br>function toPrefix(infix) {<br>    return toPostfix(infix, false);<br>}<br><br>var infix = "(a+b)*(c+d)";<br>print(toPostfix(infix));<br>print(toPrefix(infix));<br></pre>
+      <br>
+      <ul>
+        <li><a name="Haskell"></a>Haskell</li>
+      </ul>
+      <pre>priority op = if op `elem` "+-" then 1<br>              else if op `elem` "*/" then 2<br>              else 0<br>    <br>toPfix inf isPost = if isPost then output else reverse output<br>    where<br>        (toStack, toOutput) = if isPost then ('(', ')') else (')', '(')<br>        output = procExpr (if isPost then inf else reverse inf) ("", "")<br>        procOpt c stack output =        <br>            if stack == "" || (priority $ last stack) &lt; priority c <br>                then (stack ++ [c], output)<br>            else procOpt c (init stack) (output ++ [last stack])<br>        procPhs stack output =<br>            if last stack == toStack then (init stack, output)<br>            else procPhs (init stack) (output ++ [last stack])<br>        procExpr expr so =<br>            if expr == "" <br>                then output ++ (reverse stack)<br>            else if head == toStack <br>                then procExpr tail (stack ++ [head], output)<br>            else if head `elem` "+-*/" <br>                then procExpr tail $ procOpt head stack output<br>            else if head == toOutput <br>                then procExpr tail $ procPhs stack output<br>            else procExpr tail (stack, output ++ [head])<br>            where (stack, output) = so<br>                  head:tail = expr<br>                  <br>toPostfix inf = toPfix inf True<br>toPrefix inf = toPfix inf False<br><br>main = do<br>    let inf = "(a+b)*(c+d)"<br>    putStrLn $ toPostfix inf<br>    putStrLn $ toPrefix inf<br></pre>
+<br>
+
+
+
+
+
+ </td>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+
+      <br>
+
+
+
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+
+
+      <br>
+
+  
+      
+      
+      
+      
+      <center>     
+       <br>
+
+
+      </center>
+
+
+
+
+
+
+ </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/AlgorithmGossip/InFixPostfix.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:04:52 GMT -->
+</html>

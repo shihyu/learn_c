@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/ServletJPA.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:58 GMT -->
+<head>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  
+  <title>在 Servlet 中直接使用 JPA</title>
+</head>
+
+
+<body>
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+<h1><a href="index-2.html">EJB3 Gossip: 在 Servlet 中直接使用 JPA</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+
+
+
+      <br>
+
+
+
+
+      
+      
+      
+      <center>
+      
+      
+      
+       <br>
+
+
+
+
+      </center>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>若您要直接在Servlet中使用JPA，要記得的是，EntityManager不是Thread-safe，所以切記，不可直接將EntityManager注入Servlet中成為物件成員之一，Servlet被共用存取的情況下，會有資料共用存取的問題。<br>
+
+
+      <br>
+
+若您要在Servlet中直接使用JPA，有兩種方式可以進行，一是透過在類別上宣告@PersistenceContext並設定JNDI名稱來查找，
+二是透過@PersistenceUnit注入EntityManagerFactory並用其取得EntityManager，前者的方式為
+Container-Managed Entity，後者的方式則為Application-Managed EntityManager。<br>
+
+
+      <br>
+
+
+第一個方法若以 </small><small><big><a href="FirstContainManagedJPA.html"><small>第一個 JPA（容器管理）</small></a></big> 中的User實體為例，您可以如下撰寫Servlet：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>UserAdmin.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br><br>import java.util.logging.*;<br>import javax.annotation.*;<br>import javax.naming.*;<br>import javax.persistence.*;<br>import javax.rmi.PortableRemoteObject;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import javax.transaction.*;<br><br><span style="font-weight: bold;">@PersistenceContext(name="sample/EntityManager", unitName="sample")</span><br>public class UserAdmin extends HttpServlet {    <br><span style="font-weight: bold;">    @Resource <br>    private UserTransaction ut;<br><br></span>    protected void processRequest(HttpServletRequest request, <br>                                HttpServletResponse response)<br>                                    throws ServletException, IOException {<br>        <br>        String name = request.getParameter("name");<br>        String age = request.getParameter("age");<br>        <br>        User user = new User();<br>        user.setName(name);<br>        user.setAge(new Long(Long.parseLong(age)));<br>        <br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br><span style="font-weight: bold;">        EntityManager entityManager = null;<br><br></span>        try {<br><span style="font-weight: bold;">            InitialContext context = new InitialContext();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            Object obj = context.lookup(</span><br style="font-weight: bold;"><span style="font-weight: bold;">                    "java:comp/env/sample/EntityManager");</span><br style="font-weight: bold;"><span style="font-weight: bold;">            entityManager = (EntityManager) </span><br style="font-weight: bold;"><span style="font-weight: bold;">               PortableRemoteObject.narrow(obj, EntityManager.class);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            </span><br style="font-weight: bold;"><span style="font-weight: bold;">            ut.begin();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            entityManager.persist(user);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            ut.commit();</span><br style="font-weight: bold;"><span style="font-weight: bold;"></span><br>        } catch (Exception ex) {<br>            Logger.getLogger(UserAdmin.class.getName())<br>                    .log(Level.SEVERE, null, ex);<br>        } finally { <br><span style="font-weight: bold;">            entityManager.close();</span><br>            out.close();<br>        }<br>    } <br><br>    protected void doGet(HttpServletRequest request, <br>                         HttpServletResponse response)<br>                                  throws ServletException, IOException {<br>        processRequest(request, response);<br>    } <br><br>    protected void doPost(HttpServletRequest request, <br>                          HttpServletResponse response)<br>                                 throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br>}</pre>
+
+
+      <br>
+
+
+      <small>在您的Web應用程式可存取的Classpath路徑中（例如WEB-INF/classes下），要建立META-INF/persistence.xml：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li>persistence.xml</li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" <br>xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <br>xsi:schemaLocation="http://java.sun.com/xml/ns/persistence <br>http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"&gt;<br>  &lt;persistence-unit name="<span style="font-weight: bold;">sample</span>" transaction-type="JTA"&gt;<br>    &lt;jta-data-source&gt;jdbc/sample&lt;/jta-data-source&gt;<br>    &lt;properties&gt;<br>      &lt;property name="toplink.ddl-generation" <br>                value="drop-and-create-tables"/&gt;<br>    &lt;/properties&gt;<br>  &lt;/persistence-unit&gt;<br>&lt;/persistence&gt;</pre>
+
+
+      <br>
+
+
+      <small>@PersistenceContext的name名稱將作為JNDI查找名稱，從unitName設定得知，實際上查找到的
+是&lt;persistence-unit&gt;中對應的sample定義，Servlet中使用JNDI查找name名稱以取得
+EntityManager實例，並透過注入的UserTransaction啟用交易，在交易中進行持久化動作。<br>
+
+
+      <br>
+
+
+若不在類別上使用@PersistenceContext，您也可以在web.xml中加入以下的定義：<br>
+
+
+      </small>
+      
+      
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;">....</small><br>
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;persistence-context-ref&gt;</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &lt;persistence-context-ref-name&gt;</small><small style="font-family: Courier New,Courier,monospace;"><br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sample/EntityManager</small><small style="font-family: Courier New,Courier,monospace;"><br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;/persistence-context-ref&gt;</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &lt;persistence-unit-name&gt;</small><small style="font-family: Courier New,Courier,monospace;"><br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sample</small><small style="font-family: Courier New,Courier,monospace;"><br>
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;/persistence-unit-name&gt;</small><br style="font-family: Courier New,Courier,monospace;">
+
+
+      <small style="font-family: Courier New,Courier,monospace;">&nbsp; &nbsp; &lt;/persistence-context-ref&gt;<br>
+
+
+....<br>
+
+
+      </small></div>
+
+
+      <br>
+
+
+      <small>第一個方法直接使用@PersistenceUnit注入EntityManagerFactory，例如：<br>
+
+
+      </small>
+      
+      
+      <ul>
+
+
+        <li><small>UserAdmin.java</small></li>
+
+
+      
+      
+      </ul>
+
+
+      
+      
+      <pre>package onlyfun.caterpillar;<br><br>import java.io.*;<br><br>import java.util.logging.*;<br>import javax.annotation.*;<br>import javax.persistence.*;<br>import javax.servlet.*;<br>import javax.servlet.http.*;<br>import javax.transaction.*;<br><br>public class UserAdmin extends HttpServlet {    <br><span style="font-weight: bold;">    @PersistenceUnit(unitName="sample")</span><br style="font-weight: bold;"><span style="font-weight: bold;">    private EntityManagerFactory emFactory;</span><br style="font-weight: bold;">    <br><span style="font-weight: bold;">    @Resource </span><br style="font-weight: bold;"><span style="font-weight: bold;">    private UserTransaction ut;</span><br>    protected void processRequest(HttpServletRequest request, <br>                                HttpServletResponse response)<br>                                    throws ServletException, IOException {<br>        <br>        String name = request.getParameter("name");<br>        String age = request.getParameter("age");<br>        <br>        User user = new User();<br>        user.setName(name);<br>        user.setAge(new Long(Long.parseLong(age)));<br>        <br>        response.setContentType("text/html;charset=UTF-8");<br>        PrintWriter out = response.getWriter();<br><span style="font-weight: bold;">        EntityManager entityManager = null;</span><br>        <br>        try {<br><span style="font-weight: bold;">            entityManager = emFactory.createEntityManager();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            </span><br style="font-weight: bold;"><span style="font-weight: bold;">            ut.begin();</span><br style="font-weight: bold;"><span style="font-weight: bold;">            entityManager.persist(user);</span><br style="font-weight: bold;"><span style="font-weight: bold;">            ut.commit();</span><br style="font-weight: bold;"><br>        } catch (Exception ex) {<br>            Logger.getLogger(UserAdmin.class.getName())<br>                    .log(Level.SEVERE, null, ex);<br>        } finally { <br><span style="font-weight: bold;">            entityManager.close();</span><br>            out.close();<br>        }<br>    } <br><br>    protected void doGet(HttpServletRequest request, <br>                         HttpServletResponse response)<br>                                  throws ServletException, IOException {<br>        processRequest(request, response);<br>    } <br><br>    protected void doPost(HttpServletRequest request, <br>                          HttpServletResponse response)<br>                                 throws ServletException, IOException {<br>        processRequest(request, response);<br>    }<br>}</pre>
+
+
+      <br>
+
+
+      <small>類似於</small> <small><big><a href="FirstLocalJPA.html"><small>第一個 JPA（單機客戶端）</small></a></big> 中的例子，您從注入的EntityManagerFactory中建立EntityManager，之後利用其進行持久化物件或其它的操作。</small><br>
+
+
+      <small><br>
+
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/EJB3Gossip/ServletJPA.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:59 GMT -->
+</html>

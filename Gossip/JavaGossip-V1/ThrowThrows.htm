@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ThrowThrows.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>throw、throws</title></head><body>
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+<h1><a href="index-2.html">Java Gossip:&nbsp;throw、throws</a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 676px; vertical-align: top;"> <small>當程式發生錯誤而無法處理的時候，會丟出對應的例外物件，除此之外，在某些時刻，您可能會想要自行丟出例外，例如在例外處理結束後，再將例外丟出，讓下一層例外處理區塊來捕捉，若想要自行丟出例外，您可以使用<span style="font-weight: bold;">"throw"關鍵字</span>，並生成指定的例外物件，例如：<br>
+
+      </small>
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">throw new ArithmeticException();</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      <small><br>
+
+
+
+
+舉個例子來說明，在Java的除法中，允許除數為浮點數0.0，所得到的是<span style="font-weight: bold;">Infinity</span>，即無窮數，如果您想要自行檢驗除零錯誤，可以自行丟出例外，最接近這個條件的是<span style="font-weight: bold;">ArithmeticException</span>，當除數為整數且為0時，就會引發這個例外，您可以如下丟出例外： </small><br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> UseThrow.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>public class UseThrow { <br>    public static void main(String[] args) { <br>        double dblzero = 0.0; <br>        try { <br>            System.out.println("浮點數除以零: " <br>                                  + (100 / dblzero)); <br>            if(dblzero == 0) <br>                throw new ArithmeticException(); <br>        } <br>        catch(ArithmeticException e) { <br>            System.out.println("發生除零例外"); <br>        } <br>    } <br>} <br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">浮點數除以零: Infinity <br>
+
+
+
+
+發生除零例外</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+
+      <br>
+
+      <small>
+
+
+
+每個例外都必須有一個"catch"區塊來捕捉，在巢狀的try...catch時，必須注意該例外是由何者引發並由何者捕捉，例如：</small><br>
+
+
+
+
+
+      
+      <ul>
+
+        <li> UseThrow.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>public class UseThrow { <br>    public static void main(String[] args) { <br>        try { <br>            try { <br>                throw new ArrayIndexOutOfBoundsException(); <br>            } <br>            catch(ArrayIndexOutOfBoundsException e) { <br>               System.out.println(<br>             "ArrayIndexOutOfBoundsException/內層try-catch"); <br>            }<br> <br>            throw new ArithmeticException(); <br>        } <br>        catch(ArithmeticException e) { <br>            System.out.println("發生ArithmeticException"); <br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            System.out.println(<br>             "ArrayIndexOutOfBoundsException/外層try-catch"); <br>        } <br>    } <br>} <br></pre>
+
+
+
+
+
+      
+      <p><span class="postbody"></span></p>
+
+
+
+
+      
+      <p><small><span class="postbody">
+執行結果：</span></small></p>
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">ArrayIndexOutOfBoundsException/內層try-catch <br>
+
+
+
+
+發生ArithmeticException&nbsp;</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+      
+      <p><small>
+在這個程式中，ArrayIndexOutOfBoundsException由內層try-catch丟出並捕捉，由於內層
+已經捕捉了例外，所以外層的try-catch中之ArrayIndexOutOfBoundsException並不會捕捉到內層所丟出的例外，但如果
+內層的try-catch並沒有捕捉到這個例外，則外層try-catch就有機會捕捉這個例外，例如：</small></p>
+
+
+
+
+      
+      <ul>
+
+        <li>UseThrow.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>public class UseThrow { <br>    public static void main(String[] args) { <br>        try { <br>            try { <br>                throw new ArrayIndexOutOfBoundsException(); <br>            } <br>            catch(ArithmeticException e) { <br>                System.out.println(<br>             "ArrayIndexOutOfBoundsException/內層try-catch"); <br>            }<br> <br>            throw new ArithmeticException(); <br>        } <br>        catch(ArithmeticException e) { <br>            System.out.println("發生ArithmeticException"); <br>        } <br>        catch(ArrayIndexOutOfBoundsException e) { <br>            System.out.println(<br>             "ArrayIndexOutOfBoundsException/外層try-catch"); <br>        } <br>    } <br>} <br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">ArrayIndexOutOfBoundsException/外層try-catch</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+      
+      <p><small>程式中會訂定許多方法（Method），這些方法中可能會因某些錯誤而引發例外，但您不希望直接在這個方法中處理這些例外，而希望呼叫這個它的方法來統一處理，這時候您可以使用<span style="font-weight: bold;">"throws"關鍵字</span>來宣告這個方法將會丟出例外，例如：<br>
+
+
+
+
+      </small></p>
+
+
+
+
+      
+      <div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">private void someMethod(int[] arr) </span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">throws java.io.IOException</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;"> { </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 實作 </span><br style="font-weight: bold; font-family: Courier New,Courier,monospace;">
+
+
+
+
+      <span style="font-weight: bold; font-family: Courier New,Courier,monospace;">}</span><br>
+
+
+
+
+      </small></div>
+
+
+
+
+      
+      <p><small>&nbsp;注意如果會丟出多種可能的例外時，中間使用逗點分隔；當有方法上使用"throws"宣告例外時，意味著呼叫該方法的呼叫者必須處理這些例外，而被呼叫方法可以保持程式邏輯的簡潔，下面這個範例是"throws"的一個簡單示範：</small> </p>
+
+
+
+
+      
+      <ul>
+
+        <li> UseThrows.java
+  </li>
+
+      
+      </ul>
+
+
+
+
+
+      
+      <pre>public class UseThrows { <br>    public static void main(String[] args) { <br>        try { <br>            throwsTest(); <br>        } <br>        catch(java.io.IOException e) { <br>            System.out.println("捕捉例外"); <br>        } <br>    }<br><br>    private static void throwsTest() <br>                           throws java.io.IOException { <br>        System.out.println("這只是一個測試"); <br>        // 程式處理過程假設發生例外 <br>        throw new java.io.IOException(); <br>    } <br>} <br></pre>
+
+
+
+
+
+      <br>
+
+
+
+
+      <small><span class="postbody">
+執行結果：</span></small><br>
+
+
+
+
+
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);">這只是一個測試<br>
+
+
+
+
+&nbsp;捕捉例外</span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+        
+        </tbody>
+      
+      </table>
+
+
+
+
+      
+      <p><small>簡單的說，您要不就在方法中直接處理例外，要不就在方法上宣告該方法會丟回例外，由呼叫它的呼叫者來處理例外，另一方面，在方法上使用
+"throws"宣告可丟出的例外，也表示了您只能丟出所宣告類型的例外，其它的例外您必須在方法中處理完，或是重新包裝為所宣告的例外再丟出。</small></p>
+
+      <small>
+
+
+如果使用繼承時，在父類別的某個方法上宣告了throws某些例外，而在子類別中重新定義該方法時，您可以：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>不處理例外（重新定義時不設定throws）</small></li>
+
+        <li><small>可僅throws父類別中被重新定義的方法上之某些例外</small></li>
+
+        <li><small>可throws被重新定義的方法上之例外之子類別</small></li>
+
+      
+      </ul>
+
+
+
+
+      <small><br>
+
+
+但是您不可以：<br>
+
+      </small>
+      
+      <ul>
+
+        <li><small>throws出額外的例外</small></li>
+
+        <li><small>throws被重新定義的方法上之例外之父類別</small></li>
+
+      
+      </ul>
+
+ </td>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+      <br>
+
+      
+      <center>
+      
+       <br>
+
+
+      </center>
+
+
+ </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<small><br>
+
+</small><br>
+
+
+
+
+<br>
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaGossip-V1/ThrowThrows.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:17 GMT -->
+</html>

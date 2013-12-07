@@ -1,0 +1,602 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Python/ForComprehension.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>for 包含式（Comprehension）</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Python Gossip: for 包含式（Comprehension）</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+ <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br> <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>你可以在<span style="font-family: Courier New,Courier,monospace;">for</span>運算式中使用包含式語法來進行值的收集，<span style="font-family: Courier New,Courier,monospace;">for</span>運算結束傳回收集的結果，例如：<br>
+      </small>
+      <pre>import sys<br>files = [arg for arg in sys.argv if arg.endswith('.txt')]<br>print(files)<br></pre>
+      <small><br>
+這個範例可以收集命令列引數中輸入為.txt結尾的檔名，只有符合<span style="font-family: Courier New,Courier,monospace;">if</span>測試的<span style="font-family: Courier New,Courier,monospace;">arg</span>才會被收集，由於使用<span style="font-family: Courier New,Courier,monospace;">[]</span>包含，所以最後的結果是以串列傳回。例如：</small><br>
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;python demo.py 1.txt 2.doc. 3.txt 4.html 5.txt</span><br>
+['1.txt', '3.txt', '5.txt']</span></small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small>if的部份可以省略，這時會收集所有的迭代的值，你可以在<span style="font-family: Courier New,Courier,monospace;">for</span>左邊進行值的處理。例如計算串列中所有數的平方數：</small><br>
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; [number ** 2 for number in [10, 20, 30]]<br>
+</span>[100, 400, 900]</span></small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small>如果要作更巢狀的元素包括也是可行的，例如以下可將二維矩陣轉換為一維陣列：</small><br>
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; matrix = [<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; [1, 2, 3],<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; [4, 5, 6],<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; [7, 8, 9]<br>
+... ]<br>
+&gt;&gt;&gt; array = [element for row in matrix for element in row]<br>
+&gt;&gt;&gt; array<br>
+</span>[1, 2, 3, 4, 5, 6, 7, 8, 9]<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span></span></small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small>上例若不以<span style="font-family: Courier New,Courier,monospace;">for</span>包含式來實作，則如下：</small><br>
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; matrix = [<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; [1, 2, 3],<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; [4, 5, 6],<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; [7, 8, 9]<br>
+... ]<br>
+&gt;&gt;&gt; array = []<br>
+&gt;&gt;&gt; for row in matrix:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp; for element in row:<br>
+...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; array.append(element)<br>
+...<br>
+&gt;&gt;&gt; array<br>
+</span>[1, 2, 3, 4, 5, 6, 7, 8, 9]<span style="font-weight: bold;"></span></span></small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>另一個例子是，使用<span style="font-family: Courier New,Courier,monospace;">for</span>包含式來取得兩個串列的排列組合：</small><br>
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; [letter1 + letter2 for letter1 in 'Justin' for letter2 in 'momor']<br>
+</span>['Jm', 'Jo', 'Jm', 'Jo', 'Jr', 'um', 'uo', 'um', 'uo', 'ur',
+'sm', 'so', 'sm', 'so', 'sr', 'tm', 'to', 'tm', 'to', 'tr', 'im', 'io',
+'im', 'io', 'ir', 'nm', 'no<br>
+', 'nm', 'no', 'nr']<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span></span></small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>在Python3中，for包含式所收集的元素並不一定得包括在串列中，而可以包括在集合、字典中。例如：</small><br>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      <table style="text-align: left; width: 100%; font-family: Courier New,Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(0, 0, 0);"><small><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt;&gt; {i for i in 'Justin'}<br>
+</span>{'i', 'J', 'n', 's', 'u', 't'}<span style="font-weight: bold;"><br>
+&gt;&gt;&gt; scores = [('Justin', 95), ('momor', 93), ('Hamimi', 99)]<br>
+&gt;&gt;&gt; {name : score for (name, score) in scores}<br>
+            </span>{'Hamimi': 99, 'Justin': 95, 'momor': 93}<span style="font-weight: bold;"><br>
+&gt;&gt;&gt;</span><span style="font-weight: bold;"></span></span></small></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>如果以<span style="font-family: Courier New,Courier,monospace;">()包括for</span>包含式，則會建立一個產生器物件（本身是個具有<span style="font-family: Courier New,Courier,monospace;">__next__()</span>的迭代器），可以直接對其迭代來逐一取得元素。例如建立一個質數產生器（參考 </small><small><a href="../AlgorithmGossip/EratosthenesPrime.htm">Eratosthenes
+
+篩選求
+質數</a></small><small>）：<br>
+      </small>
+      <pre>import math<br>def primes(max):<br>    prime = [1] * max<br>    for i in range(2, int(math.sqrt(max))):<br>        if prime[i] == 1:<br>            for j in range(2 * i, max):<br>                if j % i == 0:<br>                    prime[j] = 0<br>    return <span style="font-weight: bold;">(i for i in range(2, max) if prime[i] == 1)</span><br>                <br>for prime in primes(1000):<br>    print(prime, end=" ")<br></pre>
+      <small><br>
+      </small><br>
+      <small><br>
+      </small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Python/ForComprehension.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

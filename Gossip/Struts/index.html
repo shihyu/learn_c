@@ -1,0 +1,1011 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Struts/ by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:01:43 GMT -->
+<head>
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+  
+  
+  <meta content="Struts, MVC, Model2" name="keywords"><title>Struts 學習筆記</title></head><body>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<div style="text-align: center;">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 15;
+google_ad_format = "728x15_0ads_al";
+google_ad_channel = "";
+google_color_border = "FFFFFF";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+<h1>開源框架: Struts Gossip</h1>
+
+
+
+<img style="width: 135px; height: 136px; float: left;" alt="目前沒有人可以動搖我的地位。。。呼。。。" title="目前沒有人可以動搖我的地位。。。呼。。。" src="images/hippo.jpg"><br>
+
+
+
+<br>
+
+
+
+<a class="wikilink" href="Model2Pattern.htm">Model 2</a>
+是現在設計Web應用程式的一個主流模式，也是經過驗證最好的Web層架構模式之一，在1999年2月的JavaWorld大會上，Govind
+Seshadri的 <a href="http://www.javaworld.com/javaworld/jw-12-1999/jw-12-ssj-jspmvc_p.html">Understanding
+JavaServer Pages Model 2
+architecture</a>
+中清楚的指出了Model 2 是一種 <a class="wikilink" href="MVCPattern.htm">MVC</a>
+模式。<br>
+
+
+
+<br>
+
+
+
+<a href="http://struts.apache.org/">
+Struts</a> 是支持Web
+MVC開發模式的 <a class="wikilink" href="FrameWork.htm">Framework</a>，
+由 <a href="http://blogs.sun.com/roller/page/craigmcc">Craig
+McClanahan</a>
+於2000年3月發起的專案，目前是 <a href="http://www.apache.org/">Apache</a>
+專案中的一個子專案，即使 Struts
+目前有許多稱其設計不良的非議之聲，但其使用人員多，文件豐富，目前來說仍是業界開發Web應用程式時一個接受度很高的MVC Framework選擇。<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//--></script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<table style="text-align: left; width: 966px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td style="width: 696px; vertical-align: top;">
+      
+      
+      <dl>
+
+
+
+        <dt><small>Struts API</small></dt>
+
+
+
+      
+      
+      </dl>
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+這邊會將我對Struts的瞭解整理起來，整理過程中所使用的Servlet Container是 <a href="http://jakarta.apache.org/tomcat/index.html">Tomcat</a>
+5.5.4，Struts版本是1.2.4，Struts 1.2之後也作了不少改進，您可以看看 <a href="http://struts.apache.org/userGuide/release-notes-1.2.1.html">1.2
+的 Release Notes</a> 瞭解一些改變的內容。<br>
+
+
+
+      <br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small>Struts 核心框架</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>Struts中支
+持MVC的主要類別及一些輔助類別，在這
+邊先不使用Struts標籤庫（Tag Library），這會讓我們更瞭解Struts中MVC的運作流程。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="WorkFlow.htm">Struts
+基本工作流程</a></small></li>
+
+
+
+          <li><small><a href="FirstStruts.htm">第
+一個 Struts 程式</a></small></li>
+
+
+
+          <li><small><a href="RequestProcessor.htm">簡
+介
+RequestProcessor</a></small></li>
+
+
+
+          <li><small><a href="ActionMapping.htm">簡
+介 ActionMapping</a></small></li>
+
+
+
+          <li><small><a href="ActionClass.htm">簡
+介 Action</a></small></li>
+
+
+
+          <li><small><a href="MessageResources.htm">訊
+息管理</a></small></li>
+
+
+
+          <li><small><a href="I18NMessage.htm">國
+際化訊息</a></small></li>
+
+
+
+          <li><small><a href="ActionForm.htm">使
+用 ActionForm</a></small></li>
+
+
+
+          <li><small><a href="ServerSideValidate.htm">伺
+服端表單驗證</a></small></li>
+
+
+
+          <li><small><a href="HandleException.htm">例
+外處理</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small>Struts 輔助方案</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>除了基本的MVC
+架構支援之外，對於一些實際開發時可能面
+對到的進階議題，Struts提供了一些輔助方案，您可以先考慮這些方案是否合用，以節省開發類似工具所要花費的時間。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="DispatchAction.htm">使
+用
+DispatchAction</a></small></li>
+
+
+
+          <li><small><a href="LookupDispatchAction.htm">使
+用
+LookupDispatchAction</a></small></li>
+
+
+
+          <li><small><a href="DynaActionForm.htm">使
+用
+DynaActionForm</a></small></li>
+
+
+
+          <li><small><a href="MapBackedActionForm.htm">Map-backed
+ActionForm</a></small></li>
+
+
+
+          <li><small><a href="WildcardMappings.htm">ActionMappings
+通配字元</a></small></li>
+
+
+
+          <li><small><a href="ModuleUnit.htm">模
+組化程式</a></small></li>
+
+
+
+          <li><small><a href="PluginInterface.htm">Plugin
+介面</a></small></li>
+
+
+
+          <li><small><a href="DataSource.htm">取
+得 DataSource</a></small></li>
+
+
+
+          <li><small><a href="FileUpload.htm">檔
+案上傳</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <dl>
+
+
+
+        <dt><small>Struts 標籤庫</small></dt>
+
+
+
+      
+      
+      </dl>
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+如果您的View層技術是使用JSP，而且您想要快速開發，充分利用Struts框架的功能，您就可以使用Struts標籤庫，儘量飽受批評，但使用它確
+實可以省不少功夫。<br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small><a href="StrutsTag.htm">使用
+Struts 標籤</a></small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <ul>
+
+
+
+        <li><small>Bean 標籤</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>如果您使用的是
+JSP
+2.0以下的版本，Bean標籤可以讓您不必撰寫scriplet就取得Servlet相關的訊息，若您使用的是JSP
+2.0，則可以使用Expression Language及其隱含物件來取代一些Bean標籤。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="BeanWrite.htm">&lt;bean:write&gt;</a></small></li>
+
+
+
+          <li><small><a href="BeanMessage.htm">&lt;bean:message&gt;</a></small></li>
+
+
+
+          <li><small><a href="BeanOtherRef.htm">其
+它 Bean 標籤參考</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small>Html 標籤</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>Struts的
+Html標籤元件用以取代一些靜態HTML
+元件，這可以讓您在JSP頁面上利用
+Struts框架的資源，像是ActionForm綁定、統一的訊息管理等，但得到好處的同時，您所付出的是View層與Struts框架的耦合度可能會
+因此增加。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="ActionMessage.htm">&lt;html:messages&gt;</a></small></li>
+
+
+
+          <li><small><a href="HtmlFTPS.htm">&lt;html:form&gt;、
+&lt;html:text&gt;、&lt;html:password&gt;、&lt;html:
+submit&gt;</a></small></li>
+
+
+
+          <li><small><a href="HtmlOtherRef.htm">其
+它 Html 標籤參考</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small>Logic 標籤</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>Logic標籤主
+要與頁面呈現邏輯相關，根據指定的條件來
+決定來呈現必要的元件，Struts的
+Logic標籤重疊到JSTL中的部份標籤，所以建議您將Struts的Logic標籤當作JSTL外的輔助標籤。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="LogicOtherRef.htm">其
+它 Logic 標籤參考</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <dl>
+
+
+
+        <dt><small>輔助框架</small></dt>
+
+
+
+      
+      
+      </dl>
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+在Struts中整合了Validator驗證框架，以及Tiles模版引擎，這邊一併簡介它們的使用方式。<br>
+
+
+
+      <br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small>Validator 框架</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small><a href="http://jakarta.apache.org/commons/index.html">Jakarta
+Commons Validator</a>
+框架可以將驗證邏輯移至ActionForm之外，輔助Struts開發人員使用或自訂客戶端與伺服端的驗證工作。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="SetupValidator.htm">設
+置 Validator 框架</a></small></li>
+
+
+
+          <li><small><a href="ClientSideValidator.htm">客
+戶端驗證器</a></small></li>
+
+
+
+          <li><small><a href="ServerSideValidator.htm">伺
+服端驗證器</a></small></li>
+
+
+
+          <li><small><a href="ValidatorMessage.htm">Validator
+訊息管理</a></small></li>
+
+
+
+          <li><small><a href="BuiltInValidator.htm">內
+建驗證器</a></small></li>
+
+
+
+          <li><small><a href="CustomizeValidator.htm">自
+訂驗證器</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small>Tiles 模版引擎</small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      
+      
+      <div style="margin-left: 40px;"><small>Tiles是一個
+模版引擎（Template
+Engine），它可以讓網頁的配置（Layout）標籤與內容分離，提供一個版面管理機制。</small></div>
+
+
+
+      
+      
+      <ul>
+
+
+
+        
+        
+        <ul>
+
+
+
+          <li><small><a href="SetupTiles.htm">設
+置 Tiles 模版引擎</a></small></li>
+
+
+
+          <li><small><a href="XmlConfig.htm">使用
+XML管理模版資源</a></small></li>
+
+
+
+          <li><small><a href="JSPConfig.htm">使用
+JSP管理模版資源</a></small></li>
+
+
+
+        
+        
+        </ul>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <small><br>
+
+
+
+      </small>
+      
+      
+      <dl>
+
+
+
+        <dt><small>參考資料</small></dt>
+
+
+
+      
+      
+      </dl>
+
+
+
+      <small>&nbsp; &nbsp; &nbsp; &nbsp;
+Struts的參考資料不少，隨便 <a href="http://www.google.com/">Google</a>
+都會有一堆，但多數為英文，中文資源比較零散，這邊收集幾個比較完整的Struts資源網站。<br>
+
+
+
+      </small>
+      
+      
+      <ul>
+
+
+
+        <li><small><a href="http://struts.apache.org/api/index.html">Struts
+API</a></small></li>
+
+
+
+        <li><small><a href="http://struts.apache.org/userGuide/index.html">Struts
+User Guide</a></small></li>
+
+
+
+        <li><small><a href="http://www.reumann.net/do/struts/main">Struttin'
+With Stuts</a></small></li>
+
+
+
+        <li><small><a href="http://www.matrix.org.cn/translation/Wiki.jsp?page=StrutsDoc">Struts
+User Guide 簡體中文翻譯</a></small></li>
+
+
+
+        <li><small><a href="http://www-900.ibm.com/developerWorks/cn/java/j-strutscol/">developerWorks
+Struts 專題</a></small></li>
+
+
+
+        <li><small><a href="http://www.theserverside.com/books/sourcebeat/JakartaStrutsLive/index.tss">theserverside
+struts 免費電子書</a></small></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      </td>
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><br>
+
+
+
+      
+      
+      <div align="center">
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+<!--
+<script language="JavaScript" src="../js/home.js"></script>
+<script language="JavaScript" src="../js/montage.js"></script>
+<script language="JavaScript">
+monTimeout = 10000;
+var urls = new Array();
+var imgs = new Array();
+var caps = new Array();
+urls[0] = "http://www.sunelearning.com.tw/index.jsp?src=T";
+imgs[0] = "../images/elearning-600-160.gif";
+caps[0] = "Sun 數位學院暑期特惠";
+urls[1] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4526&l=zh_TW";
+imgs[1] = "../images/sun_summer_160x600banner.jpg";
+caps[1] = "Sun 訓練中心暑期促銷";
+urls[2] = "https://www.suntrainingcatalogue.com/eduserv/client/viewPromo.do?pr_id=4521&l=zh_TW";
+imgs[2] = "../images/DL_banner_160X600.jpg";
+caps[2] = "2008 JCD 線上講座"; montage( urls, imgs, caps, 160, 600, monTimeout);
+</script>--></div>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <center>
+      
+      
+       </center>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <center><!-- adsense for content-->
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><!-- adsense for content end--></center>
+
+
+
+      </td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/Struts/ by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:01:57 GMT -->
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Hash.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>雜湊型態</title></head><body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Ruby Gossip: 雜湊型態<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="vertical-align: top; width: 250px; text-align: center;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br><center> </center></td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>在Ruby中，雜湊物件是儲存鍵（Key）/值（Value）對應的物件，為<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">Hash</span>的實例。直接示範如何以實字建立雜湊物件：</small><small><br></small>
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords = {"Justin" =&gt; 123456, "caterpillar" =&gt; 933933}<br>
+</span>=&gt; {"Justin"=&gt;123456, "caterpillar"=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["Justin"]<br>
+            </span>=&gt; 123456<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["caterpillar"]<br>
+            </span>=&gt; 933933<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["Hamimi"] = 970221<br>
+            </span>=&gt; 970221<span style="font-weight: bold;"><br>
+&gt;&gt; passwords<br>
+            </span>=&gt; {"Justin"=&gt;123456, "caterpillar"=&gt;933933, "Hamimi"=&gt;970221}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["Hamimi"]<br>
+            </span>=&gt; 970221<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.delete("caterpillar")<br>
+            </span>=&gt; 933933<span style="font-weight: bold;"><br>
+&gt;&gt; passwords<br>
+            </span>=&gt; {"Justin"=&gt;123456, "Hamimi"=&gt;970221}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.delete("XD")<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.delete("XD") { |key| "no such key #{key}" }<br>
+            </span>=&gt; "no such key XD"<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      </table>
+
+
+
+      <br>
+      <small>建立雜湊時，每個鍵物件（在上例中是字串，也可以是任何物件）會用來取得對應的值物件，指定鍵物件取得值物件時是使用<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">[]</span>操作。建立雜湊物件後，可以隨時再加入鍵/值。如果要刪除某個鍵/值，則可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">delete</span><span style="font-family: Courier New,Courier,monospace;">方法</span>，如果指定的鍵存在，<span style="font-family: Courier New,Courier,monospace;">delete</span>會傳回對應的值，若鍵不存在，預設會傳回<span style="font-family: Courier New,Courier,monospace;">nil</span>，<span style="font-family: Courier New,Courier,monospace;">delete</span>也可以指定區塊，</small><small>若鍵不存在，區塊傳回值就是<span style="font-family: Courier New,Courier,monospace;">delete的傳回值。</span></small><small><br>
+      <br>
+直接使用實字建立雜湊，若指定鍵要取得值時，雜湊中沒有該鍵的存在，則會傳回<span style="font-family: Courier New,Courier,monospace;">nil</span>，若使用<span style="font-family: Courier New,Courier,monospace;">fetch</span>方法指定鍵取值，在鍵不存在時會引發<span style="font-family: Courier New,Courier,monospace; font-weight: bold;">KeyError</span>例外，如果有指定<span style="font-family: Courier New,Courier,monospace;">fetch</span>的第二個引數，則鍵不存在時會傳回指定的第二個引數。可以使用<span style="font-family: Courier New,Courier,monospace;">key?、hash_key?、member?、include?等方法</span>來測試鍵是否存在於字典中，可以使<span style="font-family: Courier New,Courier,monospace;">用<span style="font-weight: bold;">value?</span>或<span style="font-weight: bold;">has_value?</span></span>方法測試指定的值是否存在。例如：</small><small><br></small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords["XD"]<br>
+</span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.fetch("XD")<br>
+            </span>KeyError: key not found: "XD"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):30:in `fetch'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from (irb):30<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from C:/Winware/Ruby192/bin/irb:12:in `&lt;main&gt;'<br>
+            <span style="font-weight: bold;">&gt;&gt; passwords.key? "XD"<br>
+            </span>=&gt; false<br>
+            <span style="font-weight: bold;">&gt;&gt; passwords.fetch("XD", "no such key")<br>
+            </span>=&gt; "no such key"<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.fetch("XD") { nil }</span><br>
+=&gt; nil<br>
+            <span style="font-weight: bold;">&gt;&gt; passwords.value? 123456<br>
+            </span>=&gt; true<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+      <br>
+      <small style="font-family: Courier New,Courier,monospace;">在上例中可以看到，fetch方法可以指定區塊，在指定的鍵不存在時，區塊的傳回值會是fetch的傳回值。</small><br>
+      <small><br>
+可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">Hash.new</span>來建立雜湊物件，如果呼叫時有傳入引數，則指定的鍵不存在時，會傳回<span style="font-family: Courier New,Courier,monospace;">Hash.new時傳入的引數，如果呼叫Hash.new時沒有傳入引數，指定的鍵不存在時會傳回nil。例如：</span></small><small><br></small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords = Hash.new<br>
+</span>=&gt; {}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["XD"]<br>
+            </span>=&gt; nil<span style="font-weight: bold;"><br>
+&gt;&gt; passwords = Hash.new(0)<br>
+            </span>=&gt; {}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["XD"]<br>
+            </span>=&gt; 0<span style="font-weight: bold;"><br>
+&gt;&gt; passwords = Hash.new { |hash, key|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; "no such key #{key}"<br>
+&gt;&gt; }<br>
+            </span>=&gt; {}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords["XD"]<br>
+            </span>=&gt; "no such key XD"<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+      <br>
+      <small>可以看到，<span style="font-family: Courier New,Courier,monospace;">Hash.new</span>時也可以指定區塊，區塊的傳回值就會是在指定的鍵不存在時的傳回值。<br>
+      <br>
+      <span style="font-family: Courier New,Courier,monospace;">想要知道雜湊長度，可以使用<span style="font-weight: bold;">size</span>或<span style="font-weight: bold;">length</span>方法，想要知道雜湊是否為空，可以使用<span style="font-weight: bold;">empty?</span>方法，想要取得雜湊中所有鍵，可以使用<span style="font-weight: bold;">keys</span>方法，這會以陣列傳回所有鍵，想要取得雜湊中所有值，可以使用<span style="font-weight: bold;">values</span>方法，這會以陣列傳回雜湊中所有值，使用to_a，則將鍵值以二維陣列傳回：</span></small><small><br></small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords = {"Justin" =&gt; 123456, "caterpillar" =&gt; 933933}<br>
+</span>=&gt; {"Justin"=&gt;123456, "caterpillar"=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.length<br>
+            </span>=&gt; 2<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.keys<br>
+            </span>=&gt; ["Justin", "caterpillar"]<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.values<br>
+            </span>=&gt; [123456, 933933]<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.to_a<br>
+            </span>=&gt; [["Justin", 123456], ["caterpillar", 933933]]<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">想要逐一取得雜湊中的鍵，可以使用<span style="font-weight: bold;">each_key</span>方法，想要逐一取得雜湊中的值，可以使用<span style="font-weight: bold;">each_value</span>方法，想要逐一取得鍵與值，可以使用<span style="font-weight: bold;">each</span>方法：</span></small><small><br></small>
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords.each_key do |key|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts key<br>
+&gt;&gt; end<br>
+</span>Justin<br>
+caterpillar<span style="font-weight: bold;"><br>
+            </span>=&gt; {"Justin"=&gt;123456, "caterpillar"=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.each_value do |val|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts val<br>
+&gt;&gt; end<br>
+            </span>123456<br>
+933933<span style="font-weight: bold;"><br>
+            </span>=&gt; {"Justin"=&gt;123456, "caterpillar"=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords.each do |key, val|<br>
+?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "#{key}-#{val}"<br>
+&gt;&gt; end<br>
+            </span>Justin-123456<br>
+caterpillar-933933<span style="font-weight: bold;"><br>
+            </span>=&gt; {"Justin"=&gt;123456, "caterpillar"=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+      <br>
+      <small>之後會談到，建立雜湊時，任何實例 可以作為鍵，但建議重新定義<span style="font-family: Courier New,Courier,monospace;">eq?與hash</span>方法，而且最好使用不可變動物件作為鍵，先前談 </small><small><a href="Symbol.html">符號型態</a> 時說明過，<span style="font-family: Courier New,Courier,monospace;">Symbol</span>實例為不可變動，且擁有唯一性，因此經常用來作為雜湊的鍵物件。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords = {:Justin =&gt; 123456, :caterpillar =&gt; 933933}<br>
+</span>=&gt; {:Justin=&gt;123456, :caterpillar=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords[:Justin]<br>
+            </span>=&gt; 123456<span style="font-weight: bold;"><br>
+&gt;&gt; passwords[:caterpillar]<br>
+            </span>=&gt; 933933<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;">因為Symbol實例作為鍵很常用，</span>在Ruby1.9之後，還可以寫得更簡潔，作用與上例相同：</small><small><br></small>
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords = {Justin: 123456, caterpillar: 933933}<br>
+</span>=&gt; {:Justin=&gt;123456, :caterpillar=&gt;933933}<span style="font-weight: bold;"><br>
+&gt;&gt; passwords[:Justin]<br>
+      </span>=&gt; 123456<span style="font-weight: bold;"><br>
+&gt;&gt; passwords[:caterpillar]<br>
+      </span>=&gt; 933933<span style="font-weight: bold;"><br>
+&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+      <br>
+      <small>在Ruby 1.9之後，雜湊是有序的，鍵的順序就是安插雜湊的順序，也會使用索引記錄。例如：</small><small><br></small>
+      
+      
+      
+      
+      
+      
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(255, 255, 255);"><span style="font-weight: bold;">&gt;&gt; passwords = {Justin: 123456, caterpillar: 933933, Monica: 987654}<br>
+</span>=&gt; {:Justin=&gt;123456, :caterpillar=&gt;933933, :Monica=&gt;987654}<br>
+            <span style="font-weight: bold;">&gt;&gt; passwords.each_with_index do |kv, index|</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "#{index} - #{kv}"</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">&gt;&gt; end</span><br>
+0 - [:Justin, 123456]<br>
+1 - [:caterpillar, 933933]<br>
+2 - [:Monica, 987654]<br>
+=&gt; {:Justin=&gt;123456, :caterpillar=&gt;933933, :Monica=&gt;987654}<br>
+            <span style="font-weight: bold;">&gt;&gt; passwords.each_with_index do |(key, value), index|</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">?&gt;&nbsp;&nbsp;&nbsp;&nbsp; puts "#{index} - #{key}, #{value}"</span><br style="font-weight: bold;">
+            <span style="font-weight: bold;">&gt;&gt; end</span><br>
+0 - Justin, 123456<br>
+1 - caterpillar, 933933<br>
+2 - Monica, 987654<br>
+=&gt; {:Justin=&gt;123456, :caterpillar=&gt;933933, :Monica=&gt;987654}<br>
+<span style="font-weight: bold;">&gt;&gt;</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></span></small><span style="color: rgb(255, 255, 255);"><br>
+
+
+
+
+            </span></td></tr></tbody>
+      
+      
+      
+      
+      
+      
+      </table>
+
+
+
+
+
+
+
+
+
+
+      <br>
+      <small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">each_with_index</span>方法的第一個區塊參數接受陣列物件，當中包括每次迭代的鍵與值物件，第二個區塊參數則是索引。上例中第二次使用<span style="font-family: Courier New,Courier,monospace;">each_with_index時，使用括號(key, value)</span>，這會將陣列中第一個索引元素指定給<span style="font-family: Courier New,Courier,monospace;">key，第二個索引元素指定給key，利用的是<big> </big></span></small><small><big><a href="Array.html"><small>陣列型態</small></a></big> 中談過的特性。</small><br>
+
+
+      <br>
+
+<br>
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script></body>
+<!-- Mirrored from openhome.cc/Gossip/Ruby/Hash.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:15:42 GMT -->
+</html>

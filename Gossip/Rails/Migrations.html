@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="zh-tw">
+  
+<!-- Mirrored from openhome.cc/Gossip/Rails/Migrations.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>資料庫遷移</title>
+    <meta content="良葛格（caterpillar）" name="author">
+    <meta content="ruby on rails ror migrations" name="keywords">
+    <link href="css/std.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="hgroup">
+        <h3><a href="../index.html">From Gossip@Openhome</a></h3>
+        <h1><a href="index-2.html">Rails Gossip: 資料庫遷移<br>
+          </a></h1>
+      </div>
+    </div>
+    <div class="article">
+      <p>當你使用rails generate model產生指定的資料庫模型物件時，會產生幾個檔案： </p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>$ rails g model message name:string content:text is_read:boolean<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp; active_record<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; db/migrate/20111214072231_create_messages.rb<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      其中20111214072231_create_messages.rb這個檔案，前半段是時間戳記，格式為YYYYMMDDHHMMSS，Rails以時間戳記來記錄哪個遷移rb檔案已經執行過，記錄用的表格是schema_migrations，欄位為version。<br>
+      <br>
+      如果db/migrate中同時存在兩個以上的遷移用rb，時間戳記會決定執行順序，擁有較早時間戳記的遷移rb檔案會先執行，執行過的rb檔案，其時間戳記會記錄於資料庫中"schema_migrations"."version"，已執行過的rb檔案不會再執行。<br>
+      <br>
+      舉例來說，db/migrate中同時存在20120116064658_xx.rb與20120116064707_oo.rb，使用rake db:migrate會依序執行20120116064658_xx.rb與20120116064707_oo.rb；如果A使用者先在db/migrate中放了20120116064707_oo.rb，使用rake db:migrate執行過後，"schema_migrations"."version"會記錄20120116064707，B使用者再於db/migrate置入20120116064658_xx.rb，使用rake db:migrate時，雖然20120116064658_xx.rb的時間戳記比20120116064707_oo.rb早，仍只會執行20120116064658_xx.rb。
+      <p>可以使用rake db:rollback撤消已執行過的遷移rb檔案，撤消順序是依據"schema_migrations"."version"中記錄的時間戳記，較晚的時間戳記會先撤消。以上例來說，執行rake db:rollback，會是20120116064707_oo.rb的撤消動作，再次執行rake db:rollback，才是20120116064658_xx.rb的撤消動作，撤消時也會從"schema_migrations"."version"刪除記錄的時間戳記。</p>
+      <p>再來看看遷移rb檔本身：</p>
+      <ul>
+        <li>*_create_messages.rb</li>
+      </ul>
+      <pre>class CreateMessages &lt; ActiveRecord::Migration
+  def change
+    create_table :messages do |t|
+      t.string :name
+      t.text :content
+      t.boolean :is_read
+
+      t.timestamps
+    end
+  end
+end</pre>
+      <p></p>
+      如果使用rails g model message...指定建立模型，則會建立<span class="courier">CreateMessages</span>類別，類別名稱與檔案名稱後半段必須有對應，類別名稱使用駝峰式（Camel case）命名，檔案名稱則以底線區隔單字命名，例如類別名稱為<span
+        class="courier">CreateMessages</span>，檔案名稱就必須是YYYYMMDDHHMMSS_create_messages.rb，相對的，如果有個檔案名稱是YYYYMMDDHHMMSS_add_columns_to_messages.rb，則類別名稱必須取名為<span
+        class="courier">AddColumnsToMessages</span>。<br>
+      <br>
+      Rails的遷移類別都繼承自<span class="courier">ActiveRecord::Migration</span>，首先看到<span
+        class="courier">change</span>方法，從Rails 3.1開始，可逆轉的（Reversible）遷移方法，會定義在<span
+        class="courier">change</span>方法中，執行rake db:migrate時，會呼叫<span class="courier">change</span>方法執行其中定義的內容，而執行rake db:rollback時，會自動根據<span
+        class="courier">change</span>方法中的邏輯，執行逆轉的遷移方法。以上例而言，<span class="courier">change</span>方法中使用了<span
+        class="courier">create_table</span>指定建立了messages表格，執行rake db:rollback時，會自動執行<span
+        class="courier">drop_table</span>方法將messages表格刪除。可逆轉指令可參考<span class="courier">ActiveRecord::Migration::CommandRecorder</span>的文件說明，如果在執行撤消時指令無法逆轉，會丟出<span
+        class="courier">ActiveRecord::IrreversibleMigration</span>。<br>
+      <p> </p>
+      <p></p>
+      若想分別控制rake db:migrate與rake db:rollback時執行的動作，可以自行定義<span class="courier">up與down</span>方法。建立遷移檔案時，Rails會嘗試判斷是否想執行可逆轉動作，如果是的話，遷移檔案中會自動產生<span
+        class="courier">change</span>方法，如果Rails無法判斷是否想執行可逆轉方法，則會自動產生<span
+        class="courier">up與down</span>方法。例如，可使用以下指令產生遷移檔案：<br>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>$ rails g migration add_columns_to_messages<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp; active_record<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; db/migrate/20120116082733_add_columns_to_messages.rb<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      因為add_column為可逆轉方法<span class="courier">add_column</span>的名稱，產生的遷移檔案會是：
+      <ul>
+        <li>*_add_columns_to_messages.rb</li>
+      </ul>
+      <pre>class AddColumnsToMessages &lt; ActiveRecord::Migration
+  def change
+  end
+end<br></pre>
+      <p>如果是以下指令：</p>
+      <p> </p>
+      <table class="cmd">
+        <tbody>
+          <tr>
+            <td>$ rails g migration a<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invoke&nbsp; active_record<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create&nbsp;&nbsp;&nbsp; db/migrate/20120116082852_a.rb<br>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>產生的遷移檔案會是：</p>
+      <ul>
+        <li>*_a.rb</li>
+      </ul>
+      <pre>class A &lt; ActiveRecord::Migration
+  def up
+  end<br><br>  def down<br>  end<br>end
+</pre>
+      <p>當然，無論是哪個，你都可以自由地在類別中選擇定義<span class="courier">change、up或down，如果同時定義了change、up與down，則up與down會被忽略。up</span>是執行rake db:migrate時要進行的動作，<span
+          class="courier">down</span>是執行rake db:rollback會進行的動作。一個範例如下：</p>
+      <ul>
+        <li>*_add_columns_to_messages.rb</li>
+      </ul>
+      <pre>class AddColumnsToMessages &lt; ActiveRecord::Migration
+  def up
+    add_column :messages, :from, :string
+  end
+
+  def down
+    remove_column :messages, :from
+  end
+end</pre>
+      <p></p>
+      <p>接著執行rake db:migrate，就會執行<span class="courier">up</span>方法，也就在messages表格中附加from欄位，如果執行rake db:rollback，則會執行<span
+          class="courier">down</span>方法，也就會將messages表格中的from欄位移除。</p>
+      <p> Rails的遷移類別都繼承自<span class="courier">ActiveRecord::Migration</span>，可查看文件瞭解有哪些資料表建立、操作的方法，常見的有：</p>
+      <ul class="courier">
+        <li><strong>create_table(name, options)</strong></li>
+        <li><strong>drop_table(name)</strong></li>
+        <li><strong>rename_table(old_name, new_name)</strong></li>
+        <li><strong>add_column(table_name, column_name, type, options)</strong></li>
+        <li><strong>rename_column(table_name, column_name, new_column_name)</strong></li>
+        <li><strong>change_column(table_name, column_name, type, options)</strong></li>
+        <li><strong>remove_column(table_name, column_names)</strong></li>
+        <li><strong>add_index(table_name, column_names, options)</strong></li>
+        <li><strong>remove_index(table_name, :column =&gt; column_name)</strong></li>
+        <li><strong>remove_index(table_name, :name =&gt; index_name)</strong></li>
+      </ul>
+      <p>相關方法細節還可以參考<span class="courier">ActiveRecord::ConnectionAdapters::SchemaStatements、ActiveRecord::ConnectionAdapters::TableDefinition與ActiveRecord::ConnectionAdapters::Table</span>的文件說明。<br>
+      </p>
+      <p>Rails內建了一些欄位型態，例如基本的型態有：<br>
+      </p>
+      <ul class="courier">
+        <li>:primary_key：主鍵欄位</li>
+        <li>:string：有限長度文字</li>
+        <li>:text：無限長度文字</li>
+        <li>:integer：整數</li>
+        <li>:float：浮點數</li>
+        <li>:decimal：十進位數</li>
+        <li>:datetime：日期時間</li>
+        <li>:timestamp：時間戳記</li>
+        <li>:time：時間</li>
+        <li>:date：日期</li>
+        <li>:binary：二進位資料</li>
+        <li>:boolean：外部鍵參考</li>
+      </ul>
+      <p> </p>
+      <p>視底層使用的資料庫而定，Rails內建的欄位型態是中性的，會自動轉換為底層資料庫合適的欄位型態，欄位型態說明，可以參考<span
+          class="courier">ActiveRecord::ConnectionAdapters::TableDefinition</span>的<a
+          href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html#method-i-column"> column(name, type, options = {})</a> 文件說明，在操作資料表格時，有些物件上會有些方法名稱與Rails內建欄位型態名稱相同，例如：</p>
+      <p class="courier" style="margin-left: 40px;"><strong>create_table :messages do |t|<br>
+          &nbsp;&nbsp;&nbsp; t.string :name<br>
+          &nbsp;&nbsp;&nbsp; t.text :content<br>
+          &nbsp;&nbsp;&nbsp; t.boolean :is_read<br>
+          <br>
+          &nbsp;&nbsp;&nbsp; t.timestamps<br>
+          end</strong><br>
+      </p>
+      <p>上例中<span class="courier">t</span>實際上會參考<span class="courier">ActiveRecord::ConnectionAdapters::Tabl</span>e實例，<span
+          class="courier">t.string :name</span>為messages表格建立name欄位，型態為有限長度文字，<span
+          class="courier">t.text、t.boolean的作用類推，有些方法會有預設的欄位建立動作，像是t.timestamps</span>會自動建立created_at與updated_at兩個欄位，有些名稱是Rails實用的欄位名稱，像是id作為主鍵欄位、表格名稱_id作為外部鍵欄位、created_at、updated_at等。</p>
+      <p>在執行資料庫遷移時，除了rake db:migrate、rake db:rollback指令之外，還有更多細部控制遷移的指令，這在Rails官方文件 <a
+          href="http://edgeguides.rubyonrails.org/migrations.html">Migrations</a> 中有詳細的介紹，其中還有更多資料庫遷移的細節可供參考。<br>
+      </p>
+      <p><br>
+      </p>
+      <p></p>
+      <ul>
+      </ul>
+    </div>
+    <div class="aside">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script> <br>
+      <br>
+      <br>
+      <center>
+         </center>
+    </div>
+    <script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script> <script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script> </body>
+
+<!-- Mirrored from openhome.cc/Gossip/Rails/Migrations.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:16:09 GMT -->
+</html>

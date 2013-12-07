@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/HibernateDeclarativeTransaction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>Hibernate 宣告式交易管理</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+
+<h1><a href="index-2.html">Spring Gossip: Hibernate 宣告式交易管理</a></h1>
+
+
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+      <br>
+
+
+      
+      
+      <center>
+      
+      
+       <br>
+
+
+
+      </center>
+
+
+
+ </td>
+
+
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>Spring對Hibernate提供宣告式的交易管理，這與 </small><a href="JDBCDeclarativeTransaction.html"><small>JDBC 宣告式交易管理</small></a> <small>類似，先來介紹一下比較簡單的方式，直接從HibernateTemplateDemo專案來進行改寫，事實上您不需要修改UserDAO類別，而只要在定義檔上設定即可：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>UserDAO.java</li>
+
+      
+      </ul>
+
+      
+      <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt; <br>&lt;!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN/EN" <br> "http://www.springframework.org/dtd/spring-beans.dtd"&gt; <br>&lt;beans&gt; <br>    &lt;bean id="dataSource" <br>          class="org.springframework.jdbc.<br>                   &rarr; datasource.DriverManagerDataSource"&gt; <br>        &lt;property name="driverClassName"&gt; <br>            &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="url"&gt; <br>            &lt;value&gt;jdbc:mysql://localhost:3306/demo&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="username"&gt; <br>            &lt;value&gt;caterpillar&lt;/value&gt; <br>        &lt;/property&gt; <br>        &lt;property name="password"&gt; <br>            &lt;value&gt;123456&lt;/value&gt; <br>        &lt;/property&gt;  <br>    &lt;/bean&gt; <br>    <br>    &lt;bean id="sessionFactory"  <br>          class="org.springframework.orm.<br>                   &rarr; hibernate3.LocalSessionFactoryBean" <br>          destroy-method="destroy"&gt; <br>        &lt;property name="dataSource"&gt; <br>            &lt;ref bean="dataSource"/&gt; <br>        &lt;/property&gt; <br>        &lt;property name="mappingResources"&gt; <br>            &lt;list&gt; <br>                &lt;value&gt;onlyfun/caterpillar/User.hbm.xml&lt;/value&gt; <br>            &lt;/list&gt; <br>        &lt;/property&gt; <br>        &lt;property name="hibernateProperties"&gt; <br>            &lt;props&gt; <br>                &lt;prop key="hibernate.dialect"&gt; <br>                    org.hibernate.dialect.MySQLDialect<br>                &lt;/prop&gt; <br>            &lt;/props&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br><br>    &lt;bean id="userDAO" class="onlyfun.caterpillar.UserDAO"&gt; <br>        &lt;property name="sessionFactory"&gt; <br>            &lt;ref bean="sessionFactory"/&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br><br>    &lt;bean id="transactionManager" <br>          class="org.springframework.orm.<br>                   &rarr; hibernate3.HibernateTransactionManager"&gt; <br>        &lt;property name="sessionFactory"&gt; <br>            &lt;ref bean="sessionFactory"/&gt; <br>        &lt;/property&gt; <br>    &lt;/bean&gt; <br>        <br>    &lt;bean id="userDAOProxy" <br>          class="org.springframework.transaction.<br>                   &rarr; interceptor.TransactionProxyFactoryBean"&gt; <br>        &lt;property name="transactionManager"&gt; <br>            &lt;ref bean="transactionManager"/&gt; <br>        &lt;/property&gt; <br>        &lt;property name="proxyInterfaces"&gt; <br>            &lt;list&gt;<br>                &lt;value&gt;onlyfun.caterpillar.IUserDAO&lt;/value&gt;<br>            &lt;/list&gt;<br>        &lt;/property&gt; <br>        &lt;property name="target"&gt; <br>            &lt;ref bean="userDAO"/&gt; <br>        &lt;/property&gt; <br>        &lt;property name="transactionAttributes"&gt; <br>            &lt;props&gt; <br>                &lt;prop key="insert"&gt;PROPAGATION_REQUIRED&lt;/prop&gt; <br>            &lt;/props&gt; <br>        &lt;/property&gt;        <br>    &lt;/bean&gt; <br>&lt;/beans&gt;</pre>
+
+      <small><br>
+
+主要的差別在於設定檔中建立了transactionManager與userDAOProxy，由於Spring所提供的一致性的設定模型，所以設定的方式與 </small><small> </small><a href="JDBCDeclarativeTransaction.html"><small>JDBC 宣告式交易管理</small></a> &nbsp;<small>的設定方式是類似的。<br>
+
+      <br>
+
+來寫個程式測試一下，這次取回DAO代理物件來進行操作，如下所示：<br>
+
+      </small>
+      
+      <ul>
+
+        <li>SpringHibernateDemo.java</li>
+
+      
+      </ul>
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>import org.springframework.context.ApplicationContext;<br>import org.springframework.context.<br>              support.FileSystemXmlApplicationContext;<br><br>public class SpringHibernateDemo {<br>    public static void main(String[] args) {<br>        ApplicationContext context = <br>            new FileSystemXmlApplicationContext(<br>                    "beans-config.xml");<br>        <br>        // 建立DAO物件<br>        IUserDAO userDAO = <br>            (IUserDAO) context.getBean("userDAOProxy");<br>        <br>        User user = new User();<br>        user.setName("cater");<br>        user.setAge(new Integer(30));<br>        <br>        userDAO.insert(user);<br>        <br>        user = userDAO.find(new Integer(1));<br>        <br>        System.out.println("name: " + user.getName());<br>    }<br>} </pre>
+
+      <small><br>
+
+如果在執行insert()方法時發生了例外，則資料不會被新增至表格中，您可以自行在UserDAO類別中嘗試丟出個例外以測試交易的功能是否正確執行。<br>
+
+      <br>
+
+同樣的，在Spring中對Hibernate進行宣告式交易管理時，使用到Spring AOP的功能，所以您必須在Classpath的路徑設定中加入spring-aop.jar檔案才可以執行專案中的程式。<br>
+
+      <br>
+
+      <br>
+
+      <br>
+
+
+      </small></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/SpringGossip/HibernateDeclarativeTransaction.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:21:06 GMT -->
+</html>

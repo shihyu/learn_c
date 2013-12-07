@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/AntJUnit.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:31 GMT -->
+<head>
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+  <title>結合 JUnit</title>
+
+  
+</head><body>
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">JUnit Gossip: 結合 JUnit<br>
+</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 250px; text-align: center;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+</script><br>
+<br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+      <br>
+      <center>
+       </center>
+      </td>
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>結
+合Ant與JUnit，可以讓你進行自動測試，最基本的方式可以執行<span style="font-family: Courier New,Courier,monospace;">org.junit.runner.JUnitCore</span>來
+進行測試。例如：<br>
+      </small>
+      <pre>&lt;project name="example" default="run"&gt; <br>    &lt;property name="src.dir" value="src"/&gt; <br>    &lt;property name="bin.dir" value="bin"/&gt;<br>    &lt;property name="junit.dir" value="lib/junit-4.8.2.jar"/&gt;<br>    &lt;property name="test.class" value=""/&gt; <br><br>    &lt;target name="clean"&gt;<br>        &lt;delete dir="${bin.dir}"/&gt;<br>    &lt;/target&gt;<br>    <br>    &lt;target name="prepare" depends="clean"&gt; <br>        &lt;mkdir dir="${bin.dir}"/&gt; <br>    &lt;/target&gt; <br><br>     &lt;target name="compile" depends="prepare"&gt; <br>        &lt;javac srcdir="${src.dir}" destdir="${bin.dir}"&gt;<br>            &lt;classpath&gt; <br>                &lt;pathelement location="${junit.dir}"/&gt;  <br>            &lt;/classpath&gt;           <br>        &lt;/javac&gt;<br>    &lt;/target&gt;<br><br>    &lt;target name="run" depends="compile"&gt;<br><span style="font-weight: bold;">        &lt;java classname="org.junit.runner.JUnitCore"&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;classpath path="${bin.dir};${junit.dir}"/&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">	        &lt;arg value="${test.class}"/&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;/java&gt;</span><br>    &lt;/target&gt;<br>&lt;/project&gt;<br><br></pre>
+      <br>
+      <small>在執行時，可以指定測試類別。例如：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;ant
+-Dtest.class=cc.openhome.CalculatorTest<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">Buildfile:
+C:\workspace\example\build.xml<br>
+            <br>
+clean:<br>
+&nbsp;&nbsp; [delete] Deleting directory C:\workspace\example\bin<br>
+            <br>
+prepare:<br>
+&nbsp;&nbsp;&nbsp; [mkdir] Created dir: C:\workspace\example\bin<br>
+            <br>
+compile:<br>
+&nbsp;&nbsp;&nbsp; [javac] C:\workspace\example\build.xml:16: warning:
+'includeantruntime' was not<br>
+&nbsp;set, defaulting to build.sysclasspath=last; set to false for
+repeatable builds<br>
+&nbsp;&nbsp;&nbsp; [javac] Compiling 2 source files to
+C:\workspace\example\bin<br>
+            <br>
+run:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java] JUnit version 4.8.2<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java] ..<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java] Time: 0.015<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java]<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java] OK (2 tests)<br>
+&nbsp;&nbsp;&nbsp;&nbsp; [java]<br>
+            <br>
+BUILD SUCCESSFUL<br>
+Total time: 1 second</span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>你也可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;junit&gt;</span>標
+籤，要使用這個標籤，Ant必須知道JUnit的JAR檔位置，你可以將JUnit的JAR檔放在Ant的lib目錄中，或者是於<span style="font-family: Courier New,Courier,monospace;">&lt;junit&gt;中使用
+&lt;classpath&gt;指定</span>。例如：<br>
+      </small>
+      <pre>&lt;project name="example" default="test"&gt; <br>    &lt;property name="src.dir" value="src"/&gt; <br>    &lt;property name="bin.dir" value="bin"/&gt;<br>    &lt;property name="junit.dir" value="lib/junit-4.8.2.jar"/&gt;<br><br>    &lt;target name="clean"&gt;<br>        &lt;delete dir="${bin.dir}"/&gt;<br>    &lt;/target&gt;<br>    <br>    &lt;target name="prepare" depends="clean"&gt; <br>        &lt;mkdir dir="${bin.dir}"/&gt; <br>    &lt;/target&gt; <br><br>    &lt;target name="compile" depends="prepare"&gt; <br>        &lt;javac srcdir="${src.dir}" destdir="${bin.dir}"&gt; <br>            &lt;classpath&gt; <br>                &lt;pathelement location="${junit.dir}"/&gt;  <br>            &lt;/classpath&gt;        <br>        &lt;/javac&gt;<br>    &lt;/target&gt;<br>        	<br>    &lt;target name="test" depends="compile"&gt; <br><span style="font-weight: bold;">        &lt;junit printsummary="yes"&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;test name="cc.openhome.CalculatorTest"/&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;classpath&gt; </span><br style="font-weight: bold;"><span style="font-weight: bold;">                &lt;pathelement location="${bin.dir}"/&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                &lt;pathelement location="${junit.dir}"/&gt;  </span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;/classpath&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">        &lt;/junit&gt;</span> <br>    &lt;/target&gt; <br>&lt;/project&gt;<br></pre>
+      <br>
+      <small>執行時可以如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;ant<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">Buildfile:
+C:\workspace\example\build.xml<br>
+            <br>
+clean:<br>
+&nbsp;&nbsp; [delete] Deleting directory C:\workspace\example\bin<br>
+            <br>
+prepare:<br>
+&nbsp;&nbsp;&nbsp; [mkdir] Created dir: C:\workspace\example\bin<br>
+            <br>
+compile:<br>
+&nbsp;&nbsp;&nbsp; [javac] C:\workspace\example\build.xml:16: warning:
+'includeantruntime' was not<br>
+&nbsp;set, defaulting to build.sysclasspath=last; set to false for
+repeatable builds<br>
+&nbsp;&nbsp;&nbsp; [javac] Compiling 2 source files to
+C:\workspace\example\bin<br>
+            <br>
+test:<br>
+&nbsp;&nbsp;&nbsp; [junit] Running cc.openhome.CalculatorTest<br>
+&nbsp;&nbsp;&nbsp; [junit] Tests run: 2, Failures: 0, Errors: 0, Time
+elapsed: 0.028 sec<br>
+            <br>
+BUILD SUCCESSFUL<br>
+Total time: 1 second</span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <small>你可以在<span style="font-family: Courier New,Courier,monospace;">&lt;junit&gt;</span>標
+籤上指定其它屬性：</small><br>
+      <div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&lt;junit printsummary="yes"
+haltonerror="yes" haltonfailure="yes" fork="yes"&gt; </span></small><br>
+      </div>
+      <br>
+      <small><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">haltonerror</span>與<span style="font-weight: bold;">haltonfailure</span>如果設為<span style="font-weight: bold;">yes</span>，則在</span>Error或Failure<span style="font-family: Courier New,Courier,monospace;">時，會中斷測試，<span style="font-weight: bold;">fork</span>如果為<span style="font-weight: bold;">yes</span>，則會為每個測試啟動一個新的</span>JVM。</small><br>
+      <br>
+      <small>如果一次執行的測試類別不只一個，使用<span style="font-family: Courier New,Courier,monospace;">&lt;test&gt;</span>指
+定並不方便，則可以使用<span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&lt;batchtest&gt;</span>。
+例如指定所有Test結尾的測試類別：<br>
+      </small>
+      <pre>&lt;project name="example" default="test"&gt; <br>    &lt;property name="src.dir" value="src"/&gt; <br>    &lt;property name="bin.dir" value="bin"/&gt;<br>    &lt;property name="junit.dir" value="lib/junit-4.8.2.jar"/&gt;<br><br>    &lt;target name="clean"&gt;<br>        &lt;delete dir="${bin.dir}"/&gt;<br>    &lt;/target&gt;<br>    <br>    &lt;target name="prepare" depends="clean"&gt; <br>        &lt;mkdir dir="${bin.dir}"/&gt; <br>    &lt;/target&gt; <br><br>    &lt;target name="compile" depends="prepare"&gt; <br>        &lt;javac srcdir="${src.dir}" destdir="${bin.dir}"&gt; <br>            &lt;classpath&gt; <br>                &lt;pathelement location="${junit.dir}"/&gt;<br>            &lt;/classpath&gt;        <br>        &lt;/javac&gt;<br>    &lt;/target&gt;<br>        	<br>    &lt;target name="test" depends="compile"&gt; <br>        &lt;junit printsummary="yes"&gt; <br><span style="font-weight: bold;">            &lt;batchtest&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">                &lt;fileset dir="${src.dir}" includes="**/*Test.java"/&gt;</span><br style="font-weight: bold;"><span style="font-weight: bold;">            &lt;/batchtest&gt;</span><br>            &lt;classpath&gt; <br>                &lt;pathelement location="${bin.dir}"/&gt;<br>                &lt;pathelement location="${junit.dir}"/&gt;  <br>            &lt;/classpath&gt;<br>        &lt;/junit&gt; <br>    &lt;/target&gt; <br>&lt;/project&gt;<br></pre>
+      <br>
+      <small>執行時可以如下：</small><span class="Apple-style-span" style="border-collapse: separate; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-style-span" style="font-family: serif; text-align: left;"><br class="Apple-interchange-newline">
+      <table style="text-align: left; width: 690px; font-family: 'Courier New',Courier,monospace;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="background-color: rgb(0, 0, 0);"><small style="font-weight: bold;"><span style="color: rgb(255, 255, 255);">&gt;ant<br>
+            </span></small><small><span style="color: rgb(255, 255, 255);">Buildfile:
+C:\workspace\example\build.xml<br>
+            <br>
+clean:<br>
+&nbsp;&nbsp; [delete] Deleting directory C:\workspace\example\bin<br>
+            <br>
+prepare:<br>
+&nbsp;&nbsp;&nbsp; [mkdir] Created dir: C:\workspace\example\bin<br>
+            <br>
+compile:<br>
+&nbsp;&nbsp;&nbsp; [javac] C:\workspace\example\build.xml:15: warning:
+'includeantruntime' was not<br>
+&nbsp;set, defaulting to build.sysclasspath=last; set to false for
+repeatable builds<br>
+&nbsp;&nbsp;&nbsp; [javac] Compiling 3 source files to
+C:\workspace\example\bin<br>
+            <br>
+test:<br>
+&nbsp;&nbsp;&nbsp; [junit] Running cc.openhome.AbcTest<br>
+&nbsp;&nbsp;&nbsp; [junit] Tests run: 1, Failures: 0, Errors: 0, Time
+elapsed: 0.023 sec<br>
+&nbsp;&nbsp;&nbsp; [junit] Running cc.openhome.CalculatorTest<br>
+&nbsp;&nbsp;&nbsp; [junit] Tests run: 2, Failures: 0, Errors: 0, Time
+elapsed: 0.004 sec<br>
+            <br>
+BUILD SUCCESSFUL<br>
+Total time: 1 second</span></small><small><span style="color: rgb(255, 255, 255);"></span></small></td>
+          </tr>
+        </tbody>
+      </table>
+      </span></span><br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JUnit/AntJUnit.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:19:31 GMT -->
+</html>

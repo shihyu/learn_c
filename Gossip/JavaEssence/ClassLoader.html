@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/ClassLoader.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:10 GMT -->
+<head>
+
+
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+  <meta content="text/html; charset=Big5" http-equiv="content-type"><title>簡介類別載入器</title></head><body>
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+<h1><a href="index-2.html">Java Essence: 簡介類別載入器</a></h1>
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 250px; text-align: center; vertical-align: top;">
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+      <br>
+
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><br>
+
+      <br>
+
+      <center>
+       <br>
+
+      </center>
+
+      </td>
+
+      <td style="vertical-align: top; width: 690px; text-align: left;"><small>Java在需要使用類別的時候，才會將類別載入，Java的類別載入是由<span style="font-weight: bold;">類別載入器（Class loader）</span>來達到的。<br><br>在文字模式下執行java XXX指令後，java執行程式會嘗試找到JRE安裝的所在目錄，然後尋找jvm.dll（預設是在JRE目錄下bin\client目錄中），接著啟動JVM並進行初始化動作，接著產生<span style="font-weight: bold;">Bootstrap Loader</span>，Bootstrap Loader會載入<span style="font-weight: bold;">Extended Loader</span>，並設定Extended Loader的parent為Bootstrap Loader，接著Bootstrap Loader會載入<span style="font-weight: bold;">System Loader</span>，並將System Loader的parent設定為Extended Loader。<br><br>Bootstrap
+Loader通常由C撰寫而成；Extended Loader是由Java所撰寫而成，如果是Sun
+JDK，實際是對應於sun.misc.Launcher$ExtClassLoader（Launcher中的內部類別）；System
+Loader是由Java撰寫而成，實際對應於sun.misc. Launcher$AppClassLoader（Launcher中的內部類別）。<br><img style="width: 636px; height: 350px;" alt="" src="images/ClassLoader-1.jpg"><br><br>Bootstrap Loader會搜尋系統參數sun.boot.class.path中指定位置的類別，預設是JRE所在目錄的classes下之.class檔案，或lib目錄下.jar檔案中（例如rt.jar）的類別並載入。<span style="font-weight: bold;">可以使用System.getProperty("sun.boot.class.path")陳述來顯示sun.boot.class.path中指定的路徑</span>，例如在我的電腦中顯示的是以下的路徑：<br></small><div style="margin-left: 40px;"><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:\Program Files\Java\jdk1.6.0_16\jre\lib\resources.jar;</span></small><br><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:\Program Files\Java\jd</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">k1.6.0_16\jre\lib\rt.jar;</span></small><br><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:\Program Files\Java\jdk1.6.0_16\jre\lib\sunrsasign.ja</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">r;</span></small><br><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:\Program Files\Java\jdk1.6.0_16\jre\lib\jsse.jar;</span></small><br><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:\Program Files\Java\jdk1.</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">6.0_16\jre\lib\jce.jar;</span></small><br><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:\Program Files\Java\jdk1.6.0_16\jre\lib\charsets.jar;</span></small><br><small><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">C:</span><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">\Program Files\Java\jdk1.6.0_16\jre\classes</span></small><br></div><small><br>Extended
+Loader（sun.misc.Launcher$ExtClassLoader）是由Java撰寫而成，會搜尋系統參數java.ext.dirs中
+指定位置的類別，預設是JRE目錄下的lib\ext\classes目錄下的.class檔案，或lib\ext目錄下的.jar檔案中的類別並載入。<span style="font-weight: bold;">可以使用System.getProperty("java.ext.dirs")陳述來顯示java.ext.dirs中指定的路徑</span>，例如在我的電腦中顯示的是以下的路徑：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">C:\Program Files\Java\jdk1.6.0_16\jre\lib\ext;<br>C:\Windows\Sun\Java\lib\ext</span></small><br></div><small><br><span style="font-weight: bold;">System Loader（sun.misc.Launcher$AppClassLoader）是由Java撰寫而成，會搜尋系統參數java.class.path中指定位置的類別，也就是Classpath所指定的路徑</span>，預設是目前工作路徑下的.class檔案。<span style="font-weight: bold;">可以使用System.getProperty("java.class.path")陳述來顯示java.class.path中指定的路徑</span>，在使用java執行程式時，也可以加上-cp來覆蓋原有的Classpath設定。<br><br>Bootstrap
+Loader會在JVM啟動之後產生，之後它會載入Extended Loader並將其parent設為Bootstrap
+Loader，然後Bootstrap Loader再載入System Loader並將其parent設定為
+ExtClassLoader，接著System
+Loader開始載入您指定的類別，在載入類別時，每個類別載入器會先將載入類別的任務交由其parent，如果parent找不到，才由自己負責載入，
+所以在載入類別時，會以Bootstrap Loader→Extended Loader→System
+Loader的順序來尋找類別，如果都找不到，就會丟出 <span style="font-weight: bold;">NoClassDefFoundError</span>。<br><br><span style="font-weight: bold;">類別載入器在Java中是以java.lang.ClassLoader型態存在</span>，
+每一個類別被載入後，都會有一個Class的實例來代表，而每個Class的實例都會記得自己是由哪個ClassLoader載入的，可以由Class的
+getClassLoader()取得載入該類別的ClassLoader，而從ClassLoader的getParent()方法可以取得自己的
+parent。<br><br>假設你有個自訂的</small><span style="font-size: 10.5pt; font-family: 華康中明體; letter-spacing: 0.4pt;"></span><span style="font-size: 10.5pt; font-family: &quot;Times New Roman&quot;; letter-spacing: 0.4pt;" lang="EN-US">SomeClass</span><span style="font-size: 10.5pt; font-family: 華康中明體; letter-spacing: 0.4pt;">，則類別載入器之間的關係是：</span><span style="font-size: 10.5pt; font-family: 華康中明體; letter-spacing: 0.4pt;"></span><br><small><img style="width: 588px; height: 426px;" alt="" src="images/ClassLoader-2.jpg"><br><br><br>如果你寫個程式來顯示這個關係：<br><span style="font-weight: bold; font-family: Courier New,Courier,monospace;">&nbsp;&nbsp;&nbsp; // 取得SomeClass的Class實例<br>&nbsp;&nbsp;&nbsp; Class c = Class.forName("SomeClass");<br>&nbsp;&nbsp;&nbsp; // 取得ClassLoader<br>&nbsp;&nbsp;&nbsp; ClassLoader loader = c.getClassLoader();<br>&nbsp;&nbsp;&nbsp; System.out.println(loader);<br>&nbsp;&nbsp;&nbsp; // 取得父ClassLoader<br>&nbsp;&nbsp;&nbsp; System.out.println(loader.getParent());<br>&nbsp;&nbsp;&nbsp; // 再取得父ClassLoader<br>&nbsp;&nbsp;&nbsp; System.out.println(loader.getParent().getParent());</span><br><br>則顯示的結果順序是：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">sun.misc.Launcher$AppClassLoader@19821f</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">sun.misc.Launcher$ExtClassLoader@addbf1</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">null</span></small><br></div><small><br>SomeClass
+是個自訂類別，你在目前的工作目錄下執行程式，首先AppClassLoader會將載入類別的任務交給ExtClassLoader，而
+ExtClassLoader會將載入類別的任務交給Bootstrap Loader，由於Bootstrap
+Loader在它的路徑設定（sun.boot.class.path）下找不到類別，所以由ExtClassLoader來試著尋找，而
+ExtClassLoader在它的路徑設定（java.ext.dirs）下也找不到類別，所以由AppClassLoader來試著尋找，
+AppClassLoader最後在Classpath（java.class.path）設定下找到指定的類別並載入。<br><br>載入
+SomeClass的ClassLoader是AppClassLoader，而AppClassLoader的parent是
+ExtClassLoader，而ExtClassLoader的parent是null，null並不是表示ExtClassLoader沒有設定
+parent，而是因為Bootstrap Loader通常由C所撰寫而成，在Java中並沒有一個實際的類別來表示它，所以才會顯示為null。<br><br>如果把SomeClass的.class檔案移至JRE目錄下的lib\ext\classes下，並重新（於任何目錄下）執行程式，你會看到以下的訊息：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">sun.misc.Launcher$ExtClassLoader@addbf1</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">null</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Exception in thread "main" java.lang.NullPointerException</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Main.main(Main.java:12)</span></small><br></div><small><br>由
+於SomeClass這次可以在ExtClassLoader的設定路徑下找到，所以會由ExtClassLoader來載入SomeClass類別，而
+ExtClassLoader的parent顯示為null，指的是它的parent是由C撰寫而成的Bootstrap
+Loader，因為沒有實際的Java類別而表示為null，所以再由null上嘗試呼叫getParent()方法就會丟出
+NullPointerException例外。<br><br>如果再把SomeClass的.class檔案移至JRE目錄下的classes目錄下，並重新（於任何目錄下）執行程式，您會看到以下的訊息：<br></small><div style="margin-left: 40px;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">null</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">Exception in thread "main" java.lang.NullPointerException</span></small><br style="font-weight: bold; font-family: Courier New,Courier,monospace;"><small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Main.main(Main.java:10)</span></small><br></div><small><br>由
+於SomeClass這次可以在Bootstrap Loader的設定路徑下找到，所以會由Bootstrap
+Loader來載入SomeClass類別，Bootstrap
+Loader通常由C撰寫而成，在Java中沒有一個實際的類別來表示，所以顯示為null，因為表示為null，所以再由null上嘗試呼叫
+getParent()方法就會丟出NullPointerException例外。<br><br>取得ClassLoader的實例之後，可以使用它的loadClass()方法來載入類別，使用loadClass()方法載入別時，不會執行靜態區塊，靜態區塊的執行會等到真正使用類別來建立實例時。<br><br><br><br></small></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+<!-- Mirrored from openhome.cc/Gossip/JavaEssence/ClassLoader.html by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:14:10 GMT -->
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/FirstJSF.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:11 GMT -->
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/stdlayout.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="css/print.css" type="text/css">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=Big5" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>第一個 JSF 程式</title>
+</head>
+
+
+<body>
+
+
+
+
+
+
+<h3><a href="../index.html">From
+Gossip@Openhome</a></h3>
+
+
+
+
+
+
+<h1><a href="index-2.html">JSF Gossip:&nbsp;第一個 JSF 程式 </a></h1>
+
+
+<table style="text-align: left; width: 946px; height: 32px;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 250px; text-align: center; vertical-align: top;"><comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>&nbsp;
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br>
+
+
+
+
+      <comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <comment title=" adsense for content" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment>
+      
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->&#160;</script>&nbsp;
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js"></script><comment title=" adsense for content end" xmlns="http://disruptive-innovations.com/zoo/nvu"></comment><br>
+
+
+
+
+      <br>
+
+
+
+      
+      
+      <script type="text/javascript"><!--
+google_ad_client = "pub-9750319131714390";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+      </script>
+      
+      
+      
+      <script type="text/javascript" src="../../../pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script><br><br>
+
+
+
+
+ </td>
+
+
+      <td style="vertical-align: top; width: 690px; text-align: left;">
+      <small>
+
+
+
+
+先看看應用程式開發人員要作些什麼事，我們撰寫一個簡單的JavaBean：</small><br>
+
+
+
+
+
+
+      
+      <ul>
+
+        <li>UserBean.java</li>
+
+      
+      </ul>
+
+
+
+
+
+
+
+
+
+
+      
+      <pre>package onlyfun.caterpillar;<br><br>public class UserBean {<br>    private String name;<br>   <br>    public void setName(String name) {<br>        this.name = name;<br>    }<br>   <br>    public String getName() {<br>        return name;<br>    }<br>}</pre>
+
+
+      <span class="postbody"><br>
+
+      <small>
+這個Bean將儲存使用者的名稱，編譯好之後放置在/WEB-INF/classes下。<br>
+
+      <br>
+
+
+接下來設計頁面流程，我們將先顯示一個登入網頁/pages/index.jsp，使用者填入名稱並送出表單，之後在 /pages/welcome.jsp中顯示Bean中的使用者名稱與歡迎訊息。<br>
+
+      <br>
+
+
+為了讓JSF知道我們所設計的Bean以及頁面流程，我們定義一個/WEB-INF/faces-config.xml：</small>
+
+      <br>
+
+
+      </span>
+      
+      <ul>
+
+        <li> faces-config.xml</li>
+
+      
+      </ul>
+
+
+      <span class="postbody"></span>
+      
+      <pre>&lt;?xml version="1.0"?&gt;<br>&lt;!DOCTYPE faces-config PUBLIC<br> "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"<br> "http://java.sun.com/dtd/web-facesconfig_1_0.dtd"&gt;<br><br>&lt;faces-config&gt;<br>    &lt;navigation-rule&gt;<br>        &lt;from-view-id&gt;/pages/index.jsp&lt;/from-view-id&gt;<br>        &lt;navigation-case&gt;<br>            &lt;from-outcome&gt;login&lt;/from-outcome&gt;<br>            &lt;to-view-id&gt;/pages/welcome.jsp&lt;/to-view-id&gt;<br>        &lt;/navigation-case&gt;<br>    &lt;/navigation-rule&gt;<br>       <br>    &lt;managed-bean&gt;<br>        &lt;managed-bean-name&gt;user&lt;/managed-bean-name&gt;<br>         &lt;managed-bean-class&gt;<br>             onlyfun.caterpillar.UserBean<br>         &lt;/managed-bean-class&gt;<br>        &lt;managed-bean-scope&gt;session&lt;/managed-bean-scope&gt;<br>    &lt;/managed-bean&gt;<br>&lt;/faces-config&gt;</pre>
+
+
+      <span class="postbody"><br>
+
+      <small>
+在&lt;navigation-rule&gt;中，我們定義了頁面流程，當請求來自&lt;from-view-
+id&gt;中指定的頁面，並且指定了&lt;navigation-case&gt;中的&lt;from-outcome&gt;為login時，則
+會將請求導向至&lt;to-view-id&gt;所指定的頁面。<br>
+
+      <br>
+
+
+在&lt;managed-bean&gt;中我們可以統一管理我們的Bean，我們設定Bean物件的存活範圍是session，也就是使用者開啟瀏覽器與程式互動過程中都存活。<br>
+
+      <br>
+
+
+接下來要告訴網頁設計人員的資訊是，他們可以使用的Bean名稱，即&lt;managed-bean-name&gt;中設定的名稱，以及上面所定義的頁面流程。<br>
+
+      <br>
+
+      </small>
+
+
+
+      </span><small>
+首先網頁設計人員撰寫index.jsp網頁：</small><br>
+
+
+      
+      <ul>
+
+        <li>index.jsp</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;%@taglib uri="http://java.sun.com/jsf/core" prefix="f" %&gt;<br>&lt;%@taglib uri="http://java.sun.com/jsf/html" prefix="h" %&gt;<br>&lt;%@page contentType="text/html;charset=Big5"%&gt; <br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;第一個JSF程式&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    &lt;f:view&gt;<br>        &lt;h:form&gt;<br>            &lt;h3&gt;請輸入您的名稱&lt;/h3&gt;<br>            名稱: &lt;h:inputText value="#{user.name}"/&gt;&lt;p&gt;<br>            &lt;h:commandButton value="送出" action="login"/&gt;<br>        &lt;/h:form&gt;<br>    &lt;/f:view&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+      <br>
+
+      <small>
+我們使用了JSF的core與html標籤庫，core是有關於UI元件的處理，而html則是有關於HTML的進階標籤。<br>
+
+      <br>
+
+
+&lt;f:view&gt;與&lt;html&gt;有類似的作用，當您要開始使用JSF元件時，這些元件一定要在&lt;f:
+view&gt;與&lt;/f:view&gt;之間，就如同使用HTML時，所有的標籤一定要在&lt;html&gt;與&lt;
+/html&gt;之間。<br>
+
+      <br>
+
+
+html標籤庫中幾乎都是與HTML標籤相關的進階標籤，&lt;h:form&gt;會產生一個表單，我們使用&lt;h:
+inputText&gt;來顯示user這個Bean物件的name屬性，而&lt;h:commandButton&gt;會產生一個提交按鈕，我們
+在action屬性中指定將根據之前定義的login頁面流程中前往welcome.jsp頁面。<br>
+
+      <br>
+
+
+網頁設計人員不必理會表單傳送之後要作些什麼，他只要設計好歡迎頁面就好了：</small>
+
+
+      <br>
+
+
+      
+      <ul>
+
+        <li>welcome.jsp</li>
+
+      
+      </ul>
+
+
+      
+      <pre>&lt;%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %&gt;<br>&lt;%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %&gt;<br>&lt;%@page contentType="text/html;charset=Big5"%&gt; <br>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;第一個JSF程式&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>    &lt;f:view&gt;<br>        &lt;h:outputText value="#{user.name}"/&gt; 您好！<br>        &lt;h3&gt;歡迎使用 JavaServer Faces！&lt;/h3&gt;<br>    &lt;/f:view&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;</pre>
+
+
+      <br>
+
+      <small>
+這個頁面沒什麼需要解釋的了，如您所看到的，在網頁上沒有程式邏輯，網頁設計人員所作的就是遵照頁面流程，使用相關名稱取出資料，而不用擔心實際上程式是如何運作的。<br>
+
+      <br>
+
+
+接下來啟動Container，連接上您的應用程式網址，例如：http://localhost: 8080/jsfDemo/pages/index.faces，填入名稱並送出表單，您的歡迎頁面就會顯示了。</small>
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+<script src="../../../www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-143766-1";
+urchinTracker();
+</script>
+</body>
+
+<!-- Mirrored from openhome.cc/Gossip/JSF/FirstJSF.htm by HTTrack Website Copier/3.x [XR&CO'2008], Sun, 28 Jul 2013 09:18:11 GMT -->
+</html>
