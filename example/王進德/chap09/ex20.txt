@@ -1,0 +1,144 @@
+* 實習20：監控數位輸出入模組
+【實習目的】
+在這個實作中，我們要在Linux PC中撰寫I-7060模組的通訊程式。
+
+【動作要求】
+(1) 程式在執行後，會讀取I-7060的輸入。
+(2) 若I-7060輸入IN1 為ON，則會每隔2秒分別點亮接在7060 RL1 - RL4輸出端的LED，而形成跑馬燈，跑馬燈共執行2次，之後程式結束執行。
+
+【程式】
+/* ex7060.c */
+#include "i7k.h"
+#include "stdio.h"
+#include "time.h"
+#include "stdlib.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <termios.h>
+
+#define BAUDRATE B9600
+#define MODEMDEVICE "/dev/ttyS0"
+#define RCVBUF_SIZE 16
+
+int main()
+{
+	int		k, fd, i, r, s;
+	char		*cmd;	
+	char 	*a,*b;
+	char 	rbuf[RCVBUF_SIZE];	
+	__tod_t	texp;
+	
+	/* 開啟串列埠 */
+	fd = sio_open("/dev/ttyS0", B9600, DATA_BITS_8, NO_PARITY,
+                 ONE_STOP_BIT);	
+	if (fd == ERR_PORT_OPEN) {
+		perror("open");
+		exit (1);
+	}
+
+	/* 設為非正規模式 */
+	sio_set_noncan(fd);
+
+	while (1) {
+	  printf("Please input mode : (0) exit  (1) i-7060\n");   	    
+	  scanf ("%d",&i);
+      if (i==0) {
+		break;
+	  }
+	  /* 讀取數位輸入狀態 */
+      cmd ="$016\r";
+      a = "!000E00"; 
+	  b = "!000F00";
+
+	  /* 設定讀取的timeout時間為10秒 */
+	  sio_set_timer(fd, 0, 10);
+
+	  /* 傳送接收命令 */
+	  r = i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+
+	  /* 判斷是否接收失敗 */
+      switch (r) {
+	  case  0:
+             printf("time-out!\ntime expended: %llu us\n", texp);
+			 break;
+	  case  -1:
+             printf("Error!\n");
+			 break;
+	  }
+      
+  	  if ((rbuf[4] - 48 ) == ( b[4] - 48 ))
+ 	     printf("In1-OFF In2-OFF In3-OFF In4-OFF\n");
+      
+	  /* 開關IN1為on */
+	  if (( rbuf[4] - 48 ) == ( a[4] - 48 )) {
+	    printf("In1-ON In2-OFF In3-OFF In4-OFF\n");
+	    for (k=0; k<2; k++) {
+			/* RL1 on */
+         	cmd = "#010001\r";
+ 	 		i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+           	sleep(2);
+
+			/* RL2 on */
+	   		cmd = "#010002\r";
+ 	   		i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+	   		sleep(2);
+
+			/* RL3 on */
+           	cmd = "#010004\r";
+ 	  		i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+	  		sleep(2);
+
+			/* RL4 on */
+           	cmd = "#010008\r";
+ 	  		i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+	  		sleep(2);
+
+			/* RL3 on */
+	   		cmd = "#010004\r";
+ 	 		i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+         	sleep(2);
+
+			/* RL2 on */
+	   		cmd = "#010002\r";
+ 	  		i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+           	sleep(2);
+
+			/* RL1 on */
+           	cmd = "#010001\r";
+        	i7k_send_readt(fd, cmd, rbuf, RCVBUF_SIZE, &texp);
+	      }
+	   }
+   	}  /* while */
+
+	/* 關閉串列埠 */
+	sio_close(fd);
+  	return (0);
+}  /* main */
+
+【編譯程式】
+要編譯【ex071.c】，我們可以寫一個makefile檔案，方便編譯我們的程式。但是makefile如何寫？我們可以用 vi開啟【/usr/i7k/samples】目錄下的makefile，稍加修改其內容，修改的部份我們以粗體字來表示。
+
+     . 
+     . 
+bindir = $(prefix)/bin
+binprefix =
+infodir = $(prefix)/info
+i7k = ../i7k/
+.SUFFIXES: .c .o
+PJ   =  ex7060
+INCS =
+OBJ1 =
+OBJ2 =
+OBJ3 =  $(i7k)msw.o $(i7k)i7000.o $(i7k)sio.o $(i7k)i7k.o $(i7k)timer.o
+OBJS =  $(OBJ1) $(OBJ2) $(OBJ3)
+AUX  =
+all:    $(PJ)
+ex7060: ex7060.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ ex7060.o $(OBJS)
+indent:
+	indent -orig *.c
+clean:
+	rm -f *.o $(PJ) *~ *.tmp *.bak \#* .\#*
+
+

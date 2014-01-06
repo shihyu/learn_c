@@ -1,0 +1,15 @@
+all: myapp
+CC= gcc
+INCLUDE= .
+CFLAGS= -g -Wall -ansi
+objects= myarray.o mysum.o myavg.o 
+myapp: $(objects)
+	$(CC) -o myapp $(objects)
+myarray.o: myarray.c myarray.h 
+	$(CC) -I$(INCLUDE) $(CFLAGS) -c myarray.c
+mysum.o: mysum.c
+	$(CC) -I$(INCLUDE) $(CFLAGS) -c mysum.c
+myavg.o: myavg.c
+	$(CC) -I$(INCLUDE) $(CFLAGS) -c myavg.c
+clean:
+	rm myapp $(objects)
