@@ -49,26 +49,22 @@
 *******************************************************************************/
 
 
-int __cdecl _fseeki64 (
-        FILE *stream,
-        __int64 offset,
-        int whence
-        )
-{
-        int retval;
+int __cdecl _fseeki64(
+    FILE* stream,
+    __int64 offset,
+    int whence
+) {
+    int retval;
+    _ASSERTE(stream != NULL);
+    _lock_str(stream);
 
-        _ASSERTE(stream != NULL);
+    __try {
+        retval = _fseeki64_nolock(stream, offset, whence);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        _lock_str(stream);
-
-        __try {
-                retval = _fseeki64_nolock (stream, offset, whence);
-        }
-        __finally {
-                _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 
@@ -86,58 +82,51 @@ int __cdecl _fseeki64 (
 *
 *******************************************************************************/
 
-int __cdecl _fseeki64_nolock (
+int __cdecl _fseeki64_nolock(
 
 
-        FILE *str,
-        __int64 offset,
-        int whence
-        )
-{
+    FILE* str,
+    __int64 offset,
+    int whence
+) {
+    REG1 FILE* stream;
+    _ASSERTE(str != NULL);
+    /* Init stream pointer */
+    stream = str;
 
+    if (!inuse(stream) || ((whence != SEEK_SET) && (whence != SEEK_CUR) &&
+                           (whence != SEEK_END))) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-        REG1 FILE *stream;
+    /* Clear EOF flag */
+    stream->_flag &= ~_IOEOF;
 
-        _ASSERTE(str != NULL);
+    /* If seeking relative to current location, then convert to
+       a seek relative to beginning of file.  This accounts for
+       buffering, etc. by letting fseek() tell us where we are. */
 
-        /* Init stream pointer */
-        stream = str;
+    if (whence == SEEK_CUR) {
+        offset += _ftelli64_nolock(stream);
+        whence = SEEK_SET;
+    }
 
-        if ( !inuse(stream) || ((whence != SEEK_SET) && (whence != SEEK_CUR) &&
-            (whence != SEEK_END)) ) {
-                errno=EINVAL;
-                return(-1);
-        }
+    /* Flush buffer as necessary */
+    _flush(stream);
 
-        /* Clear EOF flag */
+    /* If file opened for read/write, clear flags since we don't know
+       what the user is going to do next. If the file was opened for
+       read access only, decrease _bufsiz so that the next _filbuf
+       won't cost quite so much */
 
-        stream->_flag &= ~_IOEOF;
+    if (stream->_flag & _IORW) {
+        stream->_flag &= ~(_IOWRT | _IOREAD);
+    } else if ((stream->_flag & _IOREAD) && (stream->_flag & _IOMYBUF) &&
+               !(stream->_flag & _IOSETVBUF)) {
+        stream->_bufsiz = _SMALL_BUFSIZ;
+    }
 
-        /* If seeking relative to current location, then convert to
-           a seek relative to beginning of file.  This accounts for
-           buffering, etc. by letting fseek() tell us where we are. */
-
-        if (whence == SEEK_CUR) {
-                offset += _ftelli64_nolock(stream);
-                whence = SEEK_SET;
-        }
-
-        /* Flush buffer as necessary */
-
-        _flush(stream);
-
-        /* If file opened for read/write, clear flags since we don't know
-           what the user is going to do next. If the file was opened for
-           read access only, decrease _bufsiz so that the next _filbuf
-           won't cost quite so much */
-
-        if (stream->_flag & _IORW)
-                stream->_flag &= ~(_IOWRT|_IOREAD);
-        else if ( (stream->_flag & _IOREAD) && (stream->_flag & _IOMYBUF) &&
-                  !(stream->_flag & _IOSETVBUF) )
-                stream->_bufsiz = _SMALL_BUFSIZ;
-
-        /* Seek to the desired locale and return. */
-
-        return(_lseeki64(_fileno(stream), offset, whence) == -1i64 ? -1 : 0);
+    /* Seek to the desired locale and return. */
+    return (_lseeki64(_fileno(stream), offset, whence) == -1i64 ? -1 : 0);
 }

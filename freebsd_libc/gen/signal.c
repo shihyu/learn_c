@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1985, 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,21 +41,25 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/signal.c,v 1.4 2007/01/09 00:27:55 imp Exp 
 #include "un-namespace.h"
 #include "libc_private.h"
 
-sigset_t _sigintr;		/* shared with siginterrupt */
+sigset_t _sigintr;      /* shared with siginterrupt */
 
 sig_t
 signal(s, a)
-	int s;
-	sig_t a;
+int s;
+sig_t a;
 {
-	struct sigaction sa, osa;
+    struct sigaction sa, osa;
+    sa.sa_handler = a;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
 
-	sa.sa_handler = a;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (!sigismember(&_sigintr, s))
-		sa.sa_flags |= SA_RESTART;
-	if (_sigaction(s, &sa, &osa) < 0)
-		return (SIG_ERR);
-	return (osa.sa_handler);
+    if (!sigismember(&_sigintr, s)) {
+        sa.sa_flags |= SA_RESTART;
+    }
+
+    if (_sigaction(s, &sa, &osa) < 0) {
+        return (SIG_ERR);
+    }
+
+    return (osa.sa_handler);
 }

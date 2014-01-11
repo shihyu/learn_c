@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -45,45 +45,55 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fdopen.c,v 1.8 2007/01/09 00:28:06 imp Ex
 #include "un-namespace.h"
 #include "local.h"
 
-FILE *
+FILE*
 fdopen(fd, mode)
-	int fd;
-	const char *mode;
+int fd;
+const char* mode;
 {
-	FILE *fp;
-	static int nofile;
-	int flags, oflags, fdflags, tmp;
+    FILE* fp;
+    static int nofile;
+    int flags, oflags, fdflags, tmp;
 
-	if (nofile == 0)
-		nofile = getdtablesize();
+    if (nofile == 0) {
+        nofile = getdtablesize();
+    }
 
-	if ((flags = __sflags(mode, &oflags)) == 0)
-		return (NULL);
+    if ((flags = __sflags(mode, &oflags)) == 0) {
+        return (NULL);
+    }
 
-	/* Make sure the mode the user wants is a subset of the actual mode. */
-	if ((fdflags = _fcntl(fd, F_GETFL, 0)) < 0)
-		return (NULL);
-	tmp = fdflags & O_ACCMODE;
-	if (tmp != O_RDWR && (tmp != (oflags & O_ACCMODE))) {
-		errno = EINVAL;
-		return (NULL);
-	}
+    /* Make sure the mode the user wants is a subset of the actual mode. */
+    if ((fdflags = _fcntl(fd, F_GETFL, 0)) < 0) {
+        return (NULL);
+    }
 
-	if ((fp = __sfp()) == NULL)
-		return (NULL);
-	fp->_flags = flags;
-	/*
-	 * If opened for appending, but underlying descriptor does not have
-	 * O_APPEND bit set, assert __SAPP so that __swrite() caller
-	 * will _sseek() to the end before write.
-	 */
-	if ((oflags & O_APPEND) && !(fdflags & O_APPEND))
-		fp->_flags |= __SAPP;
-	fp->_file = fd;
-	fp->_cookie = fp;
-	fp->_read = __sread;
-	fp->_write = __swrite;
-	fp->_seek = __sseek;
-	fp->_close = __sclose;
-	return (fp);
+    tmp = fdflags & O_ACCMODE;
+
+    if (tmp != O_RDWR && (tmp != (oflags & O_ACCMODE))) {
+        errno = EINVAL;
+        return (NULL);
+    }
+
+    if ((fp = __sfp()) == NULL) {
+        return (NULL);
+    }
+
+    fp->_flags = flags;
+
+    /*
+     * If opened for appending, but underlying descriptor does not have
+     * O_APPEND bit set, assert __SAPP so that __swrite() caller
+     * will _sseek() to the end before write.
+     */
+    if ((oflags & O_APPEND) && !(fdflags & O_APPEND)) {
+        fp->_flags |= __SAPP;
+    }
+
+    fp->_file = fd;
+    fp->_cookie = fp;
+    fp->_read = __sread;
+    fp->_write = __swrite;
+    fp->_seek = __sseek;
+    fp->_close = __sclose;
+    return (fp);
 }

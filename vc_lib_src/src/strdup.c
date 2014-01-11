@@ -41,45 +41,46 @@
 
 #include <crtdbg.h>
 
-char * __cdecl _strdup (
-        const char * string
-        )
-{
-        return _strdup_dbg(string, _NORMAL_BLOCK, NULL, 0);
+char* __cdecl _strdup(
+    const char* string
+) {
+    return _strdup_dbg(string, _NORMAL_BLOCK, NULL, 0);
 }
 
-char * __cdecl _strdup_dbg (
-        const char * string,
-        int nBlockUse,
-        const char * szFileName,
-        int nLine
-        )
+char* __cdecl _strdup_dbg(
+    const char* string,
+    int nBlockUse,
+    const char* szFileName,
+    int nLine
+)
 
 #else  /* _DEBUG */
 
-char * __cdecl _strdup (
-        const char * string
-        )
+char* __cdecl _strdup(
+    const char* string
+)
 
 #endif  /* _DEBUG */
 
 {
-        char *memory;
+    char* memory;
     size_t size = 0;
 
-        if (!string)
-                return(NULL);
+    if (!string) {
+        return (NULL);
+    }
 
     size = strlen(string) + 1;
 #ifdef _DEBUG
-        if (memory = _malloc_dbg(size, nBlockUse, szFileName, nLine))
-#else  /* _DEBUG */
-        if (memory = malloc(size))
-#endif  /* _DEBUG */
-        {
-                _ERRCHECK(strcpy_s(memory, size, string));
-        return memory;
-        }
 
-        return(NULL);
+    if (memory = _malloc_dbg(size, nBlockUse, szFileName, nLine))
+#else  /* _DEBUG */
+    if (memory = malloc(size))
+#endif  /* _DEBUG */
+    {
+        _ERRCHECK(strcpy_s(memory, size, string));
+        return memory;
+    }
+
+    return (NULL);
 }

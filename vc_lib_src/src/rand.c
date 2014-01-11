@@ -31,13 +31,10 @@
 *
 *******************************************************************************/
 
-void __cdecl srand (
-        unsigned int seed
-        )
-{
-
-        _getptd()->_holdrand = (unsigned long)seed;
-
+void __cdecl srand(
+    unsigned int seed
+) {
+    _getptd()->_holdrand = (unsigned long)seed;
 }
 
 
@@ -57,14 +54,10 @@ void __cdecl srand (
 *
 *******************************************************************************/
 
-int __cdecl rand (
-        void
-        )
-{
-
-        _ptiddata ptd = _getptd();
-
-        return( ((ptd->_holdrand = ptd->_holdrand * 214013L
-            + 2531011L) >> 16) & 0x7fff );
-
+int __cdecl rand(
+    void
+) {
+    _ptiddata ptd = _getptd();
+    return (((ptd->_holdrand = ptd->_holdrand * 214013L
+                               + 2531011L) >> 16) & 0x7fff);
 }

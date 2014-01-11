@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Jeffrey Mogul.
@@ -39,21 +39,28 @@ __FBSDID("$FreeBSD: src/lib/libc/string/swab.c,v 1.7 2007/01/09 00:28:12 imp Exp
 #include <unistd.h>
 
 void
-swab(const void * __restrict from, void * __restrict to, ssize_t len)
-{
-	unsigned long temp;
-	int n;
-	char *fp, *tp;
+swab(const void* __restrict from, void* __restrict to, ssize_t len) {
+    unsigned long temp;
+    int n;
+    char* fp, *tp;
+    n = len >> 1;
+    fp = (char*)from;
+    tp = (char*)to;
+#define STEP    temp = *fp++,*tp++ = *fp++,*tp++ = temp
 
-	n = len >> 1;
-	fp = (char *)from;
-	tp = (char *)to;
-#define	STEP	temp = *fp++,*tp++ = *fp++,*tp++ = temp
-	/* round to multiple of 8 */
-	for (; n & 0x7; --n)
-		STEP;
-	for (n >>= 3; n > 0; --n) {
-		STEP; STEP; STEP; STEP;
-		STEP; STEP; STEP; STEP;
-	}
+    /* round to multiple of 8 */
+    for (; n & 0x7; --n) {
+        STEP;
+    }
+
+    for (n >>= 3; n > 0; --n) {
+        STEP;
+        STEP;
+        STEP;
+        STEP;
+        STEP;
+        STEP;
+        STEP;
+        STEP;
+    }
 }

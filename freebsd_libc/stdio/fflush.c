@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,39 +43,42 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fflush.c,v 1.14 2007/01/09 00:28:06 imp E
 #include "libc_private.h"
 #include "local.h"
 
-static int	sflush_locked(FILE *);
+static int  sflush_locked(FILE*);
 
 /*
  * Flush a single file, or (if fp is NULL) all files.
  * MT-safe version
  */
 int
-fflush(FILE *fp)
-{
-	int retval;
+fflush(FILE* fp) {
+    int retval;
 
-	if (fp == NULL)
-		return (_fwalk(sflush_locked));
-	FLOCKFILE(fp);
+    if (fp == NULL) {
+        return (_fwalk(sflush_locked));
+    }
 
-	/*
-	 * There is disagreement about the correct behaviour of fflush()
-	 * when passed a file which is not open for reading.  According to
-	 * the ISO C standard, the behaviour is undefined.
-	 * Under linux, such an fflush returns success and has no effect;
-	 * under Windows, such an fflush is documented as behaving instead
-	 * as fpurge().
-	 * Given that applications may be written with the expectation of
-	 * either of these two behaviours, the only safe (non-astonishing)
-	 * option is to return EBADF and ask that applications be fixed.
-	 */
-	if ((fp->_flags & (__SWR | __SRW)) == 0) {
-		errno = EBADF;
-		retval = EOF;
-	} else
-		retval = __sflush(fp);
-	FUNLOCKFILE(fp);
-	return (retval);
+    FLOCKFILE(fp);
+
+    /*
+     * There is disagreement about the correct behaviour of fflush()
+     * when passed a file which is not open for reading.  According to
+     * the ISO C standard, the behaviour is undefined.
+     * Under linux, such an fflush returns success and has no effect;
+     * under Windows, such an fflush is documented as behaving instead
+     * as fpurge().
+     * Given that applications may be written with the expectation of
+     * either of these two behaviours, the only safe (non-astonishing)
+     * option is to return EBADF and ask that applications be fixed.
+     */
+    if ((fp->_flags & (__SWR | __SRW)) == 0) {
+        errno = EBADF;
+        retval = EOF;
+    } else {
+        retval = __sflush(fp);
+    }
+
+    FUNLOCKFILE(fp);
+    return (retval);
 }
 
 /*
@@ -83,59 +86,62 @@ fflush(FILE *fp)
  * Non-MT-safe version
  */
 int
-__fflush(FILE *fp)
-{
-	int retval;
+__fflush(FILE* fp) {
+    int retval;
 
-	if (fp == NULL)
-		return (_fwalk(sflush_locked));
-	if ((fp->_flags & (__SWR | __SRW)) == 0) {
-		errno = EBADF;
-		retval = EOF;
-	} else
-		retval = __sflush(fp);
-	return (retval);
+    if (fp == NULL) {
+        return (_fwalk(sflush_locked));
+    }
+
+    if ((fp->_flags & (__SWR | __SRW)) == 0) {
+        errno = EBADF;
+        retval = EOF;
+    } else {
+        retval = __sflush(fp);
+    }
+
+    return (retval);
 }
 
 int
-__sflush(FILE *fp)
-{
-	unsigned char *p;
-	int n, t;
+__sflush(FILE* fp) {
+    unsigned char* p;
+    int n, t;
+    t = fp->_flags;
 
-	t = fp->_flags;
-	if ((t & __SWR) == 0)
-		return (0);
+    if ((t & __SWR) == 0) {
+        return (0);
+    }
 
-	if ((p = fp->_bf._base) == NULL)
-		return (0);
+    if ((p = fp->_bf._base) == NULL) {
+        return (0);
+    }
 
-	n = fp->_p - p;		/* write this much */
+    n = fp->_p - p;     /* write this much */
+    /*
+     * Set these immediately to avoid problems with longjmp and to allow
+     * exchange buffering (via setvbuf) in user write function.
+     */
+    fp->_p = p;
+    fp->_w = t & (__SLBF | __SNBF) ? 0 : fp->_bf._size;
 
-	/*
-	 * Set these immediately to avoid problems with longjmp and to allow
-	 * exchange buffering (via setvbuf) in user write function.
-	 */
-	fp->_p = p;
-	fp->_w = t & (__SLBF|__SNBF) ? 0 : fp->_bf._size;
+    for (; n > 0; n -= t, p += t) {
+        t = _swrite(fp, (char*)p, n);
 
-	for (; n > 0; n -= t, p += t) {
-		t = _swrite(fp, (char *)p, n);
-		if (t <= 0) {
-			fp->_flags |= __SERR;
-			return (EOF);
-		}
-	}
-	return (0);
+        if (t <= 0) {
+            fp->_flags |= __SERR;
+            return (EOF);
+        }
+    }
+
+    return (0);
 }
 
 static int
-sflush_locked(FILE *fp)
-{
-	int	ret;
-
-	FLOCKFILE(fp);
-	ret = __sflush(fp);
-	FUNLOCKFILE(fp);
-	return (ret);
+sflush_locked(FILE* fp) {
+    int ret;
+    FLOCKFILE(fp);
+    ret = __sflush(fp);
+    FUNLOCKFILE(fp);
+    return (ret);
 }

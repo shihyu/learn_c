@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1985, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,36 +44,35 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/abort.c,v 1.11 2007/01/09 00:28:09 imp E
 #include "libc_private.h"
 
 void
-abort()
-{
-	struct sigaction act;
+abort() {
+    struct sigaction act;
 
-	/*
-	 * POSIX requires we flush stdio buffers on abort.
-	 * XXX ISO C requires that abort() be async-signal-safe.
-	 */
-	if (__cleanup)
-		(*__cleanup)();
+    /*
+     * POSIX requires we flush stdio buffers on abort.
+     * XXX ISO C requires that abort() be async-signal-safe.
+     */
+    if (__cleanup) {
+        (*__cleanup)();
+    }
 
-	sigfillset(&act.sa_mask);
-	/*
-	 * Don't block SIGABRT to give any handler a chance; we ignore
-	 * any errors -- ISO C doesn't allow abort to return anyway.
-	 */
-	sigdelset(&act.sa_mask, SIGABRT);
-	(void)_sigprocmask(SIG_SETMASK, &act.sa_mask, NULL);
-	(void)raise(SIGABRT);
-
-	/*
-	 * If SIGABRT was ignored, or caught and the handler returns, do
-	 * it again, only harder.
-	 */
-	act.sa_handler = SIG_DFL;
-	act.sa_flags = 0;
-	sigfillset(&act.sa_mask);
-	(void)_sigaction(SIGABRT, &act, NULL);
-	sigdelset(&act.sa_mask, SIGABRT);
-	(void)_sigprocmask(SIG_SETMASK, &act.sa_mask, NULL);
-	(void)raise(SIGABRT);
-	exit(1);
+    sigfillset(&act.sa_mask);
+    /*
+     * Don't block SIGABRT to give any handler a chance; we ignore
+     * any errors -- ISO C doesn't allow abort to return anyway.
+     */
+    sigdelset(&act.sa_mask, SIGABRT);
+    (void)_sigprocmask(SIG_SETMASK, &act.sa_mask, NULL);
+    (void)raise(SIGABRT);
+    /*
+     * If SIGABRT was ignored, or caught and the handler returns, do
+     * it again, only harder.
+     */
+    act.sa_handler = SIG_DFL;
+    act.sa_flags = 0;
+    sigfillset(&act.sa_mask);
+    (void)_sigaction(SIGABRT, &act, NULL);
+    sigdelset(&act.sa_mask, SIGABRT);
+    (void)_sigprocmask(SIG_SETMASK, &act.sa_mask, NULL);
+    (void)raise(SIGABRT);
+    exit(1);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -47,46 +47,52 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/tmpfile.c,v 1.10 2007/01/09 00:28:07 imp 
 #include <paths.h>
 #include "un-namespace.h"
 
-FILE *
-tmpfile()
-{
-	sigset_t set, oset;
-	FILE *fp;
-	int fd, sverrno;
-#define	TRAILER	"tmp.XXXXXX"
-	char *buf;
-	const char *tmpdir;
+FILE*
+tmpfile() {
+    sigset_t set, oset;
+    FILE* fp;
+    int fd, sverrno;
+#define TRAILER "tmp.XXXXXX"
+    char* buf;
+    const char* tmpdir;
+    tmpdir = NULL;
 
-	tmpdir = NULL;
-	if (issetugid() == 0)
-		tmpdir = getenv("TMPDIR");
-	if (tmpdir == NULL)
-		tmpdir = _PATH_TMP;
+    if (issetugid() == 0) {
+        tmpdir = getenv("TMPDIR");
+    }
 
-	(void)asprintf(&buf, "%s%s%s", tmpdir,
-	    (tmpdir[strlen(tmpdir) - 1] == '/') ? "" : "/", TRAILER);
-	if (buf == NULL)
-		return (NULL);
+    if (tmpdir == NULL) {
+        tmpdir = _PATH_TMP;
+    }
 
-	sigfillset(&set);
-	(void)_sigprocmask(SIG_BLOCK, &set, &oset);
+    (void)asprintf(&buf, "%s%s%s", tmpdir,
+                   (tmpdir[strlen(tmpdir) - 1] == '/') ? "" : "/", TRAILER);
 
-	fd = mkstemp(buf);
-	if (fd != -1)
-		(void)unlink(buf);
+    if (buf == NULL) {
+        return (NULL);
+    }
 
-	free(buf);
+    sigfillset(&set);
+    (void)_sigprocmask(SIG_BLOCK, &set, &oset);
+    fd = mkstemp(buf);
 
-	(void)_sigprocmask(SIG_SETMASK, &oset, NULL);
+    if (fd != -1) {
+        (void)unlink(buf);
+    }
 
-	if (fd == -1)
-		return (NULL);
+    free(buf);
+    (void)_sigprocmask(SIG_SETMASK, &oset, NULL);
 
-	if ((fp = fdopen(fd, "w+")) == NULL) {
-		sverrno = errno;
-		(void)_close(fd);
-		errno = sverrno;
-		return (NULL);
-	}
-	return (fp);
+    if (fd == -1) {
+        return (NULL);
+    }
+
+    if ((fp = fdopen(fd, "w+")) == NULL) {
+        sverrno = errno;
+        (void)_close(fd);
+        errno = sverrno;
+        return (NULL);
+    }
+
+    return (fp);
 }

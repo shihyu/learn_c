@@ -58,36 +58,33 @@
 *******************************************************************************/
 
 #ifdef _UNICODE
-wchar_t * cdecl _wcserror(
+wchar_t* cdecl _wcserror(
 #else  /* _UNICODE */
-char * __cdecl strerror (
+char* __cdecl strerror(
 #endif  /* _UNICODE */
-        int errnum
-        )
-{
+    int errnum
+) {
+    _TCHAR* errmsg;
+    _ptiddata ptd = _getptd_noexit();
 
-        _TCHAR *errmsg;
-        _ptiddata ptd = _getptd_noexit();
-        if (!ptd)
-                return _T("Visual C++ CRT: Not enough memory to complete call to strerror.");
+    if (!ptd) {
+        return _T("Visual C++ CRT: Not enough memory to complete call to strerror.");
+    }
 
-
-
-        if ( (ptd->_terrmsg == NULL) && ((ptd->_terrmsg =
-                        _calloc_crt(_ERRMSGLEN_, sizeof(_TCHAR)))
-                        == NULL) )
-                return _T("Visual C++ CRT: Not enough memory to complete call to strerror.");
-        else
-                errmsg = ptd->_terrmsg;
-
+    if ((ptd->_terrmsg == NULL) && ((ptd->_terrmsg =
+                                         _calloc_crt(_ERRMSGLEN_, sizeof(_TCHAR)))
+                                    == NULL)) {
+        return _T("Visual C++ CRT: Not enough memory to complete call to strerror.");
+    } else {
+        errmsg = ptd->_terrmsg;
+    }
 
 #ifdef _UNICODE
-        _ERRCHECK(mbstowcs_s(NULL, errmsg, _ERRMSGLEN_, _get_sys_err_msg(errnum), _ERRMSGLEN_ - 1));
+    _ERRCHECK(mbstowcs_s(NULL, errmsg, _ERRMSGLEN_, _get_sys_err_msg(errnum), _ERRMSGLEN_ - 1));
 #else  /* _UNICODE */
-        _ERRCHECK(strcpy_s(errmsg, _ERRMSGLEN_, _get_sys_err_msg(errnum)));
+    _ERRCHECK(strcpy_s(errmsg, _ERRMSGLEN_, _get_sys_err_msg(errnum)));
 #endif  /* _UNICODE */
-
-        return(errmsg);
+    return (errmsg);
 }
 
 /***
@@ -116,29 +113,27 @@ errno_t __cdecl _wcserror_s(
 #else  /* _UNICODE */
 errno_t __cdecl strerror_s(
 #endif  /* _UNICODE */
-        TCHAR* buffer,
-        size_t sizeInTChars,
-        int errnum
-        )
-{
-        errno_t e = 0;
-
-        /* validation section */
-        _VALIDATE_RETURN_ERRCODE(buffer != NULL, EINVAL);
-        _VALIDATE_RETURN_ERRCODE(sizeInTChars > 0, EINVAL);
-
-        /* we use mbstowcs_s or strncpy_s because we want to truncate the error string
-         * if the destination is not big enough
-         */
+    TCHAR* buffer,
+    size_t sizeInTChars,
+    int errnum
+) {
+    errno_t e = 0;
+    /* validation section */
+    _VALIDATE_RETURN_ERRCODE(buffer != NULL, EINVAL);
+    _VALIDATE_RETURN_ERRCODE(sizeInTChars > 0, EINVAL);
+    /* we use mbstowcs_s or strncpy_s because we want to truncate the error string
+     * if the destination is not big enough
+     */
 #ifdef _UNICODE
-        e = _ERRCHECK_EINVAL_ERANGE(mbstowcs_s(NULL, buffer, sizeInTChars, _get_sys_err_msg(errnum), _TRUNCATE));
-        /* ignore the truncate information */
-        if (e == STRUNCATE)
-        {
-                e = 0;
-        }
+    e = _ERRCHECK_EINVAL_ERANGE(mbstowcs_s(NULL, buffer, sizeInTChars, _get_sys_err_msg(errnum), _TRUNCATE));
+
+    /* ignore the truncate information */
+    if (e == STRUNCATE) {
+        e = 0;
+    }
+
 #else  /* _UNICODE */
-        _ERRCHECK(strncpy_s(buffer, sizeInTChars, _get_sys_err_msg(errnum), sizeInTChars - 1));
+    _ERRCHECK(strncpy_s(buffer, sizeInTChars, _get_sys_err_msg(errnum), sizeInTChars - 1));
 #endif  /* _UNICODE */
     return e;
 }

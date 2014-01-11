@@ -70,14 +70,14 @@
 #ifdef _CRT_NOFORCE_MANIFEST
 
 #ifdef _CRT_FORCE_MANIFEST
-        #pragma message ("_CRT_FORCE_MANIFEST and _CRT_NOFORCE_MANIFEST defined. Define just one")
-        #pragma message ("_CRT_FORCE_MANIFEST ignored")
+#pragma message ("_CRT_FORCE_MANIFEST and _CRT_NOFORCE_MANIFEST defined. Define just one")
+#pragma message ("_CRT_FORCE_MANIFEST ignored")
 #endif  /* _CRT_FORCE_MANIFEST */
 
 #else  /* _CRT_NOFORCE_MANIFEST */
 
 #if !defined (_CRT_FORCE_MANIFEST) && defined (_VC_NODEFAULTLIB)
-        #define _CRT_NOFORCE_MANIFEST
+#define _CRT_NOFORCE_MANIFEST
 #endif  /* !defined (_CRT_FORCE_MANIFEST) && defined (_VC_NODEFAULTLIB) */
 
 #endif  /* _CRT_NOFORCE_MANIFEST */
@@ -251,9 +251,9 @@ extern "C" {
 #ifndef _CRTIMP_ALTERNATIVE
 #ifdef CRTDLL
 #ifdef _SAFECRT_IMPL
-    #define _CRTIMP_ALTERNATIVE
+#define _CRTIMP_ALTERNATIVE
 #else  /* _SAFECRT_IMPL */
-    #define _CRTIMP_ALTERNATIVE __declspec(dllexport)
+#define _CRTIMP_ALTERNATIVE __declspec(dllexport)
 #endif  /* _SAFECRT_IMPL */
 #else  /* CRTDLL */
 #ifdef _DLL
@@ -274,9 +274,9 @@ extern "C" {
 #ifndef _MRTIMP
 #ifdef MRTDLL
 #if !defined (_M_CEE_PURE)
-    #define _MRTIMP __declspec(dllexport)
+#define _MRTIMP __declspec(dllexport)
 #else  /* !defined (_M_CEE_PURE) */
-    #define _MRTIMP
+#define _MRTIMP
 #endif  /* !defined (_M_CEE_PURE) */
 #else  /* MRTDLL */
 #define _MRTIMP __declspec(dllimport)
@@ -332,20 +332,20 @@ extern "C" {
 
 #ifndef _CRTIMP_PURE
 #if defined (_M_CEE_PURE) || defined (_STATIC_CPPLIB)
-  #define _CRTIMP_PURE
+#define _CRTIMP_PURE
 #elif defined (MRTDLL)
-  #define _CRTIMP_PURE
+#define _CRTIMP_PURE
 #else  /* defined (MRTDLL) */
-  #define _CRTIMP_PURE _CRTIMP
+#define _CRTIMP_PURE _CRTIMP
 #endif  /* defined (MRTDLL) */
 #endif  /* _CRTIMP_PURE */
 
 #ifndef _PGLOBAL
 #ifdef _M_CEE
 #if defined (__cplusplus_cli)
-    #define _PGLOBAL __declspec(process)
+#define _PGLOBAL __declspec(process)
 #else  /* defined (__cplusplus_cli) */
-    #define _PGLOBAL
+#define _PGLOBAL
 #endif  /* defined (__cplusplus_cli) */
 #else  /* _M_CEE */
 #define _PGLOBAL
@@ -471,21 +471,21 @@ _CRT_DEPRECATE_TEXT("Direct heap access is not safely possible from managed code
 /* Define overload switches */
 #if !defined (RC_INVOKED)
 #if !defined (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES)
-  #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 0
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 0
 #else  /* !defined (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES) */
 #if !__STDC_WANT_SECURE_LIB__ && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
-   #error Cannot use Secure CRT C++ overloads when __STDC_WANT_SECURE_LIB__ is 0
+#error Cannot use Secure CRT C++ overloads when __STDC_WANT_SECURE_LIB__ is 0
 #endif  /* !__STDC_WANT_SECURE_LIB__ && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES */
 #endif  /* !defined (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES) */
 #endif  /* !defined (RC_INVOKED) */
 
 #if !defined (RC_INVOKED)
 #if !defined (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT)
-  /* _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT is ignored if _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES is set to 0 */
-  #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 0
+/* _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT is ignored if _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES is set to 0 */
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 0
 #else  /* !defined (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT) */
 #if !__STDC_WANT_SECURE_LIB__ && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT
-   #error Cannot use Secure CRT C++ overloads when __STDC_WANT_SECURE_LIB__ is 0
+#error Cannot use Secure CRT C++ overloads when __STDC_WANT_SECURE_LIB__ is 0
 #endif  /* !__STDC_WANT_SECURE_LIB__ && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT */
 #endif  /* !defined (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT) */
 #endif  /* !defined (RC_INVOKED) */
@@ -493,13 +493,13 @@ _CRT_DEPRECATE_TEXT("Direct heap access is not safely possible from managed code
 #if !defined (RC_INVOKED)
 #if !defined (_CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES)
 #if __STDC_WANT_SECURE_LIB__
-   #define _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES 1
+#define _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES 1
 #else  /* __STDC_WANT_SECURE_LIB__ */
-   #define _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES 0
+#define _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES 0
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 #else  /* !defined (_CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES) */
 #if !__STDC_WANT_SECURE_LIB__ && _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES
-   #error Cannot use Secure CRT C++ overloads when __STDC_WANT_SECURE_LIB__ is 0
+#error Cannot use Secure CRT C++ overloads when __STDC_WANT_SECURE_LIB__ is 0
 #endif  /* !__STDC_WANT_SECURE_LIB__ && _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES */
 #endif  /* !defined (_CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES) */
 #endif  /* !defined (RC_INVOKED) */
@@ -571,7 +571,7 @@ typedef unsigned short wctype_t;
 #ifdef _M_CEE_PURE
 typedef System::ArgIterator va_list;
 #else  /* _M_CEE_PURE */
-typedef char *  va_list;
+typedef char*   va_list;
 #endif  /* _M_CEE_PURE */
 #define _VA_LIST_DEFINED
 #endif  /* _VA_LIST_DEFINED */
@@ -591,7 +591,7 @@ typedef char *  va_list;
 #define _ERRCODE_DEFINED
 /* errcode is deprecated in favor or errno_t, which is part of the standard proposal */
 #if !defined (__midl)
-_CRT_DEPRECATE_TEXT("This name was supported during some Whidbey pre-releases. Instead, use the standard name errno_t." ) typedef int errcode;
+_CRT_DEPRECATE_TEXT("This name was supported during some Whidbey pre-releases. Instead, use the standard name errno_t.") typedef int errcode;
 #else  /* !defined (__midl) */
 typedef int errcode;
 #endif  /* !defined (__midl) */
@@ -922,7 +922,7 @@ typedef __time64_t time_t;      /* time value */
 
 #define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_0(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _DstType, _Dst) \
     __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_0_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _Dst) \
-
+ 
 #define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_1(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _DstType, _Dst, _TType1, _TArg1) \
     __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _Dst, _TType1, _TArg1)
 
@@ -1816,50 +1816,49 @@ typedef __time64_t time_t;      /* time value */
 
 struct threadlocaleinfostruct;
 struct threadmbcinfostruct;
-typedef struct threadlocaleinfostruct * pthreadlocinfo;
-typedef struct threadmbcinfostruct * pthreadmbcinfo;
+typedef struct threadlocaleinfostruct* pthreadlocinfo;
+typedef struct threadmbcinfostruct* pthreadmbcinfo;
 struct __lc_time_data;
 
-typedef struct localeinfo_struct
-{
+typedef struct localeinfo_struct {
     pthreadlocinfo locinfo;
     pthreadmbcinfo mbcinfo;
 } _locale_tstruct, *_locale_t;
 
 #ifndef _TAGLC_ID_DEFINED
 typedef struct tagLC_ID {
-        unsigned short wLanguage;
-        unsigned short wCountry;
-        unsigned short wCodePage;
+    unsigned short wLanguage;
+    unsigned short wCountry;
+    unsigned short wCodePage;
 } LC_ID, *LPLC_ID;
 #define _TAGLC_ID_DEFINED
 #endif  /* _TAGLC_ID_DEFINED */
 
 #ifndef _THREADLOCALEINFO
 typedef struct threadlocaleinfostruct {
-        int refcount;
-        unsigned int lc_codepage;
-        unsigned int lc_collate_cp;
-        unsigned long lc_handle[6]; /* LCID */
-        LC_ID lc_id[6];
-        struct {
-            char *locale;
-            wchar_t *wlocale;
-            int *refcount;
-            int *wrefcount;
-        } lc_category[6];
-        int lc_clike;
-        int mb_cur_max;
-        int * lconv_intl_refcount;
-        int * lconv_num_refcount;
-        int * lconv_mon_refcount;
-        struct lconv * lconv;
-        int * ctype1_refcount;
-        unsigned short * ctype1;
-        const unsigned short * pctype;
-        const unsigned char * pclmap;
-        const unsigned char * pcumap;
-        struct __lc_time_data * lc_time_curr;
+    int refcount;
+    unsigned int lc_codepage;
+    unsigned int lc_collate_cp;
+    unsigned long lc_handle[6]; /* LCID */
+    LC_ID lc_id[6];
+    struct {
+        char* locale;
+        wchar_t* wlocale;
+        int* refcount;
+        int* wrefcount;
+    } lc_category[6];
+    int lc_clike;
+    int mb_cur_max;
+    int* lconv_intl_refcount;
+    int* lconv_num_refcount;
+    int* lconv_mon_refcount;
+    struct lconv* lconv;
+    int* ctype1_refcount;
+    unsigned short* ctype1;
+    const unsigned short* pctype;
+    const unsigned char* pclmap;
+    const unsigned char* pcumap;
+    struct __lc_time_data* lc_time_curr;
 } threadlocinfo;
 #define _THREADLOCALEINFO
 #endif  /* _THREADLOCALEINFO */

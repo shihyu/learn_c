@@ -18,15 +18,15 @@ int main(int argc, char* argv[]) {
     } else if (pid == 0) {
         /* in child process */
         printf("child pid = %d, pparent pid = %d\n", getpid(), getppid());
-        printf("%p\n",&g_value);
-        printf("%d\n",g_value);
+        printf("%p\n", &g_value);
+        printf("%d\n", g_value);
         g_value = 200;
         register_sleep(10, print_hello);
     } else {
         /* in parent process */
         printf("parent pid = %d, pparent pid = %d\n", getpid(), getppid());
-        printf("%p\n",&g_value);
-        printf("%d\n",g_value);
+        printf("%p\n", &g_value);
+        printf("%d\n", g_value);
         // wait(NULL);
         waitpid(pid, &status, 0);
     }

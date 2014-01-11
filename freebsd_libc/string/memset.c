@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Mike Hibler and Chris Torek.
@@ -40,89 +40,97 @@ __FBSDID("$FreeBSD: src/lib/libc/string/memset.c,v 1.9 2007/01/09 00:28:12 imp E
 
 #include <limits.h>
 
-#define	wsize	sizeof(u_int)
-#define	wmask	(wsize - 1)
+#define wsize   sizeof(u_int)
+#define wmask   (wsize - 1)
 
 #ifdef BZERO
 #include <strings.h>
 
-#define	RETURN	return
-#define	VAL	0
-#define	WIDEVAL	0
+#define RETURN  return
+#define VAL 0
+#define WIDEVAL 0
 
 void
-bzero(void *dst0, size_t length)
+bzero(void* dst0, size_t length)
 #else
 #include <string.h>
 
-#define	RETURN	return (dst0)
-#define	VAL	c0
-#define	WIDEVAL	c
+#define RETURN  return (dst0)
+#define VAL c0
+#define WIDEVAL c
 
-void *
-memset(void *dst0, int c0, size_t length)
+void*
+memset(void* dst0, int c0, size_t length)
 #endif
 {
-	size_t t;
+    size_t t;
 #ifndef BZERO
-	u_int c;
+    u_int c;
 #endif
-	u_char *dst;
+    u_char* dst;
+    dst = dst0;
 
-	dst = dst0;
-	/*
-	 * If not enough words, just fill bytes.  A length >= 2 words
-	 * guarantees that at least one of them is `complete' after
-	 * any necessary alignment.  For instance:
-	 *
-	 *	|-----------|-----------|-----------|
-	 *	|00|01|02|03|04|05|06|07|08|09|0A|00|
-	 *	          ^---------------------^
-	 *		 dst		 dst+length-1
-	 *
-	 * but we use a minimum of 3 here since the overhead of the code
-	 * to do word writes is substantial.
-	 */
-	if (length < 3 * wsize) {
-		while (length != 0) {
-			*dst++ = VAL;
-			--length;
-		}
-		RETURN;
-	}
+    /*
+     * If not enough words, just fill bytes.  A length >= 2 words
+     * guarantees that at least one of them is `complete' after
+     * any necessary alignment.  For instance:
+     *
+     *  |-----------|-----------|-----------|
+     *  |00|01|02|03|04|05|06|07|08|09|0A|00|
+     *            ^---------------------^
+     *       dst         dst+length-1
+     *
+     * but we use a minimum of 3 here since the overhead of the code
+     * to do word writes is substantial.
+     */
+    if (length < 3 * wsize) {
+        while (length != 0) {
+            *dst++ = VAL;
+            --length;
+        }
+
+        RETURN;
+    }
 
 #ifndef BZERO
-	if ((c = (u_char)c0) != 0) {	/* Fill the word. */
-		c = (c << 8) | c;	/* u_int is 16 bits. */
+
+    if ((c = (u_char)c0) != 0) {    /* Fill the word. */
+        c = (c << 8) | c;   /* u_int is 16 bits. */
 #if UINT_MAX > 0xffff
-		c = (c << 16) | c;	/* u_int is 32 bits. */
+        c = (c << 16) | c;  /* u_int is 32 bits. */
 #endif
 #if UINT_MAX > 0xffffffff
-		c = (c << 32) | c;	/* u_int is 64 bits. */
+        c = (c << 32) | c;  /* u_int is 64 bits. */
 #endif
-	}
+    }
+
 #endif
-	/* Align destination by filling in bytes. */
-	if ((t = (long)dst & wmask) != 0) {
-		t = wsize - t;
-		length -= t;
-		do {
-			*dst++ = VAL;
-		} while (--t != 0);
-	}
 
-	/* Fill words.  Length was >= 2*words so we know t >= 1 here. */
-	t = length / wsize;
-	do {
-		*(u_int *)dst = WIDEVAL;
-		dst += wsize;
-	} while (--t != 0);
+    /* Align destination by filling in bytes. */
+    if ((t = (long)dst & wmask) != 0) {
+        t = wsize - t;
+        length -= t;
 
-	/* Mop up trailing bytes, if any. */
-	t = length & wmask;
-	if (t != 0)
-		do {
-			*dst++ = VAL;
-		} while (--t != 0);
-	RETURN;
+        do {
+            *dst++ = VAL;
+        } while (--t != 0);
+    }
+
+    /* Fill words.  Length was >= 2*words so we know t >= 1 here. */
+    t = length / wsize;
+
+    do {
+        *(u_int*)dst = WIDEVAL;
+        dst += wsize;
+    } while (--t != 0);
+
+    /* Mop up trailing bytes, if any. */
+    t = length & wmask;
+
+    if (t != 0)
+        do {
+            *dst++ = VAL;
+        } while (--t != 0);
+
+    RETURN;
 }

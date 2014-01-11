@@ -31,11 +31,12 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mbrlen.c,v 1.4 2004/05/12 14:26:54 tjr E
 #include "mblocal.h"
 
 size_t
-mbrlen(const char * __restrict s, size_t n, mbstate_t * __restrict ps)
-{
-	static mbstate_t mbs;
+mbrlen(const char* __restrict s, size_t n, mbstate_t* __restrict ps) {
+    static mbstate_t mbs;
 
-	if (ps == NULL)
-		ps = &mbs;
-	return (__mbrtowc(NULL, s, n, ps));
+    if (ps == NULL) {
+        ps = &mbs;
+    }
+
+    return (__mbrtowc(NULL, s, n, ps));
 }

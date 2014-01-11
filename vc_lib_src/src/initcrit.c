@@ -21,7 +21,7 @@
 
 typedef
 BOOL
-(WINAPI * PFN_INIT_CRITSEC_AND_SPIN_COUNT) (
+(WINAPI* PFN_INIT_CRITSEC_AND_SPIN_COUNT)(
     PCRITICAL_SECTION lpCriticalSection,
     DWORD dwSpinCount
 );
@@ -43,8 +43,7 @@ static PFN_INIT_CRITSEC_AND_SPIN_COUNT __pfnInitCritSecAndSpinCount;
 *
 *******************************************************************************/
 
-void __cdecl _initp_misc_initcrit(void* enull)
-{
+void __cdecl _initp_misc_initcrit(void* enull) {
     __pfnInitCritSecAndSpinCount = (PFN_INIT_CRITSEC_AND_SPIN_COUNT) enull;
 }
 
@@ -69,11 +68,10 @@ void __cdecl _initp_misc_initcrit(void* enull)
 *
 *******************************************************************************/
 
-static BOOL WINAPI __crtInitCritSecNoSpinCount (
+static BOOL WINAPI __crtInitCritSecNoSpinCount(
     PCRITICAL_SECTION lpCriticalSection,
     DWORD dwSpinCount
-    )
-{
+) {
     InitializeCriticalSection(lpCriticalSection);
     return TRUE;
 }
@@ -102,11 +100,10 @@ static BOOL WINAPI __crtInitCritSecNoSpinCount (
 *
 *******************************************************************************/
 
-int __cdecl __crtInitCritSecAndSpinCount (
+int __cdecl __crtInitCritSecAndSpinCount(
     PCRITICAL_SECTION lpCriticalSection,
     DWORD dwSpinCount
-    )
-{
+) {
     int ret;
     unsigned int osplatform = 0;
     PFN_INIT_CRITSEC_AND_SPIN_COUNT pfnInitCritSecAndSpinCount = (PFN_INIT_CRITSEC_AND_SPIN_COUNT) _decode_pointer(__pfnInitCritSecAndSpinCount);
@@ -118,6 +115,7 @@ int __cdecl __crtInitCritSecAndSpinCount (
          * instead.
          */
         _ERRCHECK(_get_osplatform(&osplatform));
+
         if (osplatform == VER_PLATFORM_WIN32_WINDOWS) {
             /*
              * Win98 and WinME export InitializeCriticalSectionAndSpinCount,
@@ -128,10 +126,11 @@ int __cdecl __crtInitCritSecAndSpinCount (
             pfnInitCritSecAndSpinCount = __crtInitCritSecNoSpinCount;
         } else {
             HINSTANCE hKernel32 = GetModuleHandle("kernel32.dll");
+
             if (hKernel32 != NULL) {
                 pfnInitCritSecAndSpinCount = (PFN_INIT_CRITSEC_AND_SPIN_COUNT)
-                    GetProcAddress(hKernel32,
-                                   "InitializeCriticalSectionAndSpinCount");
+                                             GetProcAddress(hKernel32,
+                                                     "InitializeCriticalSectionAndSpinCount");
 
                 if (pfnInitCritSecAndSpinCount == NULL) {
                     /*
@@ -140,8 +139,7 @@ int __cdecl __crtInitCritSecAndSpinCount (
                      */
                     pfnInitCritSecAndSpinCount = __crtInitCritSecNoSpinCount;
                 }
-            }
-            else {
+            } else {
                 /*
                  * GetModuleHandle failed (should never happen),
                  * use dummy API
@@ -149,6 +147,7 @@ int __cdecl __crtInitCritSecAndSpinCount (
                 pfnInitCritSecAndSpinCount = __crtInitCritSecNoSpinCount;
             }
         }
+
         __pfnInitCritSecAndSpinCount = (PFN_INIT_CRITSEC_AND_SPIN_COUNT) _encode_pointer(pfnInitCritSecAndSpinCount);
     }
 
@@ -159,8 +158,7 @@ int __cdecl __crtInitCritSecAndSpinCount (
          * API is not available.
          */
         ret = pfnInitCritSecAndSpinCount(lpCriticalSection, dwSpinCount);
-    }
-    __except (_exception_code()== STATUS_NO_MEMORY ? EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH) {
+    } __except (_exception_code() == STATUS_NO_MEMORY ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH) {
         /*
          * Initialization failed by raising an exception, which is probably
          * STATUS_NO_MEMORY.  It is not safe to set the CRT errno to ENOMEM,
@@ -170,6 +168,7 @@ int __cdecl __crtInitCritSecAndSpinCount (
         if (GetExceptionCode() == STATUS_NO_MEMORY) {
             SetLastError(ERROR_NOT_ENOUGH_MEMORY);
         }
+
         ret = FALSE;
     }
 

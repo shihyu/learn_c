@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,26 +43,37 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getmntinfo.c,v 1.5 2007/01/09 00:27:54 imp 
  */
 int
 getmntinfo(mntbufp, flags)
-	struct statfs **mntbufp;
-	int flags;
+struct statfs** mntbufp;
+int flags;
 {
-	static struct statfs *mntbuf;
-	static int mntsize;
-	static long bufsize;
+    static struct statfs* mntbuf;
+    static int mntsize;
+    static long bufsize;
 
-	if (mntsize <= 0 && (mntsize = getfsstat(0, 0, MNT_NOWAIT)) < 0)
-		return (0);
-	if (bufsize > 0 && (mntsize = getfsstat(mntbuf, bufsize, flags)) < 0)
-		return (0);
-	while (bufsize <= mntsize * sizeof(struct statfs)) {
-		if (mntbuf)
-			free(mntbuf);
-		bufsize = (mntsize + 1) * sizeof(struct statfs);
-		if ((mntbuf = (struct statfs *)malloc(bufsize)) == 0)
-			return (0);
-		if ((mntsize = getfsstat(mntbuf, bufsize, flags)) < 0)
-			return (0);
-	}
-	*mntbufp = mntbuf;
-	return (mntsize);
+    if (mntsize <= 0 && (mntsize = getfsstat(0, 0, MNT_NOWAIT)) < 0) {
+        return (0);
+    }
+
+    if (bufsize > 0 && (mntsize = getfsstat(mntbuf, bufsize, flags)) < 0) {
+        return (0);
+    }
+
+    while (bufsize <= mntsize * sizeof(struct statfs)) {
+        if (mntbuf) {
+            free(mntbuf);
+        }
+
+        bufsize = (mntsize + 1) * sizeof(struct statfs);
+
+        if ((mntbuf = (struct statfs*)malloc(bufsize)) == 0) {
+            return (0);
+        }
+
+        if ((mntsize = getfsstat(mntbuf, bufsize, flags)) < 0) {
+            return (0);
+        }
+    }
+
+    *mntbufp = mntbuf;
+    return (mntsize);
 }

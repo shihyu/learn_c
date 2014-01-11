@@ -1,4 +1,4 @@
-/*	$OpenBSD: strlcpy.c,v 1.4 1999/05/01 18:56:41 millert Exp $	*/
+/*  $OpenBSD: strlcpy.c,v 1.4 1999/05/01 18:56:41 millert Exp $ */
 
 /*
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
@@ -28,7 +28,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *rcsid = "$OpenBSD: strlcpy.c,v 1.4 1999/05/01 18:56:41 millert Exp $";
+static char* rcsid = "$OpenBSD: strlcpy.c,v 1.4 1999/05/01 18:56:41 millert Exp $";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/string/strlcpy.c,v 1.9 2006/06/15 15:56:55 maxim Exp $");
@@ -43,29 +43,32 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strlcpy.c,v 1.9 2006/06/15 15:56:55 maxi
  */
 size_t
 strlcpy(dst, src, siz)
-	char *dst;
-	const char *src;
-	size_t siz;
+char* dst;
+const char* src;
+size_t siz;
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
+    char* d = dst;
+    const char* s = src;
+    size_t n = siz;
 
-	/* Copy as many bytes as will fit */
-	if (n != 0 && --n != 0) {
-		do {
-			if ((*d++ = *s++) == 0)
-				break;
-		} while (--n != 0);
-	}
+    /* Copy as many bytes as will fit */
+    if (n != 0 && --n != 0) {
+        do {
+            if ((*d++ = *s++) == 0) {
+                break;
+            }
+        } while (--n != 0);
+    }
 
-	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
-		if (siz != 0)
-			*d = '\0';		/* NUL-terminate dst */
-		while (*s++)
-			;
-	}
+    /* Not enough room in dst, add NUL and traverse rest of src */
+    if (n == 0) {
+        if (siz != 0) {
+            *d = '\0';    /* NUL-terminate dst */
+        }
 
-	return(s - src - 1);	/* count does not include NUL */
+        while (*s++)
+            ;
+    }
+
+    return (s - src - 1);   /* count does not include NUL */
 }

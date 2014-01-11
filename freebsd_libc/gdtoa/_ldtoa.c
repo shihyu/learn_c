@@ -42,59 +42,65 @@ __FBSDID("$FreeBSD: src/lib/libc/gdtoa/_ldtoa.c,v 1.2 2004/01/18 07:53:49 das Ex
  * However, a long double could have a valid exponent of 9999, so we
  * use INT_MAX in ldtoa() instead.
  */
-char *
-__ldtoa(long double *ld, int mode, int ndigits, int *decpt, int *sign,
-    char **rve)
-{
-	static FPI fpi = {
-		LDBL_MANT_DIG,			/* nbits */
-		LDBL_MIN_EXP - LDBL_MANT_DIG,	/* emin */
-		LDBL_MAX_EXP - LDBL_MANT_DIG,	/* emax */
-		FPI_Round_near,	       		/* rounding */
-#ifdef Sudden_Underflow	/* unused, but correct anyway */
-		1
+char*
+__ldtoa(long double* ld, int mode, int ndigits, int* decpt, int* sign,
+        char** rve) {
+    static FPI fpi = {
+        LDBL_MANT_DIG,          /* nbits */
+        LDBL_MIN_EXP - LDBL_MANT_DIG,   /* emin */
+        LDBL_MAX_EXP - LDBL_MANT_DIG,   /* emax */
+        FPI_Round_near,             /* rounding */
+#ifdef Sudden_Underflow /* unused, but correct anyway */
+        1
 #else
-		0
+        0
 #endif
-	};
-	int be, kind;
-	char *ret;
-	union IEEEl2bits u;
-	uint32_t bits[(LDBL_MANT_DIG + 31) / 32];
+    };
+    int be, kind;
+    char* ret;
+    union IEEEl2bits u;
+    uint32_t bits[(LDBL_MANT_DIG + 31) / 32];
+    u.e = *ld;
+    *sign = u.bits.sign;
+    be = u.bits.exp - (LDBL_MAX_EXP - 1) - (LDBL_MANT_DIG - 1);
+    LDBL_TO_ARRAY32(u, bits);
 
-	u.e = *ld;
-	*sign = u.bits.sign;
-	be = u.bits.exp - (LDBL_MAX_EXP - 1) - (LDBL_MANT_DIG - 1);
-	LDBL_TO_ARRAY32(u, bits);
-
-	switch (fpclassify(u.e)) {
-	case FP_NORMAL:
-		kind = STRTOG_Normal;
-#ifdef	LDBL_IMPLICIT_NBIT
-		bits[LDBL_MANT_DIG / 32] |= 1 << ((LDBL_MANT_DIG - 1) % 32);
+    switch (fpclassify(u.e)) {
+    case FP_NORMAL:
+        kind = STRTOG_Normal;
+#ifdef  LDBL_IMPLICIT_NBIT
+        bits[LDBL_MANT_DIG / 32] |= 1 << ((LDBL_MANT_DIG - 1) % 32);
 #endif /* LDBL_IMPLICIT_NBIT */
-		break;
-	case FP_ZERO:
-		kind = STRTOG_Zero;
-		break;
-	case FP_SUBNORMAL:
-		kind = STRTOG_Denormal;
-#ifdef	LDBL_IMPLICIT_NBIT
-		be++;
-#endif
-		break;
-	case FP_INFINITE:
-		kind = STRTOG_Infinite;
-		break;
-	case FP_NAN:
-		kind = STRTOG_NaN;
-		break;
-	default:
-		abort();
-	}
+        break;
 
-	ret = gdtoa(&fpi, be, (ULong *)bits, &kind, mode, ndigits, decpt, rve);
-	if (*decpt == -32768)
-		*decpt = INT_MAX;
-	return ret;
+    case FP_ZERO:
+        kind = STRTOG_Zero;
+        break;
+
+    case FP_SUBNORMAL:
+        kind = STRTOG_Denormal;
+#ifdef  LDBL_IMPLICIT_NBIT
+        be++;
+#endif
+        break;
+
+    case FP_INFINITE:
+        kind = STRTOG_Infinite;
+        break;
+
+    case FP_NAN:
+        kind = STRTOG_NaN;
+        break;
+
+    default:
+        abort();
+    }
+
+    ret = gdtoa(&fpi, be, (ULong*)bits, &kind, mode, ndigits, decpt, rve);
+
+    if (*decpt == -32768) {
+        *decpt = INT_MAX;
+    }
+
+    return ret;
 }

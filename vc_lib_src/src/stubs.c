@@ -24,10 +24,10 @@ int _iob;
 char _osfile[20];
 int errno;
 
-void __cdecl fflush( void ){}
-void __cdecl fprintf( void ){}
-void __cdecl abort( void ){}
-void __cdecl read( void ){}
-void __cdecl _read( void ){}
-void __cdecl _assert( void ) {}
-void __cdecl _amsg_exit( void ) {}
+void __cdecl fflush(void) {}
+void __cdecl fprintf(void) {}
+void __cdecl abort(void) {}
+void __cdecl read(void) {}
+void __cdecl _read(void) {}
+void __cdecl _assert(void) {}
+void __cdecl _amsg_exit(void) {}

@@ -33,22 +33,23 @@
 *
 *******************************************************************************/
 
-wchar_t * __cdecl wcspbrk (
-        const wchar_t * string,
-        const wchar_t * control
-        )
-{
-        wchar_t *wcset;
+wchar_t* __cdecl wcspbrk(
+    const wchar_t* string,
+    const wchar_t* control
+) {
+    wchar_t* wcset;
 
-        /* 1st char in control string stops search */
-        while (*string) {
-            for (wcset = (wchar_t *) control; *wcset; wcset++) {
-                if (*wcset == *string) {
-                    return (wchar_t *) string;
-                }
+    /* 1st char in control string stops search */
+    while (*string) {
+        for (wcset = (wchar_t*) control; *wcset; wcset++) {
+            if (*wcset == *string) {
+                return (wchar_t*) string;
             }
-            string++;
         }
-        return NULL;
+
+        string++;
+    }
+
+    return NULL;
 }
 

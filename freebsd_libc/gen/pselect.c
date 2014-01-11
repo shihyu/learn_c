@@ -47,32 +47,35 @@ __weak_reference(__pselect, pselect);
  * and allows the user to specify a signal mask to apply during the select.
  */
 int
-__pselect(int count, fd_set * __restrict rfds, fd_set * __restrict wfds, 
-	fd_set * __restrict efds, const struct timespec * __restrict timo, 
-	const sigset_t * __restrict mask)
-{
-	sigset_t omask;
-	struct timeval tvtimo, *tvp;
-	int rv, sverrno;
+__pselect(int count, fd_set* __restrict rfds, fd_set* __restrict wfds,
+          fd_set* __restrict efds, const struct timespec* __restrict timo,
+          const sigset_t* __restrict mask) {
+    sigset_t omask;
+    struct timeval tvtimo, *tvp;
+    int rv, sverrno;
 
-	if (timo) {
-		TIMESPEC_TO_TIMEVAL(&tvtimo, timo);
-		tvp = &tvtimo;
-	} else
-		tvp = 0;
+    if (timo) {
+        TIMESPEC_TO_TIMEVAL(&tvtimo, timo);
+        tvp = &tvtimo;
+    } else {
+        tvp = 0;
+    }
 
-	if (mask != 0) {
-		rv = _sigprocmask(SIG_SETMASK, mask, &omask);
-		if (rv != 0)
-			return rv;
-	}
+    if (mask != 0) {
+        rv = _sigprocmask(SIG_SETMASK, mask, &omask);
 
-	rv = _select(count, rfds, wfds, efds, tvp);
-	if (mask != 0) {
-		sverrno = errno;
-		_sigprocmask(SIG_SETMASK, &omask, (sigset_t *)0);
-		errno = sverrno;
-	}
+        if (rv != 0) {
+            return rv;
+        }
+    }
 
-	return rv;
+    rv = _select(count, rfds, wfds, efds, tvp);
+
+    if (mask != 0) {
+        sverrno = errno;
+        _sigprocmask(SIG_SETMASK, &omask, (sigset_t*)0);
+        errno = sverrno;
+    }
+
+    return rv;
 }

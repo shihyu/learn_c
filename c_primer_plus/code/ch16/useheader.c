@@ -3,10 +3,8 @@
 #include "names_st.h"
 // remember to link with names_st.c
 
-int main(void)
-{
+int main(void) {
     names candidate;
-    
     get_names(&candidate);
     printf("Let's welcome ");
     show_names(&candidate);

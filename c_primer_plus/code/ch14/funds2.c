@@ -9,10 +9,9 @@ struct funds {
     double savefund;
 };
 
-double sum(const struct funds *);  /* argument is a pointer */
+double sum(const struct funds*);   /* argument is a pointer */
 
-int main(void)
-{
+int main(void) {
     struct funds stan = {
         "Garlic-Melon Bank",
         3024.72,
@@ -20,11 +19,9 @@ int main(void)
         9237.11
     };
     printf("Stan has a total of $%.2f.\n", sum(&stan));
-    
     return 0;
 }
 
-double sum(const struct funds * money)
-{
-    return(money->bankfund + money->savefund);
+double sum(const struct funds* money) {
+    return (money->bankfund + money->savefund);
 }

@@ -17,7 +17,7 @@
 #define _INC_FPIEEE
 
 #if defined (_M_CEE_PURE)
-        #error ERROR: This file is not supported in the pure mode!
+#error ERROR: This file is not supported in the pure mode!
 #else  /* defined (_M_CEE_PURE) */
 
 #include <crtdefs.h>
@@ -49,7 +49,8 @@ typedef enum {
     _FpCompareGreater,
     _FpCompareLess,
     _FpCompareUnordered
-} _FPIEEE_COMPARE_RESULT;
+}
+_FPIEEE_COMPARE_RESULT;
 
 /*
  * Define floating point format and result precision values.
@@ -404,39 +405,41 @@ typedef struct {
 
 typedef struct
 #if defined (_M_IA64)
-    _CRT_ALIGN(16)
+_CRT_ALIGN(16)
 #endif  /* defined (_M_IA64) */
 {
     unsigned short W[5];
-} _FP80;
+}
+_FP80;
 
-typedef struct _CRT_ALIGN(16)
-{
+typedef struct _CRT_ALIGN(16) {
     unsigned long W[4];
-} _FP128;
+}
+_FP128;
 
-typedef struct _CRT_ALIGN(8)
-{
+typedef struct _CRT_ALIGN(8) {
     unsigned long W[2];
-} _I64;
+}
+_I64;
 
-typedef struct _CRT_ALIGN(8)
-{
+typedef struct _CRT_ALIGN(8) {
     unsigned long W[2];
-} _U64;
+}
+_U64;
 
 typedef struct
 #if defined (_M_IA64)
-    _CRT_ALIGN(16)
+_CRT_ALIGN(16)
 #endif  /* defined (_M_IA64) */
 {
     unsigned short W[5];
-} _BCD80;
+}
+_BCD80;
 
-typedef struct _CRT_ALIGN(16)
-{
+typedef struct _CRT_ALIGN(16) {
     _Q64 W[2];
-} _FPQ64;
+}
+_FPQ64;
 
 typedef struct {
     union {
@@ -451,7 +454,7 @@ typedef struct {
         _U32         U32Value;
         _U64         U64Value;
         _BCD80       Bcd80Value;
-        char         *StringValue;
+        char*         StringValue;
         int          CompareValue;
 #ifndef _INTERNAL_IFSTRIP_
         _U32ARRAY    U32ArrayValue;
@@ -478,7 +481,7 @@ typedef struct {
 typedef struct {
     unsigned int RoundingMode : 2;
     unsigned int Precision : 3;
-    unsigned int Operation :12;
+    unsigned int Operation : 12;
     _FPIEEE_EXCEPTION_FLAGS Cause;
     _FPIEEE_EXCEPTION_FLAGS Enable;
     _FPIEEE_EXCEPTION_FLAGS Status;
@@ -498,10 +501,10 @@ struct _EXCEPTION_POINTERS;
  */
 
 _CRTIMP int __cdecl _fpieee_flt(
-        __in unsigned long _ExceptionCode,
-        __in struct _EXCEPTION_POINTERS * _PtExceptionPtr,
-        __in int (__cdecl * _Handler)(_FPIEEE_RECORD *)
-        );
+    __in unsigned long _ExceptionCode,
+    __in struct _EXCEPTION_POINTERS* _PtExceptionPtr,
+    __in int (__cdecl* _Handler)(_FPIEEE_RECORD*)
+);
 
 #ifdef __cplusplus
 }
@@ -509,10 +512,10 @@ _CRTIMP int __cdecl _fpieee_flt(
 
 #if _MSC_VER >= 1400 && defined(__cplusplus) && defined(_M_CEE)
 _MRTIMP int __cdecl _fpieee_flt(
-        __in unsigned long _ExceptionCode,
-        __in struct _EXCEPTION_POINTERS * _PtExceptionPtr,
-        __in int (__clrcall * _Handler)(_FPIEEE_RECORD *)
-        );
+    __in unsigned long _ExceptionCode,
+    __in struct _EXCEPTION_POINTERS* _PtExceptionPtr,
+    __in int (__clrcall* _Handler)(_FPIEEE_RECORD*)
+);
 #endif  /* _MSC_VER >= 1400 && defined(__cplusplus) && defined(_M_CEE) */
 
 #ifdef _MSC_VER

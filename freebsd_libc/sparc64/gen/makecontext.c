@@ -41,49 +41,52 @@ __FBSDID("$FreeBSD: src/lib/libc/sparc64/gen/makecontext.c,v 1.1 2003/04/01 23:2
 
 __weak_reference(__makecontext, makecontext);
 
-void _ctx_done(ucontext_t *ucp);
+void _ctx_done(ucontext_t* ucp);
 void _ctx_start(void);
 
 void
-__makecontext(ucontext_t *ucp, void (*start)(void), int argc, ...)
-{
-	mcontext_t *mc;
-	uint64_t sp;
-	va_list ap;
-	int i;
+__makecontext(ucontext_t* ucp, void (*start)(void), int argc, ...) {
+    mcontext_t* mc;
+    uint64_t sp;
+    va_list ap;
+    int i;
+    mc = &ucp->uc_mcontext;
 
-	mc = &ucp->uc_mcontext;
-	if (ucp == NULL ||
-	    (mc->mc_flags & ((1L << _MC_VERSION_BITS) - 1)) != _MC_VERSION)
-		return;
-	if ((argc < 0) || (argc > 6) ||
-	    (ucp->uc_stack.ss_sp == NULL) ||
-	    (ucp->uc_stack.ss_size < MINSIGSTKSZ)) {
-		mc->mc_flags = 0;
-		return;
-	}
-	mc = &ucp->uc_mcontext;
-	sp = (uint64_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
-	va_start(ap, argc);
-	for (i = 0; i < argc; i++)
-		mc->mc_out[i] = va_arg(ap, uint64_t);
-	va_end(ap);
-	mc->mc_global[1] = (uint64_t)start;
-	mc->mc_global[2] = (uint64_t)ucp;
-	mc->mc_out[6] = sp - SPOFF - sizeof(struct frame);
-	mc->mc_tnpc = (uint64_t)_ctx_start + 4;
-	mc->mc_tpc = (uint64_t)_ctx_start;
+    if (ucp == NULL ||
+            (mc->mc_flags & ((1L << _MC_VERSION_BITS) - 1)) != _MC_VERSION) {
+        return;
+    }
+
+    if ((argc < 0) || (argc > 6) ||
+            (ucp->uc_stack.ss_sp == NULL) ||
+            (ucp->uc_stack.ss_size < MINSIGSTKSZ)) {
+        mc->mc_flags = 0;
+        return;
+    }
+
+    mc = &ucp->uc_mcontext;
+    sp = (uint64_t)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
+    va_start(ap, argc);
+
+    for (i = 0; i < argc; i++) {
+        mc->mc_out[i] = va_arg(ap, uint64_t);
+    }
+
+    va_end(ap);
+    mc->mc_global[1] = (uint64_t)start;
+    mc->mc_global[2] = (uint64_t)ucp;
+    mc->mc_out[6] = sp - SPOFF - sizeof(struct frame);
+    mc->mc_tnpc = (uint64_t)_ctx_start + 4;
+    mc->mc_tpc = (uint64_t)_ctx_start;
 }
 
 void
-_ctx_done(ucontext_t *ucp)
-{
-
-	if (ucp->uc_link == NULL)
-		exit(0);
-	else {
-		ucp->uc_mcontext.mc_flags = 0;
-		setcontext((const ucontext_t *)ucp->uc_link);
-		abort();
-	}
+_ctx_done(ucontext_t* ucp) {
+    if (ucp->uc_link == NULL) {
+        exit(0);
+    } else {
+        ucp->uc_mcontext.mc_flags = 0;
+        setcontext((const ucontext_t*)ucp->uc_link);
+        abort();
+    }
 }

@@ -1,8 +1,8 @@
-/*	$KAME: if_indextoname.c,v 1.7 2000/11/08 03:09:30 itojun Exp $	*/
+/*  $KAME: if_indextoname.c,v 1.7 2000/11/08 03:09:30 itojun Exp $  */
 
 /*-
  * Copyright (c) 1997, 2000
- *	Berkeley Software Design, Inc.  All rights reserved.
+ *  Berkeley Software Design, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,7 +22,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	BSDI Id: if_indextoname.c,v 2.3 2000/04/17 22:38:05 dab Exp
+ *  BSDI Id: if_indextoname.c,v 2.3 2000/04/17 22:38:05 dab Exp
  */
 
 #include <sys/cdefs.h>
@@ -58,31 +58,31 @@ __FBSDID("$FreeBSD: src/lib/libc/net/if_indextoname.c,v 1.1 2002/07/15 19:58:56 
  * NULL and errno would be set to the proper value (e.g., ENOMEM).
  */
 
-char *
-if_indextoname(unsigned int ifindex, char *ifname)
-{
-	struct ifaddrs *ifaddrs, *ifa;
-	int error = 0;
+char*
+if_indextoname(unsigned int ifindex, char* ifname) {
+    struct ifaddrs* ifaddrs, *ifa;
+    int error = 0;
 
-	if (getifaddrs(&ifaddrs) < 0)
-		return(NULL);	/* getifaddrs properly set errno */
+    if (getifaddrs(&ifaddrs) < 0) {
+        return (NULL);    /* getifaddrs properly set errno */
+    }
 
-	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr &&
-		    ifa->ifa_addr->sa_family == AF_LINK &&
-		    ifindex == ((struct sockaddr_dl*)ifa->ifa_addr)->sdl_index)
-			break;
-	}
+    for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr &&
+                ifa->ifa_addr->sa_family == AF_LINK &&
+                ifindex == ((struct sockaddr_dl*)ifa->ifa_addr)->sdl_index) {
+            break;
+        }
+    }
 
-	if (ifa == NULL) {
-		error = ENXIO;
-		ifname = NULL;
-	}
-	else
-		strncpy(ifname, ifa->ifa_name, IFNAMSIZ);
+    if (ifa == NULL) {
+        error = ENXIO;
+        ifname = NULL;
+    } else {
+        strncpy(ifname, ifa->ifa_name, IFNAMSIZ);
+    }
 
-	freeifaddrs(ifaddrs);
-
-	errno = error;
-	return(ifname);
+    freeifaddrs(ifaddrs);
+    errno = error;
+    return (ifname);
 }

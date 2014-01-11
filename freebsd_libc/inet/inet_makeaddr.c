@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,20 +47,22 @@ __FBSDID("$FreeBSD: src/lib/libc/inet/inet_makeaddr.c,v 1.4 2007/06/03 17:20:26 
  */
 struct in_addr
 inet_makeaddr(net, host)
-	in_addr_t net, host;
+in_addr_t net, host;
 {
-	struct in_addr a;
+    struct in_addr a;
 
-	if (net < 128U)
-		a.s_addr = (net << IN_CLASSA_NSHIFT) | (host & IN_CLASSA_HOST);
-	else if (net < 65536U)
-		a.s_addr = (net << IN_CLASSB_NSHIFT) | (host & IN_CLASSB_HOST);
-	else if (net < 16777216L)
-		a.s_addr = (net << IN_CLASSC_NSHIFT) | (host & IN_CLASSC_HOST);
-	else
-		a.s_addr = net | host;
-	a.s_addr = htonl(a.s_addr);
-	return (a);
+    if (net < 128U) {
+        a.s_addr = (net << IN_CLASSA_NSHIFT) | (host & IN_CLASSA_HOST);
+    } else if (net < 65536U) {
+        a.s_addr = (net << IN_CLASSB_NSHIFT) | (host & IN_CLASSB_HOST);
+    } else if (net < 16777216L) {
+        a.s_addr = (net << IN_CLASSC_NSHIFT) | (host & IN_CLASSC_HOST);
+    } else {
+        a.s_addr = net | host;
+    }
+
+    a.s_addr = htonl(a.s_addr);
+    return (a);
 }
 
 /*

@@ -37,7 +37,7 @@ extern "C" {
 
 /* internal A&W routines */
 struct  threadlocaleinfostruct;
-typedef struct threadlocaleinfostruct * pthreadlocinfo;
+typedef struct threadlocaleinfostruct* pthreadlocinfo;
 
 int __cdecl __crtCompareStringW
 (
@@ -99,7 +99,7 @@ int __cdecl __crtLCMapStringA
 (
     __in_opt _locale_t _Plocinfo,
     __in LCID _Locale,
-        __in DWORD _DwMapFlag,
+    __in DWORD _DwMapFlag,
     __in_ecount(_CchSrc) LPCSTR _LpSrcStr,
     __in int _CchSrc,
     __out_ecount_opt(_CchDest) LPSTR _LpDestStr,
@@ -191,7 +191,7 @@ int __cdecl __crtLCMapStringA_mt
 (
     __in_opt _locale_t _Plocinfo,
     __in LCID _Locale,
-        __in DWORD _DwMapFlag,
+    __in DWORD _DwMapFlag,
     __in_ecount(_CchSrc) LPCSTR _LpSrcStr,
     __in int _CchSrc,
     __out_ecount_opt(_CchDest) LPSTR _LpDestStr,
@@ -226,13 +226,13 @@ BOOL __cdecl __crtGetStringTypeA_mt
 /* internal routines for supporting A&W routines */
 
 int __cdecl __ansicp(__in int _Lcid);
-char * __cdecl __convertcp
+char* __cdecl __convertcp
 (
     __in int _FromCp,
     __in int _ToCp,
-    __in_ecount_z(_PCchSrc) const char * _LpSrcStr,
-    __inout int * _PCchSrc,
-    __out_ecount_z_opt(_CchDest) char * _LpDestStr,
+    __in_ecount_z(_PCchSrc) const char* _LpSrcStr,
+    __inout int* _PCchSrc,
+    __out_ecount_z_opt(_CchDest) char* _LpDestStr,
     __in int _CchDest
 );
 

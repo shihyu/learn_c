@@ -56,58 +56,58 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/grantpt.c,v 1.7 2006/02/13 00:04:04 kan 
 #include <unistd.h>
 #include "un-namespace.h"
 
-#define PTM_PREFIX	"pty"	/* pseudo tty master naming convention */
-#define PTS_PREFIX	"tty"	/* pseudo tty slave naming convention */
-#define NEWPTS_PREFIX	"pts"
-#define PTMX		"ptmx"
+#define PTM_PREFIX  "pty"   /* pseudo tty master naming convention */
+#define PTS_PREFIX  "tty"   /* pseudo tty slave naming convention */
+#define NEWPTS_PREFIX   "pts"
+#define PTMX        "ptmx"
 
 /*
  * The following are range values for pseudo TTY devices.  Pseudo TTYs have a
  * name of /dev/[pt]ty[p-sP-S][0-9a-v], yielding 256 combinations per major.
  */
-#define PT_MAX		256
-#define	PT_DEV1		"pqrsPQRS"
-#define PT_DEV2		"0123456789abcdefghijklmnopqrstuv"
+#define PT_MAX      256
+#define PT_DEV1     "pqrsPQRS"
+#define PT_DEV2     "0123456789abcdefghijklmnopqrstuv"
 
 /*
  * grantpt(3) support utility.
  */
-#define _PATH_PTCHOWN	"/usr/libexec/pt_chown"
+#define _PATH_PTCHOWN   "/usr/libexec/pt_chown"
 
 /*
  * ISPTM(x) returns 0 for struct stat x if x is not a pty master.
  * The bounds checking may be unnecessary but it does eliminate doubt.
  */
-#define ISPTM(x)	(S_ISCHR((x).st_mode) && 			\
-			 minor((x).st_rdev) >= 0 &&			\
-			 minor((x).st_rdev) < PT_MAX)
+#define ISPTM(x)    (S_ISCHR((x).st_mode) &&            \
+             minor((x).st_rdev) >= 0 &&         \
+             minor((x).st_rdev) < PT_MAX)
 
 
 static int
-is_pts(int fd)
-{
-	int nb;
-
-	return (_ioctl(fd, TIOCGPTN, &nb) == 0);
+is_pts(int fd) {
+    int nb;
+    return (_ioctl(fd, TIOCGPTN, &nb) == 0);
 }
 
 int
-__use_pts(void)
-{
-	int use_pts;
-	size_t len;
-	int error;
+__use_pts(void) {
+    int use_pts;
+    size_t len;
+    int error;
+    len = sizeof(use_pts);
+    error = sysctlbyname("kern.pts.enable", &use_pts, &len, NULL, 0);
 
-	len = sizeof(use_pts);
-	error = sysctlbyname("kern.pts.enable", &use_pts, &len, NULL, 0);
-	if (error) {
-		struct stat sb;
+    if (error) {
+        struct stat sb;
 
-		if (stat("/dev/ptmx", &sb) != 0)
-			return (0);
-		use_pts = 1;
-	}
-	return (use_pts);
+        if (stat("/dev/ptmx", &sb) != 0) {
+            return (0);
+        }
+
+        use_pts = 1;
+    }
+
+    return (use_pts);
 }
 
 /*
@@ -116,78 +116,85 @@ __use_pts(void)
  */
 
 int
-grantpt(int fildes)
-{
-	int retval, serrno, status;
-	pid_t pid, spid;
-	gid_t gid;
-	char *slave;
-	sigset_t oblock, nblock;
-	struct group *grp;
+grantpt(int fildes) {
+    int retval, serrno, status;
+    pid_t pid, spid;
+    gid_t gid;
+    char* slave;
+    sigset_t oblock, nblock;
+    struct group* grp;
+    retval = -1;
+    serrno = errno;
 
-	retval = -1;
-	serrno = errno;
+    if ((slave = ptsname(fildes)) != NULL) {
+        /*
+         * Block SIGCHLD.
+         */
+        (void)sigemptyset(&nblock);
+        (void)sigaddset(&nblock, SIGCHLD);
+        (void)_sigprocmask(SIG_BLOCK, &nblock, &oblock);
 
-	if ((slave = ptsname(fildes)) != NULL) {
-		/*
-		 * Block SIGCHLD.
-		 */
-		(void)sigemptyset(&nblock);
-		(void)sigaddset(&nblock, SIGCHLD);
-		(void)_sigprocmask(SIG_BLOCK, &nblock, &oblock);
+        switch (pid = fork()) {
+        case -1:
+            break;
 
-		switch (pid = fork()) {
-		case -1:
-			break;
-		case 0:		/* child */
-			/*
-			 * pt_chown expects the master pseudo TTY to be its
-			 * standard input.
-			 */
-			(void)_dup2(fildes, STDIN_FILENO);
-			(void)_sigprocmask(SIG_SETMASK, &oblock, NULL);
-			execl(_PATH_PTCHOWN, _PATH_PTCHOWN, (char *)NULL);
-			_exit(EX_UNAVAILABLE);
-			/* NOTREACHED */
-		default:	/* parent */
-			/*
-			 * Just wait for the process.  Error checking is
-			 * done below.
-			 */
-			while ((spid = _waitpid(pid, &status, 0)) == -1 &&
-			       (errno == EINTR))
-				;
-			if (spid != -1 && WIFEXITED(status) &&
-			    WEXITSTATUS(status) == EX_OK)
-				retval = 0;
-			else
-				errno = EACCES;
-			break;
-		}
+        case 0:     /* child */
+            /*
+             * pt_chown expects the master pseudo TTY to be its
+             * standard input.
+             */
+            (void)_dup2(fildes, STDIN_FILENO);
+            (void)_sigprocmask(SIG_SETMASK, &oblock, NULL);
+            execl(_PATH_PTCHOWN, _PATH_PTCHOWN, (char*)NULL);
+            _exit(EX_UNAVAILABLE);
 
-		/*
-		 * Restore process's signal mask.
-		 */
-		(void)_sigprocmask(SIG_SETMASK, &oblock, NULL);
+        /* NOTREACHED */
+        default:    /* parent */
 
-		if (retval) {
-			/*
-			 * pt_chown failed.  Try to manually change the
-			 * permissions for the slave.
-			 */
-			gid = (grp = getgrnam("tty")) ? grp->gr_gid : -1;
-			if (chown(slave, getuid(), gid) == -1 ||
-			    chmod(slave, S_IRUSR | S_IWUSR | S_IWGRP) == -1)
-				errno = EACCES;
-			else
-				retval = 0;
-		}
-	}
+            /*
+             * Just wait for the process.  Error checking is
+             * done below.
+             */
+            while ((spid = _waitpid(pid, &status, 0)) == -1 &&
+                    (errno == EINTR))
+                ;
 
-	if (!retval)
-		errno = serrno;
+            if (spid != -1 && WIFEXITED(status) &&
+                    WEXITSTATUS(status) == EX_OK) {
+                retval = 0;
+            } else {
+                errno = EACCES;
+            }
 
-	return (retval);
+            break;
+        }
+
+        /*
+         * Restore process's signal mask.
+         */
+        (void)_sigprocmask(SIG_SETMASK, &oblock, NULL);
+
+        if (retval) {
+            /*
+             * pt_chown failed.  Try to manually change the
+             * permissions for the slave.
+             */
+            gid = (grp = getgrnam("tty")) ? grp->gr_gid : -1;
+
+            if (chown(slave, getuid(), gid) == -1 ||
+                    chmod(slave, S_IRUSR | S_IWUSR | S_IWGRP) == -1) {
+                errno = EACCES;
+            } else {
+                retval = 0;
+            }
+        }
+    }
+
+    if (!retval) {
+        errno = serrno;
+    }
+
+    return (retval);
 }
 
 /*
@@ -195,108 +202,105 @@ grantpt(int fildes)
  *                  and return descriptor.
  */
 int
-posix_openpt(int oflag)
-{
-	char *mc1, *mc2, master[] = _PATH_DEV PTM_PREFIX "XY";
-	const char *pc1, *pc2;
-	int fildes, bflag, serrno;
+posix_openpt(int oflag) {
+    char* mc1, *mc2, master[] = _PATH_DEV PTM_PREFIX "XY";
+    const char* pc1, *pc2;
+    int fildes, bflag, serrno;
+    fildes = -1;
+    bflag = 0;
+    serrno = errno;
 
-	fildes = -1;
-	bflag = 0;
-	serrno = errno;
+    /*
+     * Check flag validity.  POSIX doesn't require it,
+     * but we still do so.
+     */
+    if (oflag & ~(O_RDWR | O_NOCTTY)) {
+        errno = EINVAL;
+    } else {
+        if (__use_pts()) {
+            fildes = _open(_PATH_DEV PTMX, oflag);
+            return (fildes);
+        }
 
-	/*
-	 * Check flag validity.  POSIX doesn't require it,
-	 * but we still do so.
-	 */
-	if (oflag & ~(O_RDWR | O_NOCTTY))
-		errno = EINVAL;
-	else {
-		if (__use_pts()) {
-			fildes = _open(_PATH_DEV PTMX, oflag);
-			return (fildes);
-		}
-		mc1 = master + strlen(_PATH_DEV PTM_PREFIX);
-		mc2 = mc1 + 1;
+        mc1 = master + strlen(_PATH_DEV PTM_PREFIX);
+        mc2 = mc1 + 1;
 
-		/* Cycle through all possible master PTY devices. */
-		for (pc1 = PT_DEV1; !bflag && (*mc1 = *pc1); ++pc1)
-			for (pc2 = PT_DEV2; (*mc2 = *pc2) != '\0'; ++pc2) {
-				/*
-				 * Break out if we successfully open a PTY,
-				 * or if open() fails due to limits.
-				 */
-				if ((fildes = _open(master, oflag)) != -1 ||
-				    (errno == EMFILE || errno == ENFILE)) {
-					++bflag;
-					break;
-				}
-			}
+        /* Cycle through all possible master PTY devices. */
+        for (pc1 = PT_DEV1; !bflag && (*mc1 = *pc1); ++pc1)
+            for (pc2 = PT_DEV2; (*mc2 = *pc2) != '\0'; ++pc2) {
+                /*
+                 * Break out if we successfully open a PTY,
+                 * or if open() fails due to limits.
+                 */
+                if ((fildes = _open(master, oflag)) != -1 ||
+                        (errno == EMFILE || errno == ENFILE)) {
+                    ++bflag;
+                    break;
+                }
+            }
 
-		if (fildes != -1)
-			errno = serrno;
-		else if (!bflag)
-			errno = EAGAIN;
-	}
+        if (fildes != -1) {
+            errno = serrno;
+        } else if (!bflag) {
+            errno = EAGAIN;
+        }
+    }
 
-	return (fildes);
+    return (fildes);
 }
 
 /*
  * ptsname():  return the pathname of the slave pseudo-terminal device
  *             associated with the specified master.
  */
-char *
-ptsname(int fildes)
-{
-	static char slave[] = _PATH_DEV PTS_PREFIX "XY";
-	static char new_slave[] = _PATH_DEV NEWPTS_PREFIX "4294967295";
-	char *retval;
-	struct stat sbuf;
+char*
+ptsname(int fildes) {
+    static char slave[] = _PATH_DEV PTS_PREFIX "XY";
+    static char new_slave[] = _PATH_DEV NEWPTS_PREFIX "4294967295";
+    char* retval;
+    struct stat sbuf;
+    retval = NULL;
 
-	retval = NULL;
+    if (_fstat(fildes, &sbuf) == 0) {
+        if (!ISPTM(sbuf)) {
+            errno = EINVAL;
+        } else {
+            if (!is_pts(fildes)) {
+                (void)snprintf(slave, sizeof(slave),
+                               _PATH_DEV PTS_PREFIX "%s",
+                               devname(sbuf.st_rdev, S_IFCHR) +
+                               strlen(PTM_PREFIX));
+                retval = slave;
+            } else {
+                (void)snprintf(new_slave, sizeof(new_slave),
+                               _PATH_DEV NEWPTS_PREFIX "%s",
+                               devname(sbuf.st_rdev, S_IFCHR) +
+                               strlen(PTM_PREFIX));
+                retval = new_slave;
+            }
+        }
+    }
 
-	if (_fstat(fildes, &sbuf) == 0) {
-		if (!ISPTM(sbuf))
-			errno = EINVAL;
-		else {
-			if (!is_pts(fildes)) {
-				(void)snprintf(slave, sizeof(slave),
-					       _PATH_DEV PTS_PREFIX "%s",
-					       devname(sbuf.st_rdev, S_IFCHR) +
-					       strlen(PTM_PREFIX));
-				retval = slave;
-			} else {
-				(void)snprintf(new_slave, sizeof(new_slave),
-					       _PATH_DEV NEWPTS_PREFIX "%s",
-					       devname(sbuf.st_rdev, S_IFCHR) +
-					       strlen(PTM_PREFIX));
-				retval = new_slave;
-			}
-		}
-	}
-
-	return (retval);
+    return (retval);
 }
 
 /*
  * unlockpt():  unlock a pseudo-terminal device pair.
  */
 int
-unlockpt(int fildes)
-{
-	int retval;
-	struct stat sbuf;
+unlockpt(int fildes) {
+    int retval;
+    struct stat sbuf;
 
-	/*
-	 * Unlocking a master/slave pseudo-terminal pair has no meaning in a
-	 * non-streams PTY environment.  However, we do ensure fildes is a
-	 * valid master pseudo-terminal device.
-	 */
-	if ((retval = _fstat(fildes, &sbuf)) == 0 && !ISPTM(sbuf)) {
-		errno = EINVAL;
-		retval = -1;
-	}
+    /*
+     * Unlocking a master/slave pseudo-terminal pair has no meaning in a
+     * non-streams PTY environment.  However, we do ensure fildes is a
+     * valid master pseudo-terminal device.
+     */
+    if ((retval = _fstat(fildes, &sbuf)) == 0 && !ISPTM(sbuf)) {
+        errno = EINVAL;
+        retval = -1;
+    }
 
-	return (retval);
+    return (retval);
 }

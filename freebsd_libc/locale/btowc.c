@@ -32,22 +32,26 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/btowc.c,v 1.4 2004/05/12 14:26:54 tjr Ex
 #include "mblocal.h"
 
 wint_t
-btowc(int c)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs = initial;
-	char cc;
-	wchar_t wc;
+btowc(int c) {
+    static const mbstate_t initial;
+    mbstate_t mbs = initial;
+    char cc;
+    wchar_t wc;
 
-	if (c == EOF)
-		return (WEOF);
-	/*
-	 * We expect mbrtowc() to return 0 or 1, hence the check for n > 1
-	 * which detects error return values as well as "impossible" byte
-	 * counts.
-	 */
-	cc = (char)c;
-	if (__mbrtowc(&wc, &cc, 1, &mbs) > 1)
-		return (WEOF);
-	return (wc);
+    if (c == EOF) {
+        return (WEOF);
+    }
+
+    /*
+     * We expect mbrtowc() to return 0 or 1, hence the check for n > 1
+     * which detects error return values as well as "impossible" byte
+     * counts.
+     */
+    cc = (char)c;
+
+    if (__mbrtowc(&wc, &cc, 1, &mbs) > 1) {
+        return (WEOF);
+    }
+
+    return (wc);
 }

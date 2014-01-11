@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Margo Seltzer.
@@ -42,11 +42,12 @@ __FBSDID("$FreeBSD: src/lib/libc/db/hash/hash_log2.c,v 1.3 2007/01/09 00:27:51 i
 
 u_int32_t
 __log2(num)
-	u_int32_t num;
+u_int32_t num;
 {
-	u_int32_t i, limit;
+    u_int32_t i, limit;
+    limit = 1;
 
-	limit = 1;
-	for (i = 0; limit < num; limit = limit << 1, i++);
-	return (i);
+    for (i = 0; limit < num; limit = limit << 1, i++);
+
+    return (i);
 }

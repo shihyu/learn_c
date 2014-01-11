@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1995
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,31 +46,39 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getvfsbyname.c,v 1.11 2007/01/09 00:27:54 i
  */
 int
 getvfsbyname(fsname, vfcp)
-	const char *fsname;
-	struct xvfsconf *vfcp;
+const char* fsname;
+struct xvfsconf* vfcp;
 {
-	struct xvfsconf *xvfsp;
-	size_t buflen;
-	int cnt, i;
+    struct xvfsconf* xvfsp;
+    size_t buflen;
+    int cnt, i;
 
-	if (sysctlbyname("vfs.conflist", NULL, &buflen, NULL, 0) < 0)
-		return (-1);
-	xvfsp = malloc(buflen);
-	if (xvfsp == NULL)
-		return (-1);
-	if (sysctlbyname("vfs.conflist", xvfsp, &buflen, NULL, 0) < 0) {
-		free(xvfsp);
-		return (-1);
-	}
-	cnt = buflen / sizeof(struct xvfsconf);
-	for (i = 0; i < cnt; i++) {
-		if (strcmp(fsname, xvfsp[i].vfc_name) == 0) {
-			memcpy(vfcp, xvfsp + i, sizeof(struct xvfsconf));
-			free(xvfsp);
-			return (0);
-		}
-	}
-	free(xvfsp);
-	errno = ENOENT;
-	return (-1);
+    if (sysctlbyname("vfs.conflist", NULL, &buflen, NULL, 0) < 0) {
+        return (-1);
+    }
+
+    xvfsp = malloc(buflen);
+
+    if (xvfsp == NULL) {
+        return (-1);
+    }
+
+    if (sysctlbyname("vfs.conflist", xvfsp, &buflen, NULL, 0) < 0) {
+        free(xvfsp);
+        return (-1);
+    }
+
+    cnt = buflen / sizeof(struct xvfsconf);
+
+    for (i = 0; i < cnt; i++) {
+        if (strcmp(fsname, xvfsp[i].vfc_name) == 0) {
+            memcpy(vfcp, xvfsp + i, sizeof(struct xvfsconf));
+            free(xvfsp);
+            return (0);
+        }
+    }
+
+    free(xvfsp);
+    errno = ENOENT;
+    return (-1);
 }

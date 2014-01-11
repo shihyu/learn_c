@@ -57,9 +57,9 @@
 *
 *******************************************************************************/
 
-int __cdecl _filbuf (
-        FILE *str
-        )
+int __cdecl _filbuf(
+    FILE* str
+)
 
 #else  /* _UNICODE */
 
@@ -91,80 +91,77 @@ int __cdecl _filbuf (
 *
 *******************************************************************************/
 
-int __cdecl _filwbuf (
-        FILE *str
-        )
+int __cdecl _filwbuf(
+    FILE* str
+)
 
 #endif  /* _UNICODE */
 
 {
+    REG1 FILE* stream = NULL;
+    /* In safecrt, we assume we always have a buffer */
+    _VALIDATE_RETURN(str != NULL, EINVAL, _TEOF);
+    /* Init pointer to _iob2 entry. */
+    stream = str;
 
-        REG1 FILE *stream=NULL;
+    if (!inuse(stream) || stream->_flag & _IOSTRG) {
+        return (_TEOF);
+    }
 
-                /* In safecrt, we assume we always have a buffer */
-        _VALIDATE_RETURN(str != NULL, EINVAL, _TEOF);
+    if (stream->_flag & _IOWRT) {
+        stream->_flag |= _IOERR;
+        return (_TEOF);
+    }
 
-        /* Init pointer to _iob2 entry. */
-        stream = str;
+    stream->_flag |= _IOREAD;
 
-        if (!inuse(stream) || stream->_flag & _IOSTRG)
-                return(_TEOF);
+    /* Get a buffer, if necessary. */
 
-        if (stream->_flag & _IOWRT) {
-                stream->_flag |= _IOERR;
-                return(_TEOF);
-        }
-
-        stream->_flag |= _IOREAD;
-
-        /* Get a buffer, if necessary. */
-
-        if (!anybuf(stream))
-        {
+    if (!anybuf(stream)) {
 #ifndef _SAFECRT_IMPL
-            _getbuf(stream);
+        _getbuf(stream);
 #else  /* _SAFECRT_IMPL */
-            /* In safecrt, we assume we always have a buffer */
-            _VALIDATE_RETURN(FALSE, EINVAL, _TEOF);
+        /* In safecrt, we assume we always have a buffer */
+        _VALIDATE_RETURN(FALSE, EINVAL, _TEOF);
 #endif  /* _SAFECRT_IMPL */
-        }
-        else
-        {
-            stream->_ptr = stream->_base;
-        }
+    } else {
+        stream->_ptr = stream->_base;
+    }
 
-        stream->_cnt = _read(_fileno(stream), stream->_base, stream->_bufsiz);
+    stream->_cnt = _read(_fileno(stream), stream->_base, stream->_bufsiz);
+#ifndef _UNICODE
+
+    if ((stream->_cnt == 0) || (stream->_cnt == -1)) {
+#else  /* _UNICODE */
+
+    if ((stream->_cnt == 0) || (stream->_cnt == 1) || stream->_cnt == -1) {
+#endif  /* _UNICODE */
+        stream->_flag |= stream->_cnt ? _IOERR : _IOEOF;
+        stream->_cnt = 0;
+        return (_TEOF);
+    }
+
+    if (!(stream->_flag & (_IOWRT | _IORW)) &&
+            ((_osfile_safe(_fileno(stream)) & (FTEXT | FEOFLAG)) ==
+             (FTEXT | FEOFLAG))) {
+        stream->_flag |= _IOCTRLZ;
+    }
+
+    /* Check for small _bufsiz (_SMALL_BUFSIZ). If it is small and
+       if it is our buffer, then this must be the first _filbuf after
+       an fseek on a read-access-only stream. Restore _bufsiz to its
+       larger value (_INTERNAL_BUFSIZ) so that the next _filbuf call,
+       if one is made, will fill the whole buffer. */
+    if ((stream->_bufsiz == _SMALL_BUFSIZ) && (stream->_flag &
+            _IOMYBUF) && !(stream->_flag & _IOSETVBUF)) {
+        stream->_bufsiz = _INTERNAL_BUFSIZ;
+    }
 
 #ifndef _UNICODE
-        if ((stream->_cnt == 0) || (stream->_cnt == -1)) {
+    stream->_cnt--;
+    return (0xff & *stream->_ptr++);
 #else  /* _UNICODE */
-        if ((stream->_cnt == 0) || (stream->_cnt == 1) || stream->_cnt == -1) {
+    stream->_cnt -= sizeof(wchar_t);
+    return (0xffff & *((wchar_t*)(stream->_ptr))++);
 #endif  /* _UNICODE */
-                stream->_flag |= stream->_cnt ? _IOERR : _IOEOF;
-                stream->_cnt = 0;
-                return(_TEOF);
-        }
-
-        if (  !(stream->_flag & (_IOWRT|_IORW)) &&
-              ((_osfile_safe(_fileno(stream)) & (FTEXT|FEOFLAG)) ==
-                (FTEXT|FEOFLAG)) )
-                stream->_flag |= _IOCTRLZ;
-        /* Check for small _bufsiz (_SMALL_BUFSIZ). If it is small and
-           if it is our buffer, then this must be the first _filbuf after
-           an fseek on a read-access-only stream. Restore _bufsiz to its
-           larger value (_INTERNAL_BUFSIZ) so that the next _filbuf call,
-           if one is made, will fill the whole buffer. */
-        if ( (stream->_bufsiz == _SMALL_BUFSIZ) && (stream->_flag &
-              _IOMYBUF) && !(stream->_flag & _IOSETVBUF) )
-        {
-                stream->_bufsiz = _INTERNAL_BUFSIZ;
-        }
-#ifndef _UNICODE
-        stream->_cnt--;
-        return(0xff & *stream->_ptr++);
-#else  /* _UNICODE */
-        stream->_cnt -= sizeof(wchar_t);
-        return (0xffff & *((wchar_t *)(stream->_ptr))++);
-#endif  /* _UNICODE */
-
 }

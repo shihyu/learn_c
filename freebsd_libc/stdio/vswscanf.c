@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Donn Seeley at UUNET Technologies, Inc.
@@ -47,49 +47,49 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/vswscanf.c,v 1.4 2007/01/09 00:28:08 imp 
 #include <wchar.h>
 #include "local.h"
 
-static int	eofread(void *, char *, int);
+static int  eofread(void*, char*, int);
 
 static int
-eofread(void *cookie, char *buf, int len)
-{
-
-	return (0);
+eofread(void* cookie, char* buf, int len) {
+    return (0);
 }
 
 int
-vswscanf(const wchar_t * __restrict str, const wchar_t * __restrict fmt,
-    va_list ap)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs;
-	FILE f;
-	struct __sFILEX ext;
-	char *mbstr;
-	size_t mlen;
-	int r;
+vswscanf(const wchar_t* __restrict str, const wchar_t* __restrict fmt,
+         va_list ap) {
+    static const mbstate_t initial;
+    mbstate_t mbs;
+    FILE f;
+    struct __sFILEX ext;
+    char* mbstr;
+    size_t mlen;
+    int r;
 
-	/*
-	 * XXX Convert the wide character string to multibyte, which
-	 * __vfwscanf() will convert back to wide characters.
-	 */
-	if ((mbstr = malloc(wcslen(str) * MB_CUR_MAX + 1)) == NULL)
-		return (EOF);
-	mbs = initial;
-	if ((mlen = wcsrtombs(mbstr, &str, SIZE_T_MAX, &mbs)) == (size_t)-1) {
-		free(mbstr);
-		return (EOF);
-	}
-	f._file = -1;
-	f._flags = __SRD;
-	f._bf._base = f._p = (unsigned char *)mbstr;
-	f._bf._size = f._r = mlen;
-	f._read = eofread;
-	f._ub._base = NULL;
-	f._lb._base = NULL;
-	f._extra = &ext;
-	INITEXTRA(&f);
-	r = __vfwscanf(&f, fmt, ap);
-	free(mbstr);
+    /*
+     * XXX Convert the wide character string to multibyte, which
+     * __vfwscanf() will convert back to wide characters.
+     */
+    if ((mbstr = malloc(wcslen(str) * MB_CUR_MAX + 1)) == NULL) {
+        return (EOF);
+    }
 
-	return (r);
+    mbs = initial;
+
+    if ((mlen = wcsrtombs(mbstr, &str, SIZE_T_MAX, &mbs)) == (size_t) - 1) {
+        free(mbstr);
+        return (EOF);
+    }
+
+    f._file = -1;
+    f._flags = __SRD;
+    f._bf._base = f._p = (unsigned char*)mbstr;
+    f._bf._size = f._r = mlen;
+    f._read = eofread;
+    f._ub._base = NULL;
+    f._lb._base = NULL;
+    f._extra = &ext;
+    INITEXTRA(&f);
+    r = __vfwscanf(&f, fmt, ap);
+    free(mbstr);
+    return (r);
 }

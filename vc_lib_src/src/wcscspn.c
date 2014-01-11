@@ -37,23 +37,24 @@
 *
 *******************************************************************************/
 
-size_t __cdecl wcscspn (
-        const wchar_t * string,
-        const wchar_t * control
-        )
-{
-        wchar_t *str = (wchar_t *) string;
-        wchar_t *wcset;
+size_t __cdecl wcscspn(
+    const wchar_t* string,
+    const wchar_t* control
+) {
+    wchar_t* str = (wchar_t*) string;
+    wchar_t* wcset;
 
-        /* 1st char in control string stops search */
-        while (*str) {
-            for (wcset = (wchar_t *)control; *wcset; wcset++) {
-                if (*wcset == *str) {
-                    return (size_t)(str - string);
-                }
+    /* 1st char in control string stops search */
+    while (*str) {
+        for (wcset = (wchar_t*)control; *wcset; wcset++) {
+            if (*wcset == *str) {
+                return (size_t)(str - string);
             }
-            str++;
         }
-        return (size_t)(str - string);
+
+        str++;
+    }
+
+    return (size_t)(str - string);
 }
 

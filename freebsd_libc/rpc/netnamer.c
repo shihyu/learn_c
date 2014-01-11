@@ -57,14 +57,14 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/netnamer.c,v 1.12 2005/03/10 00:58:21 stefa
 #include <unistd.h>
 #include "un-namespace.h"
 
-static char    *OPSYS = "unix";
+static char*    OPSYS = "unix";
 #ifdef YP
-static char    *NETID = "netid.byname";
+static char*    NETID = "netid.byname";
 #endif
-static char    *NETIDFILE = "/etc/netid";
+static char*    NETIDFILE = "/etc/netid";
 
-static int getnetid( char *, char * );
-static int _getgroups( char *, gid_t * );
+static int getnetid(char*, char*);
+static int _getgroups(char*, gid_t*);
 
 #ifndef NGROUPS
 #define NGROUPS 16
@@ -75,79 +75,105 @@ static int _getgroups( char *, gid_t * );
  */
 int
 netname2user(netname, uidp, gidp, gidlenp, gidlist)
-	char            netname[MAXNETNAMELEN + 1];
-	uid_t            *uidp;
-	gid_t            *gidp;
-	int            *gidlenp;
-	gid_t	       *gidlist;
+char            netname[MAXNETNAMELEN + 1];
+uid_t*            uidp;
+gid_t*            gidp;
+int*            gidlenp;
+gid_t*          gidlist;
 {
-	char           *p;
-	int             gidlen;
-	uid_t           uid;
-	long		luid;
-	struct passwd  *pwd;
-	char            val[1024];
-	char           *val1, *val2;
-	char           *domain;
-	int             vallen;
-	int             err;
+    char*           p;
+    int             gidlen;
+    uid_t           uid;
+    long        luid;
+    struct passwd*  pwd;
+    char            val[1024];
+    char*           val1, *val2;
+    char*           domain;
+    int             vallen;
+    int             err;
 
-	if (getnetid(netname, val)) {
-		char *res = val;
+    if (getnetid(netname, val)) {
+        char* res = val;
+        p = strsep(&res, ":");
 
-		p = strsep(&res, ":");
-		if (p == NULL)
-			return (0);
-		*uidp = (uid_t) atol(p);
-		p = strsep(&res, "\n,");
-		if (p == NULL) {
-			return (0);
-		}
-		*gidp = (gid_t) atol(p);
-		for (gidlen = 0; gidlen < NGROUPS; gidlen++) {
-			p = strsep(&res, "\n,");
-			if (p == NULL)
-				break;
-			gidlist[gidlen] = (gid_t) atol(p);
-		}
-		*gidlenp = gidlen;
+        if (p == NULL) {
+            return (0);
+        }
 
-		return (1);
-	}
-	val1 = strchr(netname, '.');
-	if (val1 == NULL)
-		return (0);
-	if (strncmp(netname, OPSYS, (val1-netname)))
-		return (0);
-	val1++;
-	val2 = strchr(val1, '@');
-	if (val2 == NULL)
-		return (0);
-	vallen = val2 - val1;
-	if (vallen > (1024 - 1))
-		vallen = 1024 - 1;
-	(void) strncpy(val, val1, 1024);
-	val[vallen] = 0;
+        *uidp = (uid_t) atol(p);
+        p = strsep(&res, "\n,");
 
-	err = __rpc_get_default_domain(&domain);	/* change to rpc */
-	if (err)
-		return (0);
+        if (p == NULL) {
+            return (0);
+        }
 
-	if (strcmp(val2 + 1, domain))
-		return (0);	/* wrong domain */
+        *gidp = (gid_t) atol(p);
 
-	if (sscanf(val, "%ld", &luid) != 1)
-		return (0);
-	uid = luid;
+        for (gidlen = 0; gidlen < NGROUPS; gidlen++) {
+            p = strsep(&res, "\n,");
 
-	/* use initgroups method */
-	pwd = getpwuid(uid);
-	if (pwd == NULL)
-		return (0);
-	*uidp = pwd->pw_uid;
-	*gidp = pwd->pw_gid;
-	*gidlenp = _getgroups(pwd->pw_name, gidlist);
-	return (1);
+            if (p == NULL) {
+                break;
+            }
+
+            gidlist[gidlen] = (gid_t) atol(p);
+        }
+
+        *gidlenp = gidlen;
+        return (1);
+    }
+
+    val1 = strchr(netname, '.');
+
+    if (val1 == NULL) {
+        return (0);
+    }
+
+    if (strncmp(netname, OPSYS, (val1 - netname))) {
+        return (0);
+    }
+
+    val1++;
+    val2 = strchr(val1, '@');
+
+    if (val2 == NULL) {
+        return (0);
+    }
+
+    vallen = val2 - val1;
+
+    if (vallen > (1024 - 1)) {
+        vallen = 1024 - 1;
+    }
+
+    (void) strncpy(val, val1, 1024);
+    val[vallen] = 0;
+    err = __rpc_get_default_domain(&domain);    /* change to rpc */
+
+    if (err) {
+        return (0);
+    }
+
+    if (strcmp(val2 + 1, domain)) {
+        return (0);    /* wrong domain */
+    }
+
+    if (sscanf(val, "%ld", &luid) != 1) {
+        return (0);
+    }
+
+    uid = luid;
+    /* use initgroups method */
+    pwd = getpwuid(uid);
+
+    if (pwd == NULL) {
+        return (0);
+    }
+
+    *uidp = pwd->pw_uid;
+    *gidp = pwd->pw_gid;
+    *gidlenp = _getgroups(pwd->pw_name, gidlist);
+    return (1);
 }
 
 /*
@@ -156,40 +182,45 @@ netname2user(netname, uidp, gidp, gidlenp, gidlist)
 
 static int
 _getgroups(uname, groups)
-	char           *uname;
-	gid_t          groups[NGROUPS];
+char*           uname;
+gid_t          groups[NGROUPS];
 {
-	gid_t           ngroups = 0;
-	struct group *grp;
-	int    i;
-	int    j;
-	int             filter;
+    gid_t           ngroups = 0;
+    struct group* grp;
+    int    i;
+    int    j;
+    int             filter;
+    setgrent();
 
-	setgrent();
-	while ((grp = getgrent())) {
-		for (i = 0; grp->gr_mem[i]; i++)
-			if (!strcmp(grp->gr_mem[i], uname)) {
-				if (ngroups == NGROUPS) {
+    while ((grp = getgrent())) {
+        for (i = 0; grp->gr_mem[i]; i++)
+            if (!strcmp(grp->gr_mem[i], uname)) {
+                if (ngroups == NGROUPS) {
 #ifdef DEBUG
-					fprintf(stderr,
-				"initgroups: %s is in too many groups\n", uname);
+                    fprintf(stderr,
+                            "initgroups: %s is in too many groups\n", uname);
 #endif
-					goto toomany;
-				}
-				/* filter out duplicate group entries */
-				filter = 0;
-				for (j = 0; j < ngroups; j++)
-					if (groups[j] == grp->gr_gid) {
-						filter++;
-						break;
-					}
-				if (!filter)
-					groups[ngroups++] = grp->gr_gid;
-			}
-	}
+                    goto toomany;
+                }
+
+                /* filter out duplicate group entries */
+                filter = 0;
+
+                for (j = 0; j < ngroups; j++)
+                    if (groups[j] == grp->gr_gid) {
+                        filter++;
+                        break;
+                    }
+
+                if (!filter) {
+                    groups[ngroups++] = grp->gr_gid;
+                }
+            }
+    }
+
 toomany:
-	endgrent();
-	return (ngroups);
+    endgrent();
+    return (ngroups);
 }
 
 /*
@@ -197,47 +228,62 @@ toomany:
  */
 int
 netname2host(netname, hostname, hostlen)
-	char            netname[MAXNETNAMELEN + 1];
-	char           *hostname;
-	int             hostlen;
+char            netname[MAXNETNAMELEN + 1];
+char*           hostname;
+int             hostlen;
 {
-	int             err;
-	char            valbuf[1024];
-	char           *val;
-	char           *val2;
-	int             vallen;
-	char           *domain;
+    int             err;
+    char            valbuf[1024];
+    char*           val;
+    char*           val2;
+    int             vallen;
+    char*           domain;
 
-	if (getnetid(netname, valbuf)) {
-		val = valbuf;
-		if ((*val == '0') && (val[1] == ':')) {
-			(void) strncpy(hostname, val + 2, hostlen);
-			return (1);
-		}
-	}
-	val = strchr(netname, '.');
-	if (val == NULL)
-		return (0);
-	if (strncmp(netname, OPSYS, (val - netname)))
-		return (0);
-	val++;
-	val2 = strchr(val, '@');
-	if (val2 == NULL)
-		return (0);
-	vallen = val2 - val;
-	if (vallen > (hostlen - 1))
-		vallen = hostlen - 1;
-	(void) strncpy(hostname, val, vallen);
-	hostname[vallen] = 0;
+    if (getnetid(netname, valbuf)) {
+        val = valbuf;
 
-	err = __rpc_get_default_domain(&domain);	/* change to rpc */
-	if (err)
-		return (0);
+        if ((*val == '0') && (val[1] == ':')) {
+            (void) strncpy(hostname, val + 2, hostlen);
+            return (1);
+        }
+    }
 
-	if (strcmp(val2 + 1, domain))
-		return (0);	/* wrong domain */
-	else
-		return (1);
+    val = strchr(netname, '.');
+
+    if (val == NULL) {
+        return (0);
+    }
+
+    if (strncmp(netname, OPSYS, (val - netname))) {
+        return (0);
+    }
+
+    val++;
+    val2 = strchr(val, '@');
+
+    if (val2 == NULL) {
+        return (0);
+    }
+
+    vallen = val2 - val;
+
+    if (vallen > (hostlen - 1)) {
+        vallen = hostlen - 1;
+    }
+
+    (void) strncpy(hostname, val, vallen);
+    hostname[vallen] = 0;
+    err = __rpc_get_default_domain(&domain);    /* change to rpc */
+
+    if (err) {
+        return (0);
+    }
+
+    if (strcmp(val2 + 1, domain)) {
+        return (0);    /* wrong domain */
+    } else {
+        return (1);
+    }
 }
 
 /*
@@ -246,90 +292,105 @@ netname2host(netname, hostname, hostlen)
  */
 int
 getnetid(key, ret)
-	char           *key, *ret;
+char*           key, *ret;
 {
-	char            buf[1024];	/* big enough */
-	char           *res;
-	char           *mkey;
-	char           *mval;
-	FILE           *fd;
+    char            buf[1024];  /* big enough */
+    char*           res;
+    char*           mkey;
+    char*           mval;
+    FILE*           fd;
 #ifdef YP
-	char           *domain;
-	int             err;
-	char           *lookup;
-	int             len;
+    char*           domain;
+    int             err;
+    char*           lookup;
+    int             len;
 #endif
+    fd = fopen(NETIDFILE, "r");
 
-	fd = fopen(NETIDFILE, "r");
-	if (fd == NULL) {
+    if (fd == NULL) {
 #ifdef YP
-		res = "+";
-		goto getnetidyp;
+        res = "+";
+        goto getnetidyp;
 #else
-		return (0);
+        return (0);
 #endif
-	}
-	for (;;) {
-		if (fd == NULL)
-			return (0);	/* getnetidyp brings us here */
-		res = fgets(buf, sizeof(buf), fd);
-		if (res == NULL) {
-			fclose(fd);
-			return (0);
-		}
-		if (res[0] == '#')
-			continue;
-		else if (res[0] == '+') {
-#ifdef YP
-	getnetidyp:
-			err = yp_get_default_domain(&domain);
-			if (err) {
-				continue;
-			}
-			lookup = NULL;
-			err = yp_match(domain, NETID, key,
-				strlen(key), &lookup, &len);
-			if (err) {
-#ifdef DEBUG
-				fprintf(stderr, "match failed error %d\n", err);
-#endif
-				continue;
-			}
-			lookup[len] = 0;
-			strcpy(ret, lookup);
-			free(lookup);
-			if (fd != NULL)
-				fclose(fd);
-			return (2);
-#else	/* YP */
-#ifdef DEBUG
-			fprintf(stderr,
-"Bad record in %s '+' -- NIS not supported in this library copy\n",
-				NETIDFILE);
-#endif
-			continue;
-#endif	/* YP */
-		} else {
-			mkey = strsep(&res, "\t ");
-			if (mkey == NULL) {
-				fprintf(stderr,
-		"Bad record in %s -- %s", NETIDFILE, buf);
-				continue;
-			}
-			do {
-				mval = strsep(&res, " \t#\n");
-			} while (mval != NULL && !*mval);
-			if (mval == NULL) {
-				fprintf(stderr,
-		"Bad record in %s val problem - %s", NETIDFILE, buf);
-				continue;
-			}
-			if (strcmp(mkey, key) == 0) {
-				strcpy(ret, mval);
-				fclose(fd);
-				return (1);
+    }
 
-			}
-		}
-	}
+    for (;;) {
+        if (fd == NULL) {
+            return (0);    /* getnetidyp brings us here */
+        }
+
+        res = fgets(buf, sizeof(buf), fd);
+
+        if (res == NULL) {
+            fclose(fd);
+            return (0);
+        }
+
+        if (res[0] == '#') {
+            continue;
+        } else if (res[0] == '+') {
+#ifdef YP
+        getnetidyp:
+            err = yp_get_default_domain(&domain);
+
+            if (err) {
+                continue;
+            }
+
+            lookup = NULL;
+            err = yp_match(domain, NETID, key,
+                           strlen(key), &lookup, &len);
+
+            if (err) {
+#ifdef DEBUG
+                fprintf(stderr, "match failed error %d\n", err);
+#endif
+                continue;
+            }
+
+            lookup[len] = 0;
+            strcpy(ret, lookup);
+            free(lookup);
+
+            if (fd != NULL) {
+                fclose(fd);
+            }
+
+            return (2);
+#else   /* YP */
+#ifdef DEBUG
+            fprintf(stderr,
+                    "Bad record in %s '+' -- NIS not supported in this library copy\n",
+                    NETIDFILE);
+#endif
+            continue;
+#endif  /* YP */
+        } else {
+            mkey = strsep(&res, "\t ");
+
+            if (mkey == NULL) {
+                fprintf(stderr,
+                        "Bad record in %s -- %s", NETIDFILE, buf);
+                continue;
+            }
+
+            do {
+                mval = strsep(&res, " \t#\n");
+            } while (mval != NULL && !*mval);
+
+            if (mval == NULL) {
+                fprintf(stderr,
+                        "Bad record in %s val problem - %s", NETIDFILE, buf);
+                continue;
+            }
+
+            if (strcmp(mkey, key) == 0) {
+                strcpy(ret, mval);
+                fclose(fd);
+                return (1);
+            }
+        }
+    }
 }

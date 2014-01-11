@@ -38,25 +38,21 @@
 *
 *******************************************************************************/
 
-int __cdecl ungetc (
-        REG2 int ch,
-        REG1 FILE *stream
-        )
-{
-        int retval;
+int __cdecl ungetc(
+    REG2 int ch,
+    REG1 FILE* stream
+) {
+    int retval;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (stream != NULL), EINVAL, EOF);
+    __try {
+        retval = _ungetc_nolock(ch, stream);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        _lock_str(stream);
-
-        __try {
-                retval = _ungetc_nolock (ch, stream);
-        }
-        __finally {
-                _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 

@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wcslen.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
+ *  citrus Id: wcslen.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
 #include <sys/cdefs.h>
@@ -38,13 +38,14 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcslen.c,v 1.6 2002/09/21 00:29:23 tjr E
 
 size_t
 wcslen(s)
-	const wchar_t *s;
+const wchar_t* s;
 {
-	const wchar_t *p;
+    const wchar_t* p;
+    p = s;
 
-	p = s;
-	while (*p)
-		p++;
+    while (*p) {
+        p++;
+    }
 
-	return p - s;
+    return p - s;
 }

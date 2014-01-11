@@ -43,11 +43,11 @@ __FBSDID("$FreeBSD: src/lib/libc/net/nscachedcli.c,v 1.3 2006/12/04 17:08:43 ume
 #include "un-namespace.h"
 #include "nscachedcli.h"
 
-#define NS_DEFAULT_CACHED_IO_TIMEOUT	4
+#define NS_DEFAULT_CACHED_IO_TIMEOUT    4
 
-static int safe_write(struct cached_connection_ *, const void *, size_t);
-static int safe_read(struct cached_connection_ *, void *, size_t);
-static int send_credentials(struct cached_connection_ *, int);
+static int safe_write(struct cached_connection_*, const void*, size_t);
+static int safe_read(struct cached_connection_*, void*, size_t);
+static int send_credentials(struct cached_connection_*, int);
 
 /*
  * safe_write writes data to the specified connection and tries to do it in
@@ -56,40 +56,46 @@ static int send_credentials(struct cached_connection_ *, int);
  * splitted.
  */
 static int
-safe_write(struct cached_connection_ *connection, const void *data,
-    size_t data_size)
-{
-	struct kevent eventlist;
-	int nevents;
-	size_t result;
-	ssize_t s_result;
-	struct timespec timeout;
+safe_write(struct cached_connection_ *connection, const void* data,
+           size_t data_size) {
+    struct kevent eventlist;
+    int nevents;
+    size_t result;
+    ssize_t s_result;
+    struct timespec timeout;
 
-	if (data_size == 0)
-		return (0);
+    if (data_size == 0) {
+        return (0);
+    }
 
-	timeout.tv_sec = NS_DEFAULT_CACHED_IO_TIMEOUT;
-	timeout.tv_nsec = 0;
-	result = 0;
-	do {
-		nevents = _kevent(connection->write_queue, NULL, 0, &eventlist,
-		    1, &timeout);
-		if ((nevents == 1) && (eventlist.filter == EVFILT_WRITE)) {
-			s_result = _write(connection->sockfd, data + result,
-			    eventlist.data < data_size - result ?
-			    eventlist.data : data_size - result);
-			if (s_result == -1)
-				return (-1);
-			else
-				result += s_result;
+    timeout.tv_sec = NS_DEFAULT_CACHED_IO_TIMEOUT;
+    timeout.tv_nsec = 0;
+    result = 0;
 
-			if (eventlist.flags & EV_EOF)
-				return (result < data_size ? -1 : 0);
-		} else
-			return (-1);
-	} while (result < data_size);
+    do {
+        nevents = _kevent(connection->write_queue, NULL, 0, &eventlist,
+                          1, &timeout);
 
-	return (0);
+        if ((nevents == 1) && (eventlist.filter == EVFILT_WRITE)) {
+            s_result = _write(connection->sockfd, data + result,
+                              eventlist.data < data_size - result ?
+                              eventlist.data : data_size - result);
+
+            if (s_result == -1) {
+                return (-1);
+            } else {
+                result += s_result;
+            }
+
+            if (eventlist.flags & EV_EOF) {
+                return (result < data_size ? -1 : 0);
+            }
+        } else {
+            return (-1);
+        }
+    } while (result < data_size);
+
+    return (0);
 }
 
 /*
@@ -99,39 +105,45 @@ safe_write(struct cached_connection_ *connection, const void *data,
  * be splitted.
  */
 static int
-safe_read(struct cached_connection_ *connection, void *data, size_t data_size)
-{
-	struct kevent eventlist;
-	size_t result;
-	ssize_t s_result;
-	struct timespec timeout;
-	int nevents;
+safe_read(struct cached_connection_ *connection, void* data, size_t data_size) {
+    struct kevent eventlist;
+    size_t result;
+    ssize_t s_result;
+    struct timespec timeout;
+    int nevents;
 
-	if (data_size == 0)
-		return (0);
+    if (data_size == 0) {
+        return (0);
+    }
 
-	timeout.tv_sec = NS_DEFAULT_CACHED_IO_TIMEOUT;
-	timeout.tv_nsec = 0;
-	result = 0;
-	do {
-		nevents = _kevent(connection->read_queue, NULL, 0, &eventlist,
-		    1, &timeout);
-		if (nevents == 1 && eventlist.filter == EVFILT_READ) {
-			s_result = _read(connection->sockfd, data + result,
-			    eventlist.data <= data_size - result ?
-			    eventlist.data : data_size - result);
-			if (s_result == -1)
-				return (-1);
-			else
-				result += s_result;
+    timeout.tv_sec = NS_DEFAULT_CACHED_IO_TIMEOUT;
+    timeout.tv_nsec = 0;
+    result = 0;
 
-			if (eventlist.flags & EV_EOF)
-				return (result < data_size ? -1 : 0);
-		} else
-			return (-1);
-	} while (result < data_size);
+    do {
+        nevents = _kevent(connection->read_queue, NULL, 0, &eventlist,
+                          1, &timeout);
 
-	return (0);
+        if (nevents == 1 && eventlist.filter == EVFILT_READ) {
+            s_result = _read(connection->sockfd, data + result,
+                             eventlist.data <= data_size - result ?
+                             eventlist.data : data_size - result);
+
+            if (s_result == -1) {
+                return (-1);
+            } else {
+                result += s_result;
+            }
+
+            if (eventlist.flags & EV_EOF) {
+                return (result < data_size ? -1 : 0);
+            }
+        } else {
+            return (-1);
+        }
+    } while (result < data_size);
+
+    return (0);
 }
 
 /*
@@ -139,111 +151,94 @@ safe_read(struct cached_connection_ *connection, void *data, size_t data_size)
  * communication element type.
  */
 static int
-send_credentials(struct cached_connection_ *connection, int type)
-{
-	struct kevent eventlist;
-	int nevents;
-	ssize_t result;
-	int res;
+send_credentials(struct cached_connection_ *connection, int type) {
+    struct kevent eventlist;
+    int nevents;
+    ssize_t result;
+    int res;
+    struct msghdr cred_hdr;
+    struct iovec iov;
+    struct {
+        struct cmsghdr hdr;
+        char cred[CMSG_SPACE(sizeof(struct cmsgcred))];
+    } cmsg;
+    memset(&cmsg, 0, sizeof(cmsg));
+    cmsg.hdr.cmsg_len =  CMSG_LEN(sizeof(struct cmsgcred));
+    cmsg.hdr.cmsg_level = SOL_SOCKET;
+    cmsg.hdr.cmsg_type = SCM_CREDS;
+    memset(&cred_hdr, 0, sizeof(struct msghdr));
+    cred_hdr.msg_iov = &iov;
+    cred_hdr.msg_iovlen = 1;
+    cred_hdr.msg_control = (caddr_t)&cmsg;
+    cred_hdr.msg_controllen = CMSG_SPACE(sizeof(struct cmsgcred));
+    iov.iov_base = &type;
+    iov.iov_len = sizeof(int);
+    EV_SET(&eventlist, connection->sockfd, EVFILT_WRITE, EV_ADD,
+           NOTE_LOWAT, sizeof(int), NULL);
+    res = _kevent(connection->write_queue, &eventlist, 1, NULL, 0, NULL);
+    nevents = _kevent(connection->write_queue, NULL, 0, &eventlist, 1,
+                      NULL);
 
-	struct msghdr cred_hdr;
-	struct iovec iov;
-
-	struct {
-		struct cmsghdr hdr;
-		char cred[CMSG_SPACE(sizeof(struct cmsgcred))];
-	} cmsg;
-
-	memset(&cmsg, 0, sizeof(cmsg));
-	cmsg.hdr.cmsg_len =  CMSG_LEN(sizeof(struct cmsgcred));
-	cmsg.hdr.cmsg_level = SOL_SOCKET;
-	cmsg.hdr.cmsg_type = SCM_CREDS;
-
-	memset(&cred_hdr, 0, sizeof(struct msghdr));
-	cred_hdr.msg_iov = &iov;
-	cred_hdr.msg_iovlen = 1;
-	cred_hdr.msg_control = (caddr_t)&cmsg;
-	cred_hdr.msg_controllen = CMSG_SPACE(sizeof(struct cmsgcred));
-
-	iov.iov_base = &type;
-	iov.iov_len = sizeof(int);
-
-	EV_SET(&eventlist, connection->sockfd, EVFILT_WRITE, EV_ADD,
-	    NOTE_LOWAT, sizeof(int), NULL);
-	res = _kevent(connection->write_queue, &eventlist, 1, NULL, 0, NULL);
-
-	nevents = _kevent(connection->write_queue, NULL, 0, &eventlist, 1,
-	    NULL);
-	if (nevents == 1 && eventlist.filter == EVFILT_WRITE) {
-		result = (_sendmsg(connection->sockfd, &cred_hdr, 0) == -1) ?
-		    -1 : 0;
-		EV_SET(&eventlist, connection->sockfd, EVFILT_WRITE, EV_ADD,
-		    0, 0, NULL);
-		_kevent(connection->write_queue, &eventlist, 1, NULL, 0, NULL);
-		return (result);
-	} else
-		return (-1);
+    if (nevents == 1 && eventlist.filter == EVFILT_WRITE) {
+        result = (_sendmsg(connection->sockfd, &cred_hdr, 0) == -1) ?
+                 -1 : 0;
+        EV_SET(&eventlist, connection->sockfd, EVFILT_WRITE, EV_ADD,
+               0, 0, NULL);
+        _kevent(connection->write_queue, &eventlist, 1, NULL, 0, NULL);
+        return (result);
+    } else {
+        return (-1);
+    }
 }
 
 /*
  * Opens the connection with the specified params. Initializes all kqueues.
  */
-struct cached_connection_ *
-__open_cached_connection(struct cached_connection_params const *params)
-{
-	struct cached_connection_ *retval;
-	struct kevent eventlist;
-	struct sockaddr_un client_address;
-	int client_address_len, client_socket;
-	int res;
+struct cached_connection_*
+__open_cached_connection(struct cached_connection_params const* params) {
+    struct cached_connection_ *retval;
+    struct kevent eventlist;
+    struct sockaddr_un client_address;
+    int client_address_len, client_socket;
+    int res;
+    assert(params != NULL);
+    client_socket = _socket(PF_LOCAL, SOCK_STREAM, 0);
+    client_address.sun_family = PF_LOCAL;
+    strncpy(client_address.sun_path, params->socket_path,
+            sizeof(client_address.sun_path));
+    client_address_len = sizeof(client_address.sun_family) +
+                         strlen(client_address.sun_path) + 1;
+    res = _connect(client_socket, (struct sockaddr*)&client_address,
+                   client_address_len);
 
-	assert(params != NULL);
+    if (res == -1) {
+        _close(client_socket);
+        return (NULL);
+    }
 
-	client_socket = _socket(PF_LOCAL, SOCK_STREAM, 0);
-	client_address.sun_family = PF_LOCAL;
-	strncpy(client_address.sun_path, params->socket_path,
-	    sizeof(client_address.sun_path));
-	client_address_len = sizeof(client_address.sun_family) +
-	    strlen(client_address.sun_path) + 1;
-
-	res = _connect(client_socket, (struct sockaddr *)&client_address,
-	    client_address_len);
-	if (res == -1) {
-		_close(client_socket);
-		return (NULL);
-	}
-	_fcntl(client_socket, F_SETFL, O_NONBLOCK);
-
-	retval = malloc(sizeof(struct cached_connection_));
-	assert(retval != NULL);
-	memset(retval, 0, sizeof(struct cached_connection_));
-
-	retval->sockfd = client_socket;
-
-	retval->write_queue = kqueue();
-	assert(retval->write_queue != -1);
-
-	EV_SET(&eventlist, retval->sockfd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-	res = _kevent(retval->write_queue, &eventlist, 1, NULL, 0, NULL);
-
-	retval->read_queue = kqueue();
-	assert(retval->read_queue != -1);
-
-	EV_SET(&eventlist, retval->sockfd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-	res = _kevent(retval->read_queue, &eventlist, 1, NULL, 0, NULL);
-
-	return (retval);
+    _fcntl(client_socket, F_SETFL, O_NONBLOCK);
+    retval = malloc(sizeof(struct cached_connection_));
+    assert(retval != NULL);
+    memset(retval, 0, sizeof(struct cached_connection_));
+    retval->sockfd = client_socket;
+    retval->write_queue = kqueue();
+    assert(retval->write_queue != -1);
+    EV_SET(&eventlist, retval->sockfd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+    res = _kevent(retval->write_queue, &eventlist, 1, NULL, 0, NULL);
+    retval->read_queue = kqueue();
+    assert(retval->read_queue != -1);
+    EV_SET(&eventlist, retval->sockfd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+    res = _kevent(retval->read_queue, &eventlist, 1, NULL, 0, NULL);
+    return (retval);
 }
 
 void
-__close_cached_connection(struct cached_connection_ *connection)
-{
-	assert(connection != NULL);
-
-	_close(connection->sockfd);
-	_close(connection->read_queue);
-	_close(connection->write_queue);
-	free(connection);
+__close_cached_connection(struct cached_connection_ *connection) {
+    assert(connection != NULL);
+    _close(connection->sockfd);
+    _close(connection->read_queue);
+    _close(connection->write_queue);
+    free(connection);
 }
 
 /*
@@ -252,50 +247,64 @@ __close_cached_connection(struct cached_connection_ *connection)
  * specified key in the cache entry with entry_name.
  */
 int
-__cached_write(struct cached_connection_ *connection, const char *entry_name,
-    const char *key, size_t key_size, const char *data, size_t data_size)
-{
-	size_t name_size;
-	int error_code;
-	int result;
+__cached_write(struct cached_connection_ *connection, const char* entry_name,
+               const char* key, size_t key_size, const char* data, size_t data_size) {
+    size_t name_size;
+    int error_code;
+    int result;
+    error_code = -1;
+    result = 0;
+    result = send_credentials(connection, CET_WRITE_REQUEST);
 
-	error_code = -1;
-	result = 0;
-	result = send_credentials(connection, CET_WRITE_REQUEST);
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	name_size = strlen(entry_name);
-	result = safe_write(connection, &name_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    name_size = strlen(entry_name);
+    result = safe_write(connection, &name_size, sizeof(size_t));
 
-	result = safe_write(connection, &key_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(connection, &data_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    result = safe_write(connection, &key_size, sizeof(size_t));
 
-	result = safe_write(connection, entry_name, name_size);
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(connection, key, key_size);
-	if (result != 0)
-		goto fin;
+    result = safe_write(connection, &data_size, sizeof(size_t));
 
-	result = safe_write(connection, data, data_size);
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_read(connection, &error_code, sizeof(int));
-	if (result != 0)
-		error_code = -1;
+    result = safe_write(connection, entry_name, name_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    result = safe_write(connection, key, key_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    result = safe_write(connection, data, data_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    result = safe_read(connection, &error_code, sizeof(int));
+
+    if (result != 0) {
+        error_code = -1;
+    }
 
 fin:
-	return (error_code);
+    return (error_code);
 }
 
 /*
@@ -304,66 +313,78 @@ fin:
  * specified key from the cache entry with entry_name.
  */
 int
-__cached_read(struct cached_connection_ *connection, const char *entry_name,
-    const char *key, size_t key_size, char *data, size_t *data_size)
-{
-	size_t name_size, result_size;
-	int error_code, rec_error_code;
-	int result;
+__cached_read(struct cached_connection_ *connection, const char* entry_name,
+              const char* key, size_t key_size, char* data, size_t* data_size) {
+    size_t name_size, result_size;
+    int error_code, rec_error_code;
+    int result;
+    assert(connection != NULL);
+    result = 0;
+    error_code = -1;
+    result = send_credentials(connection, CET_READ_REQUEST);
 
-	assert(connection != NULL);
-	result = 0;
-	error_code = -1;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = send_credentials(connection, CET_READ_REQUEST);
-	if (result != 0)
-		goto fin;
+    name_size = strlen(entry_name);
+    result = safe_write(connection, &name_size, sizeof(size_t));
 
-	name_size = strlen(entry_name);
-	result = safe_write(connection, &name_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(connection, &key_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    result = safe_write(connection, &key_size, sizeof(size_t));
 
-	result = safe_write(connection, entry_name, name_size);
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(connection, key, key_size);
-	if (result != 0)
-		goto fin;
+    result = safe_write(connection, entry_name, name_size);
 
-	result = safe_read(connection, &rec_error_code, sizeof(int));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	if (rec_error_code != 0) {
-		error_code = rec_error_code;
-		goto fin;
-	}
+    result = safe_write(connection, key, key_size);
 
-	result = safe_read(connection, &result_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	 if (result_size > *data_size) {
-		 *data_size = result_size;
-		 error_code = -2;
-		 goto fin;
-	 }
+    result = safe_read(connection, &rec_error_code, sizeof(int));
 
-	result = safe_read(connection, data, result_size);
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	*data_size = result_size;
-	error_code = 0;
+    if (rec_error_code != 0) {
+        error_code = rec_error_code;
+        goto fin;
+    }
 
+    result = safe_read(connection, &result_size, sizeof(size_t));
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    if (result_size > *data_size) {
+        *data_size = result_size;
+        error_code = -2;
+        goto fin;
+    }
+
+    result = safe_read(connection, data, result_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    *data_size = result_size;
+    error_code = 0;
 fin:
-	return (error_code);
+    return (error_code);
 }
 
 /*
@@ -373,80 +394,97 @@ fin:
  * should be used to submit session and __abandon_cached_mp_write_session - to
  * abandon it. When the session is submitted, the whole se
  */
-struct cached_connection_ *
-__open_cached_mp_write_session(struct cached_connection_params const *params,
-    const char *entry_name)
-{
-	struct cached_connection_ *connection, *retval;
-	size_t name_size;
-	int error_code;
-	int result;
+struct cached_connection_*
+__open_cached_mp_write_session(struct cached_connection_params const* params,
+                               const char* entry_name) {
+    struct cached_connection_ *connection, *retval;
+    size_t name_size;
+    int error_code;
+    int result;
+    retval = NULL;
+    connection = __open_cached_connection(params);
 
-	retval = NULL;
-	connection = __open_cached_connection(params);
-	if (connection == NULL)
-		return (NULL);
-	connection->mp_flag = 1;
+    if (connection == NULL) {
+        return (NULL);
+    }
 
-	result = send_credentials(connection, CET_MP_WRITE_SESSION_REQUEST);
-	if (result != 0)
-		goto fin;
+    connection->mp_flag = 1;
+    result = send_credentials(connection, CET_MP_WRITE_SESSION_REQUEST);
 
-	name_size = strlen(entry_name);
-	result = safe_write(connection, &name_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(connection, entry_name, name_size);
-	if (result != 0)
-		goto fin;
+    name_size = strlen(entry_name);
+    result = safe_write(connection, &name_size, sizeof(size_t));
 
-	result = safe_read(connection, &error_code, sizeof(int));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	if (error_code != 0)
-		result = error_code;
+    result = safe_write(connection, entry_name, name_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    result = safe_read(connection, &error_code, sizeof(int));
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    if (error_code != 0) {
+        result = error_code;
+    }
 
 fin:
-	if (result != 0)
-		__close_cached_connection(connection);
-	else
-		retval = connection;
-	return (retval);
+
+    if (result != 0) {
+        __close_cached_connection(connection);
+    } else {
+        retval = connection;
+    }
+
+    return (retval);
 }
 
 /*
  * Adds new portion of data to the opened write session
  */
 int
-__cached_mp_write(struct cached_connection_ *ws, const char *data,
-    size_t data_size)
-{
-	int request, result;
-	int error_code;
+__cached_mp_write(struct cached_connection_ *ws, const char* data,
+                  size_t data_size) {
+    int request, result;
+    int error_code;
+    error_code = -1;
+    request = CET_MP_WRITE_SESSION_WRITE_REQUEST;
+    result = safe_write(ws, &request, sizeof(int));
 
-	error_code = -1;
+    if (result != 0) {
+        goto fin;
+    }
 
-	request = CET_MP_WRITE_SESSION_WRITE_REQUEST;
-	result = safe_write(ws, &request, sizeof(int));
-	if (result != 0)
-		goto fin;
+    result = safe_write(ws, &data_size, sizeof(size_t));
 
-	result = safe_write(ws, &data_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(ws, data, data_size);
-	if (result != 0)
-		goto fin;
+    result = safe_write(ws, data, data_size);
 
-	result = safe_read(ws, &error_code, sizeof(int));
-	if (result != 0)
-		error_code = -1;
+    if (result != 0) {
+        goto fin;
+    }
+
+    result = safe_read(ws, &error_code, sizeof(int));
+
+    if (result != 0) {
+        error_code = -1;
+    }
 
 fin:
-	return (error_code);
+    return (error_code);
 }
 
 /*
@@ -454,15 +492,13 @@ fin:
  * to the session before, are discarded.
  */
 int
-__abandon_cached_mp_write_session(struct cached_connection_ *ws)
-{
-	int notification;
-	int result;
-
-	notification = CET_MP_WRITE_SESSION_ABANDON_NOTIFICATION;
-	result = safe_write(ws, &notification, sizeof(int));
-	__close_cached_connection(ws);
-	return (result);
+__abandon_cached_mp_write_session(struct cached_connection_ *ws) {
+    int notification;
+    int result;
+    notification = CET_MP_WRITE_SESSION_ABANDON_NOTIFICATION;
+    result = safe_write(ws, &notification, sizeof(int));
+    __close_cached_connection(ws);
+    return (result);
 }
 
 /*
@@ -470,107 +506,120 @@ __abandon_cached_mp_write_session(struct cached_connection_ *ws)
  * to the session, are committed.
  */
 int
-__close_cached_mp_write_session(struct cached_connection_ *ws)
-{
-	int notification;
-	int result;
-
-	notification = CET_MP_WRITE_SESSION_CLOSE_NOTIFICATION;
-	result = safe_write(ws, &notification, sizeof(int));
-	__close_cached_connection(ws);
-	return (0);
+__close_cached_mp_write_session(struct cached_connection_ *ws) {
+    int notification;
+    int result;
+    notification = CET_MP_WRITE_SESSION_CLOSE_NOTIFICATION;
+    result = safe_write(ws, &notification, sizeof(int));
+    __close_cached_connection(ws);
+    return (0);
 }
 
-struct cached_connection_ *
-__open_cached_mp_read_session(struct cached_connection_params const *params,
-	const char *entry_name)
-{
-	struct cached_connection_ *connection, *retval;
-	size_t name_size;
-	int error_code;
-	int result;
+struct cached_connection_*
+__open_cached_mp_read_session(struct cached_connection_params const* params,
+                              const char* entry_name) {
+    struct cached_connection_ *connection, *retval;
+    size_t name_size;
+    int error_code;
+    int result;
+    retval = NULL;
+    connection = __open_cached_connection(params);
 
-	retval = NULL;
-	connection = __open_cached_connection(params);
-	if (connection == NULL)
-		return (NULL);
-	connection->mp_flag = 1;
+    if (connection == NULL) {
+        return (NULL);
+    }
 
-	result = send_credentials(connection, CET_MP_READ_SESSION_REQUEST);
-	if (result != 0)
-		goto fin;
+    connection->mp_flag = 1;
+    result = send_credentials(connection, CET_MP_READ_SESSION_REQUEST);
 
-	name_size = strlen(entry_name);
-	result = safe_write(connection, &name_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_write(connection, entry_name, name_size);
-	if (result != 0)
-		goto fin;
+    name_size = strlen(entry_name);
+    result = safe_write(connection, &name_size, sizeof(size_t));
 
-	result = safe_read(connection, &error_code, sizeof(int));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	if (error_code != 0)
-		result = error_code;
+    result = safe_write(connection, entry_name, name_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    result = safe_read(connection, &error_code, sizeof(int));
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    if (error_code != 0) {
+        result = error_code;
+    }
 
 fin:
-	if (result != 0)
-		__close_cached_connection(connection);
-	else
-		retval = connection;
-	return (retval);
+
+    if (result != 0) {
+        __close_cached_connection(connection);
+    } else {
+        retval = connection;
+    }
+
+    return (retval);
 }
 
 int
-__cached_mp_read(struct cached_connection_ *rs, char *data, size_t *data_size)
-{
-	size_t result_size;
-	int error_code, rec_error_code;
-	int request, result;
+__cached_mp_read(struct cached_connection_ *rs, char* data, size_t* data_size) {
+    size_t result_size;
+    int error_code, rec_error_code;
+    int request, result;
+    error_code = -1;
+    request = CET_MP_READ_SESSION_READ_REQUEST;
+    result = safe_write(rs, &request, sizeof(int));
 
-	error_code = -1;
-	request = CET_MP_READ_SESSION_READ_REQUEST;
-	result = safe_write(rs, &request, sizeof(int));
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_read(rs, &rec_error_code, sizeof(int));
-	if (result != 0)
-		goto fin;
+    result = safe_read(rs, &rec_error_code, sizeof(int));
 
-	if (rec_error_code != 0) {
-		error_code = rec_error_code;
-		goto fin;
-	}
+    if (result != 0) {
+        goto fin;
+    }
 
-	result = safe_read(rs, &result_size, sizeof(size_t));
-	if (result != 0)
-		goto fin;
+    if (rec_error_code != 0) {
+        error_code = rec_error_code;
+        goto fin;
+    }
 
-	if (result_size > *data_size) {
-		*data_size = result_size;
-		error_code = -2;
-		goto fin;
-	}
+    result = safe_read(rs, &result_size, sizeof(size_t));
 
-	result = safe_read(rs, data, result_size);
-	if (result != 0)
-		goto fin;
+    if (result != 0) {
+        goto fin;
+    }
 
-	*data_size = result_size;
-	error_code = 0;
+    if (result_size > *data_size) {
+        *data_size = result_size;
+        error_code = -2;
+        goto fin;
+    }
 
+    result = safe_read(rs, data, result_size);
+
+    if (result != 0) {
+        goto fin;
+    }
+
+    *data_size = result_size;
+    error_code = 0;
 fin:
-	return (error_code);
+    return (error_code);
 }
 
 int
-__close_cached_mp_read_session(struct cached_connection_ *rs)
-{
-
-	__close_cached_connection(rs);
-	return (0);
+__close_cached_mp_read_session(struct cached_connection_ *rs) {
+    __close_cached_connection(rs);
+    return (0);
 }

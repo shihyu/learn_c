@@ -34,78 +34,87 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wcsnrtombs.c,v 1.3 2005/02/12 08:45:12 s
 #include "mblocal.h"
 
 size_t
-wcsnrtombs(char * __restrict dst, const wchar_t ** __restrict src, size_t nwc,
-    size_t len, mbstate_t * __restrict ps)
-{
-	static mbstate_t mbs;
+wcsnrtombs(char* __restrict dst, const wchar_t** __restrict src, size_t nwc,
+           size_t len, mbstate_t* __restrict ps) {
+    static mbstate_t mbs;
 
-	if (ps == NULL)
-		ps = &mbs;
-	return (__wcsnrtombs(dst, src, nwc, len, ps));
+    if (ps == NULL) {
+        ps = &mbs;
+    }
+
+    return (__wcsnrtombs(dst, src, nwc, len, ps));
 }
 
 size_t
-__wcsnrtombs_std(char * __restrict dst, const wchar_t ** __restrict src,
-    size_t nwc, size_t len, mbstate_t * __restrict ps)
-{
-	mbstate_t mbsbak;
-	char buf[MB_LEN_MAX];
-	const wchar_t *s;
-	size_t nbytes;
-	size_t nb;
+__wcsnrtombs_std(char* __restrict dst, const wchar_t** __restrict src,
+                 size_t nwc, size_t len, mbstate_t* __restrict ps) {
+    mbstate_t mbsbak;
+    char buf[MB_LEN_MAX];
+    const wchar_t* s;
+    size_t nbytes;
+    size_t nb;
+    s = *src;
+    nbytes = 0;
 
-	s = *src;
-	nbytes = 0;
+    if (dst == NULL) {
+        while (nwc-- > 0) {
+            if ((nb = __wcrtomb(buf, *s, ps)) == (size_t) - 1)
+                /* Invalid character - wcrtomb() sets errno. */
+            {
+                return ((size_t) - 1);
+            } else if (*s == L'\0') {
+                return (nbytes + nb - 1);
+            }
 
-	if (dst == NULL) {
-		while (nwc-- > 0) {
-			if ((nb = __wcrtomb(buf, *s, ps)) == (size_t)-1)
-				/* Invalid character - wcrtomb() sets errno. */
-				return ((size_t)-1);
-			else if (*s == L'\0')
-				return (nbytes + nb - 1);
-			s++;
-			nbytes += nb;
-		}
-		return (nbytes);
-	}
+            s++;
+            nbytes += nb;
+        }
 
-	while (len > 0 && nwc-- > 0) {
-		if (len > (size_t)MB_CUR_MAX) {
-			/* Enough space to translate in-place. */
-			if ((nb = __wcrtomb(dst, *s, ps)) == (size_t)-1) {
-				*src = s;
-				return ((size_t)-1);
-			}
-		} else {
-			/*
-			 * May not be enough space; use temp. buffer.
-			 *
-			 * We need to save a copy of the conversion state
-			 * here so we can restore it if the multibyte
-			 * character is too long for the buffer.
-			 */
-			mbsbak = *ps;
-			if ((nb = __wcrtomb(buf, *s, ps)) == (size_t)-1) {
-				*src = s;
-				return ((size_t)-1);
-			}
-			if (nb > (int)len) {
-				/* MB sequence for character won't fit. */
-				*ps = mbsbak;
-				break;
-			}
-			memcpy(dst, buf, nb);
-		}
-		if (*s == L'\0') {
-			*src = NULL;
-			return (nbytes + nb - 1);
-		}
-		s++;
-		dst += nb;
-		len -= nb;
-		nbytes += nb;
-	}
-	*src = s;
-	return (nbytes);
+        return (nbytes);
+    }
+
+    while (len > 0 && nwc-- > 0) {
+        if (len > (size_t)MB_CUR_MAX) {
+            /* Enough space to translate in-place. */
+            if ((nb = __wcrtomb(dst, *s, ps)) == (size_t) - 1) {
+                *src = s;
+                return ((size_t) - 1);
+            }
+        } else {
+            /*
+             * May not be enough space; use temp. buffer.
+             *
+             * We need to save a copy of the conversion state
+             * here so we can restore it if the multibyte
+             * character is too long for the buffer.
+             */
+            mbsbak = *ps;
+
+            if ((nb = __wcrtomb(buf, *s, ps)) == (size_t) - 1) {
+                *src = s;
+                return ((size_t) - 1);
+            }
+
+            if (nb > (int)len) {
+                /* MB sequence for character won't fit. */
+                *ps = mbsbak;
+                break;
+            }
+
+            memcpy(dst, buf, nb);
+        }
+
+        if (*s == L'\0') {
+            *src = NULL;
+            return (nbytes + nb - 1);
+        }
+
+        s++;
+        dst += nb;
+        len -= nb;
+        nbytes += nb;
+    }
+
+    *src = s;
+    return (nbytes);
 }

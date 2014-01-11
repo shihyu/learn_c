@@ -25,7 +25,7 @@
 /*
  * Local routines
  */
-void __cdecl _lockerr_exit(char *);
+void __cdecl _lockerr_exit(char*);
 
 
 /*
@@ -66,34 +66,34 @@ static CRITICAL_SECTION lclcritsects[NUM_PREALLOC_LOCKS];
  * be allocated when first used, via a call to _mtinitlocknum.
  */
 static struct {
-        PCRITICAL_SECTION lock;
-        enum { lkNormal = 0, lkPrealloc, lkDeleted } kind;
+    PCRITICAL_SECTION lock;
+    enum { lkNormal = 0, lkPrealloc, lkDeleted } kind;
 } _locktable[_TOTAL_LOCKS] = {
-        { NULL, lkPrealloc }, /* 0  == _SIGNAL_LOCK      */
-        { NULL, lkPrealloc }, /* 1  == _IOB_SCAN_LOCK    */
-        { NULL, lkNormal   }, /* 2  == _TMPNAM_LOCK      - not preallocated */
-        { NULL, lkPrealloc }, /* 3  == _CONIO_LOCK       */
-        { NULL, lkPrealloc }, /* 4  == _HEAP_LOCK        */
-        { NULL, lkNormal   }, /* 5  == _UNDNAME_LOCK     - not preallocated */
-        { NULL, lkPrealloc }, /* 6  == _TIME_LOCK        */
-        { NULL, lkPrealloc }, /* 7  == _ENV_LOCK         */
-        { NULL, lkPrealloc }, /* 8  == _EXIT_LOCK1       */
-        { NULL, lkNormal   }, /* 9  == _POPEN_LOCK       - not preallocated */
-        { NULL, lkPrealloc }, /* 10 == _LOCKTAB_LOCK     */
-        { NULL, lkNormal   }, /* 11 == _OSFHND_LOCK      - not preallocated */
-        { NULL, lkPrealloc }, /* 12 == _SETLOCALE_LOCK   */
-        { NULL, lkPrealloc }, /* 13 == _MB_CP_LOCK       */
-        { NULL, lkPrealloc }, /* 14 == _TYPEINFO_LOCK    */
+    { NULL, lkPrealloc }, /* 0  == _SIGNAL_LOCK      */
+    { NULL, lkPrealloc }, /* 1  == _IOB_SCAN_LOCK    */
+    { NULL, lkNormal   }, /* 2  == _TMPNAM_LOCK      - not preallocated */
+    { NULL, lkPrealloc }, /* 3  == _CONIO_LOCK       */
+    { NULL, lkPrealloc }, /* 4  == _HEAP_LOCK        */
+    { NULL, lkNormal   }, /* 5  == _UNDNAME_LOCK     - not preallocated */
+    { NULL, lkPrealloc }, /* 6  == _TIME_LOCK        */
+    { NULL, lkPrealloc }, /* 7  == _ENV_LOCK         */
+    { NULL, lkPrealloc }, /* 8  == _EXIT_LOCK1       */
+    { NULL, lkNormal   }, /* 9  == _POPEN_LOCK       - not preallocated */
+    { NULL, lkPrealloc }, /* 10 == _LOCKTAB_LOCK     */
+    { NULL, lkNormal   }, /* 11 == _OSFHND_LOCK      - not preallocated */
+    { NULL, lkPrealloc }, /* 12 == _SETLOCALE_LOCK   */
+    { NULL, lkPrealloc }, /* 13 == _MB_CP_LOCK       */
+    { NULL, lkPrealloc }, /* 14 == _TYPEINFO_LOCK    */
 #ifdef _DEBUG
-        { NULL, lkPrealloc }, /* 15 == _DEBUG_LOCK       */
+    { NULL, lkPrealloc }, /* 15 == _DEBUG_LOCK       */
 #else  /* _DEBUG */
-        { NULL, lkNormal },   /* 15 == _DEBUG_LOCK       */
+    { NULL, lkNormal },   /* 15 == _DEBUG_LOCK       */
 #endif  /* _DEBUG */
 
-        { NULL, lkPrealloc }, /* 16 == _STREAM_LOCKS+0 - stdin  */
-        { NULL, lkPrealloc }, /* 17 == _STREAM_LOCKS+1 - stdout */
-        { NULL, lkPrealloc }, /* 18 == _STREAM_LOCKS+2 - stderr */
-/*      { NULL, lkNormal   }, /* ... */
+    { NULL, lkPrealloc }, /* 16 == _STREAM_LOCKS+0 - stdin  */
+    { NULL, lkPrealloc }, /* 17 == _STREAM_LOCKS+1 - stdout */
+    { NULL, lkPrealloc }, /* 18 == _STREAM_LOCKS+2 - stderr */
+    /*      { NULL, lkNormal   }, /* ... */
 };
 
 #ifdef _M_IX86
@@ -131,30 +131,28 @@ static struct {
 *
 *******************************************************************************/
 
-int __cdecl _mtinitlocks (
-        void
-        )
-{
-        int locknum;
-        int idxPrealloc = 0;
+int __cdecl _mtinitlocks(
+    void
+) {
+    int locknum;
+    int idxPrealloc = 0;
 
-        /*
-         * Scan _locktable[] and allocate all entries marked lkPrealloc.
-         */
-        for ( locknum = 0 ; locknum < _TOTAL_LOCKS ; locknum++ ) {
-            if ( _locktable[locknum].kind == lkPrealloc ) {
-                _locktable[locknum].lock = &lclcritsects[idxPrealloc++];
-                if ( !__crtInitCritSecAndSpinCount( _locktable[locknum].lock,
-                                                    _CRT_SPINCOUNT ))
-                {
-                    _locktable[locknum].lock = NULL;
-                    return FALSE;
-                }
+    /*
+     * Scan _locktable[] and allocate all entries marked lkPrealloc.
+     */
+    for (locknum = 0 ; locknum < _TOTAL_LOCKS ; locknum++) {
+        if (_locktable[locknum].kind == lkPrealloc) {
+            _locktable[locknum].lock = &lclcritsects[idxPrealloc++];
+
+            if (!__crtInitCritSecAndSpinCount(_locktable[locknum].lock,
+                                              _CRT_SPINCOUNT)) {
+                _locktable[locknum].lock = NULL;
+                return FALSE;
             }
         }
+    }
 
-
-        return TRUE;
+    return TRUE;
 }
 
 
@@ -183,44 +181,37 @@ int __cdecl _mtinitlocks (
 *******************************************************************************/
 
 void __cdecl _mtdeletelocks(
-        void
-        )
-{
-        int locknum;
+    void
+) {
+    int locknum;
 
-        /*
-         * Delete and free all normal locks that have been created.
-         */
-        for ( locknum = 0 ; locknum < _TOTAL_LOCKS ; locknum++ ) {
-            if ( _locktable[locknum].lock != NULL &&
-                 _locktable[locknum].kind != lkPrealloc )
-            {
-                PCRITICAL_SECTION pcs = _locktable[locknum].lock;
-
-                DeleteCriticalSection(pcs);
-
-                /*
-                 * Free the memory for the CritSect after deleting it.
-                 */
-
-                _free_crt(pcs);
-                _locktable[locknum].lock = NULL;
-            }
+    /*
+     * Delete and free all normal locks that have been created.
+     */
+    for (locknum = 0 ; locknum < _TOTAL_LOCKS ; locknum++) {
+        if (_locktable[locknum].lock != NULL &&
+                _locktable[locknum].kind != lkPrealloc) {
+            PCRITICAL_SECTION pcs = _locktable[locknum].lock;
+            DeleteCriticalSection(pcs);
+            /*
+             * Free the memory for the CritSect after deleting it.
+             */
+            _free_crt(pcs);
+            _locktable[locknum].lock = NULL;
         }
+    }
 
-        /*
-         * Delete all preallocated locks after all normal ones are
-         * freed (so preallocated _HEAP_LOCK outlives all heap usages).
-         */
-        for ( locknum = 0 ; locknum < _TOTAL_LOCKS ; locknum++ ) {
-            if ( _locktable[locknum].lock != NULL &&
-                 _locktable[locknum].kind == lkPrealloc )
-            {
-                PCRITICAL_SECTION pcs = _locktable[locknum].lock;
-
-                DeleteCriticalSection(pcs);
-            }
+    /*
+     * Delete all preallocated locks after all normal ones are
+     * freed (so preallocated _HEAP_LOCK outlives all heap usages).
+     */
+    for (locknum = 0 ; locknum < _TOTAL_LOCKS ; locknum++) {
+        if (_locktable[locknum].lock != NULL &&
+                _locktable[locknum].kind == lkPrealloc) {
+            PCRITICAL_SECTION pcs = _locktable[locknum].lock;
+            DeleteCriticalSection(pcs);
         }
+    }
 }
 
 /***
@@ -253,55 +244,52 @@ void __cdecl _mtdeletelocks(
 *
 *******************************************************************************/
 
-int __cdecl _mtinitlocknum (
-        int locknum
-        )
-{
-        PCRITICAL_SECTION pcs;
-        int retval=TRUE;
+int __cdecl _mtinitlocknum(
+    int locknum
+) {
+    PCRITICAL_SECTION pcs;
+    int retval = TRUE;
 
-        /*
-         * Check if CRT is initialized. The check if _crtheap is initialized
-         * will do the job. More over we had to add this test in initlocks because
-         * in debug version we don't endup calling lock before calling malloc_base,
-         * where we check for crtheap.
-         */
-        if (_crtheap == 0) {
-            _FF_MSGBANNER();    /* write run-time error banner */
-            _NMSG_WRITE(_RT_CRT_NOTINIT);  /* write message */
-            __crtExitProcess(255);  /* normally _exit(255) */
-        }
+    /*
+     * Check if CRT is initialized. The check if _crtheap is initialized
+     * will do the job. More over we had to add this test in initlocks because
+     * in debug version we don't endup calling lock before calling malloc_base,
+     * where we check for crtheap.
+     */
+    if (_crtheap == 0) {
+        _FF_MSGBANNER();    /* write run-time error banner */
+        _NMSG_WRITE(_RT_CRT_NOTINIT);  /* write message */
+        __crtExitProcess(255);  /* normally _exit(255) */
+    }
 
+    if (_locktable[locknum].lock != NULL) {
+        return TRUE;
+    }
 
-        if ( _locktable[locknum].lock != NULL )
-            return TRUE;
+    if ((pcs = _malloc_crt(sizeof(CRITICAL_SECTION))) == NULL) {
+        errno = ENOMEM;
+        return FALSE;
+    }
 
-        if ( (pcs = _malloc_crt(sizeof(CRITICAL_SECTION))) == NULL ) {
+    _mlock(_LOCKTAB_LOCK);
+    __TRY
+
+    if (_locktable[locknum].lock == NULL) {
+        if (!__crtInitCritSecAndSpinCount(pcs, _CRT_SPINCOUNT)) {
+            _free_crt(pcs);
             errno = ENOMEM;
-            return FALSE;
+            retval = FALSE;
+        } else {
+            _locktable[locknum].lock = pcs;
         }
+    } else {
+        _free_crt(pcs);
+    }
 
-        _mlock(_LOCKTAB_LOCK);
-        __TRY
-
-            if ( _locktable[locknum].lock == NULL ) {
-                if ( !__crtInitCritSecAndSpinCount(pcs, _CRT_SPINCOUNT) ) {
-                    _free_crt(pcs);
-                    errno = ENOMEM;
-                    retval=FALSE;
-                } else {
-                    _locktable[locknum].lock = pcs;
-                }
-            }
-            else {
-                _free_crt(pcs);
-            }
-
-        __FINALLY
-            _munlock(_LOCKTAB_LOCK);
-        __END_TRY_FINALLY
-
-        return retval;
+    __FINALLY
+    _munlock(_LOCKTAB_LOCK);
+    __END_TRY_FINALLY
+    return retval;
 }
 
 
@@ -327,25 +315,22 @@ int __cdecl _mtinitlocknum (
 *
 *******************************************************************************/
 
-void __cdecl _lock (
-        int locknum
-        )
-{
-
-        /*
-         * Create/open the lock, if necessary
-         */
-        if ( _locktable[locknum].lock == NULL ) {
-
-            if ( !_mtinitlocknum(locknum) )
-                _amsg_exit( _RT_LOCK );
+void __cdecl _lock(
+    int locknum
+) {
+    /*
+     * Create/open the lock, if necessary
+     */
+    if (_locktable[locknum].lock == NULL) {
+        if (!_mtinitlocknum(locknum)) {
+            _amsg_exit(_RT_LOCK);
         }
+    }
 
-        /*
-         * Enter the critical section.
-         */
-
-        EnterCriticalSection( _locktable[locknum].lock );
+    /*
+     * Enter the critical section.
+     */
+    EnterCriticalSection(_locktable[locknum].lock);
 }
 
 
@@ -365,14 +350,13 @@ void __cdecl _lock (
 *
 *******************************************************************************/
 
-void __cdecl _unlock (
-        int locknum
-        )
-{
-        /*
-         * leave the critical section.
-         */
-        LeaveCriticalSection( _locktable[locknum].lock );
+void __cdecl _unlock(
+    int locknum
+) {
+    /*
+     * leave the critical section.
+     */
+    LeaveCriticalSection(_locktable[locknum].lock);
 }
 
 
@@ -397,12 +381,11 @@ void __cdecl _unlock (
 *
 *******************************************************************************/
 
-void __cdecl _lockerr_exit (
-        char *msg
-        )
-{
-        FatalAppExit(0, msg);       /* Die with message box */
-        __crtExitProcess(255);      /* Just die */
+void __cdecl _lockerr_exit(
+    char* msg
+) {
+    FatalAppExit(0, msg);       /* Die with message box */
+    __crtExitProcess(255);      /* Just die */
 }
 
 

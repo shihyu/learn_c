@@ -30,29 +30,27 @@ static const char rcsid[] = "$Id: ns_netint.c,v 1.2.18.1 2005/04/27 05:01:08 sra
 /* Public. */
 
 u_int
-ns_get16(const u_char *src) {
-	u_int dst;
-
-	NS_GET16(dst, src);
-	return (dst);
+ns_get16(const u_char* src) {
+    u_int dst;
+    NS_GET16(dst, src);
+    return (dst);
 }
 
 u_long
-ns_get32(const u_char *src) {
-	u_long dst;
-
-	NS_GET32(dst, src);
-	return (dst);
+ns_get32(const u_char* src) {
+    u_long dst;
+    NS_GET32(dst, src);
+    return (dst);
 }
 
 void
-ns_put16(u_int src, u_char *dst) {
-	NS_PUT16(src, dst);
+ns_put16(u_int src, u_char* dst) {
+    NS_PUT16(src, dst);
 }
 
 void
-ns_put32(u_long src, u_char *dst) {
-	NS_PUT32(src, dst);
+ns_put32(u_long src, u_char* dst) {
+    NS_PUT32(src, dst);
 }
 
 /*! \file */

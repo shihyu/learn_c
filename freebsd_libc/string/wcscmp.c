@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -46,12 +46,13 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcscmp.c,v 1.8 2007/01/09 00:28:12 imp E
  */
 int
 wcscmp(s1, s2)
-	const wchar_t *s1, *s2;
+const wchar_t* s1, *s2;
 {
+    while (*s1 == *s2++)
+        if (*s1++ == 0) {
+            return (0);
+        }
 
-	while (*s1 == *s2++)
-		if (*s1++ == 0)
-			return (0);
-	/* XXX assumes wchar_t = int */
-	return (*(const unsigned int *)s1 - *(const unsigned int *)--s2);
+    /* XXX assumes wchar_t = int */
+    return (*(const unsigned int*)s1 - * (const unsigned int*)--s2);
 }

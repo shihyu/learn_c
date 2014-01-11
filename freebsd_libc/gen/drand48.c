@@ -19,7 +19,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/drand48.c,v 1.2 2002/03/22 21:52:05 obrien 
 extern unsigned short _rand48_seed[3];
 
 double
-drand48(void)
-{
-	return erand48(_rand48_seed);
+drand48(void) {
+    return erand48(_rand48_seed);
 }

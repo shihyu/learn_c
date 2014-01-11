@@ -39,42 +39,37 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl _tstrdate_s (
-        _TSCHAR *buffer,
-        size_t sizeInChars
-        )
-{
-        int month, day, year;
-        SYSTEMTIME dt;                  /* Win32 time structure */
-
-        _VALIDATE_RETURN_ERRCODE( ( buffer != NULL && sizeInChars > 0 ), EINVAL )
-        _RESET_STRING(buffer, sizeInChars);
-        _VALIDATE_RETURN_ERRCODE( (sizeInChars >= 9), ERANGE )
-
-        GetLocalTime(&dt);
-        month = dt.wMonth;
-        day = dt.wDay;
-        year = dt.wYear % 100;          /* change year into 0-99 value */
-
-        /* store the components of the date into the string */
-        /* store seperators */
-        buffer[2] = buffer[5] = _T('/');
-        /* store end of string */
-        buffer[8] = _T('\0');
-        /* store tens of month */
-        buffer[0] = (_TSCHAR) (month / 10 + _T('0'));
-        /* store units of month */
-        buffer[1] = (_TSCHAR) (month % 10 + _T('0'));
-        /* store tens of day */
-        buffer[3] = (_TSCHAR) (day   / 10 + _T('0'));
-        /* store units of day */
-        buffer[4] = (_TSCHAR) (day   % 10 + _T('0'));
-        /* store tens of year */
-        buffer[6] = (_TSCHAR) (year  / 10 + _T('0'));
-        /* store units of year */
-        buffer[7] = (_TSCHAR) (year  % 10 + _T('0'));
-
-        return 0;
+errno_t __cdecl _tstrdate_s(
+    _TSCHAR* buffer,
+    size_t sizeInChars
+) {
+    int month, day, year;
+    SYSTEMTIME dt;                  /* Win32 time structure */
+    _VALIDATE_RETURN_ERRCODE((buffer != NULL && sizeInChars > 0), EINVAL)
+    _RESET_STRING(buffer, sizeInChars);
+    _VALIDATE_RETURN_ERRCODE((sizeInChars >= 9), ERANGE)
+    GetLocalTime(&dt);
+    month = dt.wMonth;
+    day = dt.wDay;
+    year = dt.wYear % 100;          /* change year into 0-99 value */
+    /* store the components of the date into the string */
+    /* store seperators */
+    buffer[2] = buffer[5] = _T('/');
+    /* store end of string */
+    buffer[8] = _T('\0');
+    /* store tens of month */
+    buffer[0] = (_TSCHAR)(month / 10 + _T('0'));
+    /* store units of month */
+    buffer[1] = (_TSCHAR)(month % 10 + _T('0'));
+    /* store tens of day */
+    buffer[3] = (_TSCHAR)(day   / 10 + _T('0'));
+    /* store units of day */
+    buffer[4] = (_TSCHAR)(day   % 10 + _T('0'));
+    /* store tens of year */
+    buffer[6] = (_TSCHAR)(year  / 10 + _T('0'));
+    /* store units of year */
+    buffer[7] = (_TSCHAR)(year  % 10 + _T('0'));
+    return 0;
 }
 
 
@@ -94,16 +89,16 @@ errno_t __cdecl _tstrdate_s (
 *
 *******************************************************************************/
 
-_TSCHAR * __cdecl _tstrdate (
-        _TSCHAR *buffer
-        )
-{
+_TSCHAR* __cdecl _tstrdate(
+    _TSCHAR* buffer
+) {
     // This function assumes that buffer is 9 characters in size
-    errno_t e = _tstrdate_s( buffer, 9 );
-    if ( e != 0 )
-    {
+    errno_t e = _tstrdate_s(buffer, 9);
+
+    if (e != 0) {
         return NULL;
     }
+
     return buffer;
 }
 

@@ -34,17 +34,15 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _texecv (
-        const _TSCHAR *filename,
-        const _TSCHAR * const *argvector
-        )
-{
-        /* validation section */
-        _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(argvector != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*argvector != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(**argvector != _T('\0'), EINVAL, -1);
-
-        return(_texecve(filename,argvector,NULL));
+intptr_t __cdecl _texecv(
+    const _TSCHAR* filename,
+    const _TSCHAR* const* argvector
+) {
+    /* validation section */
+    _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(argvector != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*argvector != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(**argvector != _T('\0'), EINVAL, -1);
+    return (_texecve(filename, argvector, NULL));
 }

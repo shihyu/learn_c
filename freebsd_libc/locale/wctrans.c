@@ -32,49 +32,51 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wctrans.c,v 1.3 2003/11/01 08:20:58 tjr 
 #include <wctype.h>
 
 enum {
-	_WCT_ERROR	= 0,
-	_WCT_TOLOWER	= 1,
-	_WCT_TOUPPER	= 2
+    _WCT_ERROR  = 0,
+    _WCT_TOLOWER    = 1,
+    _WCT_TOUPPER    = 2
 };
 
 wint_t
-towctrans(wint_t wc, wctrans_t desc)
-{
+towctrans(wint_t wc, wctrans_t desc) {
+    switch (desc) {
+    case _WCT_TOLOWER:
+        wc = towlower(wc);
+        break;
 
-	switch (desc) {
-	case _WCT_TOLOWER:
-		wc = towlower(wc);
-		break;
-	case _WCT_TOUPPER:
-		wc = towupper(wc);
-		break;
-	case _WCT_ERROR:
-	default:
-		errno = EINVAL;
-		break;
-	}
+    case _WCT_TOUPPER:
+        wc = towupper(wc);
+        break;
 
-	return (wc);
+    case _WCT_ERROR:
+    default:
+        errno = EINVAL;
+        break;
+    }
+
+    return (wc);
 }
 
 wctrans_t
-wctrans(const char *charclass)
-{
-	struct {
-		const char	*name;
-		wctrans_t	 trans;
-	} ccls[] = {
-		{ "tolower",	_WCT_TOLOWER },
-		{ "toupper",	_WCT_TOUPPER },
-		{ NULL,		_WCT_ERROR },		/* Default */
-	};
-	int i;
+wctrans(const char* charclass) {
+    struct {
+        const char*  name;
+        wctrans_t    trans;
+    } ccls[] = {
+        { "tolower",    _WCT_TOLOWER },
+        { "toupper",    _WCT_TOUPPER },
+        { NULL,     _WCT_ERROR },       /* Default */
+    };
+    int i;
+    i = 0;
 
-	i = 0;
-	while (ccls[i].name != NULL && strcmp(ccls[i].name, charclass) != 0)
-		i++;
+    while (ccls[i].name != NULL && strcmp(ccls[i].name, charclass) != 0) {
+        i++;
+    }
 
-	if (ccls[i].trans == _WCT_ERROR)
-		errno = EINVAL;
-	return (ccls[i].trans);
+    if (ccls[i].trans == _WCT_ERROR) {
+        errno = EINVAL;
+    }
+
+    return (ccls[i].trans);
 }

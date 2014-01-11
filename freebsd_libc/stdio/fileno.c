@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,13 +44,10 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fileno.c,v 1.11 2007/01/09 00:28:06 imp E
 #undef fileno
 
 int
-fileno(FILE *fp)
-{
-	int fd;
-
-	FLOCKFILE(fp);
-	fd = __sfileno(fp);
-	FUNLOCKFILE(fp);
-
-	return (fd);
+fileno(FILE* fp) {
+    int fd;
+    FLOCKFILE(fp);
+    fd = __sfileno(fp);
+    FUNLOCKFILE(fp);
+    return (fd);
 }

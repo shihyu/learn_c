@@ -27,29 +27,29 @@
  */
 
 #ifndef _TIMELOCAL_H_
-#define	_TIMELOCAL_H_
+#define _TIMELOCAL_H_
 
 /*
  * Private header file for the strftime and strptime localization
  * stuff.
  */
 struct lc_time_T {
-	const char	*mon[12];
-	const char	*month[12];
-	const char	*wday[7];
-	const char	*weekday[7];
-	const char	*X_fmt;
-	const char	*x_fmt;
-	const char	*c_fmt;
-	const char	*am;
-	const char	*pm;
-	const char	*date_fmt;
-	const char	*alt_month[12];
-	const char	*md_order;
-	const char	*ampm_fmt;
+    const char*  mon[12];
+    const char*  month[12];
+    const char*  wday[7];
+    const char*  weekday[7];
+    const char*  X_fmt;
+    const char*  x_fmt;
+    const char*  c_fmt;
+    const char*  am;
+    const char*  pm;
+    const char*  date_fmt;
+    const char*  alt_month[12];
+    const char*  md_order;
+    const char*  ampm_fmt;
 };
 
-struct lc_time_T *__get_current_time_locale(void);
-int	__time_load_locale(const char *);
+struct lc_time_T* __get_current_time_locale(void);
+int __time_load_locale(const char*);
 
 #endif /* !_TIMELOCAL_H_ */

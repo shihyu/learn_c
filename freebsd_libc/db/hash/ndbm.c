@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Margo Seltzer.
@@ -52,176 +52,179 @@ __FBSDID("$FreeBSD: src/lib/libc/db/hash/ndbm.c,v 1.7 2007/01/09 00:27:51 imp Ex
 
 /*
  * Returns:
- * 	*DBM on success
- *	 NULL on failure
+ *  *DBM on success
+ *   NULL on failure
  */
-extern DBM *
+extern DBM*
 dbm_open(file, flags, mode)
-	const char *file;
-	int flags, mode;
+const char* file;
+int flags, mode;
 {
-	HASHINFO info;
-	char path[MAXPATHLEN];
+    HASHINFO info;
+    char path[MAXPATHLEN];
+    info.bsize = 4096;
+    info.ffactor = 40;
+    info.nelem = 1;
+    info.cachesize = 0;
+    info.hash = NULL;
+    info.lorder = 0;
 
-	info.bsize = 4096;
-	info.ffactor = 40;
-	info.nelem = 1;
-	info.cachesize = 0;
-	info.hash = NULL;
-	info.lorder = 0;
+    if (strlen(file) >= sizeof(path) - strlen(DBM_SUFFIX)) {
+        errno = ENAMETOOLONG;
+        return (NULL);
+    }
 
-	if( strlen(file) >= sizeof(path) - strlen(DBM_SUFFIX)) {
-		errno = ENAMETOOLONG;
-		return(NULL);
-	}
-	(void)strcpy(path, file);
-	(void)strcat(path, DBM_SUFFIX);
-	return ((DBM *)__hash_open(path, flags, mode, &info, 0));
+    (void)strcpy(path, file);
+    (void)strcat(path, DBM_SUFFIX);
+    return ((DBM*)__hash_open(path, flags, mode, &info, 0));
 }
 
 extern void
 dbm_close(db)
-	DBM *db;
+DBM* db;
 {
-	(void)(db->close)(db);
+    (void)(db->close)(db);
 }
 
 /*
  * Returns:
- *	DATUM on success
- *	NULL on failure
+ *  DATUM on success
+ *  NULL on failure
  */
 extern datum
 dbm_fetch(db, key)
-	DBM *db;
-	datum key;
+DBM* db;
+datum key;
 {
-	datum retdata;
-	int status;
-	DBT dbtkey, dbtretdata;
+    datum retdata;
+    int status;
+    DBT dbtkey, dbtretdata;
+    dbtkey.data = key.dptr;
+    dbtkey.size = key.dsize;
+    status = (db->get)(db, &dbtkey, &dbtretdata, 0);
 
-	dbtkey.data = key.dptr;
-	dbtkey.size = key.dsize;
-	status = (db->get)(db, &dbtkey, &dbtretdata, 0);
-	if (status) {
-		dbtretdata.data = NULL;
-		dbtretdata.size = 0;
-	}
-	retdata.dptr = dbtretdata.data;
-	retdata.dsize = dbtretdata.size;
-	return (retdata);
+    if (status) {
+        dbtretdata.data = NULL;
+        dbtretdata.size = 0;
+    }
+
+    retdata.dptr = dbtretdata.data;
+    retdata.dsize = dbtretdata.size;
+    return (retdata);
 }
 
 /*
  * Returns:
- *	DATUM on success
- *	NULL on failure
+ *  DATUM on success
+ *  NULL on failure
  */
 extern datum
 dbm_firstkey(db)
-	DBM *db;
+DBM* db;
 {
-	int status;
-	datum retkey;
-	DBT dbtretkey, dbtretdata;
+    int status;
+    datum retkey;
+    DBT dbtretkey, dbtretdata;
+    status = (db->seq)(db, &dbtretkey, &dbtretdata, R_FIRST);
 
-	status = (db->seq)(db, &dbtretkey, &dbtretdata, R_FIRST);
-	if (status)
-		dbtretkey.data = NULL;
-	retkey.dptr = dbtretkey.data;
-	retkey.dsize = dbtretkey.size;
-	return (retkey);
+    if (status) {
+        dbtretkey.data = NULL;
+    }
+
+    retkey.dptr = dbtretkey.data;
+    retkey.dsize = dbtretkey.size;
+    return (retkey);
 }
 
 /*
  * Returns:
- *	DATUM on success
- *	NULL on failure
+ *  DATUM on success
+ *  NULL on failure
  */
 extern datum
 dbm_nextkey(db)
-	DBM *db;
+DBM* db;
 {
-	int status;
-	datum retkey;
-	DBT dbtretkey, dbtretdata;
+    int status;
+    datum retkey;
+    DBT dbtretkey, dbtretdata;
+    status = (db->seq)(db, &dbtretkey, &dbtretdata, R_NEXT);
 
-	status = (db->seq)(db, &dbtretkey, &dbtretdata, R_NEXT);
-	if (status)
-		dbtretkey.data = NULL;
-	retkey.dptr = dbtretkey.data;
-	retkey.dsize = dbtretkey.size;
-	return (retkey);
+    if (status) {
+        dbtretkey.data = NULL;
+    }
+
+    retkey.dptr = dbtretkey.data;
+    retkey.dsize = dbtretkey.size;
+    return (retkey);
 }
 
 /*
  * Returns:
- *	 0 on success
- *	<0 failure
+ *   0 on success
+ *  <0 failure
  */
 extern int
 dbm_delete(db, key)
-	DBM *db;
-	datum key;
+DBM* db;
+datum key;
 {
-	int status;
-	DBT dbtkey;
+    int status;
+    DBT dbtkey;
+    dbtkey.data = key.dptr;
+    dbtkey.size = key.dsize;
+    status = (db->del)(db, &dbtkey, 0);
 
-	dbtkey.data = key.dptr;
-	dbtkey.size = key.dsize;
-	status = (db->del)(db, &dbtkey, 0);
-	if (status)
-		return (-1);
-	else
-		return (0);
+    if (status) {
+        return (-1);
+    } else {
+        return (0);
+    }
 }
 
 /*
  * Returns:
- *	 0 on success
- *	<0 failure
- *	 1 if DBM_INSERT and entry exists
+ *   0 on success
+ *  <0 failure
+ *   1 if DBM_INSERT and entry exists
  */
 extern int
 dbm_store(db, key, data, flags)
-	DBM *db;
-	datum key, data;
-	int flags;
+DBM* db;
+datum key, data;
+int flags;
 {
-	DBT dbtkey, dbtdata;
-
-	dbtkey.data = key.dptr;
-	dbtkey.size = key.dsize;
-	dbtdata.data = data.dptr;
-	dbtdata.size = data.dsize;
-	return ((db->put)(db, &dbtkey, &dbtdata,
-	    (flags == DBM_INSERT) ? R_NOOVERWRITE : 0));
+    DBT dbtkey, dbtdata;
+    dbtkey.data = key.dptr;
+    dbtkey.size = key.dsize;
+    dbtdata.data = data.dptr;
+    dbtdata.size = data.dsize;
+    return ((db->put)(db, &dbtkey, &dbtdata,
+                      (flags == DBM_INSERT) ? R_NOOVERWRITE : 0));
 }
 
 extern int
 dbm_error(db)
-	DBM *db;
+DBM* db;
 {
-	HTAB *hp;
-
-	hp = (HTAB *)db->internal;
-	return (hp->error);
+    HTAB* hp;
+    hp = (HTAB*)db->internal;
+    return (hp->error);
 }
 
 extern int
 dbm_clearerr(db)
-	DBM *db;
+DBM* db;
 {
-	HTAB *hp;
-
-	hp = (HTAB *)db->internal;
-	hp->error = 0;
-	return (0);
+    HTAB* hp;
+    hp = (HTAB*)db->internal;
+    hp->error = 0;
+    return (0);
 }
 
 extern int
 dbm_dirfno(db)
-	DBM *db;
+DBM* db;
 {
-	return(((HTAB *)db->internal)->fp);
+    return (((HTAB*)db->internal)->fp);
 }

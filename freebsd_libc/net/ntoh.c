@@ -30,29 +30,21 @@ __FBSDID("$FreeBSD: src/lib/libc/net/ntoh.c,v 1.1 2006/11/06 22:07:47 cognet Exp
 #include <sys/endian.h>
 
 uint32_t
-htonl(uint32_t hl)
-{
-
-	return (__htonl(hl));
+htonl(uint32_t hl) {
+    return (__htonl(hl));
 }
 
 uint16_t
-htons(uint16_t hs)
-{
-	
-	return (__htons(hs));
+htons(uint16_t hs) {
+    return (__htons(hs));
 }
 
 uint32_t
-ntohl(uint32_t nl)
-{
-
-	return (__ntohl(nl));
+ntohl(uint32_t nl) {
+    return (__ntohl(nl));
 }
 
 uint16_t
-ntohs(uint16_t ns)
-{
-	
-	return (__ntohs(ns));
+ntohs(uint16_t ns) {
+    return (__ntohs(ns));
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,13 +39,16 @@ __FBSDID("$FreeBSD: src/lib/libc/string/ffs.c,v 1.8 2007/01/09 00:28:11 imp Exp 
  * Find First Set bit
  */
 int
-ffs(int mask)
-{
-	int bit;
+ffs(int mask) {
+    int bit;
 
-	if (mask == 0)
-		return(0);
-	for (bit = 1; !(mask & 1); bit++)
-		mask = (unsigned int)mask >> 1;
-	return (bit);
+    if (mask == 0) {
+        return (0);
+    }
+
+    for (bit = 1; !(mask & 1); bit++) {
+        mask = (unsigned int)mask >> 1;
+    }
+
+    return (bit);
 }

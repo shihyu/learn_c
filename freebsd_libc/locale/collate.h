@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 1995 Alex Tatmanjants <alex@elvisti.kiev.ua>
- *		at Electronni Visti IA, Kiev, Ukraine.
- *			All rights reserved.
+ *      at Electronni Visti IA, Kiev, Ukraine.
+ *          All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,7 +28,7 @@
  */
 
 #ifndef _COLLATE_H_
-#define	_COLLATE_H_
+#define _COLLATE_H_
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -40,11 +40,11 @@
 #define COLLATE_VERSION1_2 "1.2\n"
 
 struct __collate_st_char_pri {
-	int prim, sec;
+    int prim, sec;
 };
 struct __collate_st_chain_pri {
-	u_char str[STR_LEN];
-	int prim, sec;
+    u_char str[STR_LEN];
+    int prim, sec;
 };
 
 extern int __collate_load_error;
@@ -53,16 +53,16 @@ extern int __collate_substitute_nontrivial;
 extern u_char __collate_substitute_table[UCHAR_MAX + 1][STR_LEN];
 #define __collate_char_pri_table (*__collate_char_pri_table_ptr)
 extern struct __collate_st_char_pri __collate_char_pri_table[UCHAR_MAX + 1];
-extern struct __collate_st_chain_pri *__collate_chain_pri_table;
+extern struct __collate_st_chain_pri* __collate_chain_pri_table;
 
 __BEGIN_DECLS
-u_char	*__collate_strdup(u_char *);
-u_char	*__collate_substitute(const u_char *);
-int	__collate_load_tables(const char *);
-void	__collate_lookup(const u_char *, int *, int *, int *);
-int	__collate_range_cmp(int, int);
+u_char*  __collate_strdup(u_char*);
+u_char*  __collate_substitute(const u_char*);
+int __collate_load_tables(const char*);
+void    __collate_lookup(const u_char*, int*, int*, int*);
+int __collate_range_cmp(int, int);
 #ifdef COLLATE_DEBUG
-void	__collate_print_tables(void);
+void    __collate_print_tables(void);
 #endif
 __END_DECLS
 

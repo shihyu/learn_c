@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,13 +44,13 @@ __FBSDID("$FreeBSD: src/lib/libc/sys/lseek.c,v 1.7 2007/07/04 23:27:38 peter Exp
  */
 off_t
 lseek(fd, offset, whence)
-	int	fd;
-	off_t	offset;
-	int	whence;
+int fd;
+off_t   offset;
+int whence;
 {
-
-	if (__getosreldate() >= 700051)
-		return(__sys_lseek(fd, offset, whence));
-	else
-		return(__sys_freebsd6_lseek(fd, 0, offset, whence));
+    if (__getosreldate() >= 700051) {
+        return (__sys_lseek(fd, offset, whence));
+    } else {
+        return (__sys_freebsd6_lseek(fd, 0, offset, whence));
+    }
 }

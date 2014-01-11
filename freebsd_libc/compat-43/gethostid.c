@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,16 +39,17 @@ __FBSDID("$FreeBSD: src/lib/libc/compat-43/gethostid.c,v 1.5 2007/01/09 00:27:49
 #include <unistd.h>
 
 long
-gethostid(void)
-{
-	int mib[2];
-	size_t size;
-	long value;
+gethostid(void) {
+    int mib[2];
+    size_t size;
+    long value;
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_HOSTID;
+    size = sizeof value;
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_HOSTID;
-	size = sizeof value;
-	if (sysctl(mib, 2, &value, &size, NULL, 0) == -1)
-		return (-1);
-	return (value);
+    if (sysctl(mib, 2, &value, &size, NULL, 0) == -1) {
+        return (-1);
+    }
+
+    return (value);
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,68 +41,75 @@ __FBSDID("$FreeBSD: src/lib/libc/compat-43/sigcompat.c,v 1.11 2007/01/09 00:27:4
 
 int
 sigvec(signo, sv, osv)
-	int signo;
-	struct sigvec *sv, *osv;
+int signo;
+struct sigvec* sv, *osv;
 {
-	struct sigaction sa, osa;
-	struct sigaction *sap, *osap;
-	int ret;
+    struct sigaction sa, osa;
+    struct sigaction* sap, *osap;
+    int ret;
 
-	if (sv != NULL) {
-		sa.sa_handler = sv->sv_handler;
-		sa.sa_flags = sv->sv_flags ^ SV_INTERRUPT;
-		sigemptyset(&sa.sa_mask);
-		sa.sa_mask.__bits[0] = sv->sv_mask;
-		sap = &sa;
-	} else
-		sap = NULL;
-	osap = osv != NULL ? &osa : NULL;
-	ret = _sigaction(signo, sap, osap);
-	if (ret == 0 && osv != NULL) {
-		osv->sv_handler = osa.sa_handler;
-		osv->sv_flags = osa.sa_flags ^ SV_INTERRUPT;
-		osv->sv_mask = osa.sa_mask.__bits[0];
-	}
-	return (ret);
+    if (sv != NULL) {
+        sa.sa_handler = sv->sv_handler;
+        sa.sa_flags = sv->sv_flags ^ SV_INTERRUPT;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_mask.__bits[0] = sv->sv_mask;
+        sap = &sa;
+    } else {
+        sap = NULL;
+    }
+
+    osap = osv != NULL ? &osa : NULL;
+    ret = _sigaction(signo, sap, osap);
+
+    if (ret == 0 && osv != NULL) {
+        osv->sv_handler = osa.sa_handler;
+        osv->sv_flags = osa.sa_flags ^ SV_INTERRUPT;
+        osv->sv_mask = osa.sa_mask.__bits[0];
+    }
+
+    return (ret);
 }
 
 int
 sigsetmask(mask)
-	int mask;
+int mask;
 {
-	sigset_t set, oset;
-	int n;
+    sigset_t set, oset;
+    int n;
+    sigemptyset(&set);
+    set.__bits[0] = mask;
+    n = _sigprocmask(SIG_SETMASK, &set, &oset);
 
-	sigemptyset(&set);
-	set.__bits[0] = mask;
-	n = _sigprocmask(SIG_SETMASK, &set, &oset);
-	if (n)
-		return (n);
-	return (oset.__bits[0]);
+    if (n) {
+        return (n);
+    }
+
+    return (oset.__bits[0]);
 }
 
 int
 sigblock(mask)
-	int mask;
+int mask;
 {
-	sigset_t set, oset;
-	int n;
+    sigset_t set, oset;
+    int n;
+    sigemptyset(&set);
+    set.__bits[0] = mask;
+    n = _sigprocmask(SIG_BLOCK, &set, &oset);
 
-	sigemptyset(&set);
-	set.__bits[0] = mask;
-	n = _sigprocmask(SIG_BLOCK, &set, &oset);
-	if (n)
-		return (n);
-	return (oset.__bits[0]);
+    if (n) {
+        return (n);
+    }
+
+    return (oset.__bits[0]);
 }
 
 int
 sigpause(mask)
-	int mask;
+int mask;
 {
-	sigset_t set;
-
-	sigemptyset(&set);
-	set.__bits[0] = mask;
-	return (_sigsuspend(&set));
+    sigset_t set;
+    sigemptyset(&set);
+    set.__bits[0] = mask;
+    return (_sigsuspend(&set));
 }

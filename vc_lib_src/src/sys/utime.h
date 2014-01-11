@@ -91,7 +91,7 @@ typedef unsigned short wchar_t;
 #undef  _USE_32BIT_TIME_T
 #endif  /* _WIN64 */
 #else  /* _USE_32BIT_TIME_T */
-#if _INTEGRAL_MAX_BITS < 64   
+#if _INTEGRAL_MAX_BITS < 64
 #define _USE_32BIT_TIME_T
 #endif  /* _INTEGRAL_MAX_BITS < 64    */
 #endif  /* _USE_32BIT_TIME_T */
@@ -102,7 +102,7 @@ typedef _W64 long __time32_t;   /* 32-bit time value */
 #endif  /* _TIME32_T_DEFINED */
 
 #ifndef _TIME64_T_DEFINED
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 typedef __int64 __time64_t;     /* 64-bit time value */
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 #define _TIME64_T_DEFINED
@@ -122,33 +122,33 @@ typedef __time64_t time_t;      /* time value */
 #ifndef _UTIMBUF_DEFINED
 
 struct _utimbuf {
-        time_t actime;          /* access time */
-        time_t modtime;         /* modification time */
-        };
+    time_t actime;          /* access time */
+    time_t modtime;         /* modification time */
+};
 
 struct __utimbuf32 {
-        __time32_t actime;      /* access time */
-        __time32_t modtime;     /* modification time */
-        };
+    __time32_t actime;      /* access time */
+    __time32_t modtime;     /* modification time */
+};
 
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 struct __utimbuf64 {
-        __time64_t actime;      /* access time */
-        __time64_t modtime;     /* modification time */
-        };
+    __time64_t actime;      /* access time */
+    __time64_t modtime;     /* modification time */
+};
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
 #if !__STDC__
 /* Non-ANSI name for compatibility */
 struct utimbuf {
-        time_t actime;          /* access time */
-        time_t modtime;         /* modification time */
-        };
+    time_t actime;          /* access time */
+    time_t modtime;         /* modification time */
+};
 
 struct utimbuf32 {
-        __time32_t actime;      /* access time */
-        __time32_t modtime;     /* modification time */
-        };
+    __time32_t actime;      /* access time */
+    __time32_t modtime;     /* modification time */
+};
 
 #endif  /* !__STDC__ */
 
@@ -158,17 +158,17 @@ struct utimbuf32 {
 
 /* Function Prototypes */
 
-_CRTIMP int __cdecl _utime32(__in_z const char * _Filename, __in_opt struct __utimbuf32 * _Time);
+_CRTIMP int __cdecl _utime32(__in_z const char* _Filename, __in_opt struct __utimbuf32* _Time);
 
-_CRTIMP int __cdecl _futime32(__in int _FileDes, __in_opt struct __utimbuf32 * _Time);
+_CRTIMP int __cdecl _futime32(__in int _FileDes, __in_opt struct __utimbuf32* _Time);
 
 /* Wide Function Prototypes */
-_CRTIMP int __cdecl _wutime32(__in_z const wchar_t * _Filename, __in_opt struct __utimbuf32 * _Time);
+_CRTIMP int __cdecl _wutime32(__in_z const wchar_t* _Filename, __in_opt struct __utimbuf32* _Time);
 
-#if _INTEGRAL_MAX_BITS >= 64   
-_CRTIMP int __cdecl _utime64(__in_z const char * _Filename, __in_opt struct __utimbuf64 * _Time);
-_CRTIMP int __cdecl _futime64(__in int _FileDes, __in_opt struct __utimbuf64 * _Time);
-_CRTIMP int __cdecl _wutime64(__in_z const wchar_t * _Filename, __in_opt struct __utimbuf64 * _Time);
+#if _INTEGRAL_MAX_BITS >= 64
+_CRTIMP int __cdecl _utime64(__in_z const char* _Filename, __in_opt struct __utimbuf64* _Time);
+_CRTIMP int __cdecl _futime64(__in int _FileDes, __in_opt struct __utimbuf64* _Time);
+_CRTIMP int __cdecl _wutime64(__in_z const wchar_t* _Filename, __in_opt struct __utimbuf64* _Time);
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
 #if !defined (RC_INVOKED) && !defined (__midl)

@@ -37,13 +37,13 @@
 extern "C" {
 #endif  /* __cplusplus */
 
- /****************************************************************************
- *
- * Debug Reporting
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Debug Reporting
+*
+***************************************************************************/
 
-typedef void *_HFILE; /* file handle pointer */
+typedef void* _HFILE; /* file handle pointer */
 
 #define _CRT_WARN           0
 #define _CRT_ERROR          1
@@ -62,51 +62,51 @@ typedef void *_HFILE; /* file handle pointer */
 #define _CRTDBG_REPORT_FILE   ((_HFILE)-6)
 
 #if !defined (_M_CEE_PURE)
-typedef int (__cdecl * _CRT_REPORT_HOOK)(int, char *, int *);
-typedef int (__cdecl * _CRT_REPORT_HOOKW)(int, wchar_t *, int *);
+typedef int (__cdecl* _CRT_REPORT_HOOK)(int, char*, int*);
+typedef int (__cdecl* _CRT_REPORT_HOOKW)(int, wchar_t*, int*);
 #else  /* !defined (_M_CEE_PURE) */
-typedef int (__clrcall * _CRT_REPORT_HOOK)(int, char *, int *);
-typedef int (__clrcall * _CRT_REPORT_HOOKW)(int, wchar_t *, int *);
+typedef int (__clrcall* _CRT_REPORT_HOOK)(int, char*, int*);
+typedef int (__clrcall* _CRT_REPORT_HOOKW)(int, wchar_t*, int*);
 #endif  /* !defined (_M_CEE_PURE) */
 
 #if defined (_M_CEE)
-typedef int (__clrcall *_CRT_REPORT_HOOK_M)(int, char *, int *);
-typedef int (__clrcall *_CRT_REPORT_HOOKW_M)(int, wchar_t *, int *);
+typedef int (__clrcall* _CRT_REPORT_HOOK_M)(int, char*, int*);
+typedef int (__clrcall* _CRT_REPORT_HOOKW_M)(int, wchar_t*, int*);
 #endif  /* defined (_M_CEE) */
 
 #define _CRT_RPTHOOK_INSTALL  0
 #define _CRT_RPTHOOK_REMOVE   1
 
- /****************************************************************************
- *
- * Heap
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Heap
+*
+***************************************************************************/
 
- /****************************************************************************
- *
- * Client-defined allocation hook
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Client-defined allocation hook
+*
+***************************************************************************/
 
 #define _HOOK_ALLOC     1
 #define _HOOK_REALLOC   2
 #define _HOOK_FREE      3
 
 #if !defined (_M_CEE_PURE)
-typedef int (__cdecl * _CRT_ALLOC_HOOK)(int, void *, size_t, int, long, const unsigned char *, int);
+typedef int (__cdecl* _CRT_ALLOC_HOOK)(int, void*, size_t, int, long, const unsigned char*, int);
 #else  /* !defined (_M_CEE_PURE) */
-typedef int (__clrcall * _CRT_ALLOC_HOOK)(int, void *, size_t, int, long, const unsigned char *, int);
+typedef int (__clrcall* _CRT_ALLOC_HOOK)(int, void*, size_t, int, long, const unsigned char*, int);
 #endif  /* !defined (_M_CEE_PURE) */
 #if defined (_M_CEE)
-typedef int (__clrcall * _CRT_ALLOC_HOOK_M)(int, void *, size_t, int, long, const unsigned char *, int);
+typedef int (__clrcall* _CRT_ALLOC_HOOK_M)(int, void*, size_t, int, long, const unsigned char*, int);
 #endif  /* defined (_M_CEE) */
 
- /****************************************************************************
- *
- * Memory management
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Memory management
+*
+***************************************************************************/
 
 /*
  * Bit values for _crtDbgFlag flag:
@@ -140,11 +140,11 @@ for some applications. You can still turn this feature on manually.
 #define _BLOCK_SUBTYPE(block)       (block >> 16 & 0xFFFF)
 
 
- /****************************************************************************
- *
- * Memory state
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Memory state
+*
+***************************************************************************/
 
 /* Memory block identification */
 #define _FREE_BLOCK      0
@@ -155,30 +155,29 @@ for some applications. You can still turn this feature on manually.
 #define _MAX_BLOCKS      5
 
 #if !defined (_M_CEE_PURE)
-typedef void (__cdecl * _CRT_DUMP_CLIENT)(void *, size_t);
+typedef void (__cdecl* _CRT_DUMP_CLIENT)(void*, size_t);
 #else  /* !defined (_M_CEE_PURE) */
-typedef void (__clrcall * _CRT_DUMP_CLIENT)(void *, size_t);
+typedef void (__clrcall* _CRT_DUMP_CLIENT)(void*, size_t);
 #endif  /* !defined (_M_CEE_PURE) */
 #if defined (_M_CEE)
-typedef void (__clrcall * _CRT_DUMP_CLIENT_M)(void *, size_t);
+typedef void (__clrcall* _CRT_DUMP_CLIENT_M)(void*, size_t);
 #endif  /* defined (_M_CEE) */
 
 struct _CrtMemBlockHeader;
-typedef struct _CrtMemState
-{
-        struct _CrtMemBlockHeader * pBlockHeader;
-        size_t lCounts[_MAX_BLOCKS];
-        size_t lSizes[_MAX_BLOCKS];
-        size_t lHighWaterCount;
-        size_t lTotalCount;
+typedef struct _CrtMemState {
+    struct _CrtMemBlockHeader* pBlockHeader;
+    size_t lCounts[_MAX_BLOCKS];
+    size_t lSizes[_MAX_BLOCKS];
+    size_t lHighWaterCount;
+    size_t lTotalCount;
 } _CrtMemState;
 
 
- /****************************************************************************
- *
- * Declarations, prototype and function-like macros
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Declarations, prototype and function-like macros
+*
+***************************************************************************/
 
 /* _STATIC_ASSERT is for enforcing boolean/integral conditions at compile time.
    Since it is purely a compile-time mechanism that generates no code, the check
@@ -190,13 +189,13 @@ typedef struct _CrtMemState
 
 #ifndef _DEBUG
 
- /****************************************************************************
- *
- * Debug OFF
- * Debug OFF
- * Debug OFF
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Debug OFF
+* Debug OFF
+* Debug OFF
+*
+***************************************************************************/
 
 /*  We allow our basic _ASSERT macros to be overridden by pre-existing definitions.
     This is not the ideal mechanism, but is helpful in some scenarios and helps avoid
@@ -322,13 +321,13 @@ typedef struct _CrtMemState
 #else  /* _DEBUG */
 
 
- /****************************************************************************
- *
- * Debug ON
- * Debug ON
- * Debug ON
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Debug ON
+* Debug ON
+* Debug ON
+*
+***************************************************************************/
 
 
 /* Define _MRTIMP */
@@ -355,16 +354,16 @@ typedef struct _CrtMemState
 #endif  /* CRTDLL */
 #endif  /* _CRTIMP */
 
- /****************************************************************************
- *
- * Debug Reporting
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Debug Reporting
+*
+***************************************************************************/
 
 #ifndef _INTERNAL_IFSTRIP_
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP long * __cdecl __p__crtAssertBusy(void);
+_CRTIMP long* __cdecl __p__crtAssertBusy(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 #if !defined (_M_CEE_PURE)
@@ -374,7 +373,7 @@ _CRTIMP extern long _crtAssertBusy;
 #if !defined (_M_CEE_PURE)
 _CRTIMP _CRT_REPORT_HOOK __cdecl _CrtGetReportHook(
     void
-    );
+);
 #endif  /* !defined (_M_CEE_PURE) */
 
 /* _CrtSetReportHook[[W]2]:
@@ -384,98 +383,96 @@ _CRTIMP _CRT_REPORT_HOOK __cdecl _CrtGetReportHook(
 #if !defined (_M_CEE_PURE)
 _CRTIMP _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
     __in_opt _CRT_REPORT_HOOK _PFnNewHook
-        );
+);
 
 _CRTIMP int __cdecl _CrtSetReportHook2(
-        __in int _Mode,
-        __in_opt _CRT_REPORT_HOOK _PFnNewHook
-        );
+    __in int _Mode,
+    __in_opt _CRT_REPORT_HOOK _PFnNewHook
+);
 
 _CRTIMP int __cdecl _CrtSetReportHookW2(
-        __in int _Mode,
-        __in_opt _CRT_REPORT_HOOKW _PFnNewHook
-        );
+    __in int _Mode,
+    __in_opt _CRT_REPORT_HOOKW _PFnNewHook
+);
 #else  /* !defined (_M_CEE_PURE) */
-extern "C++"
-{
-_MRTIMP _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
+extern "C++" {
+    _MRTIMP _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
         __in_opt _CRT_REPORT_HOOK _PFnNewHook
-        );
+    );
 
-_MRTIMP int __cdecl _CrtSetReportHook2(
+    _MRTIMP int __cdecl _CrtSetReportHook2(
         __in int _Mode,
         __in_opt _CRT_REPORT_HOOK _PFnNewHook
-        );
+    );
 
 
-_MRTIMP int __cdecl _CrtSetReportHookW2(
+    _MRTIMP int __cdecl _CrtSetReportHookW2(
         __in int _Mode,
         __in_opt _CRT_REPORT_HOOKW _PFnNewHook
-        );
+    );
 }
 #endif  /* !defined (_M_CEE_PURE) */
 
 #if defined (_M_CEE_MIXED)
-extern "C++"
-{
-_MRTIMP _CRT_REPORT_HOOK_M __cdecl _CrtSetReportHook(
+extern "C++" {
+    _MRTIMP _CRT_REPORT_HOOK_M __cdecl _CrtSetReportHook(
         __in_opt _CRT_REPORT_HOOK_M _PFnNewHook
-        );
+    );
 
 
-_MRTIMP int __cdecl _CrtSetReportHook2(
+    _MRTIMP int __cdecl _CrtSetReportHook2(
         __in int _Mode,
         __in_opt _CRT_REPORT_HOOK_M _PFnNewHook
-        );
+    );
 
 
-_MRTIMP int __cdecl _CrtSetReportHookW2(
+    _MRTIMP int __cdecl _CrtSetReportHookW2(
         __in int _Mode,
         __in_opt _CRT_REPORT_HOOKW_M _PFnNewHook
-        );
+    );
 
-/*
-This overload allows NULL to be passed unambiguously in the mixed case
-*/
-_MRTIMP _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
+    /*
+    This overload allows NULL to be passed unambiguously in the mixed case
+    */
+    _MRTIMP _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
         __in int _PFnNewHook
-        );
+    );
 }
 #endif  /* defined (_M_CEE_MIXED) */
 
 
 _CRTIMP int __cdecl _CrtSetReportMode(
-        __in int _ReportType,
-        __in_opt int _ReportMode
-        );
+    __in int _ReportType,
+    __in_opt int _ReportMode
+);
 
 _CRTIMP _HFILE __cdecl _CrtSetReportFile(
-        __in int _ReportType,
-        __in_opt _HFILE _ReportFile
-        );
+    __in int _ReportType,
+    __in_opt _HFILE _ReportFile
+);
 
 _CRTIMP int __cdecl _CrtDbgReport(
-        __in int _ReportType,
-        __in_z_opt const char * _Filename,
-        __in int _Linenumber,
-        __in_z_opt const char * _ModuleName,
-        __in_z_opt const char * _Format,
-        ...);
+    __in int _ReportType,
+    __in_z_opt const char* _Filename,
+    __in int _Linenumber,
+    __in_z_opt const char* _ModuleName,
+    __in_z_opt const char* _Format,
+    ...);
 
 _CRTIMP size_t __cdecl _CrtSetDebugFillThreshold(
-        __in size_t _NewDebugFillThreshold
-        );
+    __in size_t _NewDebugFillThreshold
+);
 
 #if !defined (_NATIVE_WCHAR_T_DEFINED) && defined (_M_CEE_PURE)
 extern "C++"
 #endif  /* !defined (_NATIVE_WCHAR_T_DEFINED) && defined (_M_CEE_PURE) */
 _CRTIMP int __cdecl _CrtDbgReportW(
-        __in int _ReportType,
-        __in_z_opt const wchar_t * _Filename,
-        __in int _LineNumber,
-        __in_z_opt const wchar_t * _ModuleName,
-        __in_z_opt const wchar_t * _Format,
-        ...);
+    __in int _ReportType,
+    __in_z_opt const wchar_t* _Filename,
+    __in int _LineNumber,
+    __in_z_opt const wchar_t* _ModuleName,
+    __in_z_opt const wchar_t* _Format,
+    ...);
 
 /* Asserts */
 /* We use !! below to ensure that any overloaded operators used to evaluate expr do not end up at operator || */
@@ -592,15 +589,15 @@ void __break(int);
 #define _CrtDbgBreak() __break(0x80016)
 #else  /* defined (_M_IA64) && !defined (_CRT_PORTABLE) */
 _CRTIMP void __cdecl _CrtDbgBreak(
-        void
-        );
+    void
+);
 #endif  /* defined (_M_IA64) && !defined (_CRT_PORTABLE) */
 
- /****************************************************************************
- *
- * Heap routines
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Heap routines
+*
+***************************************************************************/
 
 #ifdef _CRTDBG_MAP_ALLOC
 
@@ -650,7 +647,7 @@ _CRTIMP void __cdecl _CrtDbgBreak(
 #ifndef _INTERNAL_IFSTRIP_
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP long * __cdecl __p__crtBreakAlloc(void);
+_CRTIMP long* __cdecl __p__crtBreakAlloc(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 #if !defined (_M_CEE_PURE)
@@ -658,247 +655,247 @@ _CRTIMP extern long _crtBreakAlloc;      /* Break on this allocation */
 #endif  /* !defined (_M_CEE_PURE) */
 
 _CRTIMP long __cdecl _CrtSetBreakAlloc(
-        __in long _BreakAlloc
-        );
+    __in long _BreakAlloc
+);
 
 /*
  * Prototypes for malloc, free, realloc, etc are in malloc.h
  */
 
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _malloc_dbg(
-        __in size_t _Size,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-_CRTIMP __checkReturn __bcount_opt(_NumOfElements*_SizeOfElements) void * __cdecl _calloc_dbg(
-        __in size_t _NumOfElements,
-        __in size_t _SizeOfElements,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-_CRTIMP __checkReturn __bcount_opt(_NewSize) void * __cdecl _realloc_dbg(
-        __inout_opt void * _Memory,
-        __in size_t _NewSize,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-_CRTIMP __checkReturn __bcount_opt(_NewSize) void * __cdecl _recalloc_dbg
-(
-        __inout_opt void * _Memory,
-        __in size_t _NumOfElements,
-        __in size_t _SizeOfElements,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _malloc_dbg(
+    __in size_t _Size,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
 );
 
-_CRTIMP __checkReturn __bcount_opt(_NewSize) void * __cdecl _expand_dbg(
-        __inout_opt void * _Memory,
-        __in size_t _NewSize,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __bcount_opt(_NumOfElements* _SizeOfElements) void* __cdecl _calloc_dbg(
+    __in size_t _NumOfElements,
+    __in size_t _SizeOfElements,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_NewSize) void* __cdecl _realloc_dbg(
+    __inout_opt void* _Memory,
+    __in size_t _NewSize,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_NewSize) void* __cdecl _recalloc_dbg
+(
+    __inout_opt void* _Memory,
+    __in size_t _NumOfElements,
+    __in size_t _SizeOfElements,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_NewSize) void* __cdecl _expand_dbg(
+    __inout_opt void* _Memory,
+    __in size_t _NewSize,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
 _CRTIMP void __cdecl _free_dbg(
-        __inout_opt void * _Memory,
-        __in int _BlockType
-        );
-
-_CRTIMP size_t __cdecl _msize_dbg (
-        __in void * _Memory,
-        __in int _BlockType
-        );
-
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _aligned_malloc_dbg(
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _aligned_realloc_dbg(
-        __inout_opt void * _Memory,
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _aligned_recalloc_dbg
-(
-        __inout_opt void * _Memory,
-        __in size_t _NumOfElements,
-        __in size_t _SizeOfElements,
-        __in size_t _Alignment,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
+    __inout_opt void* _Memory,
+    __in int _BlockType
 );
 
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _aligned_offset_malloc_dbg(
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in size_t _Offset,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP size_t __cdecl _msize_dbg(
+    __in void* _Memory,
+    __in int _BlockType
+);
 
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _aligned_offset_realloc_dbg(
-        __inout_opt void * _Memory,
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in size_t _Offset,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _aligned_malloc_dbg(
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _aligned_offset_recalloc_dbg
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _aligned_realloc_dbg(
+    __inout_opt void* _Memory,
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _aligned_recalloc_dbg
 (
-        __inout_opt void * _Memory,
-        __in size_t _NumOfElements,
-        __in size_t _SizeOfElements,
-        __in size_t _Alignment,
-        __in size_t _Offset,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
+    __inout_opt void* _Memory,
+    __in size_t _NumOfElements,
+    __in size_t _SizeOfElements,
+    __in size_t _Alignment,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _aligned_offset_malloc_dbg(
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in size_t _Offset,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _aligned_offset_realloc_dbg(
+    __inout_opt void* _Memory,
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in size_t _Offset,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _aligned_offset_recalloc_dbg
+(
+    __inout_opt void* _Memory,
+    __in size_t _NumOfElements,
+    __in size_t _SizeOfElements,
+    __in size_t _Alignment,
+    __in size_t _Offset,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
 );
 
 _CRTIMP void __cdecl _aligned_free_dbg(
-        __inout_opt void * _Memory
-        );
+    __inout_opt void* _Memory
+);
 
-_CRTIMP __checkReturn __out_z_opt char * __cdecl _strdup_dbg(
-        __in_z_opt const char * _Str,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt char* __cdecl _strdup_dbg(
+    __in_z_opt const char* _Str,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt wchar_t * __cdecl _wcsdup_dbg(
-        __in_z_opt const wchar_t * _Str,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt wchar_t* __cdecl _wcsdup_dbg(
+    __in_z_opt const wchar_t* _Str,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt char * __cdecl _tempnam_dbg(
-        __in_z_opt const char * _DirName,
-        __in_z_opt const char * _FilePrefix,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt char* __cdecl _tempnam_dbg(
+    __in_z_opt const char* _DirName,
+    __in_z_opt const char* _FilePrefix,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt wchar_t * __cdecl _wtempnam_dbg(
-        __in_z_opt const wchar_t * _DirName,
-        __in_z_opt const wchar_t * _FilePrefix,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt wchar_t* __cdecl _wtempnam_dbg(
+    __in_z_opt const wchar_t* _DirName,
+    __in_z_opt const wchar_t* _FilePrefix,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt char * __cdecl _fullpath_dbg(
-        __out_ecount_z_opt(_SizeInBytes) char * _FullPath,
-        __in_z const char * _Path,
-        __in size_t _SizeInBytes,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt char* __cdecl _fullpath_dbg(
+    __out_ecount_z_opt(_SizeInBytes) char* _FullPath,
+    __in_z const char* _Path,
+    __in size_t _SizeInBytes,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt wchar_t * __cdecl _wfullpath_dbg(
-        __out_ecount_z_opt(_SizeInWords) wchar_t * _FullPath,
-        __in_z const wchar_t * _Path,
-        __in size_t _SizeInWords,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt wchar_t* __cdecl _wfullpath_dbg(
+    __out_ecount_z_opt(_SizeInWords) wchar_t* _FullPath,
+    __in_z const wchar_t* _Path,
+    __in size_t _SizeInWords,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt char * __cdecl _getcwd_dbg(
-        __out_ecount_z_opt(_SizeInBytes) char * _DstBuf,
-        __in int _SizeInBytes,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt char* __cdecl _getcwd_dbg(
+    __out_ecount_z_opt(_SizeInBytes) char* _DstBuf,
+    __in int _SizeInBytes,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt wchar_t * __cdecl _wgetcwd_dbg(
-        __out_ecount_z_opt(_SizeInWords) wchar_t * _DstBuf,
-        __in int _SizeInWords,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt wchar_t* __cdecl _wgetcwd_dbg(
+    __out_ecount_z_opt(_SizeInWords) wchar_t* _DstBuf,
+    __in int _SizeInWords,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt char * __cdecl _getdcwd_dbg(
-        __in int _Drive,
-        __out_ecount_z_opt(_SizeInBytes) char * _DstBuf,
-        __in int _SizeInBytes,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt char* __cdecl _getdcwd_dbg(
+    __in int _Drive,
+    __out_ecount_z_opt(_SizeInBytes) char* _DstBuf,
+    __in int _SizeInBytes,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-_CRTIMP __checkReturn __out_z_opt wchar_t * __cdecl _wgetdcwd_dbg(
-        __in int _Drive,
-        __out_ecount_z_opt(_SizeInWords) wchar_t * _DstBuf,
-        __in int _SizeInWords,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+_CRTIMP __checkReturn __out_z_opt wchar_t* __cdecl _wgetdcwd_dbg(
+    __in int _Drive,
+    __out_ecount_z_opt(_SizeInWords) wchar_t* _DstBuf,
+    __in int _SizeInWords,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-__checkReturn __out_z_opt char * __cdecl _getdcwd_lk_dbg(
-        __in int _Drive,
-        __out_ecount_z_opt(_SizeInBytes) char * _DstBuf,
-        __in int _SizeInBytes,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+__checkReturn __out_z_opt char* __cdecl _getdcwd_lk_dbg(
+    __in int _Drive,
+    __out_ecount_z_opt(_SizeInBytes) char* _DstBuf,
+    __in int _SizeInBytes,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-__checkReturn __out_z_opt wchar_t * __cdecl _wgetdcwd_lk_dbg(
-        __in int _Drive,
-        __out_ecount_z_opt(_SizeInWords) wchar_t * _DstBuf,
-        __in int _SizeInWords,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+__checkReturn __out_z_opt wchar_t* __cdecl _wgetdcwd_lk_dbg(
+    __in int _Drive,
+    __out_ecount_z_opt(_SizeInWords) wchar_t* _DstBuf,
+    __in int _SizeInWords,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
 _CRTIMP __checkReturn_wat errno_t __cdecl _dupenv_s_dbg(
-        __deref_out_ecount_z_opt(*_PBufferSizeInBytes) char ** _PBuffer,
-        __out_opt size_t * _PBufferSizeInBytes,
-        __in_z const char * _VarName,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+    __deref_out_ecount_z_opt(*_PBufferSizeInBytes) char** _PBuffer,
+    __out_opt size_t* _PBufferSizeInBytes,
+    __in_z const char* _VarName,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
 _CRTIMP __checkReturn_wat errno_t __cdecl _wdupenv_s_dbg(
-        __deref_out_ecount_z_opt(*_PBufferSizeInWords) wchar_t ** _PBuffer,
-        __out_opt size_t * _PBufferSizeInWords,
-        __in_z const wchar_t * _VarName,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+    __deref_out_ecount_z_opt(*_PBufferSizeInWords) wchar_t** _PBuffer,
+    __out_opt size_t* _PBufferSizeInWords,
+    __in_z const wchar_t* _VarName,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
 #define _malloca_dbg(s, t, f, l)    _malloc_dbg(s, t, f, l)
 #define _freea_dbg(p, t)            _free_dbg(p, t)
 
- /****************************************************************************
- *
- * Client-defined allocation hook
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Client-defined allocation hook
+*
+***************************************************************************/
 #if !defined (_M_CEE_PURE)
 _CRTIMP _CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook
 (
@@ -916,40 +913,37 @@ _CRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
     __in_opt _CRT_ALLOC_HOOK _PfnNewHook
 );
 #else  /* !defined (_M_CEE_PURE) */
-extern "C++"
-{
-_MRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
-(
-    __in_opt _CRT_ALLOC_HOOK _PfnNewHook
-);
+extern "C++" {
+    _MRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
+    (
+        __in_opt _CRT_ALLOC_HOOK _PfnNewHook
+    );
 }
 #endif  /* !defined (_M_CEE_PURE) */
 
 #if defined (_M_CEE_MIXED)
-extern "C++"
-{
-_MRTIMP _CRT_ALLOC_HOOK_M __cdecl _CrtSetAllocHook
-(
-    __in_opt _CRT_ALLOC_HOOK_M _PfnNewHook
-);
+extern "C++" {
+    _MRTIMP _CRT_ALLOC_HOOK_M __cdecl _CrtSetAllocHook
+    (
+        __in_opt _CRT_ALLOC_HOOK_M _PfnNewHook
+    );
 }
 
 /* If we have both versions, then we need an int overload to disambiguate for the NULL case */
-extern "C++"
-{
-_MRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
-(
-    __in int _PfnNewHook
-);
+extern "C++" {
+    _MRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
+    (
+        __in int _PfnNewHook
+    );
 }
 #endif  /* defined (_M_CEE_MIXED) */
 
 
- /****************************************************************************
- *
- * Memory management
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Memory management
+*
+***************************************************************************/
 
 /*
  * Bitfield flag that controls CRT heap behavior
@@ -959,7 +953,7 @@ _MRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
 #ifndef _INTERNAL_IFSTRIP_
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP int * __cdecl __p__crtDbgFlag(void);
+_CRTIMP int* __cdecl __p__crtDbgFlag(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 #if !defined (_M_CEE_PURE)
@@ -967,56 +961,55 @@ _CRTIMP extern int _crtDbgFlag;
 #endif  /* !defined (_M_CEE_PURE) */
 
 _CRTIMP int __cdecl _CrtCheckMemory(
-        void
-        );
+    void
+);
 
 _CRTIMP int __cdecl _CrtSetDbgFlag(
-        __in int _NewFlag
-        );
+    __in int _NewFlag
+);
 
 _CRTIMP void __cdecl _CrtDoForAllClientObjects(
-        __in void (__cdecl *_PFn)(void *, void *),
-        void * _Context
-        );
+    __in void (__cdecl* _PFn)(void*, void*),
+    void* _Context
+);
 
 #if defined (_M_CEE)
-extern "C++"
-{
-_MRTIMP void __cdecl _CrtDoForAllClientObjects(
-        __in void (__clrcall * _PFn)(void *, void *),
-        void * _Context
-        );
+extern "C++" {
+    _MRTIMP void __cdecl _CrtDoForAllClientObjects(
+        __in void (__clrcall * _PFn)(void*, void*),
+        void* _Context
+    );
 }
 #endif  /* defined (_M_CEE) */
 
 _CRTIMP __checkReturn int __cdecl _CrtIsValidPointer(
-        __in_opt const void * _Ptr,
-        __in unsigned int _Bytes,
-        __in int _ReadWrite
-        );
+    __in_opt const void* _Ptr,
+    __in unsigned int _Bytes,
+    __in int _ReadWrite
+);
 
 _CRTIMP __checkReturn int __cdecl _CrtIsValidHeapPointer(
-        __in_opt const void * _HeapPtr
-        );
+    __in_opt const void* _HeapPtr
+);
 
 _CRTIMP int __cdecl _CrtIsMemoryBlock(
-        __in_opt const void * _Memory,
-        __in unsigned int _Bytes,
-        __out_opt long * _RequestNumber,
-        __out_opt char ** _Filename,
-        __out_opt int * _LineNumber
-        );
+    __in_opt const void* _Memory,
+    __in unsigned int _Bytes,
+    __out_opt long* _RequestNumber,
+    __out_opt char** _Filename,
+    __out_opt int* _LineNumber
+);
 
 _CRTIMP __checkReturn int __cdecl _CrtReportBlockType(
-        __in_opt const void * _Memory
-        );
+    __in_opt const void* _Memory
+);
 
 
- /****************************************************************************
- *
- * Memory state
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Memory state
+*
+***************************************************************************/
 
 #if !defined (_M_CEE_PURE)
 _CRTIMP _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient
@@ -1036,60 +1029,58 @@ _CRTIMP _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient
 );
 
 #else  /* !defined (_M_CEE_PURE) */
-extern "C++"
-{
-_MRTIMP _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient
-(
-    __in_opt _CRT_DUMP_CLIENT _PFnNewDump
-);
+extern "C++" {
+    _MRTIMP _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient
+    (
+        __in_opt _CRT_DUMP_CLIENT _PFnNewDump
+    );
 }
 #endif  /* !defined (_M_CEE_PURE) */
 
 #if defined (_M_CEE_MIXED)
-extern "C++"
-{
-_MRTIMP _CRT_DUMP_CLIENT_M __cdecl _CrtSetDumpClient
-(
-    __in_opt _CRT_DUMP_CLIENT_M _PFnNewDump
-);
+extern "C++" {
+    _MRTIMP _CRT_DUMP_CLIENT_M __cdecl _CrtSetDumpClient
+    (
+        __in_opt _CRT_DUMP_CLIENT_M _PFnNewDump
+    );
 
-/* If we have both versions, then we need an int overload to disambiguate for the NULL case */
-_MRTIMP _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient
-(
-    __in_opt int _PFnNewDump
-);
+    /* If we have both versions, then we need an int overload to disambiguate for the NULL case */
+    _MRTIMP _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient
+    (
+        __in_opt int _PFnNewDump
+    );
 }
 #endif  /* defined (_M_CEE_MIXED) */
 
 _CRTIMP _CRT_MANAGED_HEAP_DEPRECATE void __cdecl _CrtMemCheckpoint(
-        __out _CrtMemState * _State
-        );
+    __out _CrtMemState* _State
+);
 
 _CRTIMP _CRT_MANAGED_HEAP_DEPRECATE int __cdecl _CrtMemDifference(
-        __out _CrtMemState * _State,
-        __in const _CrtMemState * _OldState,
-        __in const _CrtMemState * _NewState
-        );
+    __out _CrtMemState* _State,
+    __in const _CrtMemState* _OldState,
+    __in const _CrtMemState* _NewState
+);
 
 _CRTIMP void __cdecl _CrtMemDumpAllObjectsSince(
-        __in_opt const _CrtMemState * _State
-        );
+    __in_opt const _CrtMemState* _State
+);
 
 _CRTIMP void __cdecl _CrtMemDumpStatistics(
-        __in const _CrtMemState * _State
-        );
+    __in const _CrtMemState* _State
+);
 
 _CRTIMP int __cdecl _CrtDumpMemoryLeaks(
-        void
-        );
+    void
+);
 
 _CRTIMP int __cdecl _CrtSetCheckCount(
-        __in int _CheckCount
-        );
+    __in int _CheckCount
+);
 
 _CRTIMP int __cdecl _CrtGetCheckCount(
-        void
-        );
+    void
+);
 
 #endif  /* _DEBUG */
 
@@ -1102,78 +1093,86 @@ extern "C++" {
 
 #ifndef _DEBUG
 
- /****************************************************************************
- *
- * Debug OFF
- * Debug OFF
- * Debug OFF
- *
- ***************************************************************************/
+    /****************************************************************************
+    *
+    * Debug OFF
+    * Debug OFF
+    * Debug OFF
+    *
+    ***************************************************************************/
 
 
-__bcount(_Size) void * __CRTDECL operator new[](size_t _Size);
+    __bcount(_Size) void* __CRTDECL operator new[](size_t _Size);
 
 #if !defined (_M_CEE_PURE)
-inline __bcount(_Size) void * __CRTDECL operator new(size_t _Size, int, const char *, int)
-        { return ::operator new(_Size); }
+    inline __bcount(_Size) void* __CRTDECL operator new(size_t _Size, int, const char*, int) {
+        return ::operator new(_Size);
+    }
 
-inline __bcount(_Size) void* __CRTDECL operator new[](size_t _Size, int, const char *, int)
-        { return ::operator new[](_Size); }
+    inline __bcount(_Size) void* __CRTDECL operator new[](size_t _Size, int, const char*, int) {
+        return ::operator new[](_Size);
+    }
 
 #if _MSC_VER >= 1200
 
 
-void __CRTDECL operator delete[](void *);
+    void __CRTDECL operator delete[](void*);
 
-inline void __CRTDECL operator delete(void * _P, int, const char *, int)
-        { ::operator delete(_P); }
-inline void __CRTDECL operator delete[](void * _P, int, const char *, int)
-        { ::operator delete[](_P); }
+    inline void __CRTDECL operator delete(void* _P, int, const char*, int) {
+        ::operator delete(_P);
+    }
+    inline void __CRTDECL operator delete[](void* _P, int, const char*, int) {
+        ::operator delete[](_P);
+    }
 #endif  /* _MSC_VER >= 1200 */
 #endif  /* !defined (_M_CEE_PURE) */
 #else  /* _DEBUG */
 
- /****************************************************************************
- *
- * Debug ON
- * Debug ON
- * Debug ON
- *
- ***************************************************************************/
+    /****************************************************************************
+    *
+    * Debug ON
+    * Debug ON
+    * Debug ON
+    *
+    ***************************************************************************/
 
-__bcount(_Size) void * __CRTDECL operator new[](size_t _Size);
+    __bcount(_Size) void* __CRTDECL operator new[](size_t _Size);
 
-__bcount(_Size) void * __CRTDECL operator new(
+    __bcount(_Size) void* __CRTDECL operator new(
         size_t _Size,
         int,
-        const char *,
+        const char*,
         int
-        );
+    );
 
-__bcount(_Size) void * __CRTDECL operator new[](
+    __bcount(_Size) void* __CRTDECL operator new[](
         size_t _Size,
         int,
-        const char *,
+        const char*,
         int
-        );
+    );
 
 #if _MSC_VER >= 1200
-void __CRTDECL operator delete[](void *);
+    void __CRTDECL operator delete[](void*);
 
-inline void __CRTDECL operator delete(void * _P, int, const char *, int)
-        { ::operator delete(_P); }
+    inline void __CRTDECL operator delete(void* _P, int, const char*, int) {
+        ::operator delete(_P);
+    }
 
-inline void __CRTDECL operator delete[](void * _P, int, const char *, int)
-        { ::operator delete[](_P); }
+    inline void __CRTDECL operator delete[](void* _P, int, const char*, int) {
+        ::operator delete[](_P);
+    }
 #endif  /* _MSC_VER >= 1200 */
 
 #ifdef _CRTDBG_MAP_ALLOC
 
-inline __bcount(_Size) void * __CRTDECL operator new(size_t _Size)
-        { return ::operator new(_Size, _NORMAL_BLOCK, __FILE__, __LINE__); }
+    inline __bcount(_Size) void* __CRTDECL operator new(size_t _Size) {
+        return ::operator new(_Size, _NORMAL_BLOCK, __FILE__, __LINE__);
+    }
 
-inline __bcount(_Size) void* __CRTDECL operator new[](size_t _Size)
-        { return ::operator new[](_Size, _NORMAL_BLOCK, __FILE__, __LINE__); }
+    inline __bcount(_Size) void* __CRTDECL operator new[](size_t _Size) {
+        return ::operator new[](_Size, _NORMAL_BLOCK, __FILE__, __LINE__);
+    }
 
 #endif  /* _CRTDBG_MAP_ALLOC */
 

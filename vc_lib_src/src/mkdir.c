@@ -31,24 +31,24 @@
 *
 *******************************************************************************/
 
-int __cdecl _tmkdir (
-        const _TSCHAR *path
-        )
-{
-        ULONG dosretval;
+int __cdecl _tmkdir(
+    const _TSCHAR* path
+) {
+    ULONG dosretval;
 
-        /* ask OS to create directory */
+    /* ask OS to create directory */
 
-        if (!CreateDirectory((LPTSTR)path, (LPSECURITY_ATTRIBUTES)NULL))
-            dosretval = GetLastError();
-        else
-            dosretval = 0;
+    if (!CreateDirectory((LPTSTR)path, (LPSECURITY_ATTRIBUTES)NULL)) {
+        dosretval = GetLastError();
+    } else {
+        dosretval = 0;
+    }
 
-        if (dosretval) {
-            /* error occured -- map error code and return */
-            _dosmaperr(dosretval);
-            return -1;
-        }
+    if (dosretval) {
+        /* error occured -- map error code and return */
+        _dosmaperr(dosretval);
+        return -1;
+    }
 
-        return 0;
+    return 0;
 }

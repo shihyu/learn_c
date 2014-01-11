@@ -35,83 +35,81 @@ __FBSDID("$FreeBSD: src/lib/libc/stdtime/timelocal.c,v 1.25 2003/06/13 00:14:07 
 
 static struct lc_time_T _time_locale;
 static int _time_using_locale;
-static char *time_locale_buf;
+static char* time_locale_buf;
 
 #define LCTIME_SIZE (sizeof(struct lc_time_T) / sizeof(char *))
 
-static const struct lc_time_T	_C_time_locale = {
-	{
-		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-	}, {
-		"January", "February", "March", "April", "May", "June",
-		"July", "August", "September", "October", "November", "December"
-	}, {
-		"Sun", "Mon", "Tue", "Wed",
-		"Thu", "Fri", "Sat"
-	}, {
-		"Sunday", "Monday", "Tuesday", "Wednesday",
-		"Thursday", "Friday", "Saturday"
-	},
+static const struct lc_time_T   _C_time_locale = {
+    {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    }, {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    }, {
+        "Sun", "Mon", "Tue", "Wed",
+        "Thu", "Fri", "Sat"
+    }, {
+        "Sunday", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday"
+    },
 
-	/* X_fmt */
-	"%H:%M:%S",
+    /* X_fmt */
+    "%H:%M:%S",
 
-	/*
-	 * x_fmt
-	 * Since the C language standard calls for
-	 * "date, using locale's date format," anything goes.
-	 * Using just numbers (as here) makes Quakers happier;
-	 * it's also compatible with SVR4.
-	 */
-	"%m/%d/%y",
+    /*
+     * x_fmt
+     * Since the C language standard calls for
+     * "date, using locale's date format," anything goes.
+     * Using just numbers (as here) makes Quakers happier;
+     * it's also compatible with SVR4.
+     */
+    "%m/%d/%y",
 
-	/*
-	 * c_fmt
-	 */
-	"%a %b %e %H:%M:%S %Y",
+    /*
+     * c_fmt
+     */
+    "%a %b %e %H:%M:%S %Y",
 
-	/* am */
-	"AM",
+    /* am */
+    "AM",
 
-	/* pm */
-	"PM",
+    /* pm */
+    "PM",
 
-	/* date_fmt */
-	"%a %b %e %H:%M:%S %Z %Y",
-	
-	/* alt_month
-	 * Standalone months forms for %OB
-	 */
-	{
-		"January", "February", "March", "April", "May", "June",
-		"July", "August", "September", "October", "November", "December"
-	},
+    /* date_fmt */
+    "%a %b %e %H:%M:%S %Z %Y",
 
-	/* md_order
-	 * Month / day order in dates
-	 */
-	"md",
+    /* alt_month
+     * Standalone months forms for %OB
+     */
+    {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    },
 
-	/* ampm_fmt
-	 * To determine 12-hour clock format time (empty, if N/A)
-	 */
-	"%I:%M:%S %p"
+    /* md_order
+     * Month / day order in dates
+     */
+    "md",
+
+    /* ampm_fmt
+     * To determine 12-hour clock format time (empty, if N/A)
+     */
+    "%I:%M:%S %p"
 };
 
-struct lc_time_T *
-__get_current_time_locale(void)
-{
-	return (_time_using_locale
-		? &_time_locale
-		: (struct lc_time_T *)&_C_time_locale);
+struct lc_time_T*
+__get_current_time_locale(void) {
+    return (_time_using_locale
+            ? &_time_locale
+            : (struct lc_time_T*)&_C_time_locale);
 }
 
 int
-__time_load_locale(const char *name)
-{
-	return (__part_load_locale(name, &_time_using_locale,
-			&time_locale_buf, "LC_TIME",
-			LCTIME_SIZE, LCTIME_SIZE,
-			(const char **)&_time_locale));
+__time_load_locale(const char* name) {
+    return (__part_load_locale(name, &_time_using_locale,
+                               &time_locale_buf, "LC_TIME",
+                               LCTIME_SIZE, LCTIME_SIZE,
+                               (const char**)&_time_locale));
 }

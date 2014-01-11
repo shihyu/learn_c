@@ -33,23 +33,27 @@
 /*
  * uuid_equal() - compare for equality.
  * See also:
- *	http://www.opengroup.org/onlinepubs/009629399/uuid_equal.htm
+ *  http://www.opengroup.org/onlinepubs/009629399/uuid_equal.htm
  */
 int32_t
-uuid_equal(const uuid_t *a, const uuid_t *b, uint32_t *status)
-{
+uuid_equal(const uuid_t* a, const uuid_t* b, uint32_t* status) {
+    if (status != NULL) {
+        *status = uuid_s_ok;
+    }
 
-	if (status != NULL)
-		*status = uuid_s_ok;
+    /* Deal with equal or NULL pointers. */
+    if (a == b) {
+        return (1);
+    }
 
-	/* Deal with equal or NULL pointers. */
-	if (a == b)
-		return (1);
-	if (a == NULL)
-		return (uuid_is_nil(b, NULL));
-	if (b == NULL)
-		return (uuid_is_nil(a, NULL));
+    if (a == NULL) {
+        return (uuid_is_nil(b, NULL));
+    }
 
-	/* Do a byte for byte comparison. */
-	return ((memcmp(a, b, sizeof(uuid_t))) ? 0 : 1);
+    if (b == NULL) {
+        return (uuid_is_nil(a, NULL));
+    }
+
+    /* Do a byte for byte comparison. */
+    return ((memcmp(a, b, sizeof(uuid_t))) ? 0 : 1);
 }

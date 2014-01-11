@@ -1,4 +1,4 @@
-/*	$OpenBSD: asprintf.c,v 1.8 2002/02/19 19:39:36 millert Exp $	*/
+/*  $OpenBSD: asprintf.c,v 1.8 2002/02/19 19:39:36 millert Exp $    */
 
 /*
  * Copyright (c) 1997 Todd C. Miller <Todd.Miller@courtesan.com>
@@ -38,34 +38,36 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/asprintf.c,v 1.13 2002/09/26 13:09:48 tjr
 #include "local.h"
 
 int
-asprintf(char **str, char const *fmt, ...)
-{
-	int ret;
-	va_list ap;
-	FILE f;
-	struct __sFILEX ext;
+asprintf(char** str, char const* fmt, ...) {
+    int ret;
+    va_list ap;
+    FILE f;
+    struct __sFILEX ext;
+    f._file = -1;
+    f._flags = __SWR | __SSTR | __SALC;
+    f._bf._base = f._p = (unsigned char*)malloc(128);
 
-	f._file = -1;
-	f._flags = __SWR | __SSTR | __SALC;
-	f._bf._base = f._p = (unsigned char *)malloc(128);
-	if (f._bf._base == NULL) {
-		*str = NULL;
-		errno = ENOMEM;
-		return (-1);
-	}
-	f._bf._size = f._w = 127;		/* Leave room for the NUL */
-	f._extra = &ext;
-	INITEXTRA(&f);
-	va_start(ap, fmt);
-	ret = __vfprintf(&f, fmt, ap);		/* Use unlocked __vfprintf */
-	va_end(ap);
-	if (ret < 0) {
-		free(f._bf._base);
-		*str = NULL;
-		errno = ENOMEM;
-		return (-1);
-	}
-	*f._p = '\0';
-	*str = (char *)f._bf._base;
-	return (ret);
+    if (f._bf._base == NULL) {
+        *str = NULL;
+        errno = ENOMEM;
+        return (-1);
+    }
+
+    f._bf._size = f._w = 127;       /* Leave room for the NUL */
+    f._extra = &ext;
+    INITEXTRA(&f);
+    va_start(ap, fmt);
+    ret = __vfprintf(&f, fmt, ap);      /* Use unlocked __vfprintf */
+    va_end(ap);
+
+    if (ret < 0) {
+        free(f._bf._base);
+        *str = NULL;
+        errno = ENOMEM;
+        return (-1);
+    }
+
+    *f._p = '\0';
+    *str = (char*)f._bf._base;
+    return (ret);
 }

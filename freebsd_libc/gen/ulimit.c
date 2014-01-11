@@ -36,33 +36,41 @@
 #include <ulimit.h>
 
 long
-ulimit(int cmd, ...)
-{
-	struct rlimit limit;
-	va_list ap;
-	long arg;
+ulimit(int cmd, ...) {
+    struct rlimit limit;
+    va_list ap;
+    long arg;
 
-	if (cmd == UL_GETFSIZE) {
-		if (getrlimit(RLIMIT_FSIZE, &limit) == -1)
-			return (-1);
-		limit.rlim_cur /= 512;
-		if (limit.rlim_cur > LONG_MAX)
-			return (LONG_MAX);
-		return ((long)limit.rlim_cur);
-	} else if (cmd == UL_SETFSIZE) {
-		va_start(ap, cmd);
-		arg = va_arg(ap, long);
-		va_end(ap);
-		limit.rlim_max = limit.rlim_cur = (rlim_t)arg * 512;
+    if (cmd == UL_GETFSIZE) {
+        if (getrlimit(RLIMIT_FSIZE, &limit) == -1) {
+            return (-1);
+        }
 
-		/* The setrlimit() function sets errno to EPERM if needed. */
-		if (setrlimit(RLIMIT_FSIZE, &limit) == -1)
-			return (-1);
-		if (arg * 512 > LONG_MAX)
-			return (LONG_MAX);
-		return (arg);
-	} else {
-		errno = EINVAL;
-		return (-1);
-	}
+        limit.rlim_cur /= 512;
+
+        if (limit.rlim_cur > LONG_MAX) {
+            return (LONG_MAX);
+        }
+
+        return ((long)limit.rlim_cur);
+    } else if (cmd == UL_SETFSIZE) {
+        va_start(ap, cmd);
+        arg = va_arg(ap, long);
+        va_end(ap);
+        limit.rlim_max = limit.rlim_cur = (rlim_t)arg * 512;
+
+        /* The setrlimit() function sets errno to EPERM if needed. */
+        if (setrlimit(RLIMIT_FSIZE, &limit) == -1) {
+            return (-1);
+        }
+
+        if (arg * 512 > LONG_MAX) {
+            return (LONG_MAX);
+        }
+
+        return (arg);
+    } else {
+        errno = EINVAL;
+        return (-1);
+    }
 }

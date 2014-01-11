@@ -44,44 +44,54 @@ static once_t res_init_once = ONCE_INITIALIZER;
 static int res_thr_keycreated = 0;
 
 static void
-free_res(void *ptr)
-{
-	res_state statp = ptr;
+free_res(void* ptr) {
+    res_state statp = ptr;
 
-	if (statp->_u._ext.ext != NULL)
-		res_ndestroy(statp);
-	free(statp);
+    if (statp->_u._ext.ext != NULL) {
+        res_ndestroy(statp);
+    }
+
+    free(statp);
 }
 
 static void
-res_keycreate(void)
-{
-	res_thr_keycreated = thr_keycreate(&res_key, free_res) == 0;
+res_keycreate(void) {
+    res_thr_keycreated = thr_keycreate(&res_key, free_res) == 0;
 }
 
 res_state
-__res_state(void)
-{
-	res_state statp;
+__res_state(void) {
+    res_state statp;
 
-	if (thr_main() != 0)
-		return (&_res);
+    if (thr_main() != 0) {
+        return (&_res);
+    }
 
-	if (thr_once(&res_init_once, res_keycreate) != 0 ||
-	    !res_thr_keycreated)
-		return (&_res);
+    if (thr_once(&res_init_once, res_keycreate) != 0 ||
+            !res_thr_keycreated) {
+        return (&_res);
+    }
 
-	statp = thr_getspecific(res_key);
-	if (statp != NULL)
-		return (statp);
-	statp = calloc(1, sizeof(*statp));
-	if (statp == NULL)
-		return (&_res);
+    statp = thr_getspecific(res_key);
+
+    if (statp != NULL) {
+        return (statp);
+    }
+
+    statp = calloc(1, sizeof(*statp));
+
+    if (statp == NULL) {
+        return (&_res);
+    }
+
 #ifdef __BIND_RES_TEXT
-	statp->options = RES_TIMEOUT;			/* Motorola, et al. */
+    statp->options = RES_TIMEOUT;           /* Motorola, et al. */
 #endif
-	if (thr_setspecific(res_key, statp) == 0)
-		return (statp);
-	free(statp);
-	return (&_res);
+
+    if (thr_setspecific(res_key, statp) == 0) {
+        return (statp);
+    }
+
+    free(statp);
+    return (&_res);
 }

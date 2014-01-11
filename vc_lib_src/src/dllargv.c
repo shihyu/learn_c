@@ -49,12 +49,12 @@
 *******************************************************************************/
 
 #ifdef WPRFLAG
-int __CRTDECL _wsetargv ( void )
+int __CRTDECL _wsetargv(void)
 #else  /* WPRFLAG */
-int __CRTDECL _setargv ( void )
+int __CRTDECL _setargv(void)
 #endif  /* WPRFLAG */
 {
-        return 0;
+    return 0;
 }
 
 #endif  /* defined (CRTDLL) || defined (MRTDLL) */

@@ -26,7 +26,7 @@
  * look up the first entry in the exception-action table corresponding to
  * the given signal
  */
-static struct _XCPT_ACTION * __cdecl siglookup(int, struct _XCPT_ACTION *);
+static struct _XCPT_ACTION* __cdecl siglookup(int, struct _XCPT_ACTION*);
 
 /*
  * variables holding action codes (and code pointers) for SIGINT, SIGBRK,
@@ -53,8 +53,7 @@ static int ConsoleCtrlHandler_Installed = 0;
 #define _SIGIOINT_IGNORE 16
 #define _SIGSTOP_IGNORE 17
 
-void __cdecl _initp_misc_winsig(void* enull)
-{
+void __cdecl _initp_misc_winsig(void* enull) {
     ctrlc_action       = (_PHNDLR) enull;    /* SIGINT   */
     ctrlbreak_action   = (_PHNDLR) enull;    /* SIGBREAK */
     abort_action       = (_PHNDLR) enull;    /* SIGABRT  */
@@ -83,59 +82,57 @@ void __cdecl _initp_misc_winsig(void* enull)
 *
 *******************************************************************************/
 
-static BOOL WINAPI ctrlevent_capture (
-        DWORD CtrlType
-        )
-{
-        _PHNDLR ctrl_action;
-        _PHNDLR *pctrl_action;
-        int sigcode;
+static BOOL WINAPI ctrlevent_capture(
+    DWORD CtrlType
+) {
+    _PHNDLR ctrl_action;
+    _PHNDLR* pctrl_action;
+    int sigcode;
+    _mlock(_SIGNAL_LOCK);
 
-        _mlock(_SIGNAL_LOCK);
-        __try {
-
+    __try {
         /*
          * Identify the type of event and fetch the corresponding action
          * description.
          */
-
-        if ( CtrlType == CTRL_C_EVENT ) {
-                pctrl_action = &ctrlc_action;
-                ctrl_action = (_PHNDLR) _decode_pointer(*pctrl_action);
-                sigcode = SIGINT;
-        }
-        else {
-                pctrl_action = &ctrlbreak_action;
-                ctrl_action = (_PHNDLR) _decode_pointer(*pctrl_action);
-                sigcode = SIGBREAK;
+        if (CtrlType == CTRL_C_EVENT) {
+            pctrl_action = &ctrlc_action;
+            ctrl_action = (_PHNDLR) _decode_pointer(*pctrl_action);
+            sigcode = SIGINT;
+        } else {
+            pctrl_action = &ctrlbreak_action;
+            ctrl_action = (_PHNDLR) _decode_pointer(*pctrl_action);
+            sigcode = SIGBREAK;
         }
 
-        if ( !(ctrl_action == SIG_DFL) && !(ctrl_action == SIG_IGN) )
-                /*
-                 * Reset the action to be SIG_DFL
-                 */
-                *pctrl_action = (_PHNDLR) _encoded_null();
-
+        if (!(ctrl_action == SIG_DFL) && !(ctrl_action == SIG_IGN))
+            /*
+             * Reset the action to be SIG_DFL
+             */
+        {
+            *pctrl_action = (_PHNDLR) _encoded_null();
         }
-        __finally {
-                _munlock(_SIGNAL_LOCK);
-        }
+    } __finally {
+        _munlock(_SIGNAL_LOCK);
+    }
 
-        if ( ctrl_action == SIG_DFL )
-                /*
-                 * return FALSE, indicating the event has NOT been handled
-                 */
-                return FALSE;
-
-        if ( ctrl_action != SIG_IGN ) {
-                (*ctrl_action)(sigcode);
-        }
-
+    if (ctrl_action == SIG_DFL)
         /*
-         * Return TRUE, indicating the event has been handled (which may
-         * mean it's being ignored)
+         * return FALSE, indicating the event has NOT been handled
          */
-        return TRUE;
+    {
+        return FALSE;
+    }
+
+    if (ctrl_action != SIG_IGN) {
+        (*ctrl_action)(sigcode);
+    }
+
+    /*
+     * Return TRUE, indicating the event has been handled (which may
+     * mean it's being ignored)
+     */
+    return TRUE;
 }
 
 
@@ -213,213 +210,213 @@ static BOOL WINAPI ctrlevent_capture (
 *******************************************************************************/
 
 _PHNDLR __cdecl signal(
-        int signum,
-        _PHNDLR sigact
-        )
-{
-        struct _XCPT_ACTION *pxcptact;
-        _PHNDLR oldsigact;
-        int Error=0;
-        _ptiddata ptd;
-        BOOL SetConsoleCtrlError = FALSE;
+    int signum,
+    _PHNDLR sigact
+) {
+    struct _XCPT_ACTION* pxcptact;
+    _PHNDLR oldsigact;
+    int Error = 0;
+    _ptiddata ptd;
+    BOOL SetConsoleCtrlError = FALSE;
 
-        /*
-         * Check for values of sigact supported on other platforms but not
-         * on this one. Also, make sure sigact is not SIG_DIE
-         */
-        if ( (sigact == SIG_ACK) || (sigact == SIG_SGE) )
-                goto sigreterror;
+    /*
+     * Check for values of sigact supported on other platforms but not
+     * on this one. Also, make sure sigact is not SIG_DIE
+     */
+    if ((sigact == SIG_ACK) || (sigact == SIG_SGE)) {
+        goto sigreterror;
+    }
 
-        /*
-         * Take care of all signals which do not correspond to exceptions
-         * in the host OS. Those are:
-         *
-         *                      SIGINT
-         *                      SIGBREAK
-         *                      SIGABRT
-         *                      SIGTERM
-         *
-         */
-        if ( (signum == SIGINT) || (signum == SIGBREAK) || (signum == SIGABRT)
-            || (signum == SIGABRT_COMPAT) || (signum == SIGTERM) ) {
+    /*
+     * Take care of all signals which do not correspond to exceptions
+     * in the host OS. Those are:
+     *
+     *                      SIGINT
+     *                      SIGBREAK
+     *                      SIGABRT
+     *                      SIGTERM
+     *
+     */
+    if ((signum == SIGINT) || (signum == SIGBREAK) || (signum == SIGABRT)
+            || (signum == SIGABRT_COMPAT) || (signum == SIGTERM)) {
+        _mlock(_SIGNAL_LOCK);
 
-                _mlock( _SIGNAL_LOCK );
-                __try {
+        __try {
+            /*
+             * if SIGINT or SIGBREAK, make sure the handler is installed
+             * to capture ^C and ^Break events.
+             */
+            if (((signum == SIGINT) || (signum == SIGBREAK)) &&
+                    !ConsoleCtrlHandler_Installed) {
+                if (SetConsoleCtrlHandler(ctrlevent_capture, TRUE)
+                        == TRUE) {
+                    ConsoleCtrlHandler_Installed = TRUE;
+                } else {
+                    _doserrno = GetLastError();
+                    SetConsoleCtrlError = TRUE;
+                }
+            }
 
-                /*
-                 * if SIGINT or SIGBREAK, make sure the handler is installed
-                 * to capture ^C and ^Break events.
-                 */
-                if ( ((signum == SIGINT) || (signum == SIGBREAK)) &&
-                    !ConsoleCtrlHandler_Installed )
-                                {
-                        if ( SetConsoleCtrlHandler(ctrlevent_capture, TRUE)
-                            == TRUE )
-                                                {
-                                ConsoleCtrlHandler_Installed = TRUE;
-                                                }
-                        else
-                                                {
-                                _doserrno = GetLastError();
-                                                                SetConsoleCtrlError=TRUE;
-                        }
-                                }
+            switch (signum) {
+            case SIGINT:
+                oldsigact = (_PHNDLR) _decode_pointer(ctrlc_action);
 
-                switch (signum) {
-
-                        case SIGINT:
-                                oldsigact = (_PHNDLR) _decode_pointer(ctrlc_action);
-                                if(sigact!=SIG_GET)
-                                {
-                                    ctrlc_action = (_PHNDLR) _encode_pointer(sigact);
-                                }
-                                break;
-
-                        case SIGBREAK:
-                                oldsigact = (_PHNDLR) _decode_pointer(ctrlbreak_action);
-                                if(sigact!=SIG_GET)
-                                {
-                                    ctrlbreak_action = (_PHNDLR) _encode_pointer(sigact);
-                                }
-                                break;
-
-                        case SIGABRT:
-                        case SIGABRT_COMPAT:
-                                oldsigact = (_PHNDLR) _decode_pointer(abort_action);
-                                if(sigact!=SIG_GET)
-                                {
-                                    abort_action = (_PHNDLR) _encode_pointer(sigact);
-                                }
-                                break;
-
-                        case SIGTERM:
-                                oldsigact = (_PHNDLR) _decode_pointer(term_action);
-                                if(sigact!=SIG_GET)
-                                {
-                                    term_action = (_PHNDLR) _encode_pointer(sigact);
-                                }
-                                break;
+                if (sigact != SIG_GET) {
+                    ctrlc_action = (_PHNDLR) _encode_pointer(sigact);
                 }
 
-                }
-                __finally {
-                        _munlock( _SIGNAL_LOCK );
+                break;
+
+            case SIGBREAK:
+                oldsigact = (_PHNDLR) _decode_pointer(ctrlbreak_action);
+
+                if (sigact != SIG_GET) {
+                    ctrlbreak_action = (_PHNDLR) _encode_pointer(sigact);
                 }
 
-                if (SetConsoleCtrlError) {
-                    goto sigreterror;
+                break;
+
+            case SIGABRT:
+            case SIGABRT_COMPAT:
+                oldsigact = (_PHNDLR) _decode_pointer(abort_action);
+
+                if (sigact != SIG_GET) {
+                    abort_action = (_PHNDLR) _encode_pointer(sigact);
                 }
-                goto sigretok;
+
+                break;
+
+            case SIGTERM:
+                oldsigact = (_PHNDLR) _decode_pointer(term_action);
+
+                if (sigact != SIG_GET) {
+                    term_action = (_PHNDLR) _encode_pointer(sigact);
+                }
+
+                break;
+            }
+        } __finally {
+            _munlock(_SIGNAL_LOCK);
         }
 
-        /*
-         * If we reach here, signum is supposed to be one the signals which
-         * correspond to exceptions in the host OS. Those are:
-         *
-         *                      SIGFPE
-         *                      SIGILL
-         *                      SIGSEGV
-         */
-
-        /*
-         * Make sure signum is one of the remaining supported signals.
-         */
-        if ( (signum != SIGFPE) && (signum != SIGILL) && (signum != SIGSEGV) )
-                goto sigreterror;
-
-
-        /*
-         * Fetch the tid data table entry for this thread
-         */
-        ptd = _getptd_noexit();
-        if (!ptd)
+        if (SetConsoleCtrlError) {
             goto sigreterror;
+        }
+
+        goto sigretok;
+    }
+
+    /*
+     * If we reach here, signum is supposed to be one the signals which
+     * correspond to exceptions in the host OS. Those are:
+     *
+     *                      SIGFPE
+     *                      SIGILL
+     *                      SIGSEGV
+     */
+
+    /*
+     * Make sure signum is one of the remaining supported signals.
+     */
+    if ((signum != SIGFPE) && (signum != SIGILL) && (signum != SIGSEGV)) {
+        goto sigreterror;
+    }
+
+    /*
+     * Fetch the tid data table entry for this thread
+     */
+    ptd = _getptd_noexit();
+
+    if (!ptd) {
+        goto sigreterror;
+    }
+
+    /*
+     * Check that there a per-thread instance of the exception-action
+     * table for this thread. if there isn't, create one.
+     */
+    if (ptd->_pxcptacttab == _XcptActTab)
 
         /*
-         * Check that there a per-thread instance of the exception-action
-         * table for this thread. if there isn't, create one.
+         * allocate space for an exception-action table
          */
-        if ( ptd->_pxcptacttab == _XcptActTab )
-                /*
-                 * allocate space for an exception-action table
-                 */
-                if ( (ptd->_pxcptacttab = _malloc_crt(_XcptActTabSize)) != NULL )
-                        /*
-                         * initialize the table by copying over the contents
-                         * of _XcptActTab[]
-                         */
-                        (void) memcpy(ptd->_pxcptacttab, _XcptActTab,
-                            _XcptActTabSize);
-                else
-                        /*
-                         * cannot create exception-action table, return
-                         * error to caller
-                         */
-                        goto sigreterror;
-
-
-        /*
-         * look up the proper entry in the exception-action table. note that
-         * if several exceptions are mapped to the same signal, this returns
-         * the pointer to first such entry in the exception action table. it
-         * is assumed that the other entries immediately follow this one.
-         */
-        if ( (pxcptact = siglookup(signum, ptd->_pxcptacttab)) == NULL )
-                goto sigreterror;
-
-        /*
-         * SIGSEGV, SIGILL and SIGFPE all have more than one exception mapped
-         * to them. the code below depends on the exceptions corresponding to
-         * the same signal being grouped together in the exception-action
-         * table.
-         */
-
-        /*
-         * store old signal action code for return value
-         */
-        oldsigact = pxcptact->XcptAction;
-
-        if(sigact!=SIG_GET)
-        {
+        if ((ptd->_pxcptacttab = _malloc_crt(_XcptActTabSize)) != NULL)
             /*
-            * loop through all entries corresponding to the
-            * given signal and update the SigAction and XcptAction
-            * fields as appropriate
+             * initialize the table by copying over the contents
+             * of _XcptActTab[]
+             */
+            (void) memcpy(ptd->_pxcptacttab, _XcptActTab,
+                          _XcptActTabSize);
+        else
+            /*
+             * cannot create exception-action table, return
+             * error to caller
+             */
+        {
+            goto sigreterror;
+        }
+
+    /*
+     * look up the proper entry in the exception-action table. note that
+     * if several exceptions are mapped to the same signal, this returns
+     * the pointer to first such entry in the exception action table. it
+     * is assumed that the other entries immediately follow this one.
+     */
+    if ((pxcptact = siglookup(signum, ptd->_pxcptacttab)) == NULL) {
+        goto sigreterror;
+    }
+
+    /*
+     * SIGSEGV, SIGILL and SIGFPE all have more than one exception mapped
+     * to them. the code below depends on the exceptions corresponding to
+     * the same signal being grouped together in the exception-action
+     * table.
+     */
+    /*
+     * store old signal action code for return value
+     */
+    oldsigact = pxcptact->XcptAction;
+
+    if (sigact != SIG_GET) {
+        /*
+        * loop through all entries corresponding to the
+        * given signal and update the SigAction and XcptAction
+        * fields as appropriate
+        */
+        while (pxcptact->SigNum == signum) {
+            /*
+            * take care of the SIG_IGN and SIG_DFL action
+            * codes
             */
+            pxcptact->XcptAction = sigact;
 
-            while ( pxcptact->SigNum == signum ) {
-                    /*
-                    * take care of the SIG_IGN and SIG_DFL action
-                    * codes
-                    */
-                    pxcptact->XcptAction = sigact;
-
-                    /*
-                    * make sure we don't run off the end of the table
-                    */
-                    if ( ++pxcptact >= ((struct _XCPT_ACTION *)(ptd->_pxcptacttab)
-                                       + _XcptActTabCount) )
-                        break;
+            /*
+            * make sure we don't run off the end of the table
+            */
+            if (++pxcptact >= ((struct _XCPT_ACTION*)(ptd->_pxcptacttab)
+                               + _XcptActTabCount)) {
+                break;
             }
         }
+    }
 
 sigretok:
-        return(oldsigact);
-
+    return (oldsigact);
 sigreterror:
-        switch(signum)
-        {
-        case _SIGHUP_IGNORE:
-        case _SIGQUIT_IGNORE:
-        case _SIGPIPE_IGNORE:
-        case _SIGIOINT_IGNORE:
-        case _SIGSTOP_IGNORE:
-            return SIG_ERR;
-        default:
-            _VALIDATE_RETURN(("Invalid signal or error", 0), EINVAL, SIG_ERR);
-            /* should never happen, but compiler can't tell */
-            return SIG_ERR;
-        }
+
+    switch (signum) {
+    case _SIGHUP_IGNORE:
+    case _SIGQUIT_IGNORE:
+    case _SIGPIPE_IGNORE:
+    case _SIGIOINT_IGNORE:
+    case _SIGSTOP_IGNORE:
+        return SIG_ERR;
+
+    default:
+        _VALIDATE_RETURN(("Invalid signal or error", 0), EINVAL, SIG_ERR);
+        /* should never happen, but compiler can't tell */
+        return SIG_ERR;
+    }
 }
 
 /***
@@ -446,90 +443,90 @@ sigreterror:
 *******************************************************************************/
 
 
-int __cdecl raise (
-        int signum
-        )
-{
-        _PHNDLR sigact;
-        _PHNDLR *psigact;
-        PEXCEPTION_POINTERS oldpxcptinfoptrs;
-        int oldfpecode;
-        int indx;
+int __cdecl raise(
+    int signum
+) {
+    _PHNDLR sigact;
+    _PHNDLR* psigact;
+    PEXCEPTION_POINTERS oldpxcptinfoptrs;
+    int oldfpecode;
+    int indx;
+    int siglock = 0;
+    _ptiddata ptd = NULL;
 
-        int siglock = 0;
-        _ptiddata ptd=NULL;
+    switch (signum) {
+    case SIGINT:
+        sigact = *(psigact = &ctrlc_action);
+        siglock++;
+        break;
 
-        switch (signum) {
+    case SIGBREAK:
+        sigact = *(psigact = &ctrlbreak_action);
+        siglock++;
+        break;
 
-                case SIGINT:
-                        sigact = *(psigact = &ctrlc_action);
-                        siglock++;
-                        break;
+    case SIGABRT:
+    case SIGABRT_COMPAT:
+        sigact = *(psigact = &abort_action);
+        siglock++;
+        break;
 
-                case SIGBREAK:
-                        sigact = *(psigact = &ctrlbreak_action);
-                        siglock++;
-                        break;
+    case SIGTERM:
+        sigact = *(psigact = &term_action);
+        siglock++;
+        break;
 
-                case SIGABRT:
-                case SIGABRT_COMPAT:
-                        sigact = *(psigact = &abort_action);
-                        siglock++;
-                        break;
+    case SIGFPE:
+    case SIGILL:
+    case SIGSEGV:
+        ptd = _getptd_noexit();
 
-                case SIGTERM:
-                        sigact = *(psigact = &term_action);
-                        siglock++;
-                        break;
-
-                case SIGFPE:
-                case SIGILL:
-                case SIGSEGV:
-                        ptd = _getptd_noexit();
-                        if (!ptd)
-                            return (-1);
-                        sigact = *(psigact = &(siglookup( signum,
-                            ptd->_pxcptacttab )->XcptAction));
-                        goto decode_done;
-                        break;
-
-                default:
-                        /*
-                         * unsupported signal, return an error
-                         */
-                        _VALIDATE_RETURN(("Invalid signal or error", 0), EINVAL, -1);
+        if (!ptd) {
+            return (-1);
         }
-        sigact = (_PHNDLR) _decode_pointer(sigact);
 
+        sigact = *(psigact = &(siglookup(signum,
+                                         ptd->_pxcptacttab)->XcptAction));
+        goto decode_done;
+        break;
+
+    default:
+        /*
+         * unsupported signal, return an error
+         */
+        _VALIDATE_RETURN(("Invalid signal or error", 0), EINVAL, -1);
+    }
+
+    sigact = (_PHNDLR) _decode_pointer(sigact);
 decode_done:
 
+    /*
+     * If the current action is SIG_IGN, just return
+     */
+    if (sigact == SIG_IGN) {
+        return (0);
+    }
+
+    /*
+     * If the current action is SIG_DFL, take the default action
+     */
+    if (sigact == SIG_DFL) {
         /*
-         * If the current action is SIG_IGN, just return
+         * The current default action for all of the supported
+         * signals is to terminate with an exit code of 3.
          */
-        if ( sigact == SIG_IGN )
-                return(0);
+        _exit(3);
+    }
 
-        /*
-         * If the current action is SIG_DFL, take the default action
-         */
-        if ( sigact == SIG_DFL ) {
-                /*
-                 * The current default action for all of the supported
-                 * signals is to terminate with an exit code of 3.
-                 */
-                _exit(3);
-        }
+    /*
+     * if signum is one of the 'process-wide' signals (i.e., SIGINT,
+     * SIGBREAK, SIGABRT or SIGTERM), assert _SIGNAL_LOCK.
+     */
+    if (siglock) {
+        _mlock(_SIGNAL_LOCK);
+    }
 
-        /*
-         * if signum is one of the 'process-wide' signals (i.e., SIGINT,
-         * SIGBREAK, SIGABRT or SIGTERM), assert _SIGNAL_LOCK.
-         */
-        if ( siglock )
-                _mlock(_SIGNAL_LOCK);
-
-        __try {
-
-
+    __try {
         /*
          * From here on, sigact is assumed to be a pointer to a user-supplied
          * handler.
@@ -539,72 +536,74 @@ decode_done:
          * For signals which correspond to exceptions, set the pointer
          * to the EXCEPTION_POINTERS structure to NULL
          */
-        if ( (signum == SIGFPE) || (signum == SIGSEGV) ||
-            (signum == SIGILL) ) {
-                oldpxcptinfoptrs = ptd->_tpxcptinfoptrs;
-                ptd->_tpxcptinfoptrs = NULL;
+        if ((signum == SIGFPE) || (signum == SIGSEGV) ||
+                (signum == SIGILL)) {
+            oldpxcptinfoptrs = ptd->_tpxcptinfoptrs;
+            ptd->_tpxcptinfoptrs = NULL;
 
-                 /*
-                  * If signum is SIGFPE, also set _fpecode to
-                  * _FPE_EXPLICITGEN
-                  */
-                if ( signum == SIGFPE ) {
-                        oldfpecode = ptd->_tfpecode;
-                        ptd->_tfpecode = _FPE_EXPLICITGEN;
-                }
+            /*
+             * If signum is SIGFPE, also set _fpecode to
+             * _FPE_EXPLICITGEN
+             */
+            if (signum == SIGFPE) {
+                oldfpecode = ptd->_tfpecode;
+                ptd->_tfpecode = _FPE_EXPLICITGEN;
+            }
         }
 
         /*
          * Reset the action to SIG_DFL and call the user specified handler
          * routine.
          */
-        if ( signum == SIGFPE )
-                /*
-                 * for SIGFPE, must reset the action for all of the floating
-                 * point exceptions
-                 */
-                for ( indx = _First_FPE_Indx ;
-                      indx < _First_FPE_Indx + _Num_FPE ;
-                      indx++ )
-                {
-                        ( (struct _XCPT_ACTION *)(ptd->_pxcptacttab) +
-                          indx )->XcptAction = SIG_DFL;
-                }
-        else
-                *psigact = (_PHNDLR) _encoded_null();
+        if (signum == SIGFPE)
 
+            /*
+             * for SIGFPE, must reset the action for all of the floating
+             * point exceptions
+             */
+            for (indx = _First_FPE_Indx ;
+                    indx < _First_FPE_Indx + _Num_FPE ;
+                    indx++) {
+                ((struct _XCPT_ACTION*)(ptd->_pxcptacttab) +
+                 indx)->XcptAction = SIG_DFL;
+            }
+        else {
+            *psigact = (_PHNDLR) _encoded_null();
         }
-        __finally {
-                if ( siglock )
-                        _munlock(_SIGNAL_LOCK);
+    } __finally {
+        if (siglock) {
+            _munlock(_SIGNAL_LOCK);
         }
+    }
 
-        if ( signum == SIGFPE )
-                /*
-                 * Special code to support old SIGFPE handlers which
-                 * expect the value of _fpecode as the second argument.
-                 */
-                (*(void (__cdecl *)(int,int))sigact)(SIGFPE,
-                    ptd->_tfpecode);
-        else
-                (*sigact)(signum);
+    if (signum == SIGFPE)
+        /*
+         * Special code to support old SIGFPE handlers which
+         * expect the value of _fpecode as the second argument.
+         */
+        (*(void (__cdecl*)(int, int))sigact)(SIGFPE,
+                                             ptd->_tfpecode);
+    else {
+        (*sigact)(signum);
+    }
+
+    /*
+     * For signals which correspond to exceptions, restore the pointer
+     * to the EXCEPTION_POINTERS structure.
+     */
+    if ((signum == SIGFPE) || (signum == SIGSEGV) ||
+            (signum == SIGILL)) {
+        ptd->_tpxcptinfoptrs = oldpxcptinfoptrs;
 
         /*
-         * For signals which correspond to exceptions, restore the pointer
-         * to the EXCEPTION_POINTERS structure.
+         * If signum is SIGFPE, also restore _fpecode
          */
-        if ( (signum == SIGFPE) || (signum == SIGSEGV) ||
-            (signum == SIGILL) ) {
-                ptd->_tpxcptinfoptrs = oldpxcptinfoptrs;
-
-                 /*
-                  * If signum is SIGFPE, also restore _fpecode
-                  */
-                if ( signum == SIGFPE )
-                        ptd->_tfpecode = oldfpecode;
+        if (signum == SIGFPE) {
+            ptd->_tfpecode = oldfpecode;
         }
+    }
 
-        return(0);
+    return (0);
 }
 
 
@@ -627,35 +626,36 @@ decode_done:
 *******************************************************************************/
 
 
-static struct _XCPT_ACTION * __cdecl siglookup (
-        int signum,
-        struct _XCPT_ACTION *pxcptacttab
-        )
-{
-        struct _XCPT_ACTION *pxcptact = pxcptacttab;
+static struct _XCPT_ACTION* __cdecl siglookup(
+    int signum,
+    struct _XCPT_ACTION* pxcptacttab
+) {
+    struct _XCPT_ACTION* pxcptact = pxcptacttab;
 
+    /*
+     * walk thru the _xcptactab table looking for the proper entry. note
+     * that in the case where more than one exception corresponds to the
+     * same signal, the first such instance in the table is the one
+     * returned.
+     */
+
+    while ((pxcptact->SigNum != signum) &&
+            (++pxcptact < pxcptacttab + _XcptActTabCount)) ;
+
+    if ((pxcptact < (pxcptacttab + _XcptActTabCount)) &&
+            (pxcptact->SigNum == signum))
         /*
-         * walk thru the _xcptactab table looking for the proper entry. note
-         * that in the case where more than one exception corresponds to the
-         * same signal, the first such instance in the table is the one
-         * returned.
+         * found a table entry corresponding to the signal
          */
-
-        while ( (pxcptact->SigNum != signum) &&
-                (++pxcptact < pxcptacttab + _XcptActTabCount) ) ;
-
-
-        if ( (pxcptact < (pxcptacttab + _XcptActTabCount)) &&
-             (pxcptact->SigNum == signum) )
-                /*
-                 * found a table entry corresponding to the signal
-                 */
-                return(pxcptact);
-        else
-                /*
-                 * found no table entry corresponding to the signal
-                 */
-                return(NULL);
+    {
+        return (pxcptact);
+    } else
+        /*
+         * found no table entry corresponding to the signal
+         */
+    {
+        return (NULL);
+    }
 }
 
 
@@ -672,8 +672,7 @@ static struct _XCPT_ACTION * __cdecl siglookup (
 *
 *******************************************************************************/
 
-_PHNDLR __cdecl __get_sigabrt(void)
-{
+_PHNDLR __cdecl __get_sigabrt(void) {
     return (_PHNDLR) _decode_pointer(abort_action);
 }
 
@@ -693,11 +692,10 @@ _PHNDLR __cdecl __get_sigabrt(void)
 *
 *******************************************************************************/
 
-int * __cdecl __fpecode (
-        void
-        )
-{
-        return( &(_getptd()->_tfpecode) );
+int* __cdecl __fpecode(
+    void
+) {
+    return (&(_getptd()->_tfpecode));
 }
 
 
@@ -715,11 +713,10 @@ int * __cdecl __fpecode (
 *
 *******************************************************************************/
 
-void ** __cdecl __pxcptinfoptrs (
-        void
-        )
-{
-        return( &(_getptd()->_tpxcptinfoptrs) );
+void** __cdecl __pxcptinfoptrs(
+    void
+) {
+    return (&(_getptd()->_tpxcptinfoptrs));
 }
 
 

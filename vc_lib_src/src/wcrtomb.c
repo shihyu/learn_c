@@ -49,70 +49,66 @@
 *
 *******************************************************************************/
 
-static errno_t __cdecl _wcrtomb_s_l (
-    int *pRetValue,
-    char *dst,
+static errno_t __cdecl _wcrtomb_s_l(
+    int* pRetValue,
+    char* dst,
     size_t sizeInBytes,
     wchar_t wchar,
-    mbstate_t *pst,
+    mbstate_t* pst,
     _locale_t plocinfo
-)
-{
-    _ASSERTE (dst != NULL && sizeInBytes > 0);
-
+) {
+    _ASSERTE(dst != NULL && sizeInBytes > 0);
     _LocaleUpdate _loc_update(plocinfo);
-    _ASSERTE (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
-    if(pst!=NULL)
-    {
-        *pst=0;
+    _ASSERTE(_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
+
+    if (pst != NULL) {
+        *pst = 0;
     }
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE )
-    {
-        if ( wchar > 255 )  /* validate high byte */
-        {
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
+        if (wchar > 255) {  /* validate high byte */
             errno = EILSEQ;
-            if (pRetValue != NULL)
-            {
+
+            if (pRetValue != NULL) {
                 *pRetValue = -1;
             }
+
             return errno;
         }
 
         *dst = (char) wchar;
-        if (pRetValue != NULL)
-        {
+
+        if (pRetValue != NULL) {
             *pRetValue = 1;
         }
+
         return 0;
-    }
-    else
-    {
+    } else {
         int size;
         BOOL defused = 0;
 
-        if ( ((size = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                          0,
-                                          &wchar,
-                                          1,
-                                          dst,
-                                          (int)sizeInBytes,
-                                          NULL,
-                                          &defused)) == 0) ||
-                (defused) )
-        {
+        if (((size = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                         0,
+                                         &wchar,
+                                         1,
+                                         dst,
+                                         (int)sizeInBytes,
+                                         NULL,
+                                         &defused)) == 0) ||
+                (defused)) {
             errno = EILSEQ;
-            if (pRetValue != NULL)
-            {
+
+            if (pRetValue != NULL) {
                 *pRetValue = -1;
             }
+
             return errno;
         }
 
-        if (pRetValue != NULL)
-        {
+        if (pRetValue != NULL) {
             *pRetValue = size;
         }
+
         return 0;
     }
 }
@@ -131,47 +127,40 @@ static errno_t __cdecl _wcrtomb_s_l (
 *******************************************************************************/
 
 extern "C" errno_t __cdecl wcrtomb_s(
-        size_t *pRetValue,
-        char *dst,
-        size_t sizeInBytes,
-        wchar_t wchar,
-        mbstate_t *pst
-        )
-{
+    size_t* pRetValue,
+    char* dst,
+    size_t sizeInBytes,
+    wchar_t wchar,
+    mbstate_t* pst
+) {
     int retValue = -1;
     errno_t e;
-
     /* validation section */
     /* note that we do not force sizeInBytes > 0 in the dst != NULL case, because we do not need to add
      * null terminator, due that dst will receive a character and not a string
      */
     _VALIDATE_RETURN_ERRCODE((dst == NULL && sizeInBytes == 0) || (dst != NULL), EINVAL);
 
-    if (dst == NULL)
-    {
+    if (dst == NULL) {
         char buf[MB_LEN_MAX];
         e = _wcrtomb_s_l(&retValue, buf, MB_LEN_MAX, wchar, pst, NULL);
-    }
-    else
-    {
+    } else {
         e = _wcrtomb_s_l(&retValue, dst, sizeInBytes, wchar, pst, NULL);
     }
 
-    if (pRetValue != NULL)
-    {
+    if (pRetValue != NULL) {
         (*pRetValue) = (size_t)retValue;
     }
+
     return e;
 }
 
 extern "C" size_t __cdecl wcrtomb(
-        char *dst,
-        wchar_t wchar,
-        mbstate_t *mbst
-        )
-{
+    char* dst,
+    wchar_t wchar,
+    mbstate_t* mbst
+) {
     size_t retValue = -1;
-
     wcrtomb_s(&retValue, dst, (dst == NULL ? 0 : MB_LEN_MAX), wchar, mbst);
     return retValue;
 }
@@ -193,75 +182,59 @@ extern "C" size_t __cdecl wcrtomb(
 /* Helper shared by secure and non-secure functions. */
 
 extern "C" size_t __cdecl _wcsrtombs_helper(
-        char *s,
-        const wchar_t **pwcs,
-        size_t n,
-        mbstate_t *pst
-        )
-{
+    char* s,
+    const wchar_t** pwcs,
+    size_t n,
+    mbstate_t* pst
+) {
     /* validation section */
-    _VALIDATE_RETURN(pwcs != NULL, EINVAL, (size_t)-1);
-
+    _VALIDATE_RETURN(pwcs != NULL, EINVAL, (size_t) - 1);
     char buf[MB_LEN_MAX];
     int i = 0;
     size_t nc = 0;
-    const wchar_t *wcs = *pwcs;
+    const wchar_t* wcs = *pwcs;
     _LocaleUpdate _loc_update(NULL);
 
-    if (s == NULL)
-    {
-        for (; ; nc += i, ++wcs)
-        {
+    if (s == NULL) {
+        for (; ; nc += i, ++wcs) {
             /* translate but don't store */
             _wcrtomb_s_l(&i, buf, MB_LEN_MAX, *wcs, pst, _loc_update.GetLocaleT());
-            if (i <= 0)
-            {
-                return ((size_t)-1);
-            }
-            else if (buf[i - 1] == '\0')
-            {
+
+            if (i <= 0) {
+                return ((size_t) - 1);
+            } else if (buf[i - 1] == '\0') {
                 return (nc + i - 1);
             }
         }
     }
 
-    for (; 0 < n; nc += i, ++wcs, s += i, n -= i)
-    {
+    for (; 0 < n; nc += i, ++wcs, s += i, n -= i) {
         /* translate and store */
-        char *t = NULL;
+        char* t = NULL;
 
-        if (n < (size_t)_loc_update.GetLocaleT()->locinfo->mb_cur_max)
-        {
+        if (n < (size_t)_loc_update.GetLocaleT()->locinfo->mb_cur_max) {
             t = buf;
-        }
-        else
-        {
+        } else {
             t = s;
         }
 
         _wcrtomb_s_l(&i, t, MB_LEN_MAX, *wcs, pst, _loc_update.GetLocaleT());
-        if (i <= 0)
-        {
+
+        if (i <= 0) {
             /* encountered invalid sequence */
-            nc = (size_t)-1;
+            nc = (size_t) - 1;
             break;
         }
 
-        if (s == t)
-        {
+        if (s == t) {
             /* do nothing */
-        }
-        else if (n < (size_t)i)
-        {
+        } else if (n < (size_t)i) {
             break;  /* won't all fit */
-        }
-        else
-        {
+        } else {
             memcpy_s(s, n, buf, i);
         }
 
-        if (s[i - 1] == '\0')
-        {
+        if (s[i - 1] == '\0') {
             /* encountered terminating null */
             *pwcs = 0;
             return (nc + i - 1);
@@ -273,14 +246,12 @@ extern "C" size_t __cdecl _wcsrtombs_helper(
 }
 
 extern "C" size_t __cdecl wcsrtombs(
-        char *s,
-        const wchar_t **pwcs,
-        size_t n,
-        mbstate_t *pst
-        )
-{
+    char* s,
+    const wchar_t** pwcs,
+    size_t n,
+    mbstate_t* pst
+) {
     /* Call a non-deprecated helper to do the work. */
-
     return _wcsrtombs_helper(s, pwcs, n, pst);
 }
 
@@ -311,49 +282,44 @@ extern "C" size_t __cdecl wcsrtombs(
 *******************************************************************************/
 
 extern "C" errno_t __cdecl wcsrtombs_s(
-        size_t *pRetValue,
-        char *dst,
-        size_t sizeInBytes,
-        const wchar_t **src,
-        size_t n,
-        mbstate_t *pmbst
-        )
-{
+    size_t* pRetValue,
+    char* dst,
+    size_t sizeInBytes,
+    const wchar_t** src,
+    size_t n,
+    mbstate_t* pmbst
+) {
     size_t retsize;
 
-    if (pRetValue != NULL)
-    {
+    if (pRetValue != NULL) {
         *pRetValue = -1;
     }
 
     /* validation section */
     _VALIDATE_RETURN_ERRCODE((dst == NULL && sizeInBytes == 0) || (dst != NULL && sizeInBytes > 0), EINVAL);
-    if (dst != NULL)
-    {
+
+    if (dst != NULL) {
         _RESET_STRING(dst, sizeInBytes);
     }
-    _VALIDATE_RETURN_ERRCODE(src != NULL, EINVAL);
 
+    _VALIDATE_RETURN_ERRCODE(src != NULL, EINVAL);
     /* Call a non-deprecated helper to do the work. */
     retsize = _wcsrtombs_helper(dst, src, (n > sizeInBytes ? sizeInBytes : n), pmbst);
 
-    if (retsize == (size_t)-1)
-    {
-        if (dst != NULL)
-        {
+    if (retsize == (size_t) - 1) {
+        if (dst != NULL) {
             _RESET_STRING(dst, sizeInBytes);
         }
+
         return errno;
     }
 
     /* count the null terminator */
     retsize++;
 
-    if (dst != NULL)
-    {
+    if (dst != NULL) {
         /* return error if the string does not fit */
-        if (retsize > sizeInBytes)
-        {
+        if (retsize > sizeInBytes) {
             _RESET_STRING(dst, sizeInBytes);
             _VALIDATE_RETURN_ERRCODE(sizeInBytes <= retsize, ERANGE);
         }
@@ -362,8 +328,7 @@ extern "C" errno_t __cdecl wcsrtombs_s(
         dst[retsize - 1] = '\0';
     }
 
-    if (pRetValue != NULL)
-    {
+    if (pRetValue != NULL) {
         *pRetValue = retsize;
     }
 
@@ -385,24 +350,20 @@ extern "C" errno_t __cdecl wcsrtombs_s(
 
 extern "C" int __cdecl wctob(
     wint_t wchar
-)
-{
-    if (wchar == WEOF)
-    {
+) {
+    if (wchar == WEOF) {
         return (EOF);
-    }
-    else
-    {
+    } else {
         /* check for one-byte translation */
         int retValue = -1;
         char buf[MB_LEN_MAX];
         errno_t e;
-
         e = _wcrtomb_s_l(&retValue, buf, MB_LEN_MAX, wchar, NULL, NULL);
-        if (e == 0 && retValue == 1)
-        {
+
+        if (e == 0 && retValue == 1) {
             return buf[0];
         }
+
         return EOF;
     }
 }

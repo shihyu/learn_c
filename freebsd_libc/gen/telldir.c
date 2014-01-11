@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -57,21 +57,28 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/telldir.c,v 1.9 2007/01/09 00:27:55 imp Exp
  */
 long
 telldir(dirp)
-	DIR *dirp;
+DIR* dirp;
 {
-	struct ddloc *lp;
+    struct ddloc* lp;
 
-	if ((lp = (struct ddloc *)malloc(sizeof(struct ddloc))) == NULL)
-		return (-1);
-	if (__isthreaded)
-		_pthread_mutex_lock((pthread_mutex_t *)&dirp->dd_lock);
-	lp->loc_index = dirp->dd_td->td_loccnt++;
-	lp->loc_seek = dirp->dd_seek;
-	lp->loc_loc = dirp->dd_loc;
-	LIST_INSERT_HEAD(&dirp->dd_td->td_locq, lp, loc_lqe);
-	if (__isthreaded)
-		_pthread_mutex_unlock((pthread_mutex_t *)&dirp->dd_lock);
-	return (lp->loc_index);
+    if ((lp = (struct ddloc*)malloc(sizeof(struct ddloc))) == NULL) {
+        return (-1);
+    }
+
+    if (__isthreaded) {
+        _pthread_mutex_lock((pthread_mutex_t*)&dirp->dd_lock);
+    }
+
+    lp->loc_index = dirp->dd_td->td_loccnt++;
+    lp->loc_seek = dirp->dd_seek;
+    lp->loc_loc = dirp->dd_loc;
+    LIST_INSERT_HEAD(&dirp->dd_td->td_locq, lp, loc_lqe);
+
+    if (__isthreaded) {
+        _pthread_mutex_unlock((pthread_mutex_t*)&dirp->dd_lock);
+    }
+
+    return (lp->loc_index);
 }
 
 /*
@@ -80,32 +87,41 @@ telldir(dirp)
  */
 void
 _seekdir(dirp, loc)
-	DIR *dirp;
-	long loc;
+DIR* dirp;
+long loc;
 {
-	struct ddloc *lp;
-	struct dirent *dp;
+    struct ddloc* lp;
+    struct dirent* dp;
+    LIST_FOREACH(lp, &dirp->dd_td->td_locq, loc_lqe) {
+        if (lp->loc_index == loc) {
+            break;
+        }
+    }
 
-	LIST_FOREACH(lp, &dirp->dd_td->td_locq, loc_lqe) {
-		if (lp->loc_index == loc)
-			break;
-	}
-	if (lp == NULL)
-		return;
-	if (lp->loc_loc == dirp->dd_loc && lp->loc_seek == dirp->dd_seek)
-		goto found;
-	(void) lseek(dirp->dd_fd, (off_t)lp->loc_seek, SEEK_SET);
-	dirp->dd_seek = lp->loc_seek;
-	dirp->dd_loc = 0;
-	while (dirp->dd_loc < lp->loc_loc) {
-		dp = _readdir_unlocked(dirp);
-		if (dp == NULL)
-			break;
-	}
+    if (lp == NULL) {
+        return;
+    }
+
+    if (lp->loc_loc == dirp->dd_loc && lp->loc_seek == dirp->dd_seek) {
+        goto found;
+    }
+
+    (void) lseek(dirp->dd_fd, (off_t)lp->loc_seek, SEEK_SET);
+    dirp->dd_seek = lp->loc_seek;
+    dirp->dd_loc = 0;
+
+    while (dirp->dd_loc < lp->loc_loc) {
+        dp = _readdir_unlocked(dirp);
+
+        if (dp == NULL) {
+            break;
+        }
+    }
+
 found:
 #ifdef SINGLEUSE
-	LIST_REMOVE(lp, loc_lqe);
-	free((caddr_t)lp);
+    LIST_REMOVE(lp, loc_lqe);
+    free((caddr_t)lp);
 #endif
 }
 
@@ -114,16 +130,17 @@ found:
  */
 void
 _reclaim_telldir(dirp)
-	DIR *dirp;
+DIR* dirp;
 {
-	struct ddloc *lp;
-	struct ddloc *templp;
+    struct ddloc* lp;
+    struct ddloc* templp;
+    lp = LIST_FIRST(&dirp->dd_td->td_locq);
 
-	lp = LIST_FIRST(&dirp->dd_td->td_locq);
-	while (lp != NULL) {
-		templp = lp;
-		lp = LIST_NEXT(lp, loc_lqe);
-		free(templp);
-	}
-	LIST_INIT(&dirp->dd_td->td_locq);
+    while (lp != NULL) {
+        templp = lp;
+        lp = LIST_NEXT(lp, loc_lqe);
+        free(templp);
+    }
+
+    LIST_INIT(&dirp->dd_td->td_locq);
 }

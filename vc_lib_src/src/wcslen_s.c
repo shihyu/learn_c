@@ -34,8 +34,7 @@
 *
 *******************************************************************************/
 
-size_t __cdecl wcsnlen(const wchar_t *wcs, size_t maxsize)
-{
+size_t __cdecl wcsnlen(const wchar_t* wcs, size_t maxsize) {
     size_t n;
 
     /* Note that we do not check if s == NULL, because we do not

@@ -52,29 +52,30 @@
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-int __clrcall _initterm_e (
-        _PIFV * pfbegin,
-        _PIFV * pfend
-        )
-{
-        int ret = 0;
+int __clrcall _initterm_e(
+    _PIFV* pfbegin,
+    _PIFV* pfend
+) {
+    int ret = 0;
+
+    /*
+     * walk the table of function pointers from the bottom up, until
+     * the end is encountered.  Do not skip the first entry.  The initial
+     * value of pfbegin points to the first valid entry.  Do not try to
+     * execute what pfend points to.  Only entries before pfend are valid.
+     */
+    while (pfbegin < pfend && ret == 0) {
         /*
-         * walk the table of function pointers from the bottom up, until
-         * the end is encountered.  Do not skip the first entry.  The initial
-         * value of pfbegin points to the first valid entry.  Do not try to
-         * execute what pfend points to.  Only entries before pfend are valid.
+         * if current table entry is non-NULL, call thru it.
          */
-        while ( pfbegin < pfend && ret == 0)
-        {
-            /*
-             * if current table entry is non-NULL, call thru it.
-             */
-            if ( *pfbegin != NULL )
-                ret = (**pfbegin)();
-            ++pfbegin;
+        if (*pfbegin != NULL) {
+            ret = (**pfbegin)();
         }
 
-        return ret;
+        ++pfbegin;
+    }
+
+    return ret;
 }
 
 /***
@@ -109,48 +110,44 @@ int __clrcall _initterm_e (
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-void __clrcall _initterm (
-        _PVFV * pfbegin,
-        _PVFV * pfend
-        )
-{
+void __clrcall _initterm(
+    _PVFV* pfbegin,
+    _PVFV* pfend
+) {
+    /*
+     * walk the table of function pointers from the bottom up, until
+     * the end is encountered.  Do not skip the first entry.  The initial
+     * value of pfbegin points to the first valid entry.  Do not try to
+     * execute what pfend points to.  Only entries before pfend are valid.
+     */
+    while (pfbegin < pfend) {
         /*
-         * walk the table of function pointers from the bottom up, until
-         * the end is encountered.  Do not skip the first entry.  The initial
-         * value of pfbegin points to the first valid entry.  Do not try to
-         * execute what pfend points to.  Only entries before pfend are valid.
+         * if current table entry is non-NULL, call thru it.
          */
-        while ( pfbegin < pfend )
-        {
-            /*
-             * if current table entry is non-NULL, call thru it.
-             */
-            if ( *pfbegin != NULL )
-                (**pfbegin)();
-            ++pfbegin;
+        if (*pfbegin != NULL) {
+            (**pfbegin)();
         }
+
+        ++pfbegin;
+    }
 }
 #endif  /* defined (_M_CEE_MIXED) */
 
-namespace __identifier("<CrtImplementationDetails>")
-{
-        class ThisModule
-        {
-        private:
-                [System::Diagnostics::DebuggerStepThroughAttribute]
-                static System::ModuleHandle Handle()
-                {
-                        return ThisModule::typeid->Module->ModuleHandle;
-                }
+namespace __identifier("<CrtImplementationDetails>") {
+    class ThisModule {
+    private:
+        [System::Diagnostics::DebuggerStepThroughAttribute]
+        static System::ModuleHandle Handle() {
+            return ThisModule::typeid->Module->ModuleHandle;
+        }
 
-        public:
-                template <class T>
-                [System::Diagnostics::DebuggerStepThroughAttribute]
-                static T* ResolveMethod(T* methodToken)
-                {
-                        return (T*)Handle().ResolveMethodHandle((int)(size_t)methodToken).GetFunctionPointer().ToPointer();
-                }
-        };
+    public:
+        template <class T>
+        [System::Diagnostics::DebuggerStepThroughAttribute]
+        static T* ResolveMethod(T* methodToken) {
+            return (T*)Handle().ResolveMethodHandle((int)(size_t)methodToken).GetFunctionPointer().ToPointer();
+        }
+    };
 }
 
 /***
@@ -183,11 +180,10 @@ namespace __identifier("<CrtImplementationDetails>")
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-void __clrcall _initterm_m (
-        const _PVFVM * pfbegin,
-        const _PVFVM * pfend
-        )
-{
+void __clrcall _initterm_m(
+    const _PVFVM* pfbegin,
+    const _PVFVM* pfend
+) {
     using namespace __identifier("<CrtImplementationDetails>");
 
     /*
@@ -196,8 +192,7 @@ void __clrcall _initterm_m (
      * value of pfbegin points to the first valid entry.  Do not try to
      * execute what pfend points to.  Only entries before pfend are valid.
      */
-    while ( pfbegin < pfend )
-    {
+    while (pfbegin < pfend) {
         /*
          * if current table entry is non-NULL, call thru it.
          */
@@ -207,11 +202,11 @@ void __clrcall _initterm_m (
          * call ResolveMethodHandle once that method becomes available in the
          * VBL CLR.  Disabling the warning for now.
          */
-        if ( *pfbegin != NULL )
-        {
+        if (*pfbegin != NULL) {
             _PVFVM pfn = ThisModule::ResolveMethod(*pfbegin);
             (pfn)();
         }
+
         ++pfbegin;
     }
 }

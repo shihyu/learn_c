@@ -36,403 +36,388 @@ __FBSDID("$FreeBSD: src/lib/libc/net/nscache.c,v 1.1.2.1 2007/10/18 23:59:12 bus
 #include "nscachedcli.h"
 #include "nscache.h"
 
-#define NSS_CACHE_KEY_INITIAL_SIZE	(256)
-#define NSS_CACHE_KEY_SIZE_LIMIT	(NSS_CACHE_KEY_INITIAL_SIZE << 4)
+#define NSS_CACHE_KEY_INITIAL_SIZE  (256)
+#define NSS_CACHE_KEY_SIZE_LIMIT    (NSS_CACHE_KEY_INITIAL_SIZE << 4)
 
-#define NSS_CACHE_BUFFER_INITIAL_SIZE	(1024)
-#define NSS_CACHE_BUFFER_SIZE_LIMIT	(NSS_CACHE_BUFFER_INITIAL_SIZE << 8)
+#define NSS_CACHE_BUFFER_INITIAL_SIZE   (1024)
+#define NSS_CACHE_BUFFER_SIZE_LIMIT (NSS_CACHE_BUFFER_INITIAL_SIZE << 8)
 
-#define CACHED_SOCKET_PATH 		"/var/run/nscd"
+#define CACHED_SOCKET_PATH      "/var/run/nscd"
 
 int
-__nss_cache_handler(void *retval, void *mdata, va_list ap)
-{
-	return (NS_UNAVAIL);
+__nss_cache_handler(void* retval, void* mdata, va_list ap) {
+    return (NS_UNAVAIL);
 }
 
 int
-__nss_common_cache_read(void *retval, void *mdata, va_list ap)
-{
-	struct cached_connection_params params;
-	cached_connection connection;
+__nss_common_cache_read(void* retval, void* mdata, va_list ap) {
+    struct cached_connection_params params;
+    cached_connection connection;
+    char* buffer;
+    size_t buffer_size, size;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    va_list ap_new;
+    int res;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
+    memset(&params, 0, sizeof(struct cached_connection_params));
+    params.socket_path = CACHED_SOCKET_PATH;
+    cache_data->key = (char*)malloc(NSS_CACHE_KEY_INITIAL_SIZE);
+    memset(cache_data->key, 0, NSS_CACHE_KEY_INITIAL_SIZE);
+    cache_data->key_size = NSS_CACHE_KEY_INITIAL_SIZE;
+    va_copy(ap_new, ap);
 
-	char *buffer;
-	size_t buffer_size, size;
+    do {
+        size = cache_data->key_size;
+        res = cache_info->id_func(cache_data->key, &size, ap_new,
+                                  cache_info->mdata);
+        va_end(ap_new);
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
-	va_list ap_new;
-	int res;
+        if (res == NS_RETURN) {
+            if (cache_data->key_size > NSS_CACHE_KEY_SIZE_LIMIT) {
+                break;
+            }
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
+            cache_data->key_size <<= 1;
+            cache_data->key = realloc(cache_data->key,
+                                      cache_data->key_size);
+            memset(cache_data->key, 0, cache_data->key_size);
+            va_copy(ap_new, ap);
+        }
+    } while (res == NS_RETURN);
 
-	memset(&params, 0, sizeof(struct cached_connection_params));
-	params.socket_path = CACHED_SOCKET_PATH;
+    if (res != NS_SUCCESS) {
+        free(cache_data->key);
+        cache_data->key = NULL;
+        cache_data->key_size = 0;
+        return (res);
+    } else {
+        cache_data->key_size = size;
+    }
 
-	cache_data->key = (char *)malloc(NSS_CACHE_KEY_INITIAL_SIZE);
-	memset(cache_data->key, 0, NSS_CACHE_KEY_INITIAL_SIZE);
-	cache_data->key_size = NSS_CACHE_KEY_INITIAL_SIZE;
-	va_copy(ap_new, ap);
+    buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
+    buffer = (char*)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
+    memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
 
-	do {
-		size = cache_data->key_size;
-		res = cache_info->id_func(cache_data->key, &size, ap_new,
-		    cache_info->mdata);
-		va_end(ap_new);
-		if (res == NS_RETURN) {
-			if (cache_data->key_size > NSS_CACHE_KEY_SIZE_LIMIT)
-				break;
+    do {
+        connection = __open_cached_connection(&params);
 
-			cache_data->key_size <<= 1;
-			cache_data->key = realloc(cache_data->key,
-			    cache_data->key_size);
-			memset(cache_data->key, 0, cache_data->key_size);
-			va_copy(ap_new, ap);
-		}
-	} while (res == NS_RETURN);
+        if (connection == NULL) {
+            res = -1;
+            break;
+        }
 
-	if (res != NS_SUCCESS) {
-		free(cache_data->key);
-		cache_data->key = NULL;
-		cache_data->key_size = 0;
-		return (res);
-	} else
-		cache_data->key_size = size;
+        res = __cached_read(connection, cache_info->entry_name,
+                            cache_data->key, cache_data->key_size, buffer,
+                            &buffer_size);
+        __close_cached_connection(connection);
 
-	buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
-	buffer = (char *)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
-	memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
+        if (res == -2 && buffer_size < NSS_CACHE_BUFFER_SIZE_LIMIT) {
+            buffer = (char*)realloc(buffer, buffer_size);
+            memset(buffer, 0, buffer_size);
+        }
+    } while (res == -2);
 
-	do {
-		connection = __open_cached_connection(&params);
-		if (connection == NULL) {
-			res = -1;
-			break;
-		}
-		res = __cached_read(connection, cache_info->entry_name,
-		    cache_data->key, cache_data->key_size, buffer,
-		    &buffer_size);
-		__close_cached_connection(connection);
-		if (res == -2 && buffer_size < NSS_CACHE_BUFFER_SIZE_LIMIT) {
-			buffer = (char *)realloc(buffer, buffer_size);
-			memset(buffer, 0, buffer_size);
-		}
-	} while (res == -2);
+    if (res == 0) {
+        if (buffer_size == 0) {
+            free(buffer);
+            free(cache_data->key);
+            cache_data->key = NULL;
+            cache_data->key_size = 0;
+            return (NS_RETURN);
+        }
 
-	if (res == 0) {
-		if (buffer_size == 0) {
-			free(buffer);
-			free(cache_data->key);
-			cache_data->key = NULL;
-			cache_data->key_size = 0;
-			return (NS_RETURN);
-		}
+        va_copy(ap_new, ap);
+        res = cache_info->unmarshal_func(buffer, buffer_size, retval,
+                                         ap_new, cache_info->mdata);
+        va_end(ap_new);
 
-		va_copy(ap_new, ap);
-		res = cache_info->unmarshal_func(buffer, buffer_size, retval,
-		    ap_new, cache_info->mdata);
-		va_end(ap_new);
+        if (res != NS_SUCCESS) {
+            free(buffer);
+            free(cache_data->key);
+            cache_data->key = NULL;
+            cache_data->key_size = 0;
+            return (res);
+        } else {
+            res = 0;
+        }
+    }
 
-		if (res != NS_SUCCESS) {
-			free(buffer);
-			free(cache_data->key);
-			cache_data->key = NULL;
-			cache_data->key_size = 0;
-			return (res);
-		} else
-			res = 0;
-	}
+    if (res == 0) {
+        free(cache_data->key);
+        cache_data->key = NULL;
+        cache_data->key_size = 0;
+    }
 
-	if (res == 0) {
-		free(cache_data->key);
-		cache_data->key = NULL;
-		cache_data->key_size = 0;
-	}
-
-	free(buffer);
-	return (res == 0 ? NS_SUCCESS : NS_NOTFOUND);
+    free(buffer);
+    return (res == 0 ? NS_SUCCESS : NS_NOTFOUND);
 }
 
 int
-__nss_common_cache_write(void *retval, void *mdata, va_list ap)
-{
-	struct cached_connection_params params;
-	cached_connection connection;
+__nss_common_cache_write(void* retval, void* mdata, va_list ap) {
+    struct cached_connection_params params;
+    cached_connection connection;
+    char* buffer;
+    size_t buffer_size;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    va_list ap_new;
+    int res;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
 
-	char *buffer;
-	size_t buffer_size;
+    if (cache_data->key == NULL) {
+        return (NS_UNAVAIL);
+    }
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
-	va_list ap_new;
-	int res;
+    memset(&params, 0, sizeof(struct cached_connection_params));
+    params.socket_path = CACHED_SOCKET_PATH;
+    connection = __open_cached_connection(&params);
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
+    if (connection == NULL) {
+        free(cache_data->key);
+        return (NS_UNAVAIL);
+    }
 
-	if (cache_data->key == NULL)
-		return (NS_UNAVAIL);
+    buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
+    buffer = (char*)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
+    memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
 
-	memset(&params, 0, sizeof(struct cached_connection_params));
-	params.socket_path = CACHED_SOCKET_PATH;
+    do {
+        size_t size;
+        size = buffer_size;
+        va_copy(ap_new, ap);
+        res = cache_info->marshal_func(buffer, &size, retval, ap_new,
+                                       cache_info->mdata);
+        va_end(ap_new);
 
-	connection = __open_cached_connection(&params);
-	if (connection == NULL) {
-		free(cache_data->key);
-		return (NS_UNAVAIL);
-	}
+        if (res == NS_RETURN) {
+            if (buffer_size > NSS_CACHE_BUFFER_SIZE_LIMIT) {
+                break;
+            }
 
-	buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
-	buffer = (char *)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
-	memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
+            buffer_size <<= 1;
+            buffer = (char*)realloc(buffer, buffer_size);
+            memset(buffer, 0, buffer_size);
+        }
+    } while (res == NS_RETURN);
 
-	do {
-		size_t size;
+    if (res != NS_SUCCESS) {
+        __close_cached_connection(connection);
+        free(cache_data->key);
+        free(buffer);
+        return (res);
+    }
 
-		size = buffer_size;
-		va_copy(ap_new, ap);
-		res = cache_info->marshal_func(buffer, &size, retval, ap_new,
-		    cache_info->mdata);
-		va_end(ap_new);
-
-		if (res == NS_RETURN) {
-			if (buffer_size > NSS_CACHE_BUFFER_SIZE_LIMIT)
-				break;
-
-			buffer_size <<= 1;
-			buffer = (char *)realloc(buffer, buffer_size);
-			memset(buffer, 0, buffer_size);
-		}
-	} while (res == NS_RETURN);
-
-	if (res != NS_SUCCESS) {
-		__close_cached_connection(connection);
-		free(cache_data->key);
-		free(buffer);
-		return (res);
-	}
-
-	res = __cached_write(connection, cache_info->entry_name,
-	    cache_data->key, cache_data->key_size, buffer, buffer_size);
-	__close_cached_connection(connection);
-
-	free(cache_data->key);
-	free(buffer);
-
-	return (res == 0 ? NS_SUCCESS : NS_UNAVAIL);
+    res = __cached_write(connection, cache_info->entry_name,
+                         cache_data->key, cache_data->key_size, buffer, buffer_size);
+    __close_cached_connection(connection);
+    free(cache_data->key);
+    free(buffer);
+    return (res == 0 ? NS_SUCCESS : NS_UNAVAIL);
 }
 
 int
-__nss_common_cache_write_negative(void *mdata)
-{
-	struct cached_connection_params params;
-	cached_connection connection;
-	int res;
+__nss_common_cache_write_negative(void* mdata) {
+    struct cached_connection_params params;
+    cached_connection connection;
+    int res;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
+    if (cache_data->key == NULL) {
+        return (NS_UNAVAIL);
+    }
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
+    memset(&params, 0, sizeof(struct cached_connection_params));
+    params.socket_path = CACHED_SOCKET_PATH;
+    connection = __open_cached_connection(&params);
 
-	if (cache_data->key == NULL)
-		return (NS_UNAVAIL);
+    if (connection == NULL) {
+        free(cache_data->key);
+        return (NS_UNAVAIL);
+    }
 
-	memset(&params, 0, sizeof(struct cached_connection_params));
-	params.socket_path = CACHED_SOCKET_PATH;
-
-	connection = __open_cached_connection(&params);
-	if (connection == NULL) {
-		free(cache_data->key);
-		return (NS_UNAVAIL);
-	}
-
-	res = __cached_write(connection, cache_info->entry_name,
-	    cache_data->key, cache_data->key_size, NULL, 0);
-	__close_cached_connection(connection);
-
-	free(cache_data->key);
-	return (res == 0 ? NS_SUCCESS : NS_UNAVAIL);
+    res = __cached_write(connection, cache_info->entry_name,
+                         cache_data->key, cache_data->key_size, NULL, 0);
+    __close_cached_connection(connection);
+    free(cache_data->key);
+    return (res == 0 ? NS_SUCCESS : NS_UNAVAIL);
 }
 
 int
-__nss_mp_cache_read(void *retval, void *mdata, va_list ap)
-{
-	struct cached_connection_params params;
-	cached_mp_read_session rs;
+__nss_mp_cache_read(void* retval, void* mdata, va_list ap) {
+    struct cached_connection_params params;
+    cached_mp_read_session rs;
+    char* buffer;
+    size_t buffer_size;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    va_list ap_new;
+    int res;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
 
-	char *buffer;
-	size_t buffer_size;
+    if (cache_info->get_mp_ws_func() != INVALID_CACHED_MP_WRITE_SESSION) {
+        return (NS_UNAVAIL);
+    }
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
-	va_list ap_new;
-	int res;
+    rs = cache_info->get_mp_rs_func();
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
+    if (rs == INVALID_CACHED_MP_READ_SESSION) {
+        memset(&params, 0, sizeof(struct cached_connection_params));
+        params.socket_path = CACHED_SOCKET_PATH;
+        rs = __open_cached_mp_read_session(&params,
+                                           cache_info->entry_name);
 
-	if (cache_info->get_mp_ws_func() != INVALID_CACHED_MP_WRITE_SESSION)
-		return (NS_UNAVAIL);
+        if (rs == INVALID_CACHED_MP_READ_SESSION) {
+            return (NS_UNAVAIL);
+        }
 
-	rs = cache_info->get_mp_rs_func();
-	if (rs == INVALID_CACHED_MP_READ_SESSION) {
-		memset(&params, 0, sizeof(struct cached_connection_params));
-		params.socket_path = CACHED_SOCKET_PATH;
+        cache_info->set_mp_rs_func(rs);
+    }
 
-		rs = __open_cached_mp_read_session(&params,
-		    cache_info->entry_name);
-		if (rs == INVALID_CACHED_MP_READ_SESSION)
-			return (NS_UNAVAIL);
+    buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
+    buffer = (char*)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
+    memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
 
-		cache_info->set_mp_rs_func(rs);
-	}
+    do {
+        res = __cached_mp_read(rs, buffer, &buffer_size);
 
-	buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
-	buffer = (char *)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
-	memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
+        if (res == -2 && buffer_size < NSS_CACHE_BUFFER_SIZE_LIMIT) {
+            buffer = (char*)realloc(buffer, buffer_size);
+            memset(buffer, 0, buffer_size);
+        }
+    } while (res == -2);
 
-	do {
-		res = __cached_mp_read(rs, buffer, &buffer_size);
-		if (res == -2 && buffer_size < NSS_CACHE_BUFFER_SIZE_LIMIT) {
-			buffer = (char *)realloc(buffer, buffer_size);
-			memset(buffer, 0, buffer_size);
-		}
-	} while (res == -2);
+    if (res == 0) {
+        va_copy(ap_new, ap);
+        res = cache_info->unmarshal_func(buffer, buffer_size, retval,
+                                         ap_new, cache_info->mdata);
+        va_end(ap_new);
 
-	if (res == 0) {
-		va_copy(ap_new, ap);
-		res = cache_info->unmarshal_func(buffer, buffer_size, retval,
-		    ap_new, cache_info->mdata);
-		va_end(ap_new);
+        if (res != NS_SUCCESS) {
+            free(buffer);
+            return (res);
+        } else {
+            res = 0;
+        }
+    } else {
+        free(buffer);
+        __close_cached_mp_read_session(rs);
+        rs = INVALID_CACHED_MP_READ_SESSION;
+        cache_info->set_mp_rs_func(rs);
+        return (res == -1 ? NS_RETURN : NS_UNAVAIL);
+    }
 
-		if (res != NS_SUCCESS) {
-			free(buffer);
-			return (res);
-		} else
-			res = 0;
-	} else {
-		free(buffer);
-		__close_cached_mp_read_session(rs);
-		rs = INVALID_CACHED_MP_READ_SESSION;
-		cache_info->set_mp_rs_func(rs);
-		return (res == -1 ? NS_RETURN : NS_UNAVAIL);
-	}
-
-	free(buffer);
-	return (res == 0 ? NS_SUCCESS : NS_NOTFOUND);
+    free(buffer);
+    return (res == 0 ? NS_SUCCESS : NS_NOTFOUND);
 }
 
 int
-__nss_mp_cache_write(void *retval, void *mdata, va_list ap)
-{
-	struct cached_connection_params params;
-	cached_mp_write_session ws;
+__nss_mp_cache_write(void* retval, void* mdata, va_list ap) {
+    struct cached_connection_params params;
+    cached_mp_write_session ws;
+    char* buffer;
+    size_t buffer_size;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    va_list ap_new;
+    int res;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
+    ws = cache_info->get_mp_ws_func();
 
-	char *buffer;
-	size_t buffer_size;
+    if (ws == INVALID_CACHED_MP_WRITE_SESSION) {
+        memset(&params, 0, sizeof(struct cached_connection_params));
+        params.socket_path = CACHED_SOCKET_PATH;
+        ws = __open_cached_mp_write_session(&params,
+                                            cache_info->entry_name);
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
-	va_list ap_new;
-	int res;
+        if (ws == INVALID_CACHED_MP_WRITE_SESSION) {
+            return (NS_UNAVAIL);
+        }
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
+        cache_info->set_mp_ws_func(ws);
+    }
 
-	ws = cache_info->get_mp_ws_func();
-	if (ws == INVALID_CACHED_MP_WRITE_SESSION) {
-		memset(&params, 0, sizeof(struct cached_connection_params));
-		params.socket_path = CACHED_SOCKET_PATH;
+    buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
+    buffer = (char*)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
+    memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
 
-		ws = __open_cached_mp_write_session(&params,
-		    cache_info->entry_name);
-		if (ws == INVALID_CACHED_MP_WRITE_SESSION)
-			return (NS_UNAVAIL);
+    do {
+        size_t size;
+        size = buffer_size;
+        va_copy(ap_new, ap);
+        res = cache_info->marshal_func(buffer, &size, retval, ap_new,
+                                       cache_info->mdata);
+        va_end(ap_new);
 
-		cache_info->set_mp_ws_func(ws);
-	}
+        if (res == NS_RETURN) {
+            if (buffer_size > NSS_CACHE_BUFFER_SIZE_LIMIT) {
+                break;
+            }
 
-	buffer_size = NSS_CACHE_BUFFER_INITIAL_SIZE;
-	buffer = (char *)malloc(NSS_CACHE_BUFFER_INITIAL_SIZE);
-	memset(buffer, 0, NSS_CACHE_BUFFER_INITIAL_SIZE);
+            buffer_size <<= 1;
+            buffer = (char*)realloc(buffer, buffer_size);
+            memset(buffer, 0, buffer_size);
+        }
+    } while (res == NS_RETURN);
 
-	do {
-		size_t size;
+    if (res != NS_SUCCESS) {
+        free(buffer);
+        return (res);
+    }
 
-		size = buffer_size;
-		va_copy(ap_new, ap);
-		res = cache_info->marshal_func(buffer, &size, retval, ap_new,
-		    cache_info->mdata);
-		va_end(ap_new);
-
-		if (res == NS_RETURN) {
-			if (buffer_size > NSS_CACHE_BUFFER_SIZE_LIMIT)
-				break;
-
-			buffer_size <<= 1;
-			buffer = (char *)realloc(buffer, buffer_size);
-			memset(buffer, 0, buffer_size);
-		}
-	} while (res == NS_RETURN);
-
-	if (res != NS_SUCCESS) {
-		free(buffer);
-		return (res);
-	}
-
-	res = __cached_mp_write(ws, buffer, buffer_size);
-
-	free(buffer);
-	return (res == 0 ? NS_SUCCESS : NS_UNAVAIL);
+    res = __cached_mp_write(ws, buffer, buffer_size);
+    free(buffer);
+    return (res == 0 ? NS_SUCCESS : NS_UNAVAIL);
 }
 
 int
-__nss_mp_cache_write_submit(void *retval, void *mdata, va_list ap)
-{
-	cached_mp_write_session ws;
+__nss_mp_cache_write_submit(void* retval, void* mdata, va_list ap) {
+    cached_mp_write_session ws;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
+    ws = cache_info->get_mp_ws_func();
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
+    if (ws != INVALID_CACHED_MP_WRITE_SESSION) {
+        __close_cached_mp_write_session(ws);
+        ws = INVALID_CACHED_MP_WRITE_SESSION;
+        cache_info->set_mp_ws_func(ws);
+    }
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
-
-	ws = cache_info->get_mp_ws_func();
-	if (ws != INVALID_CACHED_MP_WRITE_SESSION) {
-		__close_cached_mp_write_session(ws);
-		ws = INVALID_CACHED_MP_WRITE_SESSION;
-		cache_info->set_mp_ws_func(ws);
-	}
-	return (NS_UNAVAIL);
+    return (NS_UNAVAIL);
 }
 
 int
-__nss_mp_cache_end(void *retval, void *mdata, va_list ap)
-{
-	cached_mp_write_session ws;
-	cached_mp_read_session rs;
+__nss_mp_cache_end(void* retval, void* mdata, va_list ap) {
+    cached_mp_write_session ws;
+    cached_mp_read_session rs;
+    nss_cache_info const* cache_info;
+    nss_cache_data* cache_data;
+    cache_data = (nss_cache_data*)mdata;
+    cache_info = cache_data->info;
+    ws = cache_info->get_mp_ws_func();
 
-	nss_cache_info const *cache_info;
-	nss_cache_data *cache_data;
+    if (ws != INVALID_CACHED_MP_WRITE_SESSION) {
+        __abandon_cached_mp_write_session(ws);
+        ws = INVALID_CACHED_MP_WRITE_SESSION;
+        cache_info->set_mp_ws_func(ws);
+    }
 
-	cache_data = (nss_cache_data *)mdata;
-	cache_info = cache_data->info;
+    rs = cache_info->get_mp_rs_func();
 
-	ws = cache_info->get_mp_ws_func();
-	if (ws != INVALID_CACHED_MP_WRITE_SESSION) {
-		__abandon_cached_mp_write_session(ws);
-		ws = INVALID_CACHED_MP_WRITE_SESSION;
-		cache_info->set_mp_ws_func(ws);
-	}
+    if (rs != INVALID_CACHED_MP_READ_SESSION) {
+        __close_cached_mp_read_session(rs);
+        rs = INVALID_CACHED_MP_READ_SESSION;
+        cache_info->set_mp_rs_func(rs);
+    }
 
-	rs = cache_info->get_mp_rs_func();
-	if (rs != INVALID_CACHED_MP_READ_SESSION) {
-		__close_cached_mp_read_session(rs);
-		rs = INVALID_CACHED_MP_READ_SESSION;
-		cache_info->set_mp_rs_func(rs);
-	}
-
-	return (NS_UNAVAIL);
+    return (NS_UNAVAIL);
 }

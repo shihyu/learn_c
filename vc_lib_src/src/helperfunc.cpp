@@ -32,14 +32,14 @@
 
 extern "C"
 {
-int __defaultmatherr;
-_MRTIMP void __cdecl __setusermatherr_m( int (__clrcall *)(struct _exception *) );
+    int __defaultmatherr;
+    _MRTIMP void __cdecl __setusermatherr_m(int (__clrcall*)(struct _exception*));
 }
 
-extern "C" void __clrcall __set_matherr()
-{
-    if ( !__defaultmatherr )
+extern "C" void __clrcall __set_matherr() {
+    if (!__defaultmatherr) {
         __setusermatherr_m(_matherr);
+    }
 }
 
 #ifdef ENABLE_EHTRACE

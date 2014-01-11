@@ -34,13 +34,14 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/ftok.c,v 1.7 2004/06/01 06:53:07 tjr Exp $"
 
 key_t
 ftok(path, id)
-	const char *path;
-	int id;
+const char* path;
+int id;
 {
-	struct stat st;
+    struct stat st;
 
-	if (stat(path, &st) < 0)
-		return (key_t)-1;
+    if (stat(path, &st) < 0) {
+        return (key_t) - 1;
+    }
 
-	return (key_t) (id << 24 | (st.st_dev & 0xff) << 16 | (st.st_ino & 0xffff));
+    return (key_t)(id << 24 | (st.st_dev & 0xff) << 16 | (st.st_ino & 0xffff));
 }

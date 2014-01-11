@@ -48,9 +48,8 @@ __weak_reference(_spinlock_debug_stub, _spinlock_debug);
  * This function is a stub for the _atomic_lock function in libpthread.
  */
 long
-_atomic_lock_stub(volatile long *lck)
-{
-	return (0L);
+_atomic_lock_stub(volatile long* lck) {
+    return (0L);
 }
 
 
@@ -58,22 +57,19 @@ _atomic_lock_stub(volatile long *lck)
  * This function is a stub for the spinlock function in libpthread.
  */
 void
-_spinlock_stub(spinlock_t *lck)
-{
+_spinlock_stub(spinlock_t* lck) {
 }
 
 /*
  * This function is a stub for the spinunlock function in libpthread.
  */
 void
-_spinunlock_stub(spinlock_t *lck)
-{
+_spinunlock_stub(spinlock_t* lck) {
 }
 
 /*
  * This function is a stub for the debug spinlock function in libpthread.
  */
 void
-_spinlock_debug_stub(spinlock_t *lck, char *fname, int lineno)
-{
+_spinlock_debug_stub(spinlock_t* lck, char* fname, int lineno) {
 }

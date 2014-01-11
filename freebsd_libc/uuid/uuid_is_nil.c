@@ -32,23 +32,24 @@
 /*
  * uuid_is_nil() - return whether the UUID is a nil UUID.
  * See also:
- *	http://www.opengroup.org/onlinepubs/009629399/uuid_is_nil.htm
+ *  http://www.opengroup.org/onlinepubs/009629399/uuid_is_nil.htm
  */
 int32_t
-uuid_is_nil(const uuid_t *u, uint32_t *status)
-{
-	const uint32_t *p;
+uuid_is_nil(const uuid_t* u, uint32_t* status) {
+    const uint32_t* p;
 
-	if (status)
-		*status = uuid_s_ok;
+    if (status) {
+        *status = uuid_s_ok;
+    }
 
-	if (!u)
-		return (1);
+    if (!u) {
+        return (1);
+    }
 
-	/*
-	 * Pick the largest type that has equivalent alignment constraints
-	 * as an UUID and use it to test if the UUID consists of all zeroes.
-	 */
-	p = (const uint32_t*)u;
-	return ((p[0] == 0 && p[1] == 0 && p[2] == 0 && p[3] == 0) ? 1 : 0);
+    /*
+     * Pick the largest type that has equivalent alignment constraints
+     * as an UUID and use it to test if the UUID consists of all zeroes.
+     */
+    p = (const uint32_t*)u;
+    return ((p[0] == 0 && p[1] == 0 && p[2] == 0 && p[3] == 0) ? 1 : 0);
 }

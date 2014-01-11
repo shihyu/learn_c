@@ -30,17 +30,15 @@
 #include <arpa/nameser.h>
 #include <resolv.h>
 
-#undef	h_errno
+#undef  h_errno
 extern int h_errno;
 
-int *
-__h_errno(void)
-{
-	return (&__res_state()->res_h_errno);
+int*
+__h_errno(void) {
+    return (&__res_state()->res_h_errno);
 }
 
 void
-__h_errno_set(res_state res, int err)
-{
-	h_errno = res->res_h_errno = err;
+__h_errno_set(res_state res, int err) {
+    h_errno = res->res_h_errno = err;
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -51,43 +51,39 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/stdio.c,v 1.25 2007/01/09 00:28:07 imp Ex
  */
 int
 __sread(cookie, buf, n)
-	void *cookie;
-	char *buf;
-	int n;
+void* cookie;
+char* buf;
+int n;
 {
-	FILE *fp = cookie;
-
-	return(_read(fp->_file, buf, (size_t)n));
+    FILE* fp = cookie;
+    return (_read(fp->_file, buf, (size_t)n));
 }
 
 int
 __swrite(cookie, buf, n)
-	void *cookie;
-	char const *buf;
-	int n;
+void* cookie;
+char const* buf;
+int n;
 {
-	FILE *fp = cookie;
-
-	return (_write(fp->_file, buf, (size_t)n));
+    FILE* fp = cookie;
+    return (_write(fp->_file, buf, (size_t)n));
 }
 
 fpos_t
 __sseek(cookie, offset, whence)
-	void *cookie;
-	fpos_t offset;
-	int whence;
+void* cookie;
+fpos_t offset;
+int whence;
 {
-	FILE *fp = cookie;
-
-	return (lseek(fp->_file, (off_t)offset, whence));
+    FILE* fp = cookie;
+    return (lseek(fp->_file, (off_t)offset, whence));
 }
 
 int
 __sclose(cookie)
-	void *cookie;
+void* cookie;
 {
-
-	return (_close(((FILE *)cookie)->_file));
+    return (_close(((FILE*)cookie)->_file));
 }
 
 /*
@@ -95,93 +91,111 @@ __sclose(cookie)
  */
 int
 _sread(fp, buf, n)
-	FILE *fp;
-	char *buf;
-	int n;
+FILE* fp;
+char* buf;
+int n;
 {
-	int ret;
+    int ret;
+    ret = (*fp->_read)(fp->_cookie, buf, n);
 
-	ret = (*fp->_read)(fp->_cookie, buf, n);
-	if (ret > 0) {
-		if (fp->_flags & __SOFF) {
-			if (fp->_offset <= OFF_MAX - ret)
-				fp->_offset += ret;
-			else
-				fp->_flags &= ~__SOFF;
-		}
-	} else if (ret < 0)
-		fp->_flags &= ~__SOFF;
-	return (ret);
+    if (ret > 0) {
+        if (fp->_flags & __SOFF) {
+            if (fp->_offset <= OFF_MAX - ret) {
+                fp->_offset += ret;
+            } else {
+                fp->_flags &= ~__SOFF;
+            }
+        }
+    } else if (ret < 0) {
+        fp->_flags &= ~__SOFF;
+    }
+
+    return (ret);
 }
 
 int
 _swrite(fp, buf, n)
-	FILE *fp;
-	char const *buf;
-	int n;
+FILE* fp;
+char const* buf;
+int n;
 {
-	int ret;
-	int serrno;
+    int ret;
+    int serrno;
 
-	if (fp->_flags & __SAPP) {
-		serrno = errno;
-		if (_sseek(fp, (fpos_t)0, SEEK_END) == -1 &&
-		    (fp->_flags & __SOPT))
-			return (-1);
-		errno = serrno;
-	}
-	ret = (*fp->_write)(fp->_cookie, buf, n);
-	/* __SOFF removed even on success in case O_APPEND mode is set. */
-	if (ret >= 0) {
-		if ((fp->_flags & (__SAPP|__SOFF)) == (__SAPP|__SOFF) &&
-		    fp->_offset <= OFF_MAX - ret)
-			fp->_offset += ret;
-		else
-			fp->_flags &= ~__SOFF;
+    if (fp->_flags & __SAPP) {
+        serrno = errno;
 
-	} else if (ret < 0)
-		fp->_flags &= ~__SOFF;
-	return (ret);
+        if (_sseek(fp, (fpos_t)0, SEEK_END) == -1 &&
+                (fp->_flags & __SOPT)) {
+            return (-1);
+        }
+
+        errno = serrno;
+    }
+
+    ret = (*fp->_write)(fp->_cookie, buf, n);
+
+    /* __SOFF removed even on success in case O_APPEND mode is set. */
+    if (ret >= 0) {
+        if ((fp->_flags & (__SAPP | __SOFF)) == (__SAPP | __SOFF) &&
+                fp->_offset <= OFF_MAX - ret) {
+            fp->_offset += ret;
+        } else {
+            fp->_flags &= ~__SOFF;
+        }
+    } else if (ret < 0) {
+        fp->_flags &= ~__SOFF;
+    }
+
+    return (ret);
 }
 
 fpos_t
 _sseek(fp, offset, whence)
-	FILE *fp;
-	fpos_t offset;
-	int whence;
+FILE* fp;
+fpos_t offset;
+int whence;
 {
-	fpos_t ret;
-	int serrno, errret;
+    fpos_t ret;
+    int serrno, errret;
+    serrno = errno;
+    errno = 0;
+    ret = (*fp->_seek)(fp->_cookie, offset, whence);
+    errret = errno;
 
-	serrno = errno;
-	errno = 0;
-	ret = (*fp->_seek)(fp->_cookie, offset, whence);
-	errret = errno;
-	if (errno == 0)
-		errno = serrno;
-	/*
-	 * Disallow negative seeks per POSIX.
-	 * It is needed here to help upper level caller
-	 * in the cases it can't detect.
-	 */
-	if (ret < 0) {
-		if (errret == 0) {
-			if (offset != 0 || whence != SEEK_CUR) {
-				if (HASUB(fp))
-					FREEUB(fp);
-				fp->_p = fp->_bf._base;
-				fp->_r = 0;
-				fp->_flags &= ~__SEOF;
-			}
-			fp->_flags |= __SERR;
-			errno = EINVAL;
-		} else if (errret == ESPIPE)
-			fp->_flags &= ~__SAPP;
-		fp->_flags &= ~__SOFF;
-		ret = -1;
-	} else if (fp->_flags & __SOPT) {
-		fp->_flags |= __SOFF;
-		fp->_offset = ret;
-	}
-	return (ret);
+    if (errno == 0) {
+        errno = serrno;
+    }
+
+    /*
+     * Disallow negative seeks per POSIX.
+     * It is needed here to help upper level caller
+     * in the cases it can't detect.
+     */
+    if (ret < 0) {
+        if (errret == 0) {
+            if (offset != 0 || whence != SEEK_CUR) {
+                if (HASUB(fp)) {
+                    FREEUB(fp);
+                }
+
+                fp->_p = fp->_bf._base;
+                fp->_r = 0;
+                fp->_flags &= ~__SEOF;
+            }
+
+            fp->_flags |= __SERR;
+            errno = EINVAL;
+        } else if (errret == ESPIPE) {
+            fp->_flags &= ~__SAPP;
+        }
+
+        fp->_flags &= ~__SOFF;
+        ret = -1;
+    } else if (fp->_flags & __SOPT) {
+        fp->_flags |= __SOFF;
+        fp->_offset = ret;
+    }
+
+    return (ret);
 }

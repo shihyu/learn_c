@@ -49,29 +49,24 @@
 
 #if defined (_DEBUG)
 extern "C" int __cdecl _chvalidator(
-        int c,
-        int mask
-        )
-{
-        _ASSERTE((unsigned)(c + 1) <= 256);
-        return _chvalidator_l(NULL, c, mask);
+    int c,
+    int mask
+) {
+    _ASSERTE((unsigned)(c + 1) <= 256);
+    return _chvalidator_l(NULL, c, mask);
 }
 
 extern "C" int __cdecl _chvalidator_l(
-        _locale_t plocinfo,
-        int c,
-        int mask
-        )
-{
+    _locale_t plocinfo,
+    int c,
+    int mask
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
     _ASSERTE((unsigned)(c + 1) <= 256);
-    if (c >= -1 && c <= 255)
-    {
+
+    if (c >= -1 && c <= 255) {
         return (_loc_update.GetLocaleT()->locinfo->pctype[c] & mask);
-    }
-    else
-    {
+    } else {
         return (_loc_update.GetLocaleT()->locinfo->pctype[-1] & mask);
     }
 }
@@ -106,60 +101,54 @@ extern "C" int __cdecl _chvalidator_l(
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _isctype_l (
-        int c,
-        int mask,
-        _locale_t plocinfo
-        )
-{
-        int size;
-        unsigned short chartype;
-        char buffer[3];
-        _LocaleUpdate _loc_update(plocinfo);
+extern "C" int __cdecl _isctype_l(
+    int c,
+    int mask,
+    _locale_t plocinfo
+) {
+    int size;
+    unsigned short chartype;
+    char buffer[3];
+    _LocaleUpdate _loc_update(plocinfo);
 
-        /* c valid between -1 and 255 */
-        if ( c >= -1 && c <= 255 )
-            return _loc_update.GetLocaleT()->locinfo->pctype[c] & mask;
+    /* c valid between -1 and 255 */
+    if (c >= -1 && c <= 255) {
+        return _loc_update.GetLocaleT()->locinfo->pctype[c] & mask;
+    }
 
-        if ( _isleadbyte_l(c >> 8 & 0xff, _loc_update.GetLocaleT()) )
-        {
-            buffer[0] = (c >> 8 & 0xff); /* put lead-byte at start of str */
-            buffer[1] = (char)c;
-            buffer[2] = 0;
-            size = 2;
-        } else {
-            buffer[0] = (char)c;
-            buffer[1] = 0;
-            size = 1;
-        }
+    if (_isleadbyte_l(c >> 8 & 0xff, _loc_update.GetLocaleT())) {
+        buffer[0] = (c >> 8 & 0xff); /* put lead-byte at start of str */
+        buffer[1] = (char)c;
+        buffer[2] = 0;
+        size = 2;
+    } else {
+        buffer[0] = (char)c;
+        buffer[1] = 0;
+        size = 1;
+    }
 
-        if ( 0 == __crtGetStringTypeA(
-                    _loc_update.GetLocaleT(),
-                    CT_CTYPE1,
-                    buffer,
-                    size,
-                    &chartype,
-                    _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                    _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE],
-                    TRUE) )
-        {
-            return 0;
-        }
+    if (0 == __crtGetStringTypeA(
+                _loc_update.GetLocaleT(),
+                CT_CTYPE1,
+                buffer,
+                size,
+                &chartype,
+                _loc_update.GetLocaleT()->locinfo->lc_codepage,
+                _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE],
+                TRUE)) {
+        return 0;
+    }
 
-        return (int)(chartype & mask);
+    return (int)(chartype & mask);
 }
 
-extern "C" int __cdecl _isctype (
-        int c,
-        int mask
-        )
-{
-    if (__locale_changed == 0)
-    {
+extern "C" int __cdecl _isctype(
+    int c,
+    int mask
+) {
+    if (__locale_changed == 0) {
         return __initiallocinfo.pctype[c] & mask;
-    }
-    else
-    {
+    } else {
         return _isctype_l(c, mask, NULL);
     }
 }

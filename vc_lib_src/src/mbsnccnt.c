@@ -44,30 +44,28 @@
 *******************************************************************************/
 
 extern "C" size_t __cdecl _mbsnccnt_l(
-        const unsigned char *string,
-        size_t bcnt,
-        _locale_t plocinfo
-        )
-{
-        size_t n;
-        _LocaleUpdate _loc_update(plocinfo);
+    const unsigned char* string,
+    size_t bcnt,
+    _locale_t plocinfo
+) {
+    size_t n;
+    _LocaleUpdate _loc_update(plocinfo);
+    _VALIDATE_RETURN(string != NULL || bcnt == 0, EINVAL, 0);
 
-        _VALIDATE_RETURN(string != NULL || bcnt == 0, EINVAL, 0);
-
-        for (n = 0; (bcnt-- && *string); n++, string++) {
-            if ( _ismbblead_l(*string, _loc_update.GetLocaleT()) ) {
-                if ( (!bcnt--) || (*++string == '\0'))
-                    break;
+    for (n = 0; (bcnt-- && *string); n++, string++) {
+        if (_ismbblead_l(*string, _loc_update.GetLocaleT())) {
+            if ((!bcnt--) || (*++string == '\0')) {
+                break;
             }
         }
+    }
 
-        return(n);
+    return (n);
 }
 extern "C" size_t (__cdecl _mbsnccnt)(
-        const unsigned char *string,
-        size_t bcnt
-        )
-{
+    const unsigned char* string,
+    size_t bcnt
+) {
     return _mbsnccnt_l(string, bcnt, NULL);
 }
 #endif  /* _MBCS */

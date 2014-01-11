@@ -35,9 +35,8 @@
 *
 *******************************************************************************/
 
-int __cdecl __init_collate (
-        pthreadlocinfo ploci
-        )
-{
-        return 0;
+int __cdecl __init_collate(
+    pthreadlocinfo ploci
+) {
+    return 0;
 }

@@ -40,33 +40,26 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_copy.c,v 1.5 2002/03/22 21:52:38 ob
  * ACL entry dest_d
  */
 int
-acl_copy_entry(acl_entry_t dest_d, acl_entry_t src_d)
-{
+acl_copy_entry(acl_entry_t dest_d, acl_entry_t src_d) {
+    if (src_d == NULL || dest_d == NULL || src_d == dest_d) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (src_d == NULL || dest_d == NULL || src_d == dest_d) {
-		errno = EINVAL;
-		return (-1);
-	}
-
-	dest_d->ae_tag  = src_d->ae_tag;
-	dest_d->ae_id   = src_d->ae_id;
-	dest_d->ae_perm = src_d->ae_perm;
-
-	return (0);
+    dest_d->ae_tag  = src_d->ae_tag;
+    dest_d->ae_id   = src_d->ae_id;
+    dest_d->ae_perm = src_d->ae_perm;
+    return (0);
 }
 
 ssize_t
-acl_copy_ext(void *buf_p, acl_t acl, ssize_t size)
-{
-
-	errno = ENOSYS;
-	return (-1);
+acl_copy_ext(void* buf_p, acl_t acl, ssize_t size) {
+    errno = ENOSYS;
+    return (-1);
 }
 
 acl_t
-acl_copy_int(const void *buf_p)
-{
-
-	errno = ENOSYS;
-	return (NULL);
+acl_copy_int(const void* buf_p) {
+    errno = ENOSYS;
+    return (NULL);
 }

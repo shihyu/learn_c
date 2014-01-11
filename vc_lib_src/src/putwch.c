@@ -43,23 +43,19 @@ extern intptr_t _confh;
 *
 *******************************************************************************/
 
-wint_t _CRTIMP __cdecl _putwch (
-        wchar_t ch
-        )
-{
-        REG2 wint_t retval;
+wint_t _CRTIMP __cdecl _putwch(
+    wchar_t ch
+) {
+    REG2 wint_t retval;
+    _mlock(_CONIO_LOCK);
 
-        _mlock(_CONIO_LOCK);
-        __try {
-
+    __try {
         retval = _putwch_nolock(ch);
+    } __finally {
+        _munlock(_CONIO_LOCK);
+    }
 
-        }
-        __finally {
-                _munlock(_CONIO_LOCK);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 /***
@@ -78,58 +74,61 @@ wint_t _CRTIMP __cdecl _putwch (
 *
 *******************************************************************************/
 
-wint_t __cdecl _putwch_nolock (
-        wchar_t ch
-        )
-{
-
+wint_t __cdecl _putwch_nolock(
+    wchar_t ch
+) {
     int size, num_written;
     static int use_w = 2;
-    char mbc[MB_LEN_MAX +1];
-    if ( use_w)
-    {
-        if (_confh == -2)
+    char mbc[MB_LEN_MAX + 1];
+
+    if (use_w) {
+        if (_confh == -2) {
             __initconout();
+        }
 
         /* write character to console file handle */
 
-        if (_confh == -1)
+        if (_confh == -1) {
             return WEOF;
-        else if ( !WriteConsoleW( (HANDLE)_confh,
+        } else if (!WriteConsoleW((HANDLE)_confh,
                                   (LPVOID)&ch,
                                   1,
                                   &num_written,
-                                  NULL )
-                  )
-        {
-            if ( use_w == 2 && GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
+                                  NULL)
+                  ) {
+            if (use_w == 2 && GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
                 use_w = 0;
-            else
+            } else {
                 return WEOF;
-        } else
-                use_w = 1;
+            }
+        } else {
+            use_w = 1;
+        }
     }
 
-    if ( use_w == 0)
-    {
+    if (use_w == 0) {
         size = WideCharToMultiByte(
-                                   GetConsoleOutputCP(),
-                                   0,
-                                   (LPWSTR)&ch, 1,
-                                   mbc,
-                                   MB_LEN_MAX,
-                                   NULL,
-                                   NULL
-                                   );
-        if ( (_confh == -1) || !WriteConsole( (HANDLE)_confh,
-                                              (LPVOID)mbc,
-                                              size,
-                                              &num_written,
-                                              NULL )
+                   GetConsoleOutputCP(),
+                   0,
+                   (LPWSTR)&ch, 1,
+                   mbc,
+                   MB_LEN_MAX,
+                   NULL,
+                   NULL
+               );
+
+        if ((_confh == -1) || !WriteConsole((HANDLE)_confh,
+                                            (LPVOID)mbc,
+                                            size,
+                                            &num_written,
+                                            NULL)
            )
-                /* return error indicator */
-                return WEOF;
+            /* return error indicator */
+        {
+            return WEOF;
+        }
     }
+
     return ch;
 }
 
@@ -146,29 +145,25 @@ wint_t __cdecl _putwch_nolock (
 *
 *******************************************************************************/
 int _CRTIMP __cdecl _cputws(
-        const wchar_t *str
-        )
-{
+    const wchar_t* str
+) {
     size_t len;
     int retval = 0;
-
     _VALIDATE_CLEAR_OSSERR_RETURN((str != NULL), EINVAL, -1);
-
     len = wcslen(str);
     _mlock(_CONIO_LOCK);
+
     __try {
-    while(len--)
-    {
-        if ( _putwch_nolock(*str++) == WEOF)
-        {
-            retval = -1;
-            break;
+        while (len--) {
+            if (_putwch_nolock(*str++) == WEOF) {
+                retval = -1;
+                break;
+            }
         }
+    } __finally {
+        _munlock(_CONIO_LOCK);
     }
-    }
-    __finally {
-            _munlock(_CONIO_LOCK);
-    }
+
     return retval;
 }
 

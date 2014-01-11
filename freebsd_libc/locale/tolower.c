@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
@@ -39,26 +39,29 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/tolower.c,v 1.13 2007/01/09 00:28:01 imp
 
 __ct_rune_t
 ___tolower(c)
-	__ct_rune_t c;
+__ct_rune_t c;
 {
-	size_t lim;
-	_RuneRange *rr = &_CurrentRuneLocale->__maplower_ext;
-	_RuneEntry *base, *re;
+    size_t lim;
+    _RuneRange* rr = &_CurrentRuneLocale->__maplower_ext;
+    _RuneEntry* base, *re;
 
-	if (c < 0 || c == EOF)
-		return(c);
+    if (c < 0 || c == EOF) {
+        return (c);
+    }
 
-	/* Binary search -- see bsearch.c for explanation. */
-	base = rr->__ranges;
-	for (lim = rr->__nranges; lim != 0; lim >>= 1) {
-		re = base + (lim >> 1);
-		if (re->__min <= c && c <= re->__max)
-			return (re->__map + c - re->__min);
-		else if (c > re->__max) {
-			base = re + 1;
-			lim--;
-		}
-	}
+    /* Binary search -- see bsearch.c for explanation. */
+    base = rr->__ranges;
 
-	return(c);
+    for (lim = rr->__nranges; lim != 0; lim >>= 1) {
+        re = base + (lim >> 1);
+
+        if (re->__min <= c && c <= re->__max) {
+            return (re->__map + c - re->__min);
+        } else if (c > re->__max) {
+            base = re + 1;
+            lim--;
+        }
+    }
+
+    return (c);
 }

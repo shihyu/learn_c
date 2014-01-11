@@ -53,73 +53,66 @@
 
 
 /* define locking/validating lseek */
-long __cdecl _lseek (
-        int fh,
-        long pos,
-        int mthd
-        )
-{
-        int r;
+long __cdecl _lseek(
+    int fh,
+    long pos,
+    int mthd
+) {
+    int r;
+    /* validate fh */
+    _CHECK_FH_CLEAR_OSSERR_RETURN(fh, EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
+    _lock_fh(fh);                   /* lock file handle */
 
-        /* validate fh */
-        _CHECK_FH_CLEAR_OSSERR_RETURN( fh, EBADF, -1 );
-        _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
-
-        _lock_fh(fh);                   /* lock file handle */
-
-        __try {
-                if ( _osfile(fh) & FOPEN )
-                        r = _lseek_nolock(fh, pos, mthd);   /* seek */
-                else {
-                        errno = EBADF;
-                        _doserrno = 0;
-                        r = -1;
-                        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-                }
+    __try {
+        if (_osfile(fh) & FOPEN) {
+            r = _lseek_nolock(fh, pos, mthd);    /* seek */
+        } else {
+            errno = EBADF;
+            _doserrno = 0;
+            r = -1;
+            _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
         }
-        __finally {
-                _unlock_fh(fh);         /* unlock file handle */
-        }
+    } __finally {
+        _unlock_fh(fh);         /* unlock file handle */
+    }
 
-        return r;
+    return r;
 }
 
 /* define core _lseek -- doesn't lock or validate fh */
-long __cdecl _lseek_nolock (
-        int fh,
-        long pos,
-        int mthd
-        )
-{
-        ULONG newpos;                   /* new file position */
-        ULONG dosretval;                /* o.s. return value */
-        HANDLE osHandle;        /* o.s. handle value */
-
-
-        /* tell o.s. to seek */
-
+long __cdecl _lseek_nolock(
+    int fh,
+    long pos,
+    int mthd
+) {
+    ULONG newpos;                   /* new file position */
+    ULONG dosretval;                /* o.s. return value */
+    HANDLE osHandle;        /* o.s. handle value */
+    /* tell o.s. to seek */
 #if SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END
-    #error Xenix and Win32 seek constants not compatible
+#error Xenix and Win32 seek constants not compatible
 #endif  /* SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END */
-        if ((osHandle = (HANDLE)_get_osfhandle(fh)) == (HANDLE)-1)
-        {
-            errno = EBADF;
-            _ASSERTE(("Invalid file descriptor",0));
-            return -1;
-        }
 
-        if ((newpos = SetFilePointer(osHandle, pos, NULL, mthd)) == -1)
-                dosretval = GetLastError();
-        else
-                dosretval = 0;
+    if ((osHandle = (HANDLE)_get_osfhandle(fh)) == (HANDLE) - 1) {
+        errno = EBADF;
+        _ASSERTE(("Invalid file descriptor", 0));
+        return -1;
+    }
 
-        if (dosretval) {
-                /* o.s. error */
-                _dosmaperr(dosretval);
-                return -1;
-        }
+    if ((newpos = SetFilePointer(osHandle, pos, NULL, mthd)) == -1) {
+        dosretval = GetLastError();
+    } else {
+        dosretval = 0;
+    }
 
-        _osfile(fh) &= ~FEOFLAG;        /* clear the ctrl-z flag on the file */
-        return newpos;                  /* return */
+    if (dosretval) {
+        /* o.s. error */
+        _dosmaperr(dosretval);
+        return -1;
+    }
+
+    _osfile(fh) &= ~FEOFLAG;        /* clear the ctrl-z flag on the file */
+    return newpos;                  /* return */
 }

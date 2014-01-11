@@ -29,7 +29,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)SYS.h	5.5 (Berkeley) 5/7/91
+ *  @(#)SYS.h   5.5 (Berkeley) 5/7/91
  * $FreeBSD: src/lib/libc/amd64/SYS.h,v 1.29 2007/07/04 23:18:38 peter Exp $
  */
 
@@ -37,33 +37,33 @@
 #include <machine/asm.h>
 
 #ifdef PIC
-#define	RSYSCALL(x)	ENTRY(__CONCAT(__sys_,x));			\
-			.weak CNAME(x);					\
-			.set CNAME(x),CNAME(__CONCAT(__sys_,x));	\
-			.weak CNAME(__CONCAT(_,x));			\
-			.set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
-			mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret; \
-			2: movq PIC_GOT(HIDENAME(cerror)),%rcx; jmp *%rcx
+#define RSYSCALL(x) ENTRY(__CONCAT(__sys_,x));          \
+            .weak CNAME(x);                 \
+            .set CNAME(x),CNAME(__CONCAT(__sys_,x));    \
+            .weak CNAME(__CONCAT(_,x));         \
+            .set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+            mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret; \
+            2: movq PIC_GOT(HIDENAME(cerror)),%rcx; jmp *%rcx
 
-#define	PSEUDO(x)	ENTRY(__CONCAT(__sys_,x));			\
-			.weak CNAME(__CONCAT(_,x));			\
-			.set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
-			mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret ; \
-			2: movq PIC_GOT(HIDENAME(cerror)),%rcx; jmp *%rcx
+#define PSEUDO(x)   ENTRY(__CONCAT(__sys_,x));          \
+            .weak CNAME(__CONCAT(_,x));         \
+            .set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+            mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret ; \
+            2: movq PIC_GOT(HIDENAME(cerror)),%rcx; jmp *%rcx
 #else
-#define	RSYSCALL(x)	ENTRY(__CONCAT(__sys_,x));			\
-			.weak CNAME(x);					\
-			.set CNAME(x),CNAME(__CONCAT(__sys_,x));	\
-			.weak CNAME(__CONCAT(_,x));			\
-			.set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
-			mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret; \
-			2: jmp HIDENAME(cerror)
+#define RSYSCALL(x) ENTRY(__CONCAT(__sys_,x));          \
+            .weak CNAME(x);                 \
+            .set CNAME(x),CNAME(__CONCAT(__sys_,x));    \
+            .weak CNAME(__CONCAT(_,x));         \
+            .set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+            mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret; \
+            2: jmp HIDENAME(cerror)
 
-#define	PSEUDO(x)	ENTRY(__CONCAT(__sys_,x));			\
-			.weak CNAME(__CONCAT(_,x));			\
-			.set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
-			mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret; \
-			2: jmp HIDENAME(cerror)
+#define PSEUDO(x)   ENTRY(__CONCAT(__sys_,x));          \
+            .weak CNAME(__CONCAT(_,x));         \
+            .set CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+            mov __CONCAT($SYS_,x),%rax; KERNCALL; jb 2f; ret; \
+            2: jmp HIDENAME(cerror)
 #endif
 
-#define KERNCALL	movq %rcx, %r10; syscall
+#define KERNCALL    movq %rcx, %r10; syscall

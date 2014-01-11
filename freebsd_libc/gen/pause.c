@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,9 +40,8 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/pause.c,v 1.7 2007/01/09 00:27:54 imp Exp $
  * Backwards compatible pause.
  */
 int
-__pause()
-{
-	return sigpause(sigblock(0L));
+__pause() {
+    return sigpause(sigblock(0L));
 }
 __weak_reference(__pause, pause);
 __weak_reference(__pause, _pause);

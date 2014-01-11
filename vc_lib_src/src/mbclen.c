@@ -33,24 +33,24 @@
 *******************************************************************************/
 
 size_t __cdecl _mbclen_l(
-        const unsigned char *c,
-        _locale_t plocinfo
-        )
+    const unsigned char* c,
+    _locale_t plocinfo
+)
 
 {
-        /*  Don't return two if we have leadbyte, EOS.
-            Don't assert here; too low level
-        */
-        return ((_ismbblead_l)(*c, plocinfo) && c[1]!='\0')  ? 2 : 1;
+    /*  Don't return two if we have leadbyte, EOS.
+        Don't assert here; too low level
+    */
+    return ((_ismbblead_l)(*c, plocinfo) && c[1] != '\0')  ? 2 : 1;
 }
 
 size_t (__cdecl _mbclen)(
-        const unsigned char *c
-        )
+    const unsigned char* c
+)
 
 {
-        /*  Don't return two if we have leadbyte, EOS.
-            Don't assert here; too low level
-        */
-        return (_ismbblead(*c) && c[1]!='\0')  ? 2 : 1;
+    /*  Don't return two if we have leadbyte, EOS.
+        Don't assert here; too low level
+    */
+    return (_ismbblead(*c) && c[1] != '\0')  ? 2 : 1;
 }

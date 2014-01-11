@@ -16,24 +16,24 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/sysctlbyname.c,v 1.5 2002/02/01 00:57:29 ob
 #include <string.h>
 
 int
-sysctlbyname(const char *name, void *oldp, size_t *oldlenp, void *newp,
-	     size_t newlen)
-{
-	int name2oid_oid[2];
-	int real_oid[CTL_MAXNAME+2];
-	int error;
-	size_t oidlen;
+sysctlbyname(const char* name, void* oldp, size_t* oldlenp, void* newp,
+             size_t newlen) {
+    int name2oid_oid[2];
+    int real_oid[CTL_MAXNAME + 2];
+    int error;
+    size_t oidlen;
+    name2oid_oid[0] = 0;    /* This is magic & undocumented! */
+    name2oid_oid[1] = 3;
+    oidlen = sizeof(real_oid);
+    error = sysctl(name2oid_oid, 2, real_oid, &oidlen, (void*)name,
+                   strlen(name));
 
-	name2oid_oid[0] = 0;	/* This is magic & undocumented! */
-	name2oid_oid[1] = 3;
+    if (error < 0) {
+        return error;
+    }
 
-	oidlen = sizeof(real_oid);
-	error = sysctl(name2oid_oid, 2, real_oid, &oidlen, (void *)name,
-		       strlen(name));
-	if (error < 0) 
-		return error;
-	oidlen /= sizeof (int);
-	error = sysctl(real_oid, oidlen, oldp, oldlenp, newp, newlen);
-	return (error);
+    oidlen /= sizeof(int);
+    error = sysctl(real_oid, oidlen, oldp, oldlenp, newp, newlen);
+    return (error);
 }
 

@@ -1,4 +1,4 @@
-/*	$NetBSD: rpc_dtablesize.c,v 1.14 1998/11/15 17:32:43 christos Exp $	*/
+/*  $NetBSD: rpc_dtablesize.c,v 1.14 1998/11/15 17:32:43 christos Exp $ */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "@(#)rpc_dtablesize.c 1.2 87/08/11 Copyr 1987 Sun Micro";
-static char *sccsid = "@(#)rpc_dtablesize.c	2.1 88/07/29 4.0 RPCSRC";
+static char* sccsid2 = "@(#)rpc_dtablesize.c 1.2 87/08/11 Copyr 1987 Sun Micro";
+static char* sccsid = "@(#)rpc_dtablesize.c	2.1 88/07/29 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/rpc_dtablesize.c,v 1.15 2004/10/16 06:11:35 obrien Exp $");
@@ -40,7 +40,7 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/rpc_dtablesize.c,v 1.15 2004/10/16 06:11:35
 #include <unistd.h>
 #include "un-namespace.h"
 
-int _rpc_dtablesize(void);	/* XXX */
+int _rpc_dtablesize(void);  /* XXX */
 
 /*
  * Cache the result of getdtablesize(), so we don't have to do an
@@ -54,14 +54,16 @@ int _rpc_dtablesize(void);	/* XXX */
  * for _select(), having this return > FD_SETSIZE is a Bad Idea(TM)!
  */
 int
-_rpc_dtablesize(void)
-{
-	static int size;
+_rpc_dtablesize(void) {
+    static int size;
 
-	if (size == 0) {
-		size = getdtablesize();
-		if (size > FD_SETSIZE)
-			size = FD_SETSIZE;
-	}
-	return (size);
+    if (size == 0) {
+        size = getdtablesize();
+
+        if (size > FD_SETSIZE) {
+            size = FD_SETSIZE;
+        }
+    }
+
+    return (size);
 }

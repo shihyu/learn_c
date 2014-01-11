@@ -36,8 +36,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gdtoa/machdep_ldisd.c,v 1.1 2003/03/12 20:29:58
 #include "gdtoaimp.h"
 
 long double
-strtold(const char * __restrict s, char ** __restrict sp)
-{
-
-	return strtod(s, sp);
+strtold(const char* __restrict s, char** __restrict sp) {
+    return strtod(s, sp);
 }

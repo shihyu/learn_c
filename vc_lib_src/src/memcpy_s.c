@@ -39,25 +39,22 @@
 *******************************************************************************/
 
 errno_t __cdecl memcpy_s(
-    void * dst,
+    void* dst,
     size_t sizeInBytes,
-    const void * src,
+    const void* src,
     size_t count
-)
-{
-    if (count == 0)
-    {
+) {
+    if (count == 0) {
         /* nothing to do */
         return 0;
     }
 
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(dst != NULL, EINVAL);
-    if (src == NULL || sizeInBytes < count)
-    {
+
+    if (src == NULL || sizeInBytes < count) {
         /* zeroes the destination buffer */
         memset(dst, 0, sizeInBytes);
-
         _VALIDATE_RETURN_ERRCODE(src != NULL, EINVAL);
         _VALIDATE_RETURN_ERRCODE(sizeInBytes >= count, ERANGE);
         /* useless, but prefast is confused */

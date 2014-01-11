@@ -38,80 +38,71 @@
 *
 *******************************************************************************/
 
-void __cdecl _free_base (void * pBlock)
-{
+void __cdecl _free_base(void* pBlock) {
+    int retval = 0;
 
-        int retval = 0;
+    if (pBlock == NULL) {
+        return;
+    }
 
-
-        if (pBlock == NULL)
-            return;
-
-        RTCCALLBACK(_RTC_Free_hook, (pBlock, 0));
-
+    RTCCALLBACK(_RTC_Free_hook, (pBlock, 0));
 #ifndef _WIN64
-        if ( __active_heap == __V6_HEAP )
-        {
-            PHEADER     pHeader;
 
-            _mlock( _HEAP_LOCK );
-            __try {
+    if (__active_heap == __V6_HEAP) {
+        PHEADER     pHeader;
+        _mlock(_HEAP_LOCK);
 
-            if ((pHeader = __sbh_find_block(pBlock)) != NULL)
+        __try {
+            if ((pHeader = __sbh_find_block(pBlock)) != NULL) {
                 __sbh_free_block(pHeader, pBlock);
-
             }
-            __finally {
-                _munlock( _HEAP_LOCK );
-            }
-
-            if (pHeader == NULL)
-            {
-                retval = HeapFree(_crtheap, 0, pBlock);
-                if (retval == 0)
-                {
-                    errno = _get_errno_from_oserr(GetLastError());
-                }
-            }
-
+        } __finally {
+            _munlock(_HEAP_LOCK);
         }
-#ifdef CRTDLL
-        else if ( __active_heap == __V5_HEAP )
-        {
-            __old_sbh_region_t *preg;
-            __old_sbh_page_t *  ppage;
-            __old_page_map_t *  pmap;
-            _mlock(_HEAP_LOCK );
-            __try {
 
-            if ( (pmap = __old_sbh_find_block(pBlock, &preg, &ppage)) != NULL )
-                __old_sbh_free_block(preg, ppage, pmap);
-
-            }
-            __finally {
-                _munlock(_HEAP_LOCK );
-            }
-
-            if (pmap == NULL)
-            {
-                retval = HeapFree(_crtheap, 0, pBlock);
-                if (retval == 0)
-                {
-                    errno = _get_errno_from_oserr(GetLastError());
-                }
-
-            }
-        }
-#endif  /* CRTDLL */
-        else    //  __active_heap == __SYSTEM_HEAP
-#endif  /* _WIN64 */
-        {
+        if (pHeader == NULL) {
             retval = HeapFree(_crtheap, 0, pBlock);
-            if (retval == 0)
-            {
+
+            if (retval == 0) {
                 errno = _get_errno_from_oserr(GetLastError());
             }
         }
+    }
+
+#ifdef CRTDLL
+    else if (__active_heap == __V5_HEAP) {
+        __old_sbh_region_t* preg;
+        __old_sbh_page_t*   ppage;
+        __old_page_map_t*   pmap;
+        _mlock(_HEAP_LOCK);
+
+        __try {
+            if ((pmap = __old_sbh_find_block(pBlock, &preg, &ppage)) != NULL) {
+                __old_sbh_free_block(preg, ppage, pmap);
+            }
+        } __finally {
+            _munlock(_HEAP_LOCK);
+        }
+
+        if (pmap == NULL) {
+            retval = HeapFree(_crtheap, 0, pBlock);
+
+            if (retval == 0) {
+                errno = _get_errno_from_oserr(GetLastError());
+            }
+        }
+    }
+
+#endif  /* CRTDLL */
+    else    //  __active_heap == __SYSTEM_HEAP
+#endif  /* _WIN64 */
+    {
+        retval = HeapFree(_crtheap, 0, pBlock);
+
+        if (retval == 0) {
+            errno = _get_errno_from_oserr(GetLastError());
+        }
+    }
 }
 
 #else  /* WINHEAP */
@@ -143,21 +134,18 @@ void __cdecl _free_base (void * pBlock)
 *******************************************************************************/
 
 
-void __cdecl _free_base (
-        void *pblock
-        )
-{
-       /* lock the heap
-        */
-        _mlock(_HEAP_LOCK);
-
-        /* free the block
-         */
-        _free_base_nolock(pblock);
-
-        /* unlock the heap
-         */
-        _munlock(_HEAP_LOCK);
+void __cdecl _free_base(
+    void* pblock
+) {
+    /* lock the heap
+     */
+    _mlock(_HEAP_LOCK);
+    /* free the block
+     */
+    _free_base_nolock(pblock);
+    /* unlock the heap
+     */
+    _munlock(_HEAP_LOCK);
 }
 
 
@@ -174,55 +162,50 @@ void __cdecl _free_base (
 *
 *******************************************************************************/
 
-void __cdecl _free_base_nolock (
+void __cdecl _free_base_nolock(
 
 
-        REG1 void *pblock
-        )
-{
-        REG2 _PBLKDESC pdesc;
+    REG1 void* pblock
+) {
+    REG2 _PBLKDESC pdesc;
 
+    /*
+     * If the pointer is NULL, just return [ANSI].
+     */
 
-        /*
-         * If the pointer is NULL, just return [ANSI].
-         */
+    if (pblock == NULL) {
+        return;
+    }
 
-        if (pblock == NULL)
-            return;
+    /*
+     * Point to block header and get the pointer back to the heap desc.
+     */
+    pblock = (char*)pblock - _HDRSIZE;
+    pdesc = *(_PBLKDESC*)pblock;
 
-        /*
-         * Point to block header and get the pointer back to the heap desc.
-         */
+    /*
+     * Validate the back pointer.
+     */
 
-        pblock = (char *)pblock - _HDRSIZE;
-        pdesc = *(_PBLKDESC*)pblock;
+    if (_ADDRESS(pdesc) != pblock) {
+        _heap_abort();
+    }
 
-        /*
-         * Validate the back pointer.
-         */
+    /*
+     * Pointer is ok.  Mark block free.
+     */
+    _SET_FREE(pdesc);
 
-        if (_ADDRESS(pdesc) != pblock)
-            _heap_abort();
-
-        /*
-         * Pointer is ok.  Mark block free.
-         */
-
-        _SET_FREE(pdesc);
-
-        /*
-         * Check for special conditions under which the rover is reset.
-         */
-        if ( (_heap_resetsize != 0xffffffff) &&
-             (_heap_desc.proverdesc->pblock > pdesc->pblock) &&
-             (_BLKSIZE(pdesc) >= _heap_resetsize) )
-        {
-            _heap_desc.proverdesc = pdesc;
-        }
-        else if ( _heap_desc.proverdesc == pdesc->pnextdesc )
-        {
-            _heap_desc.proverdesc = pdesc;
-        }
+    /*
+     * Check for special conditions under which the rover is reset.
+     */
+    if ((_heap_resetsize != 0xffffffff) &&
+            (_heap_desc.proverdesc->pblock > pdesc->pblock) &&
+            (_BLKSIZE(pdesc) >= _heap_resetsize)) {
+        _heap_desc.proverdesc = pdesc;
+    } else if (_heap_desc.proverdesc == pdesc->pnextdesc) {
+        _heap_desc.proverdesc = pdesc;
+    }
 }
 
 #endif  /* WINHEAP */

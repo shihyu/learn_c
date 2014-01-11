@@ -43,55 +43,53 @@
 *
 *******************************************************************************/
 
-extern "C" unsigned char * __cdecl _mbsncpy_l(
-        unsigned char *dst,
-        const unsigned char *src,
-        size_t cnt,
-        _locale_t plocinfo
-        )
-{
+extern "C" unsigned char* __cdecl _mbsncpy_l(
+    unsigned char* dst,
+    const unsigned char* src,
+    size_t cnt,
+    _locale_t plocinfo
+) {
+    unsigned char* start = dst;
+    _LocaleUpdate _loc_update(plocinfo);
+    /* validation section */
+    _VALIDATE_RETURN(dst != NULL || cnt == 0, EINVAL, NULL);
+    _VALIDATE_RETURN(src != NULL || cnt == 0, EINVAL, NULL);
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
 
-        unsigned char *start = dst;
-        _LocaleUpdate _loc_update(plocinfo);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return (unsigned char*)strncpy((char*)dst, (const char*)src, cnt);
+    }
 
-        /* validation section */
-        _VALIDATE_RETURN(dst != NULL || cnt == 0, EINVAL, NULL);
-        _VALIDATE_RETURN(src != NULL || cnt == 0, EINVAL, NULL);
+    _END_SECURE_CRT_DEPRECATION_DISABLE
 
-        _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return (unsigned char *)strncpy((char *)dst, (const char *)src, cnt);
-        _END_SECURE_CRT_DEPRECATION_DISABLE
+    while (cnt) {
+        cnt--;
 
-        while (cnt) {
+        if (_ismbblead_l(*src, _loc_update.GetLocaleT())) {
+            *dst++ = *src++;
 
-            cnt--;
-            if ( _ismbblead_l(*src, _loc_update.GetLocaleT()) ) {
-                *dst++ = *src++;
-                if ((*dst++ = *src++) == '\0') {
-                    dst[-2] = '\0';
-                    break;
-                }
+            if ((*dst++ = *src++) == '\0') {
+                dst[-2] = '\0';
+                break;
             }
-            else
-                if ((*dst++ = *src++) == '\0')
-                    break;
-
+        } else if ((*dst++ = *src++) == '\0') {
+            break;
         }
+    }
 
-        /* pad with nulls as needed */
+    /* pad with nulls as needed */
 
-        while (cnt--)
-            *dst++ = '\0';
+    while (cnt--) {
+        *dst++ = '\0';
+    }
 
-        return start;
+    return start;
 }
-extern "C" unsigned char * (__cdecl _mbsncpy)(
-        unsigned char *dst,
-        const unsigned char *src,
-        size_t cnt
-        )
-{
+extern "C" unsigned char* (__cdecl _mbsncpy)(
+    unsigned char* dst,
+    const unsigned char* src,
+    size_t cnt
+) {
     _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     return _mbsncpy_l(dst, src, cnt, NULL);
     _END_SECURE_CRT_DEPRECATION_DISABLE

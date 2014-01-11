@@ -26,8 +26,7 @@
 *
 *******************************************************************************/
 
-void _check_commonlanguageruntime_version()
-{
+void _check_commonlanguageruntime_version() {
 }
 
 #endif  /* _M_IX86 */

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,19 +45,22 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/psignal.c,v 1.8 2007/01/09 00:27:54 imp Exp
 
 void
 psignal(sig, s)
-	unsigned int sig;
-	const char *s;
+unsigned int sig;
+const char* s;
 {
-	const char *c;
+    const char* c;
 
-	if (sig < NSIG)
-		c = sys_siglist[sig];
-	else
-		c = "Unknown signal";
-	if (s != NULL && *s != '\0') {
-		(void)_write(STDERR_FILENO, s, strlen(s));
-		(void)_write(STDERR_FILENO, ": ", 2);
-	}
-	(void)_write(STDERR_FILENO, c, strlen(c));
-	(void)_write(STDERR_FILENO, "\n", 1);
+    if (sig < NSIG) {
+        c = sys_siglist[sig];
+    } else {
+        c = "Unknown signal";
+    }
+
+    if (s != NULL && *s != '\0') {
+        (void)_write(STDERR_FILENO, s, strlen(s));
+        (void)_write(STDERR_FILENO, ": ", 2);
+    }
+
+    (void)_write(STDERR_FILENO, c, strlen(c));
+    (void)_write(STDERR_FILENO, "\n", 1);
 }

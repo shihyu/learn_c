@@ -31,64 +31,48 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/unlocked.c,v 1.1 2003/01/10 04:35:08 tjr 
 
 #undef getchar_unlocked
 int
-getchar_unlocked(void)
-{
-
-	return (__sgetc(stdin));
+getchar_unlocked(void) {
+    return (__sgetc(stdin));
 }
 
 #undef getc_unlocked
 int
-getc_unlocked(FILE *fp)
-{
-
-	return (__sgetc(fp));
+getc_unlocked(FILE* fp) {
+    return (__sgetc(fp));
 }
 
 #undef putchar_unlocked
 int
-putchar_unlocked(int ch)
-{
-
-	return (__sputc(ch, stdout));
+putchar_unlocked(int ch) {
+    return (__sputc(ch, stdout));
 }
 
 #undef putc_unlocked
 int
-putc_unlocked(int ch, FILE *fp)
-{
-
-	return (__sputc(ch, fp));
+putc_unlocked(int ch, FILE* fp) {
+    return (__sputc(ch, fp));
 }
 
 #undef feof_unlocked
 int
-feof_unlocked(FILE *fp)
-{
-
-	return (__sfeof(fp));
+feof_unlocked(FILE* fp) {
+    return (__sfeof(fp));
 }
 
 #undef ferror_unlocked
 int
-ferror_unlocked(FILE *fp)
-{
-
-	return (__sferror(fp));
+ferror_unlocked(FILE* fp) {
+    return (__sferror(fp));
 }
 
 #undef clearerr_unlocked
 void
-clearerr_unlocked(FILE *fp)
-{
-
-	__sclearerr(fp);
+clearerr_unlocked(FILE* fp) {
+    __sclearerr(fp);
 }
 
 #undef fileno_unlocked
 int
-fileno_unlocked(FILE *fp)
-{
-
-	return (__sfileno(fp));
+fileno_unlocked(FILE* fp) {
+    return (__sfileno(fp));
 }

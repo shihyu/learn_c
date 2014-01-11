@@ -48,92 +48,82 @@ static const char sorry[] = "Service unavailable";
 
 #pragma weak _rtld_error
 void
-_rtld_error(const char *fmt, ...)
-{
+_rtld_error(const char* fmt, ...) {
 }
 
 #pragma weak dladdr
 int
-dladdr(const void *addr, Dl_info *dlip)
-{
-	_rtld_error(sorry);
-	return 0;
+dladdr(const void* addr, Dl_info* dlip) {
+    _rtld_error(sorry);
+    return 0;
 }
 
 #pragma weak dlclose
 int
-dlclose(void *handle)
-{
-	_rtld_error(sorry);
-	return -1;
+dlclose(void* handle) {
+    _rtld_error(sorry);
+    return -1;
 }
 
 #pragma weak dlerror
-const char *
-dlerror(void)
-{
-	return sorry;
+const char*
+dlerror(void) {
+    return sorry;
 }
 
 #pragma weak dllockinit
 void
-dllockinit(void *context,
-	   void *(*lock_create)(void *context),
-	   void (*rlock_acquire)(void *lock),
-	   void (*wlock_acquire)(void *lock),
-	   void (*lock_release)(void *lock),
-	   void (*lock_destroy)(void *lock),
-	   void (*context_destroy)(void *context))
-{
-	if (context_destroy != NULL)
-		context_destroy(context);
+dllockinit(void* context,
+           void* (*lock_create)(void* context),
+           void (*rlock_acquire)(void* lock),
+           void (*wlock_acquire)(void* lock),
+           void (*lock_release)(void* lock),
+           void (*lock_destroy)(void* lock),
+           void (*context_destroy)(void* context)) {
+    if (context_destroy != NULL) {
+        context_destroy(context);
+    }
 }
 
 #pragma weak dlopen
-void *
-dlopen(const char *name, int mode)
-{
-	_rtld_error(sorry);
-	return NULL;
+void*
+dlopen(const char* name, int mode) {
+    _rtld_error(sorry);
+    return NULL;
 }
 
 #pragma weak dlsym
-void *
-dlsym(void * __restrict handle, const char * __restrict name)
-{
-	_rtld_error(sorry);
-	return NULL;
+void*
+dlsym(void* __restrict handle, const char* __restrict name) {
+    _rtld_error(sorry);
+    return NULL;
 }
 
 #pragma weak dlvsym
-void *
-dlvsym(void * __restrict handle, const char * __restrict name,
-    const char * __restrict version)
-{
-	_rtld_error(sorry);
-	return NULL;
+void*
+dlvsym(void* __restrict handle, const char* __restrict name,
+       const char* __restrict version) {
+    _rtld_error(sorry);
+    return NULL;
 }
 
 #pragma weak dlinfo
 int
-dlinfo(void * __restrict handle, int request, void * __restrict p)
-{
-	_rtld_error(sorry);
-	return 0;
+dlinfo(void* __restrict handle, int request, void* __restrict p) {
+    _rtld_error(sorry);
+    return 0;
 }
 
 #pragma weak _rtld_thread_init
 void
-_rtld_thread_init(void * li)
-{
-	_rtld_error(sorry);
+_rtld_thread_init(void* li) {
+    _rtld_error(sorry);
 }
 
 #pragma weak dl_iterate_phdr
 int
-dl_iterate_phdr(int (*callback)(struct dl_phdr_info *, size_t, void *),
-    void *data)
-{
-	_rtld_error(sorry);
-	return 0;
+dl_iterate_phdr(int (*callback)(struct dl_phdr_info*, size_t, void*),
+                void* data) {
+    _rtld_error(sorry);
+    return 0;
 }

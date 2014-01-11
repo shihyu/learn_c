@@ -30,7 +30,7 @@ extern "C" {
 
 # define RTCCALLBACK(a, b)
 
-extern void *_RTC_api_change_mutex;
+extern void* _RTC_api_change_mutex;
 
 #ifdef __cplusplus
 }

@@ -38,11 +38,10 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _tspawnvp (
-        int modeflag,
-        REG3 const _TSCHAR *filename,
-        const _TSCHAR * const *argv
-        )
-{
-        return _tspawnvpe(modeflag, filename, argv, NULL);
+intptr_t __cdecl _tspawnvp(
+    int modeflag,
+    REG3 const _TSCHAR* filename,
+    const _TSCHAR* const* argv
+) {
+    return _tspawnvpe(modeflag, filename, argv, NULL);
 }

@@ -27,23 +27,23 @@
  */
 
 union IEEEl2bits {
-	long double	e;
-	struct {
-		unsigned int		sign	:1;
-		unsigned int		exp	:11;
-		unsigned int		manh	:20;
-		unsigned int		manl	:32;
-	} bits;
+    long double e;
+    struct {
+        unsigned int        sign    : 1;
+        unsigned int        exp : 11;
+        unsigned int        manh    : 20;
+        unsigned int        manl    : 32;
+    } bits;
 };
 
-#define	mask_nbit_l(u)	((void)0)
-#define	LDBL_IMPLICIT_NBIT
-#define	LDBL_NBIT	0
+#define mask_nbit_l(u)  ((void)0)
+#define LDBL_IMPLICIT_NBIT
+#define LDBL_NBIT   0
 
-#define	LDBL_MANH_SIZE	20
-#define	LDBL_MANL_SIZE	32
+#define LDBL_MANH_SIZE  20
+#define LDBL_MANL_SIZE  32
 
-#define	LDBL_TO_ARRAY32(u, a) do {			\
-	(a)[0] = (uint32_t)(u).bits.manl;		\
-	(a)[1] = (uint32_t)(u).bits.manh;		\
+#define LDBL_TO_ARRAY32(u, a) do {          \
+    (a)[0] = (uint32_t)(u).bits.manl;       \
+    (a)[1] = (uint32_t)(u).bits.manh;       \
 } while(0)

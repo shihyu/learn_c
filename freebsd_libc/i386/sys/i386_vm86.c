@@ -30,12 +30,9 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/i386_vm86.c,v 1.7 2004/01/09 16:52:09 
 #include <machine/sysarch.h>
 
 int
-i386_vm86(int fcn, void *data)
-{
-	struct i386_vm86_args p;
-
-	p.sub_op = fcn;
-	p.sub_args = (char *)data;
-
-	return (sysarch(I386_VM86, &p));
+i386_vm86(int fcn, void* data) {
+    struct i386_vm86_args p;
+    p.sub_op = fcn;
+    p.sub_args = (char*)data;
+    return (sysarch(I386_VM86, &p));
 }

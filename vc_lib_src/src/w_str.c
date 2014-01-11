@@ -60,8 +60,7 @@ static BOOL __cdecl __crtGetStringTypeW_stat
     __out LPWORD lpCharType,
     __in int code_page,
     __in int lcid
-)
-{
+) {
     static int f_use = 0;
 
     /*
@@ -69,35 +68,33 @@ static BOOL __cdecl __crtGetStringTypeW_stat
      * Must actually call the function to ensure it's not a stub.
      */
 
-    if ( cchSrc < -1 )
+    if (cchSrc < -1) {
         return FALSE;
+    }
 
-    if (0 == f_use)
-    {
+    if (0 == f_use) {
         unsigned short dummy;
 
-        if (0 != GetStringTypeW(CT_CTYPE1, L"\0", 1, &dummy))
+        if (0 != GetStringTypeW(CT_CTYPE1, L"\0", 1, &dummy)) {
             f_use = USE_W;
-
-        else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
+        } else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
             f_use = USE_A;
+        }
     }
 
     /* Use "W" version */
 
-    if (USE_W == f_use)
-    {
+    if (USE_W == f_use) {
         return GetStringTypeW(dwInfoType, lpSrcStr, cchSrc, lpCharType);
     }
 
     /* Use "A" version */
 
-    if (USE_A == f_use || f_use == 0)
-    {
+    if (USE_A == f_use || f_use == 0) {
         int buff_size;
-        BOOL retbool=FALSE;
-        unsigned char *buffer;
-        WORD * pwCharInfo;
+        BOOL retbool = FALSE;
+        unsigned char* buffer;
+        WORD* pwCharInfo;
         int malloc_flag1 = 0;
         int malloc_flag2 = 0;
         int AnsiCP;
@@ -116,66 +113,74 @@ static BOOL __cdecl __crtGetStringTypeW_stat
          * Use __lc_codepage for conversion if code_page not specified
          */
 
-        if (0 == lcid)
+        if (0 == lcid) {
             lcid = plocinfo->locinfo->lc_handle[LC_CTYPE];
-        if (0 == code_page)
+        }
+
+        if (0 == code_page) {
             code_page = plocinfo->locinfo->lc_codepage;
+        }
 
         /*
          * Always use Ansi codepage with Ansi WinAPI because they use
          * Ansi codepage
          */
-        if ( code_page != (AnsiCP = __ansicp(lcid)))
-        {
-            if (AnsiCP != -1)
+        if (code_page != (AnsiCP = __ansicp(lcid))) {
+            if (AnsiCP != -1) {
                 code_page = AnsiCP;
+            }
         }
 
         /* find out how big a buffer we need */
-        if ( 0 == (buff_size = WideCharToMultiByte( code_page,
-                                                    0,
-                                                    lpSrcStr,
-                                                    cchSrc,
-                                                    NULL,
-                                                    0,
-                                                    NULL,
-                                                    NULL )) )
-            return FALSE;
-
-        /* allocate enough space for chars */
-        buffer = (unsigned char *)_calloca( sizeof(char), buff_size );
-        if ( buffer == NULL ) {
+        if (0 == (buff_size = WideCharToMultiByte(code_page,
+                              0,
+                              lpSrcStr,
+                              cchSrc,
+                              NULL,
+                              0,
+                              NULL,
+                              NULL))) {
             return FALSE;
         }
-        (void)memset( buffer, 0, sizeof(char) * buff_size );
+
+        /* allocate enough space for chars */
+        buffer = (unsigned char*)_calloca(sizeof(char), buff_size);
+
+        if (buffer == NULL) {
+            return FALSE;
+        }
+
+        (void)memset(buffer, 0, sizeof(char) * buff_size);
 
         /* do the conversion */
-        if ( 0 == WideCharToMultiByte( code_page,
-                                       0,
-                                       lpSrcStr,
-                                       cchSrc,
-                                       (char *)buffer,
-                                       buff_size,
-                                       NULL,
-                                       NULL ) )
+        if (0 == WideCharToMultiByte(code_page,
+                                     0,
+                                     lpSrcStr,
+                                     cchSrc,
+                                     (char*)buffer,
+                                     buff_size,
+                                     NULL,
+                                     NULL)) {
             goto error_cleanup;
+        }
 
         /* allocate enough space for result (+1 for sanity check) */
-        pwCharInfo = (WORD *)_calloca( sizeof(WORD), (buff_size + 1) );
-        if ( pwCharInfo == NULL ) {
+        pwCharInfo = (WORD*)_calloca(sizeof(WORD), (buff_size + 1));
+
+        if (pwCharInfo == NULL) {
             goto error_cleanup;
         }
 
         /* do we use default lcid */
-        if (0 == lcid)
+        if (0 == lcid) {
             lcid = plocinfo->locinfo->lc_handle[LC_CTYPE];
+        }
 
         /* set to known value */
         pwCharInfo[cchSrc - 1] = pwCharInfo[cchSrc] = 0xFFFF;
-
         /* obtain result */
-        retbool = GetStringTypeA( lcid, dwInfoType, (const char *)buffer, buff_size,
-                                  pwCharInfo );
+        retbool = GetStringTypeA(lcid, dwInfoType, (const char*)buffer, buff_size,
+                                 pwCharInfo);
 
         /*
          * GetStringTypeA does not reveal how many WORDs have been
@@ -183,41 +188,38 @@ static BOOL __cdecl __crtGetStringTypeW_stat
          * verify that EXACTLY cchSrc WORDs were modified. Note that
          * not all multibyte LCID/codepage combos are guaranteed to work.
          */
-        if ( (pwCharInfo[cchSrc - 1] == 0xFFFF) || (pwCharInfo[cchSrc] != 0xFFFF) )
+        if ((pwCharInfo[cchSrc - 1] == 0xFFFF) || (pwCharInfo[cchSrc] != 0xFFFF)) {
             retbool = FALSE;
-        else
+        } else {
             memmove(lpCharType, pwCharInfo, cchSrc * sizeof(WORD));
+        }
 
         _freea(pwCharInfo);
-
-error_cleanup:
+    error_cleanup:
         _freea(buffer);
-
         return retbool;
-    }
-    else   /* f_use is neither USE_A nor USE_W */
+    } else { /* f_use is neither USE_A nor USE_W */
         return FALSE;
+    }
 }
 
 extern "C" BOOL __cdecl __crtGetStringTypeW(
-        _locale_t plocinfo,
-        DWORD    dwInfoType,
-        LPCWSTR  lpSrcStr,
-        int      cchSrc,
-        LPWORD   lpCharType,
-        int      code_page,
-        int      lcid
-        )
-{
+    _locale_t plocinfo,
+    DWORD    dwInfoType,
+    LPCWSTR  lpSrcStr,
+    int      cchSrc,
+    LPWORD   lpCharType,
+    int      code_page,
+    int      lcid
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
     return __crtGetStringTypeW_stat(
-            _loc_update.GetLocaleT(),
-            dwInfoType,
-            lpSrcStr,
-            cchSrc,
-            lpCharType,
-            code_page,
-            lcid
-            );
+               _loc_update.GetLocaleT(),
+               dwInfoType,
+               lpSrcStr,
+               cchSrc,
+               lpCharType,
+               code_page,
+               lcid
+           );
 }

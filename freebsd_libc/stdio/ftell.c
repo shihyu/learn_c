@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -50,16 +50,17 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/ftell.c,v 1.27 2007/01/09 00:28:06 imp Ex
  */
 long
 ftell(fp)
-	FILE *fp;
+FILE* fp;
 {
-	off_t rv;
+    off_t rv;
+    rv = ftello(fp);
 
-	rv = ftello(fp);
-	if (rv > LONG_MAX) {
-		errno = EOVERFLOW;
-		return (-1);
-	}
-	return (rv);
+    if (rv > LONG_MAX) {
+        errno = EOVERFLOW;
+        return (-1);
+    }
+
+    return (rv);
 }
 
 /*
@@ -67,73 +68,84 @@ ftell(fp)
  */
 off_t
 ftello(fp)
-	FILE *fp;
+FILE* fp;
 {
-	fpos_t rv;
-	int ret;
+    fpos_t rv;
+    int ret;
+    FLOCKFILE(fp);
+    ret = _ftello(fp, &rv);
+    FUNLOCKFILE(fp);
 
-	FLOCKFILE(fp);
-	ret = _ftello(fp, &rv);
-	FUNLOCKFILE(fp);
-	if (ret)
-		return (-1);
-	if (rv < 0) {   /* Unspecified value because of ungetc() at 0 */
-		errno = ESPIPE;
-		return (-1);
-	}
-	return (rv);
+    if (ret) {
+        return (-1);
+    }
+
+    if (rv < 0) {   /* Unspecified value because of ungetc() at 0 */
+        errno = ESPIPE;
+        return (-1);
+    }
+
+    return (rv);
 }
 
 int
 _ftello(fp, offset)
-	FILE *fp;
-	fpos_t *offset;
+FILE* fp;
+fpos_t* offset;
 {
-	fpos_t pos;
-	size_t n;
+    fpos_t pos;
+    size_t n;
 
-	if (fp->_seek == NULL) {
-		errno = ESPIPE;			/* historic practice */
-		return (1);
-	}
+    if (fp->_seek == NULL) {
+        errno = ESPIPE;         /* historic practice */
+        return (1);
+    }
 
-	/*
-	 * Find offset of underlying I/O object, then
-	 * adjust for buffered bytes.
-	 */
-	if (fp->_flags & __SOFF)
-		pos = fp->_offset;
-	else {
-		pos = _sseek(fp, (fpos_t)0, SEEK_CUR);
-		if (pos == -1)
-			return (1);
-	}
-	if (fp->_flags & __SRD) {
-		/*
-		 * Reading.  Any unread characters (including
-		 * those from ungetc) cause the position to be
-		 * smaller than that in the underlying object.
-		 */
-		if ((pos -= (HASUB(fp) ? fp->_ur : fp->_r)) < 0) {
-			fp->_flags |= __SERR;
-			errno = EIO;
-			return (1);
-		}
-		if (HASUB(fp))
-			pos -= fp->_r;  /* Can be negative at this point. */
-	} else if ((fp->_flags & __SWR) && fp->_p != NULL) {
-		/*
-		 * Writing.  Any buffered characters cause the
-		 * position to be greater than that in the
-		 * underlying object.
-		 */
-		n = fp->_p - fp->_bf._base;
-		if (pos > OFF_MAX - n) {
-			errno = EOVERFLOW;
-			return (1);
-		}
-		pos += n;
-	}
-	*offset = pos;
-	return (0);
+    /*
+     * Find offset of underlying I/O object, then
+     * adjust for buffered bytes.
+     */
+    if (fp->_flags & __SOFF) {
+        pos = fp->_offset;
+    } else {
+        pos = _sseek(fp, (fpos_t)0, SEEK_CUR);
+
+        if (pos == -1) {
+            return (1);
+        }
+    }
+
+    if (fp->_flags & __SRD) {
+        /*
+         * Reading.  Any unread characters (including
+         * those from ungetc) cause the position to be
+         * smaller than that in the underlying object.
+         */
+        if ((pos -= (HASUB(fp) ? fp->_ur : fp->_r)) < 0) {
+            fp->_flags |= __SERR;
+            errno = EIO;
+            return (1);
+        }
+
+        if (HASUB(fp)) {
+            pos -= fp->_r;    /* Can be negative at this point. */
+        }
+    } else if ((fp->_flags & __SWR) && fp->_p != NULL) {
+        /*
+         * Writing.  Any buffered characters cause the
+         * position to be greater than that in the
+         * underlying object.
+         */
+        n = fp->_p - fp->_bf._base;
+
+        if (pos > OFF_MAX - n) {
+            errno = EOVERFLOW;
+            return (1);
+        }
+
+        pos += n;
+    }
+
+    *offset = pos;
+    return (0);
 }

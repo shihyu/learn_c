@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,13 +44,14 @@ __FBSDID("$FreeBSD: src/lib/libc/sys/pwrite.c,v 1.4 2007/07/04 23:27:38 peter Ex
  */
 ssize_t
 pwrite(fd, buf, nbyte, offset)
-	int	fd;
-	const void *buf;
-	size_t	nbyte;
-	off_t	offset;
+int fd;
+const void* buf;
+size_t  nbyte;
+off_t   offset;
 {
-	if (__getosreldate() >= 700051)
-		return (__sys_pwrite(fd, buf, nbyte, offset));
-	else
-		return (__sys_freebsd6_pwrite(fd, buf, nbyte, 0, offset));
+    if (__getosreldate() >= 700051) {
+        return (__sys_pwrite(fd, buf, nbyte, offset));
+    } else {
+        return (__sys_freebsd6_pwrite(fd, buf, nbyte, 0, offset));
+    }
 }

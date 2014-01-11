@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,18 +39,19 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/assert.c,v 1.8 2007/01/09 00:27:53 imp Exp 
 
 void
 __assert(func, file, line, failedexpr)
-	const char *func, *file;
-	int line;
-	const char *failedexpr;
+const char* func, *file;
+int line;
+const char* failedexpr;
 {
-	if (func == NULL)
-		(void)fprintf(stderr,
-		     "Assertion failed: (%s), file %s, line %d.\n", failedexpr,
-		     file, line);
-	else
-		(void)fprintf(stderr,
-		     "Assertion failed: (%s), function %s, file %s, line %d.\n",
-		     failedexpr, func, file, line);
-	abort();
-	/* NOTREACHED */
+    if (func == NULL)
+        (void)fprintf(stderr,
+                      "Assertion failed: (%s), file %s, line %d.\n", failedexpr,
+                      file, line);
+    else
+        (void)fprintf(stderr,
+                      "Assertion failed: (%s), function %s, file %s, line %d.\n",
+                      failedexpr, func, file, line);
+
+    abort();
+    /* NOTREACHED */
 }

@@ -49,17 +49,15 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _wcsnicoll_l (
-        const wchar_t *_string1,
-        const wchar_t *_string2,
-        size_t count,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _wcsnicoll_l(
+    const wchar_t* _string1,
+    const wchar_t* _string2,
+    size_t count,
+    _locale_t plocinfo
+) {
     int ret;
 
-    if (!count)
-    {
+    if (!count) {
         return 0;
     }
 
@@ -67,35 +65,30 @@ extern "C" int __cdecl _wcsnicoll_l (
     _VALIDATE_RETURN(_string1 != NULL, EINVAL, _NLSCMPERROR);
     _VALIDATE_RETURN(_string2 != NULL, EINVAL, _NLSCMPERROR);
     _VALIDATE_RETURN(count <= INT_MAX, EINVAL, _NLSCMPERROR);
-
     _LocaleUpdate _loc_update(plocinfo);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE] == _CLOCALEHANDLE )
-    {
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE] == _CLOCALEHANDLE) {
         wchar_t f, l;
 
-        do
-        {
+        do {
             f = __ascii_towlower(*_string1);
             l = __ascii_towlower(*_string2);
             _string1++;
             _string2++;
-        }
-        while ( (--count) && f && (f == l) );
+        } while ((--count) && f && (f == l));
 
         return (int)(f - l);
     }
 
-    if ( 0 == (ret = __crtCompareStringW(
-                    _loc_update.GetLocaleT(),
-                    _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
-                               SORT_STRINGSORT | NORM_IGNORECASE,
-                               _string1,
-                               (int)count,
-                               _string2,
-                               (int)count,
-                    _loc_update.GetLocaleT()->locinfo->lc_collate_cp )) )
-    {
+    if (0 == (ret = __crtCompareStringW(
+                        _loc_update.GetLocaleT(),
+                        _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
+                        SORT_STRINGSORT | NORM_IGNORECASE,
+                        _string1,
+                        (int)count,
+                        _string2,
+                        (int)count,
+                        _loc_update.GetLocaleT()->locinfo->lc_collate_cp))) {
         errno = EINVAL;
         return _NLSCMPERROR;
     }
@@ -103,34 +96,27 @@ extern "C" int __cdecl _wcsnicoll_l (
     return (ret - 2);
 }
 
-extern "C" int __cdecl _wcsnicoll (
-        const wchar_t *_string1,
-        const wchar_t *_string2,
-        size_t count
-        )
-{
-    if (__locale_changed == 0)
-    {
+extern "C" int __cdecl _wcsnicoll(
+    const wchar_t* _string1,
+    const wchar_t* _string2,
+    size_t count
+) {
+    if (__locale_changed == 0) {
         wchar_t f, l;
-
         /* validation section */
         _VALIDATE_RETURN(_string1 != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(_string2 != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(count <= INT_MAX, EINVAL, _NLSCMPERROR);
 
-        do
-        {
+        do {
             f = __ascii_towlower(*_string1);
             l = __ascii_towlower(*_string2);
             _string1++;
             _string2++;
-        }
-        while ( (--count) && f && (f == l) );
+        } while ((--count) && f && (f == l));
 
         return (int)(f - l);
-    }
-    else
-    {
+    } else {
         return _wcsnicoll_l(_string1, _string2, count, NULL);
     }
 }

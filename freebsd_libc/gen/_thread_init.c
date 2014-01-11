@@ -32,10 +32,9 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/_thread_init.c,v 1.5 2002/02/01 00:57:29 ob
 __weak_reference(_thread_init_stub, _thread_init);
 __weak_reference(_thread_autoinit_dummy_decl_stub, _thread_autoinit_dummy_decl);
 
-int	_thread_autoinit_dummy_decl_stub = 0;
+int _thread_autoinit_dummy_decl_stub = 0;
 
 void
-_thread_init_stub(void)
-{
-	/* This is just a stub; there is nothing to do. */
+_thread_init_stub(void) {
+    /* This is just a stub; there is nothing to do. */
 }

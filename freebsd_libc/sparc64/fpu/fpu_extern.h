@@ -33,7 +33,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- *	$NetBSD: fpu_extern.h,v 1.4 2000/08/03 18:32:08 eeh Exp $
+ *  $NetBSD: fpu_extern.h,v 1.4 2000/08/03 18:32:08 eeh Exp $
  * $FreeBSD: src/lib/libc/sparc64/fpu/fpu_extern.h,v 1.6 2002/04/27 21:56:28 jake Exp $
  */
 
@@ -46,38 +46,38 @@ struct fpemu;
 struct fpn;
 
 /* fpu.c */
-int __fpu_exception(struct utrapframe *tf);
+int __fpu_exception(struct utrapframe* tf);
 
 /* fpu_add.c */
-struct fpn *__fpu_add(struct fpemu *);
+struct fpn* __fpu_add(struct fpemu*);
 
 /* fpu_compare.c */
-void __fpu_compare(struct fpemu *, int, int);
+void __fpu_compare(struct fpemu*, int, int);
 
 /* fpu_div.c */
-struct fpn *__fpu_div(struct fpemu *);
+struct fpn* __fpu_div(struct fpemu*);
 
 /* fpu_explode.c */
-int __fpu_itof(struct fpn *, u_int);
-int __fpu_xtof(struct fpn *, u_int64_t);
-int __fpu_stof(struct fpn *, u_int);
-int __fpu_dtof(struct fpn *, u_int, u_int );
-int __fpu_qtof(struct fpn *, u_int, u_int , u_int , u_int );
-void __fpu_explode(struct fpemu *, struct fpn *, int, int );
+int __fpu_itof(struct fpn*, u_int);
+int __fpu_xtof(struct fpn*, u_int64_t);
+int __fpu_stof(struct fpn*, u_int);
+int __fpu_dtof(struct fpn*, u_int, u_int);
+int __fpu_qtof(struct fpn*, u_int, u_int , u_int , u_int);
+void __fpu_explode(struct fpemu*, struct fpn*, int, int);
 
 /* fpu_implode.c */
-u_int __fpu_ftoi(struct fpemu *, struct fpn *);
-u_int __fpu_ftox(struct fpemu *, struct fpn *, u_int *);
-u_int __fpu_ftos(struct fpemu *, struct fpn *);
-u_int __fpu_ftod(struct fpemu *, struct fpn *, u_int *);
-u_int __fpu_ftoq(struct fpemu *, struct fpn *, u_int *);
-void __fpu_implode(struct fpemu *, struct fpn *, int, u_int *);
+u_int __fpu_ftoi(struct fpemu*, struct fpn*);
+u_int __fpu_ftox(struct fpemu*, struct fpn*, u_int*);
+u_int __fpu_ftos(struct fpemu*, struct fpn*);
+u_int __fpu_ftod(struct fpemu*, struct fpn*, u_int*);
+u_int __fpu_ftoq(struct fpemu*, struct fpn*, u_int*);
+void __fpu_implode(struct fpemu*, struct fpn*, int, u_int*);
 
 /* fpu_mul.c */
-struct fpn *__fpu_mul(struct fpemu *);
+struct fpn* __fpu_mul(struct fpemu*);
 
 /* fpu_sqrt.c */
-struct fpn *__fpu_sqrt(struct fpemu *);
+struct fpn* __fpu_sqrt(struct fpemu*);
 
 /* fpu_subr.c */
 /*
@@ -85,9 +85,9 @@ struct fpn *__fpu_sqrt(struct fpemu *);
  * Note that the result is probably not a well-formed number (it will lack
  * the normal 1-bit mant[0]&FP_1).
  */
-int __fpu_shr(register struct fpn *, register int);
-void __fpu_norm(register struct fpn *);
+int __fpu_shr(register struct fpn*, register int);
+void __fpu_norm(register struct fpn*);
 /* Build a new Quiet NaN (sign=0, frac=all 1's). */
-struct fpn *__fpu_newnan(register struct fpemu *);
+struct fpn* __fpu_newnan(register struct fpemu*);
 
 #endif /* !_SPARC64_FPU_FPU_EXTERN_H_ */

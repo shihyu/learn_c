@@ -26,8 +26,8 @@
 #include <string.h>
 
 typedef struct {
-        unsigned char LeadChar;
-        unsigned char SecondChar;
+    unsigned char LeadChar;
+    unsigned char SecondChar;
 } CharPair;
 
 
@@ -47,7 +47,7 @@ extern intptr_t _coninpfh;
 /*
  * Function that looks up the extended key code for a given event.
  */
-const CharPair * __cdecl _getextendedkeycode(KEY_EVENT_RECORD *);
+const CharPair* __cdecl _getextendedkeycode(KEY_EVENT_RECORD*);
 
 
 /***
@@ -77,159 +77,153 @@ const CharPair * __cdecl _getextendedkeycode(KEY_EVENT_RECORD *);
 *******************************************************************************/
 
 
-wint_t __cdecl _getwch (
-        void
-        )
-{
-        wchar_t wch;
-
-        _mlock(_CONIO_LOCK);            /* secure the console lock */
-        __TRY
-            wch = _getwch_nolock();               /* input the character */
-        __FINALLY
-            _munlock(_CONIO_LOCK);          /* release the console lock */
-        __END_TRY_FINALLY
-
-        return wch;
+wint_t __cdecl _getwch(
+    void
+) {
+    wchar_t wch;
+    _mlock(_CONIO_LOCK);            /* secure the console lock */
+    __TRY
+    wch = _getwch_nolock();               /* input the character */
+    __FINALLY
+    _munlock(_CONIO_LOCK);          /* release the console lock */
+    __END_TRY_FINALLY
+    return wch;
 }
 
-wint_t __cdecl _getwche (
-        void
-        )
-{
-        wchar_t wch;
-
-        _mlock(_CONIO_LOCK);            /* secure the console lock */
-        __TRY
-            wch = _getwche_nolock();              /* input and echo the character */
-        __FINALLY
-            _munlock(_CONIO_LOCK);          /* unlock the console */
-        __END_TRY_FINALLY
-
-        return wch;
+wint_t __cdecl _getwche(
+    void
+) {
+    wchar_t wch;
+    _mlock(_CONIO_LOCK);            /* secure the console lock */
+    __TRY
+    wch = _getwche_nolock();              /* input and echo the character */
+    __FINALLY
+    _munlock(_CONIO_LOCK);          /* unlock the console */
+    __END_TRY_FINALLY
+    return wch;
 }
 
 
 
-wint_t __cdecl _getwch_nolock (
-        void
-        )
-{
-        INPUT_RECORD ConInpRec;
-        DWORD NumRead;
-        const CharPair *pCP;
-        wchar_t wch = 0;                     /* single character buffer */
-        DWORD oldstate;
-        char ch;
+wint_t __cdecl _getwch_nolock(
+    void
+) {
+    INPUT_RECORD ConInpRec;
+    DWORD NumRead;
+    const CharPair* pCP;
+    wchar_t wch = 0;                     /* single character buffer */
+    DWORD oldstate;
+    char ch;
 
+    /*
+     * check pushback buffer (wchbuf) a for character
+     */
+    if (wchbuf != WEOF) {
         /*
-         * check pushback buffer (wchbuf) a for character
+         * something there, clear buffer and return the character.
          */
-        if ( wchbuf != WEOF ) {
-            /*
-             * something there, clear buffer and return the character.
-             */
-            wch = (wchar_t)(wchbuf & 0xFFFF);
-            wchbuf = WEOF;
-            return wch;
-        }
-
-        /*
-         * _coninpfh, the handle to the console input, is created the first
-         * time that either _getwch() or _cgetws() or _kbhit() is called.
-         */
-
-        if ( _coninpfh == -2 )
-            __initconin();
-
-        if (_coninpfh == -1)
-            return WEOF;
-
-        /*
-         * Switch to raw mode (no line input, no echo input)
-         */
-        GetConsoleMode( (HANDLE)_coninpfh, &oldstate );
-        SetConsoleMode( (HANDLE)_coninpfh, 0L );
-
-        for ( ; ; ) {
-
-            /*
-             * Get a console input event.
-             */
-            if ( bUseW ) {
-                if ( !ReadConsoleInputW( (HANDLE)_coninpfh,
-                                         &ConInpRec,
-                                         1L,
-                                         &NumRead)) {
-                    if ( bUseW == 2 && GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
-                        bUseW = FALSE;
-                    else {
-                        wch = WEOF;
-                        break;
-                    }
-                }
-                else
-                    bUseW = TRUE;
-                if ( NumRead == 0) {
-                    wch = WEOF;
-                    break;
-                }
-            }
-            if ( !bUseW) {
-                if ( !ReadConsoleInputA( (HANDLE) _coninpfh,
-                                         &ConInpRec,
-                                         1L,
-                                         &NumRead )
-                     || (NumRead == 0)) {
-                    wch = WEOF;
-                    break;
-                }
-            }
-
-            /*
-             * Look for, and decipher, key events.
-             */
-            if ( (ConInpRec.EventType == KEY_EVENT) &&
-                 ConInpRec.Event.KeyEvent.bKeyDown ) {
-                /*
-                 * Easy case: if uChar.AsciiChar is non-zero, just stuff it
-                 * into wch and quit.
-                 */
-                if (bUseW) {
-                    if ( wch = (wchar_t)ConInpRec.Event.KeyEvent.uChar.UnicodeChar )
-                        break;
-                }
-                else {
-                    if ( ch = ConInpRec.Event.KeyEvent.uChar.AsciiChar ) {
-                         MultiByteToWideChar(GetConsoleCP(),
-                                             0,
-                                             &ch,
-                                             1,
-                                             &wch,
-                                             1);
-                         break;
-                     }
-                }
-
-                /*
-                 * Hard case: either an extended code or an event which should
-                 * not be recognized. let _getextendedkeycode() do the work...
-                 */
-                if ( pCP = _getextendedkeycode( &(ConInpRec.Event.KeyEvent) ) ) {
-                    wch = pCP->LeadChar;
-                    wchbuf = pCP->SecondChar;
-                    break;
-                }
-            }
-        }
-
-
-        /*
-         * Restore previous console mode.
-         */
-        SetConsoleMode( (HANDLE)_coninpfh, oldstate );
-
+        wch = (wchar_t)(wchbuf & 0xFFFF);
+        wchbuf = WEOF;
         return wch;
+    }
+
+    /*
+     * _coninpfh, the handle to the console input, is created the first
+     * time that either _getwch() or _cgetws() or _kbhit() is called.
+     */
+
+    if (_coninpfh == -2) {
+        __initconin();
+    }
+
+    if (_coninpfh == -1) {
+        return WEOF;
+    }
+
+    /*
+     * Switch to raw mode (no line input, no echo input)
+     */
+    GetConsoleMode((HANDLE)_coninpfh, &oldstate);
+    SetConsoleMode((HANDLE)_coninpfh, 0L);
+
+    for (; ;) {
+        /*
+         * Get a console input event.
+         */
+        if (bUseW) {
+            if (!ReadConsoleInputW((HANDLE)_coninpfh,
+                                   &ConInpRec,
+                                   1L,
+                                   &NumRead)) {
+                if (bUseW == 2 && GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
+                    bUseW = FALSE;
+                } else {
+                    wch = WEOF;
+                    break;
+                }
+            } else {
+                bUseW = TRUE;
+            }
+
+            if (NumRead == 0) {
+                wch = WEOF;
+                break;
+            }
+        }
+
+        if (!bUseW) {
+            if (!ReadConsoleInputA((HANDLE) _coninpfh,
+                                   &ConInpRec,
+                                   1L,
+                                   &NumRead)
+                    || (NumRead == 0)) {
+                wch = WEOF;
+                break;
+            }
+        }
+
+        /*
+         * Look for, and decipher, key events.
+         */
+        if ((ConInpRec.EventType == KEY_EVENT) &&
+                ConInpRec.Event.KeyEvent.bKeyDown) {
+            /*
+             * Easy case: if uChar.AsciiChar is non-zero, just stuff it
+             * into wch and quit.
+             */
+            if (bUseW) {
+                if (wch = (wchar_t)ConInpRec.Event.KeyEvent.uChar.UnicodeChar) {
+                    break;
+                }
+            } else {
+                if (ch = ConInpRec.Event.KeyEvent.uChar.AsciiChar) {
+                    MultiByteToWideChar(GetConsoleCP(),
+                                        0,
+                                        &ch,
+                                        1,
+                                        &wch,
+                                        1);
+                    break;
+                }
+            }
+
+            /*
+             * Hard case: either an extended code or an event which should
+             * not be recognized. let _getextendedkeycode() do the work...
+             */
+            if (pCP = _getextendedkeycode(&(ConInpRec.Event.KeyEvent))) {
+                wch = pCP->LeadChar;
+                wchbuf = pCP->SecondChar;
+                break;
+            }
+        }
+    }
+
+    /*
+     * Restore previous console mode.
+     */
+    SetConsoleMode((HANDLE)_coninpfh, oldstate);
+    return wch;
 }
 
 
@@ -237,33 +231,33 @@ wint_t __cdecl _getwch_nolock (
  * getwche is just getwch followed by a putch if no error occurred
  */
 
-wint_t __cdecl _getwche_nolock (
-        void
-        )
-{
-        wchar_t wch;                 /* character read */
+wint_t __cdecl _getwche_nolock(
+    void
+) {
+    wchar_t wch;                 /* character read */
 
+    /*
+     * check pushback buffer (wchbuf) a for character. if found, return
+     * it without echoing.
+     */
+    if (wchbuf != WEOF) {
         /*
-         * check pushback buffer (wchbuf) a for character. if found, return
-         * it without echoing.
+         * something there, clear buffer and return the character.
          */
-        if ( wchbuf != WEOF ) {
-            /*
-             * something there, clear buffer and return the character.
-             */
-            wch = (wchar_t)(wchbuf & 0xFFFF);
-            wchbuf = WEOF;
-            return wch;
-        }
+        wch = (wchar_t)(wchbuf & 0xFFFF);
+        wchbuf = WEOF;
+        return wch;
+    }
 
-        wch = _getwch_nolock();       /* read character */
+    wch = _getwch_nolock();       /* read character */
 
-        if (wch != WEOF) {
-                if (_putwch_nolock(wch) != WEOF) {
-                        return wch;      /* if no error, return char */
-                }
+    if (wch != WEOF) {
+        if (_putwch_nolock(wch) != WEOF) {
+            return wch;      /* if no error, return char */
         }
-        return WEOF;                     /* get or put failed, return EOF */
+    }
+
+    return WEOF;                     /* get or put failed, return EOF */
 }
 
 /***
@@ -289,32 +283,29 @@ wint_t __cdecl _getwche_nolock (
 *******************************************************************************/
 
 
-wint_t __cdecl _ungetwch (
-        wint_t c
-        )
-{
-        wchar_t retval;
-
-        _mlock(_CONIO_LOCK);            /* lock the console */
-        __TRY
-            retval = _ungetwch_nolock(c);        /* pushback character */
-        __FINALLY
-            _munlock(_CONIO_LOCK);          /* unlock the console */
-        __END_TRY_FINALLY
-
-        return retval;
+wint_t __cdecl _ungetwch(
+    wint_t c
+) {
+    wchar_t retval;
+    _mlock(_CONIO_LOCK);            /* lock the console */
+    __TRY
+    retval = _ungetwch_nolock(c);        /* pushback character */
+    __FINALLY
+    _munlock(_CONIO_LOCK);          /* unlock the console */
+    __END_TRY_FINALLY
+    return retval;
 }
-wint_t __cdecl _ungetwch_nolock (
+wint_t __cdecl _ungetwch_nolock(
 
-        wint_t c
-        )
-{
-        /*
-         * Fail if the char is EOF or the pushback buffer is non-empty
-         */
-        if ( (c == WEOF) || (wchbuf != WEOF) )
-            return EOF;
+    wint_t c
+) {
+    /*
+     * Fail if the char is EOF or the pushback buffer is non-empty
+     */
+    if ((c == WEOF) || (wchbuf != WEOF)) {
+        return EOF;
+    }
 
-        wchbuf = (c & 0xFF);
-        return wchbuf;
+    wchbuf = (c & 0xFF);
+    return wchbuf;
 }

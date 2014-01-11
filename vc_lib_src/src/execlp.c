@@ -38,47 +38,41 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _texeclp (
-        const _TSCHAR *filename,
-        const _TSCHAR *arglist,
-        ...
-        )
-{
+intptr_t __cdecl _texeclp(
+    const _TSCHAR* filename,
+    const _TSCHAR* arglist,
+    ...
+) {
 #ifdef _M_IX86
-
-        /* validation section */
-        _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
-
-        return(_texecvp(filename,&arglist));
-
+    /* validation section */
+    _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
+    return (_texecvp(filename, &arglist));
 #else  /* _M_IX86 */
-
-        va_list vargs;
-        _TSCHAR * argbuf[64];
-        _TSCHAR ** argv;
-        intptr_t result;
-
-        /* validation section */
-        _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
-
-        va_start(vargs, arglist);
+    va_list vargs;
+    _TSCHAR* argbuf[64];
+    _TSCHAR** argv;
+    intptr_t result;
+    /* validation section */
+    _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
+    va_start(vargs, arglist);
 #ifdef WPRFLAG
-        argv = _wcapture_argv(&vargs, arglist, argbuf, 64);
+    argv = _wcapture_argv(&vargs, arglist, argbuf, 64);
 #else  /* WPRFLAG */
-        argv = _capture_argv(&vargs, arglist, argbuf, 64);
+    argv = _capture_argv(&vargs, arglist, argbuf, 64);
 #endif  /* WPRFLAG */
-        va_end(vargs);
+    va_end(vargs);
+    result = _texecvp(filename, argbuf);
 
-        result = _texecvp(filename,argbuf);
-        if (argv && argv != argbuf)
-            _free_crt(argv);
-        return result;
+    if (argv && argv != argbuf) {
+        _free_crt(argv);
+    }
 
+    return result;
 #endif  /* _M_IX86 */
 }

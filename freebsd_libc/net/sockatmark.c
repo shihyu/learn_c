@@ -26,11 +26,12 @@
  */
 #include <sys/ioctl.h>
 
-int sockatmark(int s)
-{
-	int atmark;
+int sockatmark(int s) {
+    int atmark;
 
-	if (ioctl(s, SIOCATMARK, &atmark) == -1)
-		return -1;
-	return atmark;
+    if (ioctl(s, SIOCATMARK, &atmark) == -1) {
+        return -1;
+    }
+
+    return atmark;
 }

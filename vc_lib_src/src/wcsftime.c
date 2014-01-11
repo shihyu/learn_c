@@ -22,8 +22,8 @@
 #include <locale.h>
 #include <setlocal.h>
 
-extern "C" size_t __cdecl _Strftime_l (char *string, size_t maxsize, const char *format,
-        const struct tm *timeptr, void *lc_time_arg, _locale_t plocinfo);
+extern "C" size_t __cdecl _Strftime_l(char* string, size_t maxsize, const char* format,
+                                      const struct tm* timeptr, void* lc_time_arg, _locale_t plocinfo);
 
 
 /***
@@ -55,110 +55,99 @@ extern "C" size_t __cdecl _Strftime_l (char *string, size_t maxsize, const char 
 *
 *******************************************************************************/
 
-static size_t __cdecl _wcsftime_l_stat (
-        wchar_t *wstring,
-        size_t maxsize,
-        const wchar_t *wformat,
-        const struct tm *timeptr,
-        _locale_t plocinfo
-        )
-{
+static size_t __cdecl _wcsftime_l_stat(
+    wchar_t* wstring,
+    size_t maxsize,
+    const wchar_t* wformat,
+    const struct tm* timeptr,
+    _locale_t plocinfo
+) {
     size_t retval = 0;
-    char *format = NULL;
-    char *string = NULL;
+    char* format = NULL;
+    char* string = NULL;
     size_t flen = 0;
+    _VALIDATE_RETURN((wstring != NULL), EINVAL, 0)
+    _VALIDATE_RETURN((maxsize != 0), EINVAL, 0)
 
-    _VALIDATE_RETURN( ( wstring != NULL ), EINVAL, 0)
-    _VALIDATE_RETURN( ( maxsize != 0 ), EINVAL, 0)
-    if ( maxsize > 0 )
-    {
+    if (maxsize > 0) {
         *wstring = '\0';
     }
 
-    _VALIDATE_RETURN( ( wformat != NULL ), EINVAL, 0)
-
+    _VALIDATE_RETURN((wformat != NULL), EINVAL, 0)
     flen = wcslen(wformat) + 1;
+    string = (char*)_calloca(sizeof(char) * 2, maxsize);
 
-    string = (char *)_calloca(sizeof(char)*2, maxsize);
-    if ( string == NULL )
-    {
+    if (string == NULL) {
         return 0;
     }
 
-    format = (char *)_calloca(sizeof(char)*2, flen);
-    if ( format == NULL )
-    {
+    format = (char*)_calloca(sizeof(char) * 2, flen);
+
+    if (format == NULL) {
         goto done;
     }
 
-    if (_ERRCHECK_EINVAL_ERANGE(_wcstombs_s_l(NULL, format, flen * 2, wformat, flen * 2 - 1, plocinfo)) != 0)
-    {
+    if (_ERRCHECK_EINVAL_ERANGE(_wcstombs_s_l(NULL, format, flen * 2, wformat, flen * 2 - 1, plocinfo)) != 0) {
         goto done;
     }
 
-    if (_Strftime_l(string, maxsize * 2, format, timeptr, 0, plocinfo))
-    {
-        if (_ERRCHECK_EINVAL_ERANGE(_mbstowcs_s_l(&retval, wstring, maxsize, string, _TRUNCATE, plocinfo)) != 0)
-        {
+    if (_Strftime_l(string, maxsize * 2, format, timeptr, 0, plocinfo)) {
+        if (_ERRCHECK_EINVAL_ERANGE(_mbstowcs_s_l(&retval, wstring, maxsize, string, _TRUNCATE, plocinfo)) != 0) {
             // VSW 435529: Set errno here if we overflowed the buffer.
-            if (retval >= maxsize)
-            {
+            if (retval >= maxsize) {
                 errno = ERANGE;
             }
+
             retval = 0;
         }
+
         /* mbstowcs_s  returns the number of characters including the null-terminator;
          * _wcsftime just returns the number of characters.
          */
-        if (retval > 0)
-        {
+        if (retval > 0) {
             --retval;
         }
-    }
-    else
-    {
+    } else {
         retval = 0;
     }
 
 done:
-    if ( format != NULL )
+
+    if (format != NULL) {
         _freea(format);
+    }
 
     _freea(string);
 
-    if (retval == 0)
-    {
+    if (retval == 0) {
         *wstring = '\0';
     }
 
     return retval;
 }
 
-extern "C" size_t __cdecl _wcsftime_l (
-        wchar_t *wstring,
-        size_t maxsize,
-        const wchar_t *wformat,
-        const struct tm *timeptr,
-        _locale_t plocinfo
-        )
-{
+extern "C" size_t __cdecl _wcsftime_l(
+    wchar_t* wstring,
+    size_t maxsize,
+    const wchar_t* wformat,
+    const struct tm* timeptr,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
     return _wcsftime_l_stat(
-            wstring,
-            maxsize,
-            wformat,
-            timeptr,
-            _loc_update.GetLocaleT());
+               wstring,
+               maxsize,
+               wformat,
+               timeptr,
+               _loc_update.GetLocaleT());
 }
 
-extern "C" size_t __cdecl wcsftime (
-        wchar_t *wstring,
-        size_t maxsize,
-        const wchar_t *wformat,
-        const struct tm *timeptr
-        )
-{
+extern "C" size_t __cdecl wcsftime(
+    wchar_t* wstring,
+    size_t maxsize,
+    const wchar_t* wformat,
+    const struct tm* timeptr
+) {
     return _wcsftime_l(wstring, maxsize, wformat, timeptr, NULL);
 }
 

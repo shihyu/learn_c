@@ -5,7 +5,7 @@
  * Oct 13, 1998 by Wes Peters <wes@softweyr.com>
  *
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -17,7 +17,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by Softweyr LLC, the
+ *  This product includes software developed by Softweyr LLC, the
  *      University of California, Berkeley, and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
@@ -41,50 +41,57 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcstok.c,v 1.2 2003/03/12 06:41:49 tjr E
 
 #include <wchar.h>
 
-wchar_t *
-wcstok(wchar_t * __restrict s, const wchar_t * __restrict delim,
-    wchar_t ** __restrict last)
-{
-	const wchar_t *spanp;
-	wchar_t *tok;
-	wchar_t c, sc;
+wchar_t*
+wcstok(wchar_t* __restrict s, const wchar_t* __restrict delim,
+       wchar_t** __restrict last) {
+    const wchar_t* spanp;
+    wchar_t* tok;
+    wchar_t c, sc;
 
-	if (s == NULL && (s = *last) == NULL)
-		return (NULL);
+    if (s == NULL && (s = *last) == NULL) {
+        return (NULL);
+    }
 
-	/*
-	 * Skip (span) leading delimiters (s += wcsspn(s, delim), sort of).
-	 */
+    /*
+     * Skip (span) leading delimiters (s += wcsspn(s, delim), sort of).
+     */
 cont:
-	c = *s++;
-	for (spanp = delim; (sc = *spanp++) != L'\0';) {
-		if (c == sc)
-			goto cont;
-	}
+    c = *s++;
 
-	if (c == L'\0') {	/* no non-delimiter characters */
-		*last = NULL;
-		return (NULL);
-	}
-	tok = s - 1;
+    for (spanp = delim; (sc = *spanp++) != L'\0';) {
+        if (c == sc) {
+            goto cont;
+        }
+    }
 
-	/*
-	 * Scan token (scan for delimiters: s += wcscspn(s, delim), sort of).
-	 * Note that delim must have one NUL; we stop if we see that, too.
-	 */
-	for (;;) {
-		c = *s++;
-		spanp = delim;
-		do {
-			if ((sc = *spanp++) == c) {
-				if (c == L'\0')
-					s = NULL;
-				else
-					s[-1] = L'\0';
-				*last = s;
-				return (tok);
-			}
-		} while (sc != L'\0');
-	}
-	/* NOTREACHED */
+    if (c == L'\0') {   /* no non-delimiter characters */
+        *last = NULL;
+        return (NULL);
+    }
+
+    tok = s - 1;
+
+    /*
+     * Scan token (scan for delimiters: s += wcscspn(s, delim), sort of).
+     * Note that delim must have one NUL; we stop if we see that, too.
+     */
+    for (;;) {
+        c = *s++;
+        spanp = delim;
+
+        do {
+            if ((sc = *spanp++) == c) {
+                if (c == L'\0') {
+                    s = NULL;
+                } else {
+                    s[-1] = L'\0';
+                }
+
+                *last = s;
+                return (tok);
+            }
+        } while (sc != L'\0');
+    }
+
+    /* NOTREACHED */
 }

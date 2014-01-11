@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemcpy.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *  citrus Id: wmemcpy.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -37,12 +37,11 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wmemcpy.c,v 1.7 2002/09/21 00:29:23 tjr 
 #include <string.h>
 #include <wchar.h>
 
-wchar_t *
+wchar_t*
 wmemcpy(d, s, n)
-	wchar_t * __restrict d;
-	const wchar_t * __restrict s;
-	size_t n;
+wchar_t* __restrict d;
+const wchar_t* __restrict s;
+size_t n;
 {
-
-	return (wchar_t *)memcpy(d, s, n * sizeof(wchar_t));
+    return (wchar_t*)memcpy(d, s, n * sizeof(wchar_t));
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,21 +50,18 @@ __FBSDID("$FreeBSD: src/lib/libc/inet/inet_ntoa.c,v 1.6 2007/06/14 07:13:28 delp
  * Convert network-format internet address
  * to base 256 d.d.d.d representation.
  */
-/*const*/ char *
+/*const*/ char*
 inet_ntoa(struct in_addr in) {
-	static char ret[18];
-
-	strcpy(ret, "[inet_ntoa error]");
-	(void) inet_ntop(AF_INET, &in, ret, sizeof ret);
-	return (ret);
+    static char ret[18];
+    strcpy(ret, "[inet_ntoa error]");
+    (void) inet_ntop(AF_INET, &in, ret, sizeof ret);
+    return (ret);
 }
 
-char *
-inet_ntoa_r(struct in_addr in, char *buf, socklen_t size)
-{
-
-	(void) inet_ntop(AF_INET, &in, buf, size);
-	return (buf);
+char*
+inet_ntoa_r(struct in_addr in, char* buf, socklen_t size) {
+    (void) inet_ntop(AF_INET, &in, buf, size);
+    return (buf);
 }
 
 /*

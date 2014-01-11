@@ -39,16 +39,15 @@
 *
 *******************************************************************************/
 
-void __cdecl setbuf (
-        FILE *stream,
-        char *buffer
-        )
-{
-        _ASSERTE(stream != NULL);
+void __cdecl setbuf(
+    FILE* stream,
+    char* buffer
+) {
+    _ASSERTE(stream != NULL);
 
-        if (buffer == NULL)
-                setvbuf(stream, NULL, _IONBF, 0);
-        else
-                setvbuf(stream, buffer, _IOFBF, BUFSIZ);
-
+    if (buffer == NULL) {
+        setvbuf(stream, NULL, _IONBF, 0);
+    } else {
+        setvbuf(stream, buffer, _IOFBF, BUFSIZ);
+    }
 }

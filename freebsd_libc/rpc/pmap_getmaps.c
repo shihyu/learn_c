@@ -1,4 +1,4 @@
-/*	$NetBSD: pmap_getmaps.c,v 1.16 2000/07/06 03:10:34 christos Exp $	*/
+/*  $NetBSD: pmap_getmaps.c,v 1.16 2000/07/06 03:10:34 christos Exp $   */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "@(#)pmap_getmaps.c 1.10 87/08/11 Copyr 1984 Sun Micro";
-static char *sccsid = "@(#)pmap_getmaps.c	2.2 88/08/01 4.0 RPCSRC";
+static char* sccsid2 = "@(#)pmap_getmaps.c 1.10 87/08/11 Copyr 1984 Sun Micro";
+static char* sccsid = "@(#)pmap_getmaps.c	2.2 88/08/01 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_getmaps.c,v 1.16 2004/10/16 06:11:35 obrien Exp $");
@@ -70,31 +70,32 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_getmaps.c,v 1.16 2004/10/16 06:11:35 o
  * Get a copy of the current port maps.
  * Calls the pmap service remotely to do get the maps.
  */
-struct pmaplist *
+struct pmaplist*
 pmap_getmaps(address)
-	 struct sockaddr_in *address;
+struct sockaddr_in* address;
 {
-	struct pmaplist *head = NULL;
-	int sock = -1;
-	struct timeval minutetimeout;
-	CLIENT *client;
+    struct pmaplist* head = NULL;
+    int sock = -1;
+    struct timeval minutetimeout;
+    CLIENT* client;
+    assert(address != NULL);
+    minutetimeout.tv_sec = 60;
+    minutetimeout.tv_usec = 0;
+    address->sin_port = htons(PMAPPORT);
+    client = clnttcp_create(address, PMAPPROG,
+                            PMAPVERS, &sock, 50, 500);
 
-	assert(address != NULL);
+    if (client != NULL) {
+        if (CLNT_CALL(client, (rpcproc_t)PMAPPROC_DUMP,
+                      (xdrproc_t)xdr_void, NULL,
+                      (xdrproc_t)xdr_pmaplist, &head, minutetimeout) !=
+                RPC_SUCCESS) {
+            clnt_perror(client, "pmap_getmaps rpc problem");
+        }
 
-	minutetimeout.tv_sec = 60;
-	minutetimeout.tv_usec = 0;
-	address->sin_port = htons(PMAPPORT);
-	client = clnttcp_create(address, PMAPPROG,
-	    PMAPVERS, &sock, 50, 500);
-	if (client != NULL) {
-		if (CLNT_CALL(client, (rpcproc_t)PMAPPROC_DUMP,
-		    (xdrproc_t)xdr_void, NULL,
-		    (xdrproc_t)xdr_pmaplist, &head, minutetimeout) !=
-		    RPC_SUCCESS) {
-			clnt_perror(client, "pmap_getmaps rpc problem");
-		}
-		CLNT_DESTROY(client);
-	}
-	address->sin_port = 0;
-	return (head);
+        CLNT_DESTROY(client);
+    }
+
+    address->sin_port = 0;
+    return (head);
 }

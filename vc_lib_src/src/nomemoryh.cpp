@@ -2,11 +2,11 @@
 #include <new>
 _STD_BEGIN
 
-_CRTIMP void __cdecl _Nomemory()
-        {       // report out of memory
-        static const _XSTD bad_alloc nomem;
-        _RAISE(nomem);
-        }
+_CRTIMP void __cdecl _Nomemory() {
+    // report out of memory
+    static const _XSTD bad_alloc nomem;
+    _RAISE(nomem);
+}
 _STD_END
 
 /*

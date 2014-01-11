@@ -47,54 +47,52 @@
 *******************************************************************************/
 
 extern "C" int __cdecl _mbsnicoll_l(
-        const unsigned char *s1,
-        const unsigned char *s2,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
-        int ret;
-        size_t bcnt1, bcnt2;
-        _LocaleUpdate _loc_update(plocinfo);
+    const unsigned char* s1,
+    const unsigned char* s2,
+    size_t n,
+    _locale_t plocinfo
+) {
+    int ret;
+    size_t bcnt1, bcnt2;
+    _LocaleUpdate _loc_update(plocinfo);
 
-        if (n == 0)
-            return 0;
+    if (n == 0) {
+        return 0;
+    }
 
-        /* validation section */
-        _VALIDATE_RETURN(s1 != NULL, EINVAL, _NLSCMPERROR);
-        _VALIDATE_RETURN(s2 != NULL, EINVAL, _NLSCMPERROR);
-        _VALIDATE_RETURN(n <= INT_MAX, EINVAL, _NLSCMPERROR);
+    /* validation section */
+    _VALIDATE_RETURN(s1 != NULL, EINVAL, _NLSCMPERROR);
+    _VALIDATE_RETURN(s2 != NULL, EINVAL, _NLSCMPERROR);
+    _VALIDATE_RETURN(n <= INT_MAX, EINVAL, _NLSCMPERROR);
 
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return _strnicoll_l((const char *)s1, (const char *)s2, n, plocinfo);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return _strnicoll_l((const char*)s1, (const char*)s2, n, plocinfo);
+    }
 
-        bcnt1 = _mbsnbcnt_l(s1, n, _loc_update.GetLocaleT());
-        bcnt2 = _mbsnbcnt_l(s2, n, _loc_update.GetLocaleT());
+    bcnt1 = _mbsnbcnt_l(s1, n, _loc_update.GetLocaleT());
+    bcnt2 = _mbsnbcnt_l(s2, n, _loc_update.GetLocaleT());
 
-        if ( 0 == (ret = __crtCompareStringA(
+    if (0 == (ret = __crtCompareStringA(
                         _loc_update.GetLocaleT(),
                         _loc_update.GetLocaleT()->mbcinfo->mblcid,
                         SORT_STRINGSORT | NORM_IGNORECASE,
-                        (const char *)s1,
+                        (const char*)s1,
                         (int)bcnt1,
-                        (char *)s2,
+                        (char*)s2,
                         (int)bcnt2,
-                        _loc_update.GetLocaleT()->mbcinfo->mbcodepage )) )
-        {
-            errno = EINVAL;
-            return _NLSCMPERROR;
-        }
+                        _loc_update.GetLocaleT()->mbcinfo->mbcodepage))) {
+        errno = EINVAL;
+        return _NLSCMPERROR;
+    }
 
-        return ret - 2;
-
+    return ret - 2;
 }
 
 extern "C" int (__cdecl _mbsnicoll)(
-        const unsigned char *s1,
-        const unsigned char *s2,
-        size_t n
-        )
-{
+    const unsigned char* s1,
+    const unsigned char* s2,
+    size_t n
+) {
     return _mbsnicoll_l(s1, s2, n, NULL);
 }
 #endif  /* _MBCS */

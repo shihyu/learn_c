@@ -32,5 +32,6 @@ int main(void) {
             printf("分數等級為丁等\n");
         }
     }
+
     return 0;
 }

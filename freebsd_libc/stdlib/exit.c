@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,22 +50,23 @@ void (*__cleanup)(void);
  * thread-safe, but without a (significant) penalty to non-threaded
  * processes.
  */
-int	__isthreaded	= 0;
+int __isthreaded    = 0;
 
 /*
  * Exit, flushing stdio buffers if necessary.
  */
 void
 exit(status)
-	int status;
+int status;
 {
-	/* Ensure that the auto-initialization routine is linked in: */
-	extern int _thread_autoinit_dummy_decl;
+    /* Ensure that the auto-initialization routine is linked in: */
+    extern int _thread_autoinit_dummy_decl;
+    _thread_autoinit_dummy_decl = 1;
+    __cxa_finalize(NULL);
 
-	_thread_autoinit_dummy_decl = 1;
+    if (__cleanup) {
+        (*__cleanup)();
+    }
 
-	__cxa_finalize(NULL);
-	if (__cleanup)
-		(*__cleanup)();
-	_exit(status);
+    _exit(status);
 }

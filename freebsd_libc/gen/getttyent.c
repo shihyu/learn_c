@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,258 +42,297 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getttyent.c,v 1.16 2007/01/09 00:27:54 imp 
 #include <paths.h>
 
 static char zapchar;
-static FILE *tf;
+static FILE* tf;
 static int maxpts = 0;
 static int curpts = 0;
 static int pts_valid = 0;
 static size_t lbsize;
-static char *line;
+static char* line;
 
 #define PTS "pts/"
-#define	MALLOCCHUNK	100
+#define MALLOCCHUNK 100
 
-static char *skip(char *);
-static char *value(char *);
+static char* skip(char*);
+static char* value(char*);
 
-struct ttyent *
+struct ttyent*
 getttynam(tty)
-	const char *tty;
+const char* tty;
 {
-	struct ttyent *t;
+    struct ttyent* t;
 
-	if (strncmp(tty, "/dev/", 5) == 0)
-		tty += 5;
-	setttyent();
-	while ( (t = getttyent()) )
-		if (!strcmp(tty, t->ty_name))
-			break;
-	endttyent();
-	return (t);
+    if (strncmp(tty, "/dev/", 5) == 0) {
+        tty += 5;
+    }
+
+    setttyent();
+
+    while ((t = getttyent()))
+        if (!strcmp(tty, t->ty_name)) {
+            break;
+        }
+
+    endttyent();
+    return (t);
 }
 
-struct ttyent *
-getttyent()
-{
-	static struct ttyent tty;
-	static char devpts_name[] = "pts/4294967295";
-	char *p;
-	int c;
-	size_t i;
+struct ttyent*
+getttyent() {
+    static struct ttyent tty;
+    static char devpts_name[] = "pts/4294967295";
+    char* p;
+    int c;
+    size_t i;
 
-	if (!tf && !setttyent())
-		return (NULL);
-	for (;;) {
-		if (!fgets(p = line, lbsize, tf)) {
-			if (pts_valid == 1 && curpts <= maxpts) {
-				sprintf(devpts_name, "pts/%d", curpts++);
-				tty.ty_name = devpts_name;
-				tty.ty_getty = tty.ty_type = NULL;
-				tty.ty_status = TTY_NETWORK;
-				tty.ty_window = NULL;   
-				tty.ty_comment = NULL;
-				tty.ty_group  = _TTYS_NOGROUP; 	
-				return (&tty);
-			}
-			return (NULL);
-		}
-		/* extend buffer if line was too big, and retry */
-		while (!index(p, '\n')) {
-			i = strlen(p);
-			lbsize += MALLOCCHUNK;
-			if ((p = realloc(line, lbsize)) == NULL) {
-				(void)endttyent();
-				return (NULL);
-			}
-			line = p;
-			if (!fgets(&line[i], lbsize - i, tf))
-				return (NULL);
-		}
-		while (isspace((unsigned char)*p))
-			++p;
-		if (*p && *p != '#')
-			break;
-	}
+    if (!tf && !setttyent()) {
+        return (NULL);
+    }
+
+    for (;;) {
+        if (!fgets(p = line, lbsize, tf)) {
+            if (pts_valid == 1 && curpts <= maxpts) {
+                sprintf(devpts_name, "pts/%d", curpts++);
+                tty.ty_name = devpts_name;
+                tty.ty_getty = tty.ty_type = NULL;
+                tty.ty_status = TTY_NETWORK;
+                tty.ty_window = NULL;
+                tty.ty_comment = NULL;
+                tty.ty_group  = _TTYS_NOGROUP;
+                return (&tty);
+            }
+
+            return (NULL);
+        }
+
+        /* extend buffer if line was too big, and retry */
+        while (!index(p, '\n')) {
+            i = strlen(p);
+            lbsize += MALLOCCHUNK;
+
+            if ((p = realloc(line, lbsize)) == NULL) {
+                (void)endttyent();
+                return (NULL);
+            }
+
+            line = p;
+
+            if (!fgets(&line[i], lbsize - i, tf)) {
+                return (NULL);
+            }
+        }
+
+        while (isspace((unsigned char)*p)) {
+            ++p;
+        }
+
+        if (*p && *p != '#') {
+            break;
+        }
+    }
 
 #define scmp(e) !strncmp(p, e, sizeof(e) - 1) && isspace((unsigned char)p[sizeof(e) - 1])
-#define	vcmp(e)	!strncmp(p, e, sizeof(e) - 1) && p[sizeof(e) - 1] == '='
+#define vcmp(e) !strncmp(p, e, sizeof(e) - 1) && p[sizeof(e) - 1] == '='
+    zapchar = 0;
+    tty.ty_name = p;
+    tty.ty_status = 0;
+    tty.ty_window = NULL;
+    tty.ty_group  = _TTYS_NOGROUP;
+    p = skip(p);
 
-	zapchar = 0;
-	tty.ty_name = p;
-	tty.ty_status = 0;
-	tty.ty_window = NULL;
-	tty.ty_group  = _TTYS_NOGROUP;
+    if (!*(tty.ty_getty = p)) {
+        tty.ty_getty = tty.ty_type = NULL;
+    } else {
+        p = skip(p);
 
-	p = skip(p);
-	if (!*(tty.ty_getty = p))
-		tty.ty_getty = tty.ty_type = NULL;
-	else {
-		p = skip(p);
-		if (!*(tty.ty_type = p))
-			tty.ty_type = NULL;
-		else {
-			/* compatibility kludge: handle network/dialup specially */
-			if (scmp(_TTYS_DIALUP))
-				tty.ty_status |= TTY_DIALUP;
-			else if (scmp(_TTYS_NETWORK))
-				tty.ty_status |= TTY_NETWORK;
-			p = skip(p);
-		}
-	}
+        if (!*(tty.ty_type = p)) {
+            tty.ty_type = NULL;
+        } else {
+            /* compatibility kludge: handle network/dialup specially */
+            if (scmp(_TTYS_DIALUP)) {
+                tty.ty_status |= TTY_DIALUP;
+            } else if (scmp(_TTYS_NETWORK)) {
+                tty.ty_status |= TTY_NETWORK;
+            }
 
-	for (; *p; p = skip(p)) {
-		if (scmp(_TTYS_OFF))
-			tty.ty_status &= ~TTY_ON;
-		else if (scmp(_TTYS_ON))
-			tty.ty_status |= TTY_ON;
-		else if (scmp(_TTYS_SECURE))
-			tty.ty_status |= TTY_SECURE;
-		else if (scmp(_TTYS_INSECURE))
-			tty.ty_status &= ~TTY_SECURE;
-		else if (scmp(_TTYS_DIALUP))
-			tty.ty_status |= TTY_DIALUP;
-		else if (scmp(_TTYS_NETWORK))
-			tty.ty_status |= TTY_NETWORK;
-		else if (vcmp(_TTYS_WINDOW))
-			tty.ty_window = value(p);
-		else if (vcmp(_TTYS_GROUP))
-			tty.ty_group = value(p);
-		else
-			break;
-	}
+            p = skip(p);
+        }
+    }
 
-	if (zapchar == '#' || *p == '#')
-		while ((c = *++p) == ' ' || c == '\t')
-			;
-	tty.ty_comment = p;
-	if (*p == 0)
-		tty.ty_comment = 0;
-	if ( (p = index(p, '\n')) )
-		*p = '\0';
-	return (&tty);
+    for (; *p; p = skip(p)) {
+        if (scmp(_TTYS_OFF)) {
+            tty.ty_status &= ~TTY_ON;
+        } else if (scmp(_TTYS_ON)) {
+            tty.ty_status |= TTY_ON;
+        } else if (scmp(_TTYS_SECURE)) {
+            tty.ty_status |= TTY_SECURE;
+        } else if (scmp(_TTYS_INSECURE)) {
+            tty.ty_status &= ~TTY_SECURE;
+        } else if (scmp(_TTYS_DIALUP)) {
+            tty.ty_status |= TTY_DIALUP;
+        } else if (scmp(_TTYS_NETWORK)) {
+            tty.ty_status |= TTY_NETWORK;
+        } else if (vcmp(_TTYS_WINDOW)) {
+            tty.ty_window = value(p);
+        } else if (vcmp(_TTYS_GROUP)) {
+            tty.ty_group = value(p);
+        } else {
+            break;
+        }
+    }
+
+    if (zapchar == '#' || *p == '#')
+        while ((c = *++p) == ' ' || c == '\t')
+            ;
+
+    tty.ty_comment = p;
+
+    if (*p == 0) {
+        tty.ty_comment = 0;
+    }
+
+    if ((p = index(p, '\n'))) {
+        *p = '\0';
+    }
+
+    return (&tty);
 }
 
-#define	QUOTED	1
+#define QUOTED  1
 
 /*
  * Skip over the current field, removing quotes, and return a pointer to
  * the next field.
  */
-static char *
+static char*
 skip(p)
-	char *p;
+char* p;
 {
-	char *t;
-	int c, q;
+    char* t;
+    int c, q;
 
-	for (q = 0, t = p; (c = *p) != '\0'; p++) {
-		if (c == '"') {
-			q ^= QUOTED;	/* obscure, but nice */
-			continue;
-		}
-		if (q == QUOTED && *p == '\\' && *(p+1) == '"')
-			p++;
-		*t++ = *p;
-		if (q == QUOTED)
-			continue;
-		if (c == '#') {
-			zapchar = c;
-			*p = 0;
-			break;
-		}
-		if (c == '\t' || c == ' ' || c == '\n') {
-			zapchar = c;
-			*p++ = 0;
-			while ((c = *p) == '\t' || c == ' ' || c == '\n')
-				p++;
-			break;
-		}
-	}
-	*--t = '\0';
-	return (p);
+    for (q = 0, t = p; (c = *p) != '\0'; p++) {
+        if (c == '"') {
+            q ^= QUOTED;    /* obscure, but nice */
+            continue;
+        }
+
+        if (q == QUOTED && *p == '\\' && *(p + 1) == '"') {
+            p++;
+        }
+
+        *t++ = *p;
+
+        if (q == QUOTED) {
+            continue;
+        }
+
+        if (c == '#') {
+            zapchar = c;
+            *p = 0;
+            break;
+        }
+
+        if (c == '\t' || c == ' ' || c == '\n') {
+            zapchar = c;
+            *p++ = 0;
+
+            while ((c = *p) == '\t' || c == ' ' || c == '\n') {
+                p++;
+            }
+
+            break;
+        }
+    }
+
+    *--t = '\0';
+    return (p);
 }
 
-static char *
+static char*
 value(p)
-	char *p;
+char* p;
 {
-
-	return ((p = index(p, '=')) ? ++p : NULL);
+    return ((p = index(p, '=')) ? ++p : NULL);
 }
 
 int
-setttyent()
-{
-	DIR *devpts_dir;
+setttyent() {
+    DIR* devpts_dir;
 
-	if (line == NULL) {
-		if ((line = malloc(MALLOCCHUNK)) == NULL)
-			return (0);
-		lbsize = MALLOCCHUNK;
-	}
-	devpts_dir = opendir(_PATH_DEV PTS);
-	if (devpts_dir) {
-		struct dirent *dp;
+    if (line == NULL) {
+        if ((line = malloc(MALLOCCHUNK)) == NULL) {
+            return (0);
+        }
 
-		while ((dp = readdir(devpts_dir))) {
-			if (strcmp(dp->d_name, ".") != 0 &&
-			    strcmp(dp->d_name, "..") != 0) {
-				if (atoi(dp->d_name) > maxpts) {
-					maxpts = atoi(dp->d_name);
-					pts_valid = 1;
-					curpts = 0;
-				}
-			}
-		}
-		closedir(devpts_dir);
-	}
-	if (tf) {
-		rewind(tf);
-		return (1);
-	} else if ( (tf = fopen(_PATH_TTYS, "r")) )
-		return (1);
-	return (0);
+        lbsize = MALLOCCHUNK;
+    }
+
+    devpts_dir = opendir(_PATH_DEV PTS);
+
+    if (devpts_dir) {
+        struct dirent* dp;
+
+        while ((dp = readdir(devpts_dir))) {
+            if (strcmp(dp->d_name, ".") != 0 &&
+                    strcmp(dp->d_name, "..") != 0) {
+                if (atoi(dp->d_name) > maxpts) {
+                    maxpts = atoi(dp->d_name);
+                    pts_valid = 1;
+                    curpts = 0;
+                }
+            }
+        }
+
+        closedir(devpts_dir);
+    }
+
+    if (tf) {
+        rewind(tf);
+        return (1);
+    } else if ((tf = fopen(_PATH_TTYS, "r"))) {
+        return (1);
+    }
+
+    return (0);
 }
 
 int
-endttyent()
-{
-	int rval;
+endttyent() {
+    int rval;
+    pts_valid = 0;
 
-	pts_valid = 0;
-	/*
+    /*
          * NB: Don't free `line' because getttynam()
-	 * may still be referencing it
-	 */
-	if (tf) {
-		rval = (fclose(tf) != EOF);
-		tf = NULL;
-		return (rval);
-	}
-	return (1);
+     * may still be referencing it
+     */
+    if (tf) {
+        rval = (fclose(tf) != EOF);
+        tf = NULL;
+        return (rval);
+    }
+
+    return (1);
 }
 
 static int
 isttystat(tty, flag)
-	const char *tty;
-	int flag;
+const char* tty;
+int flag;
 {
-	struct ttyent *t;
-
-	return ((t = getttynam(tty)) == NULL) ? 0 : !!(t->ty_status & flag);
+    struct ttyent* t;
+    return ((t = getttynam(tty)) == NULL) ? 0 : !!(t->ty_status & flag);
 }
 
 
 int
 isdialuptty(tty)
-	const char *tty;
+const char* tty;
 {
-
-	return isttystat(tty, TTY_DIALUP);
+    return isttystat(tty, TTY_DIALUP);
 }
 
 int isnettty(tty)
-	const char *tty;
+const char* tty;
 {
-
-	return isttystat(tty, TTY_NETWORK);
+    return isttystat(tty, TTY_NETWORK);
 }

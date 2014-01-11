@@ -82,7 +82,7 @@ extern "C" {
 #undef  _USE_32BIT_TIME_T
 #endif  /* _WIN64 */
 #else  /* _USE_32BIT_TIME_T */
-#if _INTEGRAL_MAX_BITS < 64   
+#if _INTEGRAL_MAX_BITS < 64
 #define _USE_32BIT_TIME_T
 #endif  /* _INTEGRAL_MAX_BITS < 64    */
 #endif  /* _USE_32BIT_TIME_T */
@@ -93,7 +93,7 @@ typedef _W64 long __time32_t;   /* 32-bit time value */
 #endif  /* _TIME32_T_DEFINED */
 
 #ifndef _TIME64_T_DEFINED
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 typedef __int64 __time64_t;     /* 64-bit time value */
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 #define _TIME64_T_DEFINED
@@ -112,32 +112,32 @@ typedef __time64_t time_t;      /* time value */
 
 #ifndef _TIMEB_DEFINED
 struct __timeb32 {
-        __time32_t time;
-        unsigned short millitm;
-        short timezone;
-        short dstflag;
-        };
+    __time32_t time;
+    unsigned short millitm;
+    short timezone;
+    short dstflag;
+};
 
 #if !__STDC__
 
 /* Non-ANSI name for compatibility */
 struct timeb {
-        time_t time;
-        unsigned short millitm;
-        short timezone;
-        short dstflag;
-        };
+    time_t time;
+    unsigned short millitm;
+    short timezone;
+    short dstflag;
+};
 
 
 #endif  /* !__STDC__ */
 
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 struct __timeb64 {
-        __time64_t time;
-        unsigned short millitm;
-        short timezone;
-        short dstflag;
-        };
+    __time64_t time;
+    unsigned short millitm;
+    short timezone;
+    short dstflag;
+};
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
 #ifdef _USE_32BIT_TIME_T
@@ -160,11 +160,11 @@ struct __timeb64 {
 
 /* Function prototypes */
 
-_CRT_INSECURE_DEPRECATE(_ftime32_s) _CRTIMP void __cdecl _ftime32(__out struct __timeb32 * _Time);
-_CRTIMP errno_t __cdecl _ftime32_s(__out struct __timeb32 * _Time);
-#if _INTEGRAL_MAX_BITS >= 64   
-_CRT_INSECURE_DEPRECATE(_ftime64_s) _CRTIMP void __cdecl _ftime64(__out struct __timeb64 * _Time);
-_CRTIMP errno_t __cdecl _ftime64_s(__out struct __timeb64 * _Time);
+_CRT_INSECURE_DEPRECATE(_ftime32_s) _CRTIMP void __cdecl _ftime32(__out struct __timeb32* _Time);
+_CRTIMP errno_t __cdecl _ftime32_s(__out struct __timeb32* _Time);
+#if _INTEGRAL_MAX_BITS >= 64
+_CRT_INSECURE_DEPRECATE(_ftime64_s) _CRTIMP void __cdecl _ftime64(__out struct __timeb64* _Time);
+_CRTIMP errno_t __cdecl _ftime64_s(__out struct __timeb64* _Time);
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
 #if !defined (RC_INVOKED) && !defined (__midl)

@@ -623,14 +623,17 @@ typedef wchar_t     TCHAR;
 #define _tccpy(_pc1,_cpc2) ((*(_pc1) = *(_cpc2)))
 #define _tccmp(_cpc1,_cpc2) ((*(_cpc1))-(*(_cpc2)))
 #else  /* __STDC__ || defined (_NO_INLINING) */
-__inline __checkReturn size_t __CRTDECL _tclen(__in_z const wchar_t *_Cpc)
-{
+__inline __checkReturn size_t __CRTDECL _tclen(__in_z const wchar_t* _Cpc) {
     /* avoid compiler warning */
-    (void *)_Cpc;
+    (void*)_Cpc;
     return 1;
 }
-__inline void __CRTDECL _tccpy(__out wchar_t *_Pc1, __in_z const wchar_t *_Cpc2) { *_Pc1 = (wchar_t)*_Cpc2; }
-__inline __checkReturn int __CRTDECL _tccmp(__in_z const wchar_t *_Cpc1, __in_z const wchar_t *_Cpc2) { return (int) ((*_Cpc1)-(*_Cpc2)); }
+__inline void __CRTDECL _tccpy(__out wchar_t* _Pc1, __in_z const wchar_t* _Cpc2) {
+    *_Pc1 = (wchar_t) * _Cpc2;
+}
+__inline __checkReturn int __CRTDECL _tccmp(__in_z const wchar_t* _Cpc1, __in_z const wchar_t* _Cpc2) {
+    return (int)((*_Cpc1) - (*_Cpc2));
+}
 #endif  /* __STDC__ || defined (_NO_INLINING) */
 
 /* ctype functions */
@@ -675,7 +678,7 @@ __inline __checkReturn int __CRTDECL _tccmp(__in_z const wchar_t *_Cpc1, __in_z 
 #define _wcsinc(_pc)    ((_pc)+1)
 #define _wcsnextc(_cpc) ((unsigned int) *(_cpc))
 #define _wcsninc(_pc, _sz) (((_pc)+(_sz)))
-_CRTIMP __checkReturn size_t __cdecl __wcsncnt(__in_ecount_z(_MaxCount) const wchar_t * _Str, __in size_t _MaxCount);
+_CRTIMP __checkReturn size_t __cdecl __wcsncnt(__in_ecount_z(_MaxCount) const wchar_t* _Str, __in size_t _MaxCount);
 #define _wcsncnt(_cpc, _sz) (__wcsncnt(_cpc,_sz))
 #define _wcsspnp(_cpc1, _cpc2)                                                          (_cpc1==NULL ? NULL : ((*((_cpc1)+wcsspn(_cpc1,_cpc2))) ? ((_cpc1)+wcsspn(_cpc1,_cpc2)) : NULL))
 #define _wcsncpy_l(_Destination, _Source, _Count, _Locale)                              (wcsncpy(_Destination, _Source, _Count))
@@ -693,29 +696,37 @@ _CRTIMP __checkReturn size_t __cdecl __wcsncnt(__in_ecount_z(_MaxCount) const wc
 #define _wcsset_l(_Destination, _Value, _Locale)                                        (_wcsset(_Destination, _Value))
 #define _wcsset_s_l(_Destination, _Destination_size_chars, _Value, _Locale)             (_wcsset_s(_Destination, _Destination_size_chars, _Value))
 #else  /* __STDC__ || defined (_NO_INLINING) */
-__inline __checkReturn wchar_t * __CRTDECL _wcsdec(__in_z const wchar_t * _Cpc1, __in_z const wchar_t * _Cpc2) { return (wchar_t *)((_Cpc1)>=(_Cpc2) ? NULL : ((_Cpc2)-1)); }
-__inline __checkReturn wchar_t * __CRTDECL _wcsinc(__in_z const wchar_t * _Pc) { return (wchar_t *)(_Pc+1); }
-__inline __checkReturn unsigned int __CRTDECL _wcsnextc(__in_z const wchar_t * _Cpc) { return (unsigned int)*_Cpc; }
-__inline __checkReturn wchar_t * __CRTDECL _wcsninc(__in_z const wchar_t * _Pc, __in size_t _Sz) { return (wchar_t *)(_Pc+_Sz); }
-__inline __checkReturn size_t __CRTDECL _wcsncnt( __in_ecount_z(_Cnt) const wchar_t * _String, __in size_t _Cnt)
-{
-        size_t n = _Cnt;
-        wchar_t *cp = (wchar_t *)_String;
-        while (n-- && *cp)
-                cp++;
-        return _Cnt - n - 1;
+__inline __checkReturn wchar_t* __CRTDECL _wcsdec(__in_z const wchar_t* _Cpc1, __in_z const wchar_t* _Cpc2) {
+    return (wchar_t*)((_Cpc1) >= (_Cpc2) ? NULL : ((_Cpc2) - 1));
 }
-__inline __checkReturn wchar_t * __CRTDECL _wcsspnp
+__inline __checkReturn wchar_t* __CRTDECL _wcsinc(__in_z const wchar_t* _Pc) {
+    return (wchar_t*)(_Pc + 1);
+}
+__inline __checkReturn unsigned int __CRTDECL _wcsnextc(__in_z const wchar_t* _Cpc) {
+    return (unsigned int) * _Cpc;
+}
+__inline __checkReturn wchar_t* __CRTDECL _wcsninc(__in_z const wchar_t* _Pc, __in size_t _Sz) {
+    return (wchar_t*)(_Pc + _Sz);
+}
+__inline __checkReturn size_t __CRTDECL _wcsncnt(__in_ecount_z(_Cnt) const wchar_t* _String, __in size_t _Cnt) {
+    size_t n = _Cnt;
+    wchar_t* cp = (wchar_t*)_String;
+
+    while (n-- && *cp) {
+        cp++;
+    }
+
+    return _Cnt - n - 1;
+}
+__inline __checkReturn wchar_t* __CRTDECL _wcsspnp
 (
-    __in_z const wchar_t * _Cpc1,
-    __in_z const wchar_t * _Cpc2
-)
-{
-    return _Cpc1==NULL ? NULL : ((*(_Cpc1 += wcsspn(_Cpc1,_Cpc2))!='\0') ? (wchar_t*)_Cpc1 : NULL);
+    __in_z const wchar_t* _Cpc1,
+    __in_z const wchar_t* _Cpc2
+) {
+    return _Cpc1 == NULL ? NULL : ((*(_Cpc1 += wcsspn(_Cpc1, _Cpc2)) != '\0') ? (wchar_t*)_Cpc1 : NULL);
 }
 
-__inline wchar_t * __CRTDECL _wcsncpy_l(__out_ecount(_Count) wchar_t *_Destination, __in_z const wchar_t *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline wchar_t* __CRTDECL _wcsncpy_l(__out_ecount(_Count) wchar_t* _Destination, __in_z const wchar_t* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 6054)
@@ -724,8 +735,7 @@ __inline wchar_t * __CRTDECL _wcsncpy_l(__out_ecount(_Count) wchar_t *_Destinati
 }
 
 #if __STDC_WANT_SECURE_LIB__
-__inline __checkReturn_wat errno_t __CRTDECL _wcsncpy_s_l(__out_ecount_z(_Destination_size_chars) wchar_t *_Destination, __in size_t _Destination_size_chars, __in_z const wchar_t *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline __checkReturn_wat errno_t __CRTDECL _wcsncpy_s_l(__out_ecount_z(_Destination_size_chars) wchar_t* _Destination, __in size_t _Destination_size_chars, __in_z const wchar_t* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -734,21 +744,19 @@ __inline __checkReturn_wat errno_t __CRTDECL _wcsncpy_s_l(__out_ecount_z(_Destin
 }
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _wcsncpy_s_l, __out_ecount(_Size) wchar_t, _Dest, __in_z const wchar_t *, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _wcsncpy_s_l, __out_ecount(_Size) wchar_t, _Dest, __in_z const wchar_t*, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
 
-__inline wchar_t * __CRTDECL _wcsncat_l(__inout_z wchar_t *_Destination, __in_z const wchar_t *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline wchar_t* __CRTDECL _wcsncat_l(__inout_z wchar_t* _Destination, __in_z const wchar_t* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 6054 6059)
-/* prefast noise VSW 489802 */
-        return wcsncat(_Destination, _Source, _Count);
+    /* prefast noise VSW 489802 */
+    return wcsncat(_Destination, _Source, _Count);
 #pragma warning( pop )
 }
 
 #if __STDC_WANT_SECURE_LIB__
-__inline __checkReturn_wat errno_t __CRTDECL _wcsncat_s_l(__inout_ecount_z(_Destination_size_chars) wchar_t *_Destination, __in size_t _Destination_size_chars, __in_z const wchar_t *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline __checkReturn_wat errno_t __CRTDECL _wcsncat_s_l(__inout_ecount_z(_Destination_size_chars) wchar_t* _Destination, __in size_t _Destination_size_chars, __in_z const wchar_t* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -757,25 +765,22 @@ __inline __checkReturn_wat errno_t __CRTDECL _wcsncat_s_l(__inout_ecount_z(_Dest
 }
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _wcsncat_s_l, __inout_ecount(_Size) wchar_t, _Dest, __in_z const wchar_t *, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _wcsncat_s_l, __inout_ecount(_Size) wchar_t, _Dest, __in_z const wchar_t*, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
 
-__inline wchar_t * _wcstok_l(__inout_z_opt wchar_t * _String, __in_z const wchar_t * _Delimiters, __in_opt _locale_t _Locale)
-{
+__inline wchar_t* _wcstok_l(__inout_z_opt wchar_t* _String, __in_z const wchar_t* _Delimiters, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning(push)
 #pragma warning(disable:4996)
-        return wcstok(_String,_Delimiters);
+    return wcstok(_String, _Delimiters);
 #pragma warning(pop)
 }
 
-__inline wchar_t * _wcstok_s_l(__inout_z_opt wchar_t * _String, __in_z const wchar_t * _Delimiters, __deref_inout_z_opt wchar_t **_Current_position, __in_opt _locale_t _Locale)
-{
+__inline wchar_t* _wcstok_s_l(__inout_z_opt wchar_t* _String, __in_z const wchar_t* _Delimiters, __deref_inout_z_opt wchar_t** _Current_position, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
     return wcstok_s(_String, _Delimiters, _Current_position);
 }
 
-__inline wchar_t * __CRTDECL _wcsnset_l(__inout_z wchar_t * _Destination, __in_z wchar_t _Value, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline wchar_t* __CRTDECL _wcsnset_l(__inout_z wchar_t* _Destination, __in_z wchar_t _Value, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -783,14 +788,12 @@ __inline wchar_t * __CRTDECL _wcsnset_l(__inout_z wchar_t * _Destination, __in_z
 #pragma warning( pop )
 }
 
-__inline errno_t _wcsnset_s_l(__inout_ecount_z(_Destination_size_chars) wchar_t * _Destination, __in size_t _Destination_size_chars, __in_z wchar_t _Value, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline errno_t _wcsnset_s_l(__inout_ecount_z(_Destination_size_chars) wchar_t* _Destination, __in size_t _Destination_size_chars, __in_z wchar_t _Value, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
     return _wcsnset_s(_Destination, _Destination_size_chars, _Value, _Count);
 }
 
-__inline wchar_t * __CRTDECL _wcsset_l(__inout_z wchar_t * _Destination, __in_z wchar_t _Value, __in_opt _locale_t _Locale)
-{
+__inline wchar_t* __CRTDECL _wcsset_l(__inout_z wchar_t* _Destination, __in_z wchar_t _Value, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -798,8 +801,7 @@ __inline wchar_t * __CRTDECL _wcsset_l(__inout_z wchar_t * _Destination, __in_z 
 #pragma warning( pop )
 }
 
-__inline errno_t _wcsset_s_l(__inout_ecount_z(_Destination_size_chars) wchar_t * _Destination, __in size_t _Destination_size_chars, __in_z wchar_t _Value, __in_opt _locale_t _Locale)
-{
+__inline errno_t _wcsset_s_l(__inout_ecount_z(_Destination_size_chars) wchar_t* _Destination, __in size_t _Destination_size_chars, __in_z wchar_t _Value, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
     return _wcsset_s(_Destination, _Destination_size_chars, _Value);
 }
@@ -1348,92 +1350,92 @@ typedef char            TCHAR;
 
 /* String functions */
 
-_CRTIMP __checkReturn _CONST_RETURN char * __cdecl _tcschr(__in_z const char * _Str, __in unsigned int _Val);
-_CRTIMP __checkReturn size_t __cdecl _tcscspn(__in_z const char * _Str, __in_z const char * _Control);
-_CRTIMP char * __cdecl _tcsncat(__in_z __out_ecount(_MaxCount) char *_Dst, __in_z const char *_Src, __in size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsncat_s(__inout_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsncat_l(__in_z __out_ecount(_MaxCount) char *_Dst, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsncat_s_l(__inout_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsncpy(__out_ecount(_MaxCount) char *_Dst, __in_z const char *_Src, size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsncpy_s(__out_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsncpy_l(__out_ecount(_MaxCount) char *_Dst, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsncpy_s_l(__out_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn _CONST_RETURN char * __cdecl _tcspbrk(__in_z const char * _Str, __in_z const char * _Control);
-_CRTIMP __checkReturn _CONST_RETURN char * __cdecl _tcsrchr(__in_z const char * _Str, __in unsigned int _Ch);
-_CRTIMP __checkReturn size_t __cdecl _tcsspn(__in_z const char * _Str, __in_z const char * _Control);
-_CRTIMP __checkReturn _CONST_RETURN char * __cdecl _tcsstr(__in_z const char * _Str, __in_z const char * _Substr);
-_CRTIMP __checkReturn char * __cdecl _tcstok(__inout_opt char *_Str, __in_z const char *_Delim);
-_CRTIMP __checkReturn char * __cdecl _tcstok_s(__inout_opt char *_Str, __in_z const char *_Delim, __deref_inout_z_opt char **_Context);
-_CRTIMP __checkReturn char * __cdecl _tcstok_l(__inout_opt char *_Str, __in_z const char *_Delim, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn char * __cdecl _tcstok_s_l(__inout_opt char *_Str, __in_z const char *_Delim, __deref_inout_z_opt char **_Context, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn _CONST_RETURN char* __cdecl _tcschr(__in_z const char* _Str, __in unsigned int _Val);
+_CRTIMP __checkReturn size_t __cdecl _tcscspn(__in_z const char* _Str, __in_z const char* _Control);
+_CRTIMP char* __cdecl _tcsncat(__in_z __out_ecount(_MaxCount) char* _Dst, __in_z const char* _Src, __in size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsncat_s(__inout_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsncat_l(__in_z __out_ecount(_MaxCount) char* _Dst, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsncat_s_l(__inout_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsncpy(__out_ecount(_MaxCount) char* _Dst, __in_z const char* _Src, size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsncpy_s(__out_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsncpy_l(__out_ecount(_MaxCount) char* _Dst, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsncpy_s_l(__out_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn _CONST_RETURN char* __cdecl _tcspbrk(__in_z const char* _Str, __in_z const char* _Control);
+_CRTIMP __checkReturn _CONST_RETURN char* __cdecl _tcsrchr(__in_z const char* _Str, __in unsigned int _Ch);
+_CRTIMP __checkReturn size_t __cdecl _tcsspn(__in_z const char* _Str, __in_z const char* _Control);
+_CRTIMP __checkReturn _CONST_RETURN char* __cdecl _tcsstr(__in_z const char* _Str, __in_z const char* _Substr);
+_CRTIMP __checkReturn char* __cdecl _tcstok(__inout_opt char* _Str, __in_z const char* _Delim);
+_CRTIMP __checkReturn char* __cdecl _tcstok_s(__inout_opt char* _Str, __in_z const char* _Delim, __deref_inout_z_opt char** _Context);
+_CRTIMP __checkReturn char* __cdecl _tcstok_l(__inout_opt char* _Str, __in_z const char* _Delim, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn char* __cdecl _tcstok_s_l(__inout_opt char* _Str, __in_z const char* _Delim, __deref_inout_z_opt char** _Context, __in_opt _locale_t _Locale);
 
-_CRTIMP char * __cdecl _tcsnset(__inout_z char * _Str, __in unsigned int _Val, __in size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsrev(__inout_z char * _Str);
-_CRTIMP char * __cdecl _tcsset(__inout_z char * _Str, __in unsigned int _Val);
-_CRTIMP char * __cdecl _tcsset_l(__inout_z char * _Str, __in unsigned int _Val, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn_wat errno_t __cdecl _tcsset_s(__inout_ecount_z(_SizeInChars) char * _Str, __in size_t _SizeInChars, __in unsigned int _Val);
-_CRTIMP __checkReturn_wat errno_t __cdecl _tcsset_s_l(__inout_ecount_z(_SizeInChars) char * _Str, __in size_t _SizeInChars, __in unsigned int, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsnset(__inout_z char* _Str, __in unsigned int _Val, __in size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsrev(__inout_z char* _Str);
+_CRTIMP char* __cdecl _tcsset(__inout_z char* _Str, __in unsigned int _Val);
+_CRTIMP char* __cdecl _tcsset_l(__inout_z char* _Str, __in unsigned int _Val, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn_wat errno_t __cdecl _tcsset_s(__inout_ecount_z(_SizeInChars) char* _Str, __in size_t _SizeInChars, __in unsigned int _Val);
+_CRTIMP __checkReturn_wat errno_t __cdecl _tcsset_s_l(__inout_ecount_z(_SizeInChars) char* _Str, __in size_t _SizeInChars, __in unsigned int, __in_opt _locale_t _Locale);
 
-_CRTIMP __checkReturn int __cdecl _tcscmp(__in_z const char *_Str1, __in_z const char * _Str);
-_CRTIMP __checkReturn int __cdecl _tcsicmp(__in_z const char *_Str1, __in_z const char *_Str2);
-_CRTIMP __checkReturn int __cdecl _tcsicmp_l(__in_z const char *_Str1, __in_z const char *_Str2, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsnccmp(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsncmp(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsncicmp(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsncicmp_l(__in_z const char *_Str1, __in_z const char *_Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsnicmp(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsnicmp_l(__in_z const char *_Str1, __in_z const char *_Str2, size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcscmp(__in_z const char* _Str1, __in_z const char* _Str);
+_CRTIMP __checkReturn int __cdecl _tcsicmp(__in_z const char* _Str1, __in_z const char* _Str2);
+_CRTIMP __checkReturn int __cdecl _tcsicmp_l(__in_z const char* _Str1, __in_z const char* _Str2, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsnccmp(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsncmp(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsncicmp(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsncicmp_l(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsnicmp(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsnicmp_l(__in_z const char* _Str1, __in_z const char* _Str2, size_t _MaxCount, __in_opt _locale_t _Locale);
 
-_CRTIMP __checkReturn int __cdecl _tcscoll(__in_z const char * _Str1, __in_z const char * _Str2);
-_CRTIMP __checkReturn int __cdecl _tcscoll_l(__in_z const char *_Str1, __in_z const char *_Str2, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsicoll(__in_z const char * _Str1, __in_z const char * _Str2);
-_CRTIMP __checkReturn int __cdecl _tcsicoll_l(__in_z const char *_Str1, __in_z const char *_Str2, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsnccoll(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsnccoll_l(__in_z const char *_Str1, __in_z const char *_Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsncoll(__in_z const char *_Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsncoll_l(__in_z const char *_Str1, __in_z const char *_Str2, size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsncicoll(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsncicoll_l(__in_z const char *_Str1, __in_z const char *_Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _tcsnicoll(__in_z const char * _Str1, __in_z const char * _Str2, __in size_t _MaxCount);
-_CRTIMP __checkReturn int __cdecl _tcsnicoll_l(__in_z const char *_Str1, __in_z const char *_Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcscoll(__in_z const char* _Str1, __in_z const char* _Str2);
+_CRTIMP __checkReturn int __cdecl _tcscoll_l(__in_z const char* _Str1, __in_z const char* _Str2, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsicoll(__in_z const char* _Str1, __in_z const char* _Str2);
+_CRTIMP __checkReturn int __cdecl _tcsicoll_l(__in_z const char* _Str1, __in_z const char* _Str2, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsnccoll(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsnccoll_l(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsncoll(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsncoll_l(__in_z const char* _Str1, __in_z const char* _Str2, size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsncicoll(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsncicoll_l(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _tcsnicoll(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount);
+_CRTIMP __checkReturn int __cdecl _tcsnicoll_l(__in_z const char* _Str1, __in_z const char* _Str2, __in size_t _MaxCount, __in_opt _locale_t _Locale);
 
 /* "logical-character" mappings */
 
-_CRTIMP __checkReturn size_t __cdecl _tcsclen(__in_z const char *_Str);
-_CRTIMP __checkReturn size_t __cdecl _tcscnlen(__in_ecount(_MaxCount) const char *_Str, __in size_t _MaxCount);
-_CRTIMP __checkReturn size_t __cdecl _tcsclen_l(__in_z const char *_Str, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn size_t __cdecl _tcscnlen_l(__in_z const char *_Str, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsnccat(__inout char *_Dst, __in_z const char *_Src, __in size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsnccat_s(__inout_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, __in size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsnccat_l(__inout char *_Dst, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsnccat_s_l(__inout_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsnccpy(__out_ecount(_MaxCount) char *_Dst, __in_z const char *_Src, __in size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsnccpy_s(__out_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, __in size_t _MaxCount);
-_CRTIMP char * __cdecl _tcsnccpy_l(__out_ecount(_DstSizeInChars) char *_Dst, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsnccpy_s_l(__out_ecount(_DstSizeInChars) char *_Dst, __in size_t _DstSizeInChars, __in_z const char *_Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsncset(__inout_ecount_z(_MaxCount) char * _Str, __in unsigned int _Val, __in size_t _MaxCount);
+_CRTIMP __checkReturn size_t __cdecl _tcsclen(__in_z const char* _Str);
+_CRTIMP __checkReturn size_t __cdecl _tcscnlen(__in_ecount(_MaxCount) const char* _Str, __in size_t _MaxCount);
+_CRTIMP __checkReturn size_t __cdecl _tcsclen_l(__in_z const char* _Str, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn size_t __cdecl _tcscnlen_l(__in_z const char* _Str, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsnccat(__inout char* _Dst, __in_z const char* _Src, __in size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsnccat_s(__inout_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, __in size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsnccat_l(__inout char* _Dst, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsnccat_s_l(__inout_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsnccpy(__out_ecount(_MaxCount) char* _Dst, __in_z const char* _Src, __in size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsnccpy_s(__out_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, __in size_t _MaxCount);
+_CRTIMP char* __cdecl _tcsnccpy_l(__out_ecount(_DstSizeInChars) char* _Dst, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsnccpy_s_l(__out_ecount(_DstSizeInChars) char* _Dst, __in size_t _DstSizeInChars, __in_z const char* _Src, __in size_t _MaxCount, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsncset(__inout_ecount_z(_MaxCount) char* _Str, __in unsigned int _Val, __in size_t _MaxCount);
 
 /* MBCS-specific mappings */
 
-_CRTIMP char * __cdecl _tcsdec(__in_ecount_z(_Pos-_Start+1) const char * _Start, __in_z const char * _Pos);
-_CRTIMP char * __cdecl _tcsinc(__in_z const char * _Ptr);
-_CRTIMP size_t __cdecl _tcsnbcnt(__in_ecount_z(_MaxCount) const char * _Str, __in size_t _MaxCount);
-_CRTIMP size_t __cdecl _tcsnccnt(__in_ecount_z(_MaxCount) const char * _Str, __in size_t _MaxCount);
-_CRTIMP unsigned int __cdecl _tcsnextc (__in_z const char * _Str);
-_CRTIMP char * __cdecl _tcsninc(__in_ecount_z(_Count) const char * _Ptr, __in size_t _Count);
-_CRTIMP char * __cdecl _tcsspnp(__in_z const char * _Str1, __in_z const char * _Str2);
+_CRTIMP char* __cdecl _tcsdec(__in_ecount_z(_Pos - _Start + 1) const char* _Start, __in_z const char* _Pos);
+_CRTIMP char* __cdecl _tcsinc(__in_z const char* _Ptr);
+_CRTIMP size_t __cdecl _tcsnbcnt(__in_ecount_z(_MaxCount) const char* _Str, __in size_t _MaxCount);
+_CRTIMP size_t __cdecl _tcsnccnt(__in_ecount_z(_MaxCount) const char* _Str, __in size_t _MaxCount);
+_CRTIMP unsigned int __cdecl _tcsnextc(__in_z const char* _Str);
+_CRTIMP char* __cdecl _tcsninc(__in_ecount_z(_Count) const char* _Ptr, __in size_t _Count);
+_CRTIMP char* __cdecl _tcsspnp(__in_z const char* _Str1, __in_z const char* _Str2);
 
-_CRTIMP char * __cdecl _tcslwr(__inout char *_Str);
-_CRTIMP char * __cdecl _tcslwr_l(__inout char *_Str, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcslwr_s(__inout_ecount(_SizeInChars) char *_Str, __in size_t _SizeInChars);
-_CRTIMP char * __cdecl _tcslwr_s_l(__inout_ecount(_SizeInChars) char *_Str, __in size_t _SizeInChars, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsupr(__inout char *_Str);
-_CRTIMP char * __cdecl _tcsupr_l(__inout char *_Str, __in_opt _locale_t _Locale);
-_CRTIMP char * __cdecl _tcsupr_s(__inout_ecount(_SizeInChars) char *_Str, __in size_t _SizeInChars);
-_CRTIMP char * __cdecl _tcsupr_s_l(__inout_ecount(_SizeInChars) char *_Str, __in size_t _SizeInChars, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcslwr(__inout char* _Str);
+_CRTIMP char* __cdecl _tcslwr_l(__inout char* _Str, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcslwr_s(__inout_ecount(_SizeInChars) char* _Str, __in size_t _SizeInChars);
+_CRTIMP char* __cdecl _tcslwr_s_l(__inout_ecount(_SizeInChars) char* _Str, __in size_t _SizeInChars, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsupr(__inout char* _Str);
+_CRTIMP char* __cdecl _tcsupr_l(__inout char* _Str, __in_opt _locale_t _Locale);
+_CRTIMP char* __cdecl _tcsupr_s(__inout_ecount(_SizeInChars) char* _Str, __in size_t _SizeInChars);
+_CRTIMP char* __cdecl _tcsupr_s_l(__inout_ecount(_SizeInChars) char* _Str, __in size_t _SizeInChars, __in_opt _locale_t _Locale);
 
-_CRTIMP __checkReturn size_t __cdecl _tclen(__in_z const char * _Str);
-_CRTIMP void __cdecl _tccpy(__out_z char * _DstCh, __in_z const char * _SrcCh);
+_CRTIMP __checkReturn size_t __cdecl _tclen(__in_z const char* _Str);
+_CRTIMP void __cdecl _tccpy(__out_z char* _DstCh, __in_z const char* _SrcCh);
 
 #else  /* __STDC__ || defined (_NO_INLINING) */
 
@@ -1449,467 +1451,433 @@ _CRTIMP void __cdecl _tccpy(__out_z char * _DstCh, __in_z const char * _SrcCh);
 
 /* String functions */
 
-__inline _CRPC _tcschr(__in _CPC _s1,__in _UI _c) {return (_CRPC)_mbschr((_CPUC)_s1,_c);}
-__inline size_t _tcscspn(__in _CPC _s1,__in _CPC _s2) {return _mbscspn((_CPUC)_s1,(_CPUC)_s2);}
+__inline _CRPC _tcschr(__in _CPC _s1, __in _UI _c) {
+    return (_CRPC)_mbschr((_CPUC)_s1, _c);
+}
+__inline size_t _tcscspn(__in _CPC _s1, __in _CPC _s2) {
+    return _mbscspn((_CPUC)_s1, (_CPUC)_s2);
+}
 
-_CRT_INSECURE_DEPRECATE(_tcsncat_s) __inline char * _tcsncat(__inout_z char *_Destination, __in_z const char *_Source, __in size_t _Count)
-{
+_CRT_INSECURE_DEPRECATE(_tcsncat_s) __inline char* _tcsncat(__inout_z char* _Destination, __in_z const char* _Source, __in size_t _Count) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnbcat((unsigned char *)_Destination,(const unsigned char *)_Source,_Count);
+    return (char*)_mbsnbcat((unsigned char*)_Destination, (const unsigned char*)_Source, _Count);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsncat_s(__inout_bcount_z(_Destination_size_chars) char *_Destination, __in size_t _Destination_size_chars, __in_z const char *_Source, __in size_t _Count)
-{
-    return _mbsnbcat_s((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source,_Count);
+__inline __checkReturn_wat errno_t _tcsncat_s(__inout_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count) {
+    return _mbsnbcat_s((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count);
 }
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(errno_t, _tcsncat_s, __inout_ecount_z(_Size) char, _Dest, __in_z const char *, _Source, __in size_t, _Count)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(errno_t, _tcsncat_s, __inout_ecount_z(_Size) char, _Dest, __in_z const char*, _Source, __in size_t, _Count)
 
-_CRT_INSECURE_DEPRECATE(_tcsncat_s_l) __inline char * _tcsncat_l(__inout_z char *_Destination, __in_z const char *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsncat_s_l) __inline char* _tcsncat_l(__inout_z char* _Destination, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnbcat_l((unsigned char *)_Destination,(const unsigned char *)_Source,_Count, _Locale);
+    return (char*)_mbsnbcat_l((unsigned char*)_Destination, (const unsigned char*)_Source, _Count, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsncat_s_l(__inout_bcount_z(_Destination_size_chars) char *_Destination, __in size_t _Destination_size_chars, __in_z const char *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnbcat_s_l((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source,_Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsncat_s_l(__inout_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnbcat_s_l((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count, _Locale);
 }
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _tcsncat_s_l, __inout_ecount_z(_Size) char, _Dest, const char *, _Source, size_t, _Count, _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _tcsncat_s_l, __inout_ecount_z(_Size) char, _Dest, const char*, _Source, size_t, _Count, _locale_t, _Locale)
 
-_CRT_INSECURE_DEPRECATE(_tcsncpy_s) __inline char * _tcsncpy(__inout_z char * _Destination,__in_z const char * _Source,__in size_t _Count)
-{
+_CRT_INSECURE_DEPRECATE(_tcsncpy_s) __inline char* _tcsncpy(__inout_z char* _Destination, __in_z const char* _Source, __in size_t _Count) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnbcpy((unsigned char *)_Destination,(const unsigned char *)_Source,_Count);
+    return (char*)_mbsnbcpy((unsigned char*)_Destination, (const unsigned char*)_Source, _Count);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsncpy_s(__out_bcount_z(_Destination_size_chars) char * _Destination, __in size_t _Destination_size_chars, __in_z const char * _Source,__in size_t _Count)
-{
-    return _mbsnbcpy_s((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source,_Count);
+__inline __checkReturn_wat errno_t _tcsncpy_s(__out_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count) {
+    return _mbsnbcpy_s((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count);
 }
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(errno_t, _tcsncpy_s, __out_bcount(_Size) char, _Dest, __in_z const char *, _Source, __in size_t, _Count)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(errno_t, _tcsncpy_s, __out_bcount(_Size) char, _Dest, __in_z const char*, _Source, __in size_t, _Count)
 
-_CRT_INSECURE_DEPRECATE(_tcsncpy_s_l) __inline char * _tcsncpy_l(__out_bcount_z(_Count) char * _Destination,__in_z const char * _Source,__in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsncpy_s_l) __inline char* _tcsncpy_l(__out_bcount_z(_Count) char* _Destination, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnbcpy_l((unsigned char *)_Destination,(const unsigned char *)_Source,_Count, _Locale);
+    return (char*)_mbsnbcpy_l((unsigned char*)_Destination, (const unsigned char*)_Source, _Count, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsncpy_s_l(__out_bcount_z(_Destination_size_chars) char * _Destination, __in size_t _Destination_size_chars, __in_z const char * _Source,__in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnbcpy_s_l((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source,_Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsncpy_s_l(__out_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnbcpy_s_l((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count, _Locale);
 }
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _tcsncpy_s, __out_bcount(_Size) char, _Dest, __in_z const char *, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _tcsncpy_s, __out_bcount(_Size) char, _Dest, __in_z const char*, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
 
-__inline __checkReturn _CRPC _tcspbrk(__in _CPC _s1,__in _CPC _s2) {return (_CRPC)_mbspbrk((_CPUC)_s1,(_CPUC)_s2);}
-__inline __checkReturn _CRPC _tcsrchr(__in _CPC _s1,__in _UI _c) {return (_CRPC)_mbsrchr((_CPUC)_s1,_c);}
-__inline __checkReturn size_t _tcsspn(__in _CPC _s1,__in _CPC _s2) {return _mbsspn((_CPUC)_s1,(_CPUC)_s2);}
-__inline __checkReturn _CRPC _tcsstr(__in _CPC _s1,__in _CPC _s2) {return (_CRPC)_mbsstr((_CPUC)_s1,(_CPUC)_s2);}
+__inline __checkReturn _CRPC _tcspbrk(__in _CPC _s1, __in _CPC _s2) {
+    return (_CRPC)_mbspbrk((_CPUC)_s1, (_CPUC)_s2);
+}
+__inline __checkReturn _CRPC _tcsrchr(__in _CPC _s1, __in _UI _c) {
+    return (_CRPC)_mbsrchr((_CPUC)_s1, _c);
+}
+__inline __checkReturn size_t _tcsspn(__in _CPC _s1, __in _CPC _s2) {
+    return _mbsspn((_CPUC)_s1, (_CPUC)_s2);
+}
+__inline __checkReturn _CRPC _tcsstr(__in _CPC _s1, __in _CPC _s2) {
+    return (_CRPC)_mbsstr((_CPUC)_s1, (_CPUC)_s2);
+}
 
-_CRT_INSECURE_DEPRECATE(_tcstok_s) __inline __checkReturn char *  _tcstok(__inout_z_opt char * _String,__in_z const char * _Delimiters)
-{
+_CRT_INSECURE_DEPRECATE(_tcstok_s) __inline __checkReturn char*   _tcstok(__inout_z_opt char* _String, __in_z const char* _Delimiters) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-        return (char * )_mbstok((unsigned char *)_String,(const unsigned char *)_Delimiters);
+    return (char*)_mbstok((unsigned char*)_String, (const unsigned char*)_Delimiters);
 #pragma warning(pop)
 }
 
-__inline __checkReturn char *  _tcstok_s(__inout_z_opt char * _String,__in_z const char * _Delimiters, __deref_inout_z_opt char **_Current_position)
-{
-        return (char * )_mbstok_s((unsigned char *)_String,(const unsigned char *)_Delimiters, (unsigned char **)_Current_position);
+__inline __checkReturn char*   _tcstok_s(__inout_z_opt char* _String, __in_z const char* _Delimiters, __deref_inout_z_opt char** _Current_position) {
+    return (char*)_mbstok_s((unsigned char*)_String, (const unsigned char*)_Delimiters, (unsigned char**)_Current_position);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcstok_s_l) __inline __checkReturn char *  _tcstok_l(__inout_z_opt char * _String,__in_z const char * _Delimiters, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcstok_s_l) __inline __checkReturn char*   _tcstok_l(__inout_z_opt char* _String, __in_z const char* _Delimiters, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-        return (char * )_mbstok_l((unsigned char *)_String,(const unsigned char *)_Delimiters, _Locale);
+    return (char*)_mbstok_l((unsigned char*)_String, (const unsigned char*)_Delimiters, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn char *  _tcstok_s_l(__inout_z_opt char * _String,__in_z const char * _Delimiters, __deref_inout_z_opt char **_Current_position, __in_opt _locale_t _Locale)
-{
-        return (char * )_mbstok_s_l((unsigned char *)_String,(const unsigned char *)_Delimiters, (unsigned char **)_Current_position, _Locale);
+__inline __checkReturn char*   _tcstok_s_l(__inout_z_opt char* _String, __in_z const char* _Delimiters, __deref_inout_z_opt char** _Current_position, __in_opt _locale_t _Locale) {
+    return (char*)_mbstok_s_l((unsigned char*)_String, (const unsigned char*)_Delimiters, (unsigned char**)_Current_position, _Locale);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsnset_s) __inline char * _tcsnset(__inout_bcount_z(_Count) char * _Dst, __in unsigned int _Value , __in size_t _Count)
-{
+_CRT_INSECURE_DEPRECATE(_tcsnset_s) __inline char* _tcsnset(__inout_bcount_z(_Count) char* _Dst, __in unsigned int _Value , __in size_t _Count) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnbset((unsigned char *)_Dst, _Value, _Count);
+    return (char*)_mbsnbset((unsigned char*)_Dst, _Value, _Count);
 #pragma warning(pop)
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsnset_s_l) __inline char * _tcsnset_l(__inout_bcount_z(_Count) char * _Dst, __in unsigned int _Value , __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsnset_s_l) __inline char* _tcsnset_l(__inout_bcount_z(_Count) char* _Dst, __in unsigned int _Value , __in size_t _Count, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnbset_l((unsigned char *)_Dst, _Value, _Count, _Locale);
+    return (char*)_mbsnbset_l((unsigned char*)_Dst, _Value, _Count, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsnset_s(__inout_bcount_z(_SizeInBytes) char * _Dst, __in size_t _SizeInBytes, __in unsigned int _Value , __in size_t _Count)
-{
-    return _mbsnbset_s((unsigned char *)_Dst, _SizeInBytes, _Value, _Count);
+__inline __checkReturn_wat errno_t _tcsnset_s(__inout_bcount_z(_SizeInBytes) char* _Dst, __in size_t _SizeInBytes, __in unsigned int _Value , __in size_t _Count) {
+    return _mbsnbset_s((unsigned char*)_Dst, _SizeInBytes, _Value, _Count);
 }
 
-__inline __checkReturn_wat errno_t _tcsnset_s_l(__inout_bcount_z(_SizeInBytes) char * _Dst, __in size_t _SizeInBytes, __in unsigned int _Value , __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnbset_s_l((unsigned char *)_Dst, _SizeInBytes, _Value, _Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsnset_s_l(__inout_bcount_z(_SizeInBytes) char* _Dst, __in size_t _SizeInBytes, __in unsigned int _Value , __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnbset_s_l((unsigned char*)_Dst, _SizeInBytes, _Value, _Count, _Locale);
 }
 
-__inline _PC _tcsrev(__inout _PC _s1) {return (_PC)_mbsrev((_PUC)_s1);}
+__inline _PC _tcsrev(__inout _PC _s1) {
+    return (_PC)_mbsrev((_PUC)_s1);
+}
 
-_CRT_INSECURE_DEPRECATE(_tcsset_s) __inline char * _tcsset(__inout_z char * _Dst, __in unsigned int _Value)
-{
+_CRT_INSECURE_DEPRECATE(_tcsset_s) __inline char* _tcsset(__inout_z char* _Dst, __in unsigned int _Value) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsset((unsigned char *)_Dst, _Value);
+    return (char*)_mbsset((unsigned char*)_Dst, _Value);
 #pragma warning(pop)
 }
 
-_CRT_INSECURE_DEPRECATE(_tscset_s_l) __inline char * _tcsset_l(__inout_z char * _Dst, __in unsigned int _Value, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tscset_s_l) __inline char* _tcsset_l(__inout_z char* _Dst, __in unsigned int _Value, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsset_l((unsigned char *)_Dst, _Value, _Locale);
+    return (char*)_mbsset_l((unsigned char*)_Dst, _Value, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsset_s(__inout_bcount_z(_SizeInBytes) char * _Dst, __in size_t _SizeInBytes, __in unsigned int _Value)
-{
-    return _mbsset_s((unsigned char *)_Dst, _SizeInBytes, _Value);
+__inline __checkReturn_wat errno_t _tcsset_s(__inout_bcount_z(_SizeInBytes) char* _Dst, __in size_t _SizeInBytes, __in unsigned int _Value) {
+    return _mbsset_s((unsigned char*)_Dst, _SizeInBytes, _Value);
 }
 
-__inline __checkReturn_wat errno_t _tcsset_s_l(__inout_bcount_z(_SizeInBytes) char * _Dst, __in size_t _SizeInBytes, __in unsigned int _Value, __in_opt _locale_t _Locale)
-{
-    return _mbsset_s_l((unsigned char *)_Dst, _SizeInBytes, _Value, _Locale);
+__inline __checkReturn_wat errno_t _tcsset_s_l(__inout_bcount_z(_SizeInBytes) char* _Dst, __in size_t _SizeInBytes, __in unsigned int _Value, __in_opt _locale_t _Locale) {
+    return _mbsset_s_l((unsigned char*)_Dst, _SizeInBytes, _Value, _Locale);
 }
 
-__inline __checkReturn int _tcscmp(__in _CPC _s1,__in _CPC _s2) {return _mbscmp((_CPUC)_s1,(_CPUC)_s2);}
-
-__inline __checkReturn int _tcsicmp(__in_z const char * _String1, __in_z const char * _String2)
-{
-    return _mbsicmp((const unsigned char *)_String1,(const unsigned char *)_String2);
+__inline __checkReturn int _tcscmp(__in _CPC _s1, __in _CPC _s2) {
+    return _mbscmp((_CPUC)_s1, (_CPUC)_s2);
 }
 
-__inline __checkReturn int _tcsicmp_l(__in_z const char * _String1, __in_z const char * _String2, __in_opt _locale_t _Locale)
-{
-    return _mbsicmp_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Locale);
+__inline __checkReturn int _tcsicmp(__in_z const char* _String1, __in_z const char* _String2) {
+    return _mbsicmp((const unsigned char*)_String1, (const unsigned char*)_String2);
 }
 
-__inline __checkReturn int _tcsnccmp(__in _CPC _s1,__in _CPC _s2,__in size_t _n) {return _mbsncmp((_CPUC)_s1,(_CPUC)_s2,_n);}
-__inline int _tcsncmp(__in _CPC _s1,__in _CPC _s2,__in size_t _n) {return _mbsnbcmp((_CPUC)_s1,(_CPUC)_s2,_n);}
-
-__inline __checkReturn int _tcsncicmp(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Char_count)
-{
-    return _mbsnicmp((const unsigned char *)_String1,(const unsigned char *)_String2,_Char_count);
+__inline __checkReturn int _tcsicmp_l(__in_z const char* _String1, __in_z const char* _String2, __in_opt _locale_t _Locale) {
+    return _mbsicmp_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Locale);
 }
 
-__inline __checkReturn int _tcsncicmp_l(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Char_count, __in_opt _locale_t _Locale)
-{
-    return _mbsnicmp_l((const unsigned char *)_String1,(const unsigned char *)_String2,_Char_count, _Locale);
+__inline __checkReturn int _tcsnccmp(__in _CPC _s1, __in _CPC _s2, __in size_t _n) {
+    return _mbsncmp((_CPUC)_s1, (_CPUC)_s2, _n);
+}
+__inline int _tcsncmp(__in _CPC _s1, __in _CPC _s2, __in size_t _n) {
+    return _mbsnbcmp((_CPUC)_s1, (_CPUC)_s2, _n);
 }
 
-__inline __checkReturn int _tcsnicmp(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Char_count)
-{
-    return _mbsnbicmp((const unsigned char *)_String1,(const unsigned char *)_String2,_Char_count);
+__inline __checkReturn int _tcsncicmp(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Char_count) {
+    return _mbsnicmp((const unsigned char*)_String1, (const unsigned char*)_String2, _Char_count);
 }
 
-__inline __checkReturn int _tcsnicmp_l(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Char_count, __in_opt _locale_t _Locale)
-{
-    return _mbsnbicmp_l((const unsigned char *)_String1,(const unsigned char *)_String2,_Char_count, _Locale);
+__inline __checkReturn int _tcsncicmp_l(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Char_count, __in_opt _locale_t _Locale) {
+    return _mbsnicmp_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Char_count, _Locale);
 }
 
-__inline __checkReturn int _tcscoll(__in_z const char * _String1, __in_z const char * _String2)
-{
-    return _mbscoll((const unsigned char *)_String1,(const unsigned char *)_String2);
+__inline __checkReturn int _tcsnicmp(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Char_count) {
+    return _mbsnbicmp((const unsigned char*)_String1, (const unsigned char*)_String2, _Char_count);
 }
 
-__inline __checkReturn int _tcscoll_l(__in_z const char * _String1, __in_z const char * _String2, __in_opt _locale_t _Locale)
-{
-    return _mbscoll_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Locale);
+__inline __checkReturn int _tcsnicmp_l(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Char_count, __in_opt _locale_t _Locale) {
+    return _mbsnbicmp_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Char_count, _Locale);
 }
 
-__inline __checkReturn int _tcsicoll(__in_z const char * _String1, __in_z const char * _String2)
-{
-    return _mbsicoll((const unsigned char *)_String1,(const unsigned char *)_String2);
+__inline __checkReturn int _tcscoll(__in_z const char* _String1, __in_z const char* _String2) {
+    return _mbscoll((const unsigned char*)_String1, (const unsigned char*)_String2);
 }
 
-__inline __checkReturn int _tcsicoll_l(__in_z const char * _String1, __in_z const char * _String2, __in_opt _locale_t _Locale)
-{
-    return _mbsicoll_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Locale);
+__inline __checkReturn int _tcscoll_l(__in_z const char* _String1, __in_z const char* _String2, __in_opt _locale_t _Locale) {
+    return _mbscoll_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Locale);
 }
 
-__inline __checkReturn int _tcsnccoll(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count)
-{
-    return _mbsncoll((const unsigned char *)_String1,(const unsigned char *)_String2, _Count);
+__inline __checkReturn int _tcsicoll(__in_z const char* _String1, __in_z const char* _String2) {
+    return _mbsicoll((const unsigned char*)_String1, (const unsigned char*)_String2);
 }
 
-__inline __checkReturn int _tcsnccoll_l(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsncoll_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Count, _Locale);
+__inline __checkReturn int _tcsicoll_l(__in_z const char* _String1, __in_z const char* _String2, __in_opt _locale_t _Locale) {
+    return _mbsicoll_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Locale);
 }
 
-__inline __checkReturn int _tcsncoll(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count)
-{
-    return _mbsnbcoll((const unsigned char *)_String1,(const unsigned char *)_String2, _Count);
+__inline __checkReturn int _tcsnccoll(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count) {
+    return _mbsncoll((const unsigned char*)_String1, (const unsigned char*)_String2, _Count);
 }
 
-__inline __checkReturn int _tcsncoll_l(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnbcoll_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Count, _Locale);
+__inline __checkReturn int _tcsnccoll_l(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsncoll_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Count, _Locale);
 }
 
-__inline __checkReturn int _tcsncicoll(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count)
-{
-    return _mbsnicoll((const unsigned char *)_String1,(const unsigned char *)_String2, _Count);
+__inline __checkReturn int _tcsncoll(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count) {
+    return _mbsnbcoll((const unsigned char*)_String1, (const unsigned char*)_String2, _Count);
 }
 
-__inline __checkReturn int _tcsncicoll_l(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnicoll_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Count, _Locale);
+__inline __checkReturn int _tcsncoll_l(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnbcoll_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Count, _Locale);
 }
 
-__inline __checkReturn int _tcsnicoll(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count)
-{
-    return _mbsnbicoll((const unsigned char *)_String1,(const unsigned char *)_String2, _Count);
+__inline __checkReturn int _tcsncicoll(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count) {
+    return _mbsnicoll((const unsigned char*)_String1, (const unsigned char*)_String2, _Count);
 }
 
-__inline __checkReturn int _tcsnicoll_l(__in_z const char * _String1, __in_z const char * _String2, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnbicoll_l((const unsigned char *)_String1,(const unsigned char *)_String2, _Count, _Locale);
+__inline __checkReturn int _tcsncicoll_l(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnicoll_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Count, _Locale);
+}
+
+__inline __checkReturn int _tcsnicoll(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count) {
+    return _mbsnbicoll((const unsigned char*)_String1, (const unsigned char*)_String2, _Count);
+}
+
+__inline __checkReturn int _tcsnicoll_l(__in_z const char* _String1, __in_z const char* _String2, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnbicoll_l((const unsigned char*)_String1, (const unsigned char*)_String2, _Count, _Locale);
 }
 
 /* "logical-character" mappings */
-__inline __checkReturn size_t _tcsclen(__in_z const char * _String)
-{
-    return _mbslen((const unsigned char *)_String);
+__inline __checkReturn size_t _tcsclen(__in_z const char* _String) {
+    return _mbslen((const unsigned char*)_String);
 }
 
-__inline __checkReturn size_t _tcscnlen(__in_z const char * _String, __in size_t _Maximum)
-{
-    return _mbsnlen((const unsigned char *)_String, _Maximum);
+__inline __checkReturn size_t _tcscnlen(__in_z const char* _String, __in size_t _Maximum) {
+    return _mbsnlen((const unsigned char*)_String, _Maximum);
 }
 
-__inline __checkReturn size_t _tcsclen_l(__in_z const char * _String, __in_opt _locale_t _Locale)
-{
-    return _mbslen_l((const unsigned char *)_String, _Locale);
+__inline __checkReturn size_t _tcsclen_l(__in_z const char* _String, __in_opt _locale_t _Locale) {
+    return _mbslen_l((const unsigned char*)_String, _Locale);
 }
 
-__inline __checkReturn size_t _tcscnlen_l(__in_z const char * _String, __in size_t _Maximum, __in_opt _locale_t _Locale)
-{
-    return _mbsnlen_l((const unsigned char *)_String, _Maximum, _Locale);
+__inline __checkReturn size_t _tcscnlen_l(__in_z const char* _String, __in size_t _Maximum, __in_opt _locale_t _Locale) {
+    return _mbsnlen_l((const unsigned char*)_String, _Maximum, _Locale);
 }
 
-_CRT_INSECURE_DEPRECATE(_tscnccat_s) __inline char * _tcsnccat(__inout_z char * _Destination, __in_z const char * _Source, __in size_t _Count)
-{
+_CRT_INSECURE_DEPRECATE(_tscnccat_s) __inline char* _tcsnccat(__inout_z char* _Destination, __in_z const char* _Source, __in size_t _Count) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsncat((unsigned char *)_Destination,(const unsigned char *)_Source, _Count);
+    return (char*)_mbsncat((unsigned char*)_Destination, (const unsigned char*)_Source, _Count);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsnccat_s(__inout_bcount_z(_Destination_size_chars) char * _Destination, __in size_t _Destination_size_chars, __in_z const char * _Source, __in size_t _Count)
-{
-    return _mbsncat_s((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source, _Count);
+__inline __checkReturn_wat errno_t _tcsnccat_s(__inout_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count) {
+    return _mbsncat_s((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsnccat_s_l) __inline char * _tcsnccat_l(__inout_z char * _Destination, __in_z const char * _Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsnccat_s_l) __inline char* _tcsnccat_l(__inout_z char* _Destination, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsncat_l((unsigned char *)_Destination,(const unsigned char *)_Source, _Count, _Locale);
+    return (char*)_mbsncat_l((unsigned char*)_Destination, (const unsigned char*)_Source, _Count, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsnccat_s_l(__inout_bcount_z(_Destination_size_chars) char * _Destination, __in size_t _Destination_size_chars, __in_z const char * _Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsncat_s_l((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source, _Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsnccat_s_l(__inout_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsncat_s_l((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count, _Locale);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsnccpy_s) __inline char * _tcsnccpy(__in_z char * _Destination, __in_z const char * _Source, __in size_t _Count)
-{
+_CRT_INSECURE_DEPRECATE(_tcsnccpy_s) __inline char* _tcsnccpy(__in_z char* _Destination, __in_z const char* _Source, __in size_t _Count) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsncpy((unsigned char *)_Destination,(const unsigned char *)_Source, _Count);
+    return (char*)_mbsncpy((unsigned char*)_Destination, (const unsigned char*)_Source, _Count);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsnccpy_s(__out_bcount_z(_Destination_size_chars) char * _Destination, __in size_t _Destination_size_chars, __in_z const char * _Source, __in size_t _Count)
-{
-    return _mbsncpy_s((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source, _Count);
+__inline __checkReturn_wat errno_t _tcsnccpy_s(__out_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count) {
+    return _mbsncpy_s((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsnccpy_s_l) __inline char * _tcsnccpy_l(__out_bcount_z(_Count) char * _Destination, __in_z const char * _Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsnccpy_s_l) __inline char* _tcsnccpy_l(__out_bcount_z(_Count) char* _Destination, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsncpy_l((unsigned char *)_Destination,(const unsigned char *)_Source, _Count, _Locale);
+    return (char*)_mbsncpy_l((unsigned char*)_Destination, (const unsigned char*)_Source, _Count, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsnccpy_s_l(__out_bcount_z(_Destination_size_chars) char * _Destination, __in size_t _Destination_size_chars, __in_z const char * _Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsncpy_s_l((unsigned char *)_Destination, _Destination_size_chars, (const unsigned char *)_Source, _Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsnccpy_s_l(__out_bcount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsncpy_s_l((unsigned char*)_Destination, _Destination_size_chars, (const unsigned char*)_Source, _Count, _Locale);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsncset_s) __inline char * _tcsncset(__inout_bcount(_Count) char *_Destination, __in unsigned int _Value, __in size_t _Count)
-{
+_CRT_INSECURE_DEPRECATE(_tcsncset_s) __inline char* _tcsncset(__inout_bcount(_Count) char* _Destination, __in unsigned int _Value, __in size_t _Count) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnset((unsigned char *)_Destination, _Value, _Count);
+    return (char*)_mbsnset((unsigned char*)_Destination, _Value, _Count);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsncset_s(__out_bcount(_SizeInBytes) char *_Destination, __in size_t _SizeInBytes, __in unsigned int _Value, __in size_t _Count)
-{
-    return _mbsnset_s((unsigned char *)_Destination, _SizeInBytes, _Value, _Count);
+__inline __checkReturn_wat errno_t _tcsncset_s(__out_bcount(_SizeInBytes) char* _Destination, __in size_t _SizeInBytes, __in unsigned int _Value, __in size_t _Count) {
+    return _mbsnset_s((unsigned char*)_Destination, _SizeInBytes, _Value, _Count);
 }
 
-_CRT_INSECURE_DEPRECATE(_tcsncset_s_l) __inline char * _tcsncset_l(__inout char *_Destination, __in unsigned int _Value, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsncset_s_l) __inline char* _tcsncset_l(__inout char* _Destination, __in unsigned int _Value, __in size_t _Count, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsnset_l((unsigned char *)_Destination, _Value, _Count, _Locale);
+    return (char*)_mbsnset_l((unsigned char*)_Destination, _Value, _Count, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsncset_s_l(__inout_bcount(_SizeInBytes) char *_Destination, __in size_t _SizeInBytes, __in unsigned int _Value, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsnset_s_l((unsigned char *)_Destination, _SizeInBytes, _Value, _Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsncset_s_l(__inout_bcount(_SizeInBytes) char* _Destination, __in size_t _SizeInBytes, __in unsigned int _Value, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsnset_s_l((unsigned char*)_Destination, _SizeInBytes, _Value, _Count, _Locale);
 }
 
 /* MBCS-specific mappings */
 
-__inline __checkReturn _PC _tcsdec(__in _CPC _s1,__in _CPC _s2) {return (_PC)_mbsdec((_CPUC)_s1,(_CPUC)_s2);}
-__inline __checkReturn _PC _tcsinc(__in _CPC _s1) {return (_PC)_mbsinc((_CPUC)_s1);}
-__inline __checkReturn size_t _tcsnbcnt(__in _CPC _s1,__in size_t _n) {return _mbsnbcnt((_CPUC)_s1,_n);}
-__inline __checkReturn size_t _tcsnccnt(__in _CPC _s1,__in size_t _n) {return _mbsnccnt((_CPUC)_s1,_n);}
-__inline __checkReturn _PC _tcsninc(__in _CPC _s1,__in size_t _n) {return (_PC)_mbsninc((_CPUC)_s1,_n);}
-__inline __checkReturn _PC _tcsspnp(__in _CPC _s1,__in _CPC _s2) {return (_PC)_mbsspnp((_CPUC)_s1,(_CPUC)_s2);}
+__inline __checkReturn _PC _tcsdec(__in _CPC _s1, __in _CPC _s2) {
+    return (_PC)_mbsdec((_CPUC)_s1, (_CPUC)_s2);
+}
+__inline __checkReturn _PC _tcsinc(__in _CPC _s1) {
+    return (_PC)_mbsinc((_CPUC)_s1);
+}
+__inline __checkReturn size_t _tcsnbcnt(__in _CPC _s1, __in size_t _n) {
+    return _mbsnbcnt((_CPUC)_s1, _n);
+}
+__inline __checkReturn size_t _tcsnccnt(__in _CPC _s1, __in size_t _n) {
+    return _mbsnccnt((_CPUC)_s1, _n);
+}
+__inline __checkReturn _PC _tcsninc(__in _CPC _s1, __in size_t _n) {
+    return (_PC)_mbsninc((_CPUC)_s1, _n);
+}
+__inline __checkReturn _PC _tcsspnp(__in _CPC _s1, __in _CPC _s2) {
+    return (_PC)_mbsspnp((_CPUC)_s1, (_CPUC)_s2);
+}
 
-_CRT_INSECURE_DEPRECATE(_tcslwr_s) __inline char * _tcslwr(__inout_z char * _String)
-{
+_CRT_INSECURE_DEPRECATE(_tcslwr_s) __inline char* _tcslwr(__inout_z char* _String) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbslwr((unsigned char *)_String);
+    return (char*)_mbslwr((unsigned char*)_String);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcslwr_s(__inout_bcount_z(_SizeInBytes) char * _String, size_t _SizeInBytes)
-{
-    return _mbslwr_s((unsigned char *)_String, _SizeInBytes);
+__inline __checkReturn_wat errno_t _tcslwr_s(__inout_bcount_z(_SizeInBytes) char* _String, size_t _SizeInBytes) {
+    return _mbslwr_s((unsigned char*)_String, _SizeInBytes);
 }
 
 __DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_0(errno_t, _tcslwr_s, __inout_bcount(_Size) char, _String)
 
-_CRT_INSECURE_DEPRECATE(_tcslwr_s_l) __inline char * _tcslwr_l(__inout_z char * _String, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcslwr_s_l) __inline char* _tcslwr_l(__inout_z char* _String, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbslwr_l((unsigned char *)_String, _Locale);
+    return (char*)_mbslwr_l((unsigned char*)_String, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcslwr_s_l(__inout_bcount_z(_SizeInBytes) char * _String, __in size_t _SizeInBytes, __in_opt _locale_t _Locale)
-{
-    return _mbslwr_s_l((unsigned char *)_String, _SizeInBytes, _Locale);
+__inline __checkReturn_wat errno_t _tcslwr_s_l(__inout_bcount_z(_SizeInBytes) char* _String, __in size_t _SizeInBytes, __in_opt _locale_t _Locale) {
+    return _mbslwr_s_l((unsigned char*)_String, _SizeInBytes, _Locale);
 }
 
 __DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1(errno_t, _tcslwr_s_l, __inout_bcount(_Size) char, _String, __in_opt _locale_t, _Locale)
 
-_CRT_INSECURE_DEPRECATE(_tcsupr_s) __inline char * _tcsupr(__inout_z char * _String)
-{
+_CRT_INSECURE_DEPRECATE(_tcsupr_s) __inline char* _tcsupr(__inout_z char* _String) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsupr((unsigned char *)_String);
+    return (char*)_mbsupr((unsigned char*)_String);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsupr_s(__inout_bcount_z(_Count) char * _String, __in size_t _Count)
-{
-    return _mbsupr_s((unsigned char *)_String, _Count);
+__inline __checkReturn_wat errno_t _tcsupr_s(__inout_bcount_z(_Count) char* _String, __in size_t _Count) {
+    return _mbsupr_s((unsigned char*)_String, _Count);
 }
 
 __DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_0(errno_t, _tcsupr_s, __inout_bcount(_Size) char, _String)
 
-_CRT_INSECURE_DEPRECATE(_tcsupr_s_l) __inline char * _tcsupr_l(__inout_z char * _String, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tcsupr_s_l) __inline char* _tcsupr_l(__inout_z char* _String, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return (char *)_mbsupr_l((unsigned char *)_String, _Locale);
+    return (char*)_mbsupr_l((unsigned char*)_String, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tcsupr_s_l(__inout_bcount_z(_Count) char * _String, __in size_t _Count, __in_opt _locale_t _Locale)
-{
-    return _mbsupr_s_l((unsigned char *)_String, _Count, _Locale);
+__inline __checkReturn_wat errno_t _tcsupr_s_l(__inout_bcount_z(_Count) char* _String, __in size_t _Count, __in_opt _locale_t _Locale) {
+    return _mbsupr_s_l((unsigned char*)_String, _Count, _Locale);
 }
 
 __DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1(errno_t, _tcsupr_s_l, __inout_bcount(_Size) char, _String, __in_opt _locale_t, _Locale)
 
-__inline __checkReturn size_t _tclen(__in_z _CPC _s1) {return _mbclen((_CPUC)_s1);}
+__inline __checkReturn size_t _tclen(__in_z _CPC _s1) {
+    return _mbclen((_CPUC)_s1);
+}
 
-_CRT_INSECURE_DEPRECATE(_tccpy_s) __inline void _tccpy(__out_bcount_z(2) char * _Destination, __in_z const char * _Source)
-{
+_CRT_INSECURE_DEPRECATE(_tccpy_s) __inline void _tccpy(__out_bcount_z(2) char* _Destination, __in_z const char* _Source) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    _mbccpy((unsigned char *)_Destination, (const unsigned char *)_Source);
+    _mbccpy((unsigned char*)_Destination, (const unsigned char*)_Source);
 #pragma warning(pop)
 }
 
-_CRT_INSECURE_DEPRECATE(_tccpy_s_l) __inline void _tccpy_l(__out_bcount_z(2) char * _Destination, __in_z const char * _Source, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_tccpy_s_l) __inline void _tccpy_l(__out_bcount_z(2) char* _Destination, __in_z const char* _Source, __in_opt _locale_t _Locale) {
 #pragma warning(push)
 #pragma warning(disable:4996)
-    _mbccpy_l((unsigned char *)_Destination,( const unsigned char *)_Source, _Locale);
+    _mbccpy_l((unsigned char*)_Destination, (const unsigned char*)_Source, _Locale);
 #pragma warning(pop)
 }
 
-__inline __checkReturn_wat errno_t _tccpy_s(__out_bcount_z(_SizeInBytes) char * _Destination, size_t _SizeInBytes, __out_opt int *_PCopied, __in_z const char * _Source)
-{
-    return _mbccpy_s((unsigned char *)_Destination, _SizeInBytes, _PCopied, (const unsigned char *)_Source);
+__inline __checkReturn_wat errno_t _tccpy_s(__out_bcount_z(_SizeInBytes) char* _Destination, size_t _SizeInBytes, __out_opt int* _PCopied, __in_z const char* _Source) {
+    return _mbccpy_s((unsigned char*)_Destination, _SizeInBytes, _PCopied, (const unsigned char*)_Source);
 }
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(errno_t, _tccpy_s, __out_bcount(_SizeInBytes) char, _Dest, __out_opt  int *, _PCopied, __in_z const char *, _Source)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(errno_t, _tccpy_s, __out_bcount(_SizeInBytes) char, _Dest, __out_opt  int*, _PCopied, __in_z const char*, _Source)
 
-__inline __checkReturn_wat errno_t _tccpy_s_l(__out_bcount_z(_SizeInBytes) char * _Destination, __in size_t _SizeInBytes, __out_opt int *_PCopied, __in_z const char * _Source, __in_opt _locale_t _Locale)
-{
-    return _mbccpy_s_l((unsigned char *)_Destination, _SizeInBytes, _PCopied, (const unsigned char *)_Source, _Locale);
+__inline __checkReturn_wat errno_t _tccpy_s_l(__out_bcount_z(_SizeInBytes) char* _Destination, __in size_t _SizeInBytes, __out_opt int* _PCopied, __in_z const char* _Source, __in_opt _locale_t _Locale) {
+    return _mbccpy_s_l((unsigned char*)_Destination, _SizeInBytes, _PCopied, (const unsigned char*)_Source, _Locale);
 }
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _tccpy_s_l, __out_bcount(_Size) char, _Dest, __out_opt int *, _PCopied, __in_z const char *, _Source, __in_opt _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _tccpy_s_l, __out_bcount(_Size) char, _Dest, __out_opt int*, _PCopied, __in_z const char*, _Source, __in_opt _locale_t, _Locale)
 
 /* inline helper */
-__inline __checkReturn _UI _tcsnextc(__in_z _CPC _s1)
-{
-    _UI _n=0;
-    if (_ismbblead((_UI)*(_PUC)_s1))
-    {
+__inline __checkReturn _UI _tcsnextc(__in_z _CPC _s1) {
+    _UI _n = 0;
+
+    if (_ismbblead((_UI) * (_PUC)_s1)) {
         /*  for a dud MBCS string (leadbyte, EOS), we don't move forward 2
             We do not assert here because this routine is too low-level
         */
-        if(_s1[1]!='\0')
-        {
-            _n=((_UI)*(_PUC)_s1)<<8;
+        if (_s1[1] != '\0') {
+            _n = ((_UI) * (_PUC)_s1) << 8;
             _s1++;
         }
     }
-    _n+=(_UI)*(_PUC)_s1;
 
-    return(_n);
+    _n += (_UI) * (_PUC)_s1;
+    return (_n);
 }
 
 #endif  /* __STDC__ || defined (_NO_INLINING) */
@@ -1918,14 +1886,18 @@ __inline __checkReturn _UI _tcsnextc(__in_z _CPC _s1)
 #ifndef _CPP_TCHAR_INLINES_DEFINED
 #define _CPP_TCHAR_INLINES_DEFINED
 extern "C++" {
-inline __checkReturn char * __CRTDECL _tcschr(__in_z char *_S, __in unsigned int _C)
-        {return ((char *)_tcschr((const char *)_S, _C)); }
-inline __checkReturn char * __CRTDECL _tcspbrk(__in_z char *_S, __in_z const char *_P)
-        {return ((char *)_tcspbrk((const char *)_S, _P)); }
-inline __checkReturn char * __CRTDECL _tcsrchr(__in_z char *_S, __in unsigned int _C)
-        {return ((char *)_tcsrchr((const char *)_S, _C)); }
-inline __checkReturn char * __CRTDECL _tcsstr(__in_z char *_S, __in_z const char *_P)
-        {return ((char *)_tcsstr((const char *)_S, _P)); }
+    inline __checkReturn char* __CRTDECL _tcschr(__in_z char* _S, __in unsigned int _C) {
+        return ((char*)_tcschr((const char*)_S, _C));
+    }
+    inline __checkReturn char* __CRTDECL _tcspbrk(__in_z char* _S, __in_z const char* _P) {
+        return ((char*)_tcspbrk((const char*)_S, _P));
+    }
+    inline __checkReturn char* __CRTDECL _tcsrchr(__in_z char* _S, __in unsigned int _C) {
+        return ((char*)_tcsrchr((const char*)_S, _C));
+    }
+    inline __checkReturn char* __CRTDECL _tcsstr(__in_z char* _S, __in_z const char* _P) {
+        return ((char*)_tcsstr((const char*)_S, _P));
+    }
 }
 #endif  /* _CPP_TCHAR_INLINES_DEFINED */
 #endif  /* __cplusplus */
@@ -2093,14 +2065,17 @@ typedef char            TCHAR;
 #define _tccpy(_pc1,_cpc2) (*(_pc1) = *(_cpc2))
 #define _tccmp(_cpc1,_cpc2) (((unsigned char)*(_cpc1))-((unsigned char)*(_cpc2)))
 #else  /* __STDC__ || defined (_NO_INLINING) */
-__inline __checkReturn size_t __CRTDECL _tclen(__in_z const char *_cpc)
-{
+__inline __checkReturn size_t __CRTDECL _tclen(__in_z const char* _cpc) {
     /* avoid compiler warning */
-    (void *)_cpc;
+    (void*)_cpc;
     return 1;
 }
-__inline void __CRTDECL _tccpy(__out char *_pc1, __in_z const char *_cpc2) { *_pc1 = *_cpc2; }
-__inline __checkReturn int __CRTDECL _tccmp(__in_z const char *_cpc1, __in_z const char *_cpc2) { return (int) (((unsigned char)*_cpc1)-((unsigned char)*_cpc2)); }
+__inline void __CRTDECL _tccpy(__out char* _pc1, __in_z const char* _cpc2) {
+    *_pc1 = *_cpc2;
+}
+__inline __checkReturn int __CRTDECL _tccmp(__in_z const char* _cpc1, __in_z const char* _cpc2) {
+    return (int)(((unsigned char) * _cpc1) - ((unsigned char) * _cpc2));
+}
 #endif  /* __STDC__ || defined (_NO_INLINING) */
 
 
@@ -2150,7 +2125,7 @@ __inline __checkReturn int __CRTDECL _tccmp(__in_z const char *_cpc1, __in_z con
 #define _strinc(_pc)    ((_pc)+1)
 #define _strnextc(_cpc) ((unsigned int) *(const unsigned char *)(_cpc))
 #define _strninc(_pc, _sz) (((_pc)+(_sz)))
-_CRTIMP size_t  __cdecl __strncnt(__in_ecount_z(_Cnt) const char * _Str, __in size_t _Cnt);
+_CRTIMP size_t  __cdecl __strncnt(__in_ecount_z(_Cnt) const char* _Str, __in size_t _Cnt);
 #define _strncnt(_cpc, _sz) (__strncnt(_cpc,_sz))
 #define _strspnp(_cpc1, _cpc2)                                                          (_cpc1==NULL ? NULL : ((*((_cpc1)+strspn(_cpc1,_cpc2))) ? ((_cpc1)+strspn(_cpc1,_cpc2)) : NULL))
 
@@ -2171,29 +2146,37 @@ _CRTIMP size_t  __cdecl __strncnt(__in_ecount_z(_Cnt) const char * _Str, __in si
 #define _strset_l(_Destination, _Value, _Locale)                                        (_strset(_Destination, _Value))
 #define _strset_s_l(_Destination, _Destination_size_chars, _Value, _Locale)             (_strset_s(_Destination, _Destination_size_chars, _Value))
 #else  /* __STDC__ || defined (_NO_INLINING) */
-__inline __checkReturn char * __CRTDECL _strdec(__in_ecount_z(_Cpc2 - _Cpc1) const char * _Cpc1, __in_z const char * _Cpc2) { return (char *)((_Cpc1)>=(_Cpc2) ? NULL : (_Cpc2-1)); }
-__inline __checkReturn char * __CRTDECL _strinc(__in_z const char * _Pc) { return (char *)(_Pc+1); }
-__inline __checkReturn unsigned int __CRTDECL _strnextc(__in_z const char * _Cpc) { return (unsigned int)*(const unsigned char *)_Cpc; }
-__inline __checkReturn char * __CRTDECL _strninc(__in_ecount_z(_Sz) const char * _Pc, __in size_t _Sz) { return (char *)(_Pc+_Sz); }
-__inline __checkReturn size_t __CRTDECL _strncnt(__in_ecount_z(_Cnt)  const char * _String, __in size_t _Cnt)
-{
-        size_t n = _Cnt;
-        char *cp = (char *)_String;
-        while (n-- && *cp)
-                cp++;
-        return _Cnt - n - 1;
+__inline __checkReturn char* __CRTDECL _strdec(__in_ecount_z(_Cpc2 - _Cpc1) const char* _Cpc1, __in_z const char* _Cpc2) {
+    return (char*)((_Cpc1) >= (_Cpc2) ? NULL : (_Cpc2 - 1));
 }
-__inline __checkReturn char * __CRTDECL _strspnp
+__inline __checkReturn char* __CRTDECL _strinc(__in_z const char* _Pc) {
+    return (char*)(_Pc + 1);
+}
+__inline __checkReturn unsigned int __CRTDECL _strnextc(__in_z const char* _Cpc) {
+    return (unsigned int) * (const unsigned char*)_Cpc;
+}
+__inline __checkReturn char* __CRTDECL _strninc(__in_ecount_z(_Sz) const char* _Pc, __in size_t _Sz) {
+    return (char*)(_Pc + _Sz);
+}
+__inline __checkReturn size_t __CRTDECL _strncnt(__in_ecount_z(_Cnt)  const char* _String, __in size_t _Cnt) {
+    size_t n = _Cnt;
+    char* cp = (char*)_String;
+
+    while (n-- && *cp) {
+        cp++;
+    }
+
+    return _Cnt - n - 1;
+}
+__inline __checkReturn char* __CRTDECL _strspnp
 (
-    __in_z const char * _Cpc1,
-    __in_z const char * _Cpc2
-)
-{
-    return _Cpc1==NULL ? NULL : ((*(_Cpc1 += strspn(_Cpc1,_Cpc2))!='\0') ? (char*)_Cpc1 : NULL);
+    __in_z const char* _Cpc1,
+    __in_z const char* _Cpc2
+) {
+    return _Cpc1 == NULL ? NULL : ((*(_Cpc1 += strspn(_Cpc1, _Cpc2)) != '\0') ? (char*)_Cpc1 : NULL);
 }
 
-_CRT_INSECURE_DEPRECATE(_strncpy_s_l) __inline char * __CRTDECL _strncpy_l(__out_ecount(_Count) char *_Destination, __in_z const char *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_strncpy_s_l) __inline char* __CRTDECL _strncpy_l(__out_ecount(_Count) char* _Destination, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -2202,8 +2185,7 @@ _CRT_INSECURE_DEPRECATE(_strncpy_s_l) __inline char * __CRTDECL _strncpy_l(__out
 }
 
 #if __STDC_WANT_SECURE_LIB__
-__inline __checkReturn_wat errno_t __CRTDECL _strncpy_s_l(__out_ecount(_Destination_size_chars) char *_Destination, __in size_t _Destination_size_chars, __in_z const char *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline __checkReturn_wat errno_t __CRTDECL _strncpy_s_l(__out_ecount(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -2212,10 +2194,9 @@ __inline __checkReturn_wat errno_t __CRTDECL _strncpy_s_l(__out_ecount(_Destinat
 }
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _strncpy_s_l, __out_ecount(_Size) char, _Dest, __in_z const char *, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _strncpy_s_l, __out_ecount(_Size) char, _Dest, __in_z const char*, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
 
-_CRT_INSECURE_DEPRECATE(_strncat_s_l) __inline char * __CRTDECL _strncat_l(__inout_z char *_Destination, __in_z const char *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_strncat_s_l) __inline char* __CRTDECL _strncat_l(__inout_z char* _Destination, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 6054 )
@@ -2224,8 +2205,7 @@ _CRT_INSECURE_DEPRECATE(_strncat_s_l) __inline char * __CRTDECL _strncat_l(__ino
 }
 
 #if __STDC_WANT_SECURE_LIB__
-__inline __checkReturn_wat errno_t __CRTDECL _strncat_s_l(__inout_ecount_z(_Destination_size_chars) char *_Destination, __in size_t _Destination_size_chars, __in_z const char *_Source, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline __checkReturn_wat errno_t __CRTDECL _strncat_s_l(__inout_ecount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in_z const char* _Source, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning(push)
 #pragma warning(disable:4996)
@@ -2234,20 +2214,18 @@ __inline __checkReturn_wat errno_t __CRTDECL _strncat_s_l(__inout_ecount_z(_Dest
 }
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _strncat_s_l, __inout_ecount_z(_Size) char, _Dest, __in_z const char *, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_3(errno_t, _strncat_s_l, __inout_ecount_z(_Size) char, _Dest, __in_z const char*, _Source, __in size_t, _Count, __in_opt _locale_t, _Locale)
 
-_CRT_INSECURE_DEPRECATE(_strtok_s_l) __inline __checkReturn char *  _strtok_l(__inout_z_opt char * _String, __in_z const char * _Delimiters, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_strtok_s_l) __inline __checkReturn char*   _strtok_l(__inout_z_opt char* _String, __in_z const char* _Delimiters, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning(push)
 #pragma warning(disable:4996)
-    return strtok(_String,_Delimiters);
+    return strtok(_String, _Delimiters);
 #pragma warning(pop)
 }
 
 #if __STDC_WANT_SECURE_LIB__
-__inline __checkReturn char *  _strtok_s_l(__inout_z_opt char * _String, __in_z const char * _Delimiters, __deref_inout_z_opt char **_Current_position, __in_opt _locale_t _Locale)
-{
+__inline __checkReturn char*   _strtok_s_l(__inout_z_opt char* _String, __in_z const char* _Delimiters, __deref_inout_z_opt char** _Current_position, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning(push)
 #pragma warning(disable:4996)
@@ -2256,8 +2234,7 @@ __inline __checkReturn char *  _strtok_s_l(__inout_z_opt char * _String, __in_z 
 }
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 
-_CRT_INSECURE_DEPRECATE(_strnset_s_l) __inline char * __CRTDECL _strnset_l(__inout char *_Destination, __in int _Value, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_strnset_s_l) __inline char* __CRTDECL _strnset_l(__inout char* _Destination, __in int _Value, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 6054 )
@@ -2265,8 +2242,7 @@ _CRT_INSECURE_DEPRECATE(_strnset_s_l) __inline char * __CRTDECL _strnset_l(__ino
 #pragma warning( pop )
 }
 
-__inline errno_t __CRTDECL _strnset_s_l(__inout_ecount_z(_Destination_size_chars) char *_Destination, __in size_t _Destination_size_chars, __in int _Value, __in size_t _Count, __in_opt _locale_t _Locale)
-{
+__inline errno_t __CRTDECL _strnset_s_l(__inout_ecount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in int _Value, __in size_t _Count, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -2274,8 +2250,7 @@ __inline errno_t __CRTDECL _strnset_s_l(__inout_ecount_z(_Destination_size_chars
 #pragma warning( pop )
 }
 
-_CRT_INSECURE_DEPRECATE(_strset_s_l) __inline char * __CRTDECL _strset_l(__inout_z char * _Destination, __in int _Value, __in_opt _locale_t _Locale)
-{
+_CRT_INSECURE_DEPRECATE(_strset_s_l) __inline char* __CRTDECL _strset_l(__inout_z char* _Destination, __in int _Value, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )
@@ -2283,8 +2258,7 @@ _CRT_INSECURE_DEPRECATE(_strset_s_l) __inline char * __CRTDECL _strset_l(__inout
 #pragma warning( pop )
 }
 
-__inline errno_t __CRTDECL _strset_s_l(__inout_ecount_z(_Destination_size_chars) char *_Destination, __in size_t _Destination_size_chars, __in int _Value, __in_opt _locale_t _Locale)
-{
+__inline errno_t __CRTDECL _strset_s_l(__inout_ecount_z(_Destination_size_chars) char* _Destination, __in size_t _Destination_size_chars, __in int _Value, __in_opt _locale_t _Locale) {
     _CRT_UNUSED(_Locale);
 #pragma warning( push )
 #pragma warning( disable : 4996 )

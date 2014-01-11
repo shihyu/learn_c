@@ -49,42 +49,43 @@
 *
 *******************************************************************************/
 
-int __cdecl _heap_param (
-        int flag,
-        int param_id,
-        void *pparam
-        )
-{
-
-        switch ( param_id ) {
-
-                case _HP_RESETSIZE:
-                        if ( flag == _HP_SETPARAM ) {
-                                _mlock(_HEAP_LOCK);
-                                _heap_resetsize = *(unsigned *)pparam;
-                                _munlock(_HEAP_LOCK);
-                        }
-                        else
-                                *(unsigned *)pparam = _heap_resetsize;
-                        break;
-
-                case _HP_AMBLKSIZ:
-                        if ( flag == _HP_SETPARAM )
-                                /*
-                                 * the only references to _amblksiz (aka
-                                 * _heap_growsize) are atomic. therefore, the
-                                 * heap does not need to be locked.
-                                 */
-                                _amblksiz = *(unsigned *)pparam;
-                        else
-                                *(unsigned *)pparam = _amblksiz;
-                        break;
-
-                default:
-                        return -1;
+int __cdecl _heap_param(
+    int flag,
+    int param_id,
+    void* pparam
+) {
+    switch (param_id) {
+    case _HP_RESETSIZE:
+        if (flag == _HP_SETPARAM) {
+            _mlock(_HEAP_LOCK);
+            _heap_resetsize = *(unsigned*)pparam;
+            _munlock(_HEAP_LOCK);
+        } else {
+            *(unsigned*)pparam = _heap_resetsize;
         }
 
-        return 0;
+        break;
+
+    case _HP_AMBLKSIZ:
+        if (flag == _HP_SETPARAM)
+            /*
+             * the only references to _amblksiz (aka
+             * _heap_growsize) are atomic. therefore, the
+             * heap does not need to be locked.
+             */
+        {
+            _amblksiz = *(unsigned*)pparam;
+        } else {
+            *(unsigned*)pparam = _amblksiz;
+        }
+
+        break;
+
+    default:
+        return -1;
+    }
+
+    return 0;
 }
 
 

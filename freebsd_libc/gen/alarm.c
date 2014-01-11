@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,17 +41,21 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/alarm.c,v 1.3 2007/01/09 00:27:53 imp Exp $
 
 unsigned int
 alarm(secs)
-	unsigned int secs;
+unsigned int secs;
 {
-	struct itimerval it, oitv;
-	struct itimerval *itp = &it;
+    struct itimerval it, oitv;
+    struct itimerval* itp = &it;
+    timerclear(&itp->it_interval);
+    itp->it_value.tv_sec = secs;
+    itp->it_value.tv_usec = 0;
 
-	timerclear(&itp->it_interval);
-	itp->it_value.tv_sec = secs;
-	itp->it_value.tv_usec = 0;
-	if (setitimer(ITIMER_REAL, itp, &oitv) < 0)
-		return (-1);
-	if (oitv.it_value.tv_usec)
-		oitv.it_value.tv_sec++;
-	return (oitv.it_value.tv_sec);
+    if (setitimer(ITIMER_REAL, itp, &oitv) < 0) {
+        return (-1);
+    }
+
+    if (oitv.it_value.tv_usec) {
+        oitv.it_value.tv_sec++;
+    }
+
+    return (oitv.it_value.tv_sec);
 }

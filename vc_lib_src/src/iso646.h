@@ -4,17 +4,17 @@
 #define _ISO646
 
 #if !defined(__cplusplus) || defined(_MSC_EXTENSIONS)
- #define and	&&
- #define and_eq	&=
- #define bitand	&
- #define bitor	|
- #define compl	~
- #define not	!
- #define not_eq	!=
- #define or		||
- #define or_eq	|=
- #define xor	^
- #define xor_eq	^=
+#define and    &&
+#define and_eq &=
+#define bitand &
+#define bitor  |
+#define compl  ~
+#define not    !
+#define not_eq !=
+#define or     ||
+#define or_eq  |=
+#define xor    ^
+#define xor_eq ^=
 #endif /* !__cplusplus || _MSC_EXTENSIONS */
 
 #endif /* _ISO646 */

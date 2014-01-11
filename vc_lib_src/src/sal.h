@@ -247,241 +247,241 @@ nothing, and do not affect the compiled code.
 
 #if !defined (__midl) && defined (_PREFAST_)
 
-    /*
-     In the primitive __declspec("SAL_*") annotations "SAL" stands for Standard
-     Annotation Language.  These __declspec("SAL_*") annotations are the
-     primitives the compiler understands and all high-level SpecString MACROs
-     will decompose into these primivates.
-    */
+/*
+ In the primitive __declspec("SAL_*") annotations "SAL" stands for Standard
+ Annotation Language.  These __declspec("SAL_*") annotations are the
+ primitives the compiler understands and all high-level SpecString MACROs
+ will decompose into these primivates.
+*/
 
-    #define SPECSTRINGIZE( x ) #x
+#define SPECSTRINGIZE( x ) #x
 
-    /*
-     __null p
-     __notnull p
-     __maybenull p
+/*
+ __null p
+ __notnull p
+ __maybenull p
 
-     Annotates a pointer p. States that pointer p is null. Commonly used
-     in the negated form __notnull or the possibly null form __maybenull.
-    */
+ Annotates a pointer p. States that pointer p is null. Commonly used
+ in the negated form __notnull or the possibly null form __maybenull.
+*/
 
-    #define __null                  __declspec("SAL_null")
-    #define __notnull               __declspec("SAL_notnull")
-    #define __maybenull             __declspec("SAL_maybenull")
+#define __null                  __declspec("SAL_null")
+#define __notnull               __declspec("SAL_notnull")
+#define __maybenull             __declspec("SAL_maybenull")
 
-    /*
-     __readonly l
-     __notreadonly l
-     __mabyereadonly l
+/*
+ __readonly l
+ __notreadonly l
+ __mabyereadonly l
 
-     Annotates a location l. States that location l is not modified after
-     this point.  If the annotation is placed on the precondition state of
-     a function, the restriction only applies until the postcondition state
-     of the function.  __maybereadonly states that the annotated location
-     may be modified, whereas __notreadonly states that a location must be
-     modified.
-    */
+ Annotates a location l. States that location l is not modified after
+ this point.  If the annotation is placed on the precondition state of
+ a function, the restriction only applies until the postcondition state
+ of the function.  __maybereadonly states that the annotated location
+ may be modified, whereas __notreadonly states that a location must be
+ modified.
+*/
 
-    #define __readonly              __declspec("SAL_readonly")
-    #define __notreadonly           __declspec("SAL_notreadonly")
-    #define __maybereadonly         __declspec("SAL_maybereadonly")
+#define __readonly              __declspec("SAL_readonly")
+#define __notreadonly           __declspec("SAL_notreadonly")
+#define __maybereadonly         __declspec("SAL_maybereadonly")
 
-    /*
-     __valid v
-     __notvalid v
-     __maybevalid v
+/*
+ __valid v
+ __notvalid v
+ __maybevalid v
 
-     Annotates any value v. States that the value satisfies all properties of
-     valid values of its type. For example, for a string buffer, valid means
-     that the buffer pointer is either NULL or points to a NULL-terminated string.
-    */
+ Annotates any value v. States that the value satisfies all properties of
+ valid values of its type. For example, for a string buffer, valid means
+ that the buffer pointer is either NULL or points to a NULL-terminated string.
+*/
 
-    #define __valid                 __declspec("SAL_valid")
-    #define __notvalid              __declspec("SAL_notvalid")
-    #define __maybevalid            __declspec("SAL_maybevalid")
+#define __valid                 __declspec("SAL_valid")
+#define __notvalid              __declspec("SAL_notvalid")
+#define __maybevalid            __declspec("SAL_maybevalid")
 
-    /*
-     __readableTo(extent) p
+/*
+ __readableTo(extent) p
 
-     Annotates a buffer pointer p.  If the buffer can be read, extent describes
-     how much of the buffer is readable. For a reader of the buffer, this is
-     an explicit permission to read up to that amount, rather than a restriction to
-     read only up to it.
-    */
+ Annotates a buffer pointer p.  If the buffer can be read, extent describes
+ how much of the buffer is readable. For a reader of the buffer, this is
+ an explicit permission to read up to that amount, rather than a restriction to
+ read only up to it.
+*/
 
-    #define __readableTo(extent)    __declspec("SAL_readableTo("SPECSTRINGIZE(extent)")")
+#define __readableTo(extent)    __declspec("SAL_readableTo("SPECSTRINGIZE(extent)")")
 
-    /*
+/*
 
-     __elem_readableTo(size)
+ __elem_readableTo(size)
 
-     Annotates a buffer pointer p as being readable to size elements.
-    */
+ Annotates a buffer pointer p as being readable to size elements.
+*/
 
-    #define __elem_readableTo(size)   __declspec("SAL_readableTo(elementCount("SPECSTRINGIZE(size)"))")
+#define __elem_readableTo(size)   __declspec("SAL_readableTo(elementCount("SPECSTRINGIZE(size)"))")
 
-    /*
-     __byte_readableTo(size)
+/*
+ __byte_readableTo(size)
 
-     Annotates a buffer pointer p as being readable to size bytes.
-    */
-    #define __byte_readableTo(size)   __declspec("SAL_readableTo(byteCount("SPECSTRINGIZE(size)"))")
+ Annotates a buffer pointer p as being readable to size bytes.
+*/
+#define __byte_readableTo(size)   __declspec("SAL_readableTo(byteCount("SPECSTRINGIZE(size)"))")
 
-    /*
-     __writableTo(extent) p
+/*
+ __writableTo(extent) p
 
-     Annotates a buffer pointer p. If the buffer can be modified, extent
-     describes how much of the buffer is writable (usually the allocation
-     size). For a writer of the buffer, this is an explicit permission to
-     write up to that amount, rather than a restriction to write only up to it.
-    */
-    #define __writableTo(size)   __declspec("SAL_writableTo("SPECSTRINGIZE(size)")")
+ Annotates a buffer pointer p. If the buffer can be modified, extent
+ describes how much of the buffer is writable (usually the allocation
+ size). For a writer of the buffer, this is an explicit permission to
+ write up to that amount, rather than a restriction to write only up to it.
+*/
+#define __writableTo(size)   __declspec("SAL_writableTo("SPECSTRINGIZE(size)")")
 
-    /*
-     __elem_writableTo(size)
+/*
+ __elem_writableTo(size)
 
-     Annotates a buffer pointer p as being writable to size elements.
-    */
-    #define __elem_writableTo(size)   __declspec("SAL_writableTo(elementCount("SPECSTRINGIZE(size)"))")
+ Annotates a buffer pointer p as being writable to size elements.
+*/
+#define __elem_writableTo(size)   __declspec("SAL_writableTo(elementCount("SPECSTRINGIZE(size)"))")
 
-    /*
-     __byte_writableTo(size)
+/*
+ __byte_writableTo(size)
 
-     Annotates a buffer pointer p as being writable to size bytes.
-    */
-    #define __byte_writableTo(size)   __declspec("SAL_writableTo(byteCount("SPECSTRINGIZE(size)"))")
+ Annotates a buffer pointer p as being writable to size bytes.
+*/
+#define __byte_writableTo(size)   __declspec("SAL_writableTo(byteCount("SPECSTRINGIZE(size)"))")
 
-    /*
-     __deref p
+/*
+ __deref p
 
-     Annotates a pointer p. The next annotation applies one dereference down
-     in the type. If readableTo(p, size) then the next annotation applies to
-     all elements *(p+i) for which i satisfies the size. If p is a pointer
-     to a struct, the next annotation applies to all fields of the struct.
-    */
-    #define __deref                 __declspec("SAL_deref")
+ Annotates a pointer p. The next annotation applies one dereference down
+ in the type. If readableTo(p, size) then the next annotation applies to
+ all elements *(p+i) for which i satisfies the size. If p is a pointer
+ to a struct, the next annotation applies to all fields of the struct.
+*/
+#define __deref                 __declspec("SAL_deref")
 
-    /*
-     __pre __next_annotation
+/*
+ __pre __next_annotation
 
-     The next annotation applies in the precondition state
-    */
-    #define __pre                   __declspec("SAL_pre")
+ The next annotation applies in the precondition state
+*/
+#define __pre                   __declspec("SAL_pre")
 
-    /*
-     __post __next_annotation
+/*
+ __post __next_annotation
 
-     The next annotation applies in the postcondition state
-    */
-    #define __post                  __declspec("SAL_post")
+ The next annotation applies in the postcondition state
+*/
+#define __post                  __declspec("SAL_post")
 
-    /*
-     __precond(<expr>)
+/*
+ __precond(<expr>)
 
-     When <expr> is true, the next annotation applies in the precondition state
-     (currently not enabled)
-    */
-    #define __precond(expr)         __pre
+ When <expr> is true, the next annotation applies in the precondition state
+ (currently not enabled)
+*/
+#define __precond(expr)         __pre
 
-    /*
-     __postcond(<expr>)
+/*
+ __postcond(<expr>)
 
-     When <expr> is true, the next annotation applies in the postcondition state
-     (currently not enabled)
-    */
-    #define __postcond(expr)        __post
+ When <expr> is true, the next annotation applies in the postcondition state
+ (currently not enabled)
+*/
+#define __postcond(expr)        __post
 
-    /*
-     __exceptthat
+/*
+ __exceptthat
 
-     Given a set of annotations Q containing __exceptthat maybeP, the effect of
-     the except clause is to erase any P or notP annotations (explicit or
-     implied) within Q at the same level of dereferencing that the except
-     clause appears, and to replace it with maybeP.
+ Given a set of annotations Q containing __exceptthat maybeP, the effect of
+ the except clause is to erase any P or notP annotations (explicit or
+ implied) within Q at the same level of dereferencing that the except
+ clause appears, and to replace it with maybeP.
 
-      Example 1: __valid __exceptthat __maybenull on a pointer p means that the
-                 pointer may be null, and is otherwise valid, thus overriding
-                 the implicit notnull annotation implied by __valid on
-                 pointers.
+  Example 1: __valid __exceptthat __maybenull on a pointer p means that the
+             pointer may be null, and is otherwise valid, thus overriding
+             the implicit notnull annotation implied by __valid on
+             pointers.
 
-      Example 2: __valid __deref __exceptthat __maybenull on an int **p means
-                 that p is not null (implied by valid), but the elements
-                 pointed to by p could be null, and are otherwise valid.
-    */
-    #define __exceptthat                __declspec("SAL_except")
-    #define __execeptthat               __exceptthat
+  Example 2: __valid __deref __exceptthat __maybenull on an int **p means
+             that p is not null (implied by valid), but the elements
+             pointed to by p could be null, and are otherwise valid.
+*/
+#define __exceptthat                __declspec("SAL_except")
+#define __execeptthat               __exceptthat
 
-    /*
-     _refparam
+/*
+ _refparam
 
-     Added to all out parameter macros to indicate that they are all reference
-     parameters.
-    */
-    #define __refparam                  __deref __notreadonly
+ Added to all out parameter macros to indicate that they are all reference
+ parameters.
+*/
+#define __refparam                  __deref __notreadonly
 
-    /*
-     __inner_*
+/*
+ __inner_*
 
-     Helper macros that directly correspond to certain high-level annotations.
+ Helper macros that directly correspond to certain high-level annotations.
 
-    */
+*/
 
-    /*
-     Macros to classify the entrypoints and indicate their category.
+/*
+ Macros to classify the entrypoints and indicate their category.
 
-     Pre-defined control point categories include: RPC, LPC, DeviceDriver, UserToKernel, ISAPI, COM.
+ Pre-defined control point categories include: RPC, LPC, DeviceDriver, UserToKernel, ISAPI, COM.
 
-    */
-    #define __inner_control_entrypoint(category) __declspec("SAL_entrypoint(controlEntry, "SPECSTRINGIZE(category)")")
+*/
+#define __inner_control_entrypoint(category) __declspec("SAL_entrypoint(controlEntry, "SPECSTRINGIZE(category)")")
 
-    /*
-     Pre-defined data entry point categories include: Registry, File, Network.
-    */
-    #define __inner_data_entrypoint(category)    __declspec("SAL_entrypoint(dataEntry, "SPECSTRINGIZE(category)")")
+/*
+ Pre-defined data entry point categories include: Registry, File, Network.
+*/
+#define __inner_data_entrypoint(category)    __declspec("SAL_entrypoint(dataEntry, "SPECSTRINGIZE(category)")")
 
-    #define __inner_success(expr)               __declspec("SAL_success("SPECSTRINGIZE(expr)")")
-    #define __inner_checkReturn                 __declspec("SAL_checkReturn")
-    #define __inner_typefix(ctype)              __declspec("SAL_typefix("SPECSTRINGIZE(ctype)")")
-    #define __inner_override                    __declspec("__override")
-    #define __inner_callback                    __declspec("__callback")
-    #define __inner_blocksOn(resource)          __declspec("SAL_blocksOn("SPECSTRINGIZE(resource)")")
-    #define __inner_fallthrough_dec             __inline __nothrow void __FallThrough() {}
-    #define __inner_fallthrough                 __FallThrough();
+#define __inner_success(expr)               __declspec("SAL_success("SPECSTRINGIZE(expr)")")
+#define __inner_checkReturn                 __declspec("SAL_checkReturn")
+#define __inner_typefix(ctype)              __declspec("SAL_typefix("SPECSTRINGIZE(ctype)")")
+#define __inner_override                    __declspec("__override")
+#define __inner_callback                    __declspec("__callback")
+#define __inner_blocksOn(resource)          __declspec("SAL_blocksOn("SPECSTRINGIZE(resource)")")
+#define __inner_fallthrough_dec             __inline __nothrow void __FallThrough() {}
+#define __inner_fallthrough                 __FallThrough();
 
 #else  /* !defined (__midl) && defined (_PREFAST_) */
-    #define __null
-    #define __notnull
-    #define __maybenull
-    #define __readonly
-    #define __notreadonly
-    #define __maybereadonly
-    #define __valid
-    #define __notvalid
-    #define __maybevalid
-    #define __readableTo(extent)
-    #define __elem_readableTo(size)
-    #define __byte_readableTo(size)
-    #define __writableTo(size)
-    #define __elem_writableTo(size)
-    #define __byte_writableTo(size)
-    #define __deref
-    #define __pre
-    #define __post
-    #define __precond(expr)
-    #define __postcond(expr)
-    #define __exceptthat
-    #define __execeptthat
-    #define __inner_success(expr)
-    #define __inner_checkReturn
-    #define __inner_typefix(ctype)
-    #define __inner_override
-    #define __inner_callback
-    #define __inner_blocksOn(resource)
-    #define __inner_fallthrough_dec
-    #define __inner_fallthrough
-    #define __refparam
-    #define __inner_control_entrypoint(category)
-    #define __inner_data_entrypoint(category)
+#define __null
+#define __notnull
+#define __maybenull
+#define __readonly
+#define __notreadonly
+#define __maybereadonly
+#define __valid
+#define __notvalid
+#define __maybevalid
+#define __readableTo(extent)
+#define __elem_readableTo(size)
+#define __byte_readableTo(size)
+#define __writableTo(size)
+#define __elem_writableTo(size)
+#define __byte_writableTo(size)
+#define __deref
+#define __pre
+#define __post
+#define __precond(expr)
+#define __postcond(expr)
+#define __exceptthat
+#define __execeptthat
+#define __inner_success(expr)
+#define __inner_checkReturn
+#define __inner_typefix(ctype)
+#define __inner_override
+#define __inner_callback
+#define __inner_blocksOn(resource)
+#define __inner_fallthrough_dec
+#define __inner_fallthrough
+#define __refparam
+#define __inner_control_entrypoint(category)
+#define __inner_data_entrypoint(category)
 #endif  /* !defined (__midl) && defined (_PREFAST_) */
 
 /*
@@ -710,8 +710,8 @@ of each annotation, see the advanced annotations section.
 #define __data_entrypoint(category)         __inner_data_entrypoint(category)
 
 #ifndef __fallthrough
-    __inner_fallthrough_dec
-    #define __fallthrough __inner_fallthrough
+__inner_fallthrough_dec
+#define __fallthrough __inner_fallthrough
 #endif  /* __fallthrough */
 
 #ifndef __analysis_assume

@@ -64,9 +64,9 @@ static TCHAR _assertstring[] = _T("Assertion failed: %s, file %s, line %d\n");
                     _T("failure, see the Visual C++ documentation on asserts")
 #define HELPINTRO   _T("(Press Retry to debug the application - JIT must be enabled)")
 
-static TCHAR * dotdotdot = _T("...");
-static TCHAR * newline = _T("\n");
-static TCHAR * dblnewline = _T("\n\n");
+static TCHAR* dotdotdot = _T("...");
+static TCHAR* newline = _T("\n");
+static TCHAR* dblnewline = _T("\n\n");
 
 #define DOTDOTDOTSZ 3
 #define NEWLINESZ   1
@@ -86,7 +86,7 @@ void __break(int);
 #endif  /* defined (_M_IA64) */
 
 #ifdef _UNICODE
-void __cdecl _assert (const char *, const char *,unsigned);
+void __cdecl _assert(const char*, const char*, unsigned);
 #endif  /* _UNICODE */
 
 /***
@@ -107,289 +107,254 @@ void __cdecl _assert (const char *, const char *,unsigned);
 *******************************************************************************/
 
 #ifdef _UNICODE
-void __cdecl _wassert (
-        const wchar_t *expr,
-        const wchar_t *filename,
-        unsigned lineno
-        )
+void __cdecl _wassert(
+    const wchar_t* expr,
+    const wchar_t* filename,
+    unsigned lineno
+)
 #else  /* _UNICODE */
-void __cdecl _assert (
+void __cdecl _assert(
 
-        const char *expr,
-        const char *filename,
-        unsigned lineno
-        )
+    const char* expr,
+    const char* filename,
+    unsigned lineno
+)
 #endif  /* _UNICODE */
 {
 #ifdef _UNICODE
-        unsigned int osplatform = 0;
+    unsigned int osplatform = 0;
+    _get_osplatform(&osplatform);
 
-        _get_osplatform(&osplatform);
-        if(osplatform == VER_PLATFORM_WIN32_WINDOWS)
-        {
-            char aexpr[ASSERTBUFSZ], afilename[ASSERTBUFSZ];
+    if (osplatform == VER_PLATFORM_WIN32_WINDOWS) {
+        char aexpr[ASSERTBUFSZ], afilename[ASSERTBUFSZ];
 
-            if(expr && *expr)
-            {
-                errno_t e = _ERRCHECK_EINVAL_ERANGE(wcstombs_s(NULL, aexpr, ASSERTBUFSZ, expr, _TRUNCATE));
-                if(e == STRUNCATE)
-                {
-                    /* We truncate the string & append a "..." to it. */
-                    aexpr[ASSERTBUFSZ - DOTDOTDOTSZ - 1] = '\0';
-                    _ERRCHECK(strcat_s(aexpr, ASSERTBUFSZ, "..."));
-                }
-                else if(e != 0)
-                {
-                    /* If wcstombs_s encounters a wide character that cannot be
-                    converted to a multibyte character, it returns EILSEQ */
-                    _ERRCHECK(strcpy_s(aexpr, ASSERTBUFSZ, "Expression cannot be displayed on Win9x"));
-                }
+        if (expr && *expr) {
+            errno_t e = _ERRCHECK_EINVAL_ERANGE(wcstombs_s(NULL, aexpr, ASSERTBUFSZ, expr, _TRUNCATE));
+
+            if (e == STRUNCATE) {
+                /* We truncate the string & append a "..." to it. */
+                aexpr[ASSERTBUFSZ - DOTDOTDOTSZ - 1] = '\0';
+                _ERRCHECK(strcat_s(aexpr, ASSERTBUFSZ, "..."));
+            } else if (e != 0) {
+                /* If wcstombs_s encounters a wide character that cannot be
+                converted to a multibyte character, it returns EILSEQ */
+                _ERRCHECK(strcpy_s(aexpr, ASSERTBUFSZ, "Expression cannot be displayed on Win9x"));
             }
-            else
-                aexpr[0] = '\0';
-
-            if(filename && *filename)
-            {
-                errno_t e = _ERRCHECK_EINVAL_ERANGE(wcstombs_s(NULL, afilename, ASSERTBUFSZ, filename, _TRUNCATE));
-                if(e == STRUNCATE)
-                {
-                    afilename[ASSERTBUFSZ - DOTDOTDOTSZ - 1] = '\0';
-                    _ERRCHECK(strcat_s(afilename, ASSERTBUFSZ, "..."));
-                }
-                else if(e != 0)
-                {
-                    _ERRCHECK(strcpy_s(aexpr, ASSERTBUFSZ, "Filename cannot be displayed on Win9x"));
-                }
-             }
-             else
-                afilename[0] = '\0';
-
-            _assert(aexpr,afilename,lineno);
-
-            return;
+        } else {
+            aexpr[0] = '\0';
         }
+
+        if (filename && *filename) {
+            errno_t e = _ERRCHECK_EINVAL_ERANGE(wcstombs_s(NULL, afilename, ASSERTBUFSZ, filename, _TRUNCATE));
+
+            if (e == STRUNCATE) {
+                afilename[ASSERTBUFSZ - DOTDOTDOTSZ - 1] = '\0';
+                _ERRCHECK(strcat_s(afilename, ASSERTBUFSZ, "..."));
+            } else if (e != 0) {
+                _ERRCHECK(strcpy_s(aexpr, ASSERTBUFSZ, "Filename cannot be displayed on Win9x"));
+            }
+        } else {
+            afilename[0] = '\0';
+        }
+
+        _assert(aexpr, afilename, lineno);
+        return;
+    }
+
 #endif  /* _UNICODE */
 
-        /*
-         * Build the assertion message, then write it out. The exact form
-         * depends on whether it is to be written out via stderr or the
-         * MessageBox API.
-         */
-        if ( (_set_error_mode(_REPORT_ERRMODE)== _OUT_TO_STDERR) ||
-             ((_set_error_mode(_REPORT_ERRMODE) == _OUT_TO_DEFAULT) &&
-              (__app_type == _CONSOLE_APP)) )
-        {
+    /*
+     * Build the assertion message, then write it out. The exact form
+     * depends on whether it is to be written out via stderr or the
+     * MessageBox API.
+     */
+    if ((_set_error_mode(_REPORT_ERRMODE) == _OUT_TO_STDERR) ||
+            ((_set_error_mode(_REPORT_ERRMODE) == _OUT_TO_DEFAULT) &&
+             (__app_type == _CONSOLE_APP))) {
 #ifdef _UNICODE
-            {
-                TCHAR assertbuf[ASSERTBUFSZ];
-                HANDLE hErr ;
-                DWORD written;
+        {
+            TCHAR assertbuf[ASSERTBUFSZ];
+            HANDLE hErr ;
+            DWORD written;
 
-                hErr = GetStdHandle(STD_ERROR_HANDLE);
+            hErr = GetStdHandle(STD_ERROR_HANDLE);
 
-                if(hErr!=INVALID_HANDLE_VALUE && hErr!=NULL)
-                {
-                    if(swprintf(assertbuf, ASSERTBUFSZ,_assertstring,expr,filename,lineno) >= 0)
-                    {
-                        if(GetFileType(hErr) == FILE_TYPE_CHAR)
-                        {
-                            if(WriteConsoleW(hErr, assertbuf, (unsigned long)wcslen(assertbuf), &written, NULL))
-                            {
-                                abort();
-                            }
+            if (hErr != INVALID_HANDLE_VALUE && hErr != NULL) {
+                if (swprintf(assertbuf, ASSERTBUFSZ, _assertstring, expr, filename, lineno) >= 0) {
+                    if (GetFileType(hErr) == FILE_TYPE_CHAR) {
+                        if (WriteConsoleW(hErr, assertbuf, (unsigned long)wcslen(assertbuf), &written, NULL)) {
+                            abort();
                         }
                     }
                 }
             }
-
+        }
 #endif  /* _UNICODE */
 
-            /*
-             * Build message and write it out to stderr. It will be of the
-             * form:
-             *        Assertion failed: <expr>, file <filename>, line <lineno>
-             */
-            if ( !anybuf(stderr) )
+        /*
+         * Build message and write it out to stderr. It will be of the
+         * form:
+         *        Assertion failed: <expr>, file <filename>, line <lineno>
+         */
+        if (!anybuf(stderr))
             /*
              * stderr is unused, hence unbuffered, as yet. set it to
              * single character buffering (to avoid a malloc() of a
              * stream buffer).
              */
-             (void) setvbuf(stderr, NULL, _IONBF, 0);
-
-
-            _ftprintf(stderr, _assertstring, expr, filename, lineno);
-            fflush(stderr);
-
+        {
+            (void) setvbuf(stderr, NULL, _IONBF, 0);
         }
-        else {
-            int nCode;
-            TCHAR * pch;
-            TCHAR assertbuf[ASSERTBUFSZ];
-            TCHAR progname[MAX_PATH + 1];
 
-            /*
-             * Line 1: box intro line
+        _ftprintf(stderr, _assertstring, expr, filename, lineno);
+        fflush(stderr);
+    } else {
+        int nCode;
+        TCHAR* pch;
+        TCHAR assertbuf[ASSERTBUFSZ];
+        TCHAR progname[MAX_PATH + 1];
+        /*
+         * Line 1: box intro line
+         */
+        _ERRCHECK(_tcscpy_s(assertbuf, ASSERTBUFSZ, BOXINTRO));
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dblnewline));
+        /*
+         * Line 2: program line
+         */
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, PROGINTRO));
+        progname[MAX_PATH] = _T('\0');
+
+        if (!GetModuleFileName(NULL, progname, MAX_PATH)) {
+            _ERRCHECK(_tcscpy_s(progname, MAX_PATH + 1, _T("<program name unknown>")));
+        }
+
+        pch = (TCHAR*)progname;
+
+        /* sizeof(PROGINTRO) includes the NULL terminator */
+        if ((sizeof(PROGINTRO) / sizeof(TCHAR)) + _tcslen(progname) + NEWLINESZ > MAXLINELEN) {
+            pch += ((sizeof(PROGINTRO) / sizeof(TCHAR)) + _tcslen(progname) + NEWLINESZ) - MAXLINELEN;
+            _ERRCHECK(_tcsncpy_s(pch, (MAX_PATH + 1) - (pch - progname), dotdotdot, DOTDOTDOTSZ));
+        }
+
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, pch));
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, newline));
+        /*
+         * Line 3: file line
+         */
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, FILEINTRO));
+
+        /* sizeof(FILEINTRO) includes the NULL terminator */
+        if ((sizeof(FILEINTRO) / sizeof(TCHAR)) + _tcslen(filename) + NEWLINESZ > MAXLINELEN) {
+            size_t p, len, ffn;
+            pch = (TCHAR*) filename;
+            ffn = MAXLINELEN - (sizeof(FILEINTRO) / sizeof(TCHAR)) - NEWLINESZ;
+
+            for (len = _tcslen(filename), p = 1;
+                    pch[len - p] != _T('\\') && pch[len - p] != _T('/') && p < len;
+                    p++);
+
+            /* keeping pathname almost 2/3rd of full filename and rest
+             * is filename
              */
-            _ERRCHECK(_tcscpy_s( assertbuf, ASSERTBUFSZ, BOXINTRO ));
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dblnewline ));
-
-            /*
-             * Line 2: program line
-             */
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, PROGINTRO ));
-
-            progname[MAX_PATH] = _T('\0');
-            if ( !GetModuleFileName( NULL, progname, MAX_PATH ))
-                _ERRCHECK(_tcscpy_s( progname, MAX_PATH + 1, _T("<program name unknown>")));
-
-            pch = (TCHAR *)progname;
-
-            /* sizeof(PROGINTRO) includes the NULL terminator */
-            if ( (sizeof(PROGINTRO)/sizeof(TCHAR)) + _tcslen(progname) + NEWLINESZ > MAXLINELEN )
-            {
-                pch += ((sizeof(PROGINTRO)/sizeof(TCHAR)) + _tcslen(progname) + NEWLINESZ) - MAXLINELEN;
-                _ERRCHECK(_tcsncpy_s( pch, (MAX_PATH + 1) - (pch - progname), dotdotdot, DOTDOTDOTSZ ));
-            }
-
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, pch ));
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, newline ));
-
-            /*
-             * Line 3: file line
-             */
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, FILEINTRO ));
-
-            /* sizeof(FILEINTRO) includes the NULL terminator */
-            if ( (sizeof(FILEINTRO)/sizeof(TCHAR)) + _tcslen(filename) + NEWLINESZ > MAXLINELEN )
-            {
-                size_t p, len, ffn;
-
-                pch = (TCHAR *) filename;
-                ffn = MAXLINELEN - (sizeof(FILEINTRO)/sizeof(TCHAR)) - NEWLINESZ;
-
-                for ( len = _tcslen(filename), p = 1;
-                      pch[len - p] != _T('\\') && pch[len - p] != _T('/') && p < len;
-                      p++ );
-
-                /* keeping pathname almost 2/3rd of full filename and rest
-                 * is filename
+            if ((ffn - ffn / 3) < (len - p) && ffn / 3 > p) {
+                /* too long. using first part of path and the
+                   filename string */
+                _ERRCHECK(_tcsncat_s(assertbuf, ASSERTBUFSZ, pch, ffn - DOTDOTDOTSZ - p));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dotdotdot));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, pch + len - p));
+            } else if (ffn - ffn / 3 > len - p) {
+                /* pathname is smaller. keeping full pathname and putting
+                 * dotdotdot in the middle of filename
                  */
-                if ( (ffn - ffn/3) < (len - p) && ffn/3 > p )
-                {
-                    /* too long. using first part of path and the
-                       filename string */
-                    _ERRCHECK(_tcsncat_s( assertbuf, ASSERTBUFSZ, pch, ffn - DOTDOTDOTSZ - p ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dotdotdot ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, pch + len - p ));
-                }
-                else if ( ffn - ffn/3 > len - p )
-                {
-                    /* pathname is smaller. keeping full pathname and putting
-                     * dotdotdot in the middle of filename
-                     */
-                    p = p/2;
-                    _ERRCHECK(_tcsncat_s( assertbuf, ASSERTBUFSZ, pch, ffn - DOTDOTDOTSZ - p ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dotdotdot ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, pch + len - p ));
-                }
-                else
-                {
-                    /* both are long. using first part of path. using first and
-                     * last part of filename.
-                     */
-                    _ERRCHECK(_tcsncat_s( assertbuf, ASSERTBUFSZ, pch, ffn - ffn/3 - DOTDOTDOTSZ ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dotdotdot ));
-                    _ERRCHECK(_tcsncat_s( assertbuf, ASSERTBUFSZ, pch + len - p, ffn/6 - 1 ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dotdotdot ));
-                    _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, pch + len - (ffn/3 - ffn/6 - 2) ));
-                }
-
+                p = p / 2;
+                _ERRCHECK(_tcsncat_s(assertbuf, ASSERTBUFSZ, pch, ffn - DOTDOTDOTSZ - p));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dotdotdot));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, pch + len - p));
+            } else {
+                /* both are long. using first part of path. using first and
+                 * last part of filename.
+                 */
+                _ERRCHECK(_tcsncat_s(assertbuf, ASSERTBUFSZ, pch, ffn - ffn / 3 - DOTDOTDOTSZ));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dotdotdot));
+                _ERRCHECK(_tcsncat_s(assertbuf, ASSERTBUFSZ, pch + len - p, ffn / 6 - 1));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dotdotdot));
+                _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, pch + len - (ffn / 3 - ffn / 6 - 2)));
             }
-            else
-                /* plenty of room on the line, just append the filename */
-                _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, filename ));
-
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, newline ));
-
-            /*
-             * Line 4: line line
-             */
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, LINEINTRO ));
-            _ERRCHECK(_itot_s( lineno, assertbuf + _tcslen(assertbuf), ASSERTBUFSZ - _tcslen(assertbuf), 10 ));
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dblnewline ));
-
-            /*
-             * Line 5: message line
-             */
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, EXPRINTRO ));
-
-            /* sizeof(HELPINTRO) includes the NULL terminator */
-
-            if (    _tcslen(assertbuf) +
-                    _tcslen(expr) +
-                    2*DBLNEWLINESZ +
-                    (sizeof(INFOINTRO)/sizeof(TCHAR)) - 1 +
-                    (sizeof(HELPINTRO)/sizeof(TCHAR)) > ASSERTBUFSZ )
-            {
-                _ERRCHECK(_tcsncat_s( assertbuf, ASSERTBUFSZ, expr,
-                    ASSERTBUFSZ -
-                    (_tcslen(assertbuf) +
-                    DOTDOTDOTSZ +
-                    2*DBLNEWLINESZ +
-                    (sizeof(INFOINTRO)/sizeof(TCHAR))-1 +
-                    (sizeof(HELPINTRO)/sizeof(TCHAR)))));
-                _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dotdotdot ));
-            }
-            else
-                _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, expr ));
-
-            _ERRCHECK(_tcscat_s( assertbuf, ASSERTBUFSZ, dblnewline ));
-
-            /*
-             * Line 6, 7: info line
-             */
-
-            _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, INFOINTRO));
-            _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dblnewline ));
-
-            /*
-             * Line 8: help line
-             */
-            _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, HELPINTRO));
-
-            /*
-             * Write out via MessageBox
-             */
-
-            nCode = __crtMessageBox(assertbuf,
-                _T("Microsoft Visual C++ Runtime Library"),
-                MB_ABORTRETRYIGNORE|MB_ICONHAND|MB_SETFOREGROUND|MB_TASKMODAL);
-
-            /* Abort: abort the program */
-            if (nCode == IDABORT)
-            {
-                /* raise abort signal */
-                raise(SIGABRT);
-
-                /* We usually won't get here, but it's possible that
-                   SIGABRT was ignored.  So exit the program anyway. */
-
-                _exit(3);
-            }
-
-            /* Retry: call the debugger */
-            if (nCode == IDRETRY)
-            {
-                _DbgBreak();
-                /* return to user code */
-                return;
-            }
-
-            /* Ignore: continue execution */
-            if (nCode == IDIGNORE)
-                return;
+        } else
+            /* plenty of room on the line, just append the filename */
+        {
+            _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, filename));
         }
 
-        abort();
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, newline));
+        /*
+         * Line 4: line line
+         */
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, LINEINTRO));
+        _ERRCHECK(_itot_s(lineno, assertbuf + _tcslen(assertbuf), ASSERTBUFSZ - _tcslen(assertbuf), 10));
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dblnewline));
+        /*
+         * Line 5: message line
+         */
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, EXPRINTRO));
+
+        /* sizeof(HELPINTRO) includes the NULL terminator */
+
+        if (_tcslen(assertbuf) +
+                _tcslen(expr) +
+                2 * DBLNEWLINESZ +
+                (sizeof(INFOINTRO) / sizeof(TCHAR)) - 1 +
+                (sizeof(HELPINTRO) / sizeof(TCHAR)) > ASSERTBUFSZ) {
+            _ERRCHECK(_tcsncat_s(assertbuf, ASSERTBUFSZ, expr,
+                                 ASSERTBUFSZ -
+                                 (_tcslen(assertbuf) +
+                                  DOTDOTDOTSZ +
+                                  2 * DBLNEWLINESZ +
+                                  (sizeof(INFOINTRO) / sizeof(TCHAR)) - 1 +
+                                  (sizeof(HELPINTRO) / sizeof(TCHAR)))));
+            _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dotdotdot));
+        } else {
+            _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, expr));
+        }
+
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dblnewline));
+        /*
+         * Line 6, 7: info line
+         */
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, INFOINTRO));
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, dblnewline));
+        /*
+         * Line 8: help line
+         */
+        _ERRCHECK(_tcscat_s(assertbuf, ASSERTBUFSZ, HELPINTRO));
+        /*
+         * Write out via MessageBox
+         */
+        nCode = __crtMessageBox(assertbuf,
+                                _T("Microsoft Visual C++ Runtime Library"),
+                                MB_ABORTRETRYIGNORE | MB_ICONHAND | MB_SETFOREGROUND | MB_TASKMODAL);
+
+        /* Abort: abort the program */
+        if (nCode == IDABORT) {
+            /* raise abort signal */
+            raise(SIGABRT);
+            /* We usually won't get here, but it's possible that
+               SIGABRT was ignored.  So exit the program anyway. */
+            _exit(3);
+        }
+
+        /* Retry: call the debugger */
+        if (nCode == IDRETRY) {
+            _DbgBreak();
+            /* return to user code */
+            return;
+        }
+
+        /* Ignore: continue execution */
+        if (nCode == IDIGNORE) {
+            return;
+        }
+    }
+
+    abort();
 }

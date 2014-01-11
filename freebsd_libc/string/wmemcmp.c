@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemcmp.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *  citrus Id: wmemcmp.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -38,19 +38,21 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wmemcmp.c,v 1.6 2002/09/21 00:29:23 tjr 
 
 int
 wmemcmp(s1, s2, n)
-	const wchar_t *s1;
-	const wchar_t *s2;
-	size_t n;
+const wchar_t* s1;
+const wchar_t* s2;
+size_t n;
 {
-	size_t i;
+    size_t i;
 
-	for (i = 0; i < n; i++) {
-		if (*s1 != *s2) {
-			/* wchar might be unsigned */
-			return *s1 > *s2 ? 1 : -1; 
-		}
-		s1++;
-		s2++;
-	}
-	return 0;
+    for (i = 0; i < n; i++) {
+        if (*s1 != *s2) {
+            /* wchar might be unsigned */
+            return *s1 > *s2 ? 1 : -1;
+        }
+
+        s1++;
+        s2++;
+    }
+
+    return 0;
 }

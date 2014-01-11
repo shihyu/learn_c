@@ -60,7 +60,7 @@ __FBSDID("$FreeBSD: src/lib/libc/net/base64.c,v 1.5 2002/03/22 21:52:28 obrien E
 #define Assert(Cond) if (!(Cond)) abort()
 
 static const char Base64[] =
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
 
 /* (From RFC1521 and draft-ietf-dnssec-secext-03.txt)
@@ -111,79 +111,90 @@ static const char Pad64 = '=';
    end of the data is performed using the '=' character.
 
    Since all base64 input is an integral number of octets, only the
-         -------------------------------------------------                       
+         -------------------------------------------------
    following cases can arise:
-   
+
        (1) the final quantum of encoding input is an integral
            multiple of 24 bits; here, the final unit of encoded
-	   output will be an integral multiple of 4 characters
-	   with no "=" padding,
+       output will be an integral multiple of 4 characters
+       with no "=" padding,
        (2) the final quantum of encoding input is exactly 8 bits;
            here, the final unit of encoded output will be two
-	   characters followed by two "=" padding characters, or
+       characters followed by two "=" padding characters, or
        (3) the final quantum of encoding input is exactly 16 bits;
            here, the final unit of encoded output will be three
-	   characters followed by one "=" padding character.
+       characters followed by one "=" padding character.
    */
 
 int
-b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize) {
-	size_t datalength = 0;
-	u_char input[3];
-	u_char output[4];
-	size_t i;
+b64_ntop(u_char const* src, size_t srclength, char* target, size_t targsize) {
+    size_t datalength = 0;
+    u_char input[3];
+    u_char output[4];
+    size_t i;
 
-	while (2 < srclength) {
-		input[0] = *src++;
-		input[1] = *src++;
-		input[2] = *src++;
-		srclength -= 3;
+    while (2 < srclength) {
+        input[0] = *src++;
+        input[1] = *src++;
+        input[2] = *src++;
+        srclength -= 3;
+        output[0] = input[0] >> 2;
+        output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
+        output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
+        output[3] = input[2] & 0x3f;
+        Assert(output[0] < 64);
+        Assert(output[1] < 64);
+        Assert(output[2] < 64);
+        Assert(output[3] < 64);
 
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-		output[3] = input[2] & 0x3f;
-		Assert(output[0] < 64);
-		Assert(output[1] < 64);
-		Assert(output[2] < 64);
-		Assert(output[3] < 64);
+        if (datalength + 4 > targsize) {
+            return (-1);
+        }
 
-		if (datalength + 4 > targsize)
-			return (-1);
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		target[datalength++] = Base64[output[2]];
-		target[datalength++] = Base64[output[3]];
-	}
-    
-	/* Now we worry about padding. */
-	if (0 != srclength) {
-		/* Get what's left. */
-		input[0] = input[1] = input[2] = '\0';
-		for (i = 0; i < srclength; i++)
-			input[i] = *src++;
-	
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-		Assert(output[0] < 64);
-		Assert(output[1] < 64);
-		Assert(output[2] < 64);
+        target[datalength++] = Base64[output[0]];
+        target[datalength++] = Base64[output[1]];
+        target[datalength++] = Base64[output[2]];
+        target[datalength++] = Base64[output[3]];
+    }
 
-		if (datalength + 4 > targsize)
-			return (-1);
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		if (srclength == 1)
-			target[datalength++] = Pad64;
-		else
-			target[datalength++] = Base64[output[2]];
-		target[datalength++] = Pad64;
-	}
-	if (datalength >= targsize)
-		return (-1);
-	target[datalength] = '\0';	/* Returned value doesn't count \0. */
-	return (datalength);
+    /* Now we worry about padding. */
+    if (0 != srclength) {
+        /* Get what's left. */
+        input[0] = input[1] = input[2] = '\0';
+
+        for (i = 0; i < srclength; i++) {
+            input[i] = *src++;
+        }
+
+        output[0] = input[0] >> 2;
+        output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
+        output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
+        Assert(output[0] < 64);
+        Assert(output[1] < 64);
+        Assert(output[2] < 64);
+
+        if (datalength + 4 > targsize) {
+            return (-1);
+        }
+
+        target[datalength++] = Base64[output[0]];
+        target[datalength++] = Base64[output[1]];
+
+        if (srclength == 1) {
+            target[datalength++] = Pad64;
+        } else {
+            target[datalength++] = Base64[output[2]];
+        }
+
+        target[datalength++] = Pad64;
+    }
+
+    if (datalength >= targsize) {
+        return (-1);
+    }
+
+    target[datalength] = '\0';  /* Returned value doesn't count \0. */
+    return (datalength);
 }
 
 /* skips all whitespace anywhere.
@@ -194,122 +205,152 @@ b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize) {
 
 int
 b64_pton(src, target, targsize)
-	char const *src;
-	u_char *target;
-	size_t targsize;
+char const* src;
+u_char* target;
+size_t targsize;
 {
-	int tarindex, state, ch;
-	char *pos;
+    int tarindex, state, ch;
+    char* pos;
+    state = 0;
+    tarindex = 0;
 
-	state = 0;
-	tarindex = 0;
+    while ((ch = *src++) != '\0') {
+        if (isspace((unsigned char)ch)) {      /* Skip whitespace anywhere. */
+            continue;
+        }
 
-	while ((ch = *src++) != '\0') {
-		if (isspace((unsigned char)ch))        /* Skip whitespace anywhere. */
-			continue;
+        if (ch == Pad64) {
+            break;
+        }
 
-		if (ch == Pad64)
-			break;
+        pos = strchr(Base64, ch);
 
-		pos = strchr(Base64, ch);
-		if (pos == 0) 		/* A non-base64 character. */
-			return (-1);
+        if (pos == 0) {     /* A non-base64 character. */
+            return (-1);
+        }
 
-		switch (state) {
-		case 0:
-			if (target) {
-				if ((size_t)tarindex >= targsize)
-					return (-1);
-				target[tarindex] = (pos - Base64) << 2;
-			}
-			state = 1;
-			break;
-		case 1:
-			if (target) {
-				if ((size_t)tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex]   |=  (pos - Base64) >> 4;
-				target[tarindex+1]  = ((pos - Base64) & 0x0f)
-							<< 4 ;
-			}
-			tarindex++;
-			state = 2;
-			break;
-		case 2:
-			if (target) {
-				if ((size_t)tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex]   |=  (pos - Base64) >> 2;
-				target[tarindex+1]  = ((pos - Base64) & 0x03)
-							<< 6;
-			}
-			tarindex++;
-			state = 3;
-			break;
-		case 3:
-			if (target) {
-				if ((size_t)tarindex >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64);
-			}
-			tarindex++;
-			state = 0;
-			break;
-		default:
-			abort();
-		}
-	}
+        switch (state) {
+        case 0:
+            if (target) {
+                if ((size_t)tarindex >= targsize) {
+                    return (-1);
+                }
 
-	/*
-	 * We are done decoding Base-64 chars.  Let's see if we ended
-	 * on a byte boundary, and/or with erroneous trailing characters.
-	 */
+                target[tarindex] = (pos - Base64) << 2;
+            }
 
-	if (ch == Pad64) {		/* We got a pad char. */
-		ch = *src++;		/* Skip it, get next. */
-		switch (state) {
-		case 0:		/* Invalid = in first position */
-		case 1:		/* Invalid = in second position */
-			return (-1);
+            state = 1;
+            break;
 
-		case 2:		/* Valid, means one byte of info */
-			/* Skip any number of spaces. */
-			for ((void)NULL; ch != '\0'; ch = *src++)
-				if (!isspace((unsigned char)ch))
-					break;
-			/* Make sure there is another trailing = sign. */
-			if (ch != Pad64)
-				return (-1);
-			ch = *src++;		/* Skip the = */
-			/* Fall through to "single trailing =" case. */
-			/* FALLTHROUGH */
+        case 1:
+            if (target) {
+                if ((size_t)tarindex + 1 >= targsize) {
+                    return (-1);
+                }
 
-		case 3:		/* Valid, means two bytes of info */
-			/*
-			 * We know this char is an =.  Is there anything but
-			 * whitespace after it?
-			 */
-			for ((void)NULL; ch != '\0'; ch = *src++)
-				if (!isspace((unsigned char)ch))
-					return (-1);
+                target[tarindex]   |= (pos - Base64) >> 4;
+                target[tarindex + 1]  = ((pos - Base64) & 0x0f)
+                                        << 4 ;
+            }
 
-			/*
-			 * Now make sure for cases 2 and 3 that the "extra"
-			 * bits that slopped past the last full byte were
-			 * zeros.  If we don't check them, they become a
-			 * subliminal channel.
-			 */
-			if (target && target[tarindex] != 0)
-				return (-1);
-		}
-	} else {
-		/*
-		 * We ended by seeing the end of the string.  Make sure we
-		 * have no partial bytes lying around.
-		 */
-		if (state != 0)
-			return (-1);
-	}
+            tarindex++;
+            state = 2;
+            break;
 
-	return (tarindex);
+        case 2:
+            if (target) {
+                if ((size_t)tarindex + 1 >= targsize) {
+                    return (-1);
+                }
+
+                target[tarindex]   |= (pos - Base64) >> 2;
+                target[tarindex + 1]  = ((pos - Base64) & 0x03)
+                                        << 6;
+            }
+
+            tarindex++;
+            state = 3;
+            break;
+
+        case 3:
+            if (target) {
+                if ((size_t)tarindex >= targsize) {
+                    return (-1);
+                }
+
+                target[tarindex] |= (pos - Base64);
+            }
+
+            tarindex++;
+            state = 0;
+            break;
+
+        default:
+            abort();
+        }
+    }
+
+    /*
+     * We are done decoding Base-64 chars.  Let's see if we ended
+     * on a byte boundary, and/or with erroneous trailing characters.
+     */
+
+    if (ch == Pad64) {      /* We got a pad char. */
+        ch = *src++;        /* Skip it, get next. */
+
+        switch (state) {
+        case 0:     /* Invalid = in first position */
+        case 1:     /* Invalid = in second position */
+            return (-1);
+
+        case 2:     /* Valid, means one byte of info */
+
+            /* Skip any number of spaces. */
+            for ((void)NULL; ch != '\0'; ch = *src++)
+                if (!isspace((unsigned char)ch)) {
+                    break;
+                }
+
+            /* Make sure there is another trailing = sign. */
+            if (ch != Pad64) {
+                return (-1);
+            }
+
+            ch = *src++;        /* Skip the = */
+
+        /* Fall through to "single trailing =" case. */
+        /* FALLTHROUGH */
+
+        case 3:     /* Valid, means two bytes of info */
+
+            /*
+             * We know this char is an =.  Is there anything but
+             * whitespace after it?
+             */
+            for ((void)NULL; ch != '\0'; ch = *src++)
+                if (!isspace((unsigned char)ch)) {
+                    return (-1);
+                }
+
+            /*
+             * Now make sure for cases 2 and 3 that the "extra"
+             * bits that slopped past the last full byte were
+             * zeros.  If we don't check them, they become a
+             * subliminal channel.
+             */
+            if (target && target[tarindex] != 0) {
+                return (-1);
+            }
+        }
+    } else {
+        /*
+         * We ended by seeing the end of the string.  Make sure we
+         * have no partial bytes lying around.
+         */
+        if (state != 0) {
+            return (-1);
+        }
+    }
+
+    return (tarindex);
 }

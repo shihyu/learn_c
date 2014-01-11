@@ -30,13 +30,10 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/i386_set_ioperm.c,v 1.8 2004/01/09 16:
 #include <machine/sysarch.h>
 
 int
-i386_set_ioperm(unsigned int start, unsigned int length, int enable)
-{
-	struct i386_ioperm_args p;
-
-	p.start = start;
-	p.length = length;
-	p.enable = enable;
-
-	return (sysarch(I386_SET_IOPERM, &p));
+i386_set_ioperm(unsigned int start, unsigned int length, int enable) {
+    struct i386_ioperm_args p;
+    p.start = start;
+    p.length = length;
+    p.enable = enable;
+    return (sysarch(I386_SET_IOPERM, &p));
 }

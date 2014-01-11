@@ -37,43 +37,31 @@
 *
 *******************************************************************************/
 
-void __cdecl _getbuf (
-        FILE *str
-        )
-{
-        REG1 FILE *stream;
-
-        _ASSERTE(str != NULL);
-
+void __cdecl _getbuf(
+    FILE* str
+) {
+    REG1 FILE* stream;
+    _ASSERTE(str != NULL);
 #if !defined (CRTDLL)
-        /* force library pre-termination procedure */
-        _cflush++;
+    /* force library pre-termination procedure */
+    _cflush++;
 #endif  /* !defined (CRTDLL) */
+    /* Init pointers */
+    stream = str;
 
-        /* Init pointers */
-        stream = str;
+    /* Try to get a big buffer */
+    if (stream->_base = _malloc_crt(_INTERNAL_BUFSIZ)) {
+        /* Got a big buffer */
+        stream->_flag |= _IOMYBUF;
+        stream->_bufsiz = _INTERNAL_BUFSIZ;
+    } else {
+        /* Did NOT get a buffer - use single char buffering. */
+        stream->_flag |= _IONBF;
+        stream->_base = (char*) & (stream->_charbuf);
+        stream->_bufsiz = 2;
+    }
 
-
-        /* Try to get a big buffer */
-        if (stream->_base = _malloc_crt(_INTERNAL_BUFSIZ))
-        {
-                /* Got a big buffer */
-                stream->_flag |= _IOMYBUF;
-                stream->_bufsiz = _INTERNAL_BUFSIZ;
-        }
-
-        else {
-
-
-                /* Did NOT get a buffer - use single char buffering. */
-                stream->_flag |= _IONBF;
-                stream->_base = (char *)&(stream->_charbuf);
-                stream->_bufsiz = 2;
-
-        }
-
-        stream->_ptr = stream->_base;
-        stream->_cnt = 0;
-
-        return;
+    stream->_ptr = stream->_base;
+    stream->_cnt = 0;
+    return;
 }

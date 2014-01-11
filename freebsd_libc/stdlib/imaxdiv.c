@@ -31,15 +31,15 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/imaxdiv.c,v 1.1 2001/11/15 02:05:03 mike
 
 /* See comments in div.c for implementation details. */
 imaxdiv_t
-imaxdiv(intmax_t numer, intmax_t denom)
-{
-	imaxdiv_t retval;
+imaxdiv(intmax_t numer, intmax_t denom) {
+    imaxdiv_t retval;
+    retval.quot = numer / denom;
+    retval.rem = numer % denom;
 
-	retval.quot = numer / denom;
-	retval.rem = numer % denom;
-	if (numer >= 0 && retval.rem < 0) {
-		retval.quot++;
-		retval.rem -= denom;
-	}
-	return (retval);
+    if (numer >= 0 && retval.rem < 0) {
+        retval.quot++;
+        retval.rem -= denom;
+    }
+
+    return (retval);
 }

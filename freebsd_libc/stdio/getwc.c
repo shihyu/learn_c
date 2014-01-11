@@ -41,8 +41,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/getwc.c,v 1.3 2004/05/25 10:42:52 tjr Exp
  * macro, may evaluate `fp' more than once.
  */
 wint_t
-getwc(FILE *fp)
-{
-
-	return (fgetwc(fp));
+getwc(FILE* fp) {
+    return (fgetwc(fp));
 }

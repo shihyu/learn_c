@@ -37,19 +37,21 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/swapcontext.c,v 1.5 2002/09/20 08:13:21 min
 __weak_reference(__swapcontext, swapcontext);
 
 int
-__swapcontext(ucontext_t *oucp, const ucontext_t *ucp)
-{
-	int ret;
+__swapcontext(ucontext_t* oucp, const ucontext_t* ucp) {
+    int ret;
 
-	if ((oucp == NULL) || (ucp == NULL)) {
-		errno = EINVAL;
-		return (-1);
-	}
-	oucp->uc_flags &= ~UCF_SWAPPED;
-	ret = getcontext(oucp);
-	if ((ret == 0) && !(oucp->uc_flags & UCF_SWAPPED)) {
-		oucp->uc_flags |= UCF_SWAPPED;
-		ret = setcontext(ucp);
-	}
-	return (ret);
+    if ((oucp == NULL) || (ucp == NULL)) {
+        errno = EINVAL;
+        return (-1);
+    }
+
+    oucp->uc_flags &= ~UCF_SWAPPED;
+    ret = getcontext(oucp);
+
+    if ((ret == 0) && !(oucp->uc_flags & UCF_SWAPPED)) {
+        oucp->uc_flags |= UCF_SWAPPED;
+        ret = setcontext(ucp);
+    }
+
+    return (ret);
 }

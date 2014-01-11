@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wcscpy.c,v 1.2 2000/12/21 04:51:09 itojun Exp
+ *  citrus Id: wcscpy.c,v 1.2 2000/12/21 04:51:09 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -36,16 +36,16 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcscpy.c,v 1.8 2002/09/26 09:23:07 tjr E
 
 #include <wchar.h>
 
-wchar_t *
+wchar_t*
 wcscpy(s1, s2)
-	wchar_t * __restrict s1;
-	const wchar_t * __restrict s2;
+wchar_t* __restrict s1;
+const wchar_t* __restrict s2;
 {
-	wchar_t *cp;
+    wchar_t* cp;
+    cp = s1;
 
-	cp = s1;
-	while ((*cp++ = *s2++) != L'\0')
-		;
+    while ((*cp++ = *s2++) != L'\0')
+        ;
 
-	return (s1);
+    return (s1);
 }

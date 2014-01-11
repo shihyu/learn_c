@@ -1,4 +1,4 @@
-/*	$NetBSD: SYS.h,v 1.8 2003/08/07 16:42:02 agc Exp $	*/
+/*  $NetBSD: SYS.h,v 1.8 2003/08/07 16:42:02 agc Exp $  */
 
 /*-
  * Copyright (c) 1990 The Regents of the University of California.
@@ -31,7 +31,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	from: @(#)SYS.h	5.5 (Berkeley) 5/7/91
+ *  from: @(#)SYS.h 5.5 (Berkeley) 5/7/91
  * $FreeBSD: src/lib/libc/arm/SYS.h,v 1.6 2007/07/05 17:42:00 peter Exp $
  */
 
@@ -39,36 +39,36 @@
 #include <sys/syscall.h>
 #include <machine/swi.h>
 
-#define SYSTRAP(x)	swi 0 | SYS_ ## x
+#define SYSTRAP(x)  swi 0 | SYS_ ## x
 
-#define	CERROR		_C_LABEL(cerror)
-#define	CURBRK		_C_LABEL(curbrk)
+#define CERROR      _C_LABEL(cerror)
+#define CURBRK      _C_LABEL(curbrk)
 
-#define _SYSCALL_NOERROR(x)						\
-	ENTRY(__CONCAT(__sys_, x));					\
-	.weak _C_LABEL(x);						\
-	.set _C_LABEL(x), _C_LABEL(__CONCAT(__sys_,x));			\
-	.weak _C_LABEL(__CONCAT(_,x));					\
-	.set _C_LABEL(__CONCAT(_,x)),_C_LABEL(__CONCAT(__sys_,x));	\
-	SYSTRAP(x)
+#define _SYSCALL_NOERROR(x)                     \
+    ENTRY(__CONCAT(__sys_, x));                 \
+    .weak _C_LABEL(x);                      \
+    .set _C_LABEL(x), _C_LABEL(__CONCAT(__sys_,x));         \
+    .weak _C_LABEL(__CONCAT(_,x));                  \
+    .set _C_LABEL(__CONCAT(_,x)),_C_LABEL(__CONCAT(__sys_,x));  \
+    SYSTRAP(x)
 
-#define _SYSCALL(x)							\
-	_SYSCALL_NOERROR(x);						\
-	bcs PIC_SYM(CERROR, PLT)
+#define _SYSCALL(x)                         \
+    _SYSCALL_NOERROR(x);                        \
+    bcs PIC_SYM(CERROR, PLT)
 
-#define SYSCALL(x)							\
-	_SYSCALL(x)
+#define SYSCALL(x)                          \
+    _SYSCALL(x)
 
-#define PSEUDO(x)							\
-	ENTRY(__CONCAT(__sys_, x));					\
-	.weak _C_LABEL(__CONCAT(_,x));					\
-	.set _C_LABEL(__CONCAT(_,x)),_C_LABEL(__CONCAT(__sys_,x));	\
-	SYSTRAP(x);							\
-	bcs PIC_SYM(CERROR, PLT);					\
-	RET
+#define PSEUDO(x)                           \
+    ENTRY(__CONCAT(__sys_, x));                 \
+    .weak _C_LABEL(__CONCAT(_,x));                  \
+    .set _C_LABEL(__CONCAT(_,x)),_C_LABEL(__CONCAT(__sys_,x));  \
+    SYSTRAP(x);                         \
+    bcs PIC_SYM(CERROR, PLT);                   \
+    RET
 
-#define RSYSCALL(x)							\
-	_SYSCALL(x);							\
-	RET
+#define RSYSCALL(x)                         \
+    _SYSCALL(x);                            \
+    RET
 
-	.globl  CERROR
+.globl  CERROR

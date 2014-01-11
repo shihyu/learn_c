@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,13 +40,12 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/usleep.c,v 1.30 2007/01/09 00:27:56 imp Exp
 
 int
 __usleep(useconds)
-	useconds_t useconds;
+useconds_t useconds;
 {
-	struct timespec time_to_sleep;
-
-	time_to_sleep.tv_nsec = (useconds % 1000000) * 1000;
-	time_to_sleep.tv_sec = useconds / 1000000;
-	return (_nanosleep(&time_to_sleep, NULL));
+    struct timespec time_to_sleep;
+    time_to_sleep.tv_nsec = (useconds % 1000000) * 1000;
+    time_to_sleep.tv_sec = useconds / 1000000;
+    return (_nanosleep(&time_to_sleep, NULL));
 }
 
 __weak_reference(__usleep, usleep);

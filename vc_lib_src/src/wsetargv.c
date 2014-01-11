@@ -29,9 +29,8 @@
 *
 *******************************************************************************/
 
-int __CRTDECL  _wsetargv (
-        void
-        )
-{
-        return __wsetargv();
+int __CRTDECL  _wsetargv(
+    void
+) {
+    return __wsetargv();
 }

@@ -32,14 +32,11 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fwprintf.c,v 1.1 2002/09/21 13:00:30 tjr 
 #include <wchar.h>
 
 int
-fwprintf(FILE * __restrict fp, const wchar_t * __restrict fmt, ...)
-{
-	int ret;
-	va_list ap;
-
-	va_start(ap, fmt);
-	ret = vfwprintf(fp, fmt, ap);
-	va_end(ap);
-
-	return (ret);
+fwprintf(FILE* __restrict fp, const wchar_t* __restrict fmt, ...) {
+    int ret;
+    va_list ap;
+    va_start(ap, fmt);
+    ret = vfwprintf(fp, fmt, ap);
+    va_end(ap);
+    return (ret);
 }

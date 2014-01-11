@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,7 +41,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/uname.c,v 1.10 2007/01/09 00:27:56 imp Exp 
 #undef uname
 
 int
-uname(struct utsname *name)
-{
-	return __xuname(32, name);
+uname(struct utsname* name) {
+    return __xuname(32, name);
 }

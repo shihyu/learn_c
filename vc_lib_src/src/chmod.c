@@ -36,37 +36,34 @@
 *
 *******************************************************************************/
 
-int __cdecl _tchmod (
-        const _TSCHAR *path,
-        int mode
-        )
-{
-        DWORD attr;
+int __cdecl _tchmod(
+    const _TSCHAR* path,
+    int mode
+) {
+    DWORD attr;
+    _VALIDATE_CLEAR_OSSERR_RETURN((path != NULL), EINVAL, -1);
+    attr = GetFileAttributes((LPTSTR)path);
 
-        _VALIDATE_CLEAR_OSSERR_RETURN((path != NULL), EINVAL, -1);
+    if (attr  == 0xffffffff) {
+        /* error occured -- map error code and return */
+        _dosmaperr(GetLastError());
+        return -1;
+    }
 
-        attr = GetFileAttributes((LPTSTR)path);
-        if (attr  == 0xffffffff) {
-                /* error occured -- map error code and return */
-                _dosmaperr(GetLastError());
-                return -1;
-        }
+    if (mode & _S_IWRITE) {
+        /* clear read only bit */
+        attr &= ~FILE_ATTRIBUTE_READONLY;
+    } else {
+        /* set read only bit */
+        attr |= FILE_ATTRIBUTE_READONLY;
+    }
 
-        if (mode & _S_IWRITE) {
-                /* clear read only bit */
-                attr &= ~FILE_ATTRIBUTE_READONLY;
-        }
-        else {
-                /* set read only bit */
-                attr |= FILE_ATTRIBUTE_READONLY;
-        }
+    /* set new attribute */
+    if (!SetFileAttributes((LPTSTR)path, attr)) {
+        /* error occured -- map error code and return */
+        _dosmaperr(GetLastError());
+        return -1;
+    }
 
-        /* set new attribute */
-        if (!SetFileAttributes((LPTSTR)path, attr)) {
-                /* error occured -- map error code and return */
-                _dosmaperr(GetLastError());
-                return -1;
-        }
-
-        return 0;
+    return 0;
 }

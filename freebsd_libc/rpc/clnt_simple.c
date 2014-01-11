@@ -1,4 +1,4 @@
-/*	$NetBSD: clnt_simple.c,v 1.21 2000/07/06 03:10:34 christos Exp $	*/
+/*  $NetBSD: clnt_simple.c,v 1.21 2000/07/06 03:10:34 christos Exp $    */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -29,12 +29,12 @@
  * Mountain View, California  94043
  */
 /*
- * Copyright (c) 1986-1991 by Sun Microsystems Inc. 
+ * Copyright (c) 1986-1991 by Sun Microsystems Inc.
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "from: @(#)clnt_simple.c 1.35 87/08/11 Copyr 1984 Sun Micro";
-static char *sccsid = "from: @(#)clnt_simple.c	2.2 88/08/01 4.0 RPCSRC";
+static char* sccsid2 = "from: @(#)clnt_simple.c 1.35 87/08/11 Copyr 1984 Sun Micro";
+static char* sccsid = "from: @(#)clnt_simple.c	2.2 88/08/01 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/clnt_simple.c,v 1.20 2006/02/27 22:10:59 deischen Exp $");
@@ -59,36 +59,37 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/clnt_simple.c,v 1.20 2006/02/27 22:10:59 de
 #include "mt_misc.h"
 
 #ifndef MAXHOSTNAMELEN
-#define	MAXHOSTNAMELEN 64
+#define MAXHOSTNAMELEN 64
 #endif
 
 #ifndef NETIDLEN
-#define	NETIDLEN 32
+#define NETIDLEN 32
 #endif
 
 struct rpc_call_private {
-	int	valid;			/* Is this entry valid ? */
-	CLIENT	*client;		/* Client handle */
-	pid_t	pid;			/* process-id at moment of creation */
-	rpcprog_t prognum;		/* Program */
-	rpcvers_t versnum;		/* Version */
-	char	host[MAXHOSTNAMELEN];	/* Servers host */
-	char	nettype[NETIDLEN];	/* Network type */
+    int valid;          /* Is this entry valid ? */
+    CLIENT*  client;        /* Client handle */
+    pid_t   pid;            /* process-id at moment of creation */
+    rpcprog_t prognum;      /* Program */
+    rpcvers_t versnum;      /* Version */
+    char    host[MAXHOSTNAMELEN];   /* Servers host */
+    char    nettype[NETIDLEN];  /* Network type */
 };
-static struct rpc_call_private *rpc_call_private_main;
+static struct rpc_call_private* rpc_call_private_main;
 
-static void rpc_call_destroy(void *);
+static void rpc_call_destroy(void*);
 
 static void
-rpc_call_destroy(void *vp)
-{
-	struct rpc_call_private *rcp = (struct rpc_call_private *)vp;
+rpc_call_destroy(void* vp) {
+    struct rpc_call_private* rcp = (struct rpc_call_private*)vp;
 
-	if (rcp) {
-		if (rcp->client)
-			CLNT_DESTROY(rcp->client);
-		free(rcp);
-	}
+    if (rcp) {
+        if (rcp->client) {
+            CLNT_DESTROY(rcp->client);
+        }
+
+        free(rcp);
+    }
 }
 
 /*
@@ -100,97 +101,121 @@ rpc_call_destroy(void *vp)
  */
 enum clnt_stat
 rpc_call(host, prognum, versnum, procnum, inproc, in, outproc, out, nettype)
-	const char *host;			/* host name */
-	rpcprog_t prognum;			/* program number */
-	rpcvers_t versnum;			/* version number */
-	rpcproc_t procnum;			/* procedure number */
-	xdrproc_t inproc, outproc;	/* in/out XDR procedures */
-	const char *in;
-	char  *out;			/* recv/send data */
-	const char *nettype;			/* nettype */
+const char* host;           /* host name */
+rpcprog_t prognum;          /* program number */
+rpcvers_t versnum;          /* version number */
+rpcproc_t procnum;          /* procedure number */
+xdrproc_t inproc, outproc;  /* in/out XDR procedures */
+const char* in;
+char*  out;         /* recv/send data */
+const char* nettype;            /* nettype */
 {
-	struct rpc_call_private *rcp = (struct rpc_call_private *) 0;
-	enum clnt_stat clnt_stat;
-	struct timeval timeout, tottimeout;
-	static thread_key_t rpc_call_key;
-	int main_thread = 1;
+    struct rpc_call_private* rcp = (struct rpc_call_private*) 0;
+    enum clnt_stat clnt_stat;
+    struct timeval timeout, tottimeout;
+    static thread_key_t rpc_call_key;
+    int main_thread = 1;
 
-	if ((main_thread = thr_main())) {
-		rcp = rpc_call_private_main;
-	} else {
-		if (rpc_call_key == 0) {
-			mutex_lock(&tsd_lock);
-			if (rpc_call_key == 0)
-				thr_keycreate(&rpc_call_key, rpc_call_destroy);
-			mutex_unlock(&tsd_lock);
-		}
-		rcp = (struct rpc_call_private *)thr_getspecific(rpc_call_key);
-	}
-	if (rcp == NULL) {
-		rcp = malloc(sizeof (*rcp));
-		if (rcp == NULL) {
-			rpc_createerr.cf_stat = RPC_SYSTEMERROR;
-			rpc_createerr.cf_error.re_errno = errno;
-			return (rpc_createerr.cf_stat);
-		}
-		if (main_thread)
-			rpc_call_private_main = rcp;
-		else
-			thr_setspecific(rpc_call_key, (void *) rcp);
-		rcp->valid = 0;
-		rcp->client = NULL;
-	}
-	if ((nettype == NULL) || (nettype[0] == 0))
-		nettype = "netpath";
-	if (!(rcp->valid && rcp->pid == getpid() &&
-		(rcp->prognum == prognum) &&
-		(rcp->versnum == versnum) &&
-		(!strcmp(rcp->host, host)) &&
-		(!strcmp(rcp->nettype, nettype)))) {
-		int fd;
+    if ((main_thread = thr_main())) {
+        rcp = rpc_call_private_main;
+    } else {
+        if (rpc_call_key == 0) {
+            mutex_lock(&tsd_lock);
 
-		rcp->valid = 0;
-		if (rcp->client)
-			CLNT_DESTROY(rcp->client);
-		/*
-		 * Using the first successful transport for that type
-		 */
-		rcp->client = clnt_create(host, prognum, versnum, nettype);
-		rcp->pid = getpid();
-		if (rcp->client == NULL) {
-			return (rpc_createerr.cf_stat);
-		}
-		/*
-		 * Set time outs for connectionless case.  Do it
-		 * unconditionally.  Faster than doing a t_getinfo()
-		 * and then doing the right thing.
-		 */
-		timeout.tv_usec = 0;
-		timeout.tv_sec = 5;
-		(void) CLNT_CONTROL(rcp->client,
-				CLSET_RETRY_TIMEOUT, (char *)(void *)&timeout);
-		if (CLNT_CONTROL(rcp->client, CLGET_FD, (char *)(void *)&fd))
-			_fcntl(fd, F_SETFD, 1);	/* make it "close on exec" */
-		rcp->prognum = prognum;
-		rcp->versnum = versnum;
-		if ((strlen(host) < (size_t)MAXHOSTNAMELEN) &&
-		    (strlen(nettype) < (size_t)NETIDLEN)) {
-			(void) strcpy(rcp->host, host);
-			(void) strcpy(rcp->nettype, nettype);
-			rcp->valid = 1;
-		} else {
-			rcp->valid = 0;
-		}
-	} /* else reuse old client */
-	tottimeout.tv_sec = 25;
-	tottimeout.tv_usec = 0;
-	/*LINTED const castaway*/
-	clnt_stat = CLNT_CALL(rcp->client, procnum, inproc, (char *) in,
-	    outproc, out, tottimeout);
-	/*
-	 * if call failed, empty cache
-	 */
-	if (clnt_stat != RPC_SUCCESS)
-		rcp->valid = 0;
-	return (clnt_stat);
+            if (rpc_call_key == 0) {
+                thr_keycreate(&rpc_call_key, rpc_call_destroy);
+            }
+
+            mutex_unlock(&tsd_lock);
+        }
+
+        rcp = (struct rpc_call_private*)thr_getspecific(rpc_call_key);
+    }
+
+    if (rcp == NULL) {
+        rcp = malloc(sizeof(*rcp));
+
+        if (rcp == NULL) {
+            rpc_createerr.cf_stat = RPC_SYSTEMERROR;
+            rpc_createerr.cf_error.re_errno = errno;
+            return (rpc_createerr.cf_stat);
+        }
+
+        if (main_thread) {
+            rpc_call_private_main = rcp;
+        } else {
+            thr_setspecific(rpc_call_key, (void*) rcp);
+        }
+
+        rcp->valid = 0;
+        rcp->client = NULL;
+    }
+
+    if ((nettype == NULL) || (nettype[0] == 0)) {
+        nettype = "netpath";
+    }
+
+    if (!(rcp->valid && rcp->pid == getpid() &&
+            (rcp->prognum == prognum) &&
+            (rcp->versnum == versnum) &&
+            (!strcmp(rcp->host, host)) &&
+            (!strcmp(rcp->nettype, nettype)))) {
+        int fd;
+        rcp->valid = 0;
+
+        if (rcp->client) {
+            CLNT_DESTROY(rcp->client);
+        }
+
+        /*
+         * Using the first successful transport for that type
+         */
+        rcp->client = clnt_create(host, prognum, versnum, nettype);
+        rcp->pid = getpid();
+
+        if (rcp->client == NULL) {
+            return (rpc_createerr.cf_stat);
+        }
+
+        /*
+         * Set time outs for connectionless case.  Do it
+         * unconditionally.  Faster than doing a t_getinfo()
+         * and then doing the right thing.
+         */
+        timeout.tv_usec = 0;
+        timeout.tv_sec = 5;
+        (void) CLNT_CONTROL(rcp->client,
+                            CLSET_RETRY_TIMEOUT, (char*)(void*)&timeout);
+
+        if (CLNT_CONTROL(rcp->client, CLGET_FD, (char*)(void*)&fd)) {
+            _fcntl(fd, F_SETFD, 1);    /* make it "close on exec" */
+        }
+
+        rcp->prognum = prognum;
+        rcp->versnum = versnum;
+
+        if ((strlen(host) < (size_t)MAXHOSTNAMELEN) &&
+                (strlen(nettype) < (size_t)NETIDLEN)) {
+            (void) strcpy(rcp->host, host);
+            (void) strcpy(rcp->nettype, nettype);
+            rcp->valid = 1;
+        } else {
+            rcp->valid = 0;
+        }
+    } /* else reuse old client */
+
+    tottimeout.tv_sec = 25;
+    tottimeout.tv_usec = 0;
+    /*LINTED const castaway*/
+    clnt_stat = CLNT_CALL(rcp->client, procnum, inproc, (char*) in,
+                          outproc, out, tottimeout);
+
+    /*
+     * if call failed, empty cache
+     */
+    if (clnt_stat != RPC_SUCCESS) {
+        rcp->valid = 0;
+    }
+
+    return (clnt_stat);
 }

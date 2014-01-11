@@ -24,7 +24,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	from OpenBSD: strlcat.c,v 1.3 2000/11/24 11:10:02 itojun Exp
+ *  from OpenBSD: strlcat.c,v 1.3 2000/11/24 11:10:02 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -47,31 +47,36 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcslcat.c,v 1.6 2002/09/21 00:29:23 tjr 
  */
 size_t
 wcslcat(dst, src, siz)
-	wchar_t *dst;
-	const wchar_t *src;
-	size_t siz;
+wchar_t* dst;
+const wchar_t* src;
+size_t siz;
 {
-	wchar_t *d = dst;
-	const wchar_t *s = src;
-	size_t n = siz;
-	size_t dlen;
+    wchar_t* d = dst;
+    const wchar_t* s = src;
+    size_t n = siz;
+    size_t dlen;
 
-	/* Find the end of dst and adjust bytes left but don't go past end */
-	while (*d != '\0' && n-- != 0)
-		d++;
-	dlen = d - dst;
-	n = siz - dlen;
+    /* Find the end of dst and adjust bytes left but don't go past end */
+    while (*d != '\0' && n-- != 0) {
+        d++;
+    }
 
-	if (n == 0)
-		return(dlen + wcslen(s));
-	while (*s != '\0') {
-		if (n != 1) {
-			*d++ = *s;
-			n--;
-		}
-		s++;
-	}
-	*d = '\0';
+    dlen = d - dst;
+    n = siz - dlen;
 
-	return(dlen + (s - src));	/* count does not include NUL */
+    if (n == 0) {
+        return (dlen + wcslen(s));
+    }
+
+    while (*s != '\0') {
+        if (n != 1) {
+            *d++ = *s;
+            n--;
+        }
+
+        s++;
+    }
+
+    *d = '\0';
+    return (dlen + (s - src));  /* count does not include NUL */
 }

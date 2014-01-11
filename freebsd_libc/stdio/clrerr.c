@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -40,13 +40,13 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/clrerr.c,v 1.10 2007/01/09 00:28:06 imp E
 #include <stdio.h>
 #include "un-namespace.h"
 #include "libc_private.h"
-#undef	clearerr
+#undef  clearerr
 
 void
 clearerr(fp)
-	FILE *fp;
+FILE* fp;
 {
-	FLOCKFILE(fp);
-	__sclearerr(fp);
-	FUNLOCKFILE(fp);
+    FLOCKFILE(fp);
+    __sclearerr(fp);
+    FUNLOCKFILE(fp);
 }

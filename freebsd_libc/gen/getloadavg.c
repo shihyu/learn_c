@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,21 +49,25 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getloadavg.c,v 1.3 2007/01/09 00:27:54 imp 
  */
 int
 getloadavg(loadavg, nelem)
-	double loadavg[];
-	int nelem;
+double loadavg[];
+int nelem;
 {
-	struct loadavg loadinfo;
-	int i, mib[2];
-	size_t size;
+    struct loadavg loadinfo;
+    int i, mib[2];
+    size_t size;
+    mib[0] = CTL_VM;
+    mib[1] = VM_LOADAVG;
+    size = sizeof(loadinfo);
 
-	mib[0] = CTL_VM;
-	mib[1] = VM_LOADAVG;
-	size = sizeof(loadinfo);
-	if (sysctl(mib, 2, &loadinfo, &size, NULL, 0) < 0)
-		return (-1);
+    if (sysctl(mib, 2, &loadinfo, &size, NULL, 0) < 0) {
+        return (-1);
+    }
 
-	nelem = MIN(nelem, sizeof(loadinfo.ldavg) / sizeof(fixpt_t));
-	for (i = 0; i < nelem; i++)
-		loadavg[i] = (double) loadinfo.ldavg[i] / loadinfo.fscale;
-	return (nelem);
+    nelem = MIN(nelem, sizeof(loadinfo.ldavg) / sizeof(fixpt_t));
+
+    for (i = 0; i < nelem; i++) {
+        loadavg[i] = (double) loadinfo.ldavg[i] / loadinfo.fscale;
+    }
+
+    return (nelem);
 }

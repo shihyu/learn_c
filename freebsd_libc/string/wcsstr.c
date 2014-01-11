@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,21 +43,24 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcsstr.c,v 1.9 2007/01/09 00:28:12 imp E
 /*
  * Find the first occurrence of find in s.
  */
-wchar_t *
-wcsstr(const wchar_t * __restrict s, const wchar_t * __restrict find)
-{
-	wchar_t c, sc;
-	size_t len;
+wchar_t*
+wcsstr(const wchar_t* __restrict s, const wchar_t* __restrict find) {
+    wchar_t c, sc;
+    size_t len;
 
-	if ((c = *find++) != 0) {
-		len = wcslen(find);
-		do {
-			do {
-				if ((sc = *s++) == L'\0')
-					return (NULL);
-			} while (sc != c);
-		} while (wcsncmp(s, find, len) != 0);
-		s--;
-	}
-	return ((wchar_t *)s);
+    if ((c = *find++) != 0) {
+        len = wcslen(find);
+
+        do {
+            do {
+                if ((sc = *s++) == L'\0') {
+                    return (NULL);
+                }
+            } while (sc != c);
+        } while (wcsncmp(s, find, len) != 0);
+
+        s--;
+    }
+
+    return ((wchar_t*)s);
 }

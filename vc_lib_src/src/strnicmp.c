@@ -42,100 +42,80 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _strnicmp_l (
-        const char * dst,
-        const char * src,
-        size_t count,
-        _locale_t plocinfo
-        )
-{
-    int f,l;
+extern "C" int __cdecl _strnicmp_l(
+    const char* dst,
+    const char* src,
+    size_t count,
+    _locale_t plocinfo
+) {
+    int f, l;
 
-    if ( count )
-    {
+    if (count) {
         _LocaleUpdate _loc_update(plocinfo);
-
         /* validation section */
         _VALIDATE_RETURN(dst != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(src != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(count <= INT_MAX, EINVAL, _NLSCMPERROR);
 
-        if ( __LC_HANDLE(_loc_update.GetLocaleT()->locinfo)[LC_CTYPE] == _CLOCALEHANDLE )
-        {
+        if (__LC_HANDLE(_loc_update.GetLocaleT()->locinfo)[LC_CTYPE] == _CLOCALEHANDLE) {
             return __ascii_strnicmp(dst, src, count);
+        } else {
+            do {
+                f = _tolower_l((unsigned char)(*(dst++)), _loc_update.GetLocaleT());
+                l = _tolower_l((unsigned char)(*(src++)), _loc_update.GetLocaleT());
+            } while (--count && f && (f == l));
         }
-        else
-        {
-            do
-            {
-                f = _tolower_l( (unsigned char)(*(dst++)), _loc_update.GetLocaleT() );
-                l = _tolower_l( (unsigned char)(*(src++)), _loc_update.GetLocaleT() );
-            }
-            while (--count && f && (f == l) );
-        }
-        return( f - l );
+
+        return (f - l);
     }
 
-    return( 0 );
+    return (0);
 }
 
 
 #ifndef _M_IX86
 
-extern "C" int __cdecl __ascii_strnicmp (
-        const char * first,
-        const char * last,
-        size_t count
-        )
-{
-    if(count)
-    {
-        int f=0;
-        int l=0;
+extern "C" int __cdecl __ascii_strnicmp(
+    const char* first,
+    const char* last,
+    size_t count
+) {
+    if (count) {
+        int f = 0;
+        int l = 0;
 
-        do
-        {
-
-            if ( ((f = (unsigned char)(*(first++))) >= 'A') &&
-                    (f <= 'Z') )
+        do {
+            if (((f = (unsigned char)(*(first++))) >= 'A') &&
+                    (f <= 'Z')) {
                 f -= 'A' - 'a';
+            }
 
-            if ( ((l = (unsigned char)(*(last++))) >= 'A') &&
-                    (l <= 'Z') )
+            if (((l = (unsigned char)(*(last++))) >= 'A') &&
+                    (l <= 'Z')) {
                 l -= 'A' - 'a';
+            }
+        } while (--count && f && (f == l));
 
-        }
-        while ( --count && f && (f == l) );
-
-        return ( f - l );
-    }
-    else
-    {
+        return (f - l);
+    } else {
         return 0;
     }
 }
 
 #endif  /* _M_IX86 */
 
-extern "C" int __cdecl _strnicmp (
-        const char * dst,
-        const char * src,
-        size_t count
-        )
-{
-
-    if (__locale_changed == 0)
-    {
+extern "C" int __cdecl _strnicmp(
+    const char* dst,
+    const char* src,
+    size_t count
+) {
+    if (__locale_changed == 0) {
         /* validation section */
         _VALIDATE_RETURN(dst != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(src != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(count <= INT_MAX, EINVAL, _NLSCMPERROR);
-
         return __ascii_strnicmp(dst, src, count);
-    }
-    else
-    {
+    } else {
         return _strnicmp_l(dst, src, count, NULL);
     }
-
 }

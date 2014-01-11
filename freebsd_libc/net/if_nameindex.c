@@ -1,8 +1,8 @@
-/*	$KAME: if_nameindex.c,v 1.8 2000/11/24 08:20:01 itojun Exp $	*/
+/*  $KAME: if_nameindex.c,v 1.8 2000/11/24 08:20:01 itojun Exp $    */
 
 /*-
  * Copyright (c) 1997, 2000
- *	Berkeley Software Design, Inc.  All rights reserved.
+ *  Berkeley Software Design, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,7 +22,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	BSDI Id: if_nameindex.c,v 2.3 2000/04/17 22:38:05 dab Exp
+ *  BSDI Id: if_nameindex.c,v 2.3 2000/04/17 22:38:05 dab Exp
  */
 
 #include <sys/cdefs.h>
@@ -76,72 +76,76 @@ __FBSDID("$FreeBSD: src/lib/libc/net/if_nameindex.c,v 1.1 2002/07/15 19:58:56 um
  *    if_nameindex().
  */
 
-struct if_nameindex *
-if_nameindex(void)
-{
-	struct ifaddrs *ifaddrs, *ifa;
-	unsigned int ni;
-	int nbytes;
-	struct if_nameindex *ifni, *ifni2;
-	char *cp;
+struct if_nameindex*
+if_nameindex(void) {
+    struct ifaddrs* ifaddrs, *ifa;
+    unsigned int ni;
+    int nbytes;
+    struct if_nameindex* ifni, *ifni2;
+    char* cp;
 
-	if (getifaddrs(&ifaddrs) < 0)
-		return(NULL);
+    if (getifaddrs(&ifaddrs) < 0) {
+        return (NULL);
+    }
 
-	/*
-	 * First, find out how many interfaces there are, and how
-	 * much space we need for the string names.
-	 */
-	ni = 0;
-	nbytes = 0;
-	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr &&
-		    ifa->ifa_addr->sa_family == AF_LINK) {
-			nbytes += strlen(ifa->ifa_name) + 1;
-			ni++;
-		}
-	}
+    /*
+     * First, find out how many interfaces there are, and how
+     * much space we need for the string names.
+     */
+    ni = 0;
+    nbytes = 0;
 
-	/*
-	 * Next, allocate a chunk of memory, use the first part
-	 * for the array of structures, and the last part for
-	 * the strings.
-	 */
-	cp = malloc((ni + 1) * sizeof(struct if_nameindex) + nbytes);
-	ifni = (struct if_nameindex *)cp;
-	if (ifni == NULL)
-		goto out;
-	cp += (ni + 1) * sizeof(struct if_nameindex);
+    for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr &&
+                ifa->ifa_addr->sa_family == AF_LINK) {
+            nbytes += strlen(ifa->ifa_name) + 1;
+            ni++;
+        }
+    }
 
-	/*
-	 * Now just loop through the list of interfaces again,
-	 * filling in the if_nameindex array and making copies
-	 * of all the strings.
-	 */
-	ifni2 = ifni;
-	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr &&
-		    ifa->ifa_addr->sa_family == AF_LINK) {
-			ifni2->if_index =
-			    ((struct sockaddr_dl*)ifa->ifa_addr)->sdl_index;
-			ifni2->if_name = cp;
-			strcpy(cp, ifa->ifa_name);
-			ifni2++;
-			cp += strlen(cp) + 1;
-		}
-	}
-	/*
-	 * Finally, don't forget to terminate the array.
-	 */
-	ifni2->if_index = 0;
-	ifni2->if_name = NULL;
+    /*
+     * Next, allocate a chunk of memory, use the first part
+     * for the array of structures, and the last part for
+     * the strings.
+     */
+    cp = malloc((ni + 1) * sizeof(struct if_nameindex) + nbytes);
+    ifni = (struct if_nameindex*)cp;
+
+    if (ifni == NULL) {
+        goto out;
+    }
+
+    cp += (ni + 1) * sizeof(struct if_nameindex);
+    /*
+     * Now just loop through the list of interfaces again,
+     * filling in the if_nameindex array and making copies
+     * of all the strings.
+     */
+    ifni2 = ifni;
+
+    for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr &&
+                ifa->ifa_addr->sa_family == AF_LINK) {
+            ifni2->if_index =
+                ((struct sockaddr_dl*)ifa->ifa_addr)->sdl_index;
+            ifni2->if_name = cp;
+            strcpy(cp, ifa->ifa_name);
+            ifni2++;
+            cp += strlen(cp) + 1;
+        }
+    }
+
+    /*
+     * Finally, don't forget to terminate the array.
+     */
+    ifni2->if_index = 0;
+    ifni2->if_name = NULL;
 out:
-	freeifaddrs(ifaddrs);
-	return(ifni);
+    freeifaddrs(ifaddrs);
+    return (ifni);
 }
 
 void
-if_freenameindex(struct if_nameindex *ptr)
-{
-	free(ptr);
+if_freenameindex(struct if_nameindex* ptr) {
+    free(ptr);
 }

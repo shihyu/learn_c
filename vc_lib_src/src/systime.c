@@ -29,16 +29,12 @@
 *
 *******************************************************************************/
 
-unsigned __cdecl _getsystime(struct tm * ptm)
-{
+unsigned __cdecl _getsystime(struct tm* ptm) {
     SYSTEMTIME  st;
-
-    _VALIDATE_RETURN( ( ptm != NULL ), EINVAL, 0 )
-
+    _VALIDATE_RETURN((ptm != NULL), EINVAL, 0)
     GetLocalTime(&st);
-
     ptm->tm_isdst       = -1;   /* mktime() computes whether this is */
-                                /* during Standard or Daylight time. */
+    /* during Standard or Daylight time. */
     ptm->tm_sec         = (int)st.wSecond;
     ptm->tm_min         = (int)st.wMinute;
     ptm->tm_hour        = (int)st.wHour;
@@ -46,10 +42,8 @@ unsigned __cdecl _getsystime(struct tm * ptm)
     ptm->tm_mon         = (int)st.wMonth - 1;
     ptm->tm_year        = (int)st.wYear - 1900;
     ptm->tm_wday        = (int)st.wDayOfWeek;
-
     /* Normalize uninitialized fields */
     _mktime32(ptm);
-
     return (st.wMilliseconds);
 }
 
@@ -70,19 +64,16 @@ unsigned __cdecl _getsystime(struct tm * ptm)
 *
 *******************************************************************************/
 
-unsigned __cdecl _setsystime(struct tm * ptm, unsigned uMilliseconds)
-{
+unsigned __cdecl _setsystime(struct tm* ptm, unsigned uMilliseconds) {
     SYSTEMTIME  st;
+    _ASSERTE(ptm != NULL);
 
-    _ASSERTE( ptm != NULL );
-    if ( !( ptm != NULL ) )
-    {
+    if (!(ptm != NULL)) {
         return ERROR_INVALID_PARAMETER;
     }
 
     /* Normalize uninitialized fields */
     _mktime32(ptm);
-
     st.wYear            = (WORD)(ptm->tm_year + 1900);
     st.wMonth           = (WORD)(ptm->tm_mon + 1);
     st.wDay             = (WORD)ptm->tm_mday;

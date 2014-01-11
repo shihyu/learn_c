@@ -33,9 +33,9 @@
 using System::AppDomain;
 
 #if defined (_DEBUG)
-    #define MANAGED_ASSERT( test, message) System::Diagnostics::Debug::Assert(test, message)
+#define MANAGED_ASSERT( test, message) System::Diagnostics::Debug::Assert(test, message)
 #else  /* defined (_DEBUG) */
-    #define MANAGED_ASSERT( test, message )
+#define MANAGED_ASSERT( test, message )
 #endif  /* defined (_DEBUG) */
 
 /*
@@ -45,130 +45,113 @@ using System::AppDomain;
 #define MININCR     4
 
 extern "C" {
-    typedef void (__clrcall *_CPVFV)(void);
+    typedef void (__clrcall* _CPVFV)(void);
 }
 
 #if defined (_M_CEE_MIXED)
-static _CPVFV *__onexitbegin  = NULL;
-static _CPVFV *__onexitend = NULL;
+static _CPVFV* __onexitbegin  = NULL;
+static _CPVFV* __onexitend = NULL;
 static size_t __exit_list_size = 0;
 #endif  /* defined (_M_CEE_MIXED) */
 
-namespace __identifier("<CrtImplementationDetails>")
-{
-using System::Threading::Monitor;
-using System::Object;
-using System::Runtime::InteropServices::GCHandle;
-using System::IntPtr;
-
-// Note the major differences between gcroot and Handle:
-// 1. Handle does not provide any constructors
-//    Call the Construct method to initialize.
-// 2. Handle does not provide any implicit casts.
-//    Use Get to obtain the underlying object.
-template <class T>
-class Handle
-{
-private:
+namespace __identifier("<CrtImplementationDetails>") {
+    using System::Threading::Monitor;
+    using System::Object;
+    using System::Runtime::InteropServices::GCHandle;
+    using System::IntPtr;
+    // Note the major differences between gcroot and Handle:
+    // 1. Handle does not provide any constructors
+    //    Call the Construct method to initialize.
+    // 2. Handle does not provide any implicit casts.
+    //    Use Get to obtain the underlying object.
+    template <class T>
+    class Handle {
+    private:
         void* _data;
 
         [System::Diagnostics::DebuggerStepThroughAttribute]
-        GCHandle^ _handle()
-        {
-                if (_data != nullptr)
-                {
-                        return GCHandle::FromIntPtr(IntPtr(_data));
-                }
+        GCHandle^ _handle() {
+            if (_data != nullptr) {
+                return GCHandle::FromIntPtr(IntPtr(_data));
+            }
 
-                return nullptr;
+            return nullptr;
         }
 
-public:
+    public:
         // Do NOT add constructors to this class
         // We want to have objects that are not initialized
         // so that we can create per-appdomain instances that are
         // used *before* per-appdomain initialization takes place.
 
-        void Construct()
-        {
+        void Construct() {
+            _data = 0;
+        }
+
+        [System::Diagnostics::DebuggerStepThroughAttribute]
+        void Construct(T value) {
+            _data = 0;
+            Set(value);
+        }
+
+        [System::Diagnostics::DebuggerStepThroughAttribute]
+        void Set(T value) {
+            GCHandle^ handle = _handle();
+
+            if (handle == nullptr) {
+                handle = GCHandle::Alloc(value);
+                _data = GCHandle::ToIntPtr(*handle).ToPointer();
+            } else {
+                handle->Target = value;
+            }
+        }
+
+        [System::Diagnostics::DebuggerStepThroughAttribute]
+        T Get() {
+            GCHandle^ handle = _handle();
+
+            if (handle != nullptr) {
+                return (T)handle->Target;
+            }
+
+            return nullptr;
+        }
+
+        ~Handle() {
+            GCHandle^ handle = _handle();
+
+            if (handle != nullptr) {
+                handle->Free();
                 _data = 0;
+            }
+        }
+    };
+    class AtExitLock {
+    private:
+        _AGLOBAL static Handle<Object^> _lock;
+
+    public:
+        [System::Diagnostics::DebuggerStepThroughAttribute]
+        static void Initialize() {
+            _lock.Construct(gcnew Object());
         }
 
         [System::Diagnostics::DebuggerStepThroughAttribute]
-        void Construct(T value)
-        {
-                _data = 0;
-                Set(value);
+        static bool IsInitialized() {
+            return (_lock.Get() != nullptr);
         }
 
         [System::Diagnostics::DebuggerStepThroughAttribute]
-        void Set(T value)
-        {
-                GCHandle^ handle = _handle();
-                if (handle == nullptr)
-                {
-                        handle = GCHandle::Alloc(value);
-                        _data = GCHandle::ToIntPtr(*handle).ToPointer();
-                }
-                else
-                {
-                        handle->Target = value;
-                }
+        static void Enter() {
+            Monitor::Enter(_lock.Get());
         }
 
         [System::Diagnostics::DebuggerStepThroughAttribute]
-        T Get()
-        {
-                GCHandle^ handle = _handle();
-                if (handle != nullptr)
-                {
-                        return (T)handle->Target;
-                }
-                return nullptr;
+        static void Exit() {
+            Monitor::Exit(_lock.Get());
         }
-
-        ~Handle()
-        {
-                GCHandle^ handle = _handle();
-                if (handle != nullptr)
-                {
-                        handle->Free();
-                        _data = 0;
-                }
-        }
-};
-
-class AtExitLock
-{
-private:
-    _AGLOBAL static Handle<Object^> _lock;
-
-public:
-    [System::Diagnostics::DebuggerStepThroughAttribute]
-    static void Initialize()
-    {
-        _lock.Construct(gcnew Object());
-    }
-
-    [System::Diagnostics::DebuggerStepThroughAttribute]
-    static bool IsInitialized()
-    {
-        return (_lock.Get() != nullptr);
-    }
-
-    [System::Diagnostics::DebuggerStepThroughAttribute]
-    static void Enter()
-    {
-        Monitor::Enter(_lock.Get());
-    }
-
-    [System::Diagnostics::DebuggerStepThroughAttribute]
-    static void Exit()
-    {
-        Monitor::Exit(_lock.Get());
-    }
-};
-_AGLOBAL Handle<Object^> AtExitLock::_lock; /* Do NOT initialize */
+    };
+    _AGLOBAL Handle<Object^> AtExitLock::_lock; /* Do NOT initialize */
 }
 
 /***
@@ -186,16 +169,15 @@ _AGLOBAL Handle<Object^> AtExitLock::_lock; /* Do NOT initialize */
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-static bool __global_lock()
-{
+static bool __global_lock() {
     using namespace __identifier("<CrtImplementationDetails>");
-
     bool retval = false;
-    if (AtExitLock::IsInitialized())
-    {
+
+    if (AtExitLock::IsInitialized()) {
         AtExitLock::Enter();
         retval = true;
     }
+
     return retval;
 }
 
@@ -213,16 +195,15 @@ static bool __global_lock()
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-static bool __global_unlock()
-{
+static bool __global_unlock() {
     using namespace __identifier("<CrtImplementationDetails>");
-
     bool retval = false;
-    if (AtExitLock::IsInitialized())
-    {
+
+    if (AtExitLock::IsInitialized()) {
         AtExitLock::Exit();
         retval = true;
     }
+
     return retval;
 }
 
@@ -241,14 +222,13 @@ static bool __global_unlock()
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-static bool __alloc_global_lock()
-{
+static bool __alloc_global_lock() {
     using namespace __identifier("<CrtImplementationDetails>");
 
-    if (!AtExitLock::IsInitialized())
-    {
+    if (!AtExitLock::IsInitialized()) {
         AtExitLock::Initialize();
     }
+
     return AtExitLock::IsInitialized();
 }
 
@@ -275,25 +255,26 @@ static bool __alloc_global_lock()
 *
 *******************************************************************************/
 
-extern "C" int __clrcall _atexit_helper( _CPVFV func,
-        size_t *__pexit_list_size,
-        _CPVFV **__ponexitend,
-        _CPVFV **__ponexitbegin)
-{
+extern "C" int __clrcall _atexit_helper(_CPVFV func,
+                                        size_t* __pexit_list_size,
+                                        _CPVFV** __ponexitend,
+                                        _CPVFV** __ponexitbegin) {
     _CPVFV retval = NULL;
 
     /*
      * Get the lock for CRT exit function calls.
      */
-    if (func == NULL) return -1;
+    if (func == NULL) {
+        return -1;
+    }
+
     if (__global_lock() == true) {
         try {
             /*
              * check if we have space of one more entry.
              */
-            if ( (*__pexit_list_size) - 1<
-                    ((size_t)((char *)(*__ponexitend) - (char *)(*__ponexitbegin)))/sizeof(_CPVFV))
-            {
+            if ((*__pexit_list_size) - 1 <
+                    ((size_t)((char*)(*__ponexitend) - (char*)(*__ponexitbegin))) / sizeof(_CPVFV)) {
                 /*
                  * Try to increment by max increment or twice the current size, if fails,
                  * then try to increment by min increment. If that too fails then return NULL.
@@ -302,39 +283,38 @@ extern "C" int __clrcall _atexit_helper( _CPVFV func,
                     System::IntPtr tmp_ptr =
                         System::Runtime::InteropServices::Marshal::ReAllocHGlobal(
                             System::IntPtr((*__ponexitbegin)),
-                            System::IntPtr((long)((*__pexit_list_size)*sizeof(_CPVFV)+
-                                __min((*__pexit_list_size)*sizeof(_CPVFV),
-                                    (MAXINCR*sizeof(_CPVFV))))));
-
-                    (*__ponexitend) = (_CPVFV *)((char *)tmp_ptr.ToPointer()+
-                            (size_t)(*__ponexitend)-
-                            (size_t)(*__ponexitbegin));
-                    (*__ponexitbegin) = (_CPVFV *)tmp_ptr.ToPointer();
+                            System::IntPtr((long)((*__pexit_list_size) * sizeof(_CPVFV) +
+                                                  __min((*__pexit_list_size) * sizeof(_CPVFV),
+                                                        (MAXINCR * sizeof(_CPVFV))))));
+                    (*__ponexitend) = (_CPVFV*)((char*)tmp_ptr.ToPointer() +
+                                                (size_t)(*__ponexitend) -
+                                                (size_t)(*__ponexitbegin));
+                    (*__ponexitbegin) = (_CPVFV*)tmp_ptr.ToPointer();
                     (*__pexit_list_size) += __min(MAXINCR, (*__pexit_list_size));
-
-                } catch (System::OutOfMemoryException ^) {
-
+                } catch (System::OutOfMemoryException^) {
                     System::IntPtr tmp_ptr =
                         System::Runtime::InteropServices::Marshal::ReAllocHGlobal(
                             System::IntPtr((*__ponexitbegin)),
-                            System::IntPtr((long)((*__pexit_list_size)*sizeof(_CPVFV)+
-                                MININCR+sizeof(_CPVFV))));
-
-                    (*__ponexitend) = (_CPVFV *)((char *)tmp_ptr.ToPointer()+
-                            (size_t)(*__ponexitend)-
-                            (size_t)(*__ponexitbegin));
-                    (*__ponexitbegin) = (_CPVFV *)tmp_ptr.ToPointer();
+                            System::IntPtr((long)((*__pexit_list_size) * sizeof(_CPVFV) +
+                                                  MININCR + sizeof(_CPVFV))));
+                    (*__ponexitend) = (_CPVFV*)((char*)tmp_ptr.ToPointer() +
+                                                (size_t)(*__ponexitend) -
+                                                (size_t)(*__ponexitbegin));
+                    (*__ponexitbegin) = (_CPVFV*)tmp_ptr.ToPointer();
                     (*__pexit_list_size) += MININCR;
                 }
             }
+
             *((*__ponexitend)++) = (_CPVFV)func;
             retval = func;
-        } catch(System::OutOfMemoryException ^) {
-        } __finally{
+        } catch (System::OutOfMemoryException^) {
+        } __finally {
+
             __global_unlock();
         }
     }
-    return retval==NULL?-1:0;
+
+    return retval == NULL ? -1 : 0;
 }
 
 #if defined (_M_CEE_MIXED)
@@ -353,8 +333,7 @@ extern "C" int __clrcall _atexit_helper( _CPVFV func,
 *
 *******************************************************************************/
 
-extern "C" void __clrcall _exit_callback(void)
-{
+extern "C" void __clrcall _exit_callback(void) {
     MANAGED_ASSERT(AppDomain::CurrentDomain->IsDefaultAppDomain(), "This function must be called in the default domain");
     /*
      * Note: this function is not supposed to be called from more then one
@@ -374,16 +353,17 @@ extern "C" void __clrcall _exit_callback(void)
      * case then we will need to have lock around this function.
      */
 
-    if ((__onexitbegin != (_CPVFV *)-1) && (__onexitbegin != NULL) && (__onexitend != NULL)) {
-        while ( --__onexitend >= __onexitbegin )
-        {
+    if ((__onexitbegin != (_CPVFV*) - 1) && (__onexitbegin != NULL) && (__onexitend != NULL)) {
+        while (--__onexitend >= __onexitbegin) {
             /*
              * if current table entry is non-NULL,
              * call thru it.
              */
-            if ( *__onexitend != NULL )
+            if (*__onexitend != NULL) {
                 (**__onexitend)();
+            }
         }
+
         /*
          * There is no real need to free memory here as the process is anyway
          * going down and CRT will free it's heap and this memory will anyway
@@ -391,7 +371,7 @@ extern "C" void __clrcall _exit_callback(void)
          * wants to detect leak using CRT functionality, we free this memory.
          */
         System::Runtime::InteropServices::Marshal::FreeHGlobal(
-                System::IntPtr((void *)__onexitbegin));
+            System::IntPtr((void*)__onexitbegin));
     }
 }
 
@@ -412,10 +392,8 @@ extern "C" void __clrcall _exit_callback(void)
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-extern "C" int __clrcall _initatexit_m()
-{
+extern "C" int __clrcall _initatexit_m() {
     MANAGED_ASSERT(AppDomain::CurrentDomain->IsDefaultAppDomain(), "This function must be called in the default domain");
-
     int retval = 0;
 
     /*
@@ -424,12 +402,12 @@ extern "C" int __clrcall _initatexit_m()
     if (__alloc_global_lock() == true) {
         System::IntPtr tmp_int_ptr =
             System::Runtime::InteropServices::Marshal::AllocHGlobal(
-                    32*sizeof(*__onexitbegin));
-
-        __onexitend = __onexitbegin = (_CPVFV *)tmp_int_ptr.ToPointer();
+                32 * sizeof(*__onexitbegin));
+        __onexitend = __onexitbegin = (_CPVFV*)tmp_int_ptr.ToPointer();
         __exit_list_size = 32;
         retval = 1;
     }
+
     return retval;
 }
 
@@ -453,17 +431,13 @@ extern "C" int __clrcall _initatexit_m()
 *
 *******************************************************************************/
 
-extern "C" _onexit_m_t __clrcall _onexit_m( _onexit_m_t _Function)
-{
+extern "C" _onexit_m_t __clrcall _onexit_m(_onexit_m_t _Function) {
     MANAGED_ASSERT(AppDomain::CurrentDomain->IsDefaultAppDomain(), "This function must be called in the default domain");
-
     return _atexit_m((_CPVFV)_Function) == -1 ? NULL : _Function;
 }
 
-extern "C" int __clrcall _atexit_m( _CPVFV func)
-{
+extern "C" int __clrcall _atexit_m(_CPVFV func) {
     MANAGED_ASSERT(AppDomain::CurrentDomain->IsDefaultAppDomain(), "This function must be called in the default domain");
-
     return _atexit_helper(func, &__exit_list_size, &__onexitend, &__onexitbegin);
 }
 #endif  /* defined (_M_CEE_MIXED) */
@@ -486,8 +460,8 @@ extern "C" int __clrcall _atexit_m( _CPVFV func)
  * intialize them in _initatexit_app_domain function
  */
 
-_AGLOBAL _CPVFV *__onexitbegin_app_domain /*= NULL*/;
-_AGLOBAL _CPVFV *__onexitend_app_domain /*= NULL*/;
+_AGLOBAL _CPVFV* __onexitbegin_app_domain /*= NULL*/;
+_AGLOBAL _CPVFV* __onexitend_app_domain /*= NULL*/;
 _AGLOBAL size_t __exit_list_size_app_domain /*= 0*/;
 
 
@@ -507,8 +481,7 @@ _AGLOBAL size_t __exit_list_size_app_domain /*= 0*/;
 *******************************************************************************/
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-extern "C" int __clrcall _initatexit_app_domain()
-{
+extern "C" int __clrcall _initatexit_app_domain() {
     if (__alloc_global_lock() == true) {
         /*
          * Note that this function is called from the cctor during the
@@ -517,19 +490,17 @@ extern "C" int __clrcall _initatexit_app_domain()
          *
          * Thus this function does not need to be under the lock.
          */
-
         System::IntPtr tmp_int_ptr =
             System::Runtime::InteropServices::Marshal::AllocHGlobal(
-                    32*sizeof(*__onexitbegin_app_domain));
-
-        __onexitend_app_domain = __onexitbegin_app_domain = (_CPVFV *)tmp_int_ptr.ToPointer();
+                32 * sizeof(*__onexitbegin_app_domain));
+        __onexitend_app_domain = __onexitbegin_app_domain = (_CPVFV*)tmp_int_ptr.ToPointer();
         __exit_list_size_app_domain = 32;
 #if defined (_M_CEE_PURE)
         extern void __clrcall __clean_type_info_names();
-
         _atexit_m_appdomain(__clean_type_info_names);
 #endif  /* defined (_M_CEE_PURE) */
     }
+
     return 1;
 }
 
@@ -547,8 +518,7 @@ extern "C" int __clrcall _initatexit_app_domain()
 *
 *******************************************************************************/
 
-extern "C" void __clrcall _app_exit_callback(void)
-{
+extern "C" void __clrcall _app_exit_callback(void) {
     /*
      * Note that this function is called during appdomain unload.
      * Thus there should be only one thread calling this function per
@@ -558,19 +528,16 @@ extern "C" void __clrcall _app_exit_callback(void)
      * are no threads executing in this appdomain. If this is not the
      * case then we will need to have lock around this function.
      */
-    if ((__onexitbegin_app_domain != (_CPVFV *)-1) && (__onexitbegin_app_domain != NULL) && (__onexitend_app_domain != NULL)) {
-        __try
-        {
+    if ((__onexitbegin_app_domain != (_CPVFV*) - 1) && (__onexitbegin_app_domain != NULL) && (__onexitend_app_domain != NULL)) {
+        __try {
             while (--__onexitend_app_domain >= __onexitbegin_app_domain) {
                 if (*__onexitend_app_domain != NULL) {
                     (**__onexitend_app_domain)();
                 }
             }
-        }
-        __finally
-        {
+        } __finally {
             System::Runtime::InteropServices::Marshal::FreeHGlobal(
-                    System::IntPtr((void *)__onexitbegin_app_domain));
+                System::IntPtr((void*)__onexitbegin_app_domain));
         }
     }
 }
@@ -595,13 +562,11 @@ extern "C" void __clrcall _app_exit_callback(void)
 *
 *******************************************************************************/
 
-extern "C" _onexit_m_t __clrcall _onexit_m_appdomain(_onexit_m_t _Function)
-{
+extern "C" _onexit_m_t __clrcall _onexit_m_appdomain(_onexit_m_t _Function) {
     return _atexit_m_appdomain((_CPVFV)_Function) == -1 ? NULL : _Function;
 }
 
 [System::Diagnostics::DebuggerStepThroughAttribute]
-extern "C" int __clrcall _atexit_m_appdomain(_CPVFV func)
-{
+extern "C" int __clrcall _atexit_m_appdomain(_CPVFV func) {
     return _atexit_helper(func, &__exit_list_size_app_domain, &__onexitend_app_domain, &__onexitbegin_app_domain);
 }

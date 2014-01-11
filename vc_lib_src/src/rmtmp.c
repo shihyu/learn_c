@@ -44,52 +44,43 @@ unsigned _old_pfxlen = 0;
 *
 *******************************************************************************/
 
-int __cdecl _rmtmp (
-        void
-        )
-{
-        REG2 int count = 0;
-        REG1 int i;
+int __cdecl _rmtmp(
+    void
+) {
+    REG2 int count = 0;
+    REG1 int i;
+    _mlock(_IOB_SCAN_LOCK);
 
-        _mlock(_IOB_SCAN_LOCK);
-        __try {
+    __try {
+        for (i = 0 ; i < _nstream ; i++)
+            if (__piob[i] != NULL && inuse((FILE*)__piob[i])) {
+                /*
+                 * lock the stream. this is not done until testing
+                 * the stream is in use to avoid unnecessarily creating
+                 * a lock for every stream. the price is having to
+                 * retest the stream after the lock has been asserted.
+                 */
+                _lock_str2(i, __piob[i]);
 
-        for ( i = 0 ; i < _nstream ; i++)
-
-                if ( __piob[i] != NULL && inuse( (FILE *)__piob[i] )) {
-
-                        /*
-                         * lock the stream. this is not done until testing
-                         * the stream is in use to avoid unnecessarily creating
-                         * a lock for every stream. the price is having to
-                         * retest the stream after the lock has been asserted.
-                         */
-                        _lock_str2(i, __piob[i]);
-                        __try {
-                                /*
-                                 * if the stream is STILL in use (it may have
-                                 * been closed before the lock was asserted),
-                                 * see about flushing it.
-                                 */
-                                if ( inuse( (FILE *)__piob[i] )) {
-
-                        if ( ((FILE *)__piob[i])->_tmpfname != NULL )
-                        {
-                                _fclose_nolock( __piob[i] );
-                                count++;
+                __try {
+                    /*
+                     * if the stream is STILL in use (it may have
+                     * been closed before the lock was asserted),
+                     * see about flushing it.
+                     */
+                    if (inuse((FILE*)__piob[i])) {
+                        if (((FILE*)__piob[i])->_tmpfname != NULL) {
+                            _fclose_nolock(__piob[i]);
+                            count++;
                         }
-
-                                }
-                        }
-                        __finally {
-                                _unlock_str2(i, __piob[i]);
-                        }
+                    }
+                } __finally {
+                    _unlock_str2(i, __piob[i]);
                 }
+            }
+    } __finally {
+        _munlock(_IOB_SCAN_LOCK);
+    }
 
-        }
-        __finally {
-                _munlock(_IOB_SCAN_LOCK);
-        }
-
-        return(count);
+    return (count);
 }

@@ -39,10 +39,9 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _texecvp (
-        REG3 const _TSCHAR *filename,
-        const _TSCHAR * const *argvector
-        )
-{
-        return _texecvpe( filename, argvector, NULL );
+intptr_t __cdecl _texecvp(
+    REG3 const _TSCHAR* filename,
+    const _TSCHAR* const* argvector
+) {
+    return _texecvpe(filename, argvector, NULL);
 }

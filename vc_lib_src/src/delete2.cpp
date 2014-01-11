@@ -14,9 +14,7 @@
 #include <windows.h>
 #include <rtcsup.h>
 
-void operator delete[]( void * p )
-{
+void operator delete[](void* p) {
     RTCCALLBACK(_RTC_Free_hook, (p, 0))
-
     operator delete(p);
 }

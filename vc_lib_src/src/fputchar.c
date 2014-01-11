@@ -30,18 +30,16 @@
 *
 *******************************************************************************/
 
-int __cdecl _fputchar (
-        REG1 int ch
-        )
-{
-        return(putc(ch, stdout));
+int __cdecl _fputchar(
+    REG1 int ch
+) {
+    return (putc(ch, stdout));
 }
 
 #undef putchar
 
-int __cdecl putchar (
-        int ch
-        )
-{
-        return _fputchar(ch);
+int __cdecl putchar(
+    int ch
+) {
+    return _fputchar(ch);
 }

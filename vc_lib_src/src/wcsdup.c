@@ -43,46 +43,47 @@
 
 #include <crtdbg.h>
 
-wchar_t * __cdecl _wcsdup (
-        const wchar_t * string
-        )
-{
-        return _wcsdup_dbg(string, _NORMAL_BLOCK, NULL, 0);
+wchar_t* __cdecl _wcsdup(
+    const wchar_t* string
+) {
+    return _wcsdup_dbg(string, _NORMAL_BLOCK, NULL, 0);
 }
 
-wchar_t * __cdecl _wcsdup_dbg (
-        const wchar_t * string,
-        int nBlockUse,
-        const char * szFileName,
-        int nLine
-        )
+wchar_t* __cdecl _wcsdup_dbg(
+    const wchar_t* string,
+    int nBlockUse,
+    const char* szFileName,
+    int nLine
+)
 
 #else  /* _DEBUG */
 
-wchar_t * __cdecl _wcsdup (
-        const wchar_t * string
-        )
+wchar_t* __cdecl _wcsdup(
+    const wchar_t* string
+)
 
 #endif  /* _DEBUG */
 
 {
-        wchar_t *memory;
+    wchar_t* memory;
     size_t size = 0;
 
-        if (!string)
-                return(NULL);
+    if (!string) {
+        return (NULL);
+    }
 
     size = wcslen(string) + 1;
 #ifdef _DEBUG
-        if (memory = (wchar_t *) _calloc_dbg(size, sizeof(wchar_t), nBlockUse, szFileName, nLine))
-#else  /* _DEBUG */
-        if (memory = (wchar_t *) calloc(size, sizeof(wchar_t)))
-#endif  /* _DEBUG */
-        {
-                _ERRCHECK(wcscpy_s(memory, size, string));
-        return memory;
-        }
 
-        return(NULL);
+    if (memory = (wchar_t*) _calloc_dbg(size, sizeof(wchar_t), nBlockUse, szFileName, nLine))
+#else  /* _DEBUG */
+    if (memory = (wchar_t*) calloc(size, sizeof(wchar_t)))
+#endif  /* _DEBUG */
+    {
+        _ERRCHECK(wcscpy_s(memory, size, string));
+        return memory;
+    }
+
+    return (NULL);
 }
 

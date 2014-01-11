@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 1992, 1993, 1994 Henry Spencer.
  * Copyright (c) 1992, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Henry Spencer.
@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)regfree.c	8.3 (Berkeley) 3/20/94
+ *  @(#)regfree.c   8.3 (Berkeley) 3/20/94
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -55,35 +55,48 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regfree.c,v 1.8 2007/06/11 03:05:54 delph
  = extern void regfree(regex_t *);
  */
 void
-regfree(regex_t *preg)
-{
-	struct re_guts *g;
-	int i;
+regfree(regex_t* preg) {
+    struct re_guts* g;
+    int i;
 
-	if (preg->re_magic != MAGIC1)	/* oops */
-		return;			/* nice to complain, but hard */
+    if (preg->re_magic != MAGIC1) { /* oops */
+        return;    /* nice to complain, but hard */
+    }
 
-	g = preg->re_g;
-	if (g == NULL || g->magic != MAGIC2)	/* oops again */
-		return;
-	preg->re_magic = 0;		/* mark it invalid */
-	g->magic = 0;			/* mark it invalid */
+    g = preg->re_g;
 
-	if (g->strip != NULL)
-		free((char *)g->strip);
-	if (g->sets != NULL) {
-		for (i = 0; i < g->ncsets; i++) {
-			free(g->sets[i].ranges);
-			free(g->sets[i].wides);
-			free(g->sets[i].types);
-		}
-		free((char *)g->sets);
-	}
-	if (g->must != NULL)
-		free(g->must);
-	if (g->charjump != NULL)
-		free(&g->charjump[CHAR_MIN]);
-	if (g->matchjump != NULL)
-		free(g->matchjump);
-	free((char *)g);
+    if (g == NULL || g->magic != MAGIC2) {  /* oops again */
+        return;
+    }
+
+    preg->re_magic = 0;     /* mark it invalid */
+    g->magic = 0;           /* mark it invalid */
+
+    if (g->strip != NULL) {
+        free((char*)g->strip);
+    }
+
+    if (g->sets != NULL) {
+        for (i = 0; i < g->ncsets; i++) {
+            free(g->sets[i].ranges);
+            free(g->sets[i].wides);
+            free(g->sets[i].types);
+        }
+
+        free((char*)g->sets);
+    }
+
+    if (g->must != NULL) {
+        free(g->must);
+    }
+
+    if (g->charjump != NULL) {
+        free(&g->charjump[CHAR_MIN]);
+    }
+
+    if (g->matchjump != NULL) {
+        free(g->matchjump);
+    }
+
+    free((char*)g);
 }

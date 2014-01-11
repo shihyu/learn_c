@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,21 +37,20 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/ctermid.c,v 1.4 2007/01/09 00:27:53 imp Exp
 #include <paths.h>
 #include <string.h>
 
-char *
-ctermid(char *s)
-{
-	static char def[] = _PATH_TTY;
+char*
+ctermid(char* s) {
+    static char def[] = _PATH_TTY;
 
-	if (s) {
-		bcopy(def, s, sizeof(_PATH_TTY));
-		return(s);
-	}
-	return(def);
+    if (s) {
+        bcopy(def, s, sizeof(_PATH_TTY));
+        return (s);
+    }
+
+    return (def);
 }
 
 
-char *
-ctermid_r(char *s)
-{
-	return (s) ? ctermid(s) : NULL;
+char*
+ctermid_r(char* s) {
+    return (s) ? ctermid(s) : NULL;
 }

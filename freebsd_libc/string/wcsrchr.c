@@ -29,19 +29,22 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcsrchr.c,v 1.7 2002/10/23 10:52:04 tjr 
 
 #include <wchar.h>
 
-wchar_t *
-wcsrchr(const wchar_t *s, wchar_t c)
-{
-	const wchar_t *last;
+wchar_t*
+wcsrchr(const wchar_t* s, wchar_t c) {
+    const wchar_t* last;
+    last = NULL;
 
-	last = NULL;
-	for (;;) {
-		if (*s == c)
-			last = s;
-		if (*s == L'\0')
-			break;
-		s++;
-	}
+    for (;;) {
+        if (*s == c) {
+            last = s;
+        }
 
-	return ((wchar_t *)last);
+        if (*s == L'\0') {
+            break;
+        }
+
+        s++;
+    }
+
+    return ((wchar_t*)last);
 }

@@ -25,30 +25,30 @@ extern "C" {
 
 /* Function prototypes */
 
-_CRTIMP __checkReturn_wat errno_t __cdecl _cgets_s(__out_ecount_z(_Size)                char * _Buffer, size_t _Size, __out size_t * _SizeRead);
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1(errno_t, _cgets_s, __out_ecount_part(_Size, *_Buffer) char, _Buffer, __out size_t *, _Size)
-__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_CGETS(char *, _CRTIMP, _cgets, __out_z char, _Buffer)
-_CRTIMP __checkReturn_opt int __cdecl _cprintf(__in_z __format_string const char * _Format, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cprintf_s(__in_z __format_string const char * _Format, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cputs(__in_z const char * _Str);
-_CRT_INSECURE_DEPRECATE(_cscanf_s) _CRTIMP __checkReturn_opt int __cdecl _cscanf(__in_z __format_string const char * _Format, ...);
-_CRT_INSECURE_DEPRECATE(_cscanf_s_l) _CRTIMP __checkReturn_opt int __cdecl _cscanf_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cscanf_s(__in_z __format_string const char * _Format, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cscanf_s_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_wat errno_t __cdecl _cgets_s(__out_ecount_z(_Size)                char* _Buffer, size_t _Size, __out size_t* _SizeRead);
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1(errno_t, _cgets_s, __out_ecount_part(_Size, *_Buffer) char, _Buffer, __out size_t*, _Size)
+__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_CGETS(char*, _CRTIMP, _cgets, __out_z char, _Buffer)
+_CRTIMP __checkReturn_opt int __cdecl _cprintf(__in_z __format_string const char* _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cprintf_s(__in_z __format_string const char* _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cputs(__in_z const char* _Str);
+_CRT_INSECURE_DEPRECATE(_cscanf_s) _CRTIMP __checkReturn_opt int __cdecl _cscanf(__in_z __format_string const char* _Format, ...);
+_CRT_INSECURE_DEPRECATE(_cscanf_s_l) _CRTIMP __checkReturn_opt int __cdecl _cscanf_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cscanf_s(__in_z __format_string const char* _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cscanf_s_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, ...);
 _CRTIMP __checkReturn int __cdecl _getch(void);
 _CRTIMP __checkReturn int __cdecl _getche(void);
-_CRTIMP __checkReturn_opt int __cdecl _vcprintf(__in_z __format_string const char * _Format, va_list _ArgList);
-_CRTIMP __checkReturn_opt int __cdecl _vcprintf_s(__in_z __format_string const char * _Format, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _vcprintf(__in_z __format_string const char* _Format, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _vcprintf_s(__in_z __format_string const char* _Format, va_list _ArgList);
 
-_CRTIMP __checkReturn_opt int __cdecl _cprintf_p(__in_z __format_string const char * _Format, ...);
-_CRTIMP __checkReturn_opt int __cdecl _vcprintf_p(__in_z const char * _Format, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _cprintf_p(__in_z __format_string const char* _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _vcprintf_p(__in_z const char* _Format, va_list _ArgList);
 
-_CRTIMP __checkReturn_opt int __cdecl _cprintf_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cprintf_s_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP __checkReturn_opt int __cdecl _vcprintf_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, va_list _ArgList);
-_CRTIMP __checkReturn_opt int __cdecl _vcprintf_s_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, va_list _ArgList);
-_CRTIMP __checkReturn_opt int __cdecl _cprintf_p_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP __checkReturn_opt int __cdecl _vcprintf_p_l(__in_z __format_string const char * _Format, __in_opt _locale_t _Locale, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _cprintf_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cprintf_s_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_opt int __cdecl _vcprintf_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _vcprintf_s_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _cprintf_p_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_opt int __cdecl _vcprintf_p_l(__in_z __format_string const char* _Format, __in_opt _locale_t _Locale, va_list _ArgList);
 
 #ifdef _M_IX86
 int __cdecl _inp(unsigned short);
@@ -79,32 +79,32 @@ _CRTIMP int __cdecl _ungetch_nolock(__in int _Ch);
 #define WEOF (wint_t)(0xFFFF)
 #endif  /* WEOF */
 
-_CRTIMP __checkReturn_wat errno_t __cdecl _cgetws_s(__out_ecount_part(_SizeInWords, *_SizeRead) wchar_t * _Buffer, size_t _SizeInWords, __out size_t * _SizeRead);
-__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1(errno_t, _cgetws_s, __out_ecount_part(_Size, *_Buffer) wchar_t, _Buffer, size_t *, _Size)
-__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_CGETS(wchar_t *, _CRTIMP, _cgetws, __out_z wchar_t, _Buffer)
+_CRTIMP __checkReturn_wat errno_t __cdecl _cgetws_s(__out_ecount_part(_SizeInWords, *_SizeRead) wchar_t* _Buffer, size_t _SizeInWords, __out size_t* _SizeRead);
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1(errno_t, _cgetws_s, __out_ecount_part(_Size, *_Buffer) wchar_t, _Buffer, size_t*, _Size)
+__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_CGETS(wchar_t*, _CRTIMP, _cgetws, __out_z wchar_t, _Buffer)
 _CRTIMP __checkReturn wint_t __cdecl _getwch(void);
 _CRTIMP __checkReturn wint_t __cdecl _getwche(void);
 _CRTIMP __checkReturn wint_t __cdecl _putwch(wchar_t _WCh);
 _CRTIMP __checkReturn wint_t __cdecl _ungetwch(wint_t _WCh);
-_CRTIMP __checkReturn_opt int __cdecl _cputws(__in_z const wchar_t * _String);
-_CRTIMP __checkReturn_opt int __cdecl _cwprintf(__in_z __format_string const wchar_t * _Format, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cwprintf_s(__in_z __format_string const wchar_t * _Format, ...);
-_CRT_INSECURE_DEPRECATE(_cwscanf_s) _CRTIMP __checkReturn_opt int __cdecl _cwscanf(__in_z __format_string const wchar_t * _Format, ...);
-_CRT_INSECURE_DEPRECATE(_cwscanf_s_l) _CRTIMP __checkReturn_opt int __cdecl _cwscanf_l(__in_z __format_string const wchar_t * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cwscanf_s(__in_z __format_string const wchar_t * _Format, ...);
-_CRTIMP __checkReturn_opt int __cdecl _cwscanf_s_l(__in_z __format_string const wchar_t * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP __checkReturn_opt int __cdecl _vcwprintf(__in_z __format_string const wchar_t *_Format, va_list _ArgList);
-_CRTIMP __checkReturn_opt int __cdecl _vcwprintf_s(__in_z __format_string const wchar_t *_Format, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _cputws(__in_z const wchar_t* _String);
+_CRTIMP __checkReturn_opt int __cdecl _cwprintf(__in_z __format_string const wchar_t* _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cwprintf_s(__in_z __format_string const wchar_t* _Format, ...);
+_CRT_INSECURE_DEPRECATE(_cwscanf_s) _CRTIMP __checkReturn_opt int __cdecl _cwscanf(__in_z __format_string const wchar_t* _Format, ...);
+_CRT_INSECURE_DEPRECATE(_cwscanf_s_l) _CRTIMP __checkReturn_opt int __cdecl _cwscanf_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cwscanf_s(__in_z __format_string const wchar_t* _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cwscanf_s_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP __checkReturn_opt int __cdecl _vcwprintf(__in_z __format_string const wchar_t* _Format, va_list _ArgList);
+_CRTIMP __checkReturn_opt int __cdecl _vcwprintf_s(__in_z __format_string const wchar_t* _Format, va_list _ArgList);
 
-_CRTIMP __checkReturn_opt int __cdecl _cwprintf_p(__in_z __format_string const wchar_t * _Format, ...);
+_CRTIMP __checkReturn_opt int __cdecl _cwprintf_p(__in_z __format_string const wchar_t* _Format, ...);
 _CRTIMP __checkReturn_opt int __cdecl _vcwprintf_p(__in_z __format_string const wchar_t*  _Format, va_list _ArgList);
 
-_CRTIMP int __cdecl _cwprintf_l(__in_z const __format_string wchar_t * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP int __cdecl _cwprintf_s_l(__in_z __format_string const wchar_t * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP int __cdecl _vcwprintf_l(__in_z __format_string const wchar_t *_Format, __in_opt _locale_t _Locale, va_list _ArgList);
-_CRTIMP int __cdecl _vcwprintf_s_l(__in_z __format_string const wchar_t * _Format, __in_opt _locale_t _Locale, va_list _ArgList);
-_CRTIMP int __cdecl _cwprintf_p_l(__in_z __format_string const wchar_t * _Format, __in_opt _locale_t _Locale, ...);
-_CRTIMP int __cdecl _vcwprintf_p_l(__in_z __format_string const wchar_t * _Format, __in_opt _locale_t _Locale, va_list _ArgList);
+_CRTIMP int __cdecl _cwprintf_l(__in_z const __format_string wchar_t* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP int __cdecl _cwprintf_s_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP int __cdecl _vcwprintf_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, va_list _ArgList);
+_CRTIMP int __cdecl _vcwprintf_s_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, va_list _ArgList);
+_CRTIMP int __cdecl _cwprintf_p_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, ...);
+_CRTIMP int __cdecl _vcwprintf_p_l(__in_z __format_string const wchar_t* _Format, __in_opt _locale_t _Locale, va_list _ArgList);
 
 _CRTIMP __checkReturn_opt wint_t __cdecl _putwch_nolock(wchar_t _WCh);
 _CRTIMP __checkReturn wint_t __cdecl _getwch_nolock(void);
@@ -121,11 +121,11 @@ _CRTIMP __checkReturn_opt wint_t __cdecl _ungetwch_nolock(wint_t _WCh);
 
 #pragma warning(push)
 #pragma warning(disable: 4141) /* Using deprecated twice */
-_CRT_NONSTDC_DEPRECATE(_cgets) _CRT_INSECURE_DEPRECATE(_cgets_s) _CRTIMP __checkReturn_opt char * __cdecl cgets(__out_ecount_z(*_Buffer+2) char * _Buffer);
+_CRT_NONSTDC_DEPRECATE(_cgets) _CRT_INSECURE_DEPRECATE(_cgets_s) _CRTIMP __checkReturn_opt char* __cdecl cgets(__out_ecount_z(*_Buffer + 2) char* _Buffer);
 #pragma warning(pop)
-_CRT_NONSTDC_DEPRECATE(_cprintf) _CRTIMP __checkReturn_opt int __cdecl cprintf(__in_z __format_string const char * _Format, ...);
-_CRT_NONSTDC_DEPRECATE(_cputs) _CRTIMP __checkReturn_opt int __cdecl cputs(__in_z const char * _Str);
-_CRT_NONSTDC_DEPRECATE(_cscanf) _CRTIMP __checkReturn_opt int __cdecl cscanf(__in_z __format_string const char * _Format, ...);
+_CRT_NONSTDC_DEPRECATE(_cprintf) _CRTIMP __checkReturn_opt int __cdecl cprintf(__in_z __format_string const char* _Format, ...);
+_CRT_NONSTDC_DEPRECATE(_cputs) _CRTIMP __checkReturn_opt int __cdecl cputs(__in_z const char* _Str);
+_CRT_NONSTDC_DEPRECATE(_cscanf) _CRTIMP __checkReturn_opt int __cdecl cscanf(__in_z __format_string const char* _Format, ...);
 #ifdef _M_IX86
 _CRT_NONSTDC_DEPRECATE(_inp) int __cdecl inp(unsigned short);
 _CRT_NONSTDC_DEPRECATE(_inpw) unsigned short __cdecl inpw(unsigned short);

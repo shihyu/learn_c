@@ -39,51 +39,51 @@ extern "C" {
 
 #ifndef _THREADMBCINFO
 typedef struct threadmbcinfostruct {
-        int refcount;
-        int mbcodepage;
-        int ismbcodepage;
-        int mblcid;
-        unsigned short mbulinfo[6];
-        unsigned char mbctype[257];
-        unsigned char mbcasemap[256];
+    int refcount;
+    int mbcodepage;
+    int ismbcodepage;
+    int mblcid;
+    unsigned short mbulinfo[6];
+    unsigned char mbctype[257];
+    unsigned char mbcasemap[256];
 } threadmbcinfo;
 #define _THREADMBCINFO
 #endif  /* _THREADMBCINFO */
 
 #ifndef _TAGLC_ID_DEFINED
 typedef struct tagLC_ID {
-        unsigned short wLanguage;
-        unsigned short wCountry;
-        unsigned short wCodePage;
+    unsigned short wLanguage;
+    unsigned short wCountry;
+    unsigned short wCodePage;
 } LC_ID, *LPLC_ID;
 #define _TAGLC_ID_DEFINED
 #endif  /* _TAGLC_ID_DEFINED */
 
 #ifndef _THREADLOCALEINFO
 typedef struct threadlocaleinfostruct {
-        int refcount;
-        unsigned int lc_codepage;
-        unsigned int lc_collate_cp;
-        unsigned long lc_handle[6]; /* LCID */
-        LC_ID lc_id[6];
-        struct {
-            char *locale;
-            wchar_t *wlocale;
-            int *refcount;
-            int *wrefcount;
-        } lc_category[6];
-        int lc_clike;
-        int mb_cur_max;
-        int * lconv_intl_refcount;
-        int * lconv_num_refcount;
-        int * lconv_mon_refcount;
-        struct lconv * lconv;
-        int * ctype1_refcount;
-        unsigned short * ctype1;
-        const unsigned short * pctype;
-        const unsigned char * pclmap;
-        const unsigned char * pcumap;
-        struct __lc_time_data * lc_time_curr;
+    int refcount;
+    unsigned int lc_codepage;
+    unsigned int lc_collate_cp;
+    unsigned long lc_handle[6]; /* LCID */
+    LC_ID lc_id[6];
+    struct {
+        char* locale;
+        wchar_t* wlocale;
+        int* refcount;
+        int* wrefcount;
+    } lc_category[6];
+    int lc_clike;
+    int mb_cur_max;
+    int* lconv_intl_refcount;
+    int* lconv_num_refcount;
+    int* lconv_mon_refcount;
+    struct lconv* lconv;
+    int* ctype1_refcount;
+    unsigned short* ctype1;
+    const unsigned short* pctype;
+    const unsigned char* pclmap;
+    const unsigned char* pcumap;
+    struct __lc_time_data* lc_time_curr;
 } threadlocinfo;
 #define _THREADLOCALEINFO
 #endif  /* _THREADLOCALEINFO */

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,25 +38,28 @@ __FBSDID("$FreeBSD: src/lib/libc/string/rindex.c,v 1.8 2007/01/09 00:28:12 imp E
 #ifdef STRRCHR
 #include <string.h>
 
-char *
+char*
 strrchr
 #else
 #include <strings.h>
 
-char *
+char*
 rindex
 #endif
-(const char *p, int ch)
-{
-	char *save;
-	char c;
+(const char* p, int ch) {
+    char* save;
+    char c;
+    c = ch;
 
-	c = ch;
-	for (save = NULL;; ++p) {
-		if (*p == c)
-			save = (char *)p;
-		if (*p == '\0')
-			return (save);
-	}
-	/* NOTREACHED */
+    for (save = NULL;; ++p) {
+        if (*p == c) {
+            save = (char*)p;
+        }
+
+        if (*p == '\0') {
+            return (save);
+        }
+    }
+
+    /* NOTREACHED */
 }

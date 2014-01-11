@@ -35,36 +35,41 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wcstold.c,v 1.4 2004/04/07 09:47:56 tjr 
  * See wcstod() for comments as to the logic used.
  */
 long double
-wcstold(const wchar_t * __restrict nptr, wchar_t ** __restrict endptr)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs;
-	long double val;
-	char *buf, *end;
-	const wchar_t *wcp;
-	size_t len;
+wcstold(const wchar_t* __restrict nptr, wchar_t** __restrict endptr) {
+    static const mbstate_t initial;
+    mbstate_t mbs;
+    long double val;
+    char* buf, *end;
+    const wchar_t* wcp;
+    size_t len;
 
-	while (iswspace(*nptr))
-		nptr++;
+    while (iswspace(*nptr)) {
+        nptr++;
+    }
 
-	wcp = nptr;
-	mbs = initial;
-	if ((len = wcsrtombs(NULL, &wcp, 0, &mbs)) == (size_t)-1) {
-		if (endptr != NULL)
-			*endptr = (wchar_t *)nptr;
-		return (0.0);
-	}
-	if ((buf = malloc(len + 1)) == NULL)
-		return (0.0);
-	mbs = initial;
-	wcsrtombs(buf, &wcp, len + 1, &mbs);
+    wcp = nptr;
+    mbs = initial;
 
-	val = strtold(buf, &end);
+    if ((len = wcsrtombs(NULL, &wcp, 0, &mbs)) == (size_t) - 1) {
+        if (endptr != NULL) {
+            *endptr = (wchar_t*)nptr;
+        }
 
-	if (endptr != NULL)
-		*endptr = (wchar_t *)nptr + (end - buf);
+        return (0.0);
+    }
 
-	free(buf);
+    if ((buf = malloc(len + 1)) == NULL) {
+        return (0.0);
+    }
 
-	return (val);
+    mbs = initial;
+    wcsrtombs(buf, &wcp, len + 1, &mbs);
+    val = strtold(buf, &end);
+
+    if (endptr != NULL) {
+        *endptr = (wchar_t*)nptr + (end - buf);
+    }
+
+    free(buf);
+    return (val);
 }

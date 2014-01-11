@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -44,10 +44,9 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/umoddi3.c,v 1.3 2007/01/09 00:28:03 imp Ex
  */
 u_quad_t
 __umoddi3(a, b)
-	u_quad_t a, b;
+u_quad_t a, b;
 {
-	u_quad_t r;
-
-	(void)__qdivrem(a, b, &r);
-	return (r);
+    u_quad_t r;
+    (void)__qdivrem(a, b, &r);
+    return (r);
 }

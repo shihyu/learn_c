@@ -29,9 +29,8 @@
 *
 *******************************************************************************/
 
-int __cdecl _getpid (
-        void
-        )
-{
-        return GetCurrentProcessId();
+int __cdecl _getpid(
+    void
+) {
+    return GetCurrentProcessId();
 }

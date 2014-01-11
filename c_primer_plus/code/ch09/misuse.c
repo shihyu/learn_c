@@ -2,12 +2,11 @@
 #include <stdio.h>
 int imax();      /* old-style declaration */
 
-int main(void)
-{
+int main(void) {
     printf("The maximum of %d and %d is %d.\n",
-            3, 5, imax(3));
+           3, 5, imax(3));
     printf("The maximum of %d and %d is %d.\n",
-            3, 5, imax(3.0, 5.0));
+           3, 5, imax(3.0, 5.0));
     return 0;
 }
 
@@ -16,11 +15,12 @@ int n, m;
 {
     int max;
 
-    if (n > m)
+    if (n > m) {
         max = n;
-    else
+    } else {
         max = m;
-    
+    }
+
     return max;
 }
 

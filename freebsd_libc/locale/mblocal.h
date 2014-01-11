@@ -27,35 +27,35 @@
  */
 
 #ifndef _MBLOCAL_H_
-#define	_MBLOCAL_H_
+#define _MBLOCAL_H_
 
 /*
  * Rune initialization function prototypes.
  */
-int	_none_init(_RuneLocale *);
-int	_UTF8_init(_RuneLocale *);
-int	_EUC_init(_RuneLocale *);
-int	_GB18030_init(_RuneLocale *);
-int	_GB2312_init(_RuneLocale *);
-int	_GBK_init(_RuneLocale *);
-int	_BIG5_init(_RuneLocale *);
-int	_MSKanji_init(_RuneLocale *);
+int _none_init(_RuneLocale*);
+int _UTF8_init(_RuneLocale*);
+int _EUC_init(_RuneLocale*);
+int _GB18030_init(_RuneLocale*);
+int _GB2312_init(_RuneLocale*);
+int _GBK_init(_RuneLocale*);
+int _BIG5_init(_RuneLocale*);
+int _MSKanji_init(_RuneLocale*);
 
 /*
  * Conversion function pointers for current encoding.
  */
-extern size_t (*__mbrtowc)(wchar_t * __restrict, const char * __restrict,
-    size_t, mbstate_t * __restrict);
-extern int (*__mbsinit)(const mbstate_t *);
-extern size_t (*__mbsnrtowcs)(wchar_t * __restrict, const char ** __restrict,
-    size_t, size_t, mbstate_t * __restrict);
-extern size_t (*__wcrtomb)(char * __restrict, wchar_t, mbstate_t * __restrict);
-extern size_t (*__wcsnrtombs)(char * __restrict, const wchar_t ** __restrict,
-    size_t, size_t, mbstate_t * __restrict);
+extern size_t (*__mbrtowc)(wchar_t* __restrict, const char* __restrict,
+                           size_t, mbstate_t* __restrict);
+extern int (*__mbsinit)(const mbstate_t*);
+extern size_t (*__mbsnrtowcs)(wchar_t* __restrict, const char** __restrict,
+                              size_t, size_t, mbstate_t* __restrict);
+extern size_t (*__wcrtomb)(char* __restrict, wchar_t, mbstate_t* __restrict);
+extern size_t (*__wcsnrtombs)(char* __restrict, const wchar_t** __restrict,
+                              size_t, size_t, mbstate_t* __restrict);
 
-extern size_t __mbsnrtowcs_std(wchar_t * __restrict, const char ** __restrict,
-    size_t, size_t, mbstate_t * __restrict);
-extern size_t __wcsnrtombs_std(char * __restrict, const wchar_t ** __restrict,
-    size_t, size_t, mbstate_t * __restrict);
+extern size_t __mbsnrtowcs_std(wchar_t* __restrict, const char** __restrict,
+                               size_t, size_t, mbstate_t* __restrict);
+extern size_t __wcsnrtombs_std(char* __restrict, const wchar_t** __restrict,
+                               size_t, size_t, mbstate_t* __restrict);
 
-#endif	/* _MBLOCAL_H_ */
+#endif  /* _MBLOCAL_H_ */

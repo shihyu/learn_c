@@ -38,172 +38,160 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/arc4random.c,v 1.12 2007/05/25 10:40:33 del
 #include "un-namespace.h"
 
 struct arc4_stream {
-	u_int8_t i;
-	u_int8_t j;
-	u_int8_t s[256];
+    u_int8_t i;
+    u_int8_t j;
+    u_int8_t s[256];
 };
 
-static pthread_mutex_t	arc4random_mtx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t  arc4random_mtx = PTHREAD_MUTEX_INITIALIZER;
 
-#define	RANDOMDEV	"/dev/urandom"
-#define	THREAD_LOCK()						\
-	do {							\
-		if (__isthreaded)				\
-			_pthread_mutex_lock(&arc4random_mtx);	\
-	} while (0)
+#define RANDOMDEV   "/dev/urandom"
+#define THREAD_LOCK()                       \
+    do {                            \
+        if (__isthreaded)               \
+            _pthread_mutex_lock(&arc4random_mtx);   \
+    } while (0)
 
-#define	THREAD_UNLOCK()						\
-	do {							\
-		if (__isthreaded)				\
-			_pthread_mutex_unlock(&arc4random_mtx);	\
-	} while (0)
+#define THREAD_UNLOCK()                     \
+    do {                            \
+        if (__isthreaded)               \
+            _pthread_mutex_unlock(&arc4random_mtx); \
+    } while (0)
 
 static struct arc4_stream rs;
 static int rs_initialized;
 static int rs_stired;
 static int arc4_count;
 
-static inline u_int8_t arc4_getbyte(struct arc4_stream *);
-static void arc4_stir(struct arc4_stream *);
+static inline u_int8_t arc4_getbyte(struct arc4_stream*);
+static void arc4_stir(struct arc4_stream*);
 
 static inline void
-arc4_init(struct arc4_stream *as)
-{
-	int     n;
+arc4_init(struct arc4_stream* as) {
+    int     n;
 
-	for (n = 0; n < 256; n++)
-		as->s[n] = n;
-	as->i = 0;
-	as->j = 0;
+    for (n = 0; n < 256; n++) {
+        as->s[n] = n;
+    }
+
+    as->i = 0;
+    as->j = 0;
 }
 
 static inline void
-arc4_addrandom(struct arc4_stream *as, u_char *dat, int datlen)
-{
-	int     n;
-	u_int8_t si;
+arc4_addrandom(struct arc4_stream* as, u_char* dat, int datlen) {
+    int     n;
+    u_int8_t si;
+    as->i--;
 
-	as->i--;
-	for (n = 0; n < 256; n++) {
-		as->i = (as->i + 1);
-		si = as->s[as->i];
-		as->j = (as->j + si + dat[n % datlen]);
-		as->s[as->i] = as->s[as->j];
-		as->s[as->j] = si;
-	}
+    for (n = 0; n < 256; n++) {
+        as->i = (as->i + 1);
+        si = as->s[as->i];
+        as->j = (as->j + si + dat[n % datlen]);
+        as->s[as->i] = as->s[as->j];
+        as->s[as->j] = si;
+    }
 }
 
 static void
-arc4_stir(struct arc4_stream *as)
-{
-	int     fd, n;
-	struct {
-		struct timeval tv;
-		pid_t pid;
-		u_int8_t rnd[128 - sizeof(struct timeval) - sizeof(pid_t)];
-	}       rdat;
+arc4_stir(struct arc4_stream* as) {
+    int     fd, n;
+    struct {
+        struct timeval tv;
+        pid_t pid;
+        u_int8_t rnd[128 - sizeof(struct timeval) - sizeof(pid_t)];
+    }       rdat;
+    gettimeofday(&rdat.tv, NULL);
+    rdat.pid = getpid();
+    fd = _open(RANDOMDEV, O_RDONLY, 0);
 
-	gettimeofday(&rdat.tv, NULL);
-	rdat.pid = getpid();
-	fd = _open(RANDOMDEV, O_RDONLY, 0);
-	if (fd >= 0) {
-		(void) _read(fd, rdat.rnd, sizeof(rdat.rnd));
-		_close(fd);
-	} 
-	/* fd < 0?  Ah, what the heck. We'll just take whatever was on the
-	 * stack... */
+    if (fd >= 0) {
+        (void) _read(fd, rdat.rnd, sizeof(rdat.rnd));
+        _close(fd);
+    }
 
-	arc4_addrandom(as, (void *) &rdat, sizeof(rdat));
+    /* fd < 0?  Ah, what the heck. We'll just take whatever was on the
+     * stack... */
+    arc4_addrandom(as, (void*) &rdat, sizeof(rdat));
 
-	/*
-	 * Throw away the first N bytes of output, as suggested in the
-	 * paper "Weaknesses in the Key Scheduling Algorithm of RC4"
-	 * by Fluher, Mantin, and Shamir.  N=1024 is based on
-	 * suggestions in the paper "(Not So) Random Shuffles of RC4"
-	 * by Ilya Mironov.
-	 */
-	for (n = 0; n < 1024; n++)
-		(void) arc4_getbyte(as);
-	arc4_count = 400000;
+    /*
+     * Throw away the first N bytes of output, as suggested in the
+     * paper "Weaknesses in the Key Scheduling Algorithm of RC4"
+     * by Fluher, Mantin, and Shamir.  N=1024 is based on
+     * suggestions in the paper "(Not So) Random Shuffles of RC4"
+     * by Ilya Mironov.
+     */
+    for (n = 0; n < 1024; n++) {
+        (void) arc4_getbyte(as);
+    }
+
+    arc4_count = 400000;
 }
 
 static inline u_int8_t
-arc4_getbyte(struct arc4_stream *as)
-{
-	u_int8_t si, sj;
-
-	as->i = (as->i + 1);
-	si = as->s[as->i];
-	as->j = (as->j + si);
-	sj = as->s[as->j];
-	as->s[as->i] = sj;
-	as->s[as->j] = si;
-
-	return (as->s[(si + sj) & 0xff]);
+arc4_getbyte(struct arc4_stream* as) {
+    u_int8_t si, sj;
+    as->i = (as->i + 1);
+    si = as->s[as->i];
+    as->j = (as->j + si);
+    sj = as->s[as->j];
+    as->s[as->i] = sj;
+    as->s[as->j] = si;
+    return (as->s[(si + sj) & 0xff]);
 }
 
 static inline u_int32_t
-arc4_getword(struct arc4_stream *as)
-{
-	u_int32_t val;
-
-	val = arc4_getbyte(as) << 24;
-	val |= arc4_getbyte(as) << 16;
-	val |= arc4_getbyte(as) << 8;
-	val |= arc4_getbyte(as);
-
-	return (val);
+arc4_getword(struct arc4_stream* as) {
+    u_int32_t val;
+    val = arc4_getbyte(as) << 24;
+    val |= arc4_getbyte(as) << 16;
+    val |= arc4_getbyte(as) << 8;
+    val |= arc4_getbyte(as);
+    return (val);
 }
 
 static void
-arc4_check_init(void)
-{
-	if (!rs_initialized) {
-		arc4_init(&rs);
-		rs_initialized = 1;
-	}
+arc4_check_init(void) {
+    if (!rs_initialized) {
+        arc4_init(&rs);
+        rs_initialized = 1;
+    }
 }
 
 static void
-arc4_check_stir(void)
-{
-	if (!rs_stired || --arc4_count == 0) {
-		arc4_stir(&rs);
-		rs_stired = 1;
-	}
+arc4_check_stir(void) {
+    if (!rs_stired || --arc4_count == 0) {
+        arc4_stir(&rs);
+        rs_stired = 1;
+    }
 }
 
 void
-arc4random_stir(void)
-{
-	THREAD_LOCK();
-	arc4_check_init();
-	arc4_stir(&rs);
-	THREAD_UNLOCK();
+arc4random_stir(void) {
+    THREAD_LOCK();
+    arc4_check_init();
+    arc4_stir(&rs);
+    THREAD_UNLOCK();
 }
 
 void
-arc4random_addrandom(u_char *dat, int datlen)
-{
-	THREAD_LOCK();
-	arc4_check_init();
-	arc4_check_stir();
-	arc4_addrandom(&rs, dat, datlen);
-	THREAD_UNLOCK();
+arc4random_addrandom(u_char* dat, int datlen) {
+    THREAD_LOCK();
+    arc4_check_init();
+    arc4_check_stir();
+    arc4_addrandom(&rs, dat, datlen);
+    THREAD_UNLOCK();
 }
 
 u_int32_t
-arc4random(void)
-{
-	u_int32_t rnd;
-
-	THREAD_LOCK();
-	arc4_check_init();
-	arc4_check_stir();
-	rnd = arc4_getword(&rs);
-	THREAD_UNLOCK();
-
-	return (rnd);
+arc4random(void) {
+    u_int32_t rnd;
+    THREAD_LOCK();
+    arc4_check_init();
+    arc4_check_stir();
+    rnd = arc4_getword(&rs);
+    THREAD_UNLOCK();
+    return (rnd);
 }
 
 #if 0
@@ -211,18 +199,18 @@ arc4random(void)
 #include <stdio.h>
 #include <machine/pctr.h>
 int
-main(int argc, char **argv)
-{
-	const int iter = 1000000;
-	int     i;
-	pctrval v;
+main(int argc, char** argv) {
+    const int iter = 1000000;
+    int     i;
+    pctrval v;
+    v = rdtsc();
 
-	v = rdtsc();
-	for (i = 0; i < iter; i++)
-		arc4random();
-	v = rdtsc() - v;
-	v /= iter;
+    for (i = 0; i < iter; i++) {
+        arc4random();
+    }
 
-	printf("%qd cycles\n", v);
+    v = rdtsc() - v;
+    v /= iter;
+    printf("%qd cycles\n", v);
 }
 #endif

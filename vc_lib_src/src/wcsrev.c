@@ -30,25 +30,24 @@
 *
 *******************************************************************************/
 
-wchar_t * __cdecl _wcsrev (
-        wchar_t * string
-        )
-{
-        wchar_t *start = string;
-        wchar_t *left = string;
-        wchar_t ch;
+wchar_t* __cdecl _wcsrev(
+    wchar_t* string
+) {
+    wchar_t* start = string;
+    wchar_t* left = string;
+    wchar_t ch;
 
-        while (*string++)                 /* find end of string */
-                ;
-        string -= 2;
+    while (*string++)                 /* find end of string */
+        ;
 
-        while (left < string)
-        {
-                ch = *left;
-                *left++ = *string;
-                *string-- = ch;
-        }
+    string -= 2;
 
-        return(start);
+    while (left < string) {
+        ch = *left;
+        *left++ = *string;
+        *string-- = ch;
+    }
+
+    return (start);
 }
 

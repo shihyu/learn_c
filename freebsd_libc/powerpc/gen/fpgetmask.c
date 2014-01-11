@@ -1,4 +1,4 @@
-/*	$NetBSD: fpgetmask.c,v 1.3 2002/01/13 21:45:47 thorpej Exp $	*/
+/*  $NetBSD: fpgetmask.c,v 1.3 2002/01/13 21:45:47 thorpej Exp $    */
 
 /*
  * Copyright (c) 1999 The NetBSD Foundation, Inc.
@@ -17,8 +17,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the NetBSD
- *	Foundation, Inc. and its contributors.
+ *  This product includes software developed by the NetBSD
+ *  Foundation, Inc. and its contributors.
  * 4. Neither the name of The NetBSD Foundation nor the names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
@@ -44,10 +44,8 @@ __FBSDID("$FreeBSD: src/lib/libc/powerpc/gen/fpgetmask.c,v 1.1 2004/02/12 09:11:
 #include <ieeefp.h>
 
 fp_except_t
-fpgetmask()
-{
-	u_int64_t fpscr;
-
-	__asm__("mffs %0" : "=f"(fpscr));
-	return ((fp_except_t)((fpscr >> 3) & 0x1f));
+fpgetmask() {
+    u_int64_t fpscr;
+    __asm__("mffs %0" : "=f"(fpscr));
+    return ((fp_except_t)((fpscr >> 3) & 0x1f));
 }

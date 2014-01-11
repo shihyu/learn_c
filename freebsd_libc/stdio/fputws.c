@@ -39,33 +39,40 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fputws.c,v 1.6 2004/07/21 10:54:57 tjr Ex
 #include "mblocal.h"
 
 int
-fputws(const wchar_t * __restrict ws, FILE * __restrict fp)
-{
-	size_t nbytes;
-	char buf[BUFSIZ];
-	struct __suio uio;
-	struct __siov iov;
+fputws(const wchar_t* __restrict ws, FILE* __restrict fp) {
+    size_t nbytes;
+    char buf[BUFSIZ];
+    struct __suio uio;
+    struct __siov iov;
+    FLOCKFILE(fp);
+    ORIENT(fp, 1);
 
-	FLOCKFILE(fp);
-	ORIENT(fp, 1);
-	if (prepwrite(fp) != 0)
-		goto error;
-	uio.uio_iov = &iov;
-	uio.uio_iovcnt = 1;
-	iov.iov_base = buf;
-	do {
-		nbytes = __wcsnrtombs(buf, &ws, SIZE_T_MAX, sizeof(buf),
-		    &fp->_extra->mbstate);
-		if (nbytes == (size_t)-1)
-			goto error;
-		iov.iov_len = uio.uio_resid = nbytes;
-		if (__sfvwrite(fp, &uio) != 0)
-			goto error;
-	} while (ws != NULL);
-	FUNLOCKFILE(fp);
-	return (0);
+    if (prepwrite(fp) != 0) {
+        goto error;
+    }
 
+    uio.uio_iov = &iov;
+    uio.uio_iovcnt = 1;
+    iov.iov_base = buf;
+
+    do {
+        nbytes = __wcsnrtombs(buf, &ws, SIZE_T_MAX, sizeof(buf),
+                              &fp->_extra->mbstate);
+
+        if (nbytes == (size_t) - 1) {
+            goto error;
+        }
+
+        iov.iov_len = uio.uio_resid = nbytes;
+
+        if (__sfvwrite(fp, &uio) != 0) {
+            goto error;
+        }
+    } while (ws != NULL);
+
+    FUNLOCKFILE(fp);
+    return (0);
 error:
-	FUNLOCKFILE(fp);
-	return (-1);
+    FUNLOCKFILE(fp);
+    return (-1);
 }

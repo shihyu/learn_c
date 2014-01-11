@@ -35,31 +35,27 @@
 *
 *******************************************************************************/
 
-int __cdecl vscanf (
-        INPUTFN inputfn,
-        const char *format,
-        _locale_t plocinfo,
-        va_list arglist
-        )
+int __cdecl vscanf(
+    INPUTFN inputfn,
+    const char* format,
+    _locale_t plocinfo,
+    va_list arglist
+)
 /*
  * stdin 'SCAN', 'F'ormatted
  */
 {
-        int retval;
+    int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
+    _lock_str2(0, stdin);
 
-        _VALIDATE_RETURN( (format != NULL), EINVAL, EOF);
-
-        _lock_str2(0, stdin);
-        __try {
-
+    __try {
         retval = (inputfn(stdin, format, plocinfo, arglist));
+    } __finally {
+        _unlock_str2(0, stdin);
+    }
 
-        }
-        __finally {
-            _unlock_str2(0, stdin);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 /***
@@ -80,25 +76,23 @@ int __cdecl vscanf (
 *Exceptions:
 *
 *******************************************************************************/
-int __cdecl scanf (
-        const char *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vscanf(_input_l, format, NULL, arglist);
+int __cdecl scanf(
+    const char* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vscanf(_input_l, format, NULL, arglist);
 }
 
-int __cdecl _scanf_l (
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vscanf(_input_l, format, plocinfo, arglist);
+int __cdecl _scanf_l(
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vscanf(_input_l, format, plocinfo, arglist);
 }
 
 /***
@@ -108,23 +102,21 @@ int __cdecl _scanf_l (
 *   _input_s_l has a size check for array parameters.
 *
 *******************************************************************************/
-int __cdecl scanf_s (
-        const char *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vscanf(_input_s_l, format, NULL, arglist);
+int __cdecl scanf_s(
+    const char* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vscanf(_input_s_l, format, NULL, arglist);
 }
 
-int __cdecl _scanf_s_l (
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vscanf(_input_s_l, format, plocinfo, arglist);
+int __cdecl _scanf_s_l(
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vscanf(_input_s_l, format, plocinfo, arglist);
 }

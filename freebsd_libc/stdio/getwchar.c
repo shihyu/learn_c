@@ -40,8 +40,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/getwchar.c,v 1.3 2004/05/25 10:42:52 tjr 
  * Synonym for fgetwc(stdin).
  */
 wint_t
-getwchar(void)
-{
-
-	return (fgetwc(stdin));
+getwchar(void) {
+    return (fgetwc(stdin));
 }

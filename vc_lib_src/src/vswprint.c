@@ -91,118 +91,111 @@ versions of (v)swprintf */
 
 #ifndef _COUNT_
 
-int __cdecl _vswprintf_l (
-        wchar_t *string,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
+int __cdecl _vswprintf_l(
+    wchar_t* string,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+)
 #else  /* _COUNT_ */
 
 #ifndef _SWPRINTFS_ERROR_RETURN_FIX
 /* Here we implement _vsnwprintf without the
 return value bugfix */
 
-int __cdecl _vsnwprintf_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
+int __cdecl _vsnwprintf_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+)
 #else  /* _SWPRINTFS_ERROR_RETURN_FIX */
-int __cdecl _vswprintf_helper (
-        WOUTPUTFN woutfn,
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
+int __cdecl _vswprintf_helper(
+    WOUTPUTFN woutfn,
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+)
 #endif  /* _SWPRINTFS_ERROR_RETURN_FIX */
 #endif  /* _COUNT_ */
 
 {
-        FILE str;
-        REG1 FILE *outfile = &str;
-        REG2 int retval;
-
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
+    FILE str;
+    REG1 FILE* outfile = &str;
+    REG2 int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
 #ifdef _COUNT_
-        _VALIDATE_RETURN( (count == 0) || (string != NULL), EINVAL, -1 );
+    _VALIDATE_RETURN((count == 0) || (string != NULL), EINVAL, -1);
 #else  /* _COUNT_ */
-        _VALIDATE_RETURN( (string != NULL), EINVAL, -1 );
+    _VALIDATE_RETURN((string != NULL), EINVAL, -1);
 #endif  /* _COUNT_ */
-
-        outfile->_flag = _IOWRT|_IOSTRG;
-        outfile->_ptr = outfile->_base = (char *) string;
+    outfile->_flag = _IOWRT | _IOSTRG;
+    outfile->_ptr = outfile->_base = (char*) string;
 #ifndef _COUNT_
-        outfile->_cnt = MAXSTR;
+    outfile->_cnt = MAXSTR;
 #else  /* _COUNT_ */
-        if(count>(INT_MAX/sizeof(wchar_t)))
-        {
-           /* old-style functions allow any large value to mean unbounded */
-           outfile->_cnt = INT_MAX;
-        }
-        else
-        {
-            outfile->_cnt = (int)(count*sizeof(wchar_t));
-        }
+
+    if (count > (INT_MAX / sizeof(wchar_t))) {
+        /* old-style functions allow any large value to mean unbounded */
+        outfile->_cnt = INT_MAX;
+    } else {
+        outfile->_cnt = (int)(count * sizeof(wchar_t));
+    }
+
 #endif  /* _COUNT_ */
-
 #ifndef _SWPRINTFS_ERROR_RETURN_FIX
-        retval = _woutput_l(outfile, format, plocinfo, ap );
+    retval = _woutput_l(outfile, format, plocinfo, ap);
 #else  /* _SWPRINTFS_ERROR_RETURN_FIX */
-        retval = woutfn(outfile, format, plocinfo, ap );
+    retval = woutfn(outfile, format, plocinfo, ap);
 #endif  /* _SWPRINTFS_ERROR_RETURN_FIX */
 
-        if(string==NULL)
-        {
-            return retval;
-        }
+    if (string == NULL) {
+        return retval;
+    }
 
 #ifndef _SWPRINTFS_ERROR_RETURN_FIX
-        _putc_nolock('\0',outfile);     /* no-lock version */
-        _putc_nolock('\0',outfile);     /* 2nd byte for wide char version */
-
-        return(retval);
+    _putc_nolock('\0', outfile);    /* no-lock version */
+    _putc_nolock('\0', outfile);    /* 2nd byte for wide char version */
+    return (retval);
 #else  /* _SWPRINTFS_ERROR_RETURN_FIX */
-        if((retval >= 0) && (_putc_nolock('\0',outfile) != EOF) && (_putc_nolock('\0',outfile) != EOF))
-            return(retval);
 
-        string[count - 1] = 0;
-        if (outfile->_cnt < 0)
-        {
-            /* the buffer was too small; we return -2 to indicate truncation */
-            return -2;
-        }
-        return -1;
+    if ((retval >= 0) && (_putc_nolock('\0', outfile) != EOF) && (_putc_nolock('\0', outfile) != EOF)) {
+        return (retval);
+    }
+
+    string[count - 1] = 0;
+
+    if (outfile->_cnt < 0) {
+        /* the buffer was too small; we return -2 to indicate truncation */
+        return -2;
+    }
+
+    return -1;
 #endif  /* _SWPRINTFS_ERROR_RETURN_FIX */
-
 }
 
 #ifndef _COUNT_
 
-int __cdecl _vswprintf (
-        wchar_t *string,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl _vswprintf(
+    wchar_t* string,
+    const wchar_t* format,
+    va_list ap
+) {
 #pragma warning(push)
 #pragma warning(disable:4996)
     return _vswprintf_l(string, format, NULL, ap);
 #pragma warning(pop)
 }
 
-int __cdecl __vswprintf_l (
-        wchar_t *string,
-        const wchar_t *format,
-        _locale_t _Plocinfo,
-        va_list ap
-        )
-{
+int __cdecl __vswprintf_l(
+    wchar_t* string,
+    const wchar_t* format,
+    _locale_t _Plocinfo,
+    va_list ap
+) {
 #pragma warning(push)
 #pragma warning(disable:4996)
     return _vswprintf_l(string, format, _Plocinfo, ap);
@@ -215,186 +208,172 @@ int __cdecl __vswprintf_l (
 /* Here we implement _vsnwprintf without the
 return value bugfix */
 
-int __cdecl _vsnwprintf (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        va_list ap
-        )
-{
-    #pragma warning(push)
-    #pragma warning(disable:4996) // Disable deprecation warning since calling function is also deprecated
+int __cdecl _vsnwprintf(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    va_list ap
+) {
+#pragma warning(push)
+#pragma warning(disable:4996) // Disable deprecation warning since calling function is also deprecated
     return _vsnwprintf_l(string, count, format, NULL, ap);
-    #pragma warning(pop)
+#pragma warning(pop)
 }
 #endif  /* _SWPRINTFS_ERROR_RETURN_FIX */
 #endif  /* _COUNT_ */
 
 
 #ifdef _SWPRINTFS_ERROR_RETURN_FIX
-int __cdecl _vswprintf_c (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl _vswprintf_c(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    va_list ap
+) {
     int retval = _vswprintf_helper(_woutput_l, string, count, format, NULL, ap);
     return (retval < 0 ? -1 : retval);
 }
 
-int __cdecl _vswprintf_c_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vswprintf_c_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     int retval = _vswprintf_helper(_woutput_l, string, count, format, plocinfo, ap);
     return (retval < 0 ? -1 : retval);
 }
 
-int __cdecl _vswprintf_s_l (
-        wchar_t *string,
-        size_t sizeInWords,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vswprintf_s_l(
+    wchar_t* string,
+    size_t sizeInWords,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     int retvalue = -1;
-
     /* validation section */
     _VALIDATE_RETURN(format != NULL, EINVAL, -1);
     _VALIDATE_RETURN(string != NULL && sizeInWords > 0, EINVAL, -1);
-
     retvalue = _vswprintf_helper(_woutput_s_l, string, sizeInWords, format, plocinfo, ap);
-    if (retvalue < 0)
-    {
+
+    if (retvalue < 0) {
         string[0] = 0;
         _SECURECRT__FILL_STRING(string, sizeInWords, 1);
     }
-    if (retvalue == -2)
-    {
+
+    if (retvalue == -2) {
         _VALIDATE_RETURN(("Buffer too small", 0), ERANGE, -1);
     }
-    if (retvalue >= 0)
-    {
+
+    if (retvalue >= 0) {
         _SECURECRT__FILL_STRING(string, sizeInWords, retvalue + 1);
     }
 
     return retvalue;
 }
 
-int __cdecl vswprintf_s (
-        wchar_t *string,
-        size_t sizeInWords,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl vswprintf_s(
+    wchar_t* string,
+    size_t sizeInWords,
+    const wchar_t* format,
+    va_list ap
+) {
     return _vswprintf_s_l(string, sizeInWords, format, NULL, ap);
 }
 
-int __cdecl _vsnwprintf_s_l (
-        wchar_t *string,
-        size_t sizeInWords,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vsnwprintf_s_l(
+    wchar_t* string,
+    size_t sizeInWords,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     int retvalue = -1;
     errno_t save_errno = 0;
-
     /* validation section */
     _VALIDATE_RETURN(format != NULL, EINVAL, -1);
-    if (count == 0 && string == NULL && sizeInWords == 0)
-    {
+
+    if (count == 0 && string == NULL && sizeInWords == 0) {
         /* this case is allowed; nothing to do */
         return 0;
     }
+
     _VALIDATE_RETURN(string != NULL && sizeInWords > 0, EINVAL, -1);
 
-    if (sizeInWords > count)
-    {
+    if (sizeInWords > count) {
         save_errno = errno;
         retvalue = _vswprintf_helper(_woutput_s_l, string, count + 1, format, plocinfo, ap);
-        if (retvalue == -2)
-        {
+
+        if (retvalue == -2) {
             /* the string has been truncated, return -1 */
             _SECURECRT__FILL_STRING(string, sizeInWords, count + 1);
-            if (errno == ERANGE)
-            {
+
+            if (errno == ERANGE) {
                 errno = save_errno;
             }
+
             return -1;
         }
-    }
-    else /* sizeInWords <= count */
-    {
+    } else { /* sizeInWords <= count */
         save_errno = errno;
         retvalue = _vswprintf_helper(_woutput_s_l, string, sizeInWords, format, plocinfo, ap);
         string[sizeInWords - 1] = 0;
+
         /* we allow truncation if count == _TRUNCATE */
-        if (retvalue == -2 && count == _TRUNCATE)
-        {
-            if (errno == ERANGE)
-            {
+        if (retvalue == -2 && count == _TRUNCATE) {
+            if (errno == ERANGE) {
                 errno = save_errno;
             }
+
             return -1;
         }
     }
 
-    if (retvalue < 0)
-    {
+    if (retvalue < 0) {
         string[0] = 0;
         _SECURECRT__FILL_STRING(string, sizeInWords, 1);
-        if (retvalue == -2)
-        {
+
+        if (retvalue == -2) {
             _VALIDATE_RETURN(("Buffer too small", 0), ERANGE, -1);
         }
+
         return -1;
     }
 
     _SECURECRT__FILL_STRING(string, sizeInWords, retvalue + 1);
-
     return (retvalue < 0 ? -1 : retvalue);
 }
 
-int __cdecl _vsnwprintf_s (
-        wchar_t *string,
-        size_t sizeInWords,
-        size_t count,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl _vsnwprintf_s(
+    wchar_t* string,
+    size_t sizeInWords,
+    size_t count,
+    const wchar_t* format,
+    va_list ap
+) {
     return _vsnwprintf_s_l(string, sizeInWords, count, format, NULL, ap);
 }
 
-int __cdecl _vswprintf_p (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl _vswprintf_p(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    va_list ap
+) {
     int retval = _vswprintf_helper(_woutput_p_l, string, count, format, NULL, ap);
     return (retval < 0 ? -1 : retval);
 }
 
-int __cdecl _vswprintf_p_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vswprintf_p_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     int retval = _vswprintf_helper(_woutput_p_l, string, count, format, plocinfo, ap);
     return (retval < 0 ? -1 : retval);
 }
@@ -421,59 +400,51 @@ int __cdecl _vswprintf_p_l (
 
 
 #ifndef _COUNT_
-int __cdecl _vscwprintf_helper (
-        WOUTPUTFN outfn,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-        FILE str;
-        REG1 FILE *outfile = &str;
-        REG2 int retval;
-
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
-        outfile->_cnt = MAXSTR;
-        outfile->_flag = _IOWRT|_IOSTRG;
-        outfile->_ptr = outfile->_base = NULL;
-
-        retval = outfn(outfile, format, plocinfo, ap);
-        return(retval);
+int __cdecl _vscwprintf_helper(
+    WOUTPUTFN outfn,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    FILE str;
+    REG1 FILE* outfile = &str;
+    REG2 int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
+    outfile->_cnt = MAXSTR;
+    outfile->_flag = _IOWRT | _IOSTRG;
+    outfile->_ptr = outfile->_base = NULL;
+    retval = outfn(outfile, format, plocinfo, ap);
+    return (retval);
 }
 
-int __cdecl _vscwprintf (
-        const wchar_t *format,
-        va_list ap
-        )
-{
-        return _vscwprintf_helper(_woutput_l, format, NULL, ap);
+int __cdecl _vscwprintf(
+    const wchar_t* format,
+    va_list ap
+) {
+    return _vscwprintf_helper(_woutput_l, format, NULL, ap);
 }
 
-int __cdecl _vscwprintf_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-        return _vscwprintf_helper(_woutput_l, format, plocinfo, ap);
+int __cdecl _vscwprintf_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    return _vscwprintf_helper(_woutput_l, format, plocinfo, ap);
 }
 
-int __cdecl _vscwprintf_p (
-        const wchar_t *format,
-        va_list ap
-        )
-{
-        return _vscwprintf_helper(_woutput_p_l, format, NULL, ap);
+int __cdecl _vscwprintf_p(
+    const wchar_t* format,
+    va_list ap
+) {
+    return _vscwprintf_helper(_woutput_p_l, format, NULL, ap);
 }
 
-int __cdecl _vscwprintf_p_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-        return _vscwprintf_helper(_woutput_p_l, format, plocinfo, ap);
+int __cdecl _vscwprintf_p_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    return _vscwprintf_helper(_woutput_p_l, format, plocinfo, ap);
 }
 
 #endif  /* _COUNT_ */

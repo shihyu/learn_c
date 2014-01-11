@@ -60,11 +60,10 @@
 *
 *******************************************************************************/
 
-void * __cdecl _aligned_malloc_base(
+void* __cdecl _aligned_malloc_base(
     size_t size,
     size_t alignment
-    )
-{
+) {
     return _aligned_offset_malloc_base(size, alignment, 0);
 }
 /***
@@ -90,30 +89,26 @@ void * __cdecl _aligned_malloc_base(
 *******************************************************************************/
 
 
-void * __cdecl _aligned_offset_malloc_base(
+void* __cdecl _aligned_offset_malloc_base(
     size_t size,
     size_t align,
     size_t offset
-    )
-{
+) {
     uintptr_t ptr, retptr, gap;
-
     /* validation section */
     _VALIDATE_RETURN(IS_2_POW_N(align), EINVAL, NULL);
     _VALIDATE_RETURN(offset == 0 || offset < size, EINVAL, NULL);
-
-    align = (align > PTR_SZ ? align : PTR_SZ) -1;
-
+    align = (align > PTR_SZ ? align : PTR_SZ) - 1;
     /* gap = number of bytes needed to round up offset to align with PTR_SZ*/
-    gap = (0 - offset)&(PTR_SZ -1);
+    gap = (0 - offset) & (PTR_SZ - 1);
 
-    if ( (ptr =(uintptr_t)malloc(PTR_SZ +gap +align +size)) == (uintptr_t)NULL)
+    if ((ptr = (uintptr_t)malloc(PTR_SZ + gap + align + size)) == (uintptr_t)NULL) {
         return NULL;
+    }
 
-    retptr =((ptr +PTR_SZ +gap +align +offset)&~align)- offset;
-    ((uintptr_t *)(retptr - gap))[-1] = ptr;
-
-    return (void *)retptr;
+    retptr = ((ptr + PTR_SZ + gap + align + offset) & ~align) - offset;
+    ((uintptr_t*)(retptr - gap))[-1] = ptr;
+    return (void*)retptr;
 }
 
 /***
@@ -144,12 +139,11 @@ void * __cdecl _aligned_offset_malloc_base(
 *
 *******************************************************************************/
 
-void * __cdecl _aligned_realloc_base(
-    void *memblock,
+void* __cdecl _aligned_realloc_base(
+    void* memblock,
     size_t size,
     size_t alignment
-    )
-{
+) {
     return _aligned_offset_realloc_base(memblock, size, alignment, 0);
 }
 
@@ -182,13 +176,12 @@ void * __cdecl _aligned_realloc_base(
 *
 *******************************************************************************/
 
-void * __cdecl _aligned_recalloc_base(
-    void *memblock,
+void* __cdecl _aligned_recalloc_base(
+    void* memblock,
     size_t count,
     size_t size,
     size_t alignment
-    )
-{
+) {
     return _aligned_offset_recalloc_base(memblock, count, size, alignment, 0);
 }
 
@@ -221,24 +214,22 @@ void * __cdecl _aligned_recalloc_base(
 *
 *******************************************************************************/
 
-void * __cdecl _aligned_offset_realloc_base(
-    void *memblock,
+void* __cdecl _aligned_offset_realloc_base(
+    void* memblock,
     size_t size,
     size_t align,
     size_t offset
-    )
-{
+) {
     uintptr_t ptr, retptr, gap, stptr, diff;
     uintptr_t movsz, reqsz;
     int bFree = 0;
 
     /* special cases */
-    if (memblock == NULL)
-    {
+    if (memblock == NULL) {
         return _aligned_offset_malloc_base(size, align, offset);
     }
-    if (size == 0)
-    {
+
+    if (size == 0) {
         _aligned_free_base(memblock);
         return NULL;
     }
@@ -246,25 +237,20 @@ void * __cdecl _aligned_offset_realloc_base(
     /* validation section */
     _VALIDATE_RETURN(IS_2_POW_N(align), EINVAL, NULL);
     _VALIDATE_RETURN(offset == 0 || offset < size, EINVAL, NULL);
-
     stptr = (uintptr_t)memblock;
-
     /* ptr points to the pointer to starting of the memory block */
-    stptr = (stptr & ~(PTR_SZ -1)) - PTR_SZ;
-
+    stptr = (stptr & ~(PTR_SZ - 1)) - PTR_SZ;
     /* ptr is the pointer to the start of memory block*/
-    stptr = *((uintptr_t *)stptr);
-
-    align = (align > PTR_SZ ? align : PTR_SZ) -1;
+    stptr = *((uintptr_t*)stptr);
+    align = (align > PTR_SZ ? align : PTR_SZ) - 1;
     /* gap = number of bytes needed to round up offset to align with PTR_SZ*/
-    gap = (0 -offset)&(PTR_SZ -1);
-
+    gap = (0 - offset) & (PTR_SZ - 1);
     diff = (uintptr_t)memblock - stptr;
     /* Mov size is min of the size of data available and sizw requested.
      */
-    movsz = _msize((void *)stptr) - ((uintptr_t)memblock - stptr);
-    movsz = movsz > size? size: movsz;
-    reqsz = PTR_SZ +gap +align +size;
+    movsz = _msize((void*)stptr) - ((uintptr_t)memblock - stptr);
+    movsz = movsz > size ? size : movsz;
+    reqsz = PTR_SZ + gap + align + size;
 
     /* First check if we can expand(reducing or expanding using expand) data
      * safely, ie no data is lost. eg, reducing alignment and keeping size
@@ -275,41 +261,43 @@ void * __cdecl _aligned_offset_realloc_base(
      *
      * If yes, expand and then check if we need to move the data.
      */
-    if ((stptr +align +PTR_SZ +gap)<(uintptr_t)memblock)
-    {
-        if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t) NULL)
+    if ((stptr + align + PTR_SZ + gap) < (uintptr_t)memblock) {
+        if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t) NULL) {
             return NULL;
+        }
+
         bFree = 1;
-    }
-    else
-    {
+    } else {
         /* we need to save errno, which can be modified by _expand */
         errno_t save_errno = errno;
-        if ((ptr = (uintptr_t)_expand((void *)stptr, reqsz)) == (uintptr_t)NULL)
-        {
+
+        if ((ptr = (uintptr_t)_expand((void*)stptr, reqsz)) == (uintptr_t)NULL) {
             errno = save_errno;
-            if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t) NULL)
+
+            if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t) NULL) {
                 return NULL;
+            }
+
             bFree = 1;
-        }
-        else
+        } else {
             stptr = ptr;
+        }
     }
 
-
-    if ( ptr == ((uintptr_t)memblock - diff)
-         && !( ((size_t)memblock + gap +offset) & ~(align) ))
-    {
+    if (ptr == ((uintptr_t)memblock - diff)
+            && !(((size_t)memblock + gap + offset) & ~(align))) {
         return memblock;
     }
 
-    retptr =((ptr +PTR_SZ +gap +align +offset)&~align)- offset;
-    memmove((void *)retptr, (void *)(stptr + diff), movsz);
-    if ( bFree)
-        free ((void *)stptr);
+    retptr = ((ptr + PTR_SZ + gap + align + offset) & ~align) - offset;
+    memmove((void*)retptr, (void*)(stptr + diff), movsz);
 
-    ((uintptr_t *)(retptr - gap))[-1] = ptr;
-    return (void *)retptr;
+    if (bFree) {
+        free((void*)stptr);
+    }
+
+    ((uintptr_t*)(retptr - gap))[-1] = ptr;
+    return (void*)retptr;
 }
 
 /***
@@ -341,23 +329,21 @@ void * __cdecl _aligned_offset_realloc_base(
 *
 *******************************************************************************/
 
-void * __cdecl _aligned_offset_recalloc_base(
-    void *memblock,
+void* __cdecl _aligned_offset_recalloc_base(
+    void* memblock,
     size_t count,
     size_t size,
     size_t align,
     size_t offset
-    )
-{
-    size_t  size_orig=0;
+) {
+    size_t  size_orig = 0;
 
     /* ensure that (size * num) does not overflow */
-    if (count > 0)
-    {
+    if (count > 0) {
         _VALIDATE_RETURN((_HEAP_MAXREQ / count) >= size, ENOMEM, NULL);
     }
-    size_orig = size * count;
 
+    size_orig = size * count;
     return _aligned_offset_realloc_base(memblock, size_orig, align, offset);
 }
 
@@ -379,19 +365,17 @@ void * __cdecl _aligned_offset_recalloc_base(
 *******************************************************************************/
 
 
-void  __cdecl _aligned_free_base(void *memblock)
-{
+void  __cdecl _aligned_free_base(void* memblock) {
     uintptr_t ptr;
 
-    if (memblock == NULL)
+    if (memblock == NULL) {
         return;
+    }
 
     ptr = (uintptr_t)memblock;
-
     /* ptr points to the pointer to starting of the memory block */
-    ptr = (ptr & ~(PTR_SZ -1)) - PTR_SZ;
-
+    ptr = (ptr & ~(PTR_SZ - 1)) - PTR_SZ;
     /* ptr is the pointer to the start of memory block*/
-    ptr = *((uintptr_t *)ptr);
-    free((void *)ptr);
+    ptr = *((uintptr_t*)ptr);
+    free((void*)ptr);
 }

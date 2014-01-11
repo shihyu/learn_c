@@ -70,15 +70,14 @@
 #define FL_OVERFLOW   4       /* overflow occured */
 #define FL_READDIGIT  8       /* we've read at least one correct digit */
 
-static unsigned __int64 __cdecl strtoxq (
-        _locale_t plocinfo,
-    const char *nptr,
-    const char **endptr,
+static unsigned __int64 __cdecl strtoxq(
+    _locale_t plocinfo,
+    const char* nptr,
+    const char** endptr,
     int ibase,
     int flags
-    )
-{
-    const char *p;
+) {
+    const char* p;
     char c;
     unsigned __int64 number;
     unsigned digval;
@@ -86,38 +85,38 @@ static unsigned __int64 __cdecl strtoxq (
     _LocaleUpdate _loc_update(plocinfo);
 
     /* validation section */
-    if (endptr != NULL)
-    {
+    if (endptr != NULL) {
         /* store beginning of string in endptr */
-        *endptr = (char *)nptr;
+        *endptr = (char*)nptr;
     }
+
     _VALIDATE_RETURN(nptr != NULL, EINVAL, 0L);
     _VALIDATE_RETURN(ibase == 0 || (2 <= ibase && ibase <= 36), EINVAL, 0L);
-
     p = nptr;            /* p is our scanning pointer */
     number = 0;            /* start with zero */
-
     c = *p++;            /* read char */
 
-    while ( _isspace_l((int)(unsigned char)c, _loc_update.GetLocaleT()) )
-        c = *p++;        /* skip whitespace */
+    while (_isspace_l((int)(unsigned char)c, _loc_update.GetLocaleT())) {
+        c = *p++;    /* skip whitespace */
+    }
 
     if (c == '-') {
         flags |= FL_NEG;    /* remember minus sign */
         c = *p++;
+    } else if (c == '+') {
+        c = *p++;    /* skip sign */
     }
-    else if (c == '+')
-        c = *p++;        /* skip sign */
 
     if (ibase == 0) {
         /* determine base free-lance, based on first two chars of
            string */
-        if (c != '0')
+        if (c != '0') {
             ibase = 10;
-        else if (*p == 'x' || *p == 'X')
+        } else if (*p == 'x' || *p == 'X') {
             ibase = 16;
-        else
+        } else {
             ibase = 8;
+        }
     }
 
     if (ibase == 16) {
@@ -131,17 +130,19 @@ static unsigned __int64 __cdecl strtoxq (
     /* if our number exceeds this, we will overflow on multiply */
     maxval = _UI64_MAX / ibase;
 
-
     for (;;) {    /* exit in middle of loop */
         /* convert c to value */
-        if ( __ascii_isdigit_l((int)(unsigned char)c, _loc_update.GetLocaleT()) )
+        if (__ascii_isdigit_l((int)(unsigned char)c, _loc_update.GetLocaleT())) {
             digval = c - '0';
-        else if ( __ascii_isalpha_l((int)(unsigned char)c, _loc_update.GetLocaleT()) )
+        } else if (__ascii_isalpha_l((int)(unsigned char)c, _loc_update.GetLocaleT())) {
             digval = __ascii_toupper(c) - 'A' + 10;
-        else
+        } else {
             break;
-        if (digval >= (unsigned)ibase)
-            break;        /* exit loop if bad digit found */
+        }
+
+        if (digval >= (unsigned)ibase) {
+            break;    /* exit loop if bad digit found */
+        }
 
         /* record the fact we have read one digit */
         flags |= FL_READDIGIT;
@@ -151,13 +152,13 @@ static unsigned __int64 __cdecl strtoxq (
            a tricky pre-check. */
 
         if (number < maxval || (number == maxval &&
-        (unsigned __int64)digval <= _UI64_MAX % ibase)) {
+                                (unsigned __int64)digval <= _UI64_MAX % ibase)) {
             /* we won't overflow, go ahead and multiply */
             number = number * ibase + digval;
-        }
-        else {
+        } else {
             /* we would have overflowed -- set the overflow flag */
             flags |= FL_OVERFLOW;
+
             if (endptr == NULL) {
                 /* no need to keep on parsing if we
                    don't have to return the endptr. */
@@ -175,81 +176,79 @@ static unsigned __int64 __cdecl strtoxq (
            string */
         if (endptr)
             /* store beginning of string in endptr later on */
+        {
             p = nptr;
+        }
+
         number = 0L;        /* return 0 */
-    }
-    else if ( (flags & FL_OVERFLOW) ||
-              ( !(flags & FL_UNSIGNED) &&
-                ( ( (flags & FL_NEG) && (number > -_I64_MIN) ) ||
-                  ( !(flags & FL_NEG) && (number > _I64_MAX) ) ) ) )
-    {
+    } else if ((flags & FL_OVERFLOW) ||
+               (!(flags & FL_UNSIGNED) &&
+                (((flags & FL_NEG) && (number > -_I64_MIN)) ||
+                 (!(flags & FL_NEG) && (number > _I64_MAX))))) {
         /* overflow or signed overflow occurred */
         errno = ERANGE;
-        if ( flags & FL_UNSIGNED )
+
+        if (flags & FL_UNSIGNED) {
             number = _UI64_MAX;
-        else if ( flags & FL_NEG )
+        } else if (flags & FL_NEG) {
             number = _I64_MIN;
-        else
+        } else {
             number = _I64_MAX;
+        }
     }
+
     if (endptr != NULL)
         /* store pointer to char that stopped the scan */
+    {
         *endptr = p;
+    }
 
     if (flags & FL_NEG)
         /* negate result if there was a neg sign */
+    {
         number = (unsigned __int64)(-(__int64)number);
+    }
 
     return number;            /* done. */
 }
 
 __int64 _CRTIMP __cdecl _strtoi64(
-    const char *nptr,
-    char **endptr,
+    const char* nptr,
+    char** endptr,
     int ibase
-    )
-{
-    if (__locale_changed == 0)
-    {
-        return (__int64) strtoxq(&__initiallocalestructinfo, nptr, (const char **)endptr, ibase, 0);
-    }
-    else
-    {
-        return (__int64) strtoxq(NULL, nptr, (const char **)endptr, ibase, 0);
+) {
+    if (__locale_changed == 0) {
+        return (__int64) strtoxq(&__initiallocalestructinfo, nptr, (const char**)endptr, ibase, 0);
+    } else {
+        return (__int64) strtoxq(NULL, nptr, (const char**)endptr, ibase, 0);
     }
 }
 extern "C" __int64 _CRTIMP __cdecl _strtoi64_l(
-        const char *nptr,
-        char **endptr,
-        int ibase,
-        _locale_t plocinfo
-        )
-{
-    return (__int64) strtoxq(plocinfo, nptr, (const char **)endptr, ibase, 0);
+    const char* nptr,
+    char** endptr,
+    int ibase,
+    _locale_t plocinfo
+) {
+    return (__int64) strtoxq(plocinfo, nptr, (const char**)endptr, ibase, 0);
 }
 
-extern "C" unsigned __int64 _CRTIMP __cdecl _strtoui64 (
-    const char *nptr,
-    char **endptr,
+extern "C" unsigned __int64 _CRTIMP __cdecl _strtoui64(
+    const char* nptr,
+    char** endptr,
     int ibase
-    )
-{
-    if (__locale_changed == 0)
-    {
-        return strtoxq(&__initiallocalestructinfo, nptr, (const char **)endptr, ibase, FL_UNSIGNED);
-    }
-    else
-    {
-        return strtoxq(NULL, nptr, (const char **)endptr, ibase, FL_UNSIGNED);
+) {
+    if (__locale_changed == 0) {
+        return strtoxq(&__initiallocalestructinfo, nptr, (const char**)endptr, ibase, FL_UNSIGNED);
+    } else {
+        return strtoxq(NULL, nptr, (const char**)endptr, ibase, FL_UNSIGNED);
     }
 }
 
-extern "C" unsigned __int64 _CRTIMP __cdecl _strtoui64_l (
-        const char *nptr,
-        char **endptr,
-        int ibase,
-        _locale_t plocinfo
-        )
-{
-    return strtoxq(plocinfo, nptr, (const char **)endptr, ibase, FL_UNSIGNED);
+extern "C" unsigned __int64 _CRTIMP __cdecl _strtoui64_l(
+    const char* nptr,
+    char** endptr,
+    int ibase,
+    _locale_t plocinfo
+) {
+    return strtoxq(plocinfo, nptr, (const char**)endptr, ibase, FL_UNSIGNED);
 }

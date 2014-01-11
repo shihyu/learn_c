@@ -52,85 +52,87 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_valid.c,v 1.10 2002/12/29 20:47:05 
  * This call is deprecated, as it doesn't ask whether the ACL is valid
  * for a particular target.  However, this call is standardized, unlike
  * the other two forms.
- */ 
+ */
 int
-acl_valid(acl_t acl)
-{
-	int	error;
+acl_valid(acl_t acl) {
+    int error;
 
-	if (acl == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-	_posix1e_acl_sort(acl);
-	error = _posix1e_acl_check(acl);
-	if (error) {
-		errno = error;
-		return (-1);
-	} else {
-		return (0);
-	}
+    if (acl == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+
+    _posix1e_acl_sort(acl);
+    error = _posix1e_acl_check(acl);
+
+    if (error) {
+        errno = error;
+        return (-1);
+    } else {
+        return (0);
+    }
 }
 
 int
-acl_valid_file_np(const char *pathp, acl_type_t type, acl_t acl)
-{
-	int	error;
+acl_valid_file_np(const char* pathp, acl_type_t type, acl_t acl) {
+    int error;
 
-	if (pathp == NULL || acl == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-	if (_posix1e_acl(acl, type)) {
-		error = _posix1e_acl_sort(acl);
-		if (error) {
-			errno = error;
-			return (-1);
-		}
-	}
+    if (pathp == NULL || acl == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	return (__acl_aclcheck_file(pathp, type, &acl->ats_acl));
+    if (_posix1e_acl(acl, type)) {
+        error = _posix1e_acl_sort(acl);
+
+        if (error) {
+            errno = error;
+            return (-1);
+        }
+    }
+
+    return (__acl_aclcheck_file(pathp, type, &acl->ats_acl));
 }
 
 int
-acl_valid_link_np(const char *pathp, acl_type_t type, acl_t acl)
-{
-	int	error;
+acl_valid_link_np(const char* pathp, acl_type_t type, acl_t acl) {
+    int error;
 
-	if (pathp == NULL || acl == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-	if (_posix1e_acl(acl, type)) {
-		error = _posix1e_acl_sort(acl);
-		if (error) {
-			errno = error;
-			return (-1);
-		}
-	}
+    if (pathp == NULL || acl == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	return (__acl_aclcheck_link(pathp, type, &acl->ats_acl));
+    if (_posix1e_acl(acl, type)) {
+        error = _posix1e_acl_sort(acl);
+
+        if (error) {
+            errno = error;
+            return (-1);
+        }
+    }
+
+    return (__acl_aclcheck_link(pathp, type, &acl->ats_acl));
 }
 
 int
-acl_valid_fd_np(int fd, acl_type_t type, acl_t acl)
-{
-	int	error;
+acl_valid_fd_np(int fd, acl_type_t type, acl_t acl) {
+    int error;
 
-	if (acl == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-	if (_posix1e_acl(acl, type)) {
-		error = _posix1e_acl_sort(acl);
-		if (error) {
-			errno = error;
-			return (-1);
-		}
-	}
+    if (acl == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	acl->ats_cur_entry = 0;
+    if (_posix1e_acl(acl, type)) {
+        error = _posix1e_acl_sort(acl);
 
+        if (error) {
+            errno = error;
+            return (-1);
+        }
+    }
 
-	return (___acl_aclcheck_fd(fd, type, &acl->ats_acl));
+    acl->ats_cur_entry = 0;
+    return (___acl_aclcheck_fd(fd, type, &acl->ats_acl));
 }

@@ -56,154 +56,148 @@
 *
 *******************************************************************************/
 
-void * __cdecl _expand_base (void * pBlock, size_t newsize)
-{
-        void *      pvReturn;
+void* __cdecl _expand_base(void* pBlock, size_t newsize) {
+    void*       pvReturn;
+    /* validation section */
+    _VALIDATE_RETURN(pBlock != NULL, EINVAL, NULL);
 
-
-        /* validation section */
-        _VALIDATE_RETURN(pBlock != NULL, EINVAL, NULL);
-        if (newsize > _HEAP_MAXREQ) {
-            errno = ENOMEM;
-            return NULL;
-        }
+    if (newsize > _HEAP_MAXREQ) {
+        errno = ENOMEM;
+        return NULL;
+    }
 
 #ifndef _WIN64
-        if ( __active_heap == __V6_HEAP )
-        {
-            PHEADER     pHeader;
 
-            _mlock( _HEAP_LOCK );
-            __try {
+    if (__active_heap == __V6_HEAP) {
+        PHEADER     pHeader;
+        _mlock(_HEAP_LOCK);
 
+        __try {
             //  if allocation block lies within the small-block heap,
             //  try to resize it there
-            if ((pHeader = __sbh_find_block(pBlock)) != NULL)
-            {
+            if ((pHeader = __sbh_find_block(pBlock)) != NULL) {
                 pvReturn = NULL;
-                if ( (newsize <= __sbh_threshold) &&
-                     __sbh_resize_block(pHeader, pBlock, (int)newsize) )
+
+                if ((newsize <= __sbh_threshold) &&
+                        __sbh_resize_block(pHeader, pBlock, (int)newsize)) {
                     pvReturn = pBlock;
-            }
-
-            }
-            __finally {
-                _munlock( _HEAP_LOCK );
-            }
-
-            if ( pHeader == NULL )
-            {
-                //  force nonzero size and round up to next paragraph
-                if (newsize == 0)
-                    newsize = 1;
-                newsize = (newsize + BYTES_PER_PARA - 1) & ~(BYTES_PER_PARA - 1);
-
-                pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY,
-                                       pBlock, newsize);
-
-                if (pvReturn == NULL)
-                {
-                    errno = _get_errno_from_oserr(GetLastError());
                 }
             }
+        } __finally {
+            _munlock(_HEAP_LOCK);
         }
-#ifdef CRTDLL
-        else if ( __active_heap == __V5_HEAP )
-        {
-            __old_sbh_region_t *preg;
-            __old_sbh_page_t *  ppage;
-            __old_page_map_t *  pmap;
 
+        if (pHeader == NULL) {
             //  force nonzero size and round up to next paragraph
-            if (newsize == 0)
+            if (newsize == 0) {
                 newsize = 1;
-            newsize = (newsize + _OLD_PARASIZE - 1) & ~(_OLD_PARASIZE - 1);
-            _mlock(_HEAP_LOCK);
-            __try {
+            }
+
+            newsize = (newsize + BYTES_PER_PARA - 1) & ~(BYTES_PER_PARA - 1);
+            pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY,
+                                   pBlock, newsize);
+
+            if (pvReturn == NULL) {
+                errno = _get_errno_from_oserr(GetLastError());
+            }
+        }
+    }
+
+#ifdef CRTDLL
+    else if (__active_heap == __V5_HEAP) {
+        __old_sbh_region_t* preg;
+        __old_sbh_page_t*   ppage;
+        __old_page_map_t*   pmap;
+
+        //  force nonzero size and round up to next paragraph
+        if (newsize == 0) {
+            newsize = 1;
+        }
+
+        newsize = (newsize + _OLD_PARASIZE - 1) & ~(_OLD_PARASIZE - 1);
+        _mlock(_HEAP_LOCK);
+
+        __try {
             pmap = __old_sbh_find_block(pBlock, &preg, &ppage);
 
             //  allocation block lies within the small-block heap, try to resize
             //  it there.
-            if ( pmap != NULL )
-            {
+            if (pmap != NULL) {
                 //  *pBlock lies within the small-block heap, try to resize it
                 //  there
                 pvReturn = NULL;
-                if ( (newsize <= __old_sbh_threshold) &&
-                     __old_sbh_resize_block(preg, ppage, pmap,
-                                            newsize >> _OLD_PARASHIFT) )
+
+                if ((newsize <= __old_sbh_threshold) &&
+                        __old_sbh_resize_block(preg, ppage, pmap,
+                                               newsize >> _OLD_PARASHIFT)) {
                     pvReturn = pBlock;
+                }
 
                 RTCCALLBACK(_RTC_Free_hook, (pBlock, 0));
                 RTCCALLBACK(_RTC_Allocate_hook, (pvReturn, newsize, 0));
             }
-
-            }
-            __finally {
-                _munlock(_HEAP_LOCK);
-            }
-
-            if (pmap != NULL)
-                return pvReturn;
-
-            if ( pmap == NULL )
-            {
-                pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY,
-                                       pBlock, newsize);
-
-                if (pvReturn == NULL)
-                {
-                    errno = _get_errno_from_oserr(GetLastError());
-                }
-            }
+        } __finally {
+            _munlock(_HEAP_LOCK);
         }
-#endif  /* CRTDLL */
-        else    // __active_heap == __SYSTEM_HEAP
-#endif  /* _WIN64 */
-        {
-#ifdef _WIN64
-            //  force nonzero size
-                        {
-                                size_t oldsize = (size_t)-1;
 
-                                if (newsize == 0)
-                                {
-                                        newsize = 1;
-                                }
+        if (pmap != NULL) {
+            return pvReturn;
+        }
 
-                                /* On Win64 we use a Low Fragmentation Heap (LFH) by default, and thus
-                                * HeapReAlloc(..., HEAP_REALLOC_IN_PLACE_ONLY, ..., ...) will
-                                * sometimes return NULL, even for sizes smaller or equal than the original size.
-                                * We explictly check for this case and we just return the original
-                                * block. Note that HeapSize returns -1 to signal failure.
-                                */
-                                oldsize = (size_t)HeapSize(_crtheap, 0, pBlock);
-                                pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY, pBlock, newsize);
-                                if(pvReturn==NULL)
-                                {
-                                        if (oldsize != (size_t)-1 && newsize <= oldsize)
-                                        {
-                                                /* hide the fact that we couldn't shrink and just reuse this block */
-                                                pvReturn = pBlock;
-                                        }
-                                }
-                        }
-#else  /* _WIN64 */
-            pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY, pBlock, newsize);
-#endif  /* _WIN64 */
-            if (pvReturn == NULL)
-            {
+        if (pmap == NULL) {
+            pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY,
+                                   pBlock, newsize);
+
+            if (pvReturn == NULL) {
                 errno = _get_errno_from_oserr(GetLastError());
             }
         }
+    }
 
-        if (pvReturn)
+#endif  /* CRTDLL */
+    else    // __active_heap == __SYSTEM_HEAP
+#endif  /* _WIN64 */
+    {
+#ifdef _WIN64
+        //  force nonzero size
         {
-            RTCCALLBACK(_RTC_Free_hook, (pBlock, 0));
-            RTCCALLBACK(_RTC_Allocate_hook, (pvReturn, newsize, 0));
-        }
+            size_t oldsize = (size_t) - 1;
 
-        return pvReturn;
+            if (newsize == 0) {
+                newsize = 1;
+            }
+
+            /* On Win64 we use a Low Fragmentation Heap (LFH) by default, and thus
+            * HeapReAlloc(..., HEAP_REALLOC_IN_PLACE_ONLY, ..., ...) will
+            * sometimes return NULL, even for sizes smaller or equal than the original size.
+            * We explictly check for this case and we just return the original
+            * block. Note that HeapSize returns -1 to signal failure.
+            */
+            oldsize = (size_t)HeapSize(_crtheap, 0, pBlock);
+            pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY, pBlock, newsize);
+
+            if (pvReturn == NULL) {
+                if (oldsize != (size_t) - 1 && newsize <= oldsize) {
+                    /* hide the fact that we couldn't shrink and just reuse this block */
+                    pvReturn = pBlock;
+                }
+            }
+        }
+#else  /* _WIN64 */
+        pvReturn = HeapReAlloc(_crtheap, HEAP_REALLOC_IN_PLACE_ONLY, pBlock, newsize);
+#endif  /* _WIN64 */
+
+        if (pvReturn == NULL) {
+            errno = _get_errno_from_oserr(GetLastError());
+        }
+    }
+
+    if (pvReturn) {
+        RTCCALLBACK(_RTC_Free_hook, (pBlock, 0));
+        RTCCALLBACK(_RTC_Allocate_hook, (pvReturn, newsize, 0));
+    }
+
+    return pvReturn;
 }
 
 

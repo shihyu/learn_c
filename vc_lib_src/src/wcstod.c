@@ -48,71 +48,71 @@
 *
 *******************************************************************************/
 
-extern "C" double __cdecl _wcstod_l (
-        const wchar_t *nptr,
-        REG2 wchar_t **endptr,
-        _locale_t plocinfo
-        )
-{
+extern "C" double __cdecl _wcstod_l(
+    const wchar_t* nptr,
+    REG2 wchar_t** endptr,
+    _locale_t plocinfo
+) {
+    struct _flt answerstruct;
+    FLT      answer;
+    double       tmp;
+    unsigned int flags;
+    REG1 wchar_t* ptr = (wchar_t*) nptr;
+    _LocaleUpdate _loc_update(plocinfo);
 
-        struct _flt answerstruct;
+    /* validation section */
+    if (endptr != NULL) {
+        /* store beginning of string in endptr */
+        *endptr = (wchar_t*)nptr;
+    }
 
-        FLT      answer;
-        double       tmp;
-        unsigned int flags;
-        REG1 wchar_t *ptr = (wchar_t *) nptr;
-        _LocaleUpdate _loc_update(plocinfo);
+    _VALIDATE_RETURN(nptr != NULL, EINVAL, 0.0);
 
-        /* validation section */
-        if (endptr != NULL)
-        {
-            /* store beginning of string in endptr */
-            *endptr = (wchar_t *)nptr;
+    /* scan past leading space/tab characters */
+
+    while (_iswspace_l(*ptr, _loc_update.GetLocaleT())) {
+        ptr++;
+    }
+
+    /* let _fltin routine do the rest of the work */
+    /* ok to take address of stack variable here; fltin2 knows to use ss */
+    answer = _wfltin2(&answerstruct, ptr, (int)wcslen(ptr), 0, 0, _loc_update.GetLocaleT());
+
+    if (endptr != NULL) {
+        *endptr = (wchar_t*) ptr + answer->nbytes;
+    }
+
+    flags = answer->flags;
+
+    if (flags & (512 | 64)) {
+        /* no digits found or invalid format:
+           ANSI says return 0.0, and *endptr = nptr */
+        tmp = 0.0;
+
+        if (endptr != NULL) {
+            *endptr = (wchar_t*) nptr;
         }
-        _VALIDATE_RETURN(nptr != NULL, EINVAL, 0.0);
-
-        /* scan past leading space/tab characters */
-
-        while ( _iswspace_l(*ptr, _loc_update.GetLocaleT()) )
-                ptr++;
-
-        /* let _fltin routine do the rest of the work */
-
-        /* ok to take address of stack variable here; fltin2 knows to use ss */
-        answer = _wfltin2( &answerstruct, ptr, (int)wcslen(ptr), 0, 0, _loc_update.GetLocaleT());
-
-        if ( endptr != NULL )
-                *endptr = (wchar_t *) ptr + answer->nbytes;
-
-        flags = answer->flags;
-        if ( flags & (512 | 64)) {
-                /* no digits found or invalid format:
-                   ANSI says return 0.0, and *endptr = nptr */
-                tmp = 0.0;
-                if ( endptr != NULL )
-                        *endptr = (wchar_t *) nptr;
+    } else if (flags & (128 | 1)) {
+        if (*ptr == '-') {
+            tmp = -HUGE_VAL;    /* negative overflow */
+        } else {
+            tmp = HUGE_VAL;    /* positive overflow */
         }
-        else if ( flags & (128 | 1) ) {
-                if ( *ptr == '-' )
-                        tmp = -HUGE_VAL;        /* negative overflow */
-                else
-                        tmp = HUGE_VAL;         /* positive overflow */
-                errno = ERANGE;
-        }
-        else if ( (flags & 256) && answer->dval == 0.0 ) {
-                tmp = 0.0;                      /* underflow (denormals OK) */
-                errno = ERANGE;
-        }
-        else
-                tmp = answer->dval;
 
-        return(tmp);
+        errno = ERANGE;
+    } else if ((flags & 256) && answer->dval == 0.0) {
+        tmp = 0.0;                      /* underflow (denormals OK) */
+        errno = ERANGE;
+    } else {
+        tmp = answer->dval;
+    }
+
+    return (tmp);
 }
 
-extern "C" double __cdecl wcstod (
-        const wchar_t *nptr,
-        REG2 wchar_t **endptr
-        )
-{
+extern "C" double __cdecl wcstod(
+    const wchar_t* nptr,
+    REG2 wchar_t** endptr
+) {
     return _wcstod_l(nptr, endptr, NULL);
 }

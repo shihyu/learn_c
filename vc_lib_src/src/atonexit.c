@@ -37,8 +37,8 @@
  * NOTE - the pointers are stored encoded.
  */
 
-_PVFV *__onexitbegin;
-_PVFV *__onexitend;
+_PVFV* __onexitbegin;
+_PVFV* __onexitend;
 
 
 /***
@@ -68,61 +68,51 @@ _PVFV *__onexitend;
 extern _onexit_t __dllonexit(_onexit_t, _PVFV**, _PVFV**);
 
 #ifdef _M_IX86
-extern _onexit_t (__cdecl *_imp___onexit)(_onexit_t func);
+extern _onexit_t (__cdecl* _imp___onexit)(_onexit_t func);
 #else  /* _M_IX86 */
-extern _onexit_t (__cdecl *__imp__onexit)(_onexit_t func);
+extern _onexit_t (__cdecl* __imp__onexit)(_onexit_t func);
 #endif  /* _M_IX86 */
 
-_onexit_t __cdecl _onexit (
-        _onexit_t func
-        )
-{
-        _PVFV * onexitbegin;
-        _PVFV * onexitend;
-        _onexit_t retval;
+_onexit_t __cdecl _onexit(
+    _onexit_t func
+) {
+    _PVFV* onexitbegin;
+    _PVFV* onexitend;
+    _onexit_t retval;
+    onexitbegin = (_PVFV*)_decode_pointer(__onexitbegin);
 
-        onexitbegin = (_PVFV *)_decode_pointer(__onexitbegin);
-
-        if (onexitbegin == (_PVFV *)-1)
-        {
-            /* EXE */
+    if (onexitbegin == (_PVFV*) - 1) {
+        /* EXE */
 #ifdef _M_IX86
-            return (*_imp___onexit)(func);
+        return (*_imp___onexit)(func);
 #else  /* _M_IX86 */
-            return (*__imp__onexit)(func);
+        return (*__imp__onexit)(func);
 #endif  /* _M_IX86 */
-        }
+    }
 
-        /*
-         * Note that we decode/encode the onexit array pointers on the
-         * client side, not the CRT DLL side, to ease backwards compatibility.
-         * That means we have to take a lock on this side, making the lock
-         * found in __dllonexit redundant.
-         */
+    /*
+     * Note that we decode/encode the onexit array pointers on the
+     * client side, not the CRT DLL side, to ease backwards compatibility.
+     * That means we have to take a lock on this side, making the lock
+     * found in __dllonexit redundant.
+     */
+    _lock(_EXIT_LOCK1);
 
-        _lock(_EXIT_LOCK1);
+    __try {
+        onexitbegin = (_PVFV*)_decode_pointer(__onexitbegin);
+        onexitend   = (_PVFV*)_decode_pointer(__onexitend);
+        retval = __dllonexit(func, &onexitbegin, &onexitend);
+        __onexitbegin = (_PVFV*)_encode_pointer(onexitbegin);
+        __onexitend   = (_PVFV*)_encode_pointer(onexitend);
+    } __finally {
+        _unlock(_EXIT_LOCK1);
+    }
 
-        __try
-        {
-            onexitbegin = (_PVFV *)_decode_pointer(__onexitbegin);
-            onexitend   = (_PVFV *)_decode_pointer(__onexitend);
-
-            retval = __dllonexit(func, &onexitbegin, &onexitend);
-
-            __onexitbegin = (_PVFV *)_encode_pointer(onexitbegin);
-            __onexitend   = (_PVFV *)_encode_pointer(onexitend);
-        }
-        __finally
-        {
-            _unlock(_EXIT_LOCK1);
-        }
-
-        return retval;
+    return retval;
 }
 
-int __cdecl atexit (
-        _PVFV func
-        )
-{
-        return (_onexit((_onexit_t)func) == NULL) ? -1 : 0;
+int __cdecl atexit(
+    _PVFV func
+) {
+    return (_onexit((_onexit_t)func) == NULL) ? -1 : 0;
 }

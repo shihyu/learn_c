@@ -27,7 +27,5 @@ int main(void) {
 ProgEnd:
     printf("1!+2!+...+m!=%d(m=%d)\n", Sum, m);
     /*  system("pause");  */
-
     return 0;
-
 }

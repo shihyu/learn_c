@@ -38,14 +38,12 @@ extern _purecall_handler __pPurecall;
 *******************************************************************************/
 
 void __cdecl _purecall(
-        void
-        )
-{
+    void
+) {
     _purecall_handler purecall = (_purecall_handler) _decode_pointer(__pPurecall);
-    if(purecall != NULL)
-    {
-        purecall();
 
+    if (purecall != NULL) {
+        purecall();
         /*  shouldn't return, but if it does, we drop back to
             default behaviour
         */
@@ -78,18 +76,14 @@ void __cdecl _purecall(
 *******************************************************************************/
 
 _CRTIMP _purecall_handler __cdecl
-_set_purecall_handler( _purecall_handler pNew )
-{
+_set_purecall_handler(_purecall_handler pNew) {
     _purecall_handler pOld = NULL;
-
     pOld = (_purecall_handler) _decode_pointer(__pPurecall);
     __pPurecall = (_purecall_handler) _encode_pointer(pNew);
-
     return pOld;
 }
 
-_CRTIMP _purecall_handler __cdecl _get_purecall_handler(void)
-{
+_CRTIMP _purecall_handler __cdecl _get_purecall_handler(void) {
     return (_purecall_handler) _decode_pointer(__pPurecall);
 }
 

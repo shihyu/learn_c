@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,11 +39,9 @@ __FBSDID("$FreeBSD: src/lib/libc/compat-43/sethostid.c,v 1.5 2007/01/09 00:27:49
 #include <unistd.h>
 
 void
-sethostid(long hostid)
-{
-	int mib[2];
-
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_HOSTID;
-	sysctl(mib, 2, NULL, NULL, &hostid, sizeof hostid);
+sethostid(long hostid) {
+    int mib[2];
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_HOSTID;
+    sysctl(mib, 2, NULL, NULL, &hostid, sizeof hostid);
 }

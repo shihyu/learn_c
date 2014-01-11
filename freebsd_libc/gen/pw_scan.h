@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,11 +26,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)pw_scan.h	8.1 (Berkeley) 4/1/94
+ *  @(#)pw_scan.h   8.1 (Berkeley) 4/1/94
  * $FreeBSD: src/lib/libc/gen/pw_scan.h,v 1.7 2007/01/09 00:27:55 imp Exp $
  */
 
 #define _PWSCAN_MASTER 0x01
 #define _PWSCAN_WARN   0x02
 
-extern int	__pw_scan(char *, struct passwd *, int);
+extern int  __pw_scan(char*, struct passwd*, int);

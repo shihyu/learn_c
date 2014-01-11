@@ -10,37 +10,46 @@ _C_STD_BEGIN
 #if defined(__cplusplus) && !defined(MRTDLL)
 extern "C"
 #endif
-_MRTIMP2_NCEEPURE unsigned long __CLRCALL_PURE_OR_CDECL _Stoulx(const char *, char **, int, int *);
+_MRTIMP2_NCEEPURE unsigned long __CLRCALL_PURE_OR_CDECL _Stoulx(const char*, char**, int, int*);
 
 #if defined(__cplusplus) && !defined(MRTDLL)
 extern "C"
 #endif
-_MRTIMP2_NCEEPURE long __CLRCALL_PURE_OR_CDECL _Stolx(const char * s, char ** endptr,
-	int base, int *perr)
-	{	/* convert string to long, with checking */
-	const char *sc;
-	char *se, sign;
-	unsigned long x;
+_MRTIMP2_NCEEPURE long __CLRCALL_PURE_OR_CDECL _Stolx(const char* s, char** endptr,
+        int base, int* perr) {
+    /* convert string to long, with checking */
+    const char* sc;
+    char* se, sign;
+    unsigned long x;
 
-	if (endptr == 0)
-		endptr = &se;
-	for (sc = s; isspace((unsigned char)*sc); ++sc)
-		;
-	sign = *sc == '-' || *sc == '+' ? *sc++ : '+';
-	x = _Stoulx(sc, endptr, base, perr);
-	if (sc == *endptr)
-		*endptr = (char *)s;
-	if (s == *endptr && x != 0 || sign == '+' && LONG_MAX < x
-		|| sign == '-' && 0 - (unsigned long)LONG_MIN < x)
-		{	/* overflow */
-		errno = ERANGE;
-		if (perr != 0)
-			*perr = 1;
-		return (sign == '-' ? LONG_MIN : LONG_MAX);
-		}
-	else
-		return ((long)(sign == '-' ? 0 - x : x));
-	}
+    if (endptr == 0) {
+        endptr = &se;
+    }
+
+    for (sc = s; isspace((unsigned char)*sc); ++sc)
+        ;
+
+    sign = *sc == '-' || *sc == '+' ? *sc++ : '+';
+    x = _Stoulx(sc, endptr, base, perr);
+
+    if (sc == *endptr) {
+        *endptr = (char*)s;
+    }
+
+    if (s == *endptr && x != 0 || sign == '+' && LONG_MAX < x
+            || sign == '-' && 0 - (unsigned long)LONG_MIN < x) {
+        /* overflow */
+        errno = ERANGE;
+
+        if (perr != 0) {
+            *perr = 1;
+        }
+
+        return (sign == '-' ? LONG_MIN : LONG_MAX);
+    } else {
+        return ((long)(sign == '-' ? 0 - x : x));
+    }
+}
 _C_STD_END
 
 /*

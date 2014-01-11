@@ -35,31 +35,27 @@
 *
 *******************************************************************************/
 
-int __cdecl vwscanf (
-        WINPUTFN winputfn,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list arglist
-        )
+int __cdecl vwscanf(
+    WINPUTFN winputfn,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list arglist
+)
 /*
  * stdin 'W'char_t 'SCAN', 'F'ormatted
  */
 {
-        int retval;
+    int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
+    _lock_str2(0, stdin);
 
-        _VALIDATE_RETURN( (format != NULL), EINVAL, EOF);
-
-        _lock_str2(0, stdin);
-        __try {
-
+    __try {
         retval = (winputfn(stdin, format, plocinfo, arglist));
+    } __finally {
+        _unlock_str2(0, stdin);
+    }
 
-        }
-        __finally {
-            _unlock_str2(0, stdin);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 /***
@@ -80,25 +76,23 @@ int __cdecl vwscanf (
 *Exceptions:
 *
 *******************************************************************************/
-int __cdecl wscanf (
-        const wchar_t *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vwscanf(_winput_l, format, NULL, arglist);
+int __cdecl wscanf(
+    const wchar_t* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vwscanf(_winput_l, format, NULL, arglist);
 }
 
-int __cdecl _wscanf_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vwscanf(_winput_l, format, plocinfo, arglist);
+int __cdecl _wscanf_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vwscanf(_winput_l, format, plocinfo, arglist);
 }
 
 /***
@@ -108,24 +102,22 @@ int __cdecl _wscanf_l (
 *   _input_s has a size check for array parameters.
 *
 *******************************************************************************/
-int __cdecl wscanf_s (
-        const wchar_t *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vwscanf(_winput_s_l, format, NULL, arglist);
+int __cdecl wscanf_s(
+    const wchar_t* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vwscanf(_winput_s_l, format, NULL, arglist);
 }
 
-int __cdecl _wscanf_s_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vwscanf(_winput_s_l, format, plocinfo, arglist);
+int __cdecl _wscanf_s_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vwscanf(_winput_s_l, format, plocinfo, arglist);
 }
 

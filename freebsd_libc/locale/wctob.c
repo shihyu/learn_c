@@ -33,13 +33,14 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wctob.c,v 1.4 2004/05/12 14:26:54 tjr Ex
 #include "mblocal.h"
 
 int
-wctob(wint_t c)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs = initial;
-	char buf[MB_LEN_MAX];
+wctob(wint_t c) {
+    static const mbstate_t initial;
+    mbstate_t mbs = initial;
+    char buf[MB_LEN_MAX];
 
-	if (c == WEOF || __wcrtomb(buf, c, &mbs) != 1)
-		return (EOF);
-	return ((unsigned char)*buf);
+    if (c == WEOF || __wcrtomb(buf, c, &mbs) != 1) {
+        return (EOF);
+    }
+
+    return ((unsigned char) * buf);
 }

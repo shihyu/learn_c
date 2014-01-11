@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)sigsetops.c	8.1 (Berkeley) 6/4/93
+ *  @(#)sigsetops.c 8.1 (Berkeley) 6/4/93
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -40,63 +40,67 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/sigsetops.c,v 1.9 2007/01/09 00:27:55 imp E
 
 int
 sigaddset(set, signo)
-	sigset_t *set;
-	int signo;
+sigset_t* set;
+int signo;
 {
+    if (signo <= 0 || signo > _SIG_MAXSIG) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (signo <= 0 || signo > _SIG_MAXSIG) {
-		errno = EINVAL;
-		return (-1);
-	}
-	set->__bits[_SIG_WORD(signo)] |= _SIG_BIT(signo);
-	return (0);
+    set->__bits[_SIG_WORD(signo)] |= _SIG_BIT(signo);
+    return (0);
 }
 
 int
 sigdelset(set, signo)
-	sigset_t *set;
-	int signo;
+sigset_t* set;
+int signo;
 {
+    if (signo <= 0 || signo > _SIG_MAXSIG) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (signo <= 0 || signo > _SIG_MAXSIG) {
-		errno = EINVAL;
-		return (-1);
-	}
-	set->__bits[_SIG_WORD(signo)] &= ~_SIG_BIT(signo);
-	return (0);
+    set->__bits[_SIG_WORD(signo)] &= ~_SIG_BIT(signo);
+    return (0);
 }
 
 int
 sigemptyset(set)
-	sigset_t *set;
+sigset_t* set;
 {
-	int i;
+    int i;
 
-	for (i = 0; i < _SIG_WORDS; i++)
-		set->__bits[i] = 0;
-	return (0);
+    for (i = 0; i < _SIG_WORDS; i++) {
+        set->__bits[i] = 0;
+    }
+
+    return (0);
 }
 
 int
 sigfillset(set)
-	sigset_t *set;
+sigset_t* set;
 {
-	int i;
+    int i;
 
-	for (i = 0; i < _SIG_WORDS; i++)
-		set->__bits[i] = ~0U;
-	return (0);
+    for (i = 0; i < _SIG_WORDS; i++) {
+        set->__bits[i] = ~0U;
+    }
+
+    return (0);
 }
 
 int
 sigismember(set, signo)
-	const sigset_t *set;
-	int signo;
+const sigset_t* set;
+int signo;
 {
+    if (signo <= 0 || signo > _SIG_MAXSIG) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (signo <= 0 || signo > _SIG_MAXSIG) {
-		errno = EINVAL;
-		return (-1);
-	}
-	return ((set->__bits[_SIG_WORD(signo)] & _SIG_BIT(signo)) ? 1 : 0);
+    return ((set->__bits[_SIG_WORD(signo)] & _SIG_BIT(signo)) ? 1 : 0);
 }

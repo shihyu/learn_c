@@ -57,23 +57,18 @@ static unsigned __int64 start_tics;
 *
 *******************************************************************************/
 
-clock_t __cdecl clock (
-        void
-        )
-{
-        unsigned __int64 current_tics;
-        FILETIME ct;
-
-        GetSystemTimeAsFileTime( &ct );
-
-        current_tics = (unsigned __int64)ct.dwLowDateTime +
-                       (((unsigned __int64)ct.dwHighDateTime) << 32);
-
-        /* calculate the elapsed number of 100 nanosecond units */
-        current_tics -= start_tics;
-
-        /* return number of elapsed milliseconds */
-        return (clock_t)(current_tics / 10000);
+clock_t __cdecl clock(
+    void
+) {
+    unsigned __int64 current_tics;
+    FILETIME ct;
+    GetSystemTimeAsFileTime(&ct);
+    current_tics = (unsigned __int64)ct.dwLowDateTime +
+                   (((unsigned __int64)ct.dwHighDateTime) << 32);
+    /* calculate the elapsed number of 100 nanosecond units */
+    current_tics -= start_tics;
+    /* return number of elapsed milliseconds */
+    return (clock_t)(current_tics / 10000);
 }
 
 /***
@@ -94,17 +89,13 @@ clock_t __cdecl clock (
 *
 *******************************************************************************/
 
-int __cdecl __inittime (
-        void
-        )
-{
-        FILETIME st;
-
-        GetSystemTimeAsFileTime( &st );
-
-        start_tics = (unsigned __int64)st.dwLowDateTime +
-                     (((unsigned __int64)st.dwHighDateTime) << 32);
-
-        return 0;
+int __cdecl __inittime(
+    void
+) {
+    FILETIME st;
+    GetSystemTimeAsFileTime(&st);
+    start_tics = (unsigned __int64)st.dwLowDateTime +
+                 (((unsigned __int64)st.dwHighDateTime) << 32);
+    return 0;
 }
 

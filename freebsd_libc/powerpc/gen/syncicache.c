@@ -13,7 +13,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by TooLs GmbH.
+ *  This product includes software developed by TooLs GmbH.
  * 4. The name of TooLs GmbH may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
@@ -33,11 +33,11 @@
 
 #ifndef lint
 static const char rcsid[] =
-  "$FreeBSD: src/lib/libc/powerpc/gen/syncicache.c,v 1.4 2007/06/10 16:32:08 marcel Exp $";
+    "$FreeBSD: src/lib/libc/powerpc/gen/syncicache.c,v 1.4 2007/06/10 16:32:08 marcel Exp $";
 #endif /* not lint */
 
 #include <sys/param.h>
-#if	defined(_KERNEL) || defined(_STANDALONE)
+#if defined(_KERNEL) || defined(_STANDALONE)
 #include <sys/time.h>
 #include <sys/proc.h>
 #include <vm/vm.h>
@@ -47,8 +47,8 @@ static const char rcsid[] =
 #include <machine/cpu.h>
 #include <machine/md_var.h>
 
-#if	defined(_KERNEL) || defined(_STANDALONE)
-#ifndef	CACHELINESIZE
+#if defined(_KERNEL) || defined(_STANDALONE)
+#ifndef CACHELINESIZE
 #error "Must know the size of a cache line"
 #endif
 #else
@@ -57,45 +57,48 @@ static const char rcsid[] =
 static void getcachelinesize(void);
 
 static int _cachelinesize;
-#define	CACHELINESIZE	_cachelinesize
+#define CACHELINESIZE   _cachelinesize
 
 static void
-getcachelinesize()
-{
-	static int	cachemib[] = { CTL_MACHDEP, CPU_CACHELINE };
-	int		clen;
+getcachelinesize() {
+    static int  cachemib[] = { CTL_MACHDEP, CPU_CACHELINE };
+    int     clen;
+    clen = sizeof(_cachelinesize);
 
-	clen = sizeof(_cachelinesize);
-
-	if (sysctl(cachemib, sizeof(cachemib) / sizeof(cachemib[0]),
-	    &_cachelinesize, &clen, NULL, 0) < 0 || !_cachelinesize) {
-		abort();
-	}
+    if (sysctl(cachemib, sizeof(cachemib) / sizeof(cachemib[0]),
+               &_cachelinesize, &clen, NULL, 0) < 0 || !_cachelinesize) {
+        abort();
+    }
 }
 #endif
 
 void
-__syncicache(void *from, int len)
-{
-	int	l, off;
-	char	*p;
+__syncicache(void* from, int len) {
+    int l, off;
+    char*    p;
+#if !defined(_KERNEL) && !defined(_STANDALONE)
 
-#if	!defined(_KERNEL) && !defined(_STANDALONE)
-	if (!_cachelinesize)
-		getcachelinesize();
-#endif	
-	off = (u_int)from & (CACHELINESIZE - 1);
-	l = len += off;
-	p = (char *)from - off;
-	do {
-		__asm __volatile ("dcbst 0,%0" :: "r"(p));
-		p += CACHELINESIZE;
-	} while ((l -= CACHELINESIZE) > 0);
-	__asm __volatile ("sync");
-	p = (char *)from - off;
-	do {
-		__asm __volatile ("icbi 0,%0" :: "r"(p));
-		p += CACHELINESIZE;
-	} while ((len -= CACHELINESIZE) > 0);
-	__asm __volatile ("sync; isync");
+    if (!_cachelinesize) {
+        getcachelinesize();
+    }
+
+#endif
+    off = (u_int)from & (CACHELINESIZE - 1);
+    l = len += off;
+    p = (char*)from - off;
+
+    do {
+        __asm __volatile("dcbst 0,%0" :: "r"(p));
+        p += CACHELINESIZE;
+    } while ((l -= CACHELINESIZE) > 0);
+
+    __asm __volatile("sync");
+    p = (char*)from - off;
+
+    do {
+        __asm __volatile("icbi 0,%0" :: "r"(p));
+        p += CACHELINESIZE;
+    } while ((len -= CACHELINESIZE) > 0);
+
+    __asm __volatile("sync; isync");
 }

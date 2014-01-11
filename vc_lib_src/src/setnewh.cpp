@@ -50,17 +50,14 @@
 *
 *******************************************************************************/
 
-new_handler __cdecl set_new_handler (
-        new_handler new_p
-        )
-{
-        // cannot use stub to register a new handler
-        assert(new_p == 0);
-
-        // remove current handler
-        _set_new_handler(0);
-
-        return 0;
+new_handler __cdecl set_new_handler(
+    new_handler new_p
+) {
+    // cannot use stub to register a new handler
+    assert(new_p == 0);
+    // remove current handler
+    _set_new_handler(0);
+    return 0;
 }
 
 

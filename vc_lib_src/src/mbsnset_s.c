@@ -28,7 +28,7 @@
 
 #include <internal.h>
 
-_REDIRECT_TO_L_VERSION_4(errno_t, _mbsnset_s, unsigned char *, size_t, unsigned int, size_t)
+_REDIRECT_TO_L_VERSION_4(errno_t, _mbsnset_s, unsigned char*, size_t, unsigned int, size_t)
 
 #endif  /* _SYSCRT */
 

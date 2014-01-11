@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -50,21 +50,25 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fpurge.c,v 1.11 2007/01/09 00:28:06 imp E
  */
 int
 fpurge(fp)
-	FILE *fp;
+FILE* fp;
 {
-	int retval;
-	FLOCKFILE(fp);
-	if (!fp->_flags) {
-		errno = EBADF;
-		retval = EOF;
-	} else {
-		if (HASUB(fp))
-			FREEUB(fp);
-		fp->_p = fp->_bf._base;
-		fp->_r = 0;
-		fp->_w = fp->_flags & (__SLBF|__SNBF) ? 0 : fp->_bf._size;
-		retval = 0;
-	}
-	FUNLOCKFILE(fp);
-	return (retval);
+    int retval;
+    FLOCKFILE(fp);
+
+    if (!fp->_flags) {
+        errno = EBADF;
+        retval = EOF;
+    } else {
+        if (HASUB(fp)) {
+            FREEUB(fp);
+        }
+
+        fp->_p = fp->_bf._base;
+        fp->_r = 0;
+        fp->_w = fp->_flags & (__SLBF | __SNBF) ? 0 : fp->_bf._size;
+        retval = 0;
+    }
+
+    FUNLOCKFILE(fp);
+    return (retval);
 }

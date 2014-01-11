@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,29 +43,35 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/snprintf.c,v 1.21 2007/01/09 00:28:07 imp
 #include "local.h"
 
 int
-snprintf(char * __restrict str, size_t n, char const * __restrict fmt, ...)
-{
-	size_t on;
-	int ret;
-	va_list ap;
-	FILE f;
-	struct __sFILEX ext;
+snprintf(char* __restrict str, size_t n, char const* __restrict fmt, ...) {
+    size_t on;
+    int ret;
+    va_list ap;
+    FILE f;
+    struct __sFILEX ext;
+    on = n;
 
-	on = n;
-	if (n != 0)
-		n--;
-	if (n > INT_MAX)
-		n = INT_MAX;
-	va_start(ap, fmt);
-	f._file = -1;
-	f._flags = __SWR | __SSTR;
-	f._bf._base = f._p = (unsigned char *)str;
-	f._bf._size = f._w = n;
-	f._extra = &ext;
-	INITEXTRA(&f);
-	ret = __vfprintf(&f, fmt, ap);
-	if (on > 0)
-		*f._p = '\0';
-	va_end(ap);
-	return (ret);
+    if (n != 0) {
+        n--;
+    }
+
+    if (n > INT_MAX) {
+        n = INT_MAX;
+    }
+
+    va_start(ap, fmt);
+    f._file = -1;
+    f._flags = __SWR | __SSTR;
+    f._bf._base = f._p = (unsigned char*)str;
+    f._bf._size = f._w = n;
+    f._extra = &ext;
+    INITEXTRA(&f);
+    ret = __vfprintf(&f, fmt, ap);
+
+    if (on > 0) {
+        *f._p = '\0';
+    }
+
+    va_end(ap);
+    return (ret);
 }

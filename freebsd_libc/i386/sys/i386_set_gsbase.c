@@ -30,8 +30,6 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/i386_set_gsbase.c,v 1.1 2005/04/14 00:
 #include <machine/sysarch.h>
 
 int
-i386_set_gsbase(void *addr)
-{
-
-	return (sysarch(I386_SET_GSBASE, &addr));
+i386_set_gsbase(void* addr) {
+    return (sysarch(I386_SET_GSBASE, &addr));
 }

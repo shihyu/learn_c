@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 1999
- *	David E. O'Brien
+ *  David E. O'Brien
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,10 +37,9 @@ __FBSDID("$FreeBSD: src/lib/libc/string/stpcpy.c,v 1.1 2002/10/03 19:39:20 obrie
 
 #include <string.h>
 
-char *
-stpcpy(char * to, const char * from)
-{
+char*
+stpcpy(char* to, const char* from) {
+    for (; (*to = *from); ++from, ++to);
 
-	for (; (*to = *from); ++from, ++to);
-	return(to);
+    return (to);
 }

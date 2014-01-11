@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,17 +43,16 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/initgroups.c,v 1.9 2007/01/09 00:27:54 imp 
 
 int
 initgroups(uname, agroup)
-	const char *uname;
-	gid_t agroup;
+const char* uname;
+gid_t agroup;
 {
-	int ngroups;
-	/*
-	 * Provide space for one group more than NGROUPS to allow
-	 * setgroups to fail and set errno.
-	 */
-	gid_t groups[NGROUPS + 1];
-
-	ngroups = NGROUPS + 1;
-	getgrouplist(uname, agroup, groups, &ngroups);
-	return (setgroups(ngroups, groups));
+    int ngroups;
+    /*
+     * Provide space for one group more than NGROUPS to allow
+     * setgroups to fail and set errno.
+     */
+    gid_t groups[NGROUPS + 1];
+    ngroups = NGROUPS + 1;
+    getgrouplist(uname, agroup, groups, &ngroups);
+    return (setgroups(ngroups, groups));
 }

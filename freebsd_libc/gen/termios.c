@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,103 +46,100 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/termios.c,v 1.14 2007/01/09 00:27:55 imp Ex
 
 int
 tcgetattr(fd, t)
-	int fd;
-	struct termios *t;
+int fd;
+struct termios* t;
 {
-
-	return (_ioctl(fd, TIOCGETA, t));
+    return (_ioctl(fd, TIOCGETA, t));
 }
 
 int
 tcsetattr(fd, opt, t)
-	int fd, opt;
-	const struct termios *t;
+int fd, opt;
+const struct termios* t;
 {
-	struct termios localterm;
+    struct termios localterm;
 
-	if (opt & TCSASOFT) {
-		localterm = *t;
-		localterm.c_cflag |= CIGNORE;
-		t = &localterm;
-	}
-	switch (opt & ~TCSASOFT) {
-	case TCSANOW:
-		return (_ioctl(fd, TIOCSETA, t));
-	case TCSADRAIN:
-		return (_ioctl(fd, TIOCSETAW, t));
-	case TCSAFLUSH:
-		return (_ioctl(fd, TIOCSETAF, t));
-	default:
-		errno = EINVAL;
-		return (-1);
-	}
+    if (opt & TCSASOFT) {
+        localterm = *t;
+        localterm.c_cflag |= CIGNORE;
+        t = &localterm;
+    }
+
+    switch (opt & ~TCSASOFT) {
+    case TCSANOW:
+        return (_ioctl(fd, TIOCSETA, t));
+
+    case TCSADRAIN:
+        return (_ioctl(fd, TIOCSETAW, t));
+
+    case TCSAFLUSH:
+        return (_ioctl(fd, TIOCSETAF, t));
+
+    default:
+        errno = EINVAL;
+        return (-1);
+    }
 }
 
 int
-tcsetpgrp(int fd, pid_t pgrp)
-{
-	int s;
-
-	s = pgrp;
-	return (_ioctl(fd, TIOCSPGRP, &s));
+tcsetpgrp(int fd, pid_t pgrp) {
+    int s;
+    s = pgrp;
+    return (_ioctl(fd, TIOCSPGRP, &s));
 }
 
 pid_t
 tcgetpgrp(fd)
-	int fd;
+int fd;
 {
-	int s;
+    int s;
 
-	if (_ioctl(fd, TIOCGPGRP, &s) < 0)
-		return ((pid_t)-1);
+    if (_ioctl(fd, TIOCGPGRP, &s) < 0) {
+        return ((pid_t) - 1);
+    }
 
-	return ((pid_t)s);
+    return ((pid_t)s);
 }
 
 speed_t
 cfgetospeed(t)
-	const struct termios *t;
+const struct termios* t;
 {
-
-	return (t->c_ospeed);
+    return (t->c_ospeed);
 }
 
 speed_t
 cfgetispeed(t)
-	const struct termios *t;
+const struct termios* t;
 {
-
-	return (t->c_ispeed);
+    return (t->c_ispeed);
 }
 
 int
 cfsetospeed(t, speed)
-	struct termios *t;
-	speed_t speed;
+struct termios* t;
+speed_t speed;
 {
-
-	t->c_ospeed = speed;
-	return (0);
+    t->c_ospeed = speed;
+    return (0);
 }
 
 int
 cfsetispeed(t, speed)
-	struct termios *t;
-	speed_t speed;
+struct termios* t;
+speed_t speed;
 {
-
-	t->c_ispeed = speed;
-	return (0);
+    t->c_ispeed = speed;
+    return (0);
 }
 
 int
 cfsetspeed(t, speed)
-	struct termios *t;
-	speed_t speed;
+struct termios* t;
+speed_t speed;
 {
-
-	t->c_ispeed = t->c_ospeed = speed;
-	return (0);
+    t->c_ispeed = t->c_ospeed = speed;
+    return (0);
 }
 
 /*
@@ -151,40 +148,44 @@ cfsetspeed(t, speed)
  */
 void
 cfmakeraw(t)
-	struct termios *t;
+struct termios* t;
 {
-
-	t->c_iflag &= ~(IMAXBEL|IXOFF|INPCK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL|IXON|IGNPAR);
-	t->c_iflag |= IGNBRK;
-	t->c_oflag &= ~OPOST;
-	t->c_lflag &= ~(ECHO|ECHOE|ECHOK|ECHONL|ICANON|ISIG|IEXTEN|NOFLSH|TOSTOP|PENDIN);
-	t->c_cflag &= ~(CSIZE|PARENB);
-	t->c_cflag |= CS8|CREAD;
-	t->c_cc[VMIN] = 1;
-	t->c_cc[VTIME] = 0;
+    t->c_iflag &= ~(IMAXBEL | IXOFF | INPCK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON | IGNPAR);
+    t->c_iflag |= IGNBRK;
+    t->c_oflag &= ~OPOST;
+    t->c_lflag &= ~(ECHO | ECHOE | ECHOK | ECHONL | ICANON | ISIG | IEXTEN | NOFLSH | TOSTOP | PENDIN);
+    t->c_cflag &= ~(CSIZE | PARENB);
+    t->c_cflag |= CS8 | CREAD;
+    t->c_cc[VMIN] = 1;
+    t->c_cc[VTIME] = 0;
 }
 
 int
 tcsendbreak(fd, len)
-	int fd, len;
+int fd, len;
 {
-	struct timeval sleepytime;
+    struct timeval sleepytime;
+    sleepytime.tv_sec = 0;
+    sleepytime.tv_usec = 400000;
 
-	sleepytime.tv_sec = 0;
-	sleepytime.tv_usec = 400000;
-	if (_ioctl(fd, TIOCSBRK, 0) == -1)
-		return (-1);
-	(void)_select(0, 0, 0, 0, &sleepytime);
-	if (_ioctl(fd, TIOCCBRK, 0) == -1)
-		return (-1);
-	return (0);
+    if (_ioctl(fd, TIOCSBRK, 0) == -1) {
+        return (-1);
+    }
+
+    (void)_select(0, 0, 0, 0, &sleepytime);
+
+    if (_ioctl(fd, TIOCCBRK, 0) == -1) {
+        return (-1);
+    }
+
+    return (0);
 }
 
 int
 __tcdrain(fd)
-	int fd;
+int fd;
 {
-	return (_ioctl(fd, TIOCDRAIN, 0));
+    return (_ioctl(fd, TIOCDRAIN, 0));
 }
 
 __weak_reference(__tcdrain, tcdrain);
@@ -192,50 +193,63 @@ __weak_reference(__tcdrain, _tcdrain);
 
 int
 tcflush(fd, which)
-	int fd, which;
+int fd, which;
 {
-	int com;
+    int com;
 
-	switch (which) {
-	case TCIFLUSH:
-		com = FREAD;
-		break;
-	case TCOFLUSH:
-		com = FWRITE;
-		break;
-	case TCIOFLUSH:
-		com = FREAD | FWRITE;
-		break;
-	default:
-		errno = EINVAL;
-		return (-1);
-	}
-	return (_ioctl(fd, TIOCFLUSH, &com));
+    switch (which) {
+    case TCIFLUSH:
+        com = FREAD;
+        break;
+
+    case TCOFLUSH:
+        com = FWRITE;
+        break;
+
+    case TCIOFLUSH:
+        com = FREAD | FWRITE;
+        break;
+
+    default:
+        errno = EINVAL;
+        return (-1);
+    }
+
+    return (_ioctl(fd, TIOCFLUSH, &com));
 }
 
 int
 tcflow(fd, action)
-	int fd, action;
+int fd, action;
 {
-	struct termios term;
-	u_char c;
+    struct termios term;
+    u_char c;
 
-	switch (action) {
-	case TCOOFF:
-		return (_ioctl(fd, TIOCSTOP, 0));
-	case TCOON:
-		return (_ioctl(fd, TIOCSTART, 0));
-	case TCION:
-	case TCIOFF:
-		if (tcgetattr(fd, &term) == -1)
-			return (-1);
-		c = term.c_cc[action == TCIOFF ? VSTOP : VSTART];
-		if (c != _POSIX_VDISABLE && _write(fd, &c, sizeof(c)) == -1)
-			return (-1);
-		return (0);
-	default:
-		errno = EINVAL;
-		return (-1);
-	}
-	/* NOTREACHED */
+    switch (action) {
+    case TCOOFF:
+        return (_ioctl(fd, TIOCSTOP, 0));
+
+    case TCOON:
+        return (_ioctl(fd, TIOCSTART, 0));
+
+    case TCION:
+    case TCIOFF:
+        if (tcgetattr(fd, &term) == -1) {
+            return (-1);
+        }
+
+        c = term.c_cc[action == TCIOFF ? VSTOP : VSTART];
+
+        if (c != _POSIX_VDISABLE && _write(fd, &c, sizeof(c)) == -1) {
+            return (-1);
+        }
+
+        return (0);
+
+    default:
+        errno = EINVAL;
+        return (-1);
+    }
+
+    /* NOTREACHED */
 }

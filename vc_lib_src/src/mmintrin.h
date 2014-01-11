@@ -19,108 +19,107 @@
 #include <crtdefs.h>
 
 #if defined (_M_CEE_PURE)
-        #error ERROR: MM intrinsics not supported in the pure mode!
+#error ERROR: MM intrinsics not supported in the pure mode!
 #else  /* defined (_M_CEE_PURE) */
 
 #if defined __cplusplus
 extern "C" { /* Begin "C" */
-/* Intrinsics use C name-mangling.
- */
+    /* Intrinsics use C name-mangling.
+     */
 #endif  /* defined __cplusplus */
 
-typedef union __declspec(intrin_type) _CRT_ALIGN(8) __m64
-{
-    unsigned __int64    m64_u64;
-    float               m64_f32[2];
-    __int8              m64_i8[8];
-    __int16             m64_i16[4];
-    __int32             m64_i32[2];
-    __int64             m64_i64;
-    unsigned __int8     m64_u8[8];
-    unsigned __int16    m64_u16[4];
-    unsigned __int32    m64_u32[2];
-} __m64;
+    typedef union __declspec(intrin_type) _CRT_ALIGN(8) __m64 {
+        unsigned __int64    m64_u64;
+        float               m64_f32[2];
+        __int8              m64_i8[8];
+        __int16             m64_i16[4];
+        __int32             m64_i32[2];
+        __int64             m64_i64;
+        unsigned __int8     m64_u8[8];
+        unsigned __int16    m64_u16[4];
+        unsigned __int32    m64_u32[2];
+    } __m64;
 
-/* General support intrinsics */
-void  _m_empty(void);
-__m64 _m_from_int(int _I);
-int   _m_to_int(__m64 _M);
-__m64 _m_packsswb(__m64 _MM1, __m64 _MM2);
-__m64 _m_packssdw(__m64 _MM1, __m64 _MM2);
-__m64 _m_packuswb(__m64 _MM1, __m64 _MM2);
-__m64 _m_punpckhbw(__m64 _MM1, __m64 _MM2);
-__m64 _m_punpckhwd(__m64 _MM1, __m64 _MM2);
-__m64 _m_punpckhdq(__m64 _MM1, __m64 _MM2);
-__m64 _m_punpcklbw(__m64 _MM1, __m64 _MM2);
-__m64 _m_punpcklwd(__m64 _MM1, __m64 _MM2);
-__m64 _m_punpckldq(__m64 _MM1, __m64 _MM2);
+    /* General support intrinsics */
+    void  _m_empty(void);
+    __m64 _m_from_int(int _I);
+    int   _m_to_int(__m64 _M);
+    __m64 _m_packsswb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_packssdw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_packuswb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_punpckhbw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_punpckhwd(__m64 _MM1, __m64 _MM2);
+    __m64 _m_punpckhdq(__m64 _MM1, __m64 _MM2);
+    __m64 _m_punpcklbw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_punpcklwd(__m64 _MM1, __m64 _MM2);
+    __m64 _m_punpckldq(__m64 _MM1, __m64 _MM2);
 
-/* Packed arithmetic intrinsics */
-__m64 _m_paddb(__m64 _MM1, __m64 _MM2);
-__m64 _m_paddw(__m64 _MM1, __m64 _MM2);
-__m64 _m_paddd(__m64 _MM1, __m64 _MM2);
-__m64 _m_paddsb(__m64 _MM1, __m64 _MM2);
-__m64 _m_paddsw(__m64 _MM1, __m64 _MM2);
-__m64 _m_paddusb(__m64 _MM1, __m64 _MM2);
-__m64 _m_paddusw(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubb(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubw(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubd(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubsb(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubsw(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubusb(__m64 _MM1, __m64 _MM2);
-__m64 _m_psubusw(__m64 _MM1, __m64 _MM2);
-__m64 _m_pmaddwd(__m64 _MM1, __m64 _MM2);
-__m64 _m_pmulhw(__m64 _MM1, __m64 _MM2);
-__m64 _m_pmullw(__m64 _MM1, __m64 _MM2);
+    /* Packed arithmetic intrinsics */
+    __m64 _m_paddb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_paddw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_paddd(__m64 _MM1, __m64 _MM2);
+    __m64 _m_paddsb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_paddsw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_paddusb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_paddusw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubd(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubsb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubsw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubusb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_psubusw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pmaddwd(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pmulhw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pmullw(__m64 _MM1, __m64 _MM2);
 
-/* Shift intrinsics */
-__m64 _m_psllw(__m64 _M, __m64 _Count);
-__m64 _m_psllwi(__m64 _M, int _Count);
-__m64 _m_pslld(__m64 _M, __m64 _Count);
-__m64 _m_pslldi(__m64 _M, int _Count);
-__m64 _m_psllq(__m64 _M, __m64 _Count);
-__m64 _m_psllqi(__m64 _M, int _Count);
-__m64 _m_psraw(__m64 _M, __m64 _Count);
-__m64 _m_psrawi(__m64 _M, int _Count);
-__m64 _m_psrad(__m64 _M, __m64 _Count);
-__m64 _m_psradi(__m64 _M, int _Count);
-__m64 _m_psrlw(__m64 _M, __m64 _Count);
-__m64 _m_psrlwi(__m64 _M, int _Count);
-__m64 _m_psrld(__m64 _M, __m64 _Count);
-__m64 _m_psrldi(__m64 _M, int _Count);
-__m64 _m_psrlq(__m64 _M, __m64 _Count);
-__m64 _m_psrlqi(__m64 _M, int _Count);
+    /* Shift intrinsics */
+    __m64 _m_psllw(__m64 _M, __m64 _Count);
+    __m64 _m_psllwi(__m64 _M, int _Count);
+    __m64 _m_pslld(__m64 _M, __m64 _Count);
+    __m64 _m_pslldi(__m64 _M, int _Count);
+    __m64 _m_psllq(__m64 _M, __m64 _Count);
+    __m64 _m_psllqi(__m64 _M, int _Count);
+    __m64 _m_psraw(__m64 _M, __m64 _Count);
+    __m64 _m_psrawi(__m64 _M, int _Count);
+    __m64 _m_psrad(__m64 _M, __m64 _Count);
+    __m64 _m_psradi(__m64 _M, int _Count);
+    __m64 _m_psrlw(__m64 _M, __m64 _Count);
+    __m64 _m_psrlwi(__m64 _M, int _Count);
+    __m64 _m_psrld(__m64 _M, __m64 _Count);
+    __m64 _m_psrldi(__m64 _M, int _Count);
+    __m64 _m_psrlq(__m64 _M, __m64 _Count);
+    __m64 _m_psrlqi(__m64 _M, int _Count);
 
-/* Logical intrinsics */
-__m64 _m_pand(__m64 _MM1, __m64 _MM2);
-__m64 _m_pandn(__m64 _MM1, __m64 _MM2);
-__m64 _m_por(__m64 _MM1, __m64 _MM2);
-__m64 _m_pxor(__m64 _MM1, __m64 _MM2);
+    /* Logical intrinsics */
+    __m64 _m_pand(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pandn(__m64 _MM1, __m64 _MM2);
+    __m64 _m_por(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pxor(__m64 _MM1, __m64 _MM2);
 
-/* Comparison intrinsics */
-__m64 _m_pcmpeqb(__m64 _MM1, __m64 _MM2);
-__m64 _m_pcmpeqw(__m64 _MM1, __m64 _MM2);
-__m64 _m_pcmpeqd(__m64 _MM1, __m64 _MM2);
-__m64 _m_pcmpgtb(__m64 _MM1, __m64 _MM2);
-__m64 _m_pcmpgtw(__m64 _MM1, __m64 _MM2);
-__m64 _m_pcmpgtd(__m64 _MM1, __m64 _MM2);
+    /* Comparison intrinsics */
+    __m64 _m_pcmpeqb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pcmpeqw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pcmpeqd(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pcmpgtb(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pcmpgtw(__m64 _MM1, __m64 _MM2);
+    __m64 _m_pcmpgtd(__m64 _MM1, __m64 _MM2);
 
-/* Utility intrinsics */
-__m64 _mm_setzero_si64(void);
-__m64 _mm_set_pi32(int _I1, int _I0);
-__m64 _mm_set_pi16(short _S3, short _S2, short _S1, short _S0);
-__m64 _mm_set_pi8(char _B7, char _B6, char _B5, char _B4,
-                  char _B3, char _B2, char _B1, char _B0);
-__m64 _mm_set1_pi32(int _I);
-__m64 _mm_set1_pi16(short _S);
-__m64 _mm_set1_pi8(char _B);
-__m64 _mm_setr_pi32(int _I1, int _I0);
-__m64 _mm_setr_pi16(short _S3, short _S2, short _S1, short _S0);
-__m64 _mm_setr_pi8(char _B7, char _B6, char _B5, char _B4,
-                   char _B3, char _B2, char _B1, char _B0);
+    /* Utility intrinsics */
+    __m64 _mm_setzero_si64(void);
+    __m64 _mm_set_pi32(int _I1, int _I0);
+    __m64 _mm_set_pi16(short _S3, short _S2, short _S1, short _S0);
+    __m64 _mm_set_pi8(char _B7, char _B6, char _B5, char _B4,
+                      char _B3, char _B2, char _B1, char _B0);
+    __m64 _mm_set1_pi32(int _I);
+    __m64 _mm_set1_pi16(short _S);
+    __m64 _mm_set1_pi8(char _B);
+    __m64 _mm_setr_pi32(int _I1, int _I0);
+    __m64 _mm_setr_pi16(short _S3, short _S2, short _S1, short _S0);
+    __m64 _mm_setr_pi8(char _B7, char _B6, char _B5, char _B4,
+                       char _B3, char _B2, char _B1, char _B0);
 
-/* Alternate intrinsic name definitions */
+    /* Alternate intrinsic name definitions */
 #define _mm_empty         _m_empty
 #define _mm_cvtsi32_si64  _m_from_int
 #define _mm_cvtsi64_si32  _m_to_int

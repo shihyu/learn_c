@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,16 +37,18 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strdup.c,v 1.5 2007/01/09 00:28:12 imp E
 #include <stdlib.h>
 #include <string.h>
 
-char *
+char*
 strdup(str)
-	const char *str;
+const char* str;
 {
-	size_t len;
-	char *copy;
+    size_t len;
+    char* copy;
+    len = strlen(str) + 1;
 
-	len = strlen(str) + 1;
-	if ((copy = malloc(len)) == NULL)
-		return (NULL);
-	memcpy(copy, str, len);
-	return (copy);
+    if ((copy = malloc(len)) == NULL) {
+        return (NULL);
+    }
+
+    memcpy(copy, str, len);
+    return (copy);
 }

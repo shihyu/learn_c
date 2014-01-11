@@ -36,73 +36,65 @@ static int __cdecl _heap_new_region(unsigned, size_t);
 *
 *******************************************************************************/
 
-int __cdecl _heap_grow (
-        REG1 size_t size
-        )
-{
-        REG2 int index;
-        int free_entry = -1;
+int __cdecl _heap_grow(
+    REG1 size_t size
+) {
+    REG2 int index;
+    int free_entry = -1;
+    /*
+     * Bump size to include header and round to nearest page boundary.
+     */
+    size += _HDRSIZE;
+    size = _ROUND2(size, _PAGESIZE_);
 
-        /*
-         * Bump size to include header and round to nearest page boundary.
-         */
+    /*
+     * Loop through the region table looking for an existing region
+     * we can grow.  Remember the index of the first null region entry.
+     *
+     * size = size of grow request
+     */
 
-        size += _HDRSIZE;
-        size = _ROUND2(size,_PAGESIZE_);
-
-        /*
-         * Loop through the region table looking for an existing region
-         * we can grow.  Remember the index of the first null region entry.
-         *
-         * size = size of grow request
-         */
-
-        for (index = 0; index < _HEAP_REGIONMAX; index++) {
-
-                if ( (_heap_regions[index]._totalsize -
-                    _heap_regions[index]._currsize) >= size )
-
-                        /*
-                         * Grow this region to satisfy the request.
-                         */
-
-                        return( _heap_grow_region(index, size) );
-
-
-                if ( (free_entry == -1) &&
-                    (_heap_regions[index]._regbase == NULL) )
-
-                        /*
-                         * Remember 1st free table entry for later
-                         */
-
-                        free_entry = index;
-
+    for (index = 0; index < _HEAP_REGIONMAX; index++) {
+        if ((_heap_regions[index]._totalsize -
+                _heap_regions[index]._currsize) >= size)
+            /*
+             * Grow this region to satisfy the request.
+             */
+        {
+            return (_heap_grow_region(index, size));
         }
 
+        if ((free_entry == -1) &&
+                (_heap_regions[index]._regbase == NULL))
+            /*
+             * Remember 1st free table entry for later
+             */
+        {
+            free_entry = index;
+        }
+    }
+
+    /*
+     * Could not find any existing regions to grow.  Try to
+     * get a new region.
+     *
+     * size = size of grow request
+     * free_entry = index of first free entry in table
+     */
+
+    if (free_entry >= 0)
         /*
-         * Could not find any existing regions to grow.  Try to
-         * get a new region.
-         *
-         * size = size of grow request
-         * free_entry = index of first free entry in table
+         * Get a new region to satisfy the request.
          */
-
-        if ( free_entry >= 0 )
-
-                /*
-                 * Get a new region to satisfy the request.
-                 */
-
-                return( _heap_new_region(free_entry, size) );
-
-        else
-                /*
-                 * No free table entries: return an error.
-                 */
-
-                return(-1);
-
+    {
+        return (_heap_new_region(free_entry, size));
+    } else
+        /*
+         * No free table entries: return an error.
+         */
+    {
+        return (-1);
+    }
 }
 
 
@@ -132,84 +124,74 @@ int __cdecl _heap_grow (
 *
 *******************************************************************************/
 
-static int __cdecl _heap_new_region (
-        REG1 unsigned index,
-        size_t size
-        )
-{
-        void * region;
-        REG2 unsigned int regsize;
+static int __cdecl _heap_new_region(
+    REG1 unsigned index,
+    size_t size
+) {
+    void* region;
+    REG2 unsigned int regsize;
+    /*
+     * Round the heap region size to a page boundary (in case
+     * the user played with it).
+     */
+    regsize = _ROUND2(_heap_regionsize, _PAGESIZE_);
 
+    /*
+     * To acommodate large users, request twice
+     * as big a region next time around.
+     */
 
+    if (_heap_regionsize < _heap_maxregsize) {
+        _heap_regionsize *= 2 ;
+    }
+
+    /*
+     * See if region is big enough for request
+     */
+
+    if (regsize < size) {
+        regsize = size;
+    }
+
+    /*
+     * Go get the new region
+     */
+
+    if (!(region = VirtualAlloc(NULL, regsize, MEM_RESERVE,
+                                PAGE_READWRITE))) {
+        goto error;
+    }
+
+    /*
+     * Put the new region in the table.
+     */
+    _heap_regions[index]._regbase = region;
+    _heap_regions[index]._totalsize = regsize;
+    _heap_regions[index]._currsize = 0;
+
+    /*
+     * Grow the region to satisfy the size request.
+     */
+
+    if (_heap_grow_region(index, size) != 0) {
         /*
-         * Round the heap region size to a page boundary (in case
-         * the user played with it).
+         * Ouch.  Allocated a region but couldn't commit
+         * any pages in it.  Free region and return error.
          */
+        _heap_free_region(index);
+        goto error;
+    }
 
-        regsize = _ROUND2(_heap_regionsize, _PAGESIZE_);
-
-        /*
-         * To acommodate large users, request twice
-         * as big a region next time around.
-         */
-
-        if ( _heap_regionsize < _heap_maxregsize )
-                _heap_regionsize *= 2 ;
-
-        /*
-         * See if region is big enough for request
-         */
-
-        if (regsize < size)
-                regsize = size;
-
-        /*
-         * Go get the new region
-         */
-
-        if (!(region = VirtualAlloc(NULL, regsize, MEM_RESERVE,
-        PAGE_READWRITE)))
-                goto error;
-
-        /*
-         * Put the new region in the table.
-         */
-
-         _heap_regions[index]._regbase = region;
-         _heap_regions[index]._totalsize = regsize;
-         _heap_regions[index]._currsize = 0;
-
-
-        /*
-         * Grow the region to satisfy the size request.
-         */
-
-        if (_heap_grow_region(index, size) != 0) {
-
-                /*
-                 * Ouch.  Allocated a region but couldn't commit
-                 * any pages in it.  Free region and return error.
-                 */
-
-                _heap_free_region(index);
-                goto error;
-        }
-
-
-        /*
-         * Good return
-         */
-
-        /* done:   unreferenced label to be removed */
-                return(0);
-
-        /*
-         * Error return
-         */
-
-        error:
-                return(-1);
-
+    /*
+     * Good return
+     */
+    /* done:   unreferenced label to be removed */
+    return (0);
+    /*
+     * Error return
+     */
+error:
+    return (-1);
 }
 
 
@@ -235,100 +217,89 @@ static int __cdecl _heap_new_region (
 *
 *******************************************************************************/
 
-int __cdecl _heap_grow_region (
-        REG1 unsigned index,
-        size_t size
-        )
-{
-        size_t left;
-        REG2 size_t growsize;
-        void * base;
-        unsigned dosretval;
+int __cdecl _heap_grow_region(
+    REG1 unsigned index,
+    size_t size
+) {
+    size_t left;
+    REG2 size_t growsize;
+    void* base;
+    unsigned dosretval;
+    /*
+     * Init some variables
+     * left = space left in region
+     * base = base of next section of region to validate
+     */
+    left = _heap_regions[index]._totalsize -
+           _heap_regions[index]._currsize;
+    base = (char*) _heap_regions[index]._regbase +
+           _heap_regions[index]._currsize;
 
+    /*
+     * Make sure we can satisfy request
+     */
 
-        /*
-         * Init some variables
-         * left = space left in region
-         * base = base of next section of region to validate
-         */
+    if (left < size) {
+        goto error;
+    }
 
-        left = _heap_regions[index]._totalsize -
-                _heap_regions[index]._currsize;
+    /*
+     * Round size up to next _heap_growsize boundary.
+     * (Must round _heap_growsize itself to page boundary, in
+     * case user set it himself).
+     */
+    growsize = _ROUND2(_heap_growsize, _PAGESIZE_);
+    growsize = _ROUND(size, growsize);
 
-        base = (char *) _heap_regions[index]._regbase +
-                _heap_regions[index]._currsize;
+    if (left < growsize) {
+        growsize = left;
+    }
 
-        /*
-         * Make sure we can satisfy request
-         */
+    /*
+     * Validate the new portion of the region
+     */
 
-        if (left < size)
-                goto error;
+    if (!VirtualAlloc(base, growsize, MEM_COMMIT, PAGE_READWRITE)) {
+        dosretval = GetLastError();
+    } else {
+        dosretval = 0;
+    }
 
-        /*
-         * Round size up to next _heap_growsize boundary.
-         * (Must round _heap_growsize itself to page boundary, in
-         * case user set it himself).
-         */
-
-        growsize = _ROUND2(_heap_growsize, _PAGESIZE_);
-        growsize = _ROUND(size, growsize);
-
-        if (left < growsize)
-                growsize = left;
-
-        /*
-         * Validate the new portion of the region
-         */
-
-        if (!VirtualAlloc(base, growsize, MEM_COMMIT, PAGE_READWRITE))
-                dosretval = GetLastError();
-        else
-                dosretval = 0;
-
-        if (dosretval)
-                /*
-                 * Error committing pages.  If out of memory, return
-                 * error, else abort.
-                 */
-
-                if (dosretval == ERROR_NOT_ENOUGH_MEMORY)
-                        goto error;
-                else
-                        _heap_abort();
-
+    if (dosretval)
 
         /*
-         * Update the region data base
+         * Error committing pages.  If out of memory, return
+         * error, else abort.
          */
+        if (dosretval == ERROR_NOT_ENOUGH_MEMORY) {
+            goto error;
+        } else {
+            _heap_abort();
+        }
 
-        _heap_regions[index]._currsize += growsize;
+    /*
+     * Update the region data base
+     */
+    _heap_regions[index]._currsize += growsize;
 
+    /*
+     * Add the memory to the heap
+     */
 
+    if (_heap_addblock(base, growsize) != 0) {
+        _heap_abort();
+    }
 
-
-        /*
-         * Add the memory to the heap
-         */
-
-        if (_heap_addblock(base, growsize) != 0)
-                _heap_abort();
-
-
-        /*
-         * Good return
-         */
-
-        /* done:   unreferenced label to be removed */
-                return(0);
-
-        /*
-         * Error return
-         */
-
-        error:
-                return(-1);
-
+    /*
+     * Good return
+     */
+    /* done:   unreferenced label to be removed */
+    return (0);
+    /*
+     * Error return
+     */
+error:
+    return (-1);
 }
 
 
@@ -349,26 +320,22 @@ int __cdecl _heap_grow_region (
 *
 *******************************************************************************/
 
-void __cdecl _heap_free_region (
-        REG1 int index
-        )
-{
+void __cdecl _heap_free_region(
+    REG1 int index
+) {
+    /*
+     * Give the memory back to the OS
+     */
+    if (!VirtualFree(_heap_regions[index]._regbase, 0, MEM_RELEASE)) {
+        _heap_abort();
+    }
 
-        /*
-         * Give the memory back to the OS
-         */
-
-        if (!VirtualFree(_heap_regions[index]._regbase, 0, MEM_RELEASE))
-                _heap_abort();
-
-        /*
-         * Zero out the heap region entry
-         */
-
-        _heap_regions[index]._regbase = NULL;
-        _heap_regions[index]._currsize =
+    /*
+     * Zero out the heap region entry
+     */
+    _heap_regions[index]._regbase = NULL;
+    _heap_regions[index]._currsize =
         _heap_regions[index]._totalsize = 0;
-
 }
 
 

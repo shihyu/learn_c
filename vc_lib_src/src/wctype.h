@@ -89,7 +89,7 @@ typedef unsigned short wctype_t;
 extern const unsigned short __newctype[];
 #if     defined(_DLL) && defined(_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP const unsigned short ** __cdecl __p__pctype(void);
+_CRTIMP const unsigned short** __cdecl __p__pctype(void);
 #endif
 #endif  /* _INTERNAL_IFSTRIP_ */
 
@@ -98,12 +98,12 @@ _CRTIMP const unsigned short ** __cdecl __p__pctype(void);
 #define __PCTYPE_FUNC  _pctype
 #else
 #define __PCTYPE_FUNC   __pctype_func()
-#endif  
+#endif
 #endif  /* __PCTYPE_FUNC */
 
-_CRTIMP const unsigned short * __cdecl __pctype_func(void);
+_CRTIMP const unsigned short* __cdecl __pctype_func(void);
 #if !defined(_M_CEE_PURE)
-_CRTIMP extern const unsigned short *_pctype;
+_CRTIMP extern const unsigned short* _pctype;
 #else
 #define _pctype (__pctype_func())
 #endif /* !defined(_M_CEE_PURE) */
@@ -120,13 +120,13 @@ _CRTIMP extern const unsigned short _wctype[];
 extern const unsigned short __newctype[];
 #if     defined(_DLL) && defined(_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP const wctype_t ** __cdecl __p__pwctype(void);
+_CRTIMP const wctype_t** __cdecl __p__pwctype(void);
 #endif
 #endif  /* _INTERNAL_IFSTRIP_ */
 
-_CRTIMP const wctype_t * __cdecl __pwctype_func(void);
+_CRTIMP const wctype_t* __cdecl __pwctype_func(void);
 #if !defined(_M_CEE_PURE)
-_CRTIMP extern const wctype_t *_pwctype;
+_CRTIMP extern const wctype_t* _pwctype;
 #else
 #define _pwctype (__pwctype_func())
 #endif /* !defined(_M_CEE_PURE) */
@@ -141,7 +141,7 @@ _CRTIMP extern const wctype_t *_pwctype;
 #define _LOWER          0x2     /* lower case letter */
 #define _DIGIT          0x4     /* digit[0-9] */
 #define _SPACE          0x8     /* tab, carriage return, newline, */
-                                /* vertical tab or form feed */
+/* vertical tab or form feed */
 #define _PUNCT          0x10    /* punctuation character */
 #define _CONTROL        0x20    /* control character */
 #define _BLANK          0x40    /* space char */
@@ -202,31 +202,54 @@ _CRT_OBSOLETE(iswctype) _CRTIMP int __cdecl is_wctype(wint_t, wctype_t);
 
 #define isleadbyte(c) (__pctype_func()[(unsigned char)(c)] & _LEADBYTE)
 #else   /* __cplusplus */
-inline int __cdecl iswalpha(wint_t _C) {return (iswctype(_C,_ALPHA)); }
-inline int __cdecl iswupper(wint_t _C) {return (iswctype(_C,_UPPER)); }
-inline int __cdecl iswlower(wint_t _C) {return (iswctype(_C,_LOWER)); }
-inline int __cdecl iswdigit(wint_t _C) {return (iswctype(_C,_DIGIT)); }
-inline int __cdecl iswxdigit(wint_t _C) {return (iswctype(_C,_HEX)); }
-inline int __cdecl iswspace(wint_t _C) {return (iswctype(_C,_SPACE)); }
-inline int __cdecl iswpunct(wint_t _C) {return (iswctype(_C,_PUNCT)); }
-inline int __cdecl iswalnum(wint_t _C) {return (iswctype(_C,_ALPHA|_DIGIT)); }
-inline int __cdecl iswprint(wint_t _C)
-        {return (iswctype(_C,_BLANK|_PUNCT|_ALPHA|_DIGIT)); }
-inline int __cdecl iswgraph(wint_t _C)
-        {return (iswctype(_C,_PUNCT|_ALPHA|_DIGIT)); }
-inline int __cdecl iswcntrl(wint_t _C) {return (iswctype(_C,_CONTROL)); }
-inline int __cdecl iswascii(wint_t _C) {return ((unsigned)(_C) < 0x80); }
+inline int __cdecl iswalpha(wint_t _C) {
+    return (iswctype(_C, _ALPHA));
+}
+inline int __cdecl iswupper(wint_t _C) {
+    return (iswctype(_C, _UPPER));
+}
+inline int __cdecl iswlower(wint_t _C) {
+    return (iswctype(_C, _LOWER));
+}
+inline int __cdecl iswdigit(wint_t _C) {
+    return (iswctype(_C, _DIGIT));
+}
+inline int __cdecl iswxdigit(wint_t _C) {
+    return (iswctype(_C, _HEX));
+}
+inline int __cdecl iswspace(wint_t _C) {
+    return (iswctype(_C, _SPACE));
+}
+inline int __cdecl iswpunct(wint_t _C) {
+    return (iswctype(_C, _PUNCT));
+}
+inline int __cdecl iswalnum(wint_t _C) {
+    return (iswctype(_C, _ALPHA | _DIGIT));
+}
+inline int __cdecl iswprint(wint_t _C) {
+    return (iswctype(_C, _BLANK | _PUNCT | _ALPHA | _DIGIT));
+}
+inline int __cdecl iswgraph(wint_t _C) {
+    return (iswctype(_C, _PUNCT | _ALPHA | _DIGIT));
+}
+inline int __cdecl iswcntrl(wint_t _C) {
+    return (iswctype(_C, _CONTROL));
+}
+inline int __cdecl iswascii(wint_t _C) {
+    return ((unsigned)(_C) < 0x80);
+}
 
-inline int __cdecl isleadbyte(int _C)
-        {return (__pctype_func()[(unsigned char)(_C)] & _LEADBYTE); }
+inline int __cdecl isleadbyte(int _C) {
+    return (__pctype_func()[(unsigned char)(_C)] & _LEADBYTE);
+}
 #endif  /* __cplusplus */
 #define _WCTYPE_INLINE_DEFINED
 #endif  /* _WCTYPE_INLINE_DEFINED */
 
 typedef wchar_t wctrans_t;
 _MRTIMP2 wint_t __cdecl towctrans(wint_t, wctrans_t);
-_MRTIMP2 wctrans_t __cdecl wctrans(const char *);
-_MRTIMP2 wctype_t __cdecl wctype(const char *);
+_MRTIMP2 wctrans_t __cdecl wctrans(const char*);
+_MRTIMP2 wctype_t __cdecl wctype(const char*);
 
 
 #ifdef  __cplusplus

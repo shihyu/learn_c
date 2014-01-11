@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -40,9 +40,8 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/getw.c,v 1.8 2007/01/09 00:28:06 imp Exp 
 
 int
 getw(fp)
-	FILE *fp;
+FILE* fp;
 {
-	int x;
-
-	return (fread((void *)&x, sizeof(x), 1, fp) == 1 ? x : EOF);
+    int x;
+    return (fread((void*)&x, sizeof(x), 1, fp) == 1 ? x : EOF);
 }

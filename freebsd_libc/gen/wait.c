@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,9 +41,8 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/wait.c,v 1.7 2007/01/09 00:27:56 imp Exp $"
 #include "un-namespace.h"
 
 pid_t
-__wait(int *istat)
-{
-	return (_wait4(WAIT_ANY, istat, 0, (struct rusage *)0));
+__wait(int* istat) {
+    return (_wait4(WAIT_ANY, istat, 0, (struct rusage*)0));
 }
 
 __weak_reference(__wait, wait);

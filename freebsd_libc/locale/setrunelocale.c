@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
@@ -47,132 +47,138 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/setrunelocale.c,v 1.46.2.1 2007/10/24 14
 
 extern int __mb_sb_limit;
 
-extern _RuneLocale	*_Read_RuneMagi(FILE *);
+extern _RuneLocale*  _Read_RuneMagi(FILE*);
 
-static int		__setrunelocale(const char *);
+static int      __setrunelocale(const char*);
 
 static int
-__setrunelocale(const char *encoding)
-{
-	FILE *fp;
-	char name[PATH_MAX];
-	_RuneLocale *rl;
-	int saverr, ret;
-	static char ctype_encoding[ENCODING_LEN + 1];
-	static _RuneLocale *CachedRuneLocale;
-	static int Cached__mb_cur_max;
-	static int Cached__mb_sb_limit;
-	static size_t (*Cached__mbrtowc)(wchar_t * __restrict,
-	    const char * __restrict, size_t, mbstate_t * __restrict);
-	static size_t (*Cached__wcrtomb)(char * __restrict, wchar_t,
-	    mbstate_t * __restrict);
-	static int (*Cached__mbsinit)(const mbstate_t *);
-	static size_t (*Cached__mbsnrtowcs)(wchar_t * __restrict,
-	    const char ** __restrict, size_t, size_t, mbstate_t * __restrict);
-	static size_t (*Cached__wcsnrtombs)(char * __restrict,
-	    const wchar_t ** __restrict, size_t, size_t,
-	    mbstate_t * __restrict);
+__setrunelocale(const char* encoding) {
+    FILE* fp;
+    char name[PATH_MAX];
+    _RuneLocale* rl;
+    int saverr, ret;
+    static char ctype_encoding[ENCODING_LEN + 1];
+    static _RuneLocale* CachedRuneLocale;
+    static int Cached__mb_cur_max;
+    static int Cached__mb_sb_limit;
+    static size_t (*Cached__mbrtowc)(wchar_t* __restrict,
+                                     const char* __restrict, size_t, mbstate_t* __restrict);
+    static size_t (*Cached__wcrtomb)(char* __restrict, wchar_t,
+                                     mbstate_t* __restrict);
+    static int (*Cached__mbsinit)(const mbstate_t*);
+    static size_t (*Cached__mbsnrtowcs)(wchar_t* __restrict,
+                                        const char** __restrict, size_t, size_t, mbstate_t* __restrict);
+    static size_t (*Cached__wcsnrtombs)(char* __restrict,
+                                        const wchar_t** __restrict, size_t, size_t,
+                                        mbstate_t* __restrict);
 
-	/*
-	 * The "C" and "POSIX" locale are always here.
-	 */
-	if (strcmp(encoding, "C") == 0 || strcmp(encoding, "POSIX") == 0) {
-		_none_init(&_DefaultRuneLocale);
-		return (0);
-	}
+    /*
+     * The "C" and "POSIX" locale are always here.
+     */
+    if (strcmp(encoding, "C") == 0 || strcmp(encoding, "POSIX") == 0) {
+        _none_init(&_DefaultRuneLocale);
+        return (0);
+    }
 
-	/*
-	 * If the locale name is the same as our cache, use the cache.
-	 */
-	if (CachedRuneLocale != NULL &&
-	    strcmp(encoding, ctype_encoding) == 0) {
-		_CurrentRuneLocale = CachedRuneLocale;
-		__mb_cur_max = Cached__mb_cur_max;
-		__mb_sb_limit = Cached__mb_sb_limit;
-		__mbrtowc = Cached__mbrtowc;
-		__mbsinit = Cached__mbsinit;
-		__mbsnrtowcs = Cached__mbsnrtowcs;
-		__wcrtomb = Cached__wcrtomb;
-		__wcsnrtombs = Cached__wcsnrtombs;
-		return (0);
-	}
+    /*
+     * If the locale name is the same as our cache, use the cache.
+     */
+    if (CachedRuneLocale != NULL &&
+            strcmp(encoding, ctype_encoding) == 0) {
+        _CurrentRuneLocale = CachedRuneLocale;
+        __mb_cur_max = Cached__mb_cur_max;
+        __mb_sb_limit = Cached__mb_sb_limit;
+        __mbrtowc = Cached__mbrtowc;
+        __mbsinit = Cached__mbsinit;
+        __mbsnrtowcs = Cached__mbsnrtowcs;
+        __wcrtomb = Cached__wcrtomb;
+        __wcsnrtombs = Cached__wcsnrtombs;
+        return (0);
+    }
 
-	/*
-	 * Slurp the locale file into the cache.
-	 */
+    /*
+     * Slurp the locale file into the cache.
+     */
+    /* Range checking not needed, encoding length already checked before */
+    (void) strcpy(name, _PathLocale);
+    (void) strcat(name, "/");
+    (void) strcat(name, encoding);
+    (void) strcat(name, "/LC_CTYPE");
 
-	/* Range checking not needed, encoding length already checked before */
-	(void) strcpy(name, _PathLocale);
-	(void) strcat(name, "/");
-	(void) strcat(name, encoding);
-	(void) strcat(name, "/LC_CTYPE");
+    if ((fp = fopen(name, "r")) == NULL) {
+        return (errno == 0 ? ENOENT : errno);
+    }
 
-	if ((fp = fopen(name, "r")) == NULL)
-		return (errno == 0 ? ENOENT : errno);
+    if ((rl = _Read_RuneMagi(fp)) == NULL) {
+        saverr = (errno == 0 ? EFTYPE : errno);
+        (void)fclose(fp);
+        return (saverr);
+    }
 
-	if ((rl = _Read_RuneMagi(fp)) == NULL) {
-		saverr = (errno == 0 ? EFTYPE : errno);
-		(void)fclose(fp);
-		return (saverr);
-	}
-	(void)fclose(fp);
+    (void)fclose(fp);
+    __mbrtowc = NULL;
+    __mbsinit = NULL;
+    __mbsnrtowcs = __mbsnrtowcs_std;
+    __wcrtomb = NULL;
+    __wcsnrtombs = __wcsnrtombs_std;
+    rl->__sputrune = NULL;
+    rl->__sgetrune = NULL;
 
-	__mbrtowc = NULL;
-	__mbsinit = NULL;
-	__mbsnrtowcs = __mbsnrtowcs_std;
-	__wcrtomb = NULL;
-	__wcsnrtombs = __wcsnrtombs_std;
-	rl->__sputrune = NULL;
-	rl->__sgetrune = NULL;
-	if (strcmp(rl->__encoding, "NONE") == 0)
-		ret = _none_init(rl);
-	else if (strcmp(rl->__encoding, "UTF-8") == 0)
-		ret = _UTF8_init(rl);
-	else if (strcmp(rl->__encoding, "EUC") == 0)
-		ret = _EUC_init(rl);
- 	else if (strcmp(rl->__encoding, "GB18030") == 0)
- 		ret = _GB18030_init(rl);
-	else if (strcmp(rl->__encoding, "GB2312") == 0)
-		ret = _GB2312_init(rl);
-	else if (strcmp(rl->__encoding, "GBK") == 0)
-		ret = _GBK_init(rl);
-	else if (strcmp(rl->__encoding, "BIG5") == 0)
-		ret = _BIG5_init(rl);
-	else if (strcmp(rl->__encoding, "MSKanji") == 0)
-		ret = _MSKanji_init(rl);
-	else
-		ret = EFTYPE;
-	if (ret == 0) {
-		if (CachedRuneLocale != NULL) {
-			/* See euc.c */
-			if (strcmp(CachedRuneLocale->__encoding, "EUC") == 0)
-				free(CachedRuneLocale->__variable);
-			free(CachedRuneLocale);
-		}
-		CachedRuneLocale = _CurrentRuneLocale;
-		Cached__mb_cur_max = __mb_cur_max;
-		Cached__mb_sb_limit = __mb_sb_limit;
-		Cached__mbrtowc = __mbrtowc;
-		Cached__mbsinit = __mbsinit;
-		Cached__mbsnrtowcs = __mbsnrtowcs;
-		Cached__wcrtomb = __wcrtomb;
-		Cached__wcsnrtombs = __wcsnrtombs;
-		(void)strcpy(ctype_encoding, encoding);
-	} else
-		free(rl);
+    if (strcmp(rl->__encoding, "NONE") == 0) {
+        ret = _none_init(rl);
+    } else if (strcmp(rl->__encoding, "UTF-8") == 0) {
+        ret = _UTF8_init(rl);
+    } else if (strcmp(rl->__encoding, "EUC") == 0) {
+        ret = _EUC_init(rl);
+    } else if (strcmp(rl->__encoding, "GB18030") == 0) {
+        ret = _GB18030_init(rl);
+    } else if (strcmp(rl->__encoding, "GB2312") == 0) {
+        ret = _GB2312_init(rl);
+    } else if (strcmp(rl->__encoding, "GBK") == 0) {
+        ret = _GBK_init(rl);
+    } else if (strcmp(rl->__encoding, "BIG5") == 0) {
+        ret = _BIG5_init(rl);
+    } else if (strcmp(rl->__encoding, "MSKanji") == 0) {
+        ret = _MSKanji_init(rl);
+    } else {
+        ret = EFTYPE;
+    }
 
-	return (ret);
+    if (ret == 0) {
+        if (CachedRuneLocale != NULL) {
+            /* See euc.c */
+            if (strcmp(CachedRuneLocale->__encoding, "EUC") == 0) {
+                free(CachedRuneLocale->__variable);
+            }
+
+            free(CachedRuneLocale);
+        }
+
+        CachedRuneLocale = _CurrentRuneLocale;
+        Cached__mb_cur_max = __mb_cur_max;
+        Cached__mb_sb_limit = __mb_sb_limit;
+        Cached__mbrtowc = __mbrtowc;
+        Cached__mbsinit = __mbsinit;
+        Cached__mbsnrtowcs = __mbsnrtowcs;
+        Cached__wcrtomb = __wcrtomb;
+        Cached__wcsnrtombs = __wcsnrtombs;
+        (void)strcpy(ctype_encoding, encoding);
+    } else {
+        free(rl);
+    }
+
+    return (ret);
 }
 
 int
-__wrap_setrunelocale(const char *locale)
-{
-	int ret = __setrunelocale(locale);
+__wrap_setrunelocale(const char* locale) {
+    int ret = __setrunelocale(locale);
 
-	if (ret != 0) {
-		errno = ret;
-		return (_LDP_ERROR);
-	}
-	return (_LDP_LOADED);
+    if (ret != 0) {
+        errno = ret;
+        return (_LDP_ERROR);
+    }
+
+    return (_LDP_LOADED);
 }
 

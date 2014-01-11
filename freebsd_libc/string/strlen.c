@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,11 +37,12 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strlen.c,v 1.5 2007/01/09 00:28:12 imp E
 
 size_t
 strlen(str)
-	const char *str;
+const char* str;
 {
-	const char *s;
+    const char* s;
 
-	for (s = str; *s; ++s);
-	return(s - str);
+    for (s = str; *s; ++s);
+
+    return (s - str);
 }
 

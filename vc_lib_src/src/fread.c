@@ -75,26 +75,23 @@
 
 /* define locking/unlocking version */
 size_t __cdecl fread_s(
-    void *buffer,
+    void* buffer,
     size_t bufferSize,
     size_t elementSize,
     size_t count,
-    FILE *stream
-)
-{
+    FILE* stream
+) {
     size_t retval = 0;
 
-    if (elementSize == 0 || count == 0)
-    {
+    if (elementSize == 0 || count == 0) {
         return 0;
     }
 
     /* validation */
     _VALIDATE_RETURN((buffer != NULL), EINVAL, 0);
-    if (stream == NULL || count > (SIZE_MAX / elementSize))
-    {
-        if (bufferSize != SIZE_MAX)
-        {
+
+    if (stream == NULL || count > (SIZE_MAX / elementSize)) {
+        if (bufferSize != SIZE_MAX) {
             memset(buffer, _BUFFER_FILL_PATTERN, bufferSize);
         }
 
@@ -103,13 +100,11 @@ size_t __cdecl fread_s(
     }
 
     _lock_str(stream);
-    __try
-    {
+
+    __try {
         /* do the read; _fread_nolock_s will make sure we do not buffer overrun */
         retval = _fread_nolock_s(buffer, bufferSize, elementSize, count, stream);
-    }
-    __finally
-    {
+    } __finally {
         _unlock_str(stream);
     }
 
@@ -118,14 +113,13 @@ size_t __cdecl fread_s(
 
 /* define the normal version */
 size_t __cdecl _fread_nolock_s(
-    void *buffer,
+    void* buffer,
     size_t bufferSize,
     size_t elementSize,
     size_t num,
-    FILE *stream
-)
-{
-    char *data;                     /* point inside the destination buffer to where we need to copy the read chars */
+    FILE* stream
+) {
+    char* data;                     /* point inside the destination buffer to where we need to copy the read chars */
     size_t dataSize;                /* space left in the destionation buffer (in bytes) */
     size_t total;                   /* total bytes to read */
     size_t count;                   /* num bytes left to read */
@@ -133,26 +127,20 @@ size_t __cdecl _fread_nolock_s(
     unsigned nbytes;                /* how much to read now */
     unsigned nread;                 /* how much we did read */
     int c;                          /* a temp char */
-
     /* initialize local vars */
     data = buffer;
     dataSize = bufferSize;
 
-    if (elementSize == 0 || num == 0)
-    {
+    if (elementSize == 0 || num == 0) {
         return 0;
     }
 
-
     count = total = elementSize * num;
 
-    if (anybuf(stream))
-    {
+    if (anybuf(stream)) {
         /* already has buffer, use its size */
         streambufsize = stream->_bufsiz;
-    }
-    else
-    {
+    } else {
         /* assume will get _INTERNAL_BUFSIZ buffer */
         streambufsize = _INTERNAL_BUFSIZ;
     }
@@ -161,10 +149,8 @@ size_t __cdecl _fread_nolock_s(
     while (count != 0) {
         /* if the buffer exists and has characters, copy them to user
             buffer */
-        if (anybuf(stream) && stream->_cnt != 0)
-        {
-            if(stream->_cnt < 0)
-            {
+        if (anybuf(stream) && stream->_cnt != 0) {
+            if (stream->_cnt < 0) {
                 _ASSERTE(("Inconsistent Stream Count. Flush between consecutive read and write", stream->_cnt >= 0));
                 stream->_flag |= _IOERR;
                 return (total - count) / elementSize;
@@ -172,81 +158,75 @@ size_t __cdecl _fread_nolock_s(
 
             /* how much do we want? */
             nbytes = (count < (size_t)stream->_cnt) ? (unsigned)count : stream->_cnt;
-            if (nbytes > dataSize)
-            {
-                if (bufferSize != SIZE_MAX)
-                {
+
+            if (nbytes > dataSize) {
+                if (bufferSize != SIZE_MAX) {
                     memset(buffer, _BUFFER_FILL_PATTERN, bufferSize);
                 }
+
                 _VALIDATE_RETURN(("buffer too small", 0), ERANGE, 0)
             }
-            memcpy_s(data, dataSize, stream->_ptr, nbytes);
 
+            memcpy_s(data, dataSize, stream->_ptr, nbytes);
             /* update stream and amt of data read */
             count -= nbytes;
             stream->_cnt -= nbytes;
             stream->_ptr += nbytes;
             data += nbytes;
             dataSize -= nbytes;
-        }
-        else if (count >= streambufsize)
-        {
+        } else if (count >= streambufsize) {
             /* If we have more than streambufsize chars to read, get data
                 by calling read with an integral number of bufsiz
                 blocks.  Note that if the stream is text mode, read
                 will return less chars than we ordered. */
-
             /* calc chars to read -- (count/streambufsize) * streambufsize */
-            nbytes = ( streambufsize ? (unsigned)(count - count % streambufsize) :
-                        (unsigned)count );
-            if (nbytes > dataSize)
-            {
-                if (bufferSize != SIZE_MAX)
-                {
+            nbytes = (streambufsize ? (unsigned)(count - count % streambufsize) :
+                      (unsigned)count);
+
+            if (nbytes > dataSize) {
+                if (bufferSize != SIZE_MAX) {
                     memset(buffer, _BUFFER_FILL_PATTERN, bufferSize);
                 }
+
                 _VALIDATE_RETURN(("buffer too small", 0), ERANGE, 0)
             }
 
             nread = _read(_fileno(stream), data, nbytes);
+
             if (nread == 0) {
-                    /* end of file -- out of here */
-                    stream->_flag |= _IOEOF;
-                    return (total - count) / elementSize;
-            }
-            else if (nread == (unsigned)-1) {
-                    /* error -- out of here */
-                    stream->_flag |= _IOERR;
-                    return (total - count) / elementSize;
+                /* end of file -- out of here */
+                stream->_flag |= _IOEOF;
+                return (total - count) / elementSize;
+            } else if (nread == (unsigned) - 1) {
+                /* error -- out of here */
+                stream->_flag |= _IOERR;
+                return (total - count) / elementSize;
             }
 
             /* update count and data to reflect read */
             count -= nread;
             data += nread;
             dataSize -= nread;
-        }
-        else
-        {
+        } else {
             /* less than streambufsize chars to read, so call _filbuf to
                 fill buffer */
             if ((c = _filbuf(stream)) == EOF) {
-                    /* error or eof, stream flags set by _filbuf */
-                    return (total - count) / elementSize;
+                /* error or eof, stream flags set by _filbuf */
+                return (total - count) / elementSize;
             }
 
             /* _filbuf returned a char -- store it */
-            if (dataSize == 0)
-            {
-                if (bufferSize != SIZE_MAX)
-                {
+            if (dataSize == 0) {
+                if (bufferSize != SIZE_MAX) {
                     memset(buffer, _BUFFER_FILL_PATTERN, bufferSize);
                 }
+
                 _VALIDATE_RETURN(("buffer too small", 0), ERANGE, 0)
             }
+
             *data++ = (char) c;
             --count;
             --dataSize;
-
             /* update buffer size */
             streambufsize = stream->_bufsiz;
         }
@@ -257,23 +237,21 @@ size_t __cdecl _fread_nolock_s(
 }
 
 size_t __cdecl fread(
-    void *buffer,
+    void* buffer,
     size_t elementSize,
     size_t count,
-    FILE *stream
-)
-{
+    FILE* stream
+) {
     /* assumes there is enough space in the destination buffer */
     return fread_s(buffer, SIZE_MAX, elementSize, count, stream);
 }
 
 size_t __cdecl _fread_nolock(
-    void *buffer,
+    void* buffer,
     size_t elementSize,
     size_t count,
-    FILE *stream
-)
-{
+    FILE* stream
+) {
     /* assumes there is enough space in the destination buffer */
     return _fread_nolock_s(buffer, SIZE_MAX, elementSize, count, stream);
 }

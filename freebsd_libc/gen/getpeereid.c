@@ -36,19 +36,22 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getpeereid.c,v 1.6 2002/12/16 13:42:13 maxi
 #include <unistd.h>
 
 int
-getpeereid(int s, uid_t *euid, gid_t *egid)
-{
-	struct xucred xuc;
-	socklen_t xuclen;
-	int error;
+getpeereid(int s, uid_t* euid, gid_t* egid) {
+    struct xucred xuc;
+    socklen_t xuclen;
+    int error;
+    xuclen = sizeof(xuc);
+    error = getsockopt(s, 0, LOCAL_PEERCRED, &xuc, &xuclen);
 
-	xuclen = sizeof(xuc);
-	error = getsockopt(s, 0, LOCAL_PEERCRED, &xuc, &xuclen);
-	if (error != 0)
-		return (error);
-	if (xuc.cr_version != XUCRED_VERSION)
-		return (EINVAL);
-	*euid = xuc.cr_uid;
-	*egid = xuc.cr_gid;
-	return (0);
+    if (error != 0) {
+        return (error);
+    }
+
+    if (xuc.cr_version != XUCRED_VERSION) {
+        return (EINVAL);
+    }
+
+    *euid = xuc.cr_uid;
+    *egid = xuc.cr_gid;
+    return (0);
 }

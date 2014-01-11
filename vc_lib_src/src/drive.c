@@ -38,46 +38,43 @@
 *
 *******************************************************************************/
 
-int __cdecl _getdrive (
-        void
-        )
-{
-        ULONG drivenum=0;
-        UCHAR curdirstr[_MAX_PATH+1];
-        UCHAR *cdirstr = curdirstr;
-        int memfree=0,r=0;
+int __cdecl _getdrive(
+    void
+) {
+    ULONG drivenum = 0;
+    UCHAR curdirstr[_MAX_PATH + 1];
+    UCHAR* cdirstr = curdirstr;
+    int memfree = 0, r = 0;
+    r = GetCurrentDirectory(MAX_PATH + 1, (LPTSTR)cdirstr);
 
-        r = GetCurrentDirectory(MAX_PATH+1,(LPTSTR)cdirstr);
-        if (r> MAX_PATH) {
-            if ((cdirstr= (UCHAR *)_calloc_crt((r+1),sizeof(UCHAR))) == NULL) {
-                errno = ENOMEM;
-                r = 0;
-            } else {
-                memfree = 1;
-            }
-            if (r)
-            {
-                r = GetCurrentDirectory(r+1,(LPTSTR)cdirstr);
-            }
-        }
-        drivenum = 0;
-        if (r)
-        {
-                if (cdirstr[1] == ':')
-                {
-                        drivenum = toupper(cdirstr[0]) - 64;
-                }
-        }
-        else
-        {
-            errno=ENOMEM;
+    if (r > MAX_PATH) {
+        if ((cdirstr = (UCHAR*)_calloc_crt((r + 1), sizeof(UCHAR))) == NULL) {
+            errno = ENOMEM;
+            r = 0;
+        } else {
+            memfree = 1;
         }
 
-        if (memfree)
-        {
-            _free_crt(cdirstr);
+        if (r) {
+            r = GetCurrentDirectory(r + 1, (LPTSTR)cdirstr);
         }
-        return drivenum;
+    }
+
+    drivenum = 0;
+
+    if (r) {
+        if (cdirstr[1] == ':') {
+            drivenum = toupper(cdirstr[0]) - 64;
+        }
+    } else {
+        errno = ENOMEM;
+    }
+
+    if (memfree) {
+        _free_crt(cdirstr);
+    }
+
+    return drivenum;
 }
 
 
@@ -97,21 +94,20 @@ int __cdecl _getdrive (
 *
 *******************************************************************************/
 
-int __cdecl _chdrive (
-        int drive
-        )
-{
-        int retval;
-        char  newdrive[3];
+int __cdecl _chdrive(
+    int drive
+) {
+    int retval;
+    char  newdrive[3];
 
-        if (drive < 1 || drive > 31) {
-            _doserrno = ERROR_INVALID_DRIVE;
-            _VALIDATE_RETURN(("Invalid Drive Index",0), EACCES, -1);
-        }
+    if (drive < 1 || drive > 31) {
+        _doserrno = ERROR_INVALID_DRIVE;
+        _VALIDATE_RETURN(("Invalid Drive Index", 0), EACCES, -1);
+    }
 
-        _mlock( _ENV_LOCK );
-        __try {
+    _mlock(_ENV_LOCK);
 
+    __try {
         newdrive[0] = (char)('A' + (char)drive - (char)1);
         newdrive[1] = ':';
         newdrive[2] = '\0';
@@ -121,17 +117,15 @@ int __cdecl _chdrive (
          * will become the cwd. Otherwise defaults to root directory.
          */
 
-        if ( SetCurrentDirectory((LPSTR)newdrive) )
+        if (SetCurrentDirectory((LPSTR)newdrive)) {
             retval = 0;
-        else {
+        } else {
             _dosmaperr(GetLastError());
             retval = -1;
         }
+    } __finally {
+        _munlock(_ENV_LOCK);
+    }
 
-        }
-        __finally {
-            _munlock( _ENV_LOCK );
-        }
-
-        return retval;
+    return retval;
 }

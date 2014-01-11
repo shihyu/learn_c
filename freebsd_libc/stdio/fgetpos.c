@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -39,13 +39,13 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fgetpos.c,v 1.13 2007/01/09 00:28:06 imp 
 #include <stdio.h>
 
 int
-fgetpos(FILE * __restrict fp, fpos_t * __restrict pos)
-{
-	/*
-	 * ftello is thread-safe; no need to lock fp.
-	 */
-	if ((*pos = ftello(fp)) == (fpos_t)-1)
-		return (-1);
-	else
-		return (0);
+fgetpos(FILE* __restrict fp, fpos_t* __restrict pos) {
+    /*
+     * ftello is thread-safe; no need to lock fp.
+     */
+    if ((*pos = ftello(fp)) == (fpos_t) - 1) {
+        return (-1);
+    } else {
+        return (0);
+    }
 }

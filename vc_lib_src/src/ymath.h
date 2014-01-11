@@ -14,50 +14,50 @@ _C_LIB_DECL
 #pragma pack(push,_CRT_PACKING)
 #endif  /* _MSC_VER */
 
-		/* MACROS FOR _Dtest RETURN (0 => ZERO) */
-#define _DENORM		(-2)	/* C9X only */
-#define _FINITE		(-1)
-#define _INFCODE	1
-#define _NANCODE	2
+/* MACROS FOR _Dtest RETURN (0 => ZERO) */
+#define _DENORM     (-2)    /* C9X only */
+#define _FINITE     (-1)
+#define _INFCODE    1
+#define _NANCODE    2
 
-		/* MACROS FOR _Feraise ARGUMENT */
-#define _FE_DIVBYZERO	0x04
-#define _FE_INEXACT		0x20
-#define _FE_INVALID		0x01
-#define _FE_OVERFLOW	0x08
-#define _FE_UNDERFLOW	0x10
+/* MACROS FOR _Feraise ARGUMENT */
+#define _FE_DIVBYZERO   0x04
+#define _FE_INEXACT     0x20
+#define _FE_INVALID     0x01
+#define _FE_OVERFLOW    0x08
+#define _FE_UNDERFLOW   0x10
 
-		/* TYPE DEFINITIONS */
-typedef union
-	{	/* pun float types as integer array */
-	unsigned short _Word[8];
-	float _Float;
-	double _Double;
-	long double _Long_double;
-	} _Dconst;
+/* TYPE DEFINITIONS */
+typedef union {
+    /* pun float types as integer array */
+    unsigned short _Word[8];
+    float _Float;
+    double _Double;
+    long double _Long_double;
+} _Dconst;
 
-		/* ERROR REPORTING */
+/* ERROR REPORTING */
 void __CLRCALL_PURE_OR_CDECL _Feraise(int);
 
-		/* double DECLARATIONS */
+/* double DECLARATIONS */
 _MRTIMP2_NCEEPURE double __CLRCALL_PURE_OR_CDECL _Cosh(double, double);
-_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _Dtest(double *);
-_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _Exp(double *, double, short);
+_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _Dtest(double*);
+_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _Exp(double*, double, short);
 _MRTIMP2_NCEEPURE double __CLRCALL_PURE_OR_CDECL _Sinh(double, double);
 extern _CRTIMP2_PURE /* const */ _Dconst _Denorm, _Hugeval, _Inf,
-	_Nan, _Snan;
+       _Nan, _Snan;
 
-		/* float DECLARATIONS */
+/* float DECLARATIONS */
 _MRTIMP2_NCEEPURE float __CLRCALL_PURE_OR_CDECL _FCosh(float, float);
-_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _FDtest(float *);
-_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _FExp(float *, float, short);
+_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _FDtest(float*);
+_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _FExp(float*, float, short);
 _MRTIMP2_NCEEPURE float __CLRCALL_PURE_OR_CDECL _FSinh(float, float);
 extern _CRTIMP2_PURE /* const */ _Dconst _FDenorm, _FInf, _FNan, _FSnan;
 
-		/* long double DECLARATIONS */
+/* long double DECLARATIONS */
 _MRTIMP2_NCEEPURE long double __CLRCALL_PURE_OR_CDECL _LCosh(long double, long double);
-_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _LDtest(long double *);
-_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _LExp(long double *, long double, short);
+_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _LDtest(long double*);
+_MRTIMP2_NCEEPURE short __CLRCALL_PURE_OR_CDECL _LExp(long double*, long double, short);
 _MRTIMP2_NCEEPURE long double __CLRCALL_PURE_OR_CDECL _LSinh(long double, long double);
 extern _CRTIMP2_PURE /* const */ _Dconst _LDenorm, _LInf, _LNan, _LSnan;
 #ifndef MRTDLL

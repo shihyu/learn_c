@@ -3,7 +3,7 @@
  * -
  * Copyright (c) 1985, 1988, 1993
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -15,7 +15,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,14 +29,14 @@
  * SUCH DAMAGE.
  * -
  * Portions Copyright (c) 1993 by Digital Equipment Corporation.
- * 
+ *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies, and that
  * the name of Digital Equipment Corporation not be used in advertising or
  * publicity pertaining to distribution of the document or software without
  * specific, written prior permission.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
@@ -70,50 +70,56 @@ __FBSDID("$FreeBSD: src/lib/libc/net/map_v4v6.c,v 1.10 2007/01/09 00:28:02 imp E
 #include <syslog.h>
 
 typedef union {
-	int32_t al;
-	char ac;
+    int32_t al;
+    char ac;
 } align;
 
 void
-_map_v4v6_address(const char *src, char *dst)
-{
-	u_char *p = (u_char *)dst;
-	char tmp[NS_INADDRSZ];
-	int i;
+_map_v4v6_address(const char* src, char* dst) {
+    u_char* p = (u_char*)dst;
+    char tmp[NS_INADDRSZ];
+    int i;
+    /* Stash a temporary copy so our caller can update in place. */
+    memcpy(tmp, src, NS_INADDRSZ);
 
-	/* Stash a temporary copy so our caller can update in place. */
-	memcpy(tmp, src, NS_INADDRSZ);
-	/* Mark this ipv6 addr as a mapped ipv4. */
-	for (i = 0; i < 10; i++)
-		*p++ = 0x00;
-	*p++ = 0xff;
-	*p++ = 0xff;
-	/* Retrieve the saved copy and we're done. */
-	memcpy((void*)p, tmp, NS_INADDRSZ);
+    /* Mark this ipv6 addr as a mapped ipv4. */
+    for (i = 0; i < 10; i++) {
+        *p++ = 0x00;
+    }
+
+    *p++ = 0xff;
+    *p++ = 0xff;
+    /* Retrieve the saved copy and we're done. */
+    memcpy((void*)p, tmp, NS_INADDRSZ);
 }
 
 void
-_map_v4v6_hostent(struct hostent *hp, char **bpp, char *ep) {
-	char **ap;
+_map_v4v6_hostent(struct hostent* hp, char** bpp, char* ep) {
+    char** ap;
 
-	if (hp->h_addrtype != AF_INET || hp->h_length != INADDRSZ)
-		return;
-	hp->h_addrtype = AF_INET6;
-	hp->h_length = IN6ADDRSZ;
-	for (ap = hp->h_addr_list; *ap; ap++) {
-		int i = (u_long)*bpp % sizeof(align);
+    if (hp->h_addrtype != AF_INET || hp->h_length != INADDRSZ) {
+        return;
+    }
 
-		if (i != 0)
-			i = sizeof(align) - i;
+    hp->h_addrtype = AF_INET6;
+    hp->h_length = IN6ADDRSZ;
 
-		if ((ep - *bpp) < (i + IN6ADDRSZ)) {
-			/* Out of memory.  Truncate address list here. */
-			*ap = NULL;
-			return;
-		}
-		*bpp += i;
-		_map_v4v6_address(*ap, *bpp);
-		*ap = *bpp;
-		*bpp += IN6ADDRSZ;
-	}
+    for (ap = hp->h_addr_list; *ap; ap++) {
+        int i = (u_long) * bpp % sizeof(align);
+
+        if (i != 0) {
+            i = sizeof(align) - i;
+        }
+
+        if ((ep - *bpp) < (i + IN6ADDRSZ)) {
+            /* Out of memory.  Truncate address list here. */
+            *ap = NULL;
+            return;
+        }
+
+        *bpp += i;
+        _map_v4v6_address(*ap, *bpp);
+        *ap = *bpp;
+        *bpp += IN6ADDRSZ;
+    }
 }

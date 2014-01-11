@@ -28,8 +28,8 @@ extern "C" {
  */
 
 struct _block_descriptor {
-        struct _block_descriptor *pnextdesc;    /* ptr to next descriptor */
-        void *pblock;               /* ptr to memory block */
+    struct _block_descriptor* pnextdesc;    /* ptr to next descriptor */
+    void* pblock;               /* ptr to memory block */
 };
 
 #define _BLKDESC    struct _block_descriptor
@@ -122,11 +122,11 @@ struct _block_descriptor {
 
 struct _heap_desc_ {
 
-        _PBLKDESC pfirstdesc;   /* pointer to first descriptor */
-        _PBLKDESC proverdesc;   /* rover pointer */
-        _PBLKDESC emptylist;    /* pointer to empty list */
+    _PBLKDESC pfirstdesc;   /* pointer to first descriptor */
+    _PBLKDESC proverdesc;   /* rover pointer */
+    _PBLKDESC emptylist;    /* pointer to empty list */
 
-        _BLKDESC  sentinel; /* Sentinel block for end of heap list */
+    _BLKDESC  sentinel; /* Sentinel block for end of heap list */
 
 };
 
@@ -137,10 +137,10 @@ extern struct _heap_desc_ _heap_desc;
  */
 
 struct _heap_region_ {
-        void * _regbase;    /* base address of region */
-        unsigned _currsize; /* current size of region */
-        unsigned _totalsize;    /* total size of region */
-        };
+    void* _regbase;     /* base address of region */
+    unsigned _currsize; /* current size of region */
+    unsigned _totalsize;    /* total size of region */
+};
 
 #define _heap_growsize _amblksiz
 
@@ -148,17 +148,17 @@ extern unsigned int _heap_resetsize;
 extern unsigned int _heap_regionsize;
 extern unsigned int _heap_maxregsize;
 extern struct _heap_region_ _heap_regions[];
-extern void ** _heap_descpages;
+extern void** _heap_descpages;
 
 #define _PAGESIZE_      0x1000      /* one page */
 
 #define _SEGSIZE_       0x10000     /* one segment (i.e., 64 Kb) */
 
 #define _HEAP_REGIONMAX     0x40        /* Max number of regions: 64 */
-                                        /* For small memory systems: */
+/* For small memory systems: */
 #define _HEAP_REGIONSIZE_S  0x4000      /* Initial region size (16K) */
 #define _HEAP_MAXREGSIZE_S  0x1000000   /* Maximum region size (16M) */
-                                        /* For large memory systems: */
+/* For large memory systems: */
 #define _HEAP_REGIONSIZE_L  0x100000    /* Initial region size  (1M) */
 #define _HEAP_MAXREGSIZE_L  0x1000000   /* Maximum region size (16M) */
 
@@ -254,21 +254,21 @@ extern void ** _heap_descpages;
  * Prototypes
  */
 
-__checkReturn  __bcount_opt(_Size) void * __cdecl _nh_malloc(__in size_t _Size, __in int _NhFlag);
-__checkReturn  __bcount_opt(_Size) void * __cdecl _heap_alloc(__in size_t _Size);
-__checkReturn  __bcount_opt(_Size) void * __cdecl _flat_malloc(__in size_t _Size);
+__checkReturn  __bcount_opt(_Size) void* __cdecl _nh_malloc(__in size_t _Size, __in int _NhFlag);
+__checkReturn  __bcount_opt(_Size) void* __cdecl _heap_alloc(__in size_t _Size);
+__checkReturn  __bcount_opt(_Size) void* __cdecl _flat_malloc(__in size_t _Size);
 __checkReturn _PBLKDESC __getempty(void);
 void __cdecl _heap_abort(void);
-__checkReturn int __cdecl _heap_addblock(__in void * _Block, __in unsigned int _Size);
+__checkReturn int __cdecl _heap_addblock(__in void* _Block, __in unsigned int _Size);
 
 
 void __cdecl _heap_free_region(__in int _Index);
-__checkReturn int __cdecl _heap_findaddr(__in void * _Block, __out _PBLKDESC * _PDesc);
+__checkReturn int __cdecl _heap_findaddr(__in void* _Block, __out _PBLKDESC* _PDesc);
 __checkReturn int __cdecl _heap_grow(__in unsigned int _Size);
 __checkReturn int __cdecl _heap_grow_region(__in unsigned _Index, __in size_t _Size);
 int __cdecl _heap_init(void);
 
-int __cdecl _heap_param(__in int _Flag, __in int _ParamID, void * _Value);
+int __cdecl _heap_param(__in int _Flag, __in int _ParamID, void* _Value);
 
 __checkReturn _PBLKDESC __cdecl _heap_search(__in unsigned _Size);
 __checkReturn _PBLKDESC __cdecl _heap_split_block(__in _PBLKDESC _Pdesc, __in size_t _NewSize);
@@ -287,9 +287,9 @@ void __cdecl _heap_print_heaplist(void);
  */
 
 
-void __cdecl _free_nolock(__inout_opt void * _Memory);
-__checkReturn size_t __cdecl _msize_nolock(__in void * _Memory);
-size_t __cdecl _heapused_nolock(__out_opt size_t *_PUsed, __out_opt size_t *_PFree);
+void __cdecl _free_nolock(__inout_opt void* _Memory);
+__checkReturn size_t __cdecl _msize_nolock(__in void* _Memory);
+size_t __cdecl _heapused_nolock(__out_opt size_t* _PUsed, __out_opt size_t* _PFree);
 
 #ifdef _DEBUG
 void __cdecl _heap_print_regions_nolock(void);

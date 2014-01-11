@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -40,13 +40,11 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/printf.c,v 1.11 2007/01/09 00:28:07 imp E
 #include <stdarg.h>
 
 int
-printf(char const * __restrict fmt, ...)
-{
-	int ret;
-	va_list ap;
-
-	va_start(ap, fmt);
-	ret = vfprintf(stdout, fmt, ap);
-	va_end(ap);
-	return (ret);
+printf(char const* __restrict fmt, ...) {
+    int ret;
+    va_list ap;
+    va_start(ap, fmt);
+    ret = vfprintf(stdout, fmt, ap);
+    va_end(ap);
+    return (ret);
 }

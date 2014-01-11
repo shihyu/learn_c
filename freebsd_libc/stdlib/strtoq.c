@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,8 +41,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strtoq.c,v 1.12 2007/01/09 00:28:10 imp 
  * Convert a string to a quad integer.
  */
 quad_t
-strtoq(const char *nptr, char **endptr, int base)
-{
-
-	return strtoll(nptr, endptr, base);
+strtoq(const char* nptr, char** endptr, int base) {
+    return strtoll(nptr, endptr, base);
 }

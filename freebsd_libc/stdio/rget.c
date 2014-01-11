@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -45,11 +45,11 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/rget.c,v 1.6 2007/01/09 00:28:07 imp Exp 
  * in the newly-filled buffer.
  */
 int
-__srget(FILE *fp)
-{
-	if (__srefill(fp) == 0) {
-		fp->_r--;
-		return (*fp->_p++);
-	}
-	return (EOF);
+__srget(FILE* fp) {
+    if (__srefill(fp) == 0) {
+        fp->_r--;
+        return (*fp->_p++);
+    }
+
+    return (EOF);
 }

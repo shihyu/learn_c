@@ -30,8 +30,6 @@ __FBSDID("$FreeBSD: src/lib/libc/amd64/sys/amd64_get_gsbase.c,v 1.2 2004/01/09 1
 #include <machine/sysarch.h>
 
 int
-amd64_get_gsbase(void **addr)
-{
-
-	return (sysarch(AMD64_GET_GSBASE, addr));
+amd64_get_gsbase(void** addr) {
+    return (sysarch(AMD64_GET_GSBASE, addr));
 }

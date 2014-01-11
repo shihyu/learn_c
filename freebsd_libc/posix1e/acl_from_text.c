@@ -43,70 +43,65 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_from_text.c,v 1.11 2007/02/26 02:07
 
 #include "acl_support.h"
 
-static int _posix1e_acl_name_to_id(acl_tag_t tag, char *name, uid_t *id);
-static acl_tag_t acl_string_to_tag(char *tag, char *qualifier);
-static char *string_skip_whitespace(char *string);
-static void string_trim_trailing_whitespace(char *string);
+static int _posix1e_acl_name_to_id(acl_tag_t tag, char* name, uid_t* id);
+static acl_tag_t acl_string_to_tag(char* tag, char* qualifier);
+static char* string_skip_whitespace(char* string);
+static void string_trim_trailing_whitespace(char* string);
 
-static char *
-string_skip_whitespace(char *string)
-{
+static char*
+string_skip_whitespace(char* string) {
+    while (*string && ((*string == ' ') || (*string == '\t'))) {
+        string++;
+    }
 
-	while (*string && ((*string == ' ') || (*string == '\t'))) {
-		string++;
-	}
-	return (string);
+    return (string);
 }
 
 static void
-string_trim_trailing_whitespace(char *string)
-{
-	char	*end;
+string_trim_trailing_whitespace(char* string) {
+    char*    end;
 
-	if (*string == '\0')
-		return;
+    if (*string == '\0') {
+        return;
+    }
 
-	end = string + strlen(string) - 1;
+    end = string + strlen(string) - 1;
 
-	while (end != string) {
-		if ((*end == ' ') || (*end == '\t')) {
-			*end = '\0';
-			end--;
-		} else {
-			return;
-		}
-	}
+    while (end != string) {
+        if ((*end == ' ') || (*end == '\t')) {
+            *end = '\0';
+            end--;
+        } else {
+            return;
+        }
+    }
 
-	return;
+    return;
 }
 
 static acl_tag_t
-acl_string_to_tag(char *tag, char *qualifier)
-{
-
-	if (*qualifier == '\0') {
-		if ((!strcmp(tag, "user")) || (!strcmp(tag, "u"))) {
-			return (ACL_USER_OBJ);
-		} else
-		if ((!strcmp(tag, "group")) || (!strcmp(tag, "g"))) {
-			return (ACL_GROUP_OBJ);
-		} else
-		if ((!strcmp(tag, "mask")) || (!strcmp(tag, "m"))) {
-			return (ACL_MASK);
-		} else
-		if ((!strcmp(tag, "other")) || (!strcmp(tag, "o"))) {
-			return (ACL_OTHER);
-		} else
-			return(-1);
-	} else {
-		if ((!strcmp(tag, "user")) || (!strcmp(tag, "u"))) {
-			return(ACL_USER);
-		} else
-		if ((!strcmp(tag, "group")) || (!strcmp(tag, "g"))) {
-			return(ACL_GROUP);
-		} else
-			return(-1);
-	}
+acl_string_to_tag(char* tag, char* qualifier) {
+    if (*qualifier == '\0') {
+        if ((!strcmp(tag, "user")) || (!strcmp(tag, "u"))) {
+            return (ACL_USER_OBJ);
+        } else if ((!strcmp(tag, "group")) || (!strcmp(tag, "g"))) {
+            return (ACL_GROUP_OBJ);
+        } else if ((!strcmp(tag, "mask")) || (!strcmp(tag, "m"))) {
+            return (ACL_MASK);
+        } else if ((!strcmp(tag, "other")) || (!strcmp(tag, "o"))) {
+            return (ACL_OTHER);
+        } else {
+            return (-1);
+        }
+    } else {
+        if ((!strcmp(tag, "user")) || (!strcmp(tag, "u"))) {
+            return (ACL_USER);
+        } else if ((!strcmp(tag, "group")) || (!strcmp(tag, "g"))) {
+            return (ACL_GROUP);
+        } else {
+            return (-1);
+        }
+    }
 }
 
 /*
@@ -115,126 +110,141 @@ acl_string_to_tag(char *tag, char *qualifier)
  * that.
  */
 acl_t
-acl_from_text(const char *buf_p)
-{
-	acl_tag_t	 t;
-	acl_perm_t	 p;
-	acl_t		 acl;
-	char		*mybuf_p, *line, *cur, *notcomment, *comment, *entry;
-	char		*tag, *qualifier, *permission;
-	int		 error;
-	uid_t		 id;
+acl_from_text(const char* buf_p) {
+    acl_tag_t    t;
+    acl_perm_t   p;
+    acl_t        acl;
+    char*        mybuf_p, *line, *cur, *notcomment, *comment, *entry;
+    char*        tag, *qualifier, *permission;
+    int      error;
+    uid_t        id;
+    /* Local copy we can mess up. */
+    mybuf_p = strdup(buf_p);
 
-	/* Local copy we can mess up. */
-	mybuf_p = strdup(buf_p);
-	if (mybuf_p == NULL)
-		return(NULL);
+    if (mybuf_p == NULL) {
+        return (NULL);
+    }
 
-	acl = acl_init(3);
-	if (acl == NULL) {
-		free(mybuf_p);
-		return(NULL);
-	}
+    acl = acl_init(3);
 
-	/* Outer loop: delimit at \n boundaries. */
-	cur = mybuf_p;
-	while ((line = strsep(&cur, "\n"))) {
-		/* Now split the line on the first # to strip out comments. */
-		comment = line;
-		notcomment = strsep(&comment, "#");
+    if (acl == NULL) {
+        free(mybuf_p);
+        return (NULL);
+    }
 
-		/* Inner loop: delimit at ',' boundaries. */
-		while ((entry = strsep(&notcomment, ","))) {
-			/* Now split into three ':' delimited fields. */
-			tag = strsep(&entry, ":");
-			if (tag == NULL) {
-				errno = EINVAL;
-				goto error_label;
-			}
-			tag = string_skip_whitespace(tag);
-			if ((*tag == '\0') && (!entry)) {
-				/*
-				 * Is an entirely comment line, skip to next
-				 * comma.
-				 */
-				continue;
-			}
-			string_trim_trailing_whitespace(tag);
+    /* Outer loop: delimit at \n boundaries. */
+    cur = mybuf_p;
 
-			qualifier = strsep(&entry, ":");
-			if (qualifier == NULL) {
-				errno = EINVAL;
-				goto error_label;
-			}
-			qualifier = string_skip_whitespace(qualifier);
-			string_trim_trailing_whitespace(qualifier);
+    while ((line = strsep(&cur, "\n"))) {
+        /* Now split the line on the first # to strip out comments. */
+        comment = line;
+        notcomment = strsep(&comment, "#");
 
-			permission = strsep(&entry, ":");
-			if (permission == NULL || entry) {
-				errno = EINVAL;
-				goto error_label;
-			}
-			permission = string_skip_whitespace(permission);
-			string_trim_trailing_whitespace(permission);
+        /* Inner loop: delimit at ',' boundaries. */
+        while ((entry = strsep(&notcomment, ","))) {
+            /* Now split into three ':' delimited fields. */
+            tag = strsep(&entry, ":");
 
-			t = acl_string_to_tag(tag, qualifier);
-			if (t == -1) {
-				errno = EINVAL;
-				goto error_label;
-			}
+            if (tag == NULL) {
+                errno = EINVAL;
+                goto error_label;
+            }
 
-			error = _posix1e_acl_string_to_perm(permission, &p);
-			if (error == -1) {
-				errno = EINVAL;
-				goto error_label;
-			}		
+            tag = string_skip_whitespace(tag);
 
-			switch(t) {
-			case ACL_USER_OBJ:
-			case ACL_GROUP_OBJ:
-			case ACL_MASK:
-			case ACL_OTHER:
-				if (*qualifier != '\0') {
-					errno = EINVAL;
-					goto error_label;
-				}
-				id = 0;
-				break;
+            if ((*tag == '\0') && (!entry)) {
+                /*
+                 * Is an entirely comment line, skip to next
+                 * comma.
+                 */
+                continue;
+            }
 
-			case ACL_USER:
-			case ACL_GROUP:
-				error = _posix1e_acl_name_to_id(t, qualifier,
-				    &id);
-				if (error == -1)
-					goto error_label;
-				break;
+            string_trim_trailing_whitespace(tag);
+            qualifier = strsep(&entry, ":");
 
-			default:
-				errno = EINVAL;
-				goto error_label;
-			}
+            if (qualifier == NULL) {
+                errno = EINVAL;
+                goto error_label;
+            }
 
-			error = _posix1e_acl_add_entry(acl, t, id, p);
-			if (error == -1)
-				goto error_label;
-		}
-	}
+            qualifier = string_skip_whitespace(qualifier);
+            string_trim_trailing_whitespace(qualifier);
+            permission = strsep(&entry, ":");
+
+            if (permission == NULL || entry) {
+                errno = EINVAL;
+                goto error_label;
+            }
+
+            permission = string_skip_whitespace(permission);
+            string_trim_trailing_whitespace(permission);
+            t = acl_string_to_tag(tag, qualifier);
+
+            if (t == -1) {
+                errno = EINVAL;
+                goto error_label;
+            }
+
+            error = _posix1e_acl_string_to_perm(permission, &p);
+
+            if (error == -1) {
+                errno = EINVAL;
+                goto error_label;
+            }
+
+            switch (t) {
+            case ACL_USER_OBJ:
+            case ACL_GROUP_OBJ:
+            case ACL_MASK:
+            case ACL_OTHER:
+                if (*qualifier != '\0') {
+                    errno = EINVAL;
+                    goto error_label;
+                }
+
+                id = 0;
+                break;
+
+            case ACL_USER:
+            case ACL_GROUP:
+                error = _posix1e_acl_name_to_id(t, qualifier,
+                                                &id);
+
+                if (error == -1) {
+                    goto error_label;
+                }
+
+                break;
+
+            default:
+                errno = EINVAL;
+                goto error_label;
+            }
+
+            error = _posix1e_acl_add_entry(acl, t, id, p);
+
+            if (error == -1) {
+                goto error_label;
+            }
+        }
+    }
 
 #if 0
-	/* XXX Should we only return ACLs valid according to acl_valid? */
-	/* Verify validity of the ACL we read in. */
-	if (acl_valid(acl) == -1) {
-		errno = EINVAL;
-		goto error_label;
-	}
+
+    /* XXX Should we only return ACLs valid according to acl_valid? */
+    /* Verify validity of the ACL we read in. */
+    if (acl_valid(acl) == -1) {
+        errno = EINVAL;
+        goto error_label;
+    }
+
 #endif
-
-	return(acl);
-
+    return (acl);
 error_label:
-	acl_free(acl);
-	free(mybuf_p);
-	return(NULL);
+    acl_free(acl);
+    free(mybuf_p);
+    return (NULL);
 }
 
 /*
@@ -247,43 +257,50 @@ error_label:
  * instead of a username.  What is correct behavior here?  Check chown.
  */
 static int
-_posix1e_acl_name_to_id(acl_tag_t tag, char *name, uid_t *id)
-{
-	struct group	*g;
-	struct passwd	*p;
-	unsigned long	l;
-	char 		*endp;
+_posix1e_acl_name_to_id(acl_tag_t tag, char* name, uid_t* id) {
+    struct group*    g;
+    struct passwd*   p;
+    unsigned long   l;
+    char*        endp;
 
-	switch(tag) {
-	case ACL_USER:
-		p = getpwnam(name);
-		if (p == NULL) {
-			l = strtoul(name, &endp, 0);
-			if (*endp != '\0' || l != (unsigned long)(uid_t)l) {
-				errno = EINVAL;
-				return (-1);
-			}
-			*id = (uid_t)l;
-			return (0);
-		}
-		*id = p->pw_uid;
-		return (0);
+    switch (tag) {
+    case ACL_USER:
+        p = getpwnam(name);
 
-	case ACL_GROUP:
-		g = getgrnam(name);
-		if (g == NULL) {
-			l = strtoul(name, &endp, 0);
-			if (*endp != '\0' || l != (unsigned long)(gid_t)l) {
-				errno = EINVAL;
-				return (-1);
-			}
-			*id = (gid_t)l;
-			return (0);
-		}
-		*id = g->gr_gid;
-		return (0);
+        if (p == NULL) {
+            l = strtoul(name, &endp, 0);
 
-	default:
-		return (EINVAL);
-	}
+            if (*endp != '\0' || l != (unsigned long)(uid_t)l) {
+                errno = EINVAL;
+                return (-1);
+            }
+
+            *id = (uid_t)l;
+            return (0);
+        }
+
+        *id = p->pw_uid;
+        return (0);
+
+    case ACL_GROUP:
+        g = getgrnam(name);
+
+        if (g == NULL) {
+            l = strtoul(name, &endp, 0);
+
+            if (*endp != '\0' || l != (unsigned long)(gid_t)l) {
+                errno = EINVAL;
+                return (-1);
+            }
+
+            *id = (gid_t)l;
+            return (0);
+        }
+
+        *id = g->gr_gid;
+        return (0);
+
+    default:
+        return (EINVAL);
+    }
 }

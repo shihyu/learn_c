@@ -23,7 +23,7 @@
 #error ERROR - ONLY WIN32 TARGET SUPPORTED!
 #endif  /* _WIN32 */
 
-__time32_t __cdecl __timet_from_ft(FILETIME * pft);
+__time32_t __cdecl __timet_from_ft(FILETIME* pft);
 
 /***
 *intptr_t _findfirst32(wildspec, finddata) - Find first matching file
@@ -52,16 +52,16 @@ __time32_t __cdecl __timet_from_ft(FILETIME * pft);
 #ifdef _USE_INT64
 
 intptr_t __cdecl _tfindfirst32i64(
-        const _TSCHAR * szWild,
-        struct _tfinddata32i64_t * pfd
-        )
+    const _TSCHAR* szWild,
+    struct _tfinddata32i64_t* pfd
+)
 
 #else  /* _USE_INT64 */
 
 intptr_t __cdecl _tfindfirst32(
-        const _TSCHAR * szWild,
-        struct _tfinddata32_t * pfd
-        )
+    const _TSCHAR* szWild,
+    struct _tfinddata32_t* pfd
+)
 
 #endif  /* _USE_INT64 */
 
@@ -69,50 +69,46 @@ intptr_t __cdecl _tfindfirst32(
     WIN32_FIND_DATA wfd;
     HANDLE          hFile;
     DWORD           err;
-
-    _VALIDATE_RETURN( (pfd != NULL), EINVAL, -1);
-
+    _VALIDATE_RETURN((pfd != NULL), EINVAL, -1);
     /* We assert to make sure the underlying Win32 struct WIN32_FIND_DATA's
     cFileName member doesn't have an array size greater than ours */
-
-    _VALIDATE_RETURN( (sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
-    _VALIDATE_RETURN( (szWild != NULL) , EINVAL, -1);
+    _VALIDATE_RETURN((sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
+    _VALIDATE_RETURN((szWild != NULL) , EINVAL, -1);
 
     if ((hFile = FindFirstFile(szWild, &wfd)) == INVALID_HANDLE_VALUE) {
         err = GetLastError();
+
         switch (err) {
-            case ERROR_NO_MORE_FILES:
-            case ERROR_FILE_NOT_FOUND:
-            case ERROR_PATH_NOT_FOUND:
-                errno = ENOENT;
-                break;
+        case ERROR_NO_MORE_FILES:
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            errno = ENOENT;
+            break;
 
-            case ERROR_NOT_ENOUGH_MEMORY:
-                errno = ENOMEM;
-                break;
+        case ERROR_NOT_ENOUGH_MEMORY:
+            errno = ENOMEM;
+            break;
 
-            default:
-                errno = EINVAL;
-                break;
+        default:
+            errno = EINVAL;
+            break;
         }
+
         return (-1);
     }
 
     pfd->attrib       = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)
-                      ? 0 : wfd.dwFileAttributes;
+                        ? 0 : wfd.dwFileAttributes;
     pfd->time_create  = __timet_from_ft(&wfd.ftCreationTime);
     pfd->time_access  = __timet_from_ft(&wfd.ftLastAccessTime);
     pfd->time_write   = __timet_from_ft(&wfd.ftLastWriteTime);
-
 #ifdef _USE_INT64
     pfd->size         = ((__int64)(wfd.nFileSizeHigh)) * (0x100000000i64) +
                         (__int64)(wfd.nFileSizeLow);
 #else  /* _USE_INT64 */
     pfd->size         = wfd.nFileSizeLow;
 #endif  /* _USE_INT64 */
-
     _ERRCHECK(_tcscpy_s(pfd->name, _countof(pfd->name), wfd.cFileName));
-
     return ((intptr_t)hFile);
 }
 
@@ -141,57 +137,55 @@ intptr_t __cdecl _tfindfirst32(
 
 #ifdef _USE_INT64
 
-int __cdecl _tfindnext32i64(intptr_t hFile, struct _tfinddata32i64_t * pfd)
+int __cdecl _tfindnext32i64(intptr_t hFile, struct _tfinddata32i64_t* pfd)
 
 #else  /* _USE_INT64 */
 
-int __cdecl _tfindnext32(intptr_t hFile, struct _tfinddata32_t * pfd)
+int __cdecl _tfindnext32(intptr_t hFile, struct _tfinddata32_t* pfd)
 
 #endif  /* _USE_INT64 */
 
 {
     WIN32_FIND_DATA wfd;
     DWORD           err;
-
-    _VALIDATE_RETURN( ((HANDLE)hFile != INVALID_HANDLE_VALUE), EINVAL, -1);
-    _VALIDATE_RETURN( (pfd != NULL), EINVAL, -1);
-    _VALIDATE_RETURN( (sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
+    _VALIDATE_RETURN(((HANDLE)hFile != INVALID_HANDLE_VALUE), EINVAL, -1);
+    _VALIDATE_RETURN((pfd != NULL), EINVAL, -1);
+    _VALIDATE_RETURN((sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
 
     if (!FindNextFile((HANDLE)hFile, &wfd)) {
         err = GetLastError();
+
         switch (err) {
-            case ERROR_NO_MORE_FILES:
-            case ERROR_FILE_NOT_FOUND:
-            case ERROR_PATH_NOT_FOUND:
-                errno = ENOENT;
-                break;
+        case ERROR_NO_MORE_FILES:
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            errno = ENOENT;
+            break;
 
-            case ERROR_NOT_ENOUGH_MEMORY:
-                errno = ENOMEM;
-                break;
+        case ERROR_NOT_ENOUGH_MEMORY:
+            errno = ENOMEM;
+            break;
 
-            default:
-                errno = EINVAL;
-                break;
+        default:
+            errno = EINVAL;
+            break;
         }
+
         return (-1);
     }
 
     pfd->attrib       = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)
-                      ? 0 : wfd.dwFileAttributes;
+                        ? 0 : wfd.dwFileAttributes;
     pfd->time_create  = __timet_from_ft(&wfd.ftCreationTime);
     pfd->time_access  = __timet_from_ft(&wfd.ftLastAccessTime);
     pfd->time_write   = __timet_from_ft(&wfd.ftLastWriteTime);
-
 #ifdef _USE_INT64
     pfd->size         = ((__int64)(wfd.nFileSizeHigh)) * (0x100000000i64) +
                         (__int64)(wfd.nFileSizeLow);
 #else  /* _USE_INT64 */
     pfd->size         = wfd.nFileSizeLow;
 #endif  /* _USE_INT64 */
-
     _ERRCHECK(_tcscpy_s(pfd->name, _countof(pfd->name), wfd.cFileName));
-
     return (0);
 }
 
@@ -217,12 +211,12 @@ int __cdecl _tfindnext32(intptr_t hFile, struct _tfinddata32_t * pfd)
 *
 *******************************************************************************/
 
-int __cdecl _findclose(intptr_t hFile)
-{
+int __cdecl _findclose(intptr_t hFile) {
     if (!FindClose((HANDLE)hFile)) {
         errno = EINVAL;
         return (-1);
     }
+
     return (0);
 }
 
@@ -250,8 +244,7 @@ int __cdecl _findclose(intptr_t hFile)
 *
 *******************************************************************************/
 
-__time32_t __cdecl __timet_from_ft(FILETIME * pft)
-{
+__time32_t __cdecl __timet_from_ft(FILETIME* pft) {
     SYSTEMTIME st;
     FILETIME lft;
 
@@ -264,19 +257,18 @@ __time32_t __cdecl __timet_from_ft(FILETIME * pft)
     /*
      * Convert to a broken down local time value
      */
-    if ( !FileTimeToLocalFileTime(pft, &lft) ||
-         !FileTimeToSystemTime(&lft, &st) )
-    {
+    if (!FileTimeToLocalFileTime(pft, &lft) ||
+            !FileTimeToSystemTime(&lft, &st)) {
         return (-1L);
     }
 
-    return ( __loctotime32_t(st.wYear,
-                             st.wMonth,
-                             st.wDay,
-                             st.wHour,
-                             st.wMinute,
-                             st.wSecond,
-                             -1) );
+    return (__loctotime32_t(st.wYear,
+                            st.wMonth,
+                            st.wDay,
+                            st.wHour,
+                            st.wMinute,
+                            st.wSecond,
+                            -1));
 }
 
 #endif  /* !defined (_UNICODE) && !defined (_USE_INT64) */

@@ -34,16 +34,16 @@
 *
 *******************************************************************************/
 
-void * __cdecl _memccpy (
-        void * dest,
-        const void * src,
-        int c,
-        size_t count
-        )
-{
-        while ( count && (*((char *)(dest = (char *)dest + 1) - 1) =
-        *((char *)(src = (char *)src + 1) - 1)) != (char)c )
-                count--;
+void* __cdecl _memccpy(
+    void* dest,
+    const void* src,
+    int c,
+    size_t count
+) {
+    while (count && (*((char*)(dest = (char*)dest + 1) - 1) =
+                         *((char*)(src = (char*)src + 1) - 1)) != (char)c) {
+        count--;
+    }
 
-        return(count ? dest : NULL);
+    return (count ? dest : NULL);
 }

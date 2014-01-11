@@ -17,8 +17,7 @@ int sum(int a, int b) {
 }
 
 int main(int argc, char* argv[]) {
-
-    printf("%d\n", sum(10,50));
+    printf("%d\n", sum(10, 50));
     test();
     printf("%d\n", g);
     return 0;
@@ -27,9 +26,7 @@ int main(int argc, char* argv[]) {
 
 // implement
 void test() {
-
     g = 100;
-    
 }
 
 int test1() {

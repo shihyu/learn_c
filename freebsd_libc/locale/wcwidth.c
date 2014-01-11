@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  * (c) UNIX System Laboratories, Inc.
  * All or some portions of this file are derived from material licensed
  * to the University of California by American Telephone and Telegraph
@@ -43,8 +43,6 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wcwidth.c,v 1.8 2007/01/09 00:28:01 imp 
 #undef wcwidth
 
 int
-wcwidth(wchar_t wc)
-{
-
-	return (__wcwidth(wc));
+wcwidth(wchar_t wc) {
+    return (__wcwidth(wc));
 }

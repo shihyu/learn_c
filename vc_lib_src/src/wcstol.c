@@ -72,55 +72,53 @@ extern "C" int _wchartodigit(wchar_t);
 #define FL_READDIGIT  8       /* we've read at least one correct digit */
 
 
-static unsigned long __cdecl wcstoxl (
-        _locale_t plocinfo,
-        const wchar_t *nptr,
-        const wchar_t **endptr,
-        int ibase,
-        int flags
-        )
-{
-    const wchar_t *p;
+static unsigned long __cdecl wcstoxl(
+    _locale_t plocinfo,
+    const wchar_t* nptr,
+    const wchar_t** endptr,
+    int ibase,
+    int flags
+) {
+    const wchar_t* p;
     wchar_t c;
     unsigned long number;
     unsigned digval;
     unsigned long maxval;
     _LocaleUpdate _loc_update(plocinfo);
 
-
     /* validation section */
-    if (endptr != NULL)
-    {
+    if (endptr != NULL) {
         /* store beginning of string in endptr */
         *endptr = nptr;
     }
+
     _VALIDATE_RETURN(nptr != NULL, EINVAL, 0L);
     _VALIDATE_RETURN(ibase == 0 || (2 <= ibase && ibase <= 36), EINVAL, 0L);
-
     p = nptr;           /* p is our scanning pointer */
     number = 0;         /* start with zero */
-
     c = *p++;           /* read char */
 
-    while ( _iswspace_l(c, _loc_update.GetLocaleT()) )
-        c = *p++;       /* skip whitespace */
+    while (_iswspace_l(c, _loc_update.GetLocaleT())) {
+        c = *p++;    /* skip whitespace */
+    }
 
     if (c == '-') {
         flags |= FL_NEG;    /* remember minus sign */
         c = *p++;
+    } else if (c == '+') {
+        c = *p++;    /* skip sign */
     }
-    else if (c == '+')
-        c = *p++;       /* skip sign */
 
     if (ibase == 0) {
         /* determine base free-lance, based on first two chars of
            string */
-        if (_wchartodigit(c) != 0)
+        if (_wchartodigit(c) != 0) {
             ibase = 10;
-        else if (*p == L'x' || *p == L'X')
+        } else if (*p == L'x' || *p == L'X') {
             ibase = 16;
-        else
+        } else {
             ibase = 8;
+        }
     }
 
     if (ibase == 16) {
@@ -134,19 +132,20 @@ static unsigned long __cdecl wcstoxl (
     /* if our number exceeds this, we will overflow on multiply */
     maxval = ULONG_MAX / ibase;
 
-
     for (;;) {  /* exit in middle of loop */
 
         /* convert c to value */
-        if ( (digval = _wchartodigit(c)) != -1 )
+        if ((digval = _wchartodigit(c)) != -1)
             ;
-        else if ( __ascii_iswalpha(c))
+        else if (__ascii_iswalpha(c)) {
             digval = __ascii_towupper(c) - L'A' + 10;
-        else
+        } else {
             break;
+        }
 
-        if (digval >= (unsigned)ibase)
-            break;      /* exit loop if bad digit found */
+        if (digval >= (unsigned)ibase) {
+            break;    /* exit loop if bad digit found */
+        }
 
         /* record the fact we have read one digit */
         flags |= FL_READDIGIT;
@@ -156,13 +155,13 @@ static unsigned long __cdecl wcstoxl (
            a tricky pre-check. */
 
         if (number < maxval || (number == maxval &&
-        (unsigned long)digval <= ULONG_MAX % ibase)) {
+                                (unsigned long)digval <= ULONG_MAX % ibase)) {
             /* we won't overflow, go ahead and multiply */
             number = number * ibase + digval;
-        }
-        else {
+        } else {
             /* we would have overflowed -- set the overflow flag */
             flags |= FL_OVERFLOW;
+
             if (endptr == NULL) {
                 /* no need to keep on parsing if we
                    don't have to return the endptr. */
@@ -180,83 +179,80 @@ static unsigned long __cdecl wcstoxl (
            string */
         if (endptr)
             /* store beginning of string in endptr later on */
+        {
             p = nptr;
+        }
+
         number = 0L;        /* return 0 */
-    }
-    else if ( (flags & FL_OVERFLOW) ||
-          ( !(flags & FL_UNSIGNED) &&
-            ( ( (flags & FL_NEG) && (number > -LONG_MIN) ) ||
-              ( !(flags & FL_NEG) && (number > LONG_MAX) ) ) ) )
-    {
+    } else if ((flags & FL_OVERFLOW) ||
+               (!(flags & FL_UNSIGNED) &&
+                (((flags & FL_NEG) && (number > -LONG_MIN)) ||
+                 (!(flags & FL_NEG) && (number > LONG_MAX))))) {
         /* overflow or signed overflow occurred */
         errno = ERANGE;
-        if ( flags & FL_UNSIGNED )
+
+        if (flags & FL_UNSIGNED) {
             number = ULONG_MAX;
-        else if ( flags & FL_NEG )
+        } else if (flags & FL_NEG) {
             number = (unsigned long)(-LONG_MIN);
-        else
+        } else {
             number = LONG_MAX;
+        }
     }
 
     if (endptr != NULL)
         /* store pointer to char that stopped the scan */
+    {
         *endptr = p;
+    }
 
     if (flags & FL_NEG)
         /* negate result if there was a neg sign */
+    {
         number = (unsigned long)(-(long)number);
+    }
 
     return number;          /* done. */
 }
 
-extern "C" long __cdecl wcstol (
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return (long) wcstoxl(&__initiallocalestructinfo, nptr, (const wchar_t **)endptr, ibase, 0);
-    }
-    else
-    {
-        return (long) wcstoxl(NULL, nptr, (const wchar_t **)endptr, ibase, 0);
+extern "C" long __cdecl wcstol(
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase
+) {
+    if (__locale_changed == 0) {
+        return (long) wcstoxl(&__initiallocalestructinfo, nptr, (const wchar_t**)endptr, ibase, 0);
+    } else {
+        return (long) wcstoxl(NULL, nptr, (const wchar_t**)endptr, ibase, 0);
     }
 }
 
-extern "C" long __cdecl _wcstol_l (
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase,
-        _locale_t plocinfo
-        )
-{
-    return (long) wcstoxl(plocinfo, nptr, (const wchar_t **)endptr, ibase, 0);
+extern "C" long __cdecl _wcstol_l(
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase,
+    _locale_t plocinfo
+) {
+    return (long) wcstoxl(plocinfo, nptr, (const wchar_t**)endptr, ibase, 0);
 }
 
-extern "C" unsigned long __cdecl wcstoul (
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return wcstoxl(&__initiallocalestructinfo, nptr, (const wchar_t **)endptr, ibase, FL_UNSIGNED);
-    }
-    else
-    {
-        return wcstoxl(NULL, nptr, (const wchar_t **)endptr, ibase, FL_UNSIGNED);
+extern "C" unsigned long __cdecl wcstoul(
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase
+) {
+    if (__locale_changed == 0) {
+        return wcstoxl(&__initiallocalestructinfo, nptr, (const wchar_t**)endptr, ibase, FL_UNSIGNED);
+    } else {
+        return wcstoxl(NULL, nptr, (const wchar_t**)endptr, ibase, FL_UNSIGNED);
     }
 }
 
-extern "C" unsigned long __cdecl _wcstoul_l (
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase,
-        _locale_t plocinfo
-        )
-{
-    return wcstoxl(plocinfo, nptr, (const wchar_t **)endptr, ibase, FL_UNSIGNED);
+extern "C" unsigned long __cdecl _wcstoul_l(
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase,
+    _locale_t plocinfo
+) {
+    return wcstoxl(plocinfo, nptr, (const wchar_t**)endptr, ibase, FL_UNSIGNED);
 }

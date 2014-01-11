@@ -1,10 +1,7 @@
 #include <stdio.h>
 
 int main(int argc, char* argv[]) {
-    int score; 
+    int score;
     scanf("%d", &score);
-
-
-
     return 0;
 }

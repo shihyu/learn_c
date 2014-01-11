@@ -1,4 +1,4 @@
-/*	$NetBSD: pmap_prot.c,v 1.10 2000/01/22 22:19:18 mycroft Exp $	*/
+/*  $NetBSD: pmap_prot.c,v 1.10 2000/01/22 22:19:18 mycroft Exp $   */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "@(#)pmap_prot.c 1.17 87/08/11 Copyr 1984 Sun Micro";
-static char *sccsid = "@(#)pmap_prot.c	2.1 88/07/29 4.0 RPCSRC";
+static char* sccsid2 = "@(#)pmap_prot.c 1.17 87/08/11 Copyr 1984 Sun Micro";
+static char* sccsid = "@(#)pmap_prot.c	2.1 88/07/29 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_prot.c,v 1.9 2004/10/16 06:11:35 obrien Exp $");
@@ -54,16 +54,17 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_prot.c,v 1.9 2004/10/16 06:11:35 obrie
 
 bool_t
 xdr_pmap(xdrs, regs)
-	XDR *xdrs;
-	struct pmap *regs;
+XDR* xdrs;
+struct pmap* regs;
 {
+    assert(xdrs != NULL);
+    assert(regs != NULL);
 
-	assert(xdrs != NULL);
-	assert(regs != NULL);
+    if (xdr_u_long(xdrs, &regs->pm_prog) &&
+            xdr_u_long(xdrs, &regs->pm_vers) &&
+            xdr_u_long(xdrs, &regs->pm_prot)) {
+        return (xdr_u_long(xdrs, &regs->pm_port));
+    }
 
-	if (xdr_u_long(xdrs, &regs->pm_prog) &&
-		xdr_u_long(xdrs, &regs->pm_vers) &&
-		xdr_u_long(xdrs, &regs->pm_prot))
-		return (xdr_u_long(xdrs, &regs->pm_port));
-	return (FALSE);
+    return (FALSE);
 }

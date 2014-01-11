@@ -5,23 +5,23 @@
  * may copy or modify Sun RPC without charge, but are not authorized
  * to license or distribute it to anyone else except as part of a product or
  * program developed by the user.
- * 
+ *
  * SUN RPC IS PROVIDED AS IS WITH NO WARRANTIES OF ANY KIND INCLUDING THE
  * WARRANTIES OF DESIGN, MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE, OR ARISING FROM A COURSE OF DEALING, USAGE OR TRADE PRACTICE.
- * 
+ *
  * Sun RPC is provided with no support and without any obligation on the
  * part of Sun Microsystems, Inc. to assist in its use, correction,
  * modification or enhancement.
- * 
+ *
  * SUN MICROSYSTEMS, INC. SHALL HAVE NO LIABILITY WITH RESPECT TO THE
  * INFRINGEMENT OF COPYRIGHTS, TRADE SECRETS OR ANY PATENTS BY SUN RPC
  * OR ANY PART THEREOF.
- * 
+ *
  * In no event will Sun Microsystems, Inc. be liable for any lost revenue
  * or profits or other special, indirect and consequential damages, even if
  * Sun has been advised of the possibility of such damages.
- * 
+ *
  * Sun Microsystems, Inc.
  * 2550 Garcia Avenue
  * Mountain View, California  94043
@@ -41,30 +41,30 @@ static char sccsid[] = "@(#)des_crypt.c	2.2 88/08/10 4.0 RPCSRC; from 1.13 88/02
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/des_crypt.c,v 1.8 2004/10/16 06:11:34 obrien Exp $");
 
-static int common_crypt( char *, char *, unsigned, unsigned, struct desparams * );
+static int common_crypt(char*, char*, unsigned, unsigned, struct desparams*);
 int (*__des_crypt_LOCAL)() = 0;
-extern int _des_crypt_call(char *, int, struct desparams *);
+extern int _des_crypt_call(char*, int, struct desparams*);
 /*
  * Copy 8 bytes
  */
 #define COPY8(src, dst) { \
-	char *a = (char *) dst; \
-	char *b = (char *) src; \
-	*a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
-	*a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
+    char *a = (char *) dst; \
+    char *b = (char *) src; \
+    *a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
+    *a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
 }
- 
+
 /*
  * Copy multiple of 8 bytes
  */
 #define DESCOPY(src, dst, len) { \
-	char *a = (char *) dst; \
-	char *b = (char *) src; \
-	int i; \
-	for (i = (int) len; i > 0; i -= 8) { \
-		*a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
-		*a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
-	} \
+    char *a = (char *) dst; \
+    char *b = (char *) src; \
+    int i; \
+    for (i = (int) len; i > 0; i -= 8) { \
+        *a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
+        *a++ = *b++; *a++ = *b++; *a++ = *b++; *a++ = *b++; \
+    } \
 }
 
 /*
@@ -72,25 +72,24 @@ extern int _des_crypt_call(char *, int, struct desparams *);
  */
 int
 cbc_crypt(key, buf, len, mode, ivec)
-	char *key;
-	char *buf;
-	unsigned len;
-	unsigned mode;
-	char *ivec;	
+char* key;
+char* buf;
+unsigned len;
+unsigned mode;
+char* ivec;
 {
-	int err;
-	struct desparams dp;
-
+    int err;
+    struct desparams dp;
 #ifdef BROKEN_DES
-	dp.UDES.UDES_buf = buf;
-	dp.des_mode = ECB;
+    dp.UDES.UDES_buf = buf;
+    dp.des_mode = ECB;
 #else
-	dp.des_mode = CBC;
+    dp.des_mode = CBC;
 #endif
-	COPY8(ivec, dp.des_ivec);
-	err = common_crypt(key, buf, len, mode, &dp);
-	COPY8(dp.des_ivec, ivec);
-	return(err);
+    COPY8(ivec, dp.des_ivec);
+    err = common_crypt(key, buf, len, mode, &dp);
+    COPY8(dp.des_ivec, ivec);
+    return (err);
 }
 
 
@@ -99,20 +98,19 @@ cbc_crypt(key, buf, len, mode, ivec)
  */
 int
 ecb_crypt(key, buf, len, mode)
-	char *key;
-	char *buf;
-	unsigned len;
-	unsigned mode;
+char* key;
+char* buf;
+unsigned len;
+unsigned mode;
 {
-	struct desparams dp;
-
+    struct desparams dp;
 #ifdef BROKEN_DES
-	dp.UDES.UDES_buf = buf;
-	dp.des_mode = CBC;
+    dp.UDES.UDES_buf = buf;
+    dp.des_mode = CBC;
 #else
-	dp.des_mode = ECB;
+    dp.des_mode = ECB;
 #endif
-	return(common_crypt(key, buf, len, mode, &dp));
+    return (common_crypt(key, buf, len, mode, &dp));
 }
 
 
@@ -121,34 +119,36 @@ ecb_crypt(key, buf, len, mode)
  * Common code to cbc_crypt() & ecb_crypt()
  */
 static int
-common_crypt(key, buf, len, mode, desp)	
-	char *key;	
-	char *buf;
-	unsigned len;
-	unsigned mode;
-	struct desparams *desp;
+common_crypt(key, buf, len, mode, desp)
+char* key;
+char* buf;
+unsigned len;
+unsigned mode;
+struct desparams* desp;
 {
-	int desdev;
+    int desdev;
 
-	if ((len % 8) != 0 || len > DES_MAXDATA) {
-		return(DESERR_BADPARAM);
-	}
-	desp->des_dir =
-		((mode & DES_DIRMASK) == DES_ENCRYPT) ? ENCRYPT : DECRYPT;
+    if ((len % 8) != 0 || len > DES_MAXDATA) {
+        return (DESERR_BADPARAM);
+    }
 
-	desdev = mode & DES_DEVMASK;
-	COPY8(key, desp->des_key);
-	/* 
-	 * software
-	 */
-	if (__des_crypt_LOCAL != NULL) {
-		if (!__des_crypt_LOCAL(buf, len, desp)) {
-			return (DESERR_HWERROR);
-		}
-	} else {
-		if (!_des_crypt_call(buf, len, desp)) {
-			return (DESERR_HWERROR);
-		}
-	}
-	return(desdev == DES_SW ? DESERR_NONE : DESERR_NOHWDEVICE);
+    desp->des_dir =
+        ((mode & DES_DIRMASK) == DES_ENCRYPT) ? ENCRYPT : DECRYPT;
+    desdev = mode & DES_DEVMASK;
+    COPY8(key, desp->des_key);
+
+    /*
+     * software
+     */
+    if (__des_crypt_LOCAL != NULL) {
+        if (!__des_crypt_LOCAL(buf, len, desp)) {
+            return (DESERR_HWERROR);
+        }
+    } else {
+        if (!_des_crypt_call(buf, len, desp)) {
+            return (DESERR_HWERROR);
+        }
+    }
+
+    return (desdev == DES_SW ? DESERR_NONE : DESERR_NOHWDEVICE);
 }

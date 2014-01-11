@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,16 +38,20 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/time.c,v 1.5 2007/01/09 00:27:55 imp Exp $"
 
 time_t
 time(t)
-	time_t *t;
+time_t* t;
 {
-	struct timeval tt;
-	time_t retval;
+    struct timeval tt;
+    time_t retval;
 
-	if (gettimeofday(&tt, (struct timezone *)0) < 0)
-		retval = -1;
-	else
-		retval = tt.tv_sec;
-	if (t != NULL)
-		*t = retval;
-	return (retval);
+    if (gettimeofday(&tt, (struct timezone*)0) < 0) {
+        retval = -1;
+    } else {
+        retval = tt.tv_sec;
+    }
+
+    if (t != NULL) {
+        *t = retval;
+    }
+
+    return (retval);
 }

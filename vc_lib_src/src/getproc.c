@@ -36,24 +36,21 @@
 *
 *******************************************************************************/
 
-int (__cdecl * __cdecl _getdllprocaddr(
-        intptr_t hMod,
-        char * szProcName,
-        intptr_t iOrdinal))(void)
-{
-        typedef int (__cdecl * PFN)(void);
+int (__cdecl* __cdecl _getdllprocaddr(
+         intptr_t hMod,
+         char* szProcName,
+         intptr_t iOrdinal))(void) {
+    typedef int (__cdecl * PFN)(void);
 
-        if (szProcName == NULL) {
-            if (iOrdinal <= 65535) {
-                return ((PFN)GetProcAddress((HANDLE)hMod, (LPSTR)iOrdinal));
-            }
+    if (szProcName == NULL) {
+        if (iOrdinal <= 65535) {
+            return ((PFN)GetProcAddress((HANDLE)hMod, (LPSTR)iOrdinal));
         }
-        else {
-            if (iOrdinal == (intptr_t)(-1)) {
-                return ((PFN)GetProcAddress((HANDLE)hMod, szProcName));
-            }
+    } else {
+        if (iOrdinal == (intptr_t)(-1)) {
+            return ((PFN)GetProcAddress((HANDLE)hMod, szProcName));
         }
+    }
 
-        return (NULL);
-
+    return (NULL);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -44,12 +44,11 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/negdi2.c,v 1.3 2007/01/09 00:28:03 imp Exp
  */
 quad_t
 __negdi2(a)
-	quad_t a;
+quad_t a;
 {
-	union uu aa, res;
-
-	aa.q = a;
-	res.ul[L] = -aa.ul[L];
-	res.ul[H] = -aa.ul[H] - (res.ul[L] > 0);
-	return (res.q);
+    union uu aa, res;
+    aa.q = a;
+    res.ul[L] = -aa.ul[L];
+    res.ul[H] = -aa.ul[H] - (res.ul[L] > 0);
+    return (res.q);
 }

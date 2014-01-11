@@ -26,7 +26,6 @@ void  __CLRCALL_OR_CDECL _setdefaultprecision(void);
 #ifdef __cplusplus
 extern "C"
 #endif  /* __cplusplus */
-void __CLRCALL_OR_CDECL _setdefaultprecision()
-{
-        _ERRCHECK(_controlfp_s(NULL, _PC_53, _MCW_PC));
+void __CLRCALL_OR_CDECL _setdefaultprecision() {
+    _ERRCHECK(_controlfp_s(NULL, _PC_53, _MCW_PC));
 }

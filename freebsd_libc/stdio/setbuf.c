@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -40,7 +40,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/setbuf.c,v 1.5 2007/01/09 00:28:07 imp Ex
 #include "local.h"
 
 void
-setbuf(FILE * __restrict fp, char * __restrict buf)
-{
-	(void) setvbuf(fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+setbuf(FILE* __restrict fp, char* __restrict buf) {
+    (void) setvbuf(fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }

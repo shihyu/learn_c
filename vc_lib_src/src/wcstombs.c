@@ -39,20 +39,22 @@
 *
 *******************************************************************************/
 
-static size_t __cdecl wcsncnt (
-        const wchar_t *string,
-        size_t cnt
-        )
-{
-        size_t n = cnt+1;
-        wchar_t *cp = (wchar_t *)string;
+static size_t __cdecl wcsncnt(
+    const wchar_t* string,
+    size_t cnt
+) {
+    size_t n = cnt + 1;
+    wchar_t* cp = (wchar_t*)string;
 
-        while (--n && *cp)
-            cp++;
+    while (--n && *cp) {
+        cp++;
+    }
 
-        if (n && !*cp)
-            return cp - string + 1;
-        return cnt;
+    if (n && !*cp) {
+        return cp - string + 1;
+    }
+
+    return cnt;
 }
 
 /***
@@ -82,13 +84,12 @@ static size_t __cdecl wcsncnt (
 *
 *******************************************************************************/
 
-extern "C" size_t __cdecl _wcstombs_l_helper (
-        char * s,
-        const wchar_t * pwcs,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
+extern "C" size_t __cdecl _wcstombs_l_helper(
+    char* s,
+    const wchar_t* pwcs,
+    size_t n,
+    _locale_t plocinfo
+) {
     size_t count = 0;
     int i, retval;
     char buffer[MB_LEN_MAX];
@@ -96,21 +97,18 @@ extern "C" size_t __cdecl _wcstombs_l_helper (
 
     if (s && n == 0)
         /* dest string exists, but 0 bytes converted */
+    {
         return 0;
+    }
 
     /* validation section */
-    _VALIDATE_RETURN(pwcs != NULL, EINVAL, (size_t)-1);
-    _VALIDATE_RETURN(n <= INT_MAX, EINVAL, (size_t)-1);
-
-
+    _VALIDATE_RETURN(pwcs != NULL, EINVAL, (size_t) - 1);
+    _VALIDATE_RETURN(n <= INT_MAX, EINVAL, (size_t) - 1);
     /* if destination string exists, fill it in */
-
     _LocaleUpdate _loc_update(plocinfo);
 
-    if (s)
-    {
-        if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE )
-        {
+    if (s) {
+        if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
             /* C locale: easy and fast */
             /* Actually, there are such wchar_t characters which are > 255,
              * but they can be transformed to a valid single byte char
@@ -120,102 +118,100 @@ extern "C" size_t __cdecl _wcstombs_l_helper (
              * wchar_t unless we pass the correct codepage (1256, Arabic).
              * See bug VSW:192653.
              */
-            while(count < n)
-            {
-                if (*pwcs > 255)  /* validate high byte */
-                {
+            while (count < n) {
+                if (*pwcs > 255) { /* validate high byte */
                     errno = EILSEQ;
-                    return (size_t)-1;  /* error */
+                    return (size_t) - 1; /* error */
                 }
-                s[count] = (char) *pwcs;
-                if (*pwcs++ == L'\0')
+
+                s[count] = (char) * pwcs;
+
+                if (*pwcs++ == L'\0') {
                     return count;
+                }
+
                 count++;
             }
+
             return count;
         } else {
-
-            if (1 == _loc_update.GetLocaleT()->locinfo->mb_cur_max)
-            {
+            if (1 == _loc_update.GetLocaleT()->locinfo->mb_cur_max) {
                 /* If SBCS, one wchar_t maps to one char */
 
                 /* WideCharToMultiByte will compare past NULL - reset n */
-                if (n > 0)
+                if (n > 0) {
                     n = wcsncnt(pwcs, n);
-                if ( ((count = WideCharToMultiByte( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                                    0,
-                                                    pwcs,
-                                                    (int)n,
-                                                    s,
-                                                    (int)n,
-                                                    NULL,
-                                                    &defused )) != 0) &&
-                     (!defused) )
-                {
-                    if (*(s + count - 1) == '\0')
-                        count--; /* don't count NUL */
+                }
+
+                if (((count = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                                  0,
+                                                  pwcs,
+                                                  (int)n,
+                                                  s,
+                                                  (int)n,
+                                                  NULL,
+                                                  &defused)) != 0) &&
+                        (!defused)) {
+                    if (*(s + count - 1) == '\0') {
+                        count--;    /* don't count NUL */
+                    }
 
                     return count;
                 }
 
                 errno = EILSEQ;
-                return (size_t)-1;
-            }
-            else {
-
+                return (size_t) - 1;
+            } else {
                 /* If MBCS, wchar_t to char mapping unknown */
 
                 /* Assume that usually the buffer is large enough */
-                if ( ((count = WideCharToMultiByte( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                                    0,
-                                                    pwcs,
-                                                    -1,
-                                                    s,
-                                                    (int)n,
-                                                    NULL,
-                                                    &defused )) != 0) &&
-                     (!defused) )
-                {
+                if (((count = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                                  0,
+                                                  pwcs,
+                                                  -1,
+                                                  s,
+                                                  (int)n,
+                                                  NULL,
+                                                  &defused)) != 0) &&
+                        (!defused)) {
                     return count - 1; /* don't count NUL */
                 }
 
-                if (defused || GetLastError() != ERROR_INSUFFICIENT_BUFFER)
-                {
+                if (defused || GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
                     errno = EILSEQ;
-                    return (size_t)-1;
+                    return (size_t) - 1;
                 }
 
                 /* buffer not large enough, must do char by char */
-                while (count < n)
-                {
-                    if ( ((retval = WideCharToMultiByte( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                                         0,
-                                                         pwcs,
-                                                         1,
-                                                         buffer,
-                                                         _loc_update.GetLocaleT()->locinfo->mb_cur_max,
-                                                         NULL,
-                                                         &defused )) == 0)
-                         || defused )
-                    {
+                while (count < n) {
+                    if (((retval = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                                       0,
+                                                       pwcs,
+                                                       1,
+                                                       buffer,
+                                                       _loc_update.GetLocaleT()->locinfo->mb_cur_max,
+                                                       NULL,
+                                                       &defused)) == 0)
+                            || defused) {
                         errno = EILSEQ;
-                        return (size_t)-1;
+                        return (size_t) - 1;
                     }
 
                     /* enforce this for prefast */
                     if (retval < 0 ||
-                        retval > _countof(buffer))
-                    {
+                            retval > _countof(buffer)) {
                         errno = EILSEQ;
-                        return (size_t)-1;
+                        return (size_t) - 1;
                     }
 
-                    if (count + retval > n)
+                    if (count + retval > n) {
                         return count;
+                    }
 
                     for (i = 0; i < retval; i++, count++) /* store character */
-                        if((s[count] = buffer[i])=='\0')
+                        if ((s[count] = buffer[i]) == '\0') {
                             return count;
+                        }
 
                     pwcs++;
                 }
@@ -223,47 +219,42 @@ extern "C" size_t __cdecl _wcstombs_l_helper (
                 return count;
             }
         }
-    }
-    else { /* s == NULL, get size only, pwcs must be NUL-terminated */
-        if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE )
+    } else { /* s == NULL, get size only, pwcs must be NUL-terminated */
+        if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
             return wcslen(pwcs);
-        else {
-            if ( ((count = WideCharToMultiByte( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                                0,
-                                                pwcs,
-                                                -1,
-                                                NULL,
-                                                0,
-                                                NULL,
-                                                &defused )) == 0) ||
-                 (defused) )
-            {
+        } else {
+            if (((count = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                              0,
+                                              pwcs,
+                                              -1,
+                                              NULL,
+                                              0,
+                                              NULL,
+                                              &defused)) == 0) ||
+                    (defused)) {
                 errno = EILSEQ;
-                return (size_t)-1;
+                return (size_t) - 1;
             }
 
             return count - 1;
         }
     }
-
 }
 
-extern "C" size_t __cdecl _wcstombs_l (
-        char * s,
-        const wchar_t * pwcs,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
+extern "C" size_t __cdecl _wcstombs_l(
+    char* s,
+    const wchar_t* pwcs,
+    size_t n,
+    _locale_t plocinfo
+) {
     return _wcstombs_l_helper(s, pwcs, n, plocinfo);
 }
 
-extern "C" size_t __cdecl wcstombs (
-        char * s,
-        const wchar_t * pwcs,
-        size_t n
-        )
-{
+extern "C" size_t __cdecl wcstombs(
+    char* s,
+    const wchar_t* pwcs,
+    size_t n
+) {
     return _wcstombs_l_helper(s, pwcs, n, NULL);
 }
 
@@ -292,54 +283,48 @@ extern "C" size_t __cdecl wcstombs (
 *
 *******************************************************************************/
 
-extern "C" errno_t __cdecl _wcstombs_s_l (
-        size_t *pConvertedChars,
-        char * dst,
-        size_t sizeInBytes,
-        const wchar_t * src,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
+extern "C" errno_t __cdecl _wcstombs_s_l(
+    size_t* pConvertedChars,
+    char* dst,
+    size_t sizeInBytes,
+    const wchar_t* src,
+    size_t n,
+    _locale_t plocinfo
+) {
     size_t retsize;
     errno_t retvalue = 0;
-
     /* validation section */
     _VALIDATE_RETURN_ERRCODE((dst != NULL && sizeInBytes > 0) || (dst == NULL && sizeInBytes == 0), EINVAL);
-    if (dst != NULL)
-    {
+
+    if (dst != NULL) {
         _RESET_STRING(dst, sizeInBytes);
     }
 
-    if (pConvertedChars != NULL)
-    {
+    if (pConvertedChars != NULL) {
         *pConvertedChars = 0;
     }
 
     retsize = _wcstombs_l_helper(dst, src, (n > sizeInBytes ? sizeInBytes : n), plocinfo);
 
-    if (retsize == (size_t)-1)
-    {
-        if (dst != NULL)
-        {
+    if (retsize == (size_t) - 1) {
+        if (dst != NULL) {
             _RESET_STRING(dst, sizeInBytes);
         }
+
         return errno;
     }
 
     /* count the null terminator */
     retsize++;
 
-    if (dst != NULL)
-    {
+    if (dst != NULL) {
         /* return error if the string does not fit, unless n == _TRUNCATE */
-        if (retsize > sizeInBytes)
-        {
-            if (n != _TRUNCATE)
-            {
+        if (retsize > sizeInBytes) {
+            if (n != _TRUNCATE) {
                 _RESET_STRING(dst, sizeInBytes);
                 _VALIDATE_RETURN_ERRCODE(sizeInBytes > retsize, ERANGE);
             }
+
             retsize = sizeInBytes;
             retvalue = STRUNCATE;
         }
@@ -348,21 +333,19 @@ extern "C" errno_t __cdecl _wcstombs_s_l (
         dst[retsize - 1] = '\0';
     }
 
-    if (pConvertedChars != NULL)
-    {
+    if (pConvertedChars != NULL) {
         *pConvertedChars = retsize;
     }
 
     return retvalue;
 }
 
-extern "C" errno_t __cdecl wcstombs_s (
-        size_t *pConvertedChars,
-        char * dst,
-        size_t sizeInBytes,
-        const wchar_t * src,
-        size_t n
-        )
-{
+extern "C" errno_t __cdecl wcstombs_s(
+    size_t* pConvertedChars,
+    char* dst,
+    size_t sizeInBytes,
+    const wchar_t* src,
+    size_t n
+) {
     return _wcstombs_s_l(pConvertedChars, dst, sizeInBytes, src, n, NULL);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -46,39 +46,47 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fopen.c,v 1.11 2007/01/09 00:28:06 imp Ex
 
 #include "local.h"
 
-FILE *
+FILE*
 fopen(file, mode)
-	const char * __restrict file;
-	const char * __restrict mode;
+const char* __restrict file;
+const char* __restrict mode;
 {
-	FILE *fp;
-	int f;
-	int flags, oflags;
+    FILE* fp;
+    int f;
+    int flags, oflags;
 
-	if ((flags = __sflags(mode, &oflags)) == 0)
-		return (NULL);
-	if ((fp = __sfp()) == NULL)
-		return (NULL);
-	if ((f = _open(file, oflags, DEFFILEMODE)) < 0) {
-		fp->_flags = 0;			/* release */
-		return (NULL);
-	}
-	fp->_file = f;
-	fp->_flags = flags;
-	fp->_cookie = fp;
-	fp->_read = __sread;
-	fp->_write = __swrite;
-	fp->_seek = __sseek;
-	fp->_close = __sclose;
-	/*
-	 * When opening in append mode, even though we use O_APPEND,
-	 * we need to seek to the end so that ftell() gets the right
-	 * answer.  If the user then alters the seek pointer, or
-	 * the file extends, this will fail, but there is not much
-	 * we can do about this.  (We could set __SAPP and check in
-	 * fseek and ftell.)
-	 */
-	if (oflags & O_APPEND)
-		(void)_sseek(fp, (fpos_t)0, SEEK_END);
-	return (fp);
+    if ((flags = __sflags(mode, &oflags)) == 0) {
+        return (NULL);
+    }
+
+    if ((fp = __sfp()) == NULL) {
+        return (NULL);
+    }
+
+    if ((f = _open(file, oflags, DEFFILEMODE)) < 0) {
+        fp->_flags = 0;         /* release */
+        return (NULL);
+    }
+
+    fp->_file = f;
+    fp->_flags = flags;
+    fp->_cookie = fp;
+    fp->_read = __sread;
+    fp->_write = __swrite;
+    fp->_seek = __sseek;
+    fp->_close = __sclose;
+
+    /*
+     * When opening in append mode, even though we use O_APPEND,
+     * we need to seek to the end so that ftell() gets the right
+     * answer.  If the user then alters the seek pointer, or
+     * the file extends, this will fail, but there is not much
+     * we can do about this.  (We could set __SAPP and check in
+     * fseek and ftell.)
+     */
+    if (oflags & O_APPEND) {
+        (void)_sseek(fp, (fpos_t)0, SEEK_END);
+    }
+
+    return (fp);
 }

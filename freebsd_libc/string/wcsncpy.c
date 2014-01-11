@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,21 +44,23 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcsncpy.c,v 1.10 2007/01/09 00:28:12 imp
  * Copy src to dst, truncating or null-padding to always copy n bytes.
  * Return dst.
  */
-wchar_t *
-wcsncpy(wchar_t * __restrict dst, const wchar_t * __restrict src, size_t n)
-{
-	if (n != 0) {
-		wchar_t *d = dst;
-		const wchar_t *s = src;
+wchar_t*
+wcsncpy(wchar_t* __restrict dst, const wchar_t* __restrict src, size_t n) {
+    if (n != 0) {
+        wchar_t* d = dst;
+        const wchar_t* s = src;
 
-		do {
-			if ((*d++ = *s++) == L'\0') {
-				/* NUL pad the remaining n-1 bytes */
-				while (--n != 0)
-					*d++ = L'\0';
-				break;
-			}
-		} while (--n != 0);
-	}
-	return (dst);
+        do {
+            if ((*d++ = *s++) == L'\0') {
+                /* NUL pad the remaining n-1 bytes */
+                while (--n != 0) {
+                    *d++ = L'\0';
+                }
+
+                break;
+            }
+        } while (--n != 0);
+    }
+
+    return (dst);
 }

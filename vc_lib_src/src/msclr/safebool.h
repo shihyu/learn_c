@@ -23,21 +23,18 @@
 #error ERROR: msclr libraries are not compatible with /clr:oldSyntax
 #endif  /* __cplusplus_cli */
 
-namespace msclr
-{
+namespace msclr {
 
-value class _detail_class
-{
-public:
-    value class dummy_struct
-    {
+    value class _detail_class {
     public:
-        static initonly System::String^ dummy_string = "";
+        value class dummy_struct {
+        public:
+            static initonly System::String^ dummy_string = "";
+        };
+        typedef System::String^ _safe_bool;
+        static _safe_bool const _safe_true  = dummy_struct::dummy_string;
+        static _safe_bool const _safe_false = nullptr;
     };
-    typedef System::String^ _safe_bool;
-    static _safe_bool const _safe_true  = dummy_struct::dummy_string;
-    static _safe_bool const _safe_false = nullptr;
-};
 
 }
 

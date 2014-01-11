@@ -30,7 +30,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/imaxabs.c,v 1.1 2001/11/15 02:05:03 mike
 #include <inttypes.h>
 
 intmax_t
-imaxabs(intmax_t j)
-{
-	return (j < 0 ? -j : j);
+imaxabs(intmax_t j) {
+    return (j < 0 ? -j : j);
 }

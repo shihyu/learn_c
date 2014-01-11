@@ -12,8 +12,7 @@ struct funds {
 
 double sum(const struct funds money[], int n);
 
-int main(void)
-{
+int main(void) {
     struct funds jones[N] = {
         {
             "Garlic-Melon Bank",
@@ -28,20 +27,18 @@ int main(void)
             3203.89
         }
     };
-
     printf("The Joneses have a total of $%.2f.\n",
-           sum(jones,N));
-    
+           sum(jones, N));
     return 0;
 }
 
-double sum(const struct funds money[], int n)
-{
+double sum(const struct funds money[], int n) {
     double total;
     int i;
 
-    for (i = 0, total = 0; i < n; i++)
+    for (i = 0, total = 0; i < n; i++) {
         total += money[i].bankfund + money[i].savefund;
-    
-    return(total);
+    }
+
+    return (total);
 }

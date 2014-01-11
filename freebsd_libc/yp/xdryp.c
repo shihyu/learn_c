@@ -36,7 +36,7 @@ __FBSDID("$FreeBSD: src/lib/libc/yp/xdryp.c,v 1.14 2002/04/28 15:18:47 des Exp $
 #include <string.h>
 
 extern int (*ypresp_allfn)();
-extern void *ypresp_data;
+extern void* ypresp_data;
 
 /*
  * I'm leaving the xdr_datum() function in purely for backwards
@@ -45,70 +45,76 @@ extern void *ypresp_data;
  * leave it in in case somebody goes looking for it.
  */
 typedef struct {
-	char *dptr;
-	int  dsize;
+    char* dptr;
+    int  dsize;
 } datum;
 
 bool_t
-xdr_datum(XDR *xdrs, datum *objp)
-{
-	if (!xdr_bytes(xdrs, (char **)&objp->dptr, (u_int *)&objp->dsize, YPMAXRECORD)) {
-		return (FALSE);
-	}
-	return (TRUE);
+xdr_datum(XDR* xdrs, datum* objp) {
+    if (!xdr_bytes(xdrs, (char**)&objp->dptr, (u_int*)&objp->dsize, YPMAXRECORD)) {
+        return (FALSE);
+    }
+
+    return (TRUE);
 }
 
 bool_t
-xdr_ypresp_all_seq(XDR *xdrs, u_long *objp)
-{
-	struct ypresp_all out;
-	u_long status;
-	char *key, *val;
-	int r;
+xdr_ypresp_all_seq(XDR* xdrs, u_long* objp) {
+    struct ypresp_all out;
+    u_long status;
+    char* key, *val;
+    int r;
+    bzero(&out, sizeof out);
 
-	bzero(&out, sizeof out);
-	while (1) {
-		if (!xdr_ypresp_all(xdrs, &out)) {
-			xdr_free((xdrproc_t)xdr_ypresp_all, &out);
-			*objp = YP_YPERR;
-			return (FALSE);
-		}
-		if (out.more == 0) {
-			xdr_free((xdrproc_t)xdr_ypresp_all, &out);
-			*objp = YP_NOMORE;
-			return (TRUE);
-		}
-		status = out.ypresp_all_u.val.stat;
-		switch (status) {
-		case YP_TRUE:
-			key = (char *)malloc(out.ypresp_all_u.val.key.keydat_len + 1);
-			bcopy(out.ypresp_all_u.val.key.keydat_val, key,
-				out.ypresp_all_u.val.key.keydat_len);
-			key[out.ypresp_all_u.val.key.keydat_len] = '\0';
-			val = (char *)malloc(out.ypresp_all_u.val.val.valdat_len + 1);
-			bcopy(out.ypresp_all_u.val.val.valdat_val, val,
-				out.ypresp_all_u.val.val.valdat_len);
-			val[out.ypresp_all_u.val.val.valdat_len] = '\0';
-			xdr_free((xdrproc_t)xdr_ypresp_all, &out);
+    while (1) {
+        if (!xdr_ypresp_all(xdrs, &out)) {
+            xdr_free((xdrproc_t)xdr_ypresp_all, &out);
+            *objp = YP_YPERR;
+            return (FALSE);
+        }
 
-			r = (*ypresp_allfn)(status,
-				key, out.ypresp_all_u.val.key.keydat_len,
-				val, out.ypresp_all_u.val.val.valdat_len,
-				ypresp_data);
-			*objp = status;
-			free(key);
-			free(val);
-			if (r)
-				return (TRUE);
-			break;
-		case YP_NOMORE:
-			xdr_free((xdrproc_t)xdr_ypresp_all, &out);
-			*objp = YP_NOMORE;
-			return (TRUE);
-		default:
-			xdr_free((xdrproc_t)xdr_ypresp_all, &out);
-			*objp = status;
-			return (TRUE);
-		}
-	}
+        if (out.more == 0) {
+            xdr_free((xdrproc_t)xdr_ypresp_all, &out);
+            *objp = YP_NOMORE;
+            return (TRUE);
+        }
+
+        status = out.ypresp_all_u.val.stat;
+
+        switch (status) {
+        case YP_TRUE:
+            key = (char*)malloc(out.ypresp_all_u.val.key.keydat_len + 1);
+            bcopy(out.ypresp_all_u.val.key.keydat_val, key,
+                  out.ypresp_all_u.val.key.keydat_len);
+            key[out.ypresp_all_u.val.key.keydat_len] = '\0';
+            val = (char*)malloc(out.ypresp_all_u.val.val.valdat_len + 1);
+            bcopy(out.ypresp_all_u.val.val.valdat_val, val,
+                  out.ypresp_all_u.val.val.valdat_len);
+            val[out.ypresp_all_u.val.val.valdat_len] = '\0';
+            xdr_free((xdrproc_t)xdr_ypresp_all, &out);
+            r = (*ypresp_allfn)(status,
+                                key, out.ypresp_all_u.val.key.keydat_len,
+                                val, out.ypresp_all_u.val.val.valdat_len,
+                                ypresp_data);
+            *objp = status;
+            free(key);
+            free(val);
+
+            if (r) {
+                return (TRUE);
+            }
+
+            break;
+
+        case YP_NOMORE:
+            xdr_free((xdrproc_t)xdr_ypresp_all, &out);
+            *objp = YP_NOMORE;
+            return (TRUE);
+
+        default:
+            xdr_free((xdrproc_t)xdr_ypresp_all, &out);
+            *objp = status;
+            return (TRUE);
+        }
+    }
 }

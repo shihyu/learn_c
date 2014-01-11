@@ -38,17 +38,14 @@
 *Exceptions:
 *
 *******************************************************************************/
-void * operator new(
-        size_t cb,
-        int nBlockUse,
-        const char * szFileName,
-        int nLine
-        )
-{
-    void *res = _nh_malloc_dbg( cb, 1, nBlockUse, szFileName, nLine );
-
+void* operator new(
+    size_t cb,
+    int nBlockUse,
+    const char* szFileName,
+    int nLine
+) {
+    void* res = _nh_malloc_dbg(cb, 1, nBlockUse, szFileName, nLine);
     RTCCALLBACK(_RTC_Allocate_hook, (res, cb, 0));
-
     return res;
 }
 
@@ -74,17 +71,14 @@ void * operator new(
 *Exceptions:
 *
 *******************************************************************************/
-void * operator new[](
-        size_t cb,
-        int nBlockUse,
-        const char * szFileName,
-        int nLine
-        )
-{
-    void *res = operator new(cb, nBlockUse, szFileName, nLine );
-
+void* operator new[](
+    size_t cb,
+    int nBlockUse,
+    const char* szFileName,
+    int nLine
+) {
+    void* res = operator new(cb, nBlockUse, szFileName, nLine);
     RTCCALLBACK(_RTC_Allocate_hook, (res, cb, 0));
-
     return res;
 }
 

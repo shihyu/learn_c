@@ -50,11 +50,10 @@ PFV _cfltcvt_tab[10] = {
     _fptrap     /*  _forcdecpt_l */
 };
 
-void __cdecl _initp_misc_cfltcvt_tab()
-{
+void __cdecl _initp_misc_cfltcvt_tab() {
     int i;
-    for (i = 0; i < _countof(_cfltcvt_tab); ++i)
-    {
+
+    for (i = 0; i < _countof(_cfltcvt_tab); ++i) {
         _cfltcvt_tab[i] = (PFV)_encode_pointer(_cfltcvt_tab[i]);
     }
 }

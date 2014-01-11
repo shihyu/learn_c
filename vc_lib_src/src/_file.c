@@ -31,26 +31,25 @@ char _bufin[_INTERNAL_BUFSIZ];
  * is not initialized)
  */
 FILE _iob[_IOB_ENTRIES] = {
-        /* _ptr, _cnt, _base,  _flag, _file, _charbuf, _bufsiz */
+    /* _ptr, _cnt, _base,  _flag, _file, _charbuf, _bufsiz */
 
-        /* stdin (_iob[0]) */
+    /* stdin (_iob[0]) */
 
-        { _bufin, 0, _bufin, _IOREAD | _IOYOURBUF, 0, 0, _INTERNAL_BUFSIZ },
+    { _bufin, 0, _bufin, _IOREAD | _IOYOURBUF, 0, 0, _INTERNAL_BUFSIZ },
 
-        /* stdout (_iob[1]) */
+    /* stdout (_iob[1]) */
 
-        { NULL, 0, NULL, _IOWRT, 1, 0, 0 },
+    { NULL, 0, NULL, _IOWRT, 1, 0, 0 },
 
-        /* stderr (_iob[3]) */
+    /* stderr (_iob[3]) */
 
-        { NULL, 0, NULL, _IOWRT, 2, 0, 0 },
+    { NULL, 0, NULL, _IOWRT, 2, 0, 0 },
 
 };
 
 
 /* These functions are for enabling STATIC_CPPLIB functionality */
-_CRTIMP FILE * __cdecl __iob_func(void)
-{
+_CRTIMP FILE* __cdecl __iob_func(void) {
     return _iob;
 }
 
@@ -58,7 +57,7 @@ _CRTIMP FILE * __cdecl __iob_func(void)
 /*
  * Pointer to array of FILE * or _FILEX * structures.
  */
-void ** __piob;
+void** __piob;
 
 /*
  * Number of open streams (set to _NSTREAM by default)
@@ -109,57 +108,60 @@ int _cflush = 0;
 *
 *******************************************************************************/
 
-int __cdecl __initstdio(void)
-{
-        int i;
-
+int __cdecl __initstdio(void) {
+    int i;
 #ifndef CRTDLL
-        /*
-         * If the user has not supplied a definition of _nstream, set it
-         * to _NSTREAM_. If the user has supplied a value that is too small
-         * set _nstream to the minimum acceptable value (_IOB_ENTRIES).
-         */
-        if ( _nstream ==  0 )
-            _nstream = _NSTREAM_;
-        else if ( _nstream < _IOB_ENTRIES )
-            _nstream = _IOB_ENTRIES;
+
+    /*
+     * If the user has not supplied a definition of _nstream, set it
+     * to _NSTREAM_. If the user has supplied a value that is too small
+     * set _nstream to the minimum acceptable value (_IOB_ENTRIES).
+     */
+    if (_nstream ==  0) {
+        _nstream = _NSTREAM_;
+    } else if (_nstream < _IOB_ENTRIES) {
+        _nstream = _IOB_ENTRIES;
+    }
+
 #endif  /* CRTDLL */
 
-        /*
-         * Allocate the __piob array. Try for _nstream entries first. If this
-         * fails then reset _nstream to _IOB_ENTRIES and try again. If it
-         * still fails, bail out with an RTE.
-         */
-        if ( (__piob = (void **)_calloc_crt( _nstream, sizeof(void *) )) ==
-             NULL ) {
-            _nstream = _IOB_ENTRIES;
-            if ( (__piob = (void **)_calloc_crt( _nstream, sizeof(void *) ))
-                 == NULL )
-                return _RT_STDIOINIT;
+    /*
+     * Allocate the __piob array. Try for _nstream entries first. If this
+     * fails then reset _nstream to _IOB_ENTRIES and try again. If it
+     * still fails, bail out with an RTE.
+     */
+    if ((__piob = (void**)_calloc_crt(_nstream, sizeof(void*))) ==
+            NULL) {
+        _nstream = _IOB_ENTRIES;
+
+        if ((__piob = (void**)_calloc_crt(_nstream, sizeof(void*)))
+                == NULL) {
+            return _RT_STDIOINIT;
         }
+    }
 
-        /*
-         * Initialize the first _IOB_ENTRIES to point to the corresponding
-         * entries in _iob[].
-         */
-        for ( i = 0 ; i < _IOB_ENTRIES ; i++ )
-            __piob[i] = (void *)&_iob[i];
+    /*
+     * Initialize the first _IOB_ENTRIES to point to the corresponding
+     * entries in _iob[].
+     */
+    for (i = 0 ; i < _IOB_ENTRIES ; i++) {
+        __piob[i] = (void*)&_iob[i];
+    }
 
-        for ( i = 0 ; i < 3 ; i++ ) {
-            if ( (_osfhnd(i) == (intptr_t)INVALID_HANDLE_VALUE) ||
-                 (_osfhnd(i) == _NO_CONSOLE_FILENO) ||
-                 (_osfhnd(i) == 0) )
-            {
+    for (i = 0 ; i < 3 ; i++) {
+        if ((_osfhnd(i) == (intptr_t)INVALID_HANDLE_VALUE) ||
+                (_osfhnd(i) == _NO_CONSOLE_FILENO) ||
+                (_osfhnd(i) == 0)) {
             /*
              * For stdin, stdout & stderr, we use _NO_CONSOLE_FILENO (a value
              * different from _INVALID_HANDLE_VALUE to distinguish between
              * a failure in opening a file & a program run without a console.
              */
-                _iob[i]._file = _NO_CONSOLE_FILENO;
-            }
+            _iob[i]._file = _NO_CONSOLE_FILENO;
         }
+    }
 
-        return 0;
+    return 0;
 }
 
 
@@ -187,15 +189,16 @@ int __cdecl __initstdio(void)
 *
 *******************************************************************************/
 
-void __cdecl __endstdio(void)
-{
-        /* flush all streams */
-        _flushall();
+void __cdecl __endstdio(void) {
+    /* flush all streams */
+    _flushall();
 
-        /* if in callable exit, close all streams */
-        if (_exitflag)
-                _fcloseall();
-        _free_crt(__piob);
+    /* if in callable exit, close all streams */
+    if (_exitflag) {
+        _fcloseall();
+    }
+
+    _free_crt(__piob);
 }
 
 
@@ -215,26 +218,28 @@ void __cdecl __endstdio(void)
 *
 *******************************************************************************/
 
-void __cdecl _lock_file (
-        FILE *pf
-        )
-{
+void __cdecl _lock_file(
+    FILE* pf
+) {
+    /*
+     * The way the FILE (pointed to by pf) is locked depends on whether
+     * it is part of _iob[] or not
+     */
+    if ((pf >= _iob) && (pf <= (&_iob[_IOB_ENTRIES - 1])))
         /*
-         * The way the FILE (pointed to by pf) is locked depends on whether
-         * it is part of _iob[] or not
+         * FILE lies in _iob[] so the lock lies in _locktable[].
          */
-        if ( (pf >= _iob) && (pf <= (&_iob[_IOB_ENTRIES-1])) )
-            /*
-             * FILE lies in _iob[] so the lock lies in _locktable[].
-             */
-            _lock( _STREAM_LOCKS + (int)(pf - _iob) );
-        else
-            /*
-             * Not part of _iob[]. Therefore, *pf is a _FILEX and the
-             * lock field of the struct is an initialized critical
-             * section.
-             */
-            EnterCriticalSection( &(((_FILEX *)pf)->lock) );
+    {
+        _lock(_STREAM_LOCKS + (int)(pf - _iob));
+    } else
+        /*
+         * Not part of _iob[]. Therefore, *pf is a _FILEX and the
+         * lock field of the struct is an initialized critical
+         * section.
+         */
+    {
+        EnterCriticalSection(&(((_FILEX*)pf)->lock));
+    }
 }
 
 
@@ -253,27 +258,29 @@ void __cdecl _lock_file (
 *
 *******************************************************************************/
 
-void __cdecl _lock_file2 (
-        int i,
-        void *s
-        )
-{
+void __cdecl _lock_file2(
+    int i,
+    void* s
+) {
+    /*
+     * The way the FILE is locked depends on whether it is part of _iob[]
+     * _iob[] or not
+     */
+    if (i < _IOB_ENTRIES)
         /*
-         * The way the FILE is locked depends on whether it is part of _iob[]
-         * _iob[] or not
+         * FILE lies in _iob[] so the lock lies in _locktable[].
          */
-        if ( i < _IOB_ENTRIES )
-            /*
-             * FILE lies in _iob[] so the lock lies in _locktable[].
-             */
-            _lock( _STREAM_LOCKS + i );
-        else
-            /*
-             * Not part of _iob[]. Therefore, *s is a _FILEX and the
-             * lock field of the struct is an initialized critical
-             * section.
-             */
-            EnterCriticalSection( &(((_FILEX *)s)->lock) );
+    {
+        _lock(_STREAM_LOCKS + i);
+    } else
+        /*
+         * Not part of _iob[]. Therefore, *s is a _FILEX and the
+         * lock field of the struct is an initialized critical
+         * section.
+         */
+    {
+        EnterCriticalSection(&(((_FILEX*)s)->lock));
+    }
 }
 
 
@@ -292,26 +299,28 @@ void __cdecl _lock_file2 (
 *
 *******************************************************************************/
 
-void __cdecl _unlock_file (
-        FILE *pf
-        )
-{
+void __cdecl _unlock_file(
+    FILE* pf
+) {
+    /*
+     * The way the FILE (pointed to by pf) is unlocked depends on whether
+     * it is part of _iob[] or not
+     */
+    if ((pf >= _iob) && (pf <= (&_iob[_IOB_ENTRIES - 1])))
         /*
-         * The way the FILE (pointed to by pf) is unlocked depends on whether
-         * it is part of _iob[] or not
+         * FILE lies in _iob[] so the lock lies in _locktable[].
          */
-        if ( (pf >= _iob) && (pf <= (&_iob[_IOB_ENTRIES-1])) )
-            /*
-             * FILE lies in _iob[] so the lock lies in _locktable[].
-             */
-            _unlock( _STREAM_LOCKS + (int)(pf - _iob) );
-        else
-            /*
-             * Not part of _iob[]. Therefore, *pf is a _FILEX and the
-             * lock field of the struct is an initialized critical
-             * section.
-             */
-            LeaveCriticalSection( &(((_FILEX *)pf)->lock) );
+    {
+        _unlock(_STREAM_LOCKS + (int)(pf - _iob));
+    } else
+        /*
+         * Not part of _iob[]. Therefore, *pf is a _FILEX and the
+         * lock field of the struct is an initialized critical
+         * section.
+         */
+    {
+        LeaveCriticalSection(&(((_FILEX*)pf)->lock));
+    }
 }
 
 
@@ -330,26 +339,28 @@ void __cdecl _unlock_file (
 *
 *******************************************************************************/
 
-void __cdecl _unlock_file2 (
-        int i,
-        void *s
-        )
-{
+void __cdecl _unlock_file2(
+    int i,
+    void* s
+) {
+    /*
+     * The way the FILE is locked depends on whether it is part of _iob[]
+     * _iob[] or not
+     */
+    if (i < _IOB_ENTRIES)
         /*
-         * The way the FILE is locked depends on whether it is part of _iob[]
-         * _iob[] or not
+         * FILE lies in _iob[] so the lock lies in _locktable[].
          */
-        if ( i < _IOB_ENTRIES )
-            /*
-             * FILE lies in _iob[] so the lock lies in _locktable[].
-             */
-            _unlock( _STREAM_LOCKS + i );
-        else
-            /*
-             * Not part of _iob[]. Therefore, *s is a _FILEX and the
-             * lock field of the struct is an initialized critical
-             * section.
-             */
-            LeaveCriticalSection( &(((_FILEX *)s)->lock) );
+    {
+        _unlock(_STREAM_LOCKS + i);
+    } else
+        /*
+         * Not part of _iob[]. Therefore, *s is a _FILEX and the
+         * lock field of the struct is an initialized critical
+         * section.
+         */
+    {
+        LeaveCriticalSection(&(((_FILEX*)s)->lock));
+    }
 }
 

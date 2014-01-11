@@ -45,32 +45,29 @@
 *
 *******************************************************************************/
 
-unsigned long __cdecl _lrotl (
+unsigned long __cdecl _lrotl(
     unsigned long val,
     int shift
-    )
-{
+) {
     shift &= 0x1f;
-    val = (val>>(0x20 - shift)) | (val << shift);
+    val = (val >> (0x20 - shift)) | (val << shift);
     return val;
 }
 
-unsigned __cdecl _rotl (
+unsigned __cdecl _rotl(
     unsigned val,
     int shift
-    )
-{
+) {
     shift &= 0x1f;
-    val = (val>>(0x20 - shift)) | (val << shift);
+    val = (val >> (0x20 - shift)) | (val << shift);
     return val;
 }
 
-unsigned __int64 __cdecl _rotl64 (
+unsigned __int64 __cdecl _rotl64(
     unsigned __int64 val,
     int shift
-    )
-{
+) {
     shift &= 0x3f;
-    val = (val>>(0x40 - shift)) | (val << shift);
+    val = (val >> (0x40 - shift)) | (val << shift);
     return val;
 }

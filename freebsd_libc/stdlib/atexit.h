@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,11 +26,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)atexit.h	8.2 (Berkeley) 7/3/94
+ *  @(#)atexit.h    8.2 (Berkeley) 7/3/94
  * $FreeBSD: src/lib/libc/stdlib/atexit.h,v 1.4 2007/01/09 00:28:09 imp Exp $
  */
 
 /* must be at least 32 to guarantee ANSI conformance */
-#define	ATEXIT_SIZE	32
+#define ATEXIT_SIZE 32
 
-void __cxa_finalize(void *dso);
+void __cxa_finalize(void* dso);

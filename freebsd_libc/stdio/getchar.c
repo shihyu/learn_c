@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -48,13 +48,12 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/getchar.c,v 1.13 2007/01/09 00:28:06 imp 
 #undef getchar
 
 int
-getchar()
-{
-	int retval;
-	FLOCKFILE(stdin);
-	/* Orientation set by __sgetc() when buffer is empty. */
-	/* ORIENT(stdin, -1); */
-	retval = __sgetc(stdin);
-	FUNLOCKFILE(stdin);
-	return (retval);
+getchar() {
+    int retval;
+    FLOCKFILE(stdin);
+    /* Orientation set by __sgetc() when buffer is empty. */
+    /* ORIENT(stdin, -1); */
+    retval = __sgetc(stdin);
+    FUNLOCKFILE(stdin);
+    return (retval);
 }

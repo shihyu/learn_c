@@ -44,35 +44,32 @@
 *******************************************************************************/
 
 extern "C" size_t __cdecl _mbsnbcnt_l(
-        const unsigned char *string,
-        size_t ccnt,
-        _locale_t plocinfo
-        )
-{
-        unsigned char *p;
-        _LocaleUpdate _loc_update(plocinfo);
+    const unsigned char* string,
+    size_t ccnt,
+    _locale_t plocinfo
+) {
+    unsigned char* p;
+    _LocaleUpdate _loc_update(plocinfo);
+    /* validation section */
+    _VALIDATE_RETURN(string != NULL || ccnt == 0, EINVAL, 0);
 
-        /* validation section */
-        _VALIDATE_RETURN(string != NULL || ccnt == 0, EINVAL, 0);
-
-        for (p = (unsigned char *)string; (ccnt-- && *p); p++) {
-            if ( _ismbblead_l(*p, _loc_update.GetLocaleT()) ) {
-                if (*++p == '\0') {
-                    --p;
-                    break;
-                }
+    for (p = (unsigned char*)string; (ccnt-- && *p); p++) {
+        if (_ismbblead_l(*p, _loc_update.GetLocaleT())) {
+            if (*++p == '\0') {
+                --p;
+                break;
             }
         }
+    }
 
-        return ((size_t) ((char *)p - (char *)string));
+    return ((size_t)((char*)p - (char*)string));
 }
 
 extern "C" size_t (__cdecl _mbsnbcnt)(
-        const unsigned char *string,
-        size_t ccnt
-        )
-{
-        return _mbsnbcnt_l(string, ccnt, NULL);
+    const unsigned char* string,
+    size_t ccnt
+) {
+    return _mbsnbcnt_l(string, ccnt, NULL);
 }
 
 #endif  /* _MBCS */

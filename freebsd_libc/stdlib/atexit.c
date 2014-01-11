@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -46,30 +46,30 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/atexit.c,v 1.8 2007/01/09 00:28:09 imp E
 
 #include "libc_private.h"
 
-#define	ATEXIT_FN_EMPTY	0
-#define	ATEXIT_FN_STD	1
-#define	ATEXIT_FN_CXA	2
+#define ATEXIT_FN_EMPTY 0
+#define ATEXIT_FN_STD   1
+#define ATEXIT_FN_CXA   2
 
 static pthread_mutex_t atexit_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-#define _MUTEX_LOCK(x)		if (__isthreaded) _pthread_mutex_lock(x)
-#define _MUTEX_UNLOCK(x)	if (__isthreaded) _pthread_mutex_unlock(x)
+#define _MUTEX_LOCK(x)      if (__isthreaded) _pthread_mutex_lock(x)
+#define _MUTEX_UNLOCK(x)    if (__isthreaded) _pthread_mutex_unlock(x)
 
 struct atexit {
-	struct atexit *next;			/* next in list */
-	int ind;				/* next index in this table */
-	struct atexit_fn {
-		int fn_type;			/* ATEXIT_? from above */
-		union {
-			void (*std_func)(void);
-			void (*cxa_func)(void *);
-		} fn_ptr;			/* function pointer */
-		void *fn_arg;			/* argument for CXA callback */
-		void *fn_dso;			/* shared module handle */
-	} fns[ATEXIT_SIZE];			/* the table itself */
+    struct atexit* next;            /* next in list */
+    int ind;                /* next index in this table */
+    struct atexit_fn {
+        int fn_type;            /* ATEXIT_? from above */
+        union {
+            void (*std_func)(void);
+            void (*cxa_func)(void*);
+        } fn_ptr;           /* function pointer */
+        void* fn_arg;           /* argument for CXA callback */
+        void* fn_dso;           /* shared module handle */
+    } fns[ATEXIT_SIZE];         /* the table itself */
 };
 
-static struct atexit *__atexit;		/* points to head of LIFO stack */
+static struct atexit* __atexit;     /* points to head of LIFO stack */
 
 /*
  * Register the function described by 'fptr' to be called at application
@@ -77,54 +77,56 @@ static struct atexit *__atexit;		/* points to head of LIFO stack */
  * for atexit and __cxa_atexit.
  */
 static int
-atexit_register(struct atexit_fn *fptr)
-{
-	static struct atexit __atexit0;	/* one guaranteed table */
-	struct atexit *p;
+atexit_register(struct atexit_fn* fptr) {
+    static struct atexit __atexit0; /* one guaranteed table */
+    struct atexit* p;
+    _MUTEX_LOCK(&atexit_mutex);
 
-	_MUTEX_LOCK(&atexit_mutex);
-	if ((p = __atexit) == NULL)
-		__atexit = p = &__atexit0;
-	else while (p->ind >= ATEXIT_SIZE) {
-		struct atexit *old__atexit;
-		old__atexit = __atexit;
-	        _MUTEX_UNLOCK(&atexit_mutex);
-		if ((p = (struct atexit *)malloc(sizeof(*p))) == NULL)
-			return (-1);
-		_MUTEX_LOCK(&atexit_mutex);
-		if (old__atexit != __atexit) {
-			/* Lost race, retry operation */
-			_MUTEX_UNLOCK(&atexit_mutex);
-			free(p);
-			_MUTEX_LOCK(&atexit_mutex);
-			p = __atexit;
-			continue;
-		}
-		p->ind = 0;
-		p->next = __atexit;
-		__atexit = p;
-	}
-	p->fns[p->ind++] = *fptr;
-	_MUTEX_UNLOCK(&atexit_mutex);
-	return 0;
+    if ((p = __atexit) == NULL) {
+        __atexit = p = &__atexit0;
+    } else while (p->ind >= ATEXIT_SIZE) {
+            struct atexit* old__atexit;
+            old__atexit = __atexit;
+            _MUTEX_UNLOCK(&atexit_mutex);
+
+            if ((p = (struct atexit*)malloc(sizeof(*p))) == NULL) {
+                return (-1);
+            }
+
+            _MUTEX_LOCK(&atexit_mutex);
+
+            if (old__atexit != __atexit) {
+                /* Lost race, retry operation */
+                _MUTEX_UNLOCK(&atexit_mutex);
+                free(p);
+                _MUTEX_LOCK(&atexit_mutex);
+                p = __atexit;
+                continue;
+            }
+
+            p->ind = 0;
+            p->next = __atexit;
+            __atexit = p;
+        }
+
+    p->fns[p->ind++] = *fptr;
+    _MUTEX_UNLOCK(&atexit_mutex);
+    return 0;
 }
 
 /*
  * Register a function to be performed at exit.
  */
 int
-atexit(void (*func)(void))
-{
-	struct atexit_fn fn;
-	int error;
-
-	fn.fn_type = ATEXIT_FN_STD;
-	fn.fn_ptr.std_func = func;;
-	fn.fn_arg = NULL;
-	fn.fn_dso = NULL;
-
- 	error = atexit_register(&fn);	
-	return (error);
+atexit(void (*func)(void)) {
+    struct atexit_fn fn;
+    int error;
+    fn.fn_type = ATEXIT_FN_STD;
+    fn.fn_ptr.std_func = func;;
+    fn.fn_arg = NULL;
+    fn.fn_dso = NULL;
+    error = atexit_register(&fn);
+    return (error);
 }
 
 /*
@@ -132,18 +134,15 @@ atexit(void (*func)(void))
  * with given dso handle is unloaded dynamically.
  */
 int
-__cxa_atexit(void (*func)(void *), void *arg, void *dso)
-{
-	struct atexit_fn fn;
-	int error;
-
-	fn.fn_type = ATEXIT_FN_CXA;
-	fn.fn_ptr.cxa_func = func;;
-	fn.fn_arg = arg;
-	fn.fn_dso = dso;
-
- 	error = atexit_register(&fn);	
-	return (error);
+__cxa_atexit(void (*func)(void*), void* arg, void* dso) {
+    struct atexit_fn fn;
+    int error;
+    fn.fn_type = ATEXIT_FN_CXA;
+    fn.fn_ptr.cxa_func = func;;
+    fn.fn_arg = arg;
+    fn.fn_dso = dso;
+    error = atexit_register(&fn);
+    return (error);
 }
 
 /*
@@ -152,34 +151,40 @@ __cxa_atexit(void (*func)(void *), void *arg, void *dso)
  * handlers are called.
  */
 void
-__cxa_finalize(void *dso)
-{
-	struct atexit *p;
-	struct atexit_fn fn;
-	int n;
+__cxa_finalize(void* dso) {
+    struct atexit* p;
+    struct atexit_fn fn;
+    int n;
+    _MUTEX_LOCK(&atexit_mutex);
 
-	_MUTEX_LOCK(&atexit_mutex);
-	for (p = __atexit; p; p = p->next) {
-		for (n = p->ind; --n >= 0;) {
-			if (p->fns[n].fn_type == ATEXIT_FN_EMPTY)
-				continue; /* already been called */
-			if (dso != NULL && dso != p->fns[n].fn_dso)
-				continue; /* wrong DSO */
-			fn = p->fns[n];
-			/*
-			  Mark entry to indicate that this particular handler
-			  has already been called.
-			*/
-			p->fns[n].fn_type = ATEXIT_FN_EMPTY;
-		        _MUTEX_UNLOCK(&atexit_mutex);
-		
-			/* Call the function of correct type. */
-			if (fn.fn_type == ATEXIT_FN_CXA)
-				fn.fn_ptr.cxa_func(fn.fn_arg);
-			else if (fn.fn_type == ATEXIT_FN_STD)
-				fn.fn_ptr.std_func();
-			_MUTEX_LOCK(&atexit_mutex);
-		}
-	}
-	_MUTEX_UNLOCK(&atexit_mutex);
+    for (p = __atexit; p; p = p->next) {
+        for (n = p->ind; --n >= 0;) {
+            if (p->fns[n].fn_type == ATEXIT_FN_EMPTY) {
+                continue;    /* already been called */
+            }
+
+            if (dso != NULL && dso != p->fns[n].fn_dso) {
+                continue;    /* wrong DSO */
+            }
+
+            fn = p->fns[n];
+            /*
+              Mark entry to indicate that this particular handler
+              has already been called.
+            */
+            p->fns[n].fn_type = ATEXIT_FN_EMPTY;
+            _MUTEX_UNLOCK(&atexit_mutex);
+
+            /* Call the function of correct type. */
+            if (fn.fn_type == ATEXIT_FN_CXA) {
+                fn.fn_ptr.cxa_func(fn.fn_arg);
+            } else if (fn.fn_type == ATEXIT_FN_STD) {
+                fn.fn_ptr.std_func();
+            }
+
+            _MUTEX_LOCK(&atexit_mutex);
+        }
+    }
+
+    _MUTEX_UNLOCK(&atexit_mutex);
 }

@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2001 Mike Barcroft <mike@FreeBSD.org>
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,26 +43,32 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strnstr.c,v 1.4 2007/01/09 00:28:12 imp 
  * Find the first occurrence of find in s, where the search is limited to the
  * first slen characters of s.
  */
-char *
+char*
 strnstr(s, find, slen)
-	const char *s;
-	const char *find;
-	size_t slen;
+const char* s;
+const char* find;
+size_t slen;
 {
-	char c, sc;
-	size_t len;
+    char c, sc;
+    size_t len;
 
-	if ((c = *find++) != '\0') {
-		len = strlen(find);
-		do {
-			do {
-				if (slen-- < 1 || (sc = *s++) == '\0')
-					return (NULL);
-			} while (sc != c);
-			if (len > slen)
-				return (NULL);
-		} while (strncmp(s, find, len) != 0);
-		s--;
-	}
-	return ((char *)s);
+    if ((c = *find++) != '\0') {
+        len = strlen(find);
+
+        do {
+            do {
+                if (slen-- < 1 || (sc = *s++) == '\0') {
+                    return (NULL);
+                }
+            } while (sc != c);
+
+            if (len > slen) {
+                return (NULL);
+            }
+        } while (strncmp(s, find, len) != 0);
+
+        s--;
+    }
+
+    return ((char*)s);
 }

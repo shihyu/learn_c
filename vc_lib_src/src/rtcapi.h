@@ -39,7 +39,7 @@ extern "C" {
 
 #endif  /* __cplusplus */
 
-    /* General User API */
+/* General User API */
 
 typedef enum _RTC_ErrorNumber {
     _RTC_CHKSTK = 0,
@@ -58,110 +58,110 @@ typedef unsigned short wchar_t;
 #define _WCHAR_T_DEFINED
 #endif  /* _WCHAR_T_DEFINED */
 
-    typedef int (__cdecl *_RTC_error_fn)(int, const char *, int, const char *, const char *, ...);
-    typedef int (__cdecl *_RTC_error_fnW)(int, const wchar_t *, int, const wchar_t *, const wchar_t *, ...);
+typedef int (__cdecl* _RTC_error_fn)(int, const char*, int, const char*, const char*, ...);
+typedef int (__cdecl* _RTC_error_fnW)(int, const wchar_t*, int, const wchar_t*, const wchar_t*, ...);
 
-    /* User API */
-    int           __cdecl _RTC_NumErrors(void);
-    const char *  __cdecl _RTC_GetErrDesc(_RTC_ErrorNumber  _Errnum);
-    int           __cdecl _RTC_SetErrorType(_RTC_ErrorNumber  _Errnum, int _ErrType);
-    _RTC_error_fn __cdecl _RTC_SetErrorFunc(_RTC_error_fn);
-    _RTC_error_fnW __cdecl _RTC_SetErrorFuncW(_RTC_error_fnW);
+/* User API */
+int           __cdecl _RTC_NumErrors(void);
+const char*   __cdecl _RTC_GetErrDesc(_RTC_ErrorNumber  _Errnum);
+int           __cdecl _RTC_SetErrorType(_RTC_ErrorNumber  _Errnum, int _ErrType);
+_RTC_error_fn __cdecl _RTC_SetErrorFunc(_RTC_error_fn);
+_RTC_error_fnW __cdecl _RTC_SetErrorFuncW(_RTC_error_fnW);
 
-    /* Power User/library API */
+/* Power User/library API */
 
 
-    /* Init functions */
+/* Init functions */
 
-    /* These functions all call _CRT_RTC_INIT */
-    void __cdecl _RTC_Initialize(void);
-    void __cdecl _RTC_Terminate(void);
+/* These functions all call _CRT_RTC_INIT */
+void __cdecl _RTC_Initialize(void);
+void __cdecl _RTC_Terminate(void);
 
-    /*
-     * If you're not using the CRT, you have to implement _CRT_RTC_INIT
-     * Just return either null, or your error reporting function
-     * *** Don't mess with res0/res1/res2/res3/res4 - YOU'VE BEEN WARNED! ***
-     */
-    _RTC_error_fn __cdecl _CRT_RTC_INIT(void *_Res0, void **_Res1, int _Res2, int _Res3, int _Res4);
-    _RTC_error_fnW __cdecl _CRT_RTC_INITW(void *_Res0, void **_Res1, int _Res2, int _Res3, int _Res4);
+/*
+ * If you're not using the CRT, you have to implement _CRT_RTC_INIT
+ * Just return either null, or your error reporting function
+ * *** Don't mess with res0/res1/res2/res3/res4 - YOU'VE BEEN WARNED! ***
+ */
+_RTC_error_fn __cdecl _CRT_RTC_INIT(void* _Res0, void** _Res1, int _Res2, int _Res3, int _Res4);
+_RTC_error_fnW __cdecl _CRT_RTC_INITW(void* _Res0, void** _Res1, int _Res2, int _Res3, int _Res4);
 
-    /* Compiler generated calls (unlikely to be used, even by power users) */
-    /* Types */
-    typedef struct _RTC_vardesc {
-        int addr;
-        int size;
-        char *name;
-    } _RTC_vardesc;
+/* Compiler generated calls (unlikely to be used, even by power users) */
+/* Types */
+typedef struct _RTC_vardesc {
+    int addr;
+    int size;
+    char* name;
+} _RTC_vardesc;
 
-    typedef struct _RTC_framedesc {
-        int varCount;
-        _RTC_vardesc *variables;
-    } _RTC_framedesc;
+typedef struct _RTC_framedesc {
+    int varCount;
+    _RTC_vardesc* variables;
+} _RTC_framedesc;
 
-    /* NOTE:
-        Changing this structure requires a matching compiler backend
-        update, because the offsets are hardcoded inside there.
-    */
+/* NOTE:
+    Changing this structure requires a matching compiler backend
+    update, because the offsets are hardcoded inside there.
+*/
 #pragma pack(push, 1)
-    /*  Structure padded under 32-bit x86, to get consistent
-        execution between 32/64 targets.
-    */
-    typedef struct _RTC_ALLOCA_NODE {
-        __int32 guard1;
-        struct _RTC_ALLOCA_NODE *next;
+/*  Structure padded under 32-bit x86, to get consistent
+    execution between 32/64 targets.
+*/
+typedef struct _RTC_ALLOCA_NODE {
+    __int32 guard1;
+    struct _RTC_ALLOCA_NODE* next;
 #if defined (_M_IX86)
-        __int32 dummypad;
+    __int32 dummypad;
 #endif  /* defined (_M_IX86) */
-        size_t allocaSize;
+    size_t allocaSize;
 #if defined (_M_IX86)
-        __int32 dummypad2;
+    __int32 dummypad2;
 #endif  /* defined (_M_IX86) */
-        __int32 guard2[3];
-    } _RTC_ALLOCA_NODE;
+    __int32 guard2[3];
+} _RTC_ALLOCA_NODE;
 #pragma pack(pop)
 
 #if !defined (_M_CEE) && !defined (_M_CEE_PURE)
-    /* These unsupported functions are deprecated in native mode and not supported at all in /clr mode */
+/* These unsupported functions are deprecated in native mode and not supported at all in /clr mode */
 
-    /* Shortening convert checks - name indicates src bytes to target bytes */
-    /* Signedness is NOT checked */
-    _RTCINTERNAL_DEPRECATED char   __fastcall _RTC_Check_2_to_1(short _Src);
-    _RTCINTERNAL_DEPRECATED char   __fastcall _RTC_Check_4_to_1(int _Src);
-    _RTCINTERNAL_DEPRECATED char   __fastcall _RTC_Check_8_to_1(__int64 _Src);
-    _RTCINTERNAL_DEPRECATED short  __fastcall _RTC_Check_4_to_2(int _Src);
-    _RTCINTERNAL_DEPRECATED short  __fastcall _RTC_Check_8_to_2(__int64 _Src);
-    _RTCINTERNAL_DEPRECATED int    __fastcall _RTC_Check_8_to_4(__int64 _Src);
+/* Shortening convert checks - name indicates src bytes to target bytes */
+/* Signedness is NOT checked */
+_RTCINTERNAL_DEPRECATED char   __fastcall _RTC_Check_2_to_1(short _Src);
+_RTCINTERNAL_DEPRECATED char   __fastcall _RTC_Check_4_to_1(int _Src);
+_RTCINTERNAL_DEPRECATED char   __fastcall _RTC_Check_8_to_1(__int64 _Src);
+_RTCINTERNAL_DEPRECATED short  __fastcall _RTC_Check_4_to_2(int _Src);
+_RTCINTERNAL_DEPRECATED short  __fastcall _RTC_Check_8_to_2(__int64 _Src);
+_RTCINTERNAL_DEPRECATED int    __fastcall _RTC_Check_8_to_4(__int64 _Src);
 #endif  /* !defined (_M_CEE) && !defined (_M_CEE_PURE) */
 
 
-    /* Stack Checking Calls */
+/* Stack Checking Calls */
 #if defined (_M_IX86)
-    void   __cdecl     _RTC_CheckEsp();
+void   __cdecl     _RTC_CheckEsp();
 #endif  /* defined (_M_IX86) */
 
 #if !defined (_M_CEE) && !defined (_M_CEE_PURE)
-    /* These unsupported functions are deprecated in native mode and not supported at all in /clr mode */
+/* These unsupported functions are deprecated in native mode and not supported at all in /clr mode */
 
-    _RTCINTERNAL_DEPRECATED  void   __fastcall _RTC_CheckStackVars(void *_Esp, _RTC_framedesc *_Fd);
-    _RTCINTERNAL_DEPRECATED  void   __fastcall _RTC_CheckStackVars2(void *_Esp, _RTC_framedesc *_Fd, _RTC_ALLOCA_NODE *_AllocaList);
-    _RTCINTERNAL_DEPRECATED  void   __fastcall _RTC_AllocaHelper(_RTC_ALLOCA_NODE *_PAllocaBase, size_t _CbSize, _RTC_ALLOCA_NODE **_PAllocaInfoList);
+_RTCINTERNAL_DEPRECATED  void   __fastcall _RTC_CheckStackVars(void* _Esp, _RTC_framedesc* _Fd);
+_RTCINTERNAL_DEPRECATED  void   __fastcall _RTC_CheckStackVars2(void* _Esp, _RTC_framedesc* _Fd, _RTC_ALLOCA_NODE* _AllocaList);
+_RTCINTERNAL_DEPRECATED  void   __fastcall _RTC_AllocaHelper(_RTC_ALLOCA_NODE* _PAllocaBase, size_t _CbSize, _RTC_ALLOCA_NODE** _PAllocaInfoList);
 #endif  /* !defined (_M_CEE) && !defined (_M_CEE_PURE) */
-    /* Unintialized Local call */
-    void   __cdecl     _RTC_UninitUse(const char *_Varname);
+/* Unintialized Local call */
+void   __cdecl     _RTC_UninitUse(const char* _Varname);
 
 #if !defined (_M_CEE) && !defined (_M_CEE_PURE)
-    /* These unsupported functions are deprecated in native mode and not supported at all in /clr mode */
+/* These unsupported functions are deprecated in native mode and not supported at all in /clr mode */
 
 #endif  /* !defined (_M_CEE) && !defined (_M_CEE_PURE) */
 
-    /* Subsystem initialization stuff */
-    void    __cdecl    _RTC_Shutdown(void);
-    void    __cdecl    _RTC_InitBase(void);
+/* Subsystem initialization stuff */
+void    __cdecl    _RTC_Shutdown(void);
+void    __cdecl    _RTC_InitBase(void);
 
 
 #ifdef __cplusplus
 
-    void* _ReturnAddress();
+void* _ReturnAddress();
 }
 
 #endif  /* __cplusplus */

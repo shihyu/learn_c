@@ -2,14 +2,16 @@
 #include "xmath.h"
 _C_STD_BEGIN
 
-_MRTIMP2_NCEEPURE double __CLRCALL_PURE_OR_CDECL _Poly(double x, const double *tab, int n)
-	{	/* compute polynomial */
-	double y;
+_MRTIMP2_NCEEPURE double __CLRCALL_PURE_OR_CDECL _Poly(double x, const double* tab, int n) {
+    /* compute polynomial */
+    double y;
 
-	for (y = *tab; 0 <= --n; )
-		y = y * x + *++tab;
-	return (y);
-	}
+    for (y = *tab; 0 <= --n;) {
+        y = y * x + *++tab;
+    }
+
+    return (y);
+}
 _C_STD_END
 
 /*

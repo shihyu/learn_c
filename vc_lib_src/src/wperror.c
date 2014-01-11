@@ -40,51 +40,45 @@
 *
 *******************************************************************************/
 
-void __cdecl _wperror (
-        const wchar_t *wmessage
-        )
-{
-        int fh = 2;
-        size_t size = 0;
-        char *amessage;
-        const char *sysmessage;
+void __cdecl _wperror(
+    const wchar_t* wmessage
+) {
+    int fh = 2;
+    size_t size = 0;
+    char* amessage;
+    const char* sysmessage;
 
-        /* convert WCS string into ASCII string */
+    /* convert WCS string into ASCII string */
 
-        if ( wmessage && *wmessage )
-        {
-            _ERRCHECK_EINVAL_ERANGE(wcstombs_s( &size, NULL, 0, wmessage, INT_MAX));
+    if (wmessage && *wmessage) {
+        _ERRCHECK_EINVAL_ERANGE(wcstombs_s(&size, NULL, 0, wmessage, INT_MAX));
 
-            if ( size==0 || (amessage = (char *)_calloc_crt(size, sizeof(char))) == NULL )
-                return;
-
-            if ( _ERRCHECK_EINVAL_ERANGE(wcstombs_s(NULL, amessage, size, wmessage, _TRUNCATE)) != 0)
-            {
-                _free_crt(amessage);
-                return;
-            }
+        if (size == 0 || (amessage = (char*)_calloc_crt(size, sizeof(char))) == NULL) {
+            return;
         }
-        else
-            amessage = NULL;
 
-        _lock_fh( fh );         /* acquire file handle lock */
-        __try {
+        if (_ERRCHECK_EINVAL_ERANGE(wcstombs_s(NULL, amessage, size, wmessage, _TRUNCATE)) != 0) {
+            _free_crt(amessage);
+            return;
+        }
+    } else {
+        amessage = NULL;
+    }
 
-        if ( amessage )
-        {
-                _write_nolock(fh,(char *)amessage,(unsigned)strlen(amessage));
-                _write_nolock(fh,": ",2);
+    _lock_fh(fh);           /* acquire file handle lock */
+
+    __try {
+        if (amessage) {
+            _write_nolock(fh, (char*)amessage, (unsigned)strlen(amessage));
+            _write_nolock(fh, ": ", 2);
         }
 
         _free_crt(amessage);    /* note: freeing NULL is legal and benign */
-
-        sysmessage = _get_sys_err_msg( errno );
-        _write_nolock(fh, sysmessage,(unsigned)strlen(sysmessage));
-        _write_nolock(fh,"\n",1);
-
-        }
-        __finally {
-            _unlock_fh( fh );   /* release file handle lock */
-        }
+        sysmessage = _get_sys_err_msg(errno);
+        _write_nolock(fh, sysmessage, (unsigned)strlen(sysmessage));
+        _write_nolock(fh, "\n", 1);
+    } __finally {
+        _unlock_fh(fh);     /* release file handle lock */
+    }
 }
 

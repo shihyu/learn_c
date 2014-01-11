@@ -38,32 +38,22 @@
 *
 *******************************************************************************/
 
-void __cdecl perror (
-        REG1 const char *message
-        )
-{
+void __cdecl perror(
+    REG1 const char* message
+) {
+    REG2 int fh = 2;
+    _lock_fh(fh);           /* acquire file handle lock */
 
-        REG2 int fh = 2;
-
-        _lock_fh( fh );         /* acquire file handle lock */
-        __try {
-
-
-        if (message && *message)
-        {
-
-            _write_nolock(fh,(char *)message,(unsigned int)strlen(message));
-            _write_nolock(fh,": ",2);
+    __try {
+        if (message && *message) {
+            _write_nolock(fh, (char*)message, (unsigned int)strlen(message));
+            _write_nolock(fh, ": ", 2);
         }
 
-        message = _get_sys_err_msg( errno );
-
-        _write_nolock(fh,(char *)message,(unsigned int)strlen(message));
-        _write_nolock(fh,"\n",1);
-
-        }
-        __finally {
-            _unlock_fh( fh );   /* release file handle lock */
-        }
-
+        message = _get_sys_err_msg(errno);
+        _write_nolock(fh, (char*)message, (unsigned int)strlen(message));
+        _write_nolock(fh, "\n", 1);
+    } __finally {
+        _unlock_fh(fh);     /* release file handle lock */
+    }
 }

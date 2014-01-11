@@ -27,7 +27,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *rcsid = "$NetBSD: stringlist.c,v 1.2 1997/01/17 07:26:20 lukem Exp $";
+static char* rcsid = "$NetBSD: stringlist.c,v 1.2 1997/01/17 07:26:20 lukem Exp $";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/gen/stringlist.c,v 1.8 2007/01/09 00:27:55 imp Exp $");
@@ -40,26 +40,29 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/stringlist.c,v 1.8 2007/01/09 00:27:55 imp 
 #include <stringlist.h>
 #include "un-namespace.h"
 
-#define _SL_CHUNKSIZE	20
+#define _SL_CHUNKSIZE   20
 
 /*
  * sl_init(): Initialize a string list
  */
-StringList *
-sl_init()
-{
-	StringList *sl;
+StringList*
+sl_init() {
+    StringList* sl;
+    sl = malloc(sizeof(StringList));
 
-	sl = malloc(sizeof(StringList));
-	if (sl == NULL)
-		_err(1, "stringlist: %m");
+    if (sl == NULL) {
+        _err(1, "stringlist: %m");
+    }
 
-	sl->sl_cur = 0;
-	sl->sl_max = _SL_CHUNKSIZE;
-	sl->sl_str = malloc(sl->sl_max * sizeof(char *));
-	if (sl->sl_str == NULL)
-		_err(1, "stringlist: %m");
-	return sl;
+    sl->sl_cur = 0;
+    sl->sl_max = _SL_CHUNKSIZE;
+    sl->sl_str = malloc(sl->sl_max * sizeof(char*));
+
+    if (sl->sl_str == NULL) {
+        _err(1, "stringlist: %m");
+    }
+
+    return sl;
 }
 
 
@@ -68,17 +71,20 @@ sl_init()
  */
 int
 sl_add(sl, name)
-	StringList *sl;
-	char *name;
+StringList* sl;
+char* name;
 {
-	if (sl->sl_cur == sl->sl_max - 1) {
-		sl->sl_max += _SL_CHUNKSIZE;
-		sl->sl_str = reallocf(sl->sl_str, sl->sl_max * sizeof(char *));
-		if (sl->sl_str == NULL)
-			return (-1);
-	}
-	sl->sl_str[sl->sl_cur++] = name;
-	return (0);
+    if (sl->sl_cur == sl->sl_max - 1) {
+        sl->sl_max += _SL_CHUNKSIZE;
+        sl->sl_str = reallocf(sl->sl_str, sl->sl_max * sizeof(char*));
+
+        if (sl->sl_str == NULL) {
+            return (-1);
+        }
+    }
+
+    sl->sl_str[sl->sl_cur++] = name;
+    return (0);
 }
 
 
@@ -87,36 +93,42 @@ sl_add(sl, name)
  */
 void
 sl_free(sl, all)
-	StringList *sl;
-	int all;
+StringList* sl;
+int all;
 {
-	size_t i;
+    size_t i;
 
-	if (sl == NULL)
-		return;
-	if (sl->sl_str) {
-		if (all)
-			for (i = 0; i < sl->sl_cur; i++)
-				free(sl->sl_str[i]);
-		free(sl->sl_str);
-	}
-	free(sl);
+    if (sl == NULL) {
+        return;
+    }
+
+    if (sl->sl_str) {
+        if (all)
+            for (i = 0; i < sl->sl_cur; i++) {
+                free(sl->sl_str[i]);
+            }
+
+        free(sl->sl_str);
+    }
+
+    free(sl);
 }
 
 
 /*
  * sl_find(): Find a name in the string list
  */
-char *
+char*
 sl_find(sl, name)
-	StringList *sl;
-	char *name;
+StringList* sl;
+char* name;
 {
-	size_t i;
+    size_t i;
 
-	for (i = 0; i < sl->sl_cur; i++)
-		if (strcmp(sl->sl_str[i], name) == 0)
-			return sl->sl_str[i];
+    for (i = 0; i < sl->sl_cur; i++)
+        if (strcmp(sl->sl_str[i], name) == 0) {
+            return sl->sl_str[i];
+        }
 
-	return NULL;
+    return NULL;
 }

@@ -38,14 +38,12 @@
 *******************************************************************************/
 
 errno_t __cdecl memmove_s(
-    void * dst,
+    void* dst,
     size_t sizeInBytes,
-    const void * src,
+    const void* src,
     size_t count
-)
-{
-    if (count == 0)
-    {
+) {
+    if (count == 0) {
         /* nothing to do */
         return 0;
     }
@@ -54,7 +52,6 @@ errno_t __cdecl memmove_s(
     _VALIDATE_RETURN_ERRCODE(dst != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(src != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(sizeInBytes >= count, ERANGE);
-
     memmove(dst, src, count);
     return 0;
 }

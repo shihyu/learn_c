@@ -42,29 +42,26 @@
 *
 *******************************************************************************/
 
-FILE * __cdecl _tfsopen (
-        const _TSCHAR *file,
-        const _TSCHAR *mode
-        ,int shflag
-        )
-{
-        REG1 FILE *stream=NULL;
-        REG2 FILE *retval=NULL;
+FILE* __cdecl _tfsopen(
+    const _TSCHAR* file,
+    const _TSCHAR* mode
+    , int shflag
+) {
+    REG1 FILE* stream = NULL;
+    REG2 FILE* retval = NULL;
+    _VALIDATE_RETURN((file != NULL), EINVAL, NULL);
+    _VALIDATE_RETURN((mode != NULL), EINVAL, NULL);
+    _VALIDATE_RETURN((*mode != _T('\0')), EINVAL, NULL);
 
-        _VALIDATE_RETURN((file != NULL), EINVAL, NULL);
-        _VALIDATE_RETURN((mode != NULL), EINVAL, NULL);
-        _VALIDATE_RETURN((*mode != _T('\0')), EINVAL, NULL);
+    /* Get a free stream */
+    /* [NOTE: _getstream() returns a locked stream.] */
 
-        /* Get a free stream */
-        /* [NOTE: _getstream() returns a locked stream.] */
+    if ((stream = _getstream()) == NULL) {
+        errno = EMFILE;
+        return (NULL);
+    }
 
-        if ((stream = _getstream()) == NULL)
-        {
-                errno = EMFILE;
-                return(NULL);
-        }
-
-        __try {
+    __try {
         /* We deliberately don't hard-validate for emptry strings here. All other invalid
         path strings are treated as runtime errors by the inner code in _open and openfile.
         This is also the appropriate treatment here. Since fopen is the primary access point
@@ -72,25 +69,22 @@ FILE * __cdecl _tfsopen (
         that rather than aborting. The CRT and OS do not provide any other path validator (because
         WIN32 doesn't allow such things to exist in full generality).
         */
-        if(*file==_T('\0'))
-        {
-            errno=EINVAL;
+        if (*file == _T('\0')) {
+            errno = EINVAL;
             return NULL;
         }
 
         /* open the stream */
 #ifdef _UNICODE
-        retval = _wopenfile(file,mode,shflag,stream);
+        retval = _wopenfile(file, mode, shflag, stream);
 #else  /* _UNICODE */
-        retval = _openfile(file,mode,shflag,stream);
+        retval = _openfile(file, mode, shflag, stream);
 #endif  /* _UNICODE */
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        }
-        __finally {
-                _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 
@@ -116,12 +110,11 @@ FILE * __cdecl _tfsopen (
 *
 *******************************************************************************/
 
-FILE * __cdecl _tfopen (
-        const _TSCHAR *file,
-        const _TSCHAR *mode
-        )
-{
-        return( _tfsopen(file, mode, _SH_DENYNO) );
+FILE* __cdecl _tfopen(
+    const _TSCHAR* file,
+    const _TSCHAR* mode
+) {
+    return (_tfsopen(file, mode, _SH_DENYNO));
 }
 
 /***
@@ -149,17 +142,17 @@ FILE * __cdecl _tfopen (
 *
 *******************************************************************************/
 
-errno_t __cdecl _tfopen_s (
-        FILE ** pfile,
-        const _TSCHAR *file,
-        const _TSCHAR *mode
-        )
-{
-        _VALIDATE_RETURN_ERRCODE((pfile != NULL), EINVAL);
-        *pfile = _tfsopen(file, mode, _SH_SECURE);
+errno_t __cdecl _tfopen_s(
+    FILE** pfile,
+    const _TSCHAR* file,
+    const _TSCHAR* mode
+) {
+    _VALIDATE_RETURN_ERRCODE((pfile != NULL), EINVAL);
+    *pfile = _tfsopen(file, mode, _SH_SECURE);
 
-        if(*pfile != NULL)
-            return 0;
+    if (*pfile != NULL) {
+        return 0;
+    }
 
-        return errno;
+    return errno;
 }

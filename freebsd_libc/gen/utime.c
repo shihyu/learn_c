@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,17 +39,19 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/utime.c,v 1.3 2007/01/09 00:27:56 imp Exp $
 
 int
 utime(path, times)
-	const char *path;
-	const struct utimbuf *times;
+const char* path;
+const struct utimbuf* times;
 {
-	struct timeval tv[2], *tvp;
+    struct timeval tv[2], *tvp;
 
-	if (times) {
-		tv[0].tv_sec = times->actime;
-		tv[1].tv_sec = times->modtime;
-		tv[0].tv_usec = tv[1].tv_usec = 0;
-		tvp = tv;
-	} else
-		tvp = NULL;
-	return (utimes(path, tvp));
+    if (times) {
+        tv[0].tv_sec = times->actime;
+        tv[1].tv_sec = times->modtime;
+        tv[0].tv_usec = tv[1].tv_usec = 0;
+        tvp = tv;
+    } else {
+        tvp = NULL;
+    }
+
+    return (utimes(path, tvp));
 }

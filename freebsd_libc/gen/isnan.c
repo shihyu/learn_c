@@ -39,19 +39,15 @@ __weak_reference(__isnan, isnan);
 __weak_reference(__isnanf, isnanf);
 
 int
-__isnan(double d)
-{
-	union IEEEd2bits u;
-
-	u.d = d;
-	return (u.bits.exp == 2047 && (u.bits.manl != 0 || u.bits.manh != 0));
+__isnan(double d) {
+    union IEEEd2bits u;
+    u.d = d;
+    return (u.bits.exp == 2047 && (u.bits.manl != 0 || u.bits.manh != 0));
 }
 
 int
-__isnanf(float f)
-{
-	union IEEEf2bits u;
-
-	u.f = f;
-	return (u.bits.exp == 255 && u.bits.man != 0);
+__isnanf(float f) {
+    union IEEEf2bits u;
+    u.f = f;
+    return (u.bits.exp == 255 && u.bits.man != 0);
 }

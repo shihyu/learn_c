@@ -35,7 +35,7 @@
  * used in the printf support routine (_output)
  */
 
-static errno_t __cdecl _fpcvt(char*, size_t, STRFLT, int, int *, int *);
+static errno_t __cdecl _fpcvt(char*, size_t, STRFLT, int, int*, int*);
 
 
 /***
@@ -73,42 +73,35 @@ static errno_t __cdecl _fpcvt(char*, size_t, STRFLT, int, int *, int *);
 *
 *******************************************************************************/
 
-errno_t __cdecl _fcvt_s (
-    char *result,
+errno_t __cdecl _fcvt_s(
+    char* result,
     size_t sizeInChars,
     double value,
     int ndec,
-    int *decpt,
-    int *sign
-    )
-{
-
+    int* decpt,
+    int* sign
+) {
     REG1 STRFLT pflt;
-    _CRT_DOUBLE *pdvalue = (_CRT_DOUBLE *)&value;
+    _CRT_DOUBLE* pdvalue = (_CRT_DOUBLE*)&value;
     REG4 int digits = 0;
-
     struct _strflt strfltstruct;
     char resultstring[22 /* MAX_MAN_DIGITS+1 */];
-
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(result != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(sizeInChars > 0, EINVAL);
     _RESET_STRING(result, sizeInChars);
     _VALIDATE_RETURN_ERRCODE(decpt != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(sign != NULL, EINVAL);
-
     /* ok to take address of stack struct here; fltout2 knows to use ss */
-    pflt = _fltout2( *pdvalue, &strfltstruct, resultstring, _countof(resultstring) );
-
+    pflt = _fltout2(*pdvalue, &strfltstruct, resultstring, _countof(resultstring));
     digits = pflt->decpt + ndec;
 
     /* if we detect overflow then set number of digits to the largest possible */
-    if (ndec > 0 && pflt->decpt > 0 && digits < ndec)
-    {
+    if (ndec > 0 && pflt->decpt > 0 && digits < ndec) {
         digits = INT_MAX;
     }
 
-    return( _fpcvt( result, sizeInChars, pflt, digits, decpt, sign ) );
+    return (_fpcvt(result, sizeInChars, pflt, digits, decpt, sign));
 }
 
 /***
@@ -145,46 +138,45 @@ errno_t __cdecl _fcvt_s (
 *
 *******************************************************************************/
 
-char * __cdecl _fcvt (
+char* __cdecl _fcvt(
     double value,
     int ndec,
-    int *decpt,
-    int *sign
-    )
-{
+    int* decpt,
+    int* sign
+) {
     errno_t e = 0;
     REG1 STRFLT pflt;
-    _CRT_DOUBLE *pdvalue = (_CRT_DOUBLE *)&value;
-
-
+    _CRT_DOUBLE* pdvalue = (_CRT_DOUBLE*)&value;
     /* use a per-thread buffer */
-    char *buf;
+    char* buf;
     _ptiddata ptd;
     struct _strflt strfltstruct;
     char resultstring[22 /* MAX_MAN_DIGITS+1 */];
-
     ptd = _getptd_noexit();
-    if (!ptd)
+
+    if (!ptd) {
         return NULL;
-    if ( ptd->_cvtbuf == NULL )
-        if ( (ptd->_cvtbuf = (char *)_malloc_crt(_CVTBUFSIZE)) == NULL )
-            return(NULL);
+    }
+
+    if (ptd->_cvtbuf == NULL)
+        if ((ptd->_cvtbuf = (char*)_malloc_crt(_CVTBUFSIZE)) == NULL) {
+            return (NULL);
+        }
+
     buf = ptd->_cvtbuf;
-
     /* ok to take address of stack struct here; fltout2 knows to use ss */
-    pflt = _fltout2( *pdvalue, &strfltstruct, resultstring, _countof(resultstring) );
-
+    pflt = _fltout2(*pdvalue, &strfltstruct, resultstring, _countof(resultstring));
     /* make sure we don't overflow the buffer size.  If the user asks for
      * more digits than the buffer can handle, truncate it to the maximum
      * size allowed in the buffer.
      */
     ndec = min(ndec, _CVTBUFSIZE - 2 - pflt->decpt);
+    e = _fcvt_s(buf, _CVTBUFSIZE, value, ndec, decpt, sign);
 
-    e = _fcvt_s( buf, _CVTBUFSIZE, value, ndec, decpt, sign );
-    if ( e != 0 )
-    {
+    if (e != 0) {
         return NULL;
     }
+
     return buf;
 }
 
@@ -219,34 +211,28 @@ char * __cdecl _fcvt (
 *
 *******************************************************************************/
 
-errno_t __cdecl _ecvt_s (
-    char *result,
+errno_t __cdecl _ecvt_s(
+    char* result,
     size_t sizeInChars,
     double value,
     int ndigit,
-    int *decpt,
-    int *sign
-    )
-{
-    _CRT_DOUBLE *pdvalue = (_CRT_DOUBLE *)&value;
+    int* decpt,
+    int* sign
+) {
+    _CRT_DOUBLE* pdvalue = (_CRT_DOUBLE*)&value;
     REG1 STRFLT pflt;
-
     struct _strflt strfltstruct;        /* temporary buffers */
     char resultstring[22 /* MAX_MAN_DIGITS+1 */];
-
     errno_t e;
-
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(result != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(sizeInChars > 0, EINVAL);
     _RESET_STRING(result, sizeInChars);
     _VALIDATE_RETURN_ERRCODE(decpt != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(sign != NULL, EINVAL);
-
     /* ok to take address of stack struct here; fltout2 knows to use ss */
-    pflt = _fltout2( *pdvalue, &strfltstruct, resultstring, _countof(resultstring) );
-
-    e = _fpcvt( result, sizeInChars, pflt, ndigit, decpt, sign );
+    pflt = _fltout2(*pdvalue, &strfltstruct, resultstring, _countof(resultstring));
+    e = _fpcvt(result, sizeInChars, pflt, ndigit, decpt, sign);
 
     /* make sure we don't overflow the buffer size.  If the user asks for
      * more digits than the buffer can handle, truncate it to the maximum
@@ -254,14 +240,14 @@ errno_t __cdecl _ecvt_s (
      * since we use one character for overflow and one for the terminating
      * null character.
      */
-    if (ndigit > (int)(sizeInChars - 2))
-    {
+    if (ndigit > (int)(sizeInChars - 2)) {
         ndigit = (int)(sizeInChars - 2);
     }
 
     /* _fptostr() occasionally returns an extra character in the buffer ... */
-    if (ndigit >= 0 && result[ndigit])
+    if (ndigit >= 0 && result[ndigit]) {
         result[ndigit] = '\0';
+    }
 
     return e;
 }
@@ -295,30 +281,28 @@ errno_t __cdecl _ecvt_s (
 *
 *******************************************************************************/
 
-char * __cdecl _ecvt (
+char* __cdecl _ecvt(
     double value,
     int ndigit,
-    int *decpt,
-    int *sign
-    )
-{
+    int* decpt,
+    int* sign
+) {
     errno_t e = 0;
-
     /* use a per-thread buffer */
-
-    char *buf;
-
+    char* buf;
     _ptiddata ptd;
-
     ptd = _getptd_noexit();
-    if (!ptd)
+
+    if (!ptd) {
         return NULL;
-    if ( ptd->_cvtbuf == NULL )
-        if ( (ptd->_cvtbuf = (char *)_malloc_crt(_CVTBUFSIZE)) == NULL )
-            return(NULL);
+    }
+
+    if (ptd->_cvtbuf == NULL)
+        if ((ptd->_cvtbuf = (char*)_malloc_crt(_CVTBUFSIZE)) == NULL) {
+            return (NULL);
+        }
+
     buf = ptd->_cvtbuf;
-
-
     /* make sure we don't overflow the buffer size.  If the user asks for
      * more digits than the buffer can handle, truncate it to the maximum
      * size allowed in the buffer.  The maximum size is _CVTBUFSIZE - 2
@@ -326,12 +310,12 @@ char * __cdecl _ecvt (
      * null character.
      */
     ndigit = min(ndigit, _CVTBUFSIZE - 2);
+    e = _ecvt_s(buf, _CVTBUFSIZE, value, ndigit, decpt, sign);
 
-    e = _ecvt_s( buf, _CVTBUFSIZE, value, ndigit, decpt, sign );
-    if ( e != 0 )
-    {
+    if (e != 0) {
         return NULL;
     }
+
     return buf;
 }
 
@@ -351,17 +335,15 @@ char * __cdecl _ecvt (
 *
 *******************************************************************************/
 
-static errno_t __cdecl _fpcvt (
-    char *result,
+static errno_t __cdecl _fpcvt(
+    char* result,
     size_t sizeInChars,
     REG2 STRFLT pflt,
     REG3 int digits,
-    int *decpt,
-    int *sign
-    )
-{
+    int* decpt,
+    int* sign
+) {
     errno_t e = 0;
-
     /* make sure we don't overflow the buffer size.  If the user asks for
      * more digits than the buffer can handle, truncate it to the maximum
      * size allowed in the buffer.  The maximum size is sizeInChars - 2
@@ -369,14 +351,13 @@ static errno_t __cdecl _fpcvt (
      * null character.
      */
     _VALIDATE_RETURN_ERRCODE(sizeInChars >= (size_t)((digits > 0 ? digits : 0) + 2), ERANGE);
-
     e = _fptostr(
-        result,
-        sizeInChars,
-        (digits > (int)(sizeInChars - 2)) ? (int)(sizeInChars - 2) : digits,
-        pflt);
-    if (e != 0)
-    {
+            result,
+            sizeInChars,
+            (digits > (int)(sizeInChars - 2)) ? (int)(sizeInChars - 2) : digits,
+            pflt);
+
+    if (e != 0) {
         errno = e;
         return e;
     }
@@ -384,14 +365,11 @@ static errno_t __cdecl _fpcvt (
     /* set the sign flag and decimal point position */
     *sign = (pflt->sign == '-') ? 1 : 0;
     *decpt = pflt->decpt;
-
     return 0;
 }
 
 /* back-compat functions for non-locale users */
-FLT __cdecl _fltinf(const char *str, int len, int scale, int decpt)
-{
+FLT __cdecl _fltinf(const char* str, int len, int scale, int decpt) {
     _LocaleUpdate _loc_update(NULL);
-
-        return _fltinf_l(str, len, scale, decpt, _loc_update.GetLocaleT());
+    return _fltinf_l(str, len, scale, decpt, _loc_update.GetLocaleT());
 }

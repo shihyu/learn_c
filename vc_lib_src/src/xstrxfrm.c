@@ -62,72 +62,63 @@
 *
 *******************************************************************************/
 
-_MRTIMP2_NCEEPURE size_t __CLRCALL_PURE_OR_CDECL _Strxfrm (
-        char *_string1,
-        char *_end1,
-        const char *_string2,
-        const char *_end2,
-        const _Collvec *ploc
-        )
-{
-        size_t _n1 = _end1 - _string1;
-        size_t _n2 = _end2 - _string2;
-        int dstlen;
-        size_t retval = (size_t)-1;   /* NON-ANSI: default if OM or API error */
-        LCID handle;
-        UINT codepage;
+_MRTIMP2_NCEEPURE size_t __CLRCALL_PURE_OR_CDECL _Strxfrm(
+    char* _string1,
+    char* _end1,
+    const char* _string2,
+    const char* _end2,
+    const _Collvec* ploc
+) {
+    size_t _n1 = _end1 - _string1;
+    size_t _n2 = _end2 - _string2;
+    int dstlen;
+    size_t retval = (size_t) - 1; /* NON-ANSI: default if OM or API error */
+    LCID handle;
+    UINT codepage;
 
-        if (ploc == 0)
-        {
-            handle = ___lc_handle_func()[LC_COLLATE];
-            codepage = ___lc_collate_cp_func();
-        }
-        else
-        {
-            handle = ploc->_Hand;
-            codepage = ploc->_Page;
+    if (ploc == 0) {
+        handle = ___lc_handle_func()[LC_COLLATE];
+        codepage = ___lc_collate_cp_func();
+    } else {
+        handle = ploc->_Hand;
+        codepage = ploc->_Page;
+    }
+
+    if ((handle == _CLOCALEHANDLE) &&
+            (codepage == _CLOCALECP)) {
+        if (_n2 <= _n1) {
+            memcpy(_string1, _string2, _n2);
         }
 
-        if ((handle == _CLOCALEHANDLE) &&
-            (codepage == _CLOCALECP))
-        {
-            if (_n2 <= _n1)
-            {
-                memcpy(_string1, _string2, _n2);
-            }
-            retval=_n2;
-        }
-        else
-        {
-            /* Inquire size of dst string in BYTES */
-            if (0 != (dstlen = __crtLCMapStringA(NULL,
-                                                 handle,
-                                                 LCMAP_SORTKEY,
-                                                 _string2,
-                                                 (int)_n2,
-                                                 NULL,
-                                                 0,
-                                                 codepage,
-                                                 TRUE)))
-            {
-                retval = dstlen;
+        retval = _n2;
+    } else {
+        /* Inquire size of dst string in BYTES */
+        if (0 != (dstlen = __crtLCMapStringA(NULL,
+                                             handle,
+                                             LCMAP_SORTKEY,
+                                             _string2,
+                                             (int)_n2,
+                                             NULL,
+                                             0,
+                                             codepage,
+                                             TRUE))) {
+            retval = dstlen;
 
-                /* if not enough room, return amount needed */
-                if (dstlen <= (int)(_n1))
-                {
-                    /* Map src string to dst string */
-                    __crtLCMapStringA(NULL,
-                                      handle,
-                                      LCMAP_SORTKEY,
-                                      _string2,
-                                      (int)_n2,
-                                      _string1,
-                                      (int)_n1,
-                                      codepage,
-                                      TRUE);
-                }
+            /* if not enough room, return amount needed */
+            if (dstlen <= (int)(_n1)) {
+                /* Map src string to dst string */
+                __crtLCMapStringA(NULL,
+                                  handle,
+                                  LCMAP_SORTKEY,
+                                  _string2,
+                                  (int)_n2,
+                                  _string1,
+                                  (int)_n1,
+                                  codepage,
+                                  TRUE);
             }
         }
+    }
 
-        return (size_t)retval;
+    return (size_t)retval;
 }

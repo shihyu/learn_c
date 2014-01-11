@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -36,21 +36,21 @@ static char sccsid[] = "@(#)ldiv.c	8.1 (Berkeley) 6/4/93";
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/stdlib/ldiv.c,v 1.3 2007/01/09 00:28:10 imp Exp $");
 
-#include <stdlib.h>		/* ldiv_t */
+#include <stdlib.h>     /* ldiv_t */
 
 ldiv_t
 ldiv(num, denom)
-	long num, denom;
+long num, denom;
 {
-	ldiv_t r;
+    ldiv_t r;
+    /* see div.c for comments */
+    r.quot = num / denom;
+    r.rem = num % denom;
 
-	/* see div.c for comments */
+    if (num >= 0 && r.rem < 0) {
+        r.quot++;
+        r.rem -= denom;
+    }
 
-	r.quot = num / denom;
-	r.rem = num % denom;
-	if (num >= 0 && r.rem < 0) {
-		r.quot++;
-		r.rem -= denom;
-	}
-	return (r);
+    return (r);
 }

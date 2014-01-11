@@ -39,33 +39,33 @@
 
 /* terminate_handler is the standard name; terminate_function is supported for historical reasons */
 #ifndef _M_CEE_PURE
-typedef void (__cdecl *terminate_function)();
-typedef void (__cdecl *terminate_handler)();
-typedef void (__cdecl *unexpected_function)();
-typedef void (__cdecl *unexpected_handler)();
+typedef void (__cdecl* terminate_function)();
+typedef void (__cdecl* terminate_handler)();
+typedef void (__cdecl* unexpected_function)();
+typedef void (__cdecl* unexpected_handler)();
 #else  /* _M_CEE_PURE */
-typedef void (__clrcall *terminate_function)();
-typedef void (__clrcall *terminate_handler)();
-typedef void (__clrcall *unexpected_function)();
-typedef void (__clrcall *unexpected_handler)();
+typedef void (__clrcall* terminate_function)();
+typedef void (__clrcall* terminate_handler)();
+typedef void (__clrcall* unexpected_function)();
+typedef void (__clrcall* unexpected_handler)();
 #endif  /* _M_CEE_PURE */
 
 #ifdef _M_CEE
-typedef void (__clrcall *__terminate_function_m)();
-typedef void (__clrcall *__terminate_handler_m)();
-typedef void (__clrcall *__unexpected_function_m)();
-typedef void (__clrcall *__unexpected_handler_m)();
+typedef void (__clrcall* __terminate_function_m)();
+typedef void (__clrcall* __terminate_handler_m)();
+typedef void (__clrcall* __unexpected_function_m)();
+typedef void (__clrcall* __unexpected_handler_m)();
 #endif  /* _M_CEE */
 
 struct _EXCEPTION_POINTERS;
 #ifndef _M_CEE_PURE
-typedef void (__cdecl *_se_translator_function)(unsigned int, struct _EXCEPTION_POINTERS*);
+typedef void (__cdecl* _se_translator_function)(unsigned int, struct _EXCEPTION_POINTERS*);
 #endif  /* _M_CEE_PURE */
 
 _CRTIMP __declspec(noreturn) void __cdecl terminate(void);
 _CRTIMP void __cdecl unexpected(void);
 
-_CRTIMP int __cdecl _is_exception_typeof(__in const type_info &_Type, __in struct _EXCEPTION_POINTERS * _ExceptionPtr);
+_CRTIMP int __cdecl _is_exception_typeof(__in const type_info& _Type, __in struct _EXCEPTION_POINTERS* _ExceptionPtr);
 
 #ifndef _M_CEE_PURE
 /* only __clrcall versions provided by the MRT exist in pure */
@@ -100,10 +100,10 @@ _MRTIMP __unexpected_function_m __cdecl set_unexpected(__in_opt __unexpected_fun
  * All these function pointer are used for creating global state of CRT
  * functions. Either all of them will be set or all of them will be NULL
  */
-typedef terminate_function (__cdecl *_set_terminate_function)(terminate_function);
-typedef terminate_function (__cdecl *_get_terminate_function)(void);
-typedef unexpected_function (__cdecl *_set_unexpected_function)(unexpected_function);
-typedef unexpected_function (__cdecl *_get_unexpected_function)(void);
+typedef terminate_function(__cdecl* _set_terminate_function)(terminate_function);
+typedef terminate_function(__cdecl* _get_terminate_function)(void);
+typedef unexpected_function(__cdecl* _set_unexpected_function)(unexpected_function);
+typedef unexpected_function(__cdecl* _get_unexpected_function)(void);
 extern _set_terminate_function _set_terminate_server;
 extern _get_terminate_function _get_terminate_server;
 extern _set_unexpected_function _set_unexpected_server;

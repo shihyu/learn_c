@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -46,32 +46,36 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/gets.c,v 1.17 2007/01/09 00:28:06 imp Exp
 
 __warn_references(gets, "warning: this program uses gets(), which is unsafe.");
 
-char *
+char*
 gets(buf)
-	char *buf;
+char* buf;
 {
-	int c;
-	char *s;
-	static int warned;
-	static char w[] =
-	    "warning: this program uses gets(), which is unsafe.\n";
+    int c;
+    char* s;
+    static int warned;
+    static char w[] =
+        "warning: this program uses gets(), which is unsafe.\n";
+    FLOCKFILE(stdin);
+    ORIENT(stdin, -1);
 
-	FLOCKFILE(stdin);
-	ORIENT(stdin, -1);
-	if (!warned) {
-		(void) _write(STDERR_FILENO, w, sizeof(w) - 1);
-		warned = 1;
-	}
-	for (s = buf; (c = __sgetc(stdin)) != '\n';)
-		if (c == EOF)
-			if (s == buf) {
-				FUNLOCKFILE(stdin);
-				return (NULL);
-			} else
-				break;
-		else
-			*s++ = c;
-	*s = 0;
-	FUNLOCKFILE(stdin);
-	return (buf);
+    if (!warned) {
+        (void) _write(STDERR_FILENO, w, sizeof(w) - 1);
+        warned = 1;
+    }
+
+    for (s = buf; (c = __sgetc(stdin)) != '\n';)
+        if (c == EOF)
+            if (s == buf) {
+                FUNLOCKFILE(stdin);
+                return (NULL);
+            } else {
+                break;
+            }
+        else {
+            *s++ = c;
+        }
+
+    *s = 0;
+    FUNLOCKFILE(stdin);
+    return (buf);
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,20 +40,22 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getosreldate.c,v 1.9 2007/01/09 00:27:54 im
 #include <osreldate.h>
 
 int
-getosreldate(void)
-{
-	int mib[2];
-	size_t size;
-	int value;
+getosreldate(void) {
+    int mib[2];
+    size_t size;
+    int value;
+    char* temp;
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_OSRELDATE;
+    size = sizeof value;
 
-	char *temp;
+    if (sysctl(mib, 2, &value, &size, NULL, 0) == -1) {
+        return (-1);
+    }
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_OSRELDATE;
-	size = sizeof value;
-	if (sysctl(mib, 2, &value, &size, NULL, 0) == -1)
-		return (-1);
-	if ((temp = getenv("OSVERSION")))
-		value = atoi(temp);
-	return (value);
+    if ((temp = getenv("OSVERSION"))) {
+        value = atoi(temp);
+    }
+
+    return (value);
 }

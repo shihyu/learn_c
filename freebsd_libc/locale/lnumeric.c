@@ -33,61 +33,63 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/lnumeric.c,v 1.16 2003/06/26 10:46:16 ph
 #include "lnumeric.h"
 
 extern int __nlocale_changed;
-extern const char *__fix_locale_grouping_str(const char *);
+extern const char* __fix_locale_grouping_str(const char*);
 
 #define LCNUMERIC_SIZE (sizeof(struct lc_numeric_T) / sizeof(char *))
 
-static char	numempty[] = { CHAR_MAX, '\0' };
+static char numempty[] = { CHAR_MAX, '\0' };
 
 static const struct lc_numeric_T _C_numeric_locale = {
-	".",     	/* decimal_point */
-	"",     	/* thousands_sep */
-	numempty	/* grouping */
+    ".",        /* decimal_point */
+    "",         /* thousands_sep */
+    numempty    /* grouping */
 };
 
 static struct lc_numeric_T _numeric_locale;
-static int	_numeric_using_locale;
-static char	*_numeric_locale_buf;
+static int  _numeric_using_locale;
+static char* _numeric_locale_buf;
 
 int
-__numeric_load_locale(const char *name)
-{
-	int ret;
+__numeric_load_locale(const char* name) {
+    int ret;
+    ret = __part_load_locale(name, &_numeric_using_locale,
+                             &_numeric_locale_buf, "LC_NUMERIC",
+                             LCNUMERIC_SIZE, LCNUMERIC_SIZE,
+                             (const char**)&_numeric_locale);
 
-	ret = __part_load_locale(name, &_numeric_using_locale,
-		&_numeric_locale_buf, "LC_NUMERIC",
-		LCNUMERIC_SIZE, LCNUMERIC_SIZE,
-		(const char **)&_numeric_locale);
-	if (ret != _LDP_ERROR)
-		__nlocale_changed = 1;
-	if (ret == _LDP_LOADED) {
-		/* Can't be empty according to C99 */
-		if (*_numeric_locale.decimal_point == '\0')
-			_numeric_locale.decimal_point =
-			    _C_numeric_locale.decimal_point;
-		_numeric_locale.grouping =
-		    __fix_locale_grouping_str(_numeric_locale.grouping);
-	}
-	return (ret);
+    if (ret != _LDP_ERROR) {
+        __nlocale_changed = 1;
+    }
+
+    if (ret == _LDP_LOADED) {
+        /* Can't be empty according to C99 */
+        if (*_numeric_locale.decimal_point == '\0')
+            _numeric_locale.decimal_point =
+                _C_numeric_locale.decimal_point;
+
+        _numeric_locale.grouping =
+            __fix_locale_grouping_str(_numeric_locale.grouping);
+    }
+
+    return (ret);
 }
 
-struct lc_numeric_T *
-__get_current_numeric_locale(void)
-{
-	return (_numeric_using_locale
-		? &_numeric_locale
-		: (struct lc_numeric_T *)&_C_numeric_locale);
+struct lc_numeric_T*
+__get_current_numeric_locale(void) {
+    return (_numeric_using_locale
+            ? &_numeric_locale
+            : (struct lc_numeric_T*)&_C_numeric_locale);
 }
 
 #ifdef LOCALE_DEBUG
 void
 numericdebug(void) {
-printf(	"decimal_point = %s\n"
-	"thousands_sep = %s\n"
-	"grouping = %s\n",
-	_numeric_locale.decimal_point,
-	_numeric_locale.thousands_sep,
-	_numeric_locale.grouping
-);
+    printf("decimal_point = %s\n"
+           "thousands_sep = %s\n"
+           "grouping = %s\n",
+           _numeric_locale.decimal_point,
+           _numeric_locale.thousands_sep,
+           _numeric_locale.grouping
+          );
 }
 #endif /* LOCALE_DEBUG */

@@ -30,8 +30,6 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/i386_get_fsbase.c,v 1.1 2005/04/14 00:
 #include <machine/sysarch.h>
 
 int
-i386_get_fsbase(void **addr)
-{
-
-	return (sysarch(I386_GET_FSBASE, addr));
+i386_get_fsbase(void** addr) {
+    return (sysarch(I386_GET_FSBASE, addr));
 }

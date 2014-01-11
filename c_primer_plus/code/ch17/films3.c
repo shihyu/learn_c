@@ -5,62 +5,58 @@
 #include "list.h"      /* defines List, Item   */
 void showmovies(Item item);
 
-int main(void)
-{
+int main(void) {
     List movies;
     Item temp;
-
-
-/* initialize       */
+    /* initialize       */
     InitializeList(&movies);
-    if (ListIsFull(&movies))
-    {
-        fprintf(stderr,"No memory available! Bye!\n");
+
+    if (ListIsFull(&movies)) {
+        fprintf(stderr, "No memory available! Bye!\n");
         exit(1);
     }
-    
-/* gather and store */
+
+    /* gather and store */
     puts("Enter first movie title:");
-    while (gets(temp.title) != NULL && temp.title[0] != '\0')
-    {
+
+    while (gets(temp.title) != NULL && temp.title[0] != '\0') {
         puts("Enter your rating <0-10>:");
         scanf("%d", &temp.rating);
-        while(getchar() != '\n')
+
+        while (getchar() != '\n') {
             continue;
-        if (AddItem(temp, &movies)==false)
-        {
-            fprintf(stderr,"Problem allocating memory\n");
+        }
+
+        if (AddItem(temp, &movies) == false) {
+            fprintf(stderr, "Problem allocating memory\n");
             break;
         }
-        if (ListIsFull(&movies))
-        {
+
+        if (ListIsFull(&movies)) {
             puts("The list is now full.");
             break;
         }
+
         puts("Enter next movie title (empty line to stop):");
     }
-   
-/* display          */
-    if (ListIsEmpty(&movies))
+
+    /* display          */
+    if (ListIsEmpty(&movies)) {
         printf("No data entered. ");
-    else
-    {
-        printf ("Here is the movie list:\n");
+    } else {
+        printf("Here is the movie list:\n");
         Traverse(&movies, showmovies);
     }
+
     printf("You entered %d movies.\n", ListItemCount(&movies));
-
-
-/* clean up         */
+    /* clean up         */
     EmptyTheList(&movies);
     printf("Bye!\n");
-   
     return 0;
 }
 
-void showmovies(Item item)
-{
+void showmovies(Item item) {
     printf("Movie: %s  Rating: %d\n", item.title,
-            item.rating); 
+           item.rating);
 }
 

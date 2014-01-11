@@ -83,44 +83,37 @@ static void __cdecl init_namebuf(int);
  * Generator function that produces temporary filenames
  */
 #ifdef _UNICODE
-static int __cdecl wgenfname(wchar_t *, size_t, unsigned long);
+static int __cdecl wgenfname(wchar_t*, size_t, unsigned long);
 #else  /* _UNICODE */
-static int __cdecl genfname(char *, size_t, unsigned long);
+static int __cdecl genfname(char*, size_t, unsigned long);
 #endif  /* _UNICODE */
 
 
-errno_t _ttmpnam_helper (
-        _TSCHAR *s, size_t sz, int buffer_no, unsigned long tmp_max, _TSCHAR **ret
-        )
+errno_t _ttmpnam_helper(
+    _TSCHAR* s, size_t sz, int buffer_no, unsigned long tmp_max, _TSCHAR** ret
+)
 
 {
-        _TSCHAR *pfnam = NULL;
-        size_t pfnameSize = 0;
-        errno_t retval = 0;
-        errno_t saved_errno=errno;
+    _TSCHAR* pfnam = NULL;
+    size_t pfnameSize = 0;
+    errno_t retval = 0;
+    errno_t saved_errno = errno;
+    _ptiddata ptd;
 
-        _ptiddata ptd;
+    if (!_mtinitlocknum(_TMPNAM_LOCK)) {
+        *ret = NULL;
+        return errno;
+    }
 
-        if ( !_mtinitlocknum( _TMPNAM_LOCK ))
-        {
-                *ret = NULL;
-                return errno;
-        }
+    _mlock(_TMPNAM_LOCK);
 
-        _mlock(_TMPNAM_LOCK);
-
-        __try {
-
+    __try {
         /* buffer_no is either _TMPNAM_BUFFER or _TMPNAM_S_BUFFER
         It's never _TMPFILE_BUFFER */
-
-        if (buffer_no == _TMPNAM_BUFFER)
-        {
+        if (buffer_no == _TMPNAM_BUFFER) {
             pfnam = tmpnam_buf;
             pfnameSize = _countof(tmpnam_buf);
-        }
-        else
-        {
+        } else {
             pfnam = tmpnam_s_buf;
             pfnameSize = _countof(tmpnam_s_buf);
         }
@@ -129,77 +122,76 @@ errno_t _ttmpnam_helper (
          * Initialize tmpnam_buf, if needed. Otherwise, call genfname() to
          * generate the next filename.
          */
-        if ( *pfnam == 0 ) {
+        if (*pfnam == 0) {
 #ifdef _UNICODE
-                winit_namebuf(buffer_no);
+            winit_namebuf(buffer_no);
 #else  /* _UNICODE */
-                init_namebuf(buffer_no);
+            init_namebuf(buffer_no);
 #endif  /* _UNICODE */
         }
+
 #ifdef _UNICODE
-        else if ( wgenfname(pfnam, pfnameSize, tmp_max) )
+        else if (wgenfname(pfnam, pfnameSize, tmp_max))
 #else  /* _UNICODE */
-        else if ( genfname(pfnam, pfnameSize, tmp_max) )
+        else if (genfname(pfnam, pfnameSize, tmp_max))
 #endif  /* _UNICODE */
-                goto tmpnam_err;
+            goto tmpnam_err;
 
         /*
          * Generate a filename that doesn't already exist.
          */
-        while ( _taccess_s(pfnam, 0) == 0 )
+        while (_taccess_s(pfnam, 0) == 0)
 #ifdef _UNICODE
-                if ( wgenfname(pfnam, pfnameSize, tmp_max) )
+            if (wgenfname(pfnam, pfnameSize, tmp_max))
 #else  /* _UNICODE */
-                if ( genfname(pfnam, pfnameSize, tmp_max) )
+            if (genfname(pfnam, pfnameSize, tmp_max))
 #endif  /* _UNICODE */
-                        goto tmpnam_err;
+                goto tmpnam_err;
 
         /*
          * Filename has successfully been generated.
          */
-        if ( s == NULL )
-        {
+        if (s == NULL) {
+            /* Will never come here for tmpnam_s */
+            _ASSERTE(pfnam == tmpnam_buf);
+            /*
+             * Use a per-thread buffer to hold the generated file name.
+             */
+            ptd = _getptd_noexit();
 
-                /* Will never come here for tmpnam_s */
-                _ASSERTE(pfnam == tmpnam_buf);
-                /*
-                 * Use a per-thread buffer to hold the generated file name.
-                 */
-                ptd = _getptd_noexit();
-                if (!ptd) {
-                    retval = ENOMEM;
-                    goto tmpnam_err;
-                }
+            if (!ptd) {
+                retval = ENOMEM;
+                goto tmpnam_err;
+            }
+
 #ifdef _UNICODE
-                if ( (ptd->_wnamebuf0 != NULL) || ((ptd->_wnamebuf0 =
-                      _calloc_crt(L_tmpnam, sizeof(wchar_t))) != NULL) )
-                {
-                        s = ptd->_wnamebuf0;
-                        _ERRCHECK(wcscpy_s(s, L_tmpnam, pfnam));
-                }
-#else  /* _UNICODE */
-                if ( (ptd->_namebuf0 != NULL) || ((ptd->_namebuf0 =
-                      _malloc_crt(L_tmpnam)) != NULL) )
-                {
-                        s = ptd->_namebuf0;
-                        _ERRCHECK(strcpy_s(s, L_tmpnam, pfnam));
-                }
-#endif  /* _UNICODE */
-                else
-                {
-                        retval = ENOMEM;
-                        goto tmpnam_err;
-                }
 
-        }
-        else
-        {
-            if((buffer_no != _TMPNAM_BUFFER) && (_tcslen(pfnam) >= sz))
-            {
+            if ((ptd->_wnamebuf0 != NULL) || ((ptd->_wnamebuf0 =
+                                                   _calloc_crt(L_tmpnam, sizeof(wchar_t))) != NULL)) {
+                s = ptd->_wnamebuf0;
+                _ERRCHECK(wcscpy_s(s, L_tmpnam, pfnam));
+            }
+
+#else  /* _UNICODE */
+
+            if ((ptd->_namebuf0 != NULL) || ((ptd->_namebuf0 =
+                                                  _malloc_crt(L_tmpnam)) != NULL)) {
+                s = ptd->_namebuf0;
+                _ERRCHECK(strcpy_s(s, L_tmpnam, pfnam));
+            }
+
+#endif  /* _UNICODE */
+            else {
+                retval = ENOMEM;
+                goto tmpnam_err;
+            }
+        } else {
+            if ((buffer_no != _TMPNAM_BUFFER) && (_tcslen(pfnam) >= sz)) {
                 retval = ERANGE;
 
-                if(sz != 0)
+                if (sz != 0) {
                     s[0] = 0;
+                }
 
                 goto tmpnam_err;
             }
@@ -207,35 +199,30 @@ errno_t _ttmpnam_helper (
             _ERRCHECK(_tcscpy_s(s, sz, pfnam));
         }
 
-
         /*
          * All errors come here.
          */
-tmpnam_err:
+    tmpnam_err:
+        ;
+    } __finally {
+        _munlock(_TMPNAM_LOCK);
+    }
 
-        ; }
-        __finally {
-                _munlock(_TMPNAM_LOCK);
-        }
-        *ret = s;
-        if (retval != 0)
-        {
-            errno = retval;
-        }
-        else
-        {
-            errno = saved_errno;
-        }
-        return retval ;
+    *ret = s;
+
+    if (retval != 0) {
+        errno = retval;
+    } else {
+        errno = saved_errno;
+    }
+
+    return retval ;
 }
 
 
-errno_t __cdecl _ttmpnam_s(_TSCHAR * s, size_t sz)
-{
-    _TSCHAR * ret; /* Not used by tmpnam_s */
-
-    _VALIDATE_RETURN_ERRCODE( (s != NULL), EINVAL);
-
+errno_t __cdecl _ttmpnam_s(_TSCHAR* s, size_t sz) {
+    _TSCHAR* ret;  /* Not used by tmpnam_s */
+    _VALIDATE_RETURN_ERRCODE((s != NULL), EINVAL);
     return _ttmpnam_helper(s, sz, _TMPNAM_S_BUFFER, _TMP_MAX_S, &ret);
 }
 
@@ -258,57 +245,51 @@ errno_t __cdecl _ttmpnam_s(_TSCHAR * s, size_t sz)
 *
 *******************************************************************************/
 
-_TSCHAR * __cdecl _ttmpnam (
-        _TSCHAR *s
-        )
-{
-    _TSCHAR * ret = NULL;
-    _ttmpnam_helper(s, (size_t)-1, _TMPNAM_BUFFER, TMP_MAX, &ret) ;
+_TSCHAR* __cdecl _ttmpnam(
+    _TSCHAR* s
+) {
+    _TSCHAR* ret = NULL;
+    _ttmpnam_helper(s, (size_t) - 1, _TMPNAM_BUFFER, TMP_MAX, &ret) ;
     return ret;
 }
 
 
 #ifndef _UNICODE
 
-errno_t __cdecl _tmpfile_helper (FILE ** pFile, int shflag)
-{
-        FILE *stream;
-        int fh;
-        errno_t retval = 0;
-        errno_t save_errno;
+errno_t __cdecl _tmpfile_helper(FILE** pFile, int shflag) {
+    FILE* stream;
+    int fh;
+    errno_t retval = 0;
+    errno_t save_errno;
+    int stream_lock_held = 0;
+    _VALIDATE_RETURN_ERRCODE((pFile != NULL), EINVAL);
+    *pFile = NULL;
 
-        int stream_lock_held = 0;
+    if (!_mtinitlocknum(_TMPNAM_LOCK)) {
+        return errno;
+    }
 
-        _VALIDATE_RETURN_ERRCODE( (pFile != NULL), EINVAL);
-        *pFile = NULL;
+    _mlock(_TMPNAM_LOCK);
 
-        if ( !_mtinitlocknum( _TMPNAM_LOCK ))
-        {
-                return errno;
-        }
-
-        _mlock(_TMPNAM_LOCK);
-
-        __try {
-
+    __try {
         /*
          * Initialize tmpfile_buf, if needed. Otherwise, call genfname() to
          * generate the next filename.
          */
-        if ( *tmpfile_buf == 0 ) {
-                init_namebuf(_TMPFILE_BUFFER);
+        if (*tmpfile_buf == 0) {
+            init_namebuf(_TMPFILE_BUFFER);
+        } else if (genfname(tmpfile_buf, _countof(tmpfile_buf), _TMP_MAX_S)) {
+            goto tmpfile_err;
         }
-        else if ( genfname(tmpfile_buf, _countof(tmpfile_buf), _TMP_MAX_S) )
-                goto tmpfile_err;
 
         /*
          * Get a free stream.
          *
          * Note: In multi-thread models, the stream obtained below is locked!
          */
-        if ( (stream = _getstream()) == NULL ) {
-                retval = EMFILE;
-                goto tmpfile_err;
+        if ((stream = _getstream()) == NULL) {
+            retval = EMFILE;
+            goto tmpfile_err;
         }
 
         stream_lock_held = 1;
@@ -324,19 +305,19 @@ errno_t __cdecl _tmpfile_helper (FILE ** pFile, int shflag)
          */
         save_errno = errno;
         errno = 0;
-        while ( (_sopen_s(&fh, tmpfile_buf,
-                              _O_CREAT | _O_EXCL | _O_RDWR | _O_BINARY |
-                                _O_TEMPORARY,
-                              shflag,
-                              _S_IREAD | _S_IWRITE
-                             ) == EEXIST) )
-        {
-                if ( genfname(tmpfile_buf, _countof(tmpfile_buf), _TMP_MAX_S) )
-                        break;
+
+        while ((_sopen_s(&fh, tmpfile_buf,
+                         _O_CREAT | _O_EXCL | _O_RDWR | _O_BINARY |
+                         _O_TEMPORARY,
+                         shflag,
+                         _S_IREAD | _S_IWRITE
+                        ) == EEXIST)) {
+            if (genfname(tmpfile_buf, _countof(tmpfile_buf), _TMP_MAX_S)) {
+                break;
+            }
         }
 
-        if(errno == 0)
-        {
+        if (errno == 0) {
             errno = save_errno;
         }
 
@@ -344,49 +325,51 @@ errno_t __cdecl _tmpfile_helper (FILE ** pFile, int shflag)
          * Check that the loop above did indeed create a temporary
          * file.
          */
-        if ( fh == -1 )
-                goto tmpfile_err;
+        if (fh == -1) {
+            goto tmpfile_err;
+        }
 
         /*
          * Initialize stream
          */
 #ifdef _DEBUG
-        if ( (stream->_tmpfname = _calloc_crt( (_tcslen( tmpfile_buf ) + 1), sizeof(_TSCHAR) )) == NULL )
+
+        if ((stream->_tmpfname = _calloc_crt((_tcslen(tmpfile_buf) + 1), sizeof(_TSCHAR))) == NULL)
 #else  /* _DEBUG */
-        if ( (stream->_tmpfname = _tcsdup( tmpfile_buf )) == NULL )
+        if ((stream->_tmpfname = _tcsdup(tmpfile_buf)) == NULL)
 #endif  /* _DEBUG */
         {
-                /* close the file, then branch to error handling */
-                _close(fh);
-                goto tmpfile_err;
+            /* close the file, then branch to error handling */
+            _close(fh);
+            goto tmpfile_err;
         }
+
 #ifdef _DEBUG
-        _ERRCHECK(_tcscpy_s( stream->_tmpfname, _tcslen( tmpfile_buf ) + 1, tmpfile_buf ));
+        _ERRCHECK(_tcscpy_s(stream->_tmpfname, _tcslen(tmpfile_buf) + 1, tmpfile_buf));
 #endif  /* _DEBUG */
         stream->_cnt = 0;
         stream->_base = stream->_ptr = NULL;
         stream->_flag = _commode | _IORW;
         stream->_file = fh;
-
         *pFile = stream;
-
         /*
          * All errors branch to the label below.
          */
-tmpfile_err:
-
-        ; }
-        __finally {
-                if ( stream_lock_held )
-                        _unlock_str(stream);
-                _munlock(_TMPNAM_LOCK);
+    tmpfile_err:
+        ;
+    } __finally {
+        if (stream_lock_held) {
+            _unlock_str(stream);
         }
 
-        if (retval != 0)
-        {
-            errno = retval;
-        }
-        return retval ;
+        _munlock(_TMPNAM_LOCK);
+    }
+
+    if (retval != 0) {
+        errno = retval;
+    }
+
+    return retval ;
 }
 
 /***
@@ -408,9 +391,8 @@ tmpfile_err:
 *
 *******************************************************************************/
 
-FILE * __cdecl tmpfile (void)
-{
-    FILE * fp = NULL;
+FILE* __cdecl tmpfile(void) {
+    FILE* fp = NULL;
     _tmpfile_helper(&fp, _SH_DENYNO);
     return fp;
 }
@@ -436,8 +418,7 @@ FILE * __cdecl tmpfile (void)
 *
 *******************************************************************************/
 
-errno_t __cdecl tmpfile_s (FILE ** pFile)
-{
+errno_t __cdecl tmpfile_s(FILE** pFile) {
     return _tmpfile_helper(pFile, _SH_DENYRW);
 }
 
@@ -465,61 +446,62 @@ static void __cdecl winit_namebuf(
 #else  /* _UNICODE */
 static void __cdecl init_namebuf(
 #endif  /* _UNICODE */
-        int flag
-        )
-{
-        _TSCHAR *p, *q;
-        size_t size = 0;
+    int flag
+) {
+    _TSCHAR* p, *q;
+    size_t size = 0;
 
-        switch(flag)
-        {
-            case 0 :
-                p = tmpnam_buf;
-                size = _countof(tmpnam_buf);
-                break;
+    switch (flag) {
+    case 0 :
+        p = tmpnam_buf;
+        size = _countof(tmpnam_buf);
+        break;
 
-            case 1 :
-                p = tmpfile_buf;
-                size = _countof(tmpfile_buf);
-                break;
+    case 1 :
+        p = tmpfile_buf;
+        size = _countof(tmpfile_buf);
+        break;
 
-            case 2 :
-                p = tmpnam_s_buf;
-                size = _countof(tmpnam_s_buf);
-                break;
+    case 2 :
+        p = tmpnam_s_buf;
+        size = _countof(tmpnam_s_buf);
+        break;
+    }
 
-        }
-
-        /*
-         * Put in the path prefix. Make sure it ends with a slash or
-         * backslash character.
-         */
+    /*
+     * Put in the path prefix. Make sure it ends with a slash or
+     * backslash character.
+     */
 #ifdef _UNICODE
-        _ERRCHECK(wcscpy_s(p, size, _wP_tmpdir));
+    _ERRCHECK(wcscpy_s(p, size, _wP_tmpdir));
 #else  /* _UNICODE */
-        _ERRCHECK(strcpy_s(p, size, _P_tmpdir));
+    _ERRCHECK(strcpy_s(p, size, _P_tmpdir));
 #endif  /* _UNICODE */
-        q = p + sizeof(_P_tmpdir) - 1;      /* same as p + _tcslen(p) */
+    q = p + sizeof(_P_tmpdir) - 1;      /* same as p + _tcslen(p) */
 
-        if  ( (*(q - 1) != _T('\\')) && (*(q - 1) != _T('/')) )
-                *(q++) = _T('\\');
+    if ((*(q - 1) != _T('\\')) && (*(q - 1) != _T('/'))) {
+        *(q++) = _T('\\');
+    }
 
-        /*
-         * Append the leading character of the filename.
-         */
-        if ( flag == _TMPFILE_BUFFER )
-                /* for tmpfile() */
-                *(q++) = _T('t');
-        else
-                /* for tmpnam() & _tmpnam_s */
-                *(q++) = _T('s');
+    /*
+     * Append the leading character of the filename.
+     */
+    if (flag == _TMPFILE_BUFFER)
+        /* for tmpfile() */
+    {
+        *(q++) = _T('t');
+    } else
+        /* for tmpnam() & _tmpnam_s */
+    {
+        *(q++) = _T('s');
+    }
 
-        /*
-         * Append the process id, encoded in base 32. Note this makes
-         * p back into a string again (i.e., terminated by a '\0').
-         */
-        _ERRCHECK(_ultot_s((unsigned long)_getpid(), q, size - (q - p), 32));
-        _ERRCHECK(_tcscat_s(p, size, _T(".")));
+    /*
+     * Append the process id, encoded in base 32. Note this makes
+     * p back into a string again (i.e., terminated by a '\0').
+     */
+    _ERRCHECK(_ultot_s((unsigned long)_getpid(), q, size - (q - p), 32));
+    _ERRCHECK(_tcscat_s(p, size, _T(".")));
 }
 
 
@@ -537,28 +519,25 @@ static void __cdecl init_namebuf(
 *******************************************************************************/
 
 #ifdef _UNICODE
-static int __cdecl wgenfname (
+static int __cdecl wgenfname(
 #else  /* _UNICODE */
-static int __cdecl genfname (
+static int __cdecl genfname(
 #endif  /* _UNICODE */
-        _TSCHAR *fname, size_t fnameSize, unsigned long tmp_max
-        )
-{
-        _TSCHAR *p;
-        _TSCHAR pext[8];        // 7 positions for base 32 ulong + null terminator
-        unsigned long extnum;
+    _TSCHAR* fname, size_t fnameSize, unsigned long tmp_max
+) {
+    _TSCHAR* p;
+    _TSCHAR pext[8];        // 7 positions for base 32 ulong + null terminator
+    unsigned long extnum;
+    p = _tcsrchr(fname, _T('.'));
+    p++;
 
-        p = _tcsrchr(fname, _T('.'));
+    if ((extnum = _tcstoul(p, NULL, 32) + 1) >= tmp_max) {
+        return -1;
+    }
 
-        p++;
-
-        if ( (extnum = _tcstoul(p, NULL, 32) + 1) >= tmp_max )
-                return -1;
-
-        _ERRCHECK(_ultot_s(extnum, pext, _countof(pext), 32));
-        _ERRCHECK(_tcscpy_s(p, fnameSize - (p - fname), pext));
-
-        return 0;
+    _ERRCHECK(_ultot_s(extnum, pext, _countof(pext), 32));
+    _ERRCHECK(_tcscpy_s(p, fnameSize - (p - fname), pext));
+    return 0;
 }
 
 #if !defined (_UNICODE) && !defined (CRTDLL)
@@ -583,10 +562,9 @@ static int __cdecl genfname (
 extern int _tmpoff;
 
 void __inc_tmpoff(
-        void
-        )
-{
-        _tmpoff++;
+    void
+) {
+    _tmpoff++;
 }
 
 #endif  /* !defined (_UNICODE) && !defined (CRTDLL) */

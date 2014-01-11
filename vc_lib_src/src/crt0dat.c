@@ -50,16 +50,16 @@ _CRTIMP unsigned int _winminor = 0;
 /* argument vector and environment */
 
 _CRTIMP int __argc = 0;
-_CRTIMP char **__argv = NULL;
-_CRTIMP wchar_t **__wargv = NULL;
-_CRTIMP char **_environ = NULL;
-_CRTIMP char **__initenv = NULL;
-_CRTIMP wchar_t **_wenviron = NULL;
-_CRTIMP wchar_t **__winitenv = NULL;
-_CRTIMP char *_pgmptr = NULL;           /* ptr to program name */
-_CRTIMP wchar_t *_wpgmptr = NULL;       /* ptr to wide program name */
+_CRTIMP char** __argv = NULL;
+_CRTIMP wchar_t** __wargv = NULL;
+_CRTIMP char** _environ = NULL;
+_CRTIMP char** __initenv = NULL;
+_CRTIMP wchar_t** _wenviron = NULL;
+_CRTIMP wchar_t** __winitenv = NULL;
+_CRTIMP char* _pgmptr = NULL;           /* ptr to program name */
+_CRTIMP wchar_t* _wpgmptr = NULL;       /* ptr to wide program name */
 
-void (__cdecl * _aexit_rtn)(int) = _exit;   /* RT message return procedure */
+void (__cdecl* _aexit_rtn)(int) = _exit;    /* RT message return procedure */
 
 
 /* callable exit flag */
@@ -121,8 +121,8 @@ extern _CRTALLOC(".CRT$XTZ") _PVFV __xt_z[];    /* C terminators */
  * pointers to the start and finish of the _onexit/atexit table
  * NOTE - the pointers are stored encoded.
  */
-_PVFV *__onexitbegin;
-_PVFV *__onexitend;
+_PVFV* __onexitbegin;
+_PVFV* __onexitend;
 
 /*
  * Pointer to callback function to initialize any dynamically initialized
@@ -150,11 +150,11 @@ const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback;
  * indicate an initialization failed fatally.
  */
 #ifdef CRTDLL
-void __cdecl _initterm(_PVFV *, _PVFV *);
+void __cdecl _initterm(_PVFV*, _PVFV*);
 #else  /* CRTDLL */
-static void __cdecl _initterm(_PVFV *, _PVFV *);
+static void __cdecl _initterm(_PVFV*, _PVFV*);
 #endif  /* CRTDLL */
-int  __cdecl _initterm_e(_PIFV *, _PIFV *);
+int  __cdecl _initterm_e(_PIFV*, _PIFV*);
 
 
 #ifdef CRTDLL
@@ -181,51 +181,60 @@ int  __cdecl _initterm_e(_PIFV *, _PIFV *);
 *
 *******************************************************************************/
 
-static int __cdecl check_managed_app (
-        void
-        )
-{
-        PIMAGE_DOS_HEADER pDOSHeader;
-        PIMAGE_NT_HEADERS pPEHeader;
-        PIMAGE_OPTIONAL_HEADER32 pNTHeader32;
-        PIMAGE_OPTIONAL_HEADER64 pNTHeader64;
+static int __cdecl check_managed_app(
+    void
+) {
+    PIMAGE_DOS_HEADER pDOSHeader;
+    PIMAGE_NT_HEADERS pPEHeader;
+    PIMAGE_OPTIONAL_HEADER32 pNTHeader32;
+    PIMAGE_OPTIONAL_HEADER64 pNTHeader64;
+    pDOSHeader = (PIMAGE_DOS_HEADER)GetModuleHandleA(NULL);
 
-        pDOSHeader = (PIMAGE_DOS_HEADER)GetModuleHandleA(NULL);
-        if ( pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE )
-            return 0;
+    if (pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE) {
+        return 0;
+    }
 
-        pPEHeader = (PIMAGE_NT_HEADERS)((char *)pDOSHeader +
-                                        pDOSHeader->e_lfanew);
-        if ( pPEHeader->Signature != IMAGE_NT_SIGNATURE )
-            return 0;
+    pPEHeader = (PIMAGE_NT_HEADERS)((char*)pDOSHeader +
+                                    pDOSHeader->e_lfanew);
 
-        pNTHeader32 = (PIMAGE_OPTIONAL_HEADER32)&pPEHeader->OptionalHeader;
-        switch ( pNTHeader32->Magic ) {
-        case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
-            /* PE header */
-            /* prefast assumes we are overflowing __ImageBase */
+    if (pPEHeader->Signature != IMAGE_NT_SIGNATURE) {
+        return 0;
+    }
+
+    pNTHeader32 = (PIMAGE_OPTIONAL_HEADER32)&pPEHeader->OptionalHeader;
+
+    switch (pNTHeader32->Magic) {
+    case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
+        /* PE header */
+        /* prefast assumes we are overflowing __ImageBase */
 #pragma warning(push)
 #pragma warning(disable:26000)
-            if ( pNTHeader32->NumberOfRvaAndSizes <=
-                    IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR )
-                return 0;
-#pragma warning(pop)
-            return !! pNTHeader32 ->
-                      DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
-                      VirtualAddress;
-        case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
-            /* PE+ header */
-            pNTHeader64 = (PIMAGE_OPTIONAL_HEADER64)pNTHeader32;
-            if ( pNTHeader64->NumberOfRvaAndSizes <=
-                    IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR )
-                return 0;
-            return !! pNTHeader64 ->
-                      DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
-                      VirtualAddress;
+        if (pNTHeader32->NumberOfRvaAndSizes <=
+                IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR) {
+            return 0;
         }
 
-        /* Not PE or PE+, so not managed */
-        return 0;
+#pragma warning(pop)
+        return !! pNTHeader32 ->
+               DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
+               VirtualAddress;
+
+    case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
+        /* PE+ header */
+        pNTHeader64 = (PIMAGE_OPTIONAL_HEADER64)pNTHeader32;
+
+        if (pNTHeader64->NumberOfRvaAndSizes <=
+                IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR) {
+            return 0;
+        }
+
+        return !! pNTHeader64 ->
+               DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
+               VirtualAddress;
+    }
+
+    /* Not PE or PE+, so not managed */
+    return 0;
 }
 
 #endif  /* CRTDLL */
@@ -257,59 +266,58 @@ static int __cdecl check_managed_app (
 extern void __cdecl _initp_misc_cfltcvt_tab();
 #endif  /* CRTDLL */
 
-int __cdecl _cinit (
-        int initFloatingPrecision
-        )
-{
-        int initret;
-
-        /*
-         * initialize floating point package, if present
-         */
+int __cdecl _cinit(
+    int initFloatingPrecision
+) {
+    int initret;
+    /*
+     * initialize floating point package, if present
+     */
 #ifdef CRTDLL
-        _fpmath(initFloatingPrecision);
+    _fpmath(initFloatingPrecision);
 #else  /* CRTDLL */
-        if (_FPinit != NULL &&
-            _IsNonwritableInCurrentImage((PBYTE)&_FPinit))
-        {
-            (*_FPinit)(initFloatingPrecision);
-        }
-        _initp_misc_cfltcvt_tab();
-#endif  /* CRTDLL */
 
-        /*
-         * do initializations
-         */
-        initret = _initterm_e( __xi_a, __xi_z );
-        if ( initret != 0 )
-            return initret;
+    if (_FPinit != NULL &&
+            _IsNonwritableInCurrentImage((PBYTE)&_FPinit)) {
+        (*_FPinit)(initFloatingPrecision);
+    }
+
+    _initp_misc_cfltcvt_tab();
+#endif  /* CRTDLL */
+    /*
+     * do initializations
+     */
+    initret = _initterm_e(__xi_a, __xi_z);
+
+    if (initret != 0) {
+        return initret;
+    }
 
 #ifdef _RTC
-        atexit(_RTC_Terminate);
+    atexit(_RTC_Terminate);
 #endif  /* _RTC */
-        /*
-         * do C++ initializations
-         */
-        _initterm( __xc_a, __xc_z );
-
+    /*
+     * do C++ initializations
+     */
+    _initterm(__xc_a, __xc_z);
 #ifndef CRTDLL
-        /*
-         * If we have any dynamically initialized __declspec(thread)
-         * variables, then invoke their initialization for the thread on
-         * which the DLL is being loaded, by calling __dyn_tls_init through
-         * a callback defined in tlsdyn.obj.  We can't rely on the OS
-         * calling __dyn_tls_init with DLL_PROCESS_ATTACH because, on
-         * Win2K3 and before, that call happens before the CRT is
-         * initialized.
-         */
-        if (__dyn_tls_init_callback != NULL &&
-            _IsNonwritableInCurrentImage((PBYTE)&__dyn_tls_init_callback))
-        {
-            __dyn_tls_init_callback(NULL, DLL_THREAD_ATTACH, NULL);
-        }
-#endif  /* CRTDLL */
 
-        return 0;
+    /*
+     * If we have any dynamically initialized __declspec(thread)
+     * variables, then invoke their initialization for the thread on
+     * which the DLL is being loaded, by calling __dyn_tls_init through
+     * a callback defined in tlsdyn.obj.  We can't rely on the OS
+     * calling __dyn_tls_init with DLL_PROCESS_ATTACH because, on
+     * Win2K3 and before, that call happens before the CRT is
+     * initialized.
+     */
+    if (__dyn_tls_init_callback != NULL &&
+            _IsNonwritableInCurrentImage((PBYTE)&__dyn_tls_init_callback)) {
+        __dyn_tls_init_callback(NULL, DLL_THREAD_ATTACH, NULL);
+    }
+
+#endif  /* CRTDLL */
+    return 0;
 }
 
 
@@ -389,35 +397,31 @@ int __cdecl _cinit (
 *******************************************************************************/
 
 /* worker routine prototype */
-static void __cdecl doexit (int code, int quick, int retcaller);
+static void __cdecl doexit(int code, int quick, int retcaller);
 
-void __cdecl exit (
-        int code
-        )
-{
-        doexit(code, 0, 0); /* full term, kill process */
+void __cdecl exit(
+    int code
+) {
+    doexit(code, 0, 0); /* full term, kill process */
 }
 
 
-void __cdecl _exit (
-        int code
-        )
-{
-        doexit(code, 1, 0); /* quick term, kill process */
+void __cdecl _exit(
+    int code
+) {
+    doexit(code, 1, 0); /* quick term, kill process */
 }
 
-void __cdecl _cexit (
-        void
-        )
-{
-        doexit(0, 0, 1);    /* full term, return to caller */
+void __cdecl _cexit(
+    void
+) {
+    doexit(0, 0, 1);    /* full term, return to caller */
 }
 
-void __cdecl _c_exit (
-        void
-        )
-{
-        doexit(0, 1, 1);    /* quick term, return to caller */
+void __cdecl _c_exit(
+    void
+) {
+    doexit(0, 1, 1);    /* quick term, return to caller */
 }
 
 
@@ -440,16 +444,14 @@ void __cdecl _c_exit (
 *
 *******************************************************************************/
 
-void __cdecl _amsg_exit (
-        int rterrnum
-        )
-{
-        void(__cdecl *ertn)(int);
-
-        _FF_MSGBANNER();    /* write run-time error banner */
-        _NMSG_WRITE(rterrnum);  /* write message */
-        ertn = (void(__cdecl*)(int)) _decode_pointer(_aexit_rtn);
-        ertn(255);        /* normally _exit(255) */
+void __cdecl _amsg_exit(
+    int rterrnum
+) {
+    void(__cdecl * ertn)(int);
+    _FF_MSGBANNER();    /* write run-time error banner */
+    _NMSG_WRITE(rterrnum);  /* write message */
+    ertn = (void(__cdecl*)(int)) _decode_pointer(_aexit_rtn);
+    ertn(255);        /* normally _exit(255) */
 }
 
 
@@ -462,18 +464,21 @@ void __cdecl _amsg_exit (
 *       minimum.
 *
 *******************************************************************************/
-void __cdecl __freeCrtMemory()
-{
-    void **pptr;
+void __cdecl __freeCrtMemory() {
+    void** pptr;
+
     for (pptr = _wenviron; pptr != NULL && *pptr != NULL; ++pptr) {
         _free_crt(*pptr);
     }
+
     _free_crt(_wenviron);
     _wenviron = NULL;
     pptr = _environ;
+
     for (; pptr != NULL && *pptr != NULL; ++pptr) {
         _free_crt(*pptr);
     }
+
     _free_crt(_environ);
     _environ = NULL;
     _free_crt(__wargv);
@@ -481,119 +486,119 @@ void __cdecl __freeCrtMemory()
     _free_crt(_decode_pointer(__onexitbegin));
     __wargv = NULL;
     __argv = NULL;
-    __onexitbegin = (_PVFV *)_encoded_null();
-    if (InterlockedDecrement(&(__ptmbcinfo->refcount)) == 0 && __ptmbcinfo != &__initialmbcinfo)
-    {
+    __onexitbegin = (_PVFV*)_encoded_null();
+
+    if (InterlockedDecrement(&(__ptmbcinfo->refcount)) == 0 && __ptmbcinfo != &__initialmbcinfo) {
         _free_crt(__ptmbcinfo);
         __ptmbcinfo = &__initialmbcinfo;
     }
+
     InterlockedIncrement(&(__ptmbcinfo->refcount));
 }
 #endif  /* _DEBUG */
 
-static void __cdecl doexit (
-        int code,
-        int quick,
-        int retcaller
-        )
-{
+static void __cdecl doexit(
+    int code,
+    int quick,
+    int retcaller
+) {
 #ifdef _DEBUG
-        static int fExit = 0;
+    static int fExit = 0;
 #endif  /* _DEBUG */
-
 #ifdef CRTDLL
-        if (!retcaller && check_managed_app())
-        {
-            /*
-               Only if the EXE is managed then we call CorExitProcess.
-               Native cleanup is done in .cctor of the EXE
-               If the Exe is Native then native clean up should be done
-               before calling (Cor)ExitProcess.
-            */
-            __crtCorExitProcess(code);
-        }
+
+    if (!retcaller && check_managed_app()) {
+        /*
+           Only if the EXE is managed then we call CorExitProcess.
+           Native cleanup is done in .cctor of the EXE
+           If the Exe is Native then native clean up should be done
+           before calling (Cor)ExitProcess.
+        */
+        __crtCorExitProcess(code);
+    }
+
 #endif  /* CRTDLL */
+    _lockexit();        /* assure only 1 thread in exit path */
+    __TRY
 
-        _lockexit();        /* assure only 1 thread in exit path */
-        __TRY
+    if (_C_Exit_Done != TRUE) {
+        _C_Termination_Done = TRUE;
+        /* save callable exit flag (for use by terminators) */
+        _exitflag = (char) retcaller;  /* 0 = term, !0 = callable exit */
 
-        if (_C_Exit_Done != TRUE) {
-            _C_Termination_Done = TRUE;
+        if (!quick) {
+            /*
+             * do _onexit/atexit() terminators
+             * (if there are any)
+             *
+             * These terminators MUST be executed in reverse order (LIFO)!
+             *
+             * NOTE:
+             *  This code assumes that __onexitbegin points
+             *  to the first valid onexit() entry and that
+             *  __onexitend points past the last valid entry.
+             *  If __onexitbegin == __onexitend, the table
+             *  is empty and there are no routines to call.
+             */
+            _PVFV* onexitbegin = (_PVFV*)_decode_pointer(__onexitbegin);
+            _PVFV* onexitend   = (_PVFV*)_decode_pointer(__onexitend);
 
-            /* save callable exit flag (for use by terminators) */
-            _exitflag = (char) retcaller;  /* 0 = term, !0 = callable exit */
+            if (onexitbegin) {
+                while (--onexitend >= onexitbegin)
 
-            if (!quick) {
-
-                /*
-                 * do _onexit/atexit() terminators
-                 * (if there are any)
-                 *
-                 * These terminators MUST be executed in reverse order (LIFO)!
-                 *
-                 * NOTE:
-                 *  This code assumes that __onexitbegin points
-                 *  to the first valid onexit() entry and that
-                 *  __onexitend points past the last valid entry.
-                 *  If __onexitbegin == __onexitend, the table
-                 *  is empty and there are no routines to call.
-                 */
-
-                _PVFV * onexitbegin = (_PVFV *)_decode_pointer(__onexitbegin);
-                _PVFV * onexitend   = (_PVFV *)_decode_pointer(__onexitend);
-
-                if (onexitbegin) {
-                    while ( --onexitend >= onexitbegin )
                     /*
                      * if current table entry is non-NULL,
                      * call thru it.
                      */
-                    if ( *onexitend != NULL )
+                    if (*onexitend != NULL) {
                         (**onexitend)();
-                }
-#ifndef CRTDLL
-                /*
-                 * do pre-terminators
-                 */
-                _initterm(__xp_a, __xp_z);
-#endif  /* CRTDLL */
+                    }
             }
 
 #ifndef CRTDLL
             /*
-             * do terminators
+             * do pre-terminators
              */
-            _initterm(__xt_a, __xt_z);
+            _initterm(__xp_a, __xp_z);
 #endif  /* CRTDLL */
-
-#ifdef _DEBUG
-            /* Dump all memory leaks */
-            if (!fExit && _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & _CRTDBG_LEAK_CHECK_DF)
-            {
-                fExit = 1;
-#ifndef CRTDLL
-                __freeCrtMemory();
-                _CrtDumpMemoryLeaks();
-#endif  /* CRTDLL */
-            }
-#endif  /* _DEBUG */
-
         }
-        /* return to OS or to caller */
 
-        __FINALLY
-            if (retcaller)
-                _unlockexit();      /* unlock the exit code path */
-        __END_TRY_FINALLY
-        if (retcaller)
-            return;
+#ifndef CRTDLL
+        /*
+         * do terminators
+         */
+        _initterm(__xt_a, __xt_z);
+#endif  /* CRTDLL */
+#ifdef _DEBUG
 
+        /* Dump all memory leaks */
+        if (!fExit && _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & _CRTDBG_LEAK_CHECK_DF) {
+            fExit = 1;
+#ifndef CRTDLL
+            __freeCrtMemory();
+            _CrtDumpMemoryLeaks();
+#endif  /* CRTDLL */
+        }
 
-        _C_Exit_Done = TRUE;
+#endif  /* _DEBUG */
+    }
 
-        _unlockexit();      /* unlock the exit code path */
+    /* return to OS or to caller */
+    __FINALLY
 
-        __crtExitProcess(code);
+    if (retcaller) {
+        _unlockexit();    /* unlock the exit code path */
+    }
+
+    __END_TRY_FINALLY
+
+    if (retcaller) {
+        return;
+    }
+
+    _C_Exit_Done = TRUE;
+    _unlockexit();      /* unlock the exit code path */
+    __crtExitProcess(code);
 }
 
 #ifdef CRTDLL
@@ -612,7 +617,6 @@ void __crtdll_callstaticterminators(void) {
      * do pre-terminators
      */
     _initterm(__xp_a, __xp_z);
-
     /*
      * do terminators
      */
@@ -642,45 +646,42 @@ void __crtdll_callstaticterminators(void) {
 *
 *******************************************************************************/
 
-typedef void (WINAPI * PFN_EXIT_PROCESS)(UINT uExitCode);
+typedef void (WINAPI* PFN_EXIT_PROCESS)(UINT uExitCode);
 
-void __cdecl __crtCorExitProcess (
-        int status
-        )
-{
-        HMODULE hmod;
-        PFN_EXIT_PROCESS pfn;
+void __cdecl __crtCorExitProcess(
+    int status
+) {
+    HMODULE hmod;
+    PFN_EXIT_PROCESS pfn;
+    hmod = GetModuleHandle("mscoree.dll");
 
-        hmod = GetModuleHandle("mscoree.dll");
-        if (hmod != NULL) {
-            pfn = (PFN_EXIT_PROCESS)GetProcAddress(hmod, "CorExitProcess");
-            if (pfn != NULL) {
-                pfn(status);
-            }
+    if (hmod != NULL) {
+        pfn = (PFN_EXIT_PROCESS)GetProcAddress(hmod, "CorExitProcess");
+
+        if (pfn != NULL) {
+            pfn(status);
         }
+    }
 
-        /*
-         * Either mscoree.dll isn't loaded,
-         * or CorExitProcess isn't exported from mscoree.dll,
-         * or CorExitProcess returned (should never happen).
-         * Just call return.
-         */
+    /*
+     * Either mscoree.dll isn't loaded,
+     * or CorExitProcess isn't exported from mscoree.dll,
+     * or CorExitProcess returned (should never happen).
+     * Just call return.
+     */
 }
 
-void __cdecl __crtExitProcess (
-        int status
-        )
-{
-        __crtCorExitProcess(status);
-
-        /*
-         * Either mscoree.dll isn't loaded,
-         * or CorExitProcess isn't exported from mscoree.dll,
-         * or CorExitProcess returned (should never happen).
-         * Just call ExitProcess.
-         */
-
-        ExitProcess(status);
+void __cdecl __crtExitProcess(
+    int status
+) {
+    __crtCorExitProcess(status);
+    /*
+     * Either mscoree.dll isn't loaded,
+     * or CorExitProcess isn't exported from mscoree.dll,
+     * or CorExitProcess returned (should never happen).
+     * Just call ExitProcess.
+     */
+    ExitProcess(status);
 }
 
 
@@ -727,11 +728,10 @@ void __cdecl __crtExitProcess (
 *
 *******************************************************************************/
 
-void __cdecl _lockexit (
-        void
-        )
-{
-        _mlock(_EXIT_LOCK1);
+void __cdecl _lockexit(
+    void
+) {
+    _mlock(_EXIT_LOCK1);
 }
 
 /***
@@ -753,11 +753,10 @@ void __cdecl _lockexit (
 *
 *******************************************************************************/
 
-void __cdecl _unlockexit (
-        void
-        )
-{
-        _munlock(_EXIT_LOCK1);
+void __cdecl _unlockexit(
+    void
+) {
+    _munlock(_EXIT_LOCK1);
 }
 
 
@@ -784,19 +783,17 @@ extern void __cdecl _initp_misc_winsig(void*);
 extern void __cdecl _initp_misc_winxfltr(void*);
 
 void __cdecl _init_pointers() {
-        void *enull = _encoded_null();
-
-        _initp_heap_handler(enull);
-        _initp_misc_initcrit(enull);
-        _initp_misc_invarg(enull);
-        _initp_misc_purevirt(enull);
-        _initp_misc_rand_s(enull);
-        _initp_misc_winsig(enull);
-        _initp_misc_winxfltr(enull);
-        _initp_eh_hooks(enull);
-
-        /* startup\crt0dat.c */
-         _aexit_rtn = (void(__cdecl*)(int)) _encode_pointer(_exit);
+    void* enull = _encoded_null();
+    _initp_heap_handler(enull);
+    _initp_misc_initcrit(enull);
+    _initp_misc_invarg(enull);
+    _initp_misc_purevirt(enull);
+    _initp_misc_rand_s(enull);
+    _initp_misc_winsig(enull);
+    _initp_misc_winxfltr(enull);
+    _initp_eh_hooks(enull);
+    /* startup\crt0dat.c */
+    _aexit_rtn = (void(__cdecl*)(int)) _encode_pointer(_exit);
 }
 
 /***
@@ -831,29 +828,29 @@ void __cdecl _init_pointers() {
 *******************************************************************************/
 
 #ifdef CRTDLL
-void __cdecl _initterm (
+void __cdecl _initterm(
 #else  /* CRTDLL */
-static void __cdecl _initterm (
+static void __cdecl _initterm(
 #endif  /* CRTDLL */
-        _PVFV * pfbegin,
-        _PVFV * pfend
-        )
-{
+    _PVFV* pfbegin,
+    _PVFV* pfend
+) {
+    /*
+     * walk the table of function pointers from the bottom up, until
+     * the end is encountered.  Do not skip the first entry.  The initial
+     * value of pfbegin points to the first valid entry.  Do not try to
+     * execute what pfend points to.  Only entries before pfend are valid.
+     */
+    while (pfbegin < pfend) {
         /*
-         * walk the table of function pointers from the bottom up, until
-         * the end is encountered.  Do not skip the first entry.  The initial
-         * value of pfbegin points to the first valid entry.  Do not try to
-         * execute what pfend points to.  Only entries before pfend are valid.
+         * if current table entry is non-NULL, call thru it.
          */
-        while ( pfbegin < pfend )
-        {
-            /*
-             * if current table entry is non-NULL, call thru it.
-             */
-            if ( *pfbegin != NULL )
-                (**pfbegin)();
-            ++pfbegin;
+        if (*pfbegin != NULL) {
+            (**pfbegin)();
         }
+
+        ++pfbegin;
+    }
 }
 
 /***
@@ -883,30 +880,30 @@ static void __cdecl _initterm (
 *
 *******************************************************************************/
 
-int __cdecl _initterm_e (
-        _PIFV * pfbegin,
-        _PIFV * pfend
-        )
-{
-        int ret = 0;
+int __cdecl _initterm_e(
+    _PIFV* pfbegin,
+    _PIFV* pfend
+) {
+    int ret = 0;
 
+    /*
+     * walk the table of function pointers from the bottom up, until
+     * the end is encountered.  Do not skip the first entry.  The initial
+     * value of pfbegin points to the first valid entry.  Do not try to
+     * execute what pfend points to.  Only entries before pfend are valid.
+     */
+    while (pfbegin < pfend  && ret == 0) {
         /*
-         * walk the table of function pointers from the bottom up, until
-         * the end is encountered.  Do not skip the first entry.  The initial
-         * value of pfbegin points to the first valid entry.  Do not try to
-         * execute what pfend points to.  Only entries before pfend are valid.
+         * if current table entry is non-NULL, call thru it.
          */
-        while ( pfbegin < pfend  && ret == 0)
-        {
-            /*
-             * if current table entry is non-NULL, call thru it.
-             */
-            if ( *pfbegin != NULL )
-                ret = (**pfbegin)();
-            ++pfbegin;
+        if (*pfbegin != NULL) {
+            ret = (**pfbegin)();
         }
 
-        return ret;
+        ++pfbegin;
+    }
+
+    return ret;
 }
 
 /***
@@ -925,16 +922,13 @@ int __cdecl _initterm_e (
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_osplatform(unsigned int *pValue)
-{
+errno_t _get_osplatform(unsigned int* pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-    _VALIDATE_RETURN_ERRCODE(_osplatform!=0, EINVAL);
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+    _VALIDATE_RETURN_ERRCODE(_osplatform != 0, EINVAL);
     *pValue = _osplatform;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 
@@ -954,16 +948,13 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_osver(unsigned int *pValue)
-{
+errno_t _get_osver(unsigned int* pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-    _VALIDATE_RETURN_ERRCODE(_osplatform!=0, EINVAL);
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+    _VALIDATE_RETURN_ERRCODE(_osplatform != 0, EINVAL);
     *pValue = _osver;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 
@@ -983,16 +974,13 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_winver(unsigned int *pValue)
-{
+errno_t _get_winver(unsigned int* pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-    _VALIDATE_RETURN_ERRCODE(_osplatform!=0, EINVAL);
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+    _VALIDATE_RETURN_ERRCODE(_osplatform != 0, EINVAL);
     *pValue = _winver;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 
@@ -1012,16 +1000,13 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_winmajor(unsigned int *pValue)
-{
+errno_t _get_winmajor(unsigned int* pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-    _VALIDATE_RETURN_ERRCODE(_osplatform!=0, EINVAL);
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+    _VALIDATE_RETURN_ERRCODE(_osplatform != 0, EINVAL);
     *pValue = _winmajor;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 
@@ -1041,16 +1026,13 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_winminor(unsigned int *pValue)
-{
+errno_t _get_winminor(unsigned int* pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-    _VALIDATE_RETURN_ERRCODE(_osplatform!=0, EINVAL);
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+    _VALIDATE_RETURN_ERRCODE(_osplatform != 0, EINVAL);
     *pValue = _winminor;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 
@@ -1070,17 +1052,13 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_wpgmptr(wchar_t **pValue)
-{
+errno_t _get_wpgmptr(wchar_t** pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     _VALIDATE_RETURN_ERRCODE(_wpgmptr != NULL, EINVAL);
-
     *pValue = _wpgmptr;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 
@@ -1100,17 +1078,13 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-errno_t _get_pgmptr(char **pValue)
-{
+errno_t _get_pgmptr(char** pValue) {
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(pValue != NULL, EINVAL);
-
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     _VALIDATE_RETURN_ERRCODE(_pgmptr != NULL, EINVAL);
-
     *pValue = _pgmptr;
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
     return 0;
 }
 

@@ -14,9 +14,7 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/gtsf2.c,v 1.1 2004/05/14 12:13:04 cog
 flag __gtsf2(float32, float32);
 
 flag
-__gtsf2(float32 a, float32 b)
-{
-
-	/* libgcc1.c says a > b */
-	return float32_lt(b, a);
+__gtsf2(float32 a, float32 b) {
+    /* libgcc1.c says a > b */
+    return float32_lt(b, a);
 }

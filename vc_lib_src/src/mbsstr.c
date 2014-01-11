@@ -40,67 +40,66 @@
 *
 *******************************************************************************/
 
-extern "C" _CONST_RETURN unsigned char * __cdecl _mbsstr_l(
-        const unsigned char *str1,
-        const unsigned char *str2,
-        _locale_t plocinfo
-        )
-{
-        unsigned char *cp, *s1, *s2, *endp;
-        _LocaleUpdate _loc_update(plocinfo);
+extern "C" _CONST_RETURN unsigned char* __cdecl _mbsstr_l(
+    const unsigned char* str1,
+    const unsigned char* str2,
+    _locale_t plocinfo
+) {
+    unsigned char* cp, *s1, *s2, *endp;
+    _LocaleUpdate _loc_update(plocinfo);
 
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return (unsigned char *)strstr((const char *)str1, (const char *)str2);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return (unsigned char*)strstr((const char*)str1, (const char*)str2);
+    }
 
-        /* validation section */
-        _VALIDATE_RETURN(str2 != NULL, EINVAL, 0);
-        if ( *str2 == '\0')
-            return (unsigned char *)str1;
-        _VALIDATE_RETURN(str1 != NULL, EINVAL, 0);
+    /* validation section */
+    _VALIDATE_RETURN(str2 != NULL, EINVAL, 0);
 
-        cp = (unsigned char *) str1;
-        endp = (unsigned char *) (str1 + (strlen((const char *)str1) - strlen((const char *)str2)));
+    if (*str2 == '\0') {
+        return (unsigned char*)str1;
+    }
 
-        while (*cp && (cp <= endp))
-        {
-            s1 = cp;
-            s2 = (unsigned char *) str2;
+    _VALIDATE_RETURN(str1 != NULL, EINVAL, 0);
+    cp = (unsigned char*) str1;
+    endp = (unsigned char*)(str1 + (strlen((const char*)str1) - strlen((const char*)str2)));
 
-            /*
-             * MBCS: ok to ++ since doing equality comparison.
-             * [This depends on MBCS strings being "legal".]
-             */
-            while ( *s1 && *s2 && (*s1 == *s2) )
-                s1++, s2++;
+    while (*cp && (cp <= endp)) {
+        s1 = cp;
+        s2 = (unsigned char*) str2;
 
-            if (!(*s2))
-                return(cp);     /* success! */
-
-            /*
-             * bump pointer to next char
-             */
-            if ( _ismbblead_l(*(cp++), _loc_update.GetLocaleT()) )
-            {
-                /*  don't move forward if we have leadbyte, EOS
-                    means dud string was passed in.
-                    Don't assert - too low level
-                */
-                if(*cp!='\0')
-                {
-                    cp++;
-                }
-            }
+        /*
+         * MBCS: ok to ++ since doing equality comparison.
+         * [This depends on MBCS strings being "legal".]
+         */
+        while (*s1 && *s2 && (*s1 == *s2)) {
+            s1++, s2++;
         }
 
-        return(NULL);
+        if (!(*s2)) {
+            return (cp);    /* success! */
+        }
 
+        /*
+         * bump pointer to next char
+         */
+        if (_ismbblead_l(*(cp++), _loc_update.GetLocaleT())) {
+            /*  don't move forward if we have leadbyte, EOS
+                means dud string was passed in.
+                Don't assert - too low level
+            */
+            if (*cp != '\0') {
+                cp++;
+            }
+        }
+    }
+
+    return (NULL);
 }
 
-extern "C" _CONST_RETURN unsigned char * (__cdecl _mbsstr)(
-        const unsigned char *str1,
-        const unsigned char *str2
-        )
-{
+extern "C" _CONST_RETURN unsigned char* (__cdecl _mbsstr)(
+    const unsigned char* str1,
+    const unsigned char* str2
+) {
     return _mbsstr_l(str1, str2, NULL);
 }
 

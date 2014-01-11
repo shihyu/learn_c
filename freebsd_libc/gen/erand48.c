@@ -17,10 +17,9 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/erand48.c,v 1.2 2002/03/22 21:52:05 obrien 
 #include "rand48.h"
 
 double
-erand48(unsigned short xseed[3])
-{
-	_dorand48(xseed);
-	return ldexp((double) xseed[0], -48) +
-	       ldexp((double) xseed[1], -32) +
-	       ldexp((double) xseed[2], -16);
+erand48(unsigned short xseed[3]) {
+    _dorand48(xseed);
+    return ldexp((double) xseed[0], -48) +
+           ldexp((double) xseed[1], -32) +
+           ldexp((double) xseed[2], -16);
 }

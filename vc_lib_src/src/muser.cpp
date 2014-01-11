@@ -38,26 +38,24 @@ void __cdecl __invalid_parameter_handler_thunk(
     const wchar_t* pszFile,
     unsigned int nLine,
     uintptr_t pReserved
-)
-{
+) {
     // Put the value in a local variable to avoid MT synchronization
     // problems using the global.
     _invalid_parameter_handler_m function = (_invalid_parameter_handler_m) _decode_pointer(__pParameter_m);
 
-    if (function)
-    {
+    if (function) {
         function(pszExpression, pszFunction, pszFile, nLine, pReserved);
     }
 }
 
-static void __clrcall __invalid_parameter_handler_cleanup(void)
-{
-    _invalid_parameter_handler handler=_get_invalid_parameter_handler();
-    if(handler==__invalid_parameter_handler_thunk && __pParameter_m!=NULL)
-    {
+static void __clrcall __invalid_parameter_handler_cleanup(void) {
+    _invalid_parameter_handler handler = _get_invalid_parameter_handler();
+
+    if (handler == __invalid_parameter_handler_thunk && __pParameter_m != NULL) {
         _set_invalid_parameter_handler((_invalid_parameter_handler)NULL);
     }
-    __pParameter_m=NULL;
+
+    __pParameter_m = NULL;
 }
 
 /***
@@ -69,36 +67,27 @@ static void __clrcall __invalid_parameter_handler_cleanup(void)
 *
 *******************************************************************************/
 _MRTIMP _invalid_parameter_handler_m __cdecl
-_set_invalid_parameter_handler( _invalid_parameter_handler_m pNew )
-{
-    if(_atexit_m_appdomain(__invalid_parameter_handler_cleanup)!=0)
-    {
+_set_invalid_parameter_handler(_invalid_parameter_handler_m pNew) {
+    if (_atexit_m_appdomain(__invalid_parameter_handler_cleanup) != 0) {
         return NULL;
     }
 
     _invalid_parameter_handler_m pOld = (_invalid_parameter_handler_m) _decode_pointer(__pParameter_m);
-
     _set_invalid_parameter_handler(pNew != NULL ? __invalid_parameter_handler_thunk : static_cast<_invalid_parameter_handler>(NULL));
-
     __pParameter_m = (_invalid_parameter_handler_m) _encode_pointer(pNew);
-
     return pOld;
 }
 
-namespace __identifier("<CrtImplementationDetails>")
-{
-
-class Handlers
-{
-public:
+namespace __identifier("<CrtImplementationDetails>") {
+    class Handlers {
+    public:
         [System::ThreadStaticAttribute] __declspec(appdomain) static __terminate_function_m __pTerminate_m;
         [System::ThreadStaticAttribute] __declspec(appdomain) static __unexpected_function_m __pUnexpected_m;
         [System::ThreadStaticAttribute] __declspec(appdomain) static _purecall_handler_m __pPurecall_m;
-};
-
-__declspec(appdomain) __terminate_function_m Handlers::__pTerminate_m = (__terminate_function_m) _encoded_null();
-__declspec(appdomain) __unexpected_function_m Handlers::__pUnexpected_m = (__unexpected_function_m) _encoded_null();
-__declspec(appdomain) _purecall_handler_m Handlers::__pPurecall_m = (_purecall_handler_m) _encoded_null();
+    };
+    __declspec(appdomain) __terminate_function_m Handlers::__pTerminate_m = (__terminate_function_m) _encoded_null();
+    __declspec(appdomain) __unexpected_function_m Handlers::__pUnexpected_m = (__unexpected_function_m) _encoded_null();
+    __declspec(appdomain) _purecall_handler_m Handlers::__pPurecall_m = (_purecall_handler_m) _encoded_null();
 }
 
 using namespace __identifier("<CrtImplementationDetails>");
@@ -112,24 +101,23 @@ using namespace __identifier("<CrtImplementationDetails>");
 *       terminate handler.
 *
 *******************************************************************************/
-void __cdecl __terminate_thunk()
-{
-        __terminate_function_m function= (__terminate_function_m) _decode_pointer(Handlers::__pTerminate_m);
-    if (function)
-    {
+void __cdecl __terminate_thunk() {
+    __terminate_function_m function = (__terminate_function_m) _decode_pointer(Handlers::__pTerminate_m);
+
+    if (function) {
         (*Handlers::__pTerminate_m)();
     }
 }
 
-static void __clrcall __terminate_cleanup()
-{
-    terminate_function handler=_get_terminate();
+static void __clrcall __terminate_cleanup() {
+    terminate_function handler = _get_terminate();
     __terminate_function_m enull = (__terminate_function_m) _encoded_null();
-    if(handler==__terminate_thunk && Handlers::__pTerminate_m!=enull)
-    {
+
+    if (handler == __terminate_thunk && Handlers::__pTerminate_m != enull) {
         set_terminate((terminate_function)NULL);
     }
-    Handlers::__pTerminate_m=enull;
+
+    Handlers::__pTerminate_m = enull;
 }
 
 
@@ -146,27 +134,23 @@ static void __clrcall __terminate_cleanup()
 *
 *******************************************************************************/
 _MRTIMP __terminate_function_m __cdecl
-set_terminate( __terminate_function_m pNew )
-{
-    if(_atexit_m_appdomain(__terminate_cleanup)!=0)
-    {
+set_terminate(__terminate_function_m pNew) {
+    if (_atexit_m_appdomain(__terminate_cleanup) != 0) {
         return NULL;
     }
 
     __terminate_function_m pOld = (__terminate_function_m) _encoded_null();
-
 #if defined (_DEBUG)
 #pragma warning(push)
 #pragma warning(disable:4191)
 
-    if ( (pNew != NULL) )
-
+    if ((pNew != NULL))
 #pragma warning(pop)
 #endif  /* defined (_DEBUG) */
     {
         pOld = (__terminate_function_m) _decode_pointer(Handlers::__pTerminate_m);
         Handlers::__pTerminate_m = (__terminate_function_m) _encode_pointer(pNew);
-        set_terminate(pNew==NULL ? (terminate_function)NULL : __terminate_thunk);
+        set_terminate(pNew == NULL ? (terminate_function)NULL : __terminate_thunk);
     }
 
     return pOld;
@@ -180,25 +164,23 @@ set_terminate( __terminate_function_m pNew )
 *       purecall handler.
 *
 *******************************************************************************/
-static void __cdecl __purecall_thunk()
-{
-    _purecall_handler_m handler= (_purecall_handler_m) _decode_pointer(Handlers::__pPurecall_m);
+static void __cdecl __purecall_thunk() {
+    _purecall_handler_m handler = (_purecall_handler_m) _decode_pointer(Handlers::__pPurecall_m);
 
-    if (handler)
-    {
+    if (handler) {
         (*handler)();
     }
 }
 
-static void __clrcall __purecall_cleanup()
-{
-    _purecall_handler handler=_get_purecall_handler();
+static void __clrcall __purecall_cleanup() {
+    _purecall_handler handler = _get_purecall_handler();
     _purecall_handler_m enull = (_purecall_handler_m) _encoded_null();
-    if(handler==__purecall_thunk && Handlers::__pPurecall_m!=enull)
-    {
+
+    if (handler == __purecall_thunk && Handlers::__pPurecall_m != enull) {
         _set_purecall_handler((_purecall_handler)NULL);
     }
-    Handlers::__pPurecall_m= enull;
+
+    Handlers::__pPurecall_m = enull;
 }
 
 /***
@@ -214,27 +196,23 @@ static void __clrcall __purecall_cleanup()
 *
 *******************************************************************************/
 _MRTIMP _purecall_handler_m __cdecl
-_set_purecall_handler( _purecall_handler_m pNew )
-{
-    if(_atexit_m_appdomain(__purecall_cleanup)!=0)
-    {
+_set_purecall_handler(_purecall_handler_m pNew) {
+    if (_atexit_m_appdomain(__purecall_cleanup) != 0) {
         return NULL;
     }
 
     _purecall_handler_m pOld = (_purecall_handler_m) _encoded_null();
-
 #if defined (_DEBUG)
 #pragma warning(push)
 #pragma warning(disable:4191)
 
-    if ( (pNew != NULL) )
-
+    if ((pNew != NULL))
 #pragma warning(pop)
 #endif  /* defined (_DEBUG) */
     {
         pOld = (_purecall_handler_m) _decode_pointer(Handlers::__pPurecall_m);
         Handlers::__pPurecall_m = (_purecall_handler_m) _encode_pointer(pNew);
-        _set_purecall_handler(pNew==NULL ? (_purecall_handler)NULL : __purecall_thunk);
+        _set_purecall_handler(pNew == NULL ? (_purecall_handler)NULL : __purecall_thunk);
     }
 
     return pOld;
@@ -249,24 +227,23 @@ _set_purecall_handler( _purecall_handler_m pNew )
 *       terminate handler.
 *
 *******************************************************************************/
-void __cdecl __unexpected_thunk()
-{
-    __unexpected_function_m function= (__unexpected_function_m) _decode_pointer(Handlers::__pUnexpected_m);
-    if (function)
-    {
+void __cdecl __unexpected_thunk() {
+    __unexpected_function_m function = (__unexpected_function_m) _decode_pointer(Handlers::__pUnexpected_m);
+
+    if (function) {
         (*function)();
     }
 }
 
-static void __clrcall __unexpected_cleanup()
-{
-    unexpected_function handler=_get_unexpected();
+static void __clrcall __unexpected_cleanup() {
+    unexpected_function handler = _get_unexpected();
     __unexpected_function_m enull = (__unexpected_function_m) _encoded_null();
-    if(handler==__unexpected_thunk && Handlers::__pUnexpected_m!=NULL)
-    {
+
+    if (handler == __unexpected_thunk && Handlers::__pUnexpected_m != NULL) {
         set_unexpected((unexpected_function)NULL);
     }
-    Handlers::__pUnexpected_m=enull;
+
+    Handlers::__pUnexpected_m = enull;
 }
 
 /***
@@ -283,27 +260,23 @@ static void __clrcall __unexpected_cleanup()
 *
 *******************************************************************************/
 _MRTIMP __unexpected_function_m __cdecl
-set_unexpected( __unexpected_function_m pNew )
-{
-    if(_atexit_m_appdomain(__unexpected_cleanup)!=0)
-    {
+set_unexpected(__unexpected_function_m pNew) {
+    if (_atexit_m_appdomain(__unexpected_cleanup) != 0) {
         return NULL;
     }
 
     __unexpected_function_m pOld = (__unexpected_function_m) _encoded_null();
-
 #if defined (_DEBUG)
 #pragma warning(push)
 #pragma warning(disable:4191)
 
-    if ( (pNew != NULL) )
-
+    if ((pNew != NULL))
 #pragma warning(pop)
 #endif  /* defined (_DEBUG) */
     {
         pOld = (__unexpected_function_m) _decode_pointer(Handlers::__pUnexpected_m);
         Handlers::__pUnexpected_m = (__unexpected_function_m) _encode_pointer(pNew);
-        set_unexpected(pNew==NULL ? (unexpected_function)NULL : __unexpected_thunk);
+        set_unexpected(pNew == NULL ? (unexpected_function)NULL : __unexpected_thunk);
     }
 
     return pOld;
@@ -318,10 +291,8 @@ set_unexpected( __unexpected_function_m pNew )
 *
 *******************************************************************************/
 _MRTIMP _invalid_parameter_handler __cdecl
-_set_invalid_parameter_handler( int pNew )
-{
+_set_invalid_parameter_handler(int pNew) {
     _VALIDATE_RETURN(pNew == NULL, EINVAL, NULL);
-
     return _set_invalid_parameter_handler(static_cast<_invalid_parameter_handler>(0));
 }
 
@@ -346,10 +317,8 @@ _set_invalid_parameter_handler( int pNew )
 *******************************************************************************/
 
 _MRTIMP _purecall_handler __cdecl
-_set_purecall_handler( int pNew )
-{
+_set_purecall_handler(int pNew) {
     _VALIDATE_RETURN(pNew == NULL, EINVAL, NULL);
-
     return _set_purecall_handler(static_cast<_purecall_handler>(NULL));
 }
 

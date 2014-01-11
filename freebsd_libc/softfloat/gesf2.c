@@ -14,9 +14,7 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/gesf2.c,v 1.1 2004/05/14 12:13:04 cog
 flag __gesf2(float32, float32);
 
 flag
-__gesf2(float32 a, float32 b)
-{
-
-	/* libgcc1.c says (a >= b) - 1 */
-	return float32_le(b, a) - 1;
+__gesf2(float32 a, float32 b) {
+    /* libgcc1.c says (a >= b) - 1 */
+    return float32_le(b, a) - 1;
 }

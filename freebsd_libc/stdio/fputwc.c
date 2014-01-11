@@ -42,46 +42,43 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fputwc.c,v 1.10 2004/07/20 08:27:27 tjr E
  * Non-MT-safe version.
  */
 wint_t
-__fputwc(wchar_t wc, FILE *fp)
-{
-	char buf[MB_LEN_MAX];
-	size_t i, len;
+__fputwc(wchar_t wc, FILE* fp) {
+    char buf[MB_LEN_MAX];
+    size_t i, len;
 
-	if (MB_CUR_MAX == 1 && wc > 0 && wc <= UCHAR_MAX) {
-		/*
-		 * Assume single-byte locale with no special encoding.
-		 * A more careful test would be to check
-		 * _CurrentRuneLocale->encoding.
-		 */
-		*buf = (unsigned char)wc;
-		len = 1;
-	} else {
-		if ((len = __wcrtomb(buf, wc, &fp->_extra->mbstate)) ==
-		    (size_t)-1) {
-			fp->_flags |= __SERR;
-			return (WEOF);
-		}
-	}
+    if (MB_CUR_MAX == 1 && wc > 0 && wc <= UCHAR_MAX) {
+        /*
+         * Assume single-byte locale with no special encoding.
+         * A more careful test would be to check
+         * _CurrentRuneLocale->encoding.
+         */
+        *buf = (unsigned char)wc;
+        len = 1;
+    } else {
+        if ((len = __wcrtomb(buf, wc, &fp->_extra->mbstate)) ==
+                (size_t) - 1) {
+            fp->_flags |= __SERR;
+            return (WEOF);
+        }
+    }
 
-	for (i = 0; i < len; i++)
-		if (__sputc((unsigned char)buf[i], fp) == EOF)
-			return (WEOF);
+    for (i = 0; i < len; i++)
+        if (__sputc((unsigned char)buf[i], fp) == EOF) {
+            return (WEOF);
+        }
 
-	return ((wint_t)wc);
+    return ((wint_t)wc);
 }
 
 /*
  * MT-safe version.
  */
 wint_t
-fputwc(wchar_t wc, FILE *fp)
-{
-	wint_t r;
-
-	FLOCKFILE(fp);
-	ORIENT(fp, 1);
-	r = __fputwc(wc, fp);
-	FUNLOCKFILE(fp);
-
-	return (r);
+fputwc(wchar_t wc, FILE* fp) {
+    wint_t r;
+    FLOCKFILE(fp);
+    ORIENT(fp, 1);
+    r = __fputwc(wc, fp);
+    FUNLOCKFILE(fp);
+    return (r);
 }

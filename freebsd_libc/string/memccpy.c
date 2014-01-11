@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,22 +35,24 @@ __FBSDID("$FreeBSD: src/lib/libc/string/memccpy.c,v 1.6 2007/01/09 00:28:12 imp 
 
 #include <string.h>
 
-void *
+void*
 memccpy(t, f, c, n)
-	void *t;
-	const void *f;
-	int c;
-	size_t n;
+void* t;
+const void* f;
+int c;
+size_t n;
 {
+    if (n) {
+        unsigned char* tp = t;
+        const unsigned char* fp = f;
+        unsigned char uc = c;
 
-	if (n) {
-		unsigned char *tp = t;
-		const unsigned char *fp = f;
-		unsigned char uc = c;
-		do {
-			if ((*tp++ = *fp++) == uc)
-				return (tp);
-		} while (--n != 0);
-	}
-	return (0);
+        do {
+            if ((*tp++ = *fp++) == uc) {
+                return (tp);
+            }
+        } while (--n != 0);
+    }
+
+    return (0);
 }

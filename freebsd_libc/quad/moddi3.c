@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -47,19 +47,23 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/moddi3.c,v 1.4 2007/01/09 00:28:03 imp Exp
  */
 quad_t
 __moddi3(a, b)
-	quad_t a, b;
+quad_t a, b;
 {
-	u_quad_t ua, ub, ur;
-	int neg;
+    u_quad_t ua, ub, ur;
+    int neg;
 
-	if (a < 0)
-		ua = -(u_quad_t)a, neg = 1;
-	else
-		ua = a, neg = 0;
-	if (b < 0)
-		ub = -(u_quad_t)b;
-	else
-		ub = b;
-	(void)__qdivrem(ua, ub, &ur);
-	return (neg ? -ur : ur);
+    if (a < 0) {
+        ua = -(u_quad_t)a, neg = 1;
+    } else {
+        ua = a, neg = 0;
+    }
+
+    if (b < 0) {
+        ub = -(u_quad_t)b;
+    } else {
+        ub = b;
+    }
+
+    (void)__qdivrem(ua, ub, &ur);
+    return (neg ? -ur : ur);
 }

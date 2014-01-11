@@ -32,9 +32,8 @@
 *
 *******************************************************************************/
 
-long __cdecl labs (
-        long lnumber
-        )
-{
-        return( lnumber>=0L ? lnumber : -lnumber );
+long __cdecl labs(
+    long lnumber
+) {
+    return (lnumber >= 0L ? lnumber : -lnumber);
 }

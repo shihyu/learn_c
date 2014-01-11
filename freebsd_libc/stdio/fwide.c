@@ -36,16 +36,16 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fwide.c,v 1.1 2002/08/13 09:30:41 tjr Exp
 #include "local.h"
 
 int
-fwide(FILE *fp, int mode)
-{
-	int m;
+fwide(FILE* fp, int mode) {
+    int m;
+    FLOCKFILE(fp);
 
-	FLOCKFILE(fp);
-	/* Only change the orientation if the stream is not oriented yet. */
-	if (mode != 0 && fp->_extra->orientation == 0)
-		fp->_extra->orientation = mode > 0 ? 1 : -1;
-	m = fp->_extra->orientation;
-	FUNLOCKFILE(fp);
+    /* Only change the orientation if the stream is not oriented yet. */
+    if (mode != 0 && fp->_extra->orientation == 0) {
+        fp->_extra->orientation = mode > 0 ? 1 : -1;
+    }
 
-	return (m);
+    m = fp->_extra->orientation;
+    FUNLOCKFILE(fp);
+    return (m);
 }

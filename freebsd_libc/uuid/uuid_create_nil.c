@@ -33,14 +33,13 @@
 /*
  * uuid_create_nil() - create a nil UUID.
  * See also:
- *	http://www.opengroup.org/onlinepubs/009629399/uuid_create_nil.htm
+ *  http://www.opengroup.org/onlinepubs/009629399/uuid_create_nil.htm
  */
 void
-uuid_create_nil(uuid_t *u, uint32_t *status)
-{
+uuid_create_nil(uuid_t* u, uint32_t* status) {
+    if (status) {
+        *status = uuid_s_ok;
+    }
 
-	if (status)
-		*status = uuid_s_ok;
-
-	bzero(u, sizeof(*u));
+    bzero(u, sizeof(*u));
 }

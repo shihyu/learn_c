@@ -36,19 +36,16 @@
 ******************************************************************************/
 
 extern "C" int __cdecl _ismbclegal_l(
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
-        _LocaleUpdate _loc_update(plocinfo);
-
-        return( (_ismbblead_l(c >> 8, _loc_update.GetLocaleT())) &&
-                (_ismbbtrail_l(c & 0x0ff, _loc_update.GetLocaleT())) );
+    unsigned int c,
+    _locale_t plocinfo
+) {
+    _LocaleUpdate _loc_update(plocinfo);
+    return ((_ismbblead_l(c >> 8, _loc_update.GetLocaleT())) &&
+            (_ismbbtrail_l(c & 0x0ff, _loc_update.GetLocaleT())));
 }
 extern "C" int (__cdecl _ismbclegal)(
-        unsigned int c
-        )
-{
+    unsigned int c
+) {
     return _ismbclegal_l(c, NULL);
 }
 

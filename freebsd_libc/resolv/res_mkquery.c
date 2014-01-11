@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1985, 1993
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -13,7 +13,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,14 +29,14 @@
 
 /*
  * Portions Copyright (c) 1993 by Digital Equipment Corporation.
- * 
+ *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies, and that
  * the name of Digital Equipment Corporation not be used in advertising or
  * publicity pertaining to distribution of the document or software without
  * specific, written prior permission.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
@@ -85,7 +85,7 @@ __FBSDID("$FreeBSD: src/lib/libc/resolv/res_mkquery.c,v 1.4 2007/06/03 17:20:27 
 /* Options.  Leave them on. */
 #define DEBUG
 
-extern const char *_res_opcodes[];
+extern const char* _res_opcodes[];
 
 /*%
  * Form all types of queries.
@@ -93,164 +93,193 @@ extern const char *_res_opcodes[];
  */
 int
 res_nmkquery(res_state statp,
-	     int op,			/*!< opcode of query  */
-	     const char *dname,		/*!< domain name  */
-	     int class, int type,	/*!< class and type of query  */
-	     const u_char *data,	/*!< resource record data  */
-	     int datalen,		/*!< length of data  */
-	     const u_char *newrr_in,	/*!< new rr for modify or append  */
-	     u_char *buf,		/*!< buffer to put query  */
-	     int buflen)		/*!< size of buffer  */
-{
-	HEADER *hp;
-	u_char *cp, *ep;
-	int n;
-	u_char *dnptrs[20], **dpp, **lastdnptr;
-
-	UNUSED(newrr_in);
-
+             int op,            /*!< opcode of query  */
+             const char* dname,     /*!< domain name  */
+             int class, int type,   /*!< class and type of query  */
+             const u_char* data,    /*!< resource record data  */
+             int datalen,       /*!< length of data  */
+             const u_char* newrr_in,    /*!< new rr for modify or append  */
+             u_char* buf,       /*!< buffer to put query  */
+             int buflen) {      /*!< size of buffer  */
+    HEADER* hp;
+    u_char* cp, *ep;
+    int n;
+    u_char* dnptrs[20], **dpp, **lastdnptr;
+    UNUSED(newrr_in);
 #ifdef DEBUG
-	if (statp->options & RES_DEBUG)
-		printf(";; res_nmkquery(%s, %s, %s, %s)\n",
-		       _res_opcodes[op], dname, p_class(class), p_type(type));
+
+    if (statp->options & RES_DEBUG)
+        printf(";; res_nmkquery(%s, %s, %s, %s)\n",
+               _res_opcodes[op], dname, p_class(class), p_type(type));
+
 #endif
-	/*
-	 * Initialize header fields.
-	 */
-	if ((buf == NULL) || (buflen < HFIXEDSZ))
-		return (-1);
-	memset(buf, 0, HFIXEDSZ);
-	hp = (HEADER *) buf;
-	hp->id = htons(++statp->id);
-	hp->opcode = op;
-	hp->rd = (statp->options & RES_RECURSE) != 0U;
-	hp->rcode = NOERROR;
-	cp = buf + HFIXEDSZ;
-	ep = buf + buflen;
-	dpp = dnptrs;
-	*dpp++ = buf;
-	*dpp++ = NULL;
-	lastdnptr = dnptrs + sizeof dnptrs / sizeof dnptrs[0];
-	/*
-	 * perform opcode specific processing
-	 */
-	switch (op) {
-	case QUERY:	/*FALLTHROUGH*/
-	case NS_NOTIFY_OP:
-		if (ep - cp < QFIXEDSZ)
-			return (-1);
-		if ((n = dn_comp(dname, cp, ep - cp - QFIXEDSZ, dnptrs,
-		    lastdnptr)) < 0)
-			return (-1);
-		cp += n;
-		ns_put16(type, cp);
-		cp += INT16SZ;
-		ns_put16(class, cp);
-		cp += INT16SZ;
-		hp->qdcount = htons(1);
-		if (op == QUERY || data == NULL)
-			break;
-		/*
-		 * Make an additional record for completion domain.
-		 */
-		if ((ep - cp) < RRFIXEDSZ)
-			return (-1);
-		n = dn_comp((const char *)data, cp, ep - cp - RRFIXEDSZ,
-			    dnptrs, lastdnptr);
-		if (n < 0)
-			return (-1);
-		cp += n;
-		ns_put16(T_NULL, cp);
-		cp += INT16SZ;
-		ns_put16(class, cp);
-		cp += INT16SZ;
-		ns_put32(0, cp);
-		cp += INT32SZ;
-		ns_put16(0, cp);
-		cp += INT16SZ;
-		hp->arcount = htons(1);
-		break;
 
-	case IQUERY:
-		/*
-		 * Initialize answer section
-		 */
-		if (ep - cp < 1 + RRFIXEDSZ + datalen)
-			return (-1);
-		*cp++ = '\0';	/*%< no domain name */
-		ns_put16(type, cp);
-		cp += INT16SZ;
-		ns_put16(class, cp);
-		cp += INT16SZ;
-		ns_put32(0, cp);
-		cp += INT32SZ;
-		ns_put16(datalen, cp);
-		cp += INT16SZ;
-		if (datalen) {
-			memcpy(cp, data, datalen);
-			cp += datalen;
-		}
-		hp->ancount = htons(1);
-		break;
+    /*
+     * Initialize header fields.
+     */
+    if ((buf == NULL) || (buflen < HFIXEDSZ)) {
+        return (-1);
+    }
 
-	default:
-		return (-1);
-	}
-	return (cp - buf);
+    memset(buf, 0, HFIXEDSZ);
+    hp = (HEADER*) buf;
+    hp->id = htons(++statp->id);
+    hp->opcode = op;
+    hp->rd = (statp->options & RES_RECURSE) != 0U;
+    hp->rcode = NOERROR;
+    cp = buf + HFIXEDSZ;
+    ep = buf + buflen;
+    dpp = dnptrs;
+    *dpp++ = buf;
+    *dpp++ = NULL;
+    lastdnptr = dnptrs + sizeof dnptrs / sizeof dnptrs[0];
+
+    /*
+     * perform opcode specific processing
+     */
+    switch (op) {
+    case QUERY: /*FALLTHROUGH*/
+    case NS_NOTIFY_OP:
+        if (ep - cp < QFIXEDSZ) {
+            return (-1);
+        }
+
+        if ((n = dn_comp(dname, cp, ep - cp - QFIXEDSZ, dnptrs,
+                         lastdnptr)) < 0) {
+            return (-1);
+        }
+
+        cp += n;
+        ns_put16(type, cp);
+        cp += INT16SZ;
+        ns_put16(class, cp);
+        cp += INT16SZ;
+        hp->qdcount = htons(1);
+
+        if (op == QUERY || data == NULL) {
+            break;
+        }
+
+        /*
+         * Make an additional record for completion domain.
+         */
+        if ((ep - cp) < RRFIXEDSZ) {
+            return (-1);
+        }
+
+        n = dn_comp((const char*)data, cp, ep - cp - RRFIXEDSZ,
+                    dnptrs, lastdnptr);
+
+        if (n < 0) {
+            return (-1);
+        }
+
+        cp += n;
+        ns_put16(T_NULL, cp);
+        cp += INT16SZ;
+        ns_put16(class, cp);
+        cp += INT16SZ;
+        ns_put32(0, cp);
+        cp += INT32SZ;
+        ns_put16(0, cp);
+        cp += INT16SZ;
+        hp->arcount = htons(1);
+        break;
+
+    case IQUERY:
+
+        /*
+         * Initialize answer section
+         */
+        if (ep - cp < 1 + RRFIXEDSZ + datalen) {
+            return (-1);
+        }
+
+        *cp++ = '\0';   /*%< no domain name */
+        ns_put16(type, cp);
+        cp += INT16SZ;
+        ns_put16(class, cp);
+        cp += INT16SZ;
+        ns_put32(0, cp);
+        cp += INT32SZ;
+        ns_put16(datalen, cp);
+        cp += INT16SZ;
+
+        if (datalen) {
+            memcpy(cp, data, datalen);
+            cp += datalen;
+        }
+
+        hp->ancount = htons(1);
+        break;
+
+    default:
+        return (-1);
+    }
+
+    return (cp - buf);
 }
 
 #ifdef RES_USE_EDNS0
 /* attach OPT pseudo-RR, as documented in RFC2671 (EDNS0). */
 #ifndef T_OPT
-#define T_OPT	41
+#define T_OPT   41
 #endif
 
 int
 res_nopt(res_state statp,
-	 int n0,		/*%< current offset in buffer */
-	 u_char *buf,		/*%< buffer to put query */
-	 int buflen,		/*%< size of buffer */
-	 int anslen)		/*%< UDP answer buffer size */
-{
-	HEADER *hp;
-	u_char *cp, *ep;
-	u_int16_t flags = 0;
-
+         int n0,        /*%< current offset in buffer */
+         u_char* buf,       /*%< buffer to put query */
+         int buflen,        /*%< size of buffer */
+         int anslen) {      /*%< UDP answer buffer size */
+    HEADER* hp;
+    u_char* cp, *ep;
+    u_int16_t flags = 0;
 #ifdef DEBUG
-	if ((statp->options & RES_DEBUG) != 0U)
-		printf(";; res_nopt()\n");
+
+    if ((statp->options & RES_DEBUG) != 0U) {
+        printf(";; res_nopt()\n");
+    }
+
 #endif
+    hp = (HEADER*) buf;
+    cp = buf + n0;
+    ep = buf + buflen;
 
-	hp = (HEADER *) buf;
-	cp = buf + n0;
-	ep = buf + buflen;
+    if ((ep - cp) < 1 + RRFIXEDSZ) {
+        return (-1);
+    }
 
-	if ((ep - cp) < 1 + RRFIXEDSZ)
-		return (-1);
+    *cp++ = 0;  /*%< "." */
+    ns_put16(T_OPT, cp);    /*%< TYPE */
+    cp += INT16SZ;
 
-	*cp++ = 0;	/*%< "." */
-	ns_put16(T_OPT, cp);	/*%< TYPE */
-	cp += INT16SZ;
-	if (anslen > 0xffff)
-		anslen = 0xffff;		/* limit to 16bit value */
-	ns_put16(anslen & 0xffff, cp);	/*%< CLASS = UDP payload size */
-	cp += INT16SZ;
-	*cp++ = NOERROR;	/*%< extended RCODE */
-	*cp++ = 0;		/*%< EDNS version */
-	if (statp->options & RES_USE_DNSSEC) {
+    if (anslen > 0xffff) {
+        anslen = 0xffff;    /* limit to 16bit value */
+    }
+
+    ns_put16(anslen & 0xffff, cp);  /*%< CLASS = UDP payload size */
+    cp += INT16SZ;
+    *cp++ = NOERROR;    /*%< extended RCODE */
+    *cp++ = 0;      /*%< EDNS version */
+
+    if (statp->options & RES_USE_DNSSEC) {
 #ifdef DEBUG
-		if (statp->options & RES_DEBUG)
-			printf(";; res_opt()... ENDS0 DNSSEC\n");
-#endif
-		flags |= NS_OPT_DNSSEC_OK;
-	}
-	ns_put16(flags, cp);
-	cp += INT16SZ;
-	ns_put16(0, cp);	/*%< RDLEN */
-	cp += INT16SZ;
-	hp->arcount = htons(ntohs(hp->arcount) + 1);
 
-	return (cp - buf);
+        if (statp->options & RES_DEBUG) {
+            printf(";; res_opt()... ENDS0 DNSSEC\n");
+        }
+
+#endif
+        flags |= NS_OPT_DNSSEC_OK;
+    }
+
+    ns_put16(flags, cp);
+    cp += INT16SZ;
+    ns_put16(0, cp);    /*%< RDLEN */
+    cp += INT16SZ;
+    hp->arcount = htons(ntohs(hp->arcount) + 1);
+    return (cp - buf);
 }
 #endif
 

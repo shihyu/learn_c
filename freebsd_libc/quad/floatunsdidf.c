@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -45,13 +45,12 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/floatunsdidf.c,v 1.3 2007/01/09 00:28:03 i
  */
 double
 __floatunsdidf(x)
-	u_quad_t x;
+u_quad_t x;
 {
-	double d;
-	union uu u;
-
-	u.uq = x;
-	d = (double)u.ul[H] * ((1 << (LONG_BITS - 2)) * 4.0);
-	d += u.ul[L];
-	return (d);
+    double d;
+    union uu u;
+    u.uq = x;
+    d = (double)u.ul[H] * ((1 << (LONG_BITS - 2)) * 4.0);
+    d += u.ul[L];
+    return (d);
 }

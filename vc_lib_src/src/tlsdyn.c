@@ -69,9 +69,8 @@ BOOL WINAPI __dyn_tls_init(
     HANDLE  hDllHandle,
     DWORD   dwReason,
     LPVOID  lpreserved
-    )
-{
-    _PVFV *pfunc;
+) {
+    _PVFV* pfunc;
 
     if (dwReason != DLL_THREAD_ATTACH) {
         return TRUE;
@@ -80,13 +79,14 @@ BOOL WINAPI __dyn_tls_init(
     /* prefast assumes we are overflowing __xd_a */
 #pragma warning(push)
 #pragma warning(disable:26000)
+
     for (pfunc = &__xd_a + 1; pfunc != &__xd_z; ++pfunc) {
         if (*pfunc != NULL) {
             (*pfunc)();
         }
     }
-#pragma warning(pop)
 
+#pragma warning(pop)
     return TRUE;
 }
 

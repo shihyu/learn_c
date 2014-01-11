@@ -47,59 +47,67 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wcsftime.c,v 1.4 2004/04/07 09:47:56 tjr
  * format specifications in the format string.
  */
 size_t
-wcsftime(wchar_t * __restrict wcs, size_t maxsize,
-    const wchar_t * __restrict format, const struct tm * __restrict timeptr)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs;
-	char *dst, *dstp, *sformat;
-	size_t n, sflen;
-	int sverrno;
+wcsftime(wchar_t* __restrict wcs, size_t maxsize,
+         const wchar_t* __restrict format, const struct tm* __restrict timeptr) {
+    static const mbstate_t initial;
+    mbstate_t mbs;
+    char* dst, *dstp, *sformat;
+    size_t n, sflen;
+    int sverrno;
+    sformat = dst = NULL;
+    /*
+     * Convert the supplied format string to a multibyte representation
+     * for strftime(), which only handles single-byte characters.
+     */
+    mbs = initial;
+    sflen = wcsrtombs(NULL, &format, 0, &mbs);
 
-	sformat = dst = NULL;
+    if (sflen == (size_t) - 1) {
+        goto error;
+    }
 
-	/*
-	 * Convert the supplied format string to a multibyte representation
-	 * for strftime(), which only handles single-byte characters.
-	 */
-	mbs = initial;
-	sflen = wcsrtombs(NULL, &format, 0, &mbs);
-	if (sflen == (size_t)-1)
-		goto error;
-	if ((sformat = malloc(sflen + 1)) == NULL)
-		goto error;
-	mbs = initial;
-	wcsrtombs(sformat, &format, sflen + 1, &mbs);
+    if ((sformat = malloc(sflen + 1)) == NULL) {
+        goto error;
+    }
 
-	/*
-	 * Allocate memory for longest multibyte sequence that will fit
-	 * into the caller's buffer and call strftime() to fill it.
-	 * Then, copy and convert the result back into wide characters in
-	 * the caller's buffer.
-	 */
-	if (SIZE_T_MAX / MB_CUR_MAX <= maxsize) {
-		/* maxsize is prepostorously large - avoid int. overflow. */
-		errno = EINVAL;
-		goto error;
-	}
-	if ((dst = malloc(maxsize * MB_CUR_MAX)) == NULL)
-		goto error;
-	if (strftime(dst, maxsize, sformat, timeptr) == 0)
-		goto error;
-	dstp = dst;
-	mbs = initial;
-	n = mbsrtowcs(wcs, (const char **)&dstp, maxsize, &mbs);
-	if (n == (size_t)-2 || n == (size_t)-1 || dstp != NULL)
-		goto error;
+    mbs = initial;
+    wcsrtombs(sformat, &format, sflen + 1, &mbs);
 
-	free(sformat);
-	free(dst);
-	return (n);
+    /*
+     * Allocate memory for longest multibyte sequence that will fit
+     * into the caller's buffer and call strftime() to fill it.
+     * Then, copy and convert the result back into wide characters in
+     * the caller's buffer.
+     */
+    if (SIZE_T_MAX / MB_CUR_MAX <= maxsize) {
+        /* maxsize is prepostorously large - avoid int. overflow. */
+        errno = EINVAL;
+        goto error;
+    }
 
+    if ((dst = malloc(maxsize * MB_CUR_MAX)) == NULL) {
+        goto error;
+    }
+
+    if (strftime(dst, maxsize, sformat, timeptr) == 0) {
+        goto error;
+    }
+
+    dstp = dst;
+    mbs = initial;
+    n = mbsrtowcs(wcs, (const char**)&dstp, maxsize, &mbs);
+
+    if (n == (size_t) - 2 || n == (size_t) - 1 || dstp != NULL) {
+        goto error;
+    }
+
+    free(sformat);
+    free(dst);
+    return (n);
 error:
-	sverrno = errno;
-	free(sformat);
-	free(dst);
-	errno = sverrno;
-	return (0);
+    sverrno = errno;
+    free(sformat);
+    free(dst);
+    errno = sverrno;
+    return (0);
 }

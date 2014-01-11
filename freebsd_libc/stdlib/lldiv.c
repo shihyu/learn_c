@@ -31,15 +31,15 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/lldiv.c,v 1.1 2001/11/15 02:05:03 mike E
 
 /* See comments in div.c for implementation details. */
 lldiv_t
-lldiv(long long numer, long long denom)
-{
-	lldiv_t retval;
+lldiv(long long numer, long long denom) {
+    lldiv_t retval;
+    retval.quot = numer / denom;
+    retval.rem = numer % denom;
 
-	retval.quot = numer / denom;
-	retval.rem = numer % denom;
-	if (numer >= 0 && retval.rem < 0) {
-		retval.quot++;
-		retval.rem -= denom;
-	}
-	return (retval);
+    if (numer >= 0 && retval.rem < 0) {
+        retval.quot++;
+        retval.rem -= denom;
+    }
+
+    return (retval);
 }

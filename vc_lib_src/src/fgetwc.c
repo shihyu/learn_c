@@ -40,25 +40,20 @@
 *
 *******************************************************************************/
 
-wint_t __cdecl fgetwc (
-        REG1 FILE *stream
-        )
-{
-        wint_t retval;
+wint_t __cdecl fgetwc(
+    REG1 FILE* stream
+) {
+    wint_t retval;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, WEOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (stream != NULL), EINVAL, WEOF);
-
-        _lock_str(stream);
-        __try {
-
+    __try {
         retval = _getwc_nolock(stream);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        }
-        __finally {
-                _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 
@@ -66,10 +61,9 @@ wint_t __cdecl fgetwc (
 
 #undef getwc
 
-wint_t __cdecl getwc (
-        FILE *stream
-        )
-{
-        return fgetwc(stream);
+wint_t __cdecl getwc(
+    FILE* stream
+) {
+    return fgetwc(stream);
 }
 

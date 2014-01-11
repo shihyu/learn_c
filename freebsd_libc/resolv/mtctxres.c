@@ -16,18 +16,18 @@ __FBSDID("$FreeBSD: src/lib/libc/resolv/mtctxres.c,v 1.3 2006/12/15 20:59:55 ume
 #include <port_after.h>
 
 #ifdef DO_PTHREADS
-static pthread_key_t	key;
-static int		mt_key_initialized = 0;
+static pthread_key_t    key;
+static int      mt_key_initialized = 0;
 
-static int		__res_init_ctx(void);
-static void		__res_destroy_ctx(void *);
+static int      __res_init_ctx(void);
+static void     __res_destroy_ctx(void*);
 
 #if defined(sun) && !defined(__GNUC__)
-#pragma init	(_mtctxres_init)
+#pragma init    (_mtctxres_init)
 #endif
 #endif
 
-static mtctxres_t	sharedctx;
+static mtctxres_t   sharedctx;
 
 #ifdef DO_PTHREADS
 /*
@@ -37,11 +37,12 @@ static mtctxres_t	sharedctx;
  */
 static void
 _mtctxres_init(void) {
-	int pthread_keycreate_ret;
+    int pthread_keycreate_ret;
+    pthread_keycreate_ret = pthread_key_create(&key, __res_destroy_ctx);
 
-	pthread_keycreate_ret = pthread_key_create(&key, __res_destroy_ctx);
-	if (pthread_keycreate_ret == 0)
-		mt_key_initialized = 1;
+    if (pthread_keycreate_ret == 0) {
+        mt_key_initialized = 1;
+    }
 }
 #endif
 
@@ -53,89 +54,91 @@ _mtctxres_init(void) {
  */
 int
 __res_enable_mt(void) {
-	return (-1);
+    return (-1);
 }
 
 int
 __res_disable_mt(void) {
-	return (0);
+    return (0);
 }
 #endif
 
 #ifdef DO_PTHREADS
 static int
 __res_init_ctx(void) {
+    mtctxres_t*  mt;
+    int     ret;
 
-	mtctxres_t	*mt;
-	int		ret;
+    if (pthread_getspecific(key) != 0) {
+        /* Already exists */
+        return (0);
+    }
 
+    if ((mt = malloc(sizeof(mtctxres_t))) == 0) {
+        errno = ENOMEM;
+        return (-1);
+    }
 
-	if (pthread_getspecific(key) != 0) {
-		/* Already exists */
-		return (0);
-	}
+    memset(mt, 0, sizeof(mtctxres_t));
 
-	if ((mt = malloc(sizeof (mtctxres_t))) == 0) {
-		errno = ENOMEM;
-		return (-1);
-	}
+    if ((ret = pthread_setspecific(key, mt)) != 0) {
+        free(mt);
+        errno = ret;
+        return (-1);
+    }
 
-	memset(mt, 0, sizeof (mtctxres_t));
-
-	if ((ret = pthread_setspecific(key, mt)) != 0) {
-		free(mt);
-		errno = ret;
-		return (-1);
-	}
-
-	return (0);
+    return (0);
 }
 
 static void
-__res_destroy_ctx(void *value) {
+__res_destroy_ctx(void* value) {
+    mtctxres_t*  mt = (mtctxres_t*)value;
 
-	mtctxres_t	*mt = (mtctxres_t *)value;
-
-	if (mt != 0)
-		free(mt);
+    if (mt != 0) {
+        free(mt);
+    }
 }
 #endif
 
-mtctxres_t *
+mtctxres_t*
 ___mtctxres(void) {
 #ifdef DO_PTHREADS
-	mtctxres_t	*mt;
-
+    mtctxres_t*  mt;
 #ifdef _LIBC
-	if (pthread_main_np() != 0)
-		return (&sharedctx);
+
+    if (pthread_main_np() != 0) {
+        return (&sharedctx);
+    }
+
 #endif
 
-	/*
-	 * This if clause should only be executed if we are linking
-	 * statically.  When linked dynamically _mtctxres_init() should
-	 * be called at binding time due the #pragma above.
-	 */
-	if (!mt_key_initialized) {
-		static pthread_mutex_t keylock = PTHREAD_MUTEX_INITIALIZER;
-                if (pthread_mutex_lock(&keylock) == 0) {
-			_mtctxres_init();
-			(void) pthread_mutex_unlock(&keylock);
-		}
-	}
+    /*
+     * This if clause should only be executed if we are linking
+     * statically.  When linked dynamically _mtctxres_init() should
+     * be called at binding time due the #pragma above.
+     */
+    if (!mt_key_initialized) {
+        static pthread_mutex_t keylock = PTHREAD_MUTEX_INITIALIZER;
 
-	/*
-	 * If we have already been called in this thread return the existing
-	 * context.  Otherwise recreat a new context and return it.  If
-	 * that fails return a global context.
-	 */
-	if (mt_key_initialized) {
-		if (((mt = pthread_getspecific(key)) != 0) ||
-		    (__res_init_ctx() == 0 &&
-		     (mt = pthread_getspecific(key)) != 0)) {
-			return (mt);
-		}
-	}
+        if (pthread_mutex_lock(&keylock) == 0) {
+            _mtctxres_init();
+            (void) pthread_mutex_unlock(&keylock);
+        }
+    }
+
+    /*
+     * If we have already been called in this thread return the existing
+     * context.  Otherwise recreat a new context and return it.  If
+     * that fails return a global context.
+     */
+    if (mt_key_initialized) {
+        if (((mt = pthread_getspecific(key)) != 0) ||
+                (__res_init_ctx() == 0 &&
+                 (mt = pthread_getspecific(key)) != 0)) {
+            return (mt);
+        }
+    }
+
 #endif
-	return (&sharedctx);
+    return (&sharedctx);
 }

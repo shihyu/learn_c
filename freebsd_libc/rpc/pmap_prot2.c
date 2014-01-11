@@ -1,4 +1,4 @@
-/*	$NetBSD: pmap_prot2.c,v 1.14 2000/07/06 03:10:34 christos Exp $	*/
+/*  $NetBSD: pmap_prot2.c,v 1.14 2000/07/06 03:10:34 christos Exp $ */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "@(#)pmap_prot2.c 1.3 87/08/11 Copyr 1984 Sun Micro";
-static char *sccsid = "@(#)pmap_prot2.c	2.1 88/07/29 4.0 RPCSRC";
+static char* sccsid2 = "@(#)pmap_prot2.c 1.3 87/08/11 Copyr 1984 Sun Micro";
+static char* sccsid = "@(#)pmap_prot2.c	2.1 88/07/29 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_prot2.c,v 1.10 2004/10/16 06:11:35 obrien Exp $");
@@ -57,8 +57,8 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_prot2.c,v 1.10 2004/10/16 06:11:35 obr
  * First recall the link list declaration from pmap_prot.h:
  *
  * struct pmaplist {
- *	struct pmap pml_map;
- *	struct pmaplist *pml_map;
+ *  struct pmap pml_map;
+ *  struct pmaplist *pml_map;
  * };
  *
  * Compare that declaration with a corresponding xdr declaration that
@@ -66,12 +66,12 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_prot2.c,v 1.10 2004/10/16 06:11:35 obr
  *
  * typedef union switch (bool_t) {
  *
- *	case TRUE: struct {
- *		struct pmap;
- * 		pmaplist_t foo;
- *	};
+ *  case TRUE: struct {
+ *      struct pmap;
+ *      pmaplist_t foo;
+ *  };
  *
- *	case FALSE: struct {};
+ *  case FALSE: struct {};
  * } pmaplist_t;
  *
  * Notice that the xdr declaration has no nxt pointer while
@@ -92,41 +92,48 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/pmap_prot2.c,v 1.10 2004/10/16 06:11:35 obr
  */
 bool_t
 xdr_pmaplist(xdrs, rp)
-	XDR *xdrs;
-	struct pmaplist **rp;
+XDR* xdrs;
+struct pmaplist** rp;
 {
-	/*
-	 * more_elements is pre-computed in case the direction is
-	 * XDR_ENCODE or XDR_FREE.  more_elements is overwritten by
-	 * xdr_bool when the direction is XDR_DECODE.
-	 */
-	bool_t more_elements;
-	int freeing;
-	struct pmaplist **next	= NULL; /* pacify gcc */
+    /*
+     * more_elements is pre-computed in case the direction is
+     * XDR_ENCODE or XDR_FREE.  more_elements is overwritten by
+     * xdr_bool when the direction is XDR_DECODE.
+     */
+    bool_t more_elements;
+    int freeing;
+    struct pmaplist** next  = NULL; /* pacify gcc */
+    assert(xdrs != NULL);
+    assert(rp != NULL);
+    freeing = (xdrs->x_op == XDR_FREE);
 
-	assert(xdrs != NULL);
-	assert(rp != NULL);
+    for (;;) {
+        more_elements = (bool_t)(*rp != NULL);
 
-	freeing = (xdrs->x_op == XDR_FREE);
+        if (! xdr_bool(xdrs, &more_elements)) {
+            return (FALSE);
+        }
 
-	for (;;) {
-		more_elements = (bool_t)(*rp != NULL);
-		if (! xdr_bool(xdrs, &more_elements))
-			return (FALSE);
-		if (! more_elements)
-			return (TRUE);  /* we are done */
-		/*
-		 * the unfortunate side effect of non-recursion is that in
-		 * the case of freeing we must remember the next object
-		 * before we free the current object ...
-		 */
-		if (freeing)
-			next = &((*rp)->pml_next); 
-		if (! xdr_reference(xdrs, (caddr_t *)rp,
-		    (u_int)sizeof(struct pmaplist), (xdrproc_t)xdr_pmap))
-			return (FALSE);
-		rp = (freeing) ? next : &((*rp)->pml_next);
-	}
+        if (! more_elements) {
+            return (TRUE);    /* we are done */
+        }
+
+        /*
+         * the unfortunate side effect of non-recursion is that in
+         * the case of freeing we must remember the next object
+         * before we free the current object ...
+         */
+        if (freeing) {
+            next = &((*rp)->pml_next);
+        }
+
+        if (! xdr_reference(xdrs, (caddr_t*)rp,
+                            (u_int)sizeof(struct pmaplist), (xdrproc_t)xdr_pmap)) {
+            return (FALSE);
+        }
+
+        rp = (freeing) ? next : &((*rp)->pml_next);
+    }
 }
 
 
@@ -136,8 +143,8 @@ xdr_pmaplist(xdrs, rp)
  */
 bool_t
 xdr_pmaplist_ptr(xdrs, rp)
-	XDR *xdrs;
-	struct pmaplist *rp;
+XDR* xdrs;
+struct pmaplist* rp;
 {
-	return xdr_pmaplist(xdrs, (struct pmaplist **)(void *)rp);
+    return xdr_pmaplist(xdrs, (struct pmaplist**)(void*)rp);
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  * (c) UNIX System Laboratories, Inc.
  * All or some portions of this file are derived from material licensed
  * to the University of California by American Telephone and Telegraph
@@ -46,184 +46,184 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/isctype.c,v 1.10.2.1 2007/10/24 14:29:31
 #undef digittoint
 int
 digittoint(c)
-	int c;
+int c;
 {
-	return (__sbmaskrune(c, 0xFF));
+    return (__sbmaskrune(c, 0xFF));
 }
 
 #undef isalnum
 int
 isalnum(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_A|_CTYPE_D));
+    return (__sbistype(c, _CTYPE_A | _CTYPE_D));
 }
 
 #undef isalpha
 int
 isalpha(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_A));
+    return (__sbistype(c, _CTYPE_A));
 }
 
 #undef isascii
 int
 isascii(c)
-	int c;
+int c;
 {
-	return ((c & ~0x7F) == 0);
+    return ((c & ~0x7F) == 0);
 }
 
 #undef isblank
 int
 isblank(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_B));
+    return (__sbistype(c, _CTYPE_B));
 }
 
 #undef iscntrl
 int
 iscntrl(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_C));
+    return (__sbistype(c, _CTYPE_C));
 }
 
 #undef isdigit
 int
 isdigit(c)
-	int c;
+int c;
 {
-	return (__isctype(c, _CTYPE_D));
+    return (__isctype(c, _CTYPE_D));
 }
 
 #undef isgraph
 int
 isgraph(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_G));
+    return (__sbistype(c, _CTYPE_G));
 }
 
-#undef ishexnumber 
+#undef ishexnumber
 int
 ishexnumber(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_X));
+    return (__sbistype(c, _CTYPE_X));
 }
 
 #undef isideogram
 int
 isideogram(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_I));
+    return (__sbistype(c, _CTYPE_I));
 }
 
 #undef islower
 int
 islower(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_L));
+    return (__sbistype(c, _CTYPE_L));
 }
 
 #undef isnumber
 int
 isnumber(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_D));
+    return (__sbistype(c, _CTYPE_D));
 }
 
-#undef isphonogram	
+#undef isphonogram
 int
 isphonogram(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_Q));
+    return (__sbistype(c, _CTYPE_Q));
 }
 
 #undef isprint
 int
 isprint(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_R));
+    return (__sbistype(c, _CTYPE_R));
 }
 
 #undef ispunct
 int
 ispunct(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_P));
+    return (__sbistype(c, _CTYPE_P));
 }
 
 #undef isrune
 int
 isrune(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, 0xFFFFFF00L));
+    return (__sbistype(c, 0xFFFFFF00L));
 }
 
 #undef isspace
 int
 isspace(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_S));
+    return (__sbistype(c, _CTYPE_S));
 }
 
 #undef isspecial
 int
 isspecial(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_T));
+    return (__sbistype(c, _CTYPE_T));
 }
 
 #undef isupper
 int
 isupper(c)
-	int c;
+int c;
 {
-	return (__sbistype(c, _CTYPE_U));
+    return (__sbistype(c, _CTYPE_U));
 }
 
 #undef isxdigit
 int
 isxdigit(c)
-	int c;
+int c;
 {
-	return (__isctype(c, _CTYPE_X));
+    return (__isctype(c, _CTYPE_X));
 }
 
 #undef toascii
 int
 toascii(c)
-	int c;
+int c;
 {
-	return (c & 0x7F);
+    return (c & 0x7F);
 }
 
 #undef tolower
 int
 tolower(c)
-	int c;
+int c;
 {
-	return (__sbtolower(c));
+    return (__sbtolower(c));
 }
 
 #undef toupper
 int
 toupper(c)
-	int c;
+int c;
 {
-	return (__sbtoupper(c));
+    return (__sbtoupper(c));
 }
 

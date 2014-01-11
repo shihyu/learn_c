@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -29,7 +29,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)glue.h	8.1 (Berkeley) 6/4/93
+ *  @(#)glue.h  8.1 (Berkeley) 6/4/93
  * $FreeBSD: src/lib/libc/stdio/glue.h,v 1.4 2007/01/09 00:28:06 imp Exp $
  */
 
@@ -38,8 +38,8 @@
  * allocated and linked in via this glue structure.
  */
 struct glue {
-	struct	glue *next;
-	int	niobs;
-	FILE	*iobs;
+    struct  glue* next;
+    int niobs;
+    FILE*    iobs;
 };
 extern struct glue __sglue;

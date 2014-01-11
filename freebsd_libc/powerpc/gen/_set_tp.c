@@ -23,13 +23,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	$FreeBSD: src/lib/libc/powerpc/gen/_set_tp.c,v 1.3 2006/09/02 01:07:21 marcel Exp $
+ *  $FreeBSD: src/lib/libc/powerpc/gen/_set_tp.c,v 1.3 2006/09/02 01:07:21 marcel Exp $
  */
 
 void
-_set_tp(void *tpval)
-{
-	register void *tp __asm__("r2");
-
-	__asm __volatile("mr %0,%1" : "=r"(tp) : "r"((char*)tpval + 0x7008));
+_set_tp(void* tpval) {
+    register void* tp __asm__("r2");
+    __asm __volatile("mr %0,%1" : "=r"(tp) : "r"((char*)tpval + 0x7008));
 }

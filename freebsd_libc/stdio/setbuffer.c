@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -40,12 +40,11 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/setbuffer.c,v 1.8 2007/01/09 00:28:07 imp
 
 void
 setbuffer(fp, buf, size)
-	FILE *fp;
-	char *buf;
-	int size;
+FILE* fp;
+char* buf;
+int size;
 {
-
-	(void)setvbuf(fp, buf, buf ? _IOFBF : _IONBF, (size_t)size);
+    (void)setvbuf(fp, buf, buf ? _IOFBF : _IONBF, (size_t)size);
 }
 
 /*
@@ -53,8 +52,7 @@ setbuffer(fp, buf, size)
  */
 int
 setlinebuf(fp)
-	FILE *fp;
+FILE* fp;
 {
-
-	return (setvbuf(fp, (char *)NULL, _IOLBF, (size_t)0));
+    return (setvbuf(fp, (char*)NULL, _IOLBF, (size_t)0));
 }

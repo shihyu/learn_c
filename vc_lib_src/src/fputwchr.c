@@ -32,19 +32,17 @@
 *
 *******************************************************************************/
 
-wint_t __cdecl _fputwchar (
-        REG1 wchar_t ch
-        )
-{
-        return(putwc(ch, stdout));
+wint_t __cdecl _fputwchar(
+    REG1 wchar_t ch
+) {
+    return (putwc(ch, stdout));
 }
 
 #undef putwchar
 
-wint_t __cdecl putwchar (
-        REG1 wchar_t ch
-        )
-{
-        return(_fputwchar(ch));
+wint_t __cdecl putwchar(
+    REG1 wchar_t ch
+) {
+    return (_fputwchar(ch));
 }
 

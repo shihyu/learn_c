@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -52,28 +52,32 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/bsearch.c,v 1.4 2007/01/09 00:28:09 imp 
  * have to make lim 3, then halve, obtaining 1, so that we will only
  * look at item 3.
  */
-void *
+void*
 bsearch(key, base0, nmemb, size, compar)
-	const void *key;
-	const void *base0;
-	size_t nmemb;
-	size_t size;
-	int (*compar)(const void *, const void *);
+const void* key;
+const void* base0;
+size_t nmemb;
+size_t size;
+int (*compar)(const void*, const void*);
 {
-	const char *base = base0;
-	size_t lim;
-	int cmp;
-	const void *p;
+    const char* base = base0;
+    size_t lim;
+    int cmp;
+    const void* p;
 
-	for (lim = nmemb; lim != 0; lim >>= 1) {
-		p = base + (lim >> 1) * size;
-		cmp = (*compar)(key, p);
-		if (cmp == 0)
-			return ((void *)p);
-		if (cmp > 0) {	/* key > p: move right */
-			base = (char *)p + size;
-			lim--;
-		}		/* else move left */
-	}
-	return (NULL);
+    for (lim = nmemb; lim != 0; lim >>= 1) {
+        p = base + (lim >> 1) * size;
+        cmp = (*compar)(key, p);
+
+        if (cmp == 0) {
+            return ((void*)p);
+        }
+
+        if (cmp > 0) {  /* key > p: move right */
+            base = (char*)p + size;
+            lim--;
+        }       /* else move left */
+    }
+
+    return (NULL);
 }

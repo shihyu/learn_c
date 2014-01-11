@@ -26,23 +26,18 @@
 
 extern "C++"
 _CRTIMP int __cdecl _CrtDbgReportW(
-        int nRptType,
-        const unsigned short * szFile,
-        int nLine,
-        const unsigned short * szModule,
-        const unsigned short * szFormat,
-        ...
-        )
-{
+    int nRptType,
+    const unsigned short* szFile,
+    int nLine,
+    const unsigned short* szModule,
+    const unsigned short* szFormat,
+    ...
+) {
     int retval;
     va_list arglist;
-
-    va_start(arglist,szFormat);
-
+    va_start(arglist, szFormat);
     retval = _CrtDbgReportTV(nRptType, reinterpret_cast<const wchar_t*>(szFile), nLine, reinterpret_cast<const wchar_t*>(szModule), reinterpret_cast<const wchar_t*>(szFormat), arglist);
-
     va_end(arglist);
-
     return retval;
 }
 

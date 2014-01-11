@@ -34,10 +34,9 @@
 *
 *******************************************************************************/
 
-int __cdecl _fileno (
-        FILE *stream
-        )
-{
-        _VALIDATE_RETURN((stream != NULL), EINVAL, -1);
-        return( stream->_file );
+int __cdecl _fileno(
+    FILE* stream
+) {
+    _VALIDATE_RETURN((stream != NULL), EINVAL, -1);
+    return (stream->_file);
 }

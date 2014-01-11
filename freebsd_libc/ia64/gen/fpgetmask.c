@@ -31,10 +31,8 @@ __FBSDID("$FreeBSD: src/lib/libc/ia64/gen/fpgetmask.c,v 1.4 2003/10/22 09:00:07 
 #include <ieeefp.h>
 
 fp_except_t
-fpgetmask(void)
-{
-	u_int64_t fpsr;
-
-	__asm __volatile("mov %0=ar.fpsr" : "=r" (fpsr));
-	return (~fpsr & 0x3d);
+fpgetmask(void) {
+    u_int64_t fpsr;
+    __asm __volatile("mov %0=ar.fpsr" : "=r"(fpsr));
+    return (~fpsr & 0x3d);
 }

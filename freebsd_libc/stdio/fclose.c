@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -45,27 +45,36 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fclose.c,v 1.12 2007/01/09 00:28:06 imp E
 #include "local.h"
 
 int
-fclose(FILE *fp)
-{
-	int r;
+fclose(FILE* fp) {
+    int r;
 
-	if (fp->_flags == 0) {	/* not open! */
-		errno = EBADF;
-		return (EOF);
-	}
-	FLOCKFILE(fp);
-	r = fp->_flags & __SWR ? __sflush(fp) : 0;
-	if (fp->_close != NULL && (*fp->_close)(fp->_cookie) < 0)
-		r = EOF;
-	if (fp->_flags & __SMBF)
-		free((char *)fp->_bf._base);
-	if (HASUB(fp))
-		FREEUB(fp);
-	if (HASLB(fp))
-		FREELB(fp);
-	fp->_file = -1;
-	fp->_r = fp->_w = 0;	/* Mess up if reaccessed. */
-	fp->_flags = 0;		/* Release this FILE for reuse. */
-	FUNLOCKFILE(fp);
-	return (r);
+    if (fp->_flags == 0) {  /* not open! */
+        errno = EBADF;
+        return (EOF);
+    }
+
+    FLOCKFILE(fp);
+    r = fp->_flags & __SWR ? __sflush(fp) : 0;
+
+    if (fp->_close != NULL && (*fp->_close)(fp->_cookie) < 0) {
+        r = EOF;
+    }
+
+    if (fp->_flags & __SMBF) {
+        free((char*)fp->_bf._base);
+    }
+
+    if (HASUB(fp)) {
+        FREEUB(fp);
+    }
+
+    if (HASLB(fp)) {
+        FREELB(fp);
+    }
+
+    fp->_file = -1;
+    fp->_r = fp->_w = 0;    /* Mess up if reaccessed. */
+    fp->_flags = 0;     /* Release this FILE for reuse. */
+    FUNLOCKFILE(fp);
+    return (r);
 }

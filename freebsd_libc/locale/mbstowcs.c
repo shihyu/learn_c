@@ -33,11 +33,9 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mbstowcs.c,v 1.11 2004/07/21 10:54:57 tj
 #include "mblocal.h"
 
 size_t
-mbstowcs(wchar_t * __restrict pwcs, const char * __restrict s, size_t n)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs;
-
-	mbs = initial;
-	return (__mbsnrtowcs(pwcs, &s, SIZE_T_MAX, n, &mbs));
+mbstowcs(wchar_t* __restrict pwcs, const char* __restrict s, size_t n) {
+    static const mbstate_t initial;
+    mbstate_t mbs;
+    mbs = initial;
+    return (__mbsnrtowcs(pwcs, &s, SIZE_T_MAX, n, &mbs));
 }

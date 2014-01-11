@@ -17,32 +17,30 @@ typedef struct rect_v {
 
 POLAR_V rect_to_polar(RECT_V);
 
-int main(void)
-{
+int main(void) {
     RECT_V input;
     POLAR_V result;
-
     puts("Enter x,y coordinates; enter q to quit:");
-    while (scanf("%lf %lf", &input.x, &input.y) == 2)
-    {
+
+    while (scanf("%lf %lf", &input.x, &input.y) == 2) {
         result = rect_to_polar(input);
         printf("magnitude = %0.2f, angle = %0.2f\n",
-                result.magnitude, result.angle);
+               result.magnitude, result.angle);
     }
+
     puts("Bye.");
-    
     return 0;
 }
 
-POLAR_V rect_to_polar(RECT_V rv)
-{
+POLAR_V rect_to_polar(RECT_V rv) {
     POLAR_V pv;
-
     pv.magnitude = sqrt(rv.x * rv.x + rv.y * rv.y);
-    if (pv.magnitude == 0)
+
+    if (pv.magnitude == 0) {
         pv.angle = 0.0;
-    else
+    } else {
         pv.angle = RAD_TO_DEG * atan2(rv.y, rv.x);
-    
+    }
+
     return pv;
 }

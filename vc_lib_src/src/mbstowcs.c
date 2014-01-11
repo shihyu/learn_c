@@ -47,80 +47,76 @@
 
 /* Helper shared by secure and non-secure functions */
 
-extern "C" size_t __cdecl _mbstowcs_l_helper (
-        wchar_t  *pwcs,
-        const char *s,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
+extern "C" size_t __cdecl _mbstowcs_l_helper(
+    wchar_t*  pwcs,
+    const char* s,
+    size_t n,
+    _locale_t plocinfo
+) {
     size_t count = 0;
 
     if (pwcs && n == 0)
         /* dest string exists, but 0 bytes converted */
-        return (size_t) 0;
-
-    if (pwcs && n > 0)
     {
+        return (size_t) 0;
+    }
+
+    if (pwcs && n > 0) {
         *pwcs = '\0';
     }
 
     /* validation section */
-    _VALIDATE_RETURN(s != NULL, EINVAL, (size_t)-1);
+    _VALIDATE_RETURN(s != NULL, EINVAL, (size_t) - 1);
     /* n must fit into an int for MultiByteToWideChar */
-    _VALIDATE_RETURN(n <= INT_MAX, EINVAL, (size_t)-1);
-
-
+    _VALIDATE_RETURN(n <= INT_MAX, EINVAL, (size_t) - 1);
     _LocaleUpdate _loc_update(plocinfo);
+
     /* if destination string exists, fill it in */
-    if (pwcs)
-    {
-        if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE)
-        {
+    if (pwcs) {
+        if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
             /* C locale: easy and fast */
-            while (count < n)
-            {
-                *pwcs = (wchar_t) ((unsigned char)s[count]);
-                if (!s[count])
+            while (count < n) {
+                *pwcs = (wchar_t)((unsigned char)s[count]);
+
+                if (!s[count]) {
                     return count;
+                }
+
                 count++;
                 pwcs++;
             }
-            return count;
 
+            return count;
         } else {
             int bytecnt, charcnt;
-            unsigned char *p;
+            unsigned char* p;
 
             /* Assume that the buffer is large enough */
-            if ( (count = MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                               MB_PRECOMPOSED |
-                                                MB_ERR_INVALID_CHARS,
-                                               s,
-                                               -1,
-                                               pwcs,
-                                               (int)n )) != 0 )
-                return count - 1; /* don't count NUL */
+            if ((count = MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                             MB_PRECOMPOSED |
+                                             MB_ERR_INVALID_CHARS,
+                                             s,
+                                             -1,
+                                             pwcs,
+                                             (int)n)) != 0) {
+                return count - 1;    /* don't count NUL */
+            }
 
-            if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
-            {
+            if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
                 errno = EILSEQ;
                 *pwcs = '\0';
-                return (size_t)-1;
+                return (size_t) - 1;
             }
 
             /* User-supplied buffer not large enough. */
-
             /* How many bytes are in n characters of the string? */
             charcnt = (int)n;
-            for (p = (unsigned char *)s; (charcnt-- && *p); p++)
-            {
+
+            for (p = (unsigned char*)s; (charcnt-- && *p); p++) {
                 if (
                     _isleadbyte_l(*p, _loc_update.GetLocaleT())
-                    )
-                {
-                    if(p[1]=='\0')
-                    {
+                ) {
+                    if (p[1] == '\0') {
                         /*  this is a leadbyte followed by EOS -- a dud MBCS string
                             We choose not to assert here because this
                             function is defined to deal with dud strings on
@@ -128,77 +124,69 @@ extern "C" size_t __cdecl _mbstowcs_l_helper (
                         */
                         errno = EILSEQ;
                         *pwcs = '\0';
-                        return (size_t)-1;
-                    }
-                    else
-                    {
+                        return (size_t) - 1;
+                    } else {
                         p++;
                     }
                 }
             }
-            bytecnt = ((int) ((char *)p - (char *)s));
 
-            if ( (count = MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                               MB_PRECOMPOSED,
-                                               s,
-                                               bytecnt,
-                                               pwcs,
-                                               (int)n )) == 0 )
-            {
+            bytecnt = ((int)((char*)p - (char*)s));
+
+            if ((count = MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                             MB_PRECOMPOSED,
+                                             s,
+                                             bytecnt,
+                                             pwcs,
+                                             (int)n)) == 0) {
                 errno = EILSEQ;
                 *pwcs = '\0';
-                return (size_t)-1;
+                return (size_t) - 1;
             }
 
             return count; /* no NUL in string */
         }
-    }
-    else { /* pwcs == NULL, get size only, s must be NUL-terminated */
+    } else { /* pwcs == NULL, get size only, s must be NUL-terminated */
         if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
             return strlen(s);
-        } else if ( (count = MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                                  MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                                                  s,
-                                                  -1,
-                                                  NULL,
-                                                  0 )) == 0 ) {
+        } else if ((count = MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                                MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                                                s,
+                                                -1,
+                                                NULL,
+                                                0)) == 0) {
             errno = EILSEQ;
-            return (size_t)-1;
+            return (size_t) - 1;
         } else {
             return count - 1;
         }
     }
-
 }
 
-extern "C" size_t __cdecl _mbstowcs_l (
-        wchar_t  *pwcs,
-        const char *s,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
+extern "C" size_t __cdecl _mbstowcs_l(
+    wchar_t*  pwcs,
+    const char* s,
+    size_t n,
+    _locale_t plocinfo
+) {
     /* Call a non-deprecated helper to do the work. */
-
     return _mbstowcs_l_helper(pwcs, s, n, plocinfo);
 }
 
 extern "C" size_t __cdecl mbstowcs
 (
-        wchar_t  *pwcs,
-        const char *s,
-        size_t n
-        )
-{
+    wchar_t*  pwcs,
+    const char* s,
+    size_t n
+) {
     _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-    if (__locale_changed == 0)
-    {
+
+    if (__locale_changed == 0) {
         return _mbstowcs_l(pwcs, s, n, &__initiallocalestructinfo);
-    }
-    else
-    {
+    } else {
         return _mbstowcs_l(pwcs, s, n, NULL);
     }
+
     _END_SECURE_CRT_DEPRECATION_DISABLE
 }
 
@@ -227,59 +215,50 @@ extern "C" size_t __cdecl mbstowcs
 *
 *******************************************************************************/
 
-extern "C" errno_t __cdecl _mbstowcs_s_l (
-        size_t *pConvertedChars,
-        wchar_t  *pwcs,
-        size_t sizeInWords,
-        const char *s,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
+extern "C" errno_t __cdecl _mbstowcs_s_l(
+    size_t* pConvertedChars,
+    wchar_t*  pwcs,
+    size_t sizeInWords,
+    const char* s,
+    size_t n,
+    _locale_t plocinfo
+) {
     size_t retsize;
     errno_t retvalue = 0;
-
     /* validation section */
     _VALIDATE_RETURN_ERRCODE((pwcs == NULL && sizeInWords == 0) || (pwcs != NULL && sizeInWords > 0), EINVAL);
 
-    if (pwcs != NULL)
-    {
+    if (pwcs != NULL) {
         _RESET_STRING(pwcs, sizeInWords);
     }
 
-    if (pConvertedChars != NULL)
-    {
+    if (pConvertedChars != NULL) {
         *pConvertedChars = 0;
     }
 
     _LocaleUpdate _loc_update(plocinfo);
-
     /* Call a non-deprecated helper to do the work. */
-
     retsize = _mbstowcs_l_helper(pwcs, s, (n > sizeInWords ? sizeInWords : n), _loc_update.GetLocaleT());
 
-    if (retsize == (size_t)-1)
-    {
-        if (pwcs != NULL)
-        {
+    if (retsize == (size_t) - 1) {
+        if (pwcs != NULL) {
             _RESET_STRING(pwcs, sizeInWords);
         }
+
         return errno;
     }
 
     /* count the null terminator */
     retsize++;
 
-    if (pwcs != NULL)
-    {
+    if (pwcs != NULL) {
         /* return error if the string does not fit, unless n == _TRUNCATE */
-        if (retsize > sizeInWords)
-        {
-            if (n != _TRUNCATE)
-            {
+        if (retsize > sizeInWords) {
+            if (n != _TRUNCATE) {
                 _RESET_STRING(pwcs, sizeInWords);
                 _VALIDATE_RETURN_ERRCODE(retsize <= sizeInWords, ERANGE);
             }
+
             retsize = sizeInWords;
             retvalue = STRUNCATE;
         }
@@ -288,21 +267,19 @@ extern "C" errno_t __cdecl _mbstowcs_s_l (
         pwcs[retsize - 1] = '\0';
     }
 
-    if (pConvertedChars != NULL)
-    {
+    if (pConvertedChars != NULL) {
         *pConvertedChars = retsize;
     }
 
     return retvalue;
 }
 
-extern "C" errno_t __cdecl mbstowcs_s (
-        size_t *pConvertedChars,
-        wchar_t  *pwcs,
-        size_t sizeInWords,
-        const char *s,
-        size_t n
-)
-{
+extern "C" errno_t __cdecl mbstowcs_s(
+    size_t* pConvertedChars,
+    wchar_t*  pwcs,
+    size_t sizeInWords,
+    const char* s,
+    size_t n
+) {
     return _mbstowcs_s_l(pConvertedChars, pwcs, sizeInWords, s, n, NULL);
 }

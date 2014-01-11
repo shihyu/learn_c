@@ -40,16 +40,13 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/sysctlnametomib.c,v 1.4 2003/01/04 00:11:11
  * may seem, there are various conflicting requirements.
  */
 int
-sysctlnametomib(const char *name, int *mibp, size_t *sizep)
-{
-	int oid[2];
-	int error;
-
-	oid[0] = 0;
-	oid[1] = 3;
-
-	*sizep *= sizeof (int);
-	error = sysctl(oid, 2, mibp, sizep, (void *)name, strlen(name));
-	*sizep /= sizeof (int);
-	return (error);
+sysctlnametomib(const char* name, int* mibp, size_t* sizep) {
+    int oid[2];
+    int error;
+    oid[0] = 0;
+    oid[1] = 3;
+    *sizep *= sizeof(int);
+    error = sysctl(oid, 2, mibp, sizep, (void*)name, strlen(name));
+    *sizep /= sizeof(int);
+    return (error);
 }

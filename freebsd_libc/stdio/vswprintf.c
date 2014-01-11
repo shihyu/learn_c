@@ -1,4 +1,4 @@
-/*	$OpenBSD: vasprintf.c,v 1.4 1998/06/21 22:13:47 millert Exp $	*/
+/*  $OpenBSD: vasprintf.c,v 1.4 1998/06/21 22:13:47 millert Exp $   */
 
 /*
  * Copyright (c) 1997 Todd C. Miller <Todd.Miller@courtesan.com>
@@ -40,57 +40,62 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/vswprintf.c,v 1.6 2005/02/21 19:41:44 fjo
 #include "local.h"
 
 int
-vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
-    __va_list ap)
-{
-	static const mbstate_t initial;
-	mbstate_t mbs;
-	FILE f;
-	struct __sFILEX ext;
-	char *mbp;
-	int ret, sverrno;
-	size_t nwc;
+vswprintf(wchar_t* __restrict s, size_t n, const wchar_t* __restrict fmt,
+          __va_list ap) {
+    static const mbstate_t initial;
+    mbstate_t mbs;
+    FILE f;
+    struct __sFILEX ext;
+    char* mbp;
+    int ret, sverrno;
+    size_t nwc;
 
-	if (n == 0) {
-		errno = EINVAL;
-		return (-1);
-	}
+    if (n == 0) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	f._file = -1;
-	f._flags = __SWR | __SSTR | __SALC;
-	f._bf._base = f._p = (unsigned char *)malloc(128);
-	if (f._bf._base == NULL) {
-		errno = ENOMEM;
-		return (-1);
-	}
-	f._bf._size = f._w = 127;		/* Leave room for the NUL */
-	f._extra = &ext;
-	INITEXTRA(&f);
-	ret = __vfwprintf(&f, fmt, ap);
-	if (ret < 0) {
-		sverrno = errno;
-		free(f._bf._base);
-		errno = sverrno;
-		return (-1);
-	}
-	*f._p = '\0';
-	mbp = f._bf._base;
-	/*
-	 * XXX Undo the conversion from wide characters to multibyte that
-	 * fputwc() did in __vfwprintf().
-	 */
-	mbs = initial;
-	nwc = mbsrtowcs(s, (const char **)&mbp, n, &mbs);
-	free(f._bf._base);
-	if (nwc == (size_t)-1) {
-		errno = EILSEQ;
-		return (-1);
-	}
-	if (nwc == n) {
-		s[n - 1] = L'\0';
-		errno = EOVERFLOW;
-		return (-1);
-	}
+    f._file = -1;
+    f._flags = __SWR | __SSTR | __SALC;
+    f._bf._base = f._p = (unsigned char*)malloc(128);
 
-	return (ret);
+    if (f._bf._base == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+
+    f._bf._size = f._w = 127;       /* Leave room for the NUL */
+    f._extra = &ext;
+    INITEXTRA(&f);
+    ret = __vfwprintf(&f, fmt, ap);
+
+    if (ret < 0) {
+        sverrno = errno;
+        free(f._bf._base);
+        errno = sverrno;
+        return (-1);
+    }
+
+    *f._p = '\0';
+    mbp = f._bf._base;
+    /*
+     * XXX Undo the conversion from wide characters to multibyte that
+     * fputwc() did in __vfwprintf().
+     */
+    mbs = initial;
+    nwc = mbsrtowcs(s, (const char**)&mbp, n, &mbs);
+    free(f._bf._base);
+
+    if (nwc == (size_t) - 1) {
+        errno = EILSEQ;
+        return (-1);
+    }
+
+    if (nwc == n) {
+        s[n - 1] = L'\0';
+        errno = EOVERFLOW;
+        return (-1);
+    }
+
+    return (ret);
 }

@@ -36,44 +36,41 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/gen/signalcontext.c,v 1.7 2004/07/02 23:20
 
 __weak_reference(__signalcontext, signalcontext);
 
-extern void _ctx_start(ucontext_t *, int argc, ...);
+extern void _ctx_start(ucontext_t*, int argc, ...);
 
 int
-__signalcontext(ucontext_t *ucp, int sig, __sighandler_t *func)
-{
-	register_t *p;
-	struct sigframe *sfp;
-
-	/*-
-	 * Set up stack.
-	 * (n = sizeof(int))
-	 * 2n+sizeof(struct sigframe)	ucp
-	 * 2n				struct sigframe
-	 * 1n				&func
-	 * 0n				&_ctx_start
-	 */
-	p = (register_t *)(void *)(intptr_t)ucp->uc_mcontext.mc_esp;
-	*--p = (register_t)(intptr_t)ucp;
-	p = (register_t *)((u_register_t)p & ~0xF);  /* Align to 16 bytes. */
-	p = (register_t *)((u_register_t)p - sizeof(struct sigframe));
-	sfp = (struct sigframe *)p;
-	bzero(sfp, sizeof(struct sigframe));
-	sfp->sf_signum = sig;
-	sfp->sf_siginfo = (register_t)(intptr_t)&sfp->sf_si;
-	sfp->sf_ucontext = (register_t)(intptr_t)&sfp->sf_uc;
-	sfp->sf_ahu.sf_action = (__siginfohandler_t *)func;
-	bcopy(ucp, &sfp->sf_uc, sizeof(ucontext_t));
-	sfp->sf_si.si_signo = sig;
-	*--p = (register_t)(intptr_t)func;
-
-	/*
-	 * Set up ucontext_t.
-	 */
-	ucp->uc_mcontext.mc_esi = ucp->uc_mcontext.mc_esp - sizeof(int);
-	ucp->uc_mcontext.mc_esp = (register_t)(intptr_t)p;
-	ucp->uc_mcontext.mc_eip = (register_t)(intptr_t)_ctx_start;
-	ucp->uc_mcontext.mc_eflags &= ~PSL_T;
-	ucp->uc_link = &sfp->sf_uc;
-	sigdelset(&ucp->uc_sigmask, sig);
-	return (0);
+__signalcontext(ucontext_t* ucp, int sig, __sighandler_t* func) {
+    register_t* p;
+    struct sigframe* sfp;
+    /*-
+     * Set up stack.
+     * (n = sizeof(int))
+     * 2n+sizeof(struct sigframe)   ucp
+     * 2n               struct sigframe
+     * 1n               &func
+     * 0n               &_ctx_start
+     */
+    p = (register_t*)(void*)(intptr_t)ucp->uc_mcontext.mc_esp;
+    *--p = (register_t)(intptr_t)ucp;
+    p = (register_t*)((u_register_t)p & ~0xF);   /* Align to 16 bytes. */
+    p = (register_t*)((u_register_t)p - sizeof(struct sigframe));
+    sfp = (struct sigframe*)p;
+    bzero(sfp, sizeof(struct sigframe));
+    sfp->sf_signum = sig;
+    sfp->sf_siginfo = (register_t)(intptr_t)&sfp->sf_si;
+    sfp->sf_ucontext = (register_t)(intptr_t)&sfp->sf_uc;
+    sfp->sf_ahu.sf_action = (__siginfohandler_t*)func;
+    bcopy(ucp, &sfp->sf_uc, sizeof(ucontext_t));
+    sfp->sf_si.si_signo = sig;
+    *--p = (register_t)(intptr_t)func;
+    /*
+     * Set up ucontext_t.
+     */
+    ucp->uc_mcontext.mc_esi = ucp->uc_mcontext.mc_esp - sizeof(int);
+    ucp->uc_mcontext.mc_esp = (register_t)(intptr_t)p;
+    ucp->uc_mcontext.mc_eip = (register_t)(intptr_t)_ctx_start;
+    ucp->uc_mcontext.mc_eflags &= ~PSL_T;
+    ucp->uc_link = &sfp->sf_uc;
+    sigdelset(&ucp->uc_sigmask, sig);
+    return (0);
 }

@@ -38,40 +38,44 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/extattr.c,v 1.7 2005/09/12 19:52:41 ste
 #include <string.h>
 
 int
-extattr_namespace_to_string(int attrnamespace, char **string)
-{
+extattr_namespace_to_string(int attrnamespace, char** string) {
+    switch (attrnamespace) {
+    case EXTATTR_NAMESPACE_USER:
+        if (string != NULL) {
+            *string = strdup(EXTATTR_NAMESPACE_USER_STRING);
+        }
 
-	switch(attrnamespace) {
-	case EXTATTR_NAMESPACE_USER:
-		if (string != NULL)
-			*string = strdup(EXTATTR_NAMESPACE_USER_STRING);
-		return (0);
+        return (0);
 
-	case EXTATTR_NAMESPACE_SYSTEM:
-		if (string != NULL)
-			*string = strdup(EXTATTR_NAMESPACE_SYSTEM_STRING);
-		return (0);
+    case EXTATTR_NAMESPACE_SYSTEM:
+        if (string != NULL) {
+            *string = strdup(EXTATTR_NAMESPACE_SYSTEM_STRING);
+        }
 
-	default:
-		errno = EINVAL;
-		return (-1);
-	}
+        return (0);
+
+    default:
+        errno = EINVAL;
+        return (-1);
+    }
 }
 
 int
-extattr_string_to_namespace(const char *string, int *attrnamespace)
-{
+extattr_string_to_namespace(const char* string, int* attrnamespace) {
+    if (!strcmp(string, EXTATTR_NAMESPACE_USER_STRING)) {
+        if (attrnamespace != NULL) {
+            *attrnamespace = EXTATTR_NAMESPACE_USER;
+        }
 
-	if (!strcmp(string, EXTATTR_NAMESPACE_USER_STRING)) {
-		if (attrnamespace != NULL)
-			*attrnamespace = EXTATTR_NAMESPACE_USER;
-		return (0);
-	} else if (!strcmp(string, EXTATTR_NAMESPACE_SYSTEM_STRING)) {
-		if (attrnamespace != NULL)
-			*attrnamespace = EXTATTR_NAMESPACE_SYSTEM;
-		return (0);
-	} else {
-		errno = EINVAL;
-		return (-1);
-	}
+        return (0);
+    } else if (!strcmp(string, EXTATTR_NAMESPACE_SYSTEM_STRING)) {
+        if (attrnamespace != NULL) {
+            *attrnamespace = EXTATTR_NAMESPACE_SYSTEM;
+        }
+
+        return (0);
+    } else {
+        errno = EINVAL;
+        return (-1);
+    }
 }

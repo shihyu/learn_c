@@ -36,31 +36,27 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl _tctime32_s (
-        _TSCHAR * buffer,
-        size_t sizeInChars,
-        const __time32_t *timp
-        )
-{
-        struct tm tmtemp;
-        errno_t e;
+errno_t __cdecl _tctime32_s(
+    _TSCHAR* buffer,
+    size_t sizeInChars,
+    const __time32_t* timp
+) {
+    struct tm tmtemp;
+    errno_t e;
+    _VALIDATE_RETURN_ERRCODE(
+        ((buffer != NULL) && (sizeInChars > 0)),
+        EINVAL
+    )
+    _RESET_STRING(buffer, sizeInChars);
+    _VALIDATE_RETURN_ERRCODE((timp != NULL), EINVAL)
+    _VALIDATE_RETURN_ERRCODE_NOEXC((*timp >= 0), EINVAL)
+    e = _localtime32_s(&tmtemp, timp);
 
-        _VALIDATE_RETURN_ERRCODE(
-            ( ( buffer != NULL ) && ( sizeInChars > 0 ) ),
-            EINVAL
-        )
+    if (e == 0) {
+        e = _tasctime_s(buffer, sizeInChars, &tmtemp);
+    }
 
-        _RESET_STRING(buffer, sizeInChars);
-
-        _VALIDATE_RETURN_ERRCODE( ( timp != NULL ), EINVAL )
-        _VALIDATE_RETURN_ERRCODE_NOEXC( ( *timp >= 0 ), EINVAL )
-
-        e = _localtime32_s(&tmtemp, timp);
-        if ( e == 0 )
-        {
-            e = _tasctime_s(buffer, sizeInChars, &tmtemp);
-        }
-        return e;
+    return e;
 }
 
 /***
@@ -81,25 +77,20 @@ errno_t __cdecl _tctime32_s (
 *
 *******************************************************************************/
 
-_TSCHAR * __cdecl _tctime32 (
-        const __time32_t *timp
-        )
-{
-        struct tm tmtemp;
-        errno_t e;
+_TSCHAR* __cdecl _tctime32(
+    const __time32_t* timp
+) {
+    struct tm tmtemp;
+    errno_t e;
+    _VALIDATE_RETURN((timp != NULL), EINVAL, NULL)
+    _VALIDATE_RETURN_NOEXC((*timp >= 0), EINVAL, NULL)
+    e = _localtime32_s(&tmtemp, timp);
 
-        _VALIDATE_RETURN( ( timp != NULL ), EINVAL, NULL )
-        _VALIDATE_RETURN_NOEXC( ( *timp >= 0 ), EINVAL, NULL )
-
-        e = _localtime32_s(&tmtemp, timp);
-        if ( e == 0 )
-        {
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-            return(_tasctime(&tmtemp));
-_END_SECURE_CRT_DEPRECATION_DISABLE
-        }
-        else
-        {
-            return(NULL);
-        }
+    if (e == 0) {
+        _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+        return (_tasctime(&tmtemp));
+        _END_SECURE_CRT_DEPRECATION_DISABLE
+    } else {
+        return (NULL);
+    }
 }

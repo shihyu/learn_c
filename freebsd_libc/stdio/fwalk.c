@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,24 +44,26 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fwalk.c,v 1.10 2007/01/09 00:28:06 imp Ex
 
 int
 _fwalk(function)
-	int (*function)(FILE *);
+int (*function)(FILE*);
 {
-	FILE *fp;
-	int n, ret;
-	struct glue *g;
+    FILE* fp;
+    int n, ret;
+    struct glue* g;
+    ret = 0;
 
-	ret = 0;
-	/*
-	 * It should be safe to walk the list without locking it;
-	 * new nodes are only added to the end and none are ever
-	 * removed.
-	 *
-	 * Avoid locking this list while walking it or else you will
-	 * introduce a potential deadlock in [at least] refill.c.
-	 */
-	for (g = &__sglue; g != NULL; g = g->next)
-		for (fp = g->iobs, n = g->niobs; --n >= 0; fp++)
-			if ((fp->_flags != 0) && ((fp->_flags & __SIGN) == 0))
-				ret |= (*function)(fp);
-	return (ret);
+    /*
+     * It should be safe to walk the list without locking it;
+     * new nodes are only added to the end and none are ever
+     * removed.
+     *
+     * Avoid locking this list while walking it or else you will
+     * introduce a potential deadlock in [at least] refill.c.
+     */
+    for (g = &__sglue; g != NULL; g = g->next)
+        for (fp = g->iobs, n = g->niobs; --n >= 0; fp++)
+            if ((fp->_flags != 0) && ((fp->_flags & __SIGN) == 0)) {
+                ret |= (*function)(fp);
+            }
+
+    return (ret);
 }

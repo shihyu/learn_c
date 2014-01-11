@@ -18,30 +18,26 @@
 
 volatile _CRT_REPORT_HOOK_M __declspec(appdomain) __pfnReportHookManaged = (_CRT_REPORT_HOOK_M) _encoded_null();
 
-static int __cdecl _CrtReportHook_managed_thunk(int i, char *pCh, int *pInt)
-{
+static int __cdecl _CrtReportHook_managed_thunk(int i, char* pCh, int* pInt) {
     // Avoid thread-sync issues
     _CRT_REPORT_HOOK_M pfnReportHookManaged = (_CRT_REPORT_HOOK_M) _decode_pointer(__pfnReportHookManaged);
 
-    if (pfnReportHookManaged != NULL)
-    {
+    if (pfnReportHookManaged != NULL) {
         return (*pfnReportHookManaged)(i, pCh, pInt);
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }
 
-static void __clrcall _CrtReportHook_managed_cleanup(void)
-{
-    _CRT_REPORT_HOOK pfnReportHook=_CrtGetReportHook();
+static void __clrcall _CrtReportHook_managed_cleanup(void) {
+    _CRT_REPORT_HOOK pfnReportHook = _CrtGetReportHook();
     _CRT_REPORT_HOOK_M enull = (_CRT_REPORT_HOOK_M) _encoded_null();
-    if(pfnReportHook==_CrtReportHook_managed_thunk && __pfnReportHookManaged!=enull)
-    {
+
+    if (pfnReportHook == _CrtReportHook_managed_thunk && __pfnReportHookManaged != enull) {
         _CrtSetReportHook((_CRT_REPORT_HOOK)NULL);
     }
-    __pfnReportHookManaged=enull;
+
+    __pfnReportHookManaged = enull;
 }
 
 /***
@@ -60,11 +56,9 @@ static void __clrcall _CrtReportHook_managed_cleanup(void)
 *
 *******************************************************************************/
 _MRTIMP _CRT_REPORT_HOOK_M __cdecl _CrtSetReportHook(
-        _CRT_REPORT_HOOK_M pfnNewHook
-        )
-{
-    if(_atexit_m_appdomain(_CrtReportHook_managed_cleanup)!=0)
-    {
+    _CRT_REPORT_HOOK_M pfnNewHook
+) {
+    if (_atexit_m_appdomain(_CrtReportHook_managed_cleanup) != 0) {
         return NULL;
     }
 
@@ -75,11 +69,9 @@ _MRTIMP _CRT_REPORT_HOOK_M __cdecl _CrtSetReportHook(
 }
 
 _MRTIMP _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
-        int pfnNewHook
-        )
-{
+    int pfnNewHook
+) {
     _VALIDATE_RETURN(pfnNewHook == NULL, EINVAL, NULL);
-
     return _CrtSetReportHook((_CRT_REPORT_HOOK)NULL);
 }
 
@@ -106,36 +98,32 @@ volatile _CRT_ALLOC_HOOK_M __declspec(appdomain) __pfnAllocHookManaged = (_CRT_A
 static int __cdecl _CrtAllocHook_managed_thunk
 (
     int allocType,
-    void *userData,
+    void* userData,
     size_t size,
     int blockType,
     long requestNumber,
-    const unsigned char *filename,
+    const unsigned char* filename,
     int lineNumber
-)
-{
+) {
     // Avoid thread-sync issues
-    _CRT_ALLOC_HOOK_M pfnAllocHookManaged= (_CRT_ALLOC_HOOK_M) _decode_pointer(__pfnAllocHookManaged);
+    _CRT_ALLOC_HOOK_M pfnAllocHookManaged = (_CRT_ALLOC_HOOK_M) _decode_pointer(__pfnAllocHookManaged);
 
-    if (pfnAllocHookManaged != NULL)
-    {
+    if (pfnAllocHookManaged != NULL) {
         return (*pfnAllocHookManaged)(allocType, userData, size, blockType, requestNumber, filename, lineNumber);
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }
 
-static void __clrcall _CrtAllocHook_managed_cleanup(void)
-{
-    _CRT_ALLOC_HOOK pfnAllocHook=_CrtGetAllocHook();
+static void __clrcall _CrtAllocHook_managed_cleanup(void) {
+    _CRT_ALLOC_HOOK pfnAllocHook = _CrtGetAllocHook();
     _CRT_ALLOC_HOOK_M enull = (_CRT_ALLOC_HOOK_M) _encoded_null();
-    if(pfnAllocHook==_CrtAllocHook_managed_thunk && __pfnAllocHookManaged!=enull)
-    {
+
+    if (pfnAllocHook == _CrtAllocHook_managed_thunk && __pfnAllocHookManaged != enull) {
         _CrtSetAllocHook((_CRT_ALLOC_HOOK)NULL);
     }
-    __pfnAllocHookManaged=enull;
+
+    __pfnAllocHookManaged = enull;
 }
 
 /***
@@ -156,10 +144,8 @@ static void __clrcall _CrtAllocHook_managed_cleanup(void)
 _MRTIMP _CRT_ALLOC_HOOK_M __cdecl _CrtSetAllocHook
 (
     _CRT_ALLOC_HOOK_M pfnNewHook
-)
-{
-    if(_atexit_m_appdomain(_CrtAllocHook_managed_cleanup)!=0)
-    {
+) {
+    if (_atexit_m_appdomain(_CrtAllocHook_managed_cleanup) != 0) {
         return NULL;
     }
 
@@ -172,10 +158,8 @@ _MRTIMP _CRT_ALLOC_HOOK_M __cdecl _CrtSetAllocHook
 _MRTIMP _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook
 (
     int pfnNewHook
-)
-{
+) {
     _VALIDATE_RETURN(pfnNewHook == NULL, EINVAL, NULL);
-
     return _CrtSetAllocHook((_CRT_ALLOC_HOOK)NULL);
 }
 
@@ -196,28 +180,26 @@ volatile _CRT_DUMP_CLIENT_M __declspec(appdomain) __pfnDumpClientManaged = (_CRT
 
 static void __cdecl _CrtDumpClient_managed_thunk
 (
-    void *userPortion,
+    void* userPortion,
     size_t blockSize
-)
-{
+) {
     // Avoid thread-sync issues
     _CRT_DUMP_CLIENT_M pfnDumpClientManaged = (_CRT_DUMP_CLIENT_M) _decode_pointer(__pfnDumpClientManaged);
 
-    if (pfnDumpClientManaged != NULL)
-    {
+    if (pfnDumpClientManaged != NULL) {
         (*pfnDumpClientManaged)(userPortion, blockSize);
     }
 }
 
-static void __clrcall _CrtDumpClient_managed_cleanup(void)
-{
-    _CRT_DUMP_CLIENT pfnDumpClient=_CrtGetDumpClient();
+static void __clrcall _CrtDumpClient_managed_cleanup(void) {
+    _CRT_DUMP_CLIENT pfnDumpClient = _CrtGetDumpClient();
     _CRT_DUMP_CLIENT_M enull = (_CRT_DUMP_CLIENT_M) _encoded_null();
-    if(pfnDumpClient==_CrtDumpClient_managed_thunk && __pfnDumpClientManaged!=enull)
-    {
+
+    if (pfnDumpClient == _CrtDumpClient_managed_thunk && __pfnDumpClientManaged != enull) {
         _CrtSetDumpClient((_CRT_DUMP_CLIENT)NULL);
     }
-    __pfnDumpClientManaged=enull;
+
+    __pfnDumpClientManaged = enull;
 }
 
 /***
@@ -238,10 +220,8 @@ static void __clrcall _CrtDumpClient_managed_cleanup(void)
 _MRTIMP _CRT_DUMP_CLIENT_M __cdecl _CrtSetDumpClient
 (
     _CRT_DUMP_CLIENT_M pfnNewHook
-)
-{
-    if(_atexit_m_appdomain(_CrtDumpClient_managed_cleanup)!=0)
-    {
+) {
+    if (_atexit_m_appdomain(_CrtDumpClient_managed_cleanup) != 0) {
         return NULL;
     }
 
@@ -254,10 +234,8 @@ _MRTIMP _CRT_DUMP_CLIENT_M __cdecl _CrtSetDumpClient
 _MRTIMP _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient
 (
     int pfnNewHook
-)
-{
+) {
     _VALIDATE_RETURN(pfnNewHook == NULL, EINVAL, NULL);
-
     return _CrtSetDumpClient((_CRT_DUMP_CLIENT)NULL);
 }
 
@@ -287,8 +265,7 @@ static int __cdecl _CrtSetReportHook2_thunk
 (
     int mode,
     _CRT_REPORT_HOOK pfnNewHook
-)
-{
+) {
     return _CrtSetReportHook2(mode, pfnNewHook);
 }
 
@@ -297,41 +274,34 @@ static int __cdecl _CrtSetReportHook2_thunk
 (
     int mode,
     _CRT_REPORT_HOOKW pfnNewHook
-)
-{
+) {
     return _CrtSetReportHookW2(mode, pfnNewHook);
 }
 
 template<typename HookType, typename CharType>
-class CCrtReportHook2DB
-{
+class CCrtReportHook2DB {
 public:
-    struct CReportHookList
-    {
-        CReportHookList *m_pNext;
-        CReportHookList *m_pPrev;
+    struct CReportHookList {
+        CReportHookList* m_pNext;
+        CReportHookList* m_pPrev;
         HookType m_Hook;
         int m_Refcount;
 
         CReportHookList()
-            : m_pNext(NULL), m_pPrev(NULL), m_Hook(NULL), m_Refcount(0)
-        {
+            : m_pNext(NULL), m_pPrev(NULL), m_Hook(NULL), m_Refcount(0) {
         }
 
-        static CReportHookList* create()
-        {
+        static CReportHookList* create() {
             return reinterpret_cast<CReportHookList*>(calloc(1, sizeof(CReportHookList)));
         }
 
-        static void destroy(CReportHookList* pReportHookList)
-        {
+        static void destroy(CReportHookList* pReportHookList) {
             free(pReportHookList);
         }
     };
 
-    CReportHookList *findHook(HookType pfnHook)
-    {
-        CReportHookList *retval=NULL;
+    CReportHookList* findHook(HookType pfnHook) {
+        CReportHookList* retval = NULL;
 
         for (retval = m_HeadNode.m_pNext;
                 retval != NULL && retval->m_Hook != pfnHook;
@@ -340,126 +310,114 @@ public:
         return retval;
     }
 
-    int updateHook(CReportHookList *pCReportHookList)
-    {
+    int updateHook(CReportHookList* pCReportHookList) {
         int retval = 0;
-        if (pCReportHookList->m_pPrev != NULL)
-        {
+
+        if (pCReportHookList->m_pPrev != NULL) {
             disconnect(pCReportHookList);
             setHead(pCReportHookList);
             retval = pCReportHookList->m_Refcount++;
-        }
-        else
-        {
+        } else {
             setHead(pCReportHookList);
             retval = pCReportHookList->m_Refcount = 1;
         }
+
         return retval;
     }
 
-    int deleteHook(CReportHookList *pCReportHookList)
-    {
+    int deleteHook(CReportHookList* pCReportHookList) {
         int retval = 0;
-        if ((retval = --pCReportHookList->m_Refcount) == 0)
-        {
+
+        if ((retval = --pCReportHookList->m_Refcount) == 0) {
             disconnect(pCReportHookList);
             CReportHookList::destroy(pCReportHookList);
         }
+
         return retval;
     }
 
     /* lock must be already held */
-    int callReportHooks(int i, CharType *pCh, int *pInt)
-    {
+    int callReportHooks(int i, CharType* pCh, int* pInt) {
         int retval = 0;
-        for (CReportHookList *ptmp = m_HeadNode.m_pNext;
+
+        for (CReportHookList* ptmp = m_HeadNode.m_pNext;
                 ptmp != NULL;
-                ptmp = ptmp->m_pNext)
-        {
-            if (ptmp->m_Hook)
-            {
-                if (retval = (*(ptmp->m_Hook))(i, pCh, pInt))
+                ptmp = ptmp->m_pNext) {
+            if (ptmp->m_Hook) {
+                if (retval = (*(ptmp->m_Hook))(i, pCh, pInt)) {
                     break;
+                }
             }
         }
+
         return retval;
     }
 
     /* lock must be already held */
-    void removeReportHooks()
-    {
+    void removeReportHooks() {
         CReportHookList* ptmp = m_HeadNode.m_pNext;
-        while (ptmp != NULL)
-        {
+
+        while (ptmp != NULL) {
             CReportHookList* current = ptmp;
             ptmp = ptmp->m_pNext;
             CReportHookList::destroy(current);
         }
     }
 
-    CCrtReportHook2DB()
-    {
+    CCrtReportHook2DB() {
     }
 
-        static __declspec(appdomain) bool callback_registered;
-        static __declspec(appdomain) class CCrtReportHook2DB<HookType, CharType> __ReportHookDB;
+    static __declspec(appdomain) bool callback_registered;
+    static __declspec(appdomain) class CCrtReportHook2DB<HookType, CharType> __ReportHookDB;
 
 private:
-    void disconnect(CReportHookList* pCReportHookList)
-    {
+    void disconnect(CReportHookList* pCReportHookList) {
         // Remove an item from the list
-
         // Assume item is in list
         pCReportHookList->m_pPrev->m_pNext = pCReportHookList->m_pNext;
 
         // Check whether item is at end of list
-        if (pCReportHookList->m_pNext)
-        {
+        if (pCReportHookList->m_pNext) {
             pCReportHookList->m_pNext->m_pPrev = pCReportHookList->m_pPrev;
         }
     }
 
-    void setHead(CReportHookList* pCReportHookList)
-    {
+    void setHead(CReportHookList* pCReportHookList) {
         pCReportHookList->m_pNext = m_HeadNode.m_pNext;
-        if (pCReportHookList->m_pNext != NULL)
-        {
+
+        if (pCReportHookList->m_pNext != NULL) {
             pCReportHookList->m_pNext->m_pPrev = pCReportHookList;
         }
+
         m_HeadNode.m_pNext = pCReportHookList;
         pCReportHookList->m_pPrev = &m_HeadNode;
     }
 
     // Data members
 private:
-        CReportHookList m_HeadNode;
+    CReportHookList m_HeadNode;
 };
 
 template<typename HookType, typename CharType>
-__declspec(appdomain) bool CCrtReportHook2DB<HookType, CharType>::callback_registered=false;
+__declspec(appdomain) bool CCrtReportHook2DB<HookType, CharType>::callback_registered = false;
 
 template<typename HookType, typename CharType>
 __declspec(appdomain) CCrtReportHook2DB<HookType, CharType> CCrtReportHook2DB<HookType, CharType>::__ReportHookDB;
 
 template<typename CharType, typename DBType>
-static int __cdecl _CrtReportHook2_managed_thunk(int i, CharType *pCh, int *pInt)
-{
+static int __cdecl _CrtReportHook2_managed_thunk(int i, CharType* pCh, int* pInt) {
     /* lock was already taken by caller */
-        return DBType::__ReportHookDB.callReportHooks(i, pCh, pInt);
+    return DBType::__ReportHookDB.callReportHooks(i, pCh, pInt);
 }
 
 template<typename NativeHookType, typename CharType, typename DBType>
-static void __clrcall _CrtReportHook2_managed_cleanup(void)
-{
-    _CrtSetReportHook2_thunk(_CRT_RPTHOOK_REMOVE, static_cast<NativeHookType>(_CrtReportHook2_managed_thunk<CharType, DBType>) );
-
+static void __clrcall _CrtReportHook2_managed_cleanup(void) {
+    _CrtSetReportHook2_thunk(_CRT_RPTHOOK_REMOVE, static_cast<NativeHookType>(_CrtReportHook2_managed_thunk<CharType, DBType>));
     _mlock(_DEBUG_LOCK);
-    __try
-    {
+
+    __try {
         DBType::__ReportHookDB.removeReportHooks();
-    }
-    __finally
-    {
+    } __finally {
         _munlock(_DEBUG_LOCK);
     }
 }
@@ -492,79 +450,57 @@ int __cdecl _CrtSetReportHook2_impl
     int mode,
     HookType pfnNewHook,
     int (* pfnHook)(int, NativeHookType)
-)
-{
-    DBType::CReportHookList *pHook=NULL;
-    int ret=0;
-
+) {
+    DBType::CReportHookList* pHook = NULL;
+    int ret = 0;
     /* validation section */
     _VALIDATE_RETURN(mode == _CRT_RPTHOOK_INSTALL || mode == _CRT_RPTHOOK_REMOVE, EINVAL, -1);
     _VALIDATE_RETURN(pfnNewHook != NULL, EINVAL, -1);
-
     _mlock(_DEBUG_LOCK);
-    __try
-    {
 
+    __try {
         /* Search for new hook function to see if it's already installed */
         pHook = DBType::__ReportHookDB.findHook(pfnNewHook);
 
-        if (mode == _CRT_RPTHOOK_REMOVE)
-        {
+        if (mode == _CRT_RPTHOOK_REMOVE) {
             /* Remove request - free list node if refcount goes to zero */
-            if (pHook != NULL)
-            {
+            if (pHook != NULL) {
                 DBType::__ReportHookDB.deleteHook(pHook);
-            }
-            else
-            {
+            } else {
                 _RPTF0(_CRT_ASSERT, "The hook function is not in the list!");
                 ret = -1;
                 errno = EINVAL;
             }
-        }
-        else
-        {
+        } else {
             /* Insert request */
-            if (pHook != NULL)
-            {
+            if (pHook != NULL) {
                 /* Hook function already registered, move to head of list */
                 ret = DBType::__ReportHookDB.updateHook(pHook);
-            }
-            else
-            {
+            } else {
                 /* Hook function not already registered, insert new node */
                 pHook = DBType::CReportHookList::create();
-                if (pHook == NULL)
-                {
+
+                if (pHook == NULL) {
                     /* malloc fails: we do not assert here */
                     ret = -1;
                     errno = ENOMEM;
-                }
-                else
-                {
+                } else {
                     pHook->m_Hook = pfnNewHook;
                     ret = DBType::__ReportHookDB.updateHook(pHook);
-                                        if (DBType::callback_registered == false)
-                    {
-                        if(_atexit_m_appdomain(_CrtReportHook2_managed_cleanup<NativeHookType, CharType, DBType>)!=0)
-                        {
-                            ret=-1;
-                            errno=ENOMEM;
-                        }
-                        else
-                        {
-                            pfnHook(_CRT_RPTHOOK_INSTALL, static_cast<NativeHookType>(_CrtReportHook2_managed_thunk<CharType, DBType>));
 
-                            DBType::callback_registered=true;
+                    if (DBType::callback_registered == false) {
+                        if (_atexit_m_appdomain(_CrtReportHook2_managed_cleanup<NativeHookType, CharType, DBType>) != 0) {
+                            ret = -1;
+                            errno = ENOMEM;
+                        } else {
+                            pfnHook(_CRT_RPTHOOK_INSTALL, static_cast<NativeHookType>(_CrtReportHook2_managed_thunk<CharType, DBType>));
+                            DBType::callback_registered = true;
                         }
                     }
                 }
             }
         }
-
-    }
-    __finally
-    {
+    } __finally {
         _munlock(_DEBUG_LOCK);
     }
 
@@ -575,17 +511,15 @@ _MRTIMP int __cdecl _CrtSetReportHook2
 (
     int mode,
     _CRT_REPORT_HOOK_M pfnNewHook
-)
-{
-    return _CrtSetReportHook2_impl<_CRT_REPORT_HOOK, _CRT_REPORT_HOOK_M, char, CCrtReportHook2DB<_CRT_REPORT_HOOK_M, char> >(mode, pfnNewHook, _CrtSetReportHook2_thunk );
+) {
+    return _CrtSetReportHook2_impl<_CRT_REPORT_HOOK, _CRT_REPORT_HOOK_M, char, CCrtReportHook2DB<_CRT_REPORT_HOOK_M, char> >(mode, pfnNewHook, _CrtSetReportHook2_thunk);
 }
 
 _MRTIMP int __cdecl _CrtSetReportHookW2
 (
     int mode,
     _CRT_REPORT_HOOKW_M pfnNewHook
-)
-{
+) {
     return _CrtSetReportHook2_impl<_CRT_REPORT_HOOKW, _CRT_REPORT_HOOKW_M, wchar_t, CCrtReportHook2DB<_CRT_REPORT_HOOKW_M, wchar_t> >(mode, pfnNewHook, _CrtSetReportHook2_thunk);
 }
 #endif  /* _DEBUG */

@@ -31,15 +31,14 @@
 *
 *******************************************************************************/
 
-int _CrtSetCheckCount(int fCheckCount)
-{
+int _CrtSetCheckCount(int fCheckCount) {
     return 0;
 }
 
 #ifdef _M_IX86
-int (__cdecl * _imp___CrtSetCheckCount)(int) = &_CrtSetCheckCount;
+int (__cdecl* _imp___CrtSetCheckCount)(int) = &_CrtSetCheckCount;
 #else  /* _M_IX86 */
-int (__cdecl * __imp__CrtSetCheckCount)(int) = &_CrtSetCheckCount;
+int (__cdecl* __imp__CrtSetCheckCount)(int) = &_CrtSetCheckCount;
 #endif  /* _M_IX86 */
 
 #endif  /* _DEBUG */

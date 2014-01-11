@@ -38,22 +38,19 @@
 *******************************************************************************/
 
 extern "C" int __cdecl _ismbcl0_l(
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
+    unsigned int c,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
-    return( (_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP) &&
+    return ((_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP) &&
             (_ismbblead_l(c >> 8, _loc_update.GetLocaleT())) &&
             (_ismbbtrail_l(c & 0x0ff, _loc_update.GetLocaleT())) &&
-            (c < 0x889f) );
+            (c < 0x889f));
 }
 
 extern "C" int (__cdecl _ismbcl0)(
-        unsigned int c
-        )
-{
+    unsigned int c
+) {
     return _ismbcl0_l(c, NULL);
 }
 
@@ -75,22 +72,19 @@ extern "C" int (__cdecl _ismbcl0)(
 *******************************************************************************/
 
 extern "C" int __cdecl _ismbcl1_l(
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
+    unsigned int c,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
-    return( (_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP) &&
+    return ((_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP) &&
             (_ismbblead_l(c >> 8, _loc_update.GetLocaleT())) &&
             (_ismbbtrail_l(c & 0x0ff, _loc_update.GetLocaleT())) &&
-            (c >= 0x889f) && (c <= 0x9872) );
+            (c >= 0x889f) && (c <= 0x9872));
 }
 
 extern "C" int (__cdecl _ismbcl1)(
     unsigned int c
-    )
-{
+) {
     return _ismbcl1_l(c, NULL);
 }
 
@@ -112,21 +106,18 @@ extern "C" int (__cdecl _ismbcl1)(
 *******************************************************************************/
 
 extern "C" int __cdecl _ismbcl2_l(
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
+    unsigned int c,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
-    return( (_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP) &&
+    return ((_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP) &&
             (_ismbblead_l(c >> 8, _loc_update.GetLocaleT())) &&
             (_ismbbtrail_l(c & 0x0ff, _loc_update.GetLocaleT())) &&
-            (c >= 0x989f) && (c <= 0xEAA4) );
+            (c >= 0x989f) && (c <= 0xEAA4));
 }
 extern "C" int __cdecl _ismbcl2(
-        unsigned int c
-        )
-{
+    unsigned int c
+) {
     return _ismbcl2_l(c, NULL);
 }
 

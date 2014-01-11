@@ -31,24 +31,25 @@
 *
 *******************************************************************************/
 
-extern "C" wint_t __cdecl _towupper_l (
-        wint_t c,
-        _locale_t plocinfo
-        )
-{
+extern "C" wint_t __cdecl _towupper_l(
+    wint_t c,
+    _locale_t plocinfo
+) {
     wint_t widechar;
 
-    if (c == WEOF)
+    if (c == WEOF) {
         return c;
+    }
 
     _LocaleUpdate _loc_update(plocinfo);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE )
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
         return __ascii_towupper(c);
+    }
 
     /* if checking case of c does not require API call, do it */
-    if ( c < 256 ) {
-        if ( !_iswlower_l(c, _loc_update.GetLocaleT()) ) {
+    if (c < 256) {
+        if (!_iswlower_l(c, _loc_update.GetLocaleT())) {
             return c;
         } else {
             return _loc_update.GetLocaleT()->locinfo->pcumap[c];
@@ -56,7 +57,7 @@ extern "C" wint_t __cdecl _towupper_l (
     }
 
     /* convert wide char to uppercase */
-    if ( 0 == __crtLCMapStringW(
+    if (0 == __crtLCMapStringW(
                 _loc_update.GetLocaleT(),
                 _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE],
                 LCMAP_UPPERCASE,
@@ -64,13 +65,11 @@ extern "C" wint_t __cdecl _towupper_l (
                 1,
                 (LPWSTR)&widechar,
                 1,
-                _loc_update.GetLocaleT()->locinfo->lc_codepage ) )
-    {
+                _loc_update.GetLocaleT()->locinfo->lc_codepage)) {
         return c;
     }
 
     return widechar;
-
 }
 
 /***
@@ -90,10 +89,8 @@ extern "C" wint_t __cdecl _towupper_l (
 *
 *******************************************************************************/
 
-extern "C" wint_t __cdecl towupper (
-        wint_t c
-        )
-{
-
+extern "C" wint_t __cdecl towupper(
+    wint_t c
+) {
     return _towupper_l(c, NULL);
 }

@@ -30,14 +30,15 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcsdup.c,v 1.1 2005/08/13 05:54:33 tjr E
 #include <stdlib.h>
 #include <wchar.h>
 
-wchar_t *
-wcsdup(const wchar_t *s)
-{
-	wchar_t *copy;
-	size_t len;
+wchar_t*
+wcsdup(const wchar_t* s) {
+    wchar_t* copy;
+    size_t len;
+    len = wcslen(s) + 1;
 
-	len = wcslen(s) + 1;
-	if ((copy = malloc(len * sizeof(wchar_t))) == NULL)
-		return (NULL);
-	return (wmemcpy(copy, s, len));
+    if ((copy = malloc(len * sizeof(wchar_t))) == NULL) {
+        return (NULL);
+    }
+
+    return (wmemcpy(copy, s, len));
 }

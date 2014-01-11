@@ -25,6 +25,6 @@
 
 #include <internal.h>
 
-_REDIRECT_TO_L_VERSION_4(errno_t, _mbccpy_s, unsigned char *, size_t , int *, const unsigned char *)
+_REDIRECT_TO_L_VERSION_4(errno_t, _mbccpy_s, unsigned char*, size_t , int*, const unsigned char*)
 
 #endif  /* _SYSCRT */

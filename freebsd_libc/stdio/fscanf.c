@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,15 +44,13 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fscanf.c,v 1.13 2007/01/09 00:28:06 imp E
 #include "local.h"
 
 int
-fscanf(FILE * __restrict fp, char const * __restrict fmt, ...)
-{
-	int ret;
-	va_list ap;
-
-	va_start(ap, fmt);
-	FLOCKFILE(fp);
-	ret = __svfscanf(fp, fmt, ap);
-	va_end(ap);
-	FUNLOCKFILE(fp);
-	return (ret);
+fscanf(FILE* __restrict fp, char const* __restrict fmt, ...) {
+    int ret;
+    va_list ap;
+    va_start(ap, fmt);
+    FLOCKFILE(fp);
+    ret = __svfscanf(fp, fmt, ap);
+    va_end(ap);
+    FUNLOCKFILE(fp);
+    return (ret);
 }

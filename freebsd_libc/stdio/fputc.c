@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,14 +44,14 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fputc.c,v 1.14 2007/01/09 00:28:06 imp Ex
 
 int
 fputc(c, fp)
-	int c;
-	FILE *fp;
+int c;
+FILE* fp;
 {
-	int retval;
-	FLOCKFILE(fp);
-	/* Orientation set by __sputc() when buffer is full. */
-	/* ORIENT(fp, -1); */
-	retval = __sputc(c, fp);
-	FUNLOCKFILE(fp);
-	return (retval);
+    int retval;
+    FLOCKFILE(fp);
+    /* Orientation set by __sputc() when buffer is full. */
+    /* ORIENT(fp, -1); */
+    retval = __sputc(c, fp);
+    FUNLOCKFILE(fp);
+    return (retval);
 }

@@ -42,13 +42,12 @@
 *
 *******************************************************************************/
 
-void __cdecl _tmakepath (
-        register _TSCHAR *path,
-        const _TSCHAR *drive,
-        const _TSCHAR *dir,
-        const _TSCHAR *fname,
-        const _TSCHAR *ext
-        )
-{
-        _tmakepath_s(path, (size_t)-1, drive, dir, fname, ext);
+void __cdecl _tmakepath(
+    register _TSCHAR* path,
+    const _TSCHAR* drive,
+    const _TSCHAR* dir,
+    const _TSCHAR* fname,
+    const _TSCHAR* ext
+) {
+    _tmakepath_s(path, (size_t) - 1, drive, dir, fname, ext);
 }

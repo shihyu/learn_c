@@ -47,18 +47,15 @@ unsigned int __abort_behavior = _INIT_ABORT_BEHAVIOR;
 *
 *******************************************************************************/
 
-void __cdecl abort (
-        void
-        )
-{
+void __cdecl abort(
+    void
+) {
     _PHNDLR sigabrt_act = SIG_DFL;
 
-    if (__abort_behavior & _WRITE_ABORT_MSG)
-    {
+    if (__abort_behavior & _WRITE_ABORT_MSG) {
         /* write the abort message */
         _NMSG_WRITE(_RT_ABORT);
     }
-
 
     /* Check if the user installed a handler for SIGABRT.
      * We need to read the user handler atomically in the case
@@ -66,8 +63,8 @@ void __cdecl abort (
      * handler.
      */
     sigabrt_act = __get_sigabrt();
-    if (sigabrt_act != SIG_DFL)
-    {
+
+    if (sigabrt_act != SIG_DFL) {
         raise(SIGABRT);
     }
 
@@ -75,13 +72,11 @@ void __cdecl abort (
      * handler returns, then exit from the program anyway
      */
 
-    if (__abort_behavior & _CALL_REPORTFAULT)
-    {
+    if (__abort_behavior & _CALL_REPORTFAULT) {
         /* Fake an exception to call reportfault. */
         EXCEPTION_RECORD ExceptionRecord;
         CONTEXT ContextRecord;
         EXCEPTION_POINTERS ExceptionPointers;
-
 #ifdef _X86_
         __asm {
             mov dword ptr [ContextRecord.Eax], eax
@@ -99,41 +94,32 @@ void __cdecl abort (
             pushfd
             pop [ContextRecord.EFlags]
         }
-
         ContextRecord.ContextFlags = CONTEXT_CONTROL;
 #pragma warning(push)
 #pragma warning(disable:4311)
         ContextRecord.Eip = (ULONG)_ReturnAddress();
         ContextRecord.Esp = (ULONG)_AddressOfReturnAddress();
 #pragma warning(pop)
-        ContextRecord.Ebp = *((ULONG *)_AddressOfReturnAddress()-1);
+        ContextRecord.Ebp = *((ULONG*)_AddressOfReturnAddress() - 1);
 #elif defined (_IA64_) || defined (_AMD64_)
         /* Need to fill up the Context in IA64 and AMD64. See VSW#286097 */
         RtlCaptureContext(&ContextRecord);
 #else  /* defined (_IA64_) || defined (_AMD64_) */
         ZeroMemory(&ContextRecord, sizeof(ContextRecord));
 #endif  /* defined (_IA64_) || defined (_AMD64_) */
-
         ZeroMemory(&ExceptionRecord, sizeof(ExceptionRecord));
-
         ExceptionRecord.ExceptionCode = STATUS_FATAL_APP_EXIT;
         ExceptionRecord.ExceptionAddress = _ReturnAddress();
-
         ExceptionPointers.ExceptionRecord = &ExceptionRecord;
         ExceptionPointers.ContextRecord = &ContextRecord;
-
         /* Make sure any filter already in place is deleted. */
         SetUnhandledExceptionFilter(NULL);
-
         UnhandledExceptionFilter(&ExceptionPointers);
     }
-
 
     /* If we don't want to call ReportFault, then we call _exit(3), which is the
      * same as invoking the default handler for SIGABRT
      */
-
-
     _exit(3);
 }
 
@@ -154,8 +140,7 @@ void __cdecl abort (
 *
 *******************************************************************************/
 
-unsigned int __cdecl _set_abort_behavior(unsigned int flags, unsigned int mask)
-{
+unsigned int __cdecl _set_abort_behavior(unsigned int flags, unsigned int mask) {
     unsigned int oldflags = __abort_behavior;
     __abort_behavior = oldflags & (~mask) | flags & mask;
     return oldflags;

@@ -35,8 +35,8 @@ extern "C" {
 #ifndef _INTERNAL_IFSTRIP_
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP __checkReturn unsigned char * __cdecl __p__mbctype(void);
-_CRTIMP __checkReturn unsigned char * __cdecl __p__mbcasemap(void);
+_CRTIMP __checkReturn unsigned char* __cdecl __p__mbctype(void);
+_CRTIMP __checkReturn unsigned char* __cdecl __p__mbcasemap(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 #if !defined (_M_CEE_PURE)
@@ -44,8 +44,8 @@ _CRTIMP __checkReturn unsigned char * __cdecl __p__mbcasemap(void);
 _CRTIMP extern unsigned char _mbctype[];
 _CRTIMP extern unsigned char _mbcasemap[];
 #else  /* !defined (_M_CEE_PURE) */
-_CRTIMP __checkReturn unsigned char * __cdecl __p__mbctype(void);
-_CRTIMP __checkReturn unsigned char * __cdecl __p__mbcasemap(void);
+_CRTIMP __checkReturn unsigned char* __cdecl __p__mbctype(void);
+_CRTIMP __checkReturn unsigned char* __cdecl __p__mbcasemap(void);
 #define _mbctype   (__p__mbctype())
 #define _mbcasemap (__p__mbcasemap())
 #endif  /* !defined (_M_CEE_PURE) */
@@ -96,34 +96,34 @@ _CRTIMP int __cdecl _getmbcp(void);
 
 
 /* byte routines */
-_CRTIMP __checkReturn int __cdecl _ismbbkalnum( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbkalnum(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbkalnum_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbkana( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbkana(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbkana_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbkpunct( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbkpunct(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbkpunct_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbkprint( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbkprint(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbkprint_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbalpha( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbalpha(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbalpha_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbpunct( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbpunct(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbpunct_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbalnum( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbalnum(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbalnum_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbprint( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbprint(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbprint_l(__in unsigned int _C, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbbgraph( __in unsigned int _C );
+_CRTIMP __checkReturn int __cdecl _ismbbgraph(__in unsigned int _C);
 _CRTIMP __checkReturn int __cdecl _ismbbgraph_l(__in unsigned int _C, __in_opt _locale_t _Locale);
 
 #ifndef _MBLEADTRAIL_DEFINED
-_CRTIMP __checkReturn int __cdecl _ismbblead( __in unsigned int _C);
-_CRTIMP __checkReturn int __cdecl _ismbblead_l(__in unsigned int _C, __in_opt _locale_t _Locale );
-_CRTIMP __checkReturn int __cdecl _ismbbtrail( __in unsigned int _C);
-_CRTIMP __checkReturn int __cdecl _ismbbtrail_l(__in unsigned int _C, __in_opt _locale_t _Locale );
-_CRTIMP __checkReturn int __cdecl _ismbslead(__in_bcount_z(_Pos - _Str+1) const unsigned char * _Str, __in_z const unsigned char * _Pos);
-_CRTIMP __checkReturn int __cdecl _ismbslead_l(__in_bcount_z(_Pos - _Str+1) const unsigned char * _Str, __in_z const unsigned char * _Pos, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _ismbstrail(__in_bcount_z(_Pos - _Str+1) const unsigned char * _Str, __in_z const unsigned char * _Pos);
-_CRTIMP __checkReturn int __cdecl _ismbstrail_l(__in_bcount_z(_Pos - _Str+1) const unsigned char * _Str, __in_z const unsigned char * _Pos, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _ismbblead(__in unsigned int _C);
+_CRTIMP __checkReturn int __cdecl _ismbblead_l(__in unsigned int _C, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _ismbbtrail(__in unsigned int _C);
+_CRTIMP __checkReturn int __cdecl _ismbbtrail_l(__in unsigned int _C, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _ismbslead(__in_bcount_z(_Pos - _Str + 1) const unsigned char* _Str, __in_z const unsigned char* _Pos);
+_CRTIMP __checkReturn int __cdecl _ismbslead_l(__in_bcount_z(_Pos - _Str + 1) const unsigned char* _Str, __in_z const unsigned char* _Pos, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _ismbstrail(__in_bcount_z(_Pos - _Str + 1) const unsigned char* _Str, __in_z const unsigned char* _Pos);
+_CRTIMP __checkReturn int __cdecl _ismbstrail_l(__in_bcount_z(_Pos - _Str + 1) const unsigned char* _Str, __in_z const unsigned char* _Pos, __in_opt _locale_t _Locale);
 
 #define _MBLEADTRAIL_DEFINED
 #endif  /* _MBLEADTRAIL_DEFINED */

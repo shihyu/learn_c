@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1987, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,34 +40,40 @@ typedef unsigned char u_char;
 
 int
 strcasecmp(s1, s2)
-	const char *s1, *s2;
+const char* s1, *s2;
 {
-	const u_char
-			*us1 = (const u_char *)s1,
-			*us2 = (const u_char *)s2;
+    const u_char
+    *us1 = (const u_char*)s1,
+     *us2 = (const u_char*)s2;
 
-	while (tolower(*us1) == tolower(*us2++))
-		if (*us1++ == '\0')
-			return (0);
-	return (tolower(*us1) - tolower(*--us2));
+    while (tolower(*us1) == tolower(*us2++))
+        if (*us1++ == '\0') {
+            return (0);
+        }
+
+    return (tolower(*us1) - tolower(*--us2));
 }
 
 int
 strncasecmp(s1, s2, n)
-	const char *s1, *s2;
-	size_t n;
+const char* s1, *s2;
+size_t n;
 {
-	if (n != 0) {
-		const u_char
-				*us1 = (const u_char *)s1,
-				*us2 = (const u_char *)s2;
+    if (n != 0) {
+        const u_char
+        *us1 = (const u_char*)s1,
+         *us2 = (const u_char*)s2;
 
-		do {
-			if (tolower(*us1) != tolower(*us2++))
-				return (tolower(*us1) - tolower(*--us2));
-			if (*us1++ == '\0')
-				break;
-		} while (--n != 0);
-	}
-	return (0);
+        do {
+            if (tolower(*us1) != tolower(*us2++)) {
+                return (tolower(*us1) - tolower(*--us2));
+            }
+
+            if (*us1++ == '\0') {
+                break;
+            }
+        } while (--n != 0);
+    }
+
+    return (0);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Sean Eric Fagan.
@@ -47,16 +47,15 @@ __FBSDID("$FreeBSD: src/lib/libc/amd64/gen/ldexp.c,v 1.14 2007/01/09 00:38:24 im
  * We do the conversion in C to let gcc optimize it away, if possible.
  */
 double
-ldexp (double value, int exp)
-{
-	double temp, texp, temp2;
-	texp = exp;
+ldexp(double value, int exp) {
+    double temp, texp, temp2;
+    texp = exp;
 #ifdef __GNUC__
-	__asm ("fscale "
-		: "=u" (temp2), "=t" (temp)
-		: "0" (texp), "1" (value));
+    __asm("fscale "
+          : "=u"(temp2), "=t"(temp)
+          : "0"(texp), "1"(value));
 #else
 #error unknown asm
 #endif
-	return (temp);
+    return (temp);
 }

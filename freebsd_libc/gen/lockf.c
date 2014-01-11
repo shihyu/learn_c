@@ -34,7 +34,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	$NetBSD: lockf.c,v 1.1 1997/12/20 20:23:18 kleink Exp $	*/
+/*  $NetBSD: lockf.c,v 1.1 1997/12/20 20:23:18 kleink Exp $ */
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/gen/lockf.c,v 1.8 2002/02/01 00:57:29 obrien Exp $");
 
@@ -46,44 +46,52 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/lockf.c,v 1.8 2002/02/01 00:57:29 obrien Ex
 
 int
 lockf(filedes, function, size)
-	int filedes;
-	int function;
-	off_t size;
+int filedes;
+int function;
+off_t size;
 {
-	struct flock fl;
-	int cmd;
+    struct flock fl;
+    int cmd;
+    fl.l_start = 0;
+    fl.l_len = size;
+    fl.l_whence = SEEK_CUR;
 
-	fl.l_start = 0;
-	fl.l_len = size;
-	fl.l_whence = SEEK_CUR;
+    switch (function) {
+    case F_ULOCK:
+        cmd = F_SETLK;
+        fl.l_type = F_UNLCK;
+        break;
 
-	switch (function) {
-	case F_ULOCK:
-		cmd = F_SETLK;
-		fl.l_type = F_UNLCK;
-		break;
-	case F_LOCK:
-		cmd = F_SETLKW;
-		fl.l_type = F_WRLCK;
-		break;
-	case F_TLOCK:
-		cmd = F_SETLK;
-		fl.l_type = F_WRLCK;
-		break;
-	case F_TEST:
-		fl.l_type = F_WRLCK;
-		if (_fcntl(filedes, F_GETLK, &fl) == -1)
-			return (-1);
-		if (fl.l_type == F_UNLCK || fl.l_pid == getpid())
-			return (0);
-		errno = EAGAIN;
-		return (-1);
-		/* NOTREACHED */
-	default:
-		errno = EINVAL;
-		return (-1);
-		/* NOTREACHED */
-	}
+    case F_LOCK:
+        cmd = F_SETLKW;
+        fl.l_type = F_WRLCK;
+        break;
 
-	return (_fcntl(filedes, cmd, &fl));
+    case F_TLOCK:
+        cmd = F_SETLK;
+        fl.l_type = F_WRLCK;
+        break;
+
+    case F_TEST:
+        fl.l_type = F_WRLCK;
+
+        if (_fcntl(filedes, F_GETLK, &fl) == -1) {
+            return (-1);
+        }
+
+        if (fl.l_type == F_UNLCK || fl.l_pid == getpid()) {
+            return (0);
+        }
+
+        errno = EAGAIN;
+        return (-1);
+
+    /* NOTREACHED */
+    default:
+        errno = EINVAL;
+        return (-1);
+        /* NOTREACHED */
+    }
+
+    return (_fcntl(filedes, cmd, &fl));
 }

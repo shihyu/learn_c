@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -49,15 +49,14 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/putchar.c,v 1.14 2007/01/09 00:28:07 imp 
  */
 int
 putchar(c)
-	int c;
+int c;
 {
-	int retval;
-	FILE *so = stdout;
-
-	FLOCKFILE(so);
-	/* Orientation set by __sputc() when buffer is full. */
-	/* ORIENT(so, -1); */
-	retval = __sputc(c, so);
-	FUNLOCKFILE(so);
-	return (retval);
+    int retval;
+    FILE* so = stdout;
+    FLOCKFILE(so);
+    /* Orientation set by __sputc() when buffer is full. */
+    /* ORIENT(so, -1); */
+    retval = __sputc(c, so);
+    FUNLOCKFILE(so);
+    return (retval);
 }

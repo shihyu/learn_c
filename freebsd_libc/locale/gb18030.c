@@ -41,181 +41,219 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/gb18030.c,v 1.7.10.1 2007/10/24 14:29:31
 
 extern int __mb_sb_limit;
 
-static size_t	_GB18030_mbrtowc(wchar_t * __restrict, const char * __restrict,
-		    size_t, mbstate_t * __restrict);
-static int	_GB18030_mbsinit(const mbstate_t *);
-static size_t	_GB18030_wcrtomb(char * __restrict, wchar_t,
-		    mbstate_t * __restrict);
+static size_t   _GB18030_mbrtowc(wchar_t* __restrict, const char* __restrict,
+                                 size_t, mbstate_t* __restrict);
+static int  _GB18030_mbsinit(const mbstate_t*);
+static size_t   _GB18030_wcrtomb(char* __restrict, wchar_t,
+                                 mbstate_t* __restrict);
 
 typedef struct {
-	int	count;
-	u_char	bytes[4];
+    int count;
+    u_char  bytes[4];
 } _GB18030State;
 
 int
-_GB18030_init(_RuneLocale *rl)
-{
-
-	__mbrtowc = _GB18030_mbrtowc;
-	__wcrtomb = _GB18030_wcrtomb;
-	__mbsinit = _GB18030_mbsinit;
-	_CurrentRuneLocale = rl;
-	__mb_cur_max = 4;
-	__mb_sb_limit = 128;
-
-	return (0);
+_GB18030_init(_RuneLocale* rl) {
+    __mbrtowc = _GB18030_mbrtowc;
+    __wcrtomb = _GB18030_wcrtomb;
+    __mbsinit = _GB18030_mbsinit;
+    _CurrentRuneLocale = rl;
+    __mb_cur_max = 4;
+    __mb_sb_limit = 128;
+    return (0);
 }
 
 static int
-_GB18030_mbsinit(const mbstate_t *ps)
-{
-
-	return (ps == NULL || ((const _GB18030State *)ps)->count == 0);
+_GB18030_mbsinit(const mbstate_t* ps) {
+    return (ps == NULL || ((const _GB18030State*)ps)->count == 0);
 }
 
 static size_t
-_GB18030_mbrtowc(wchar_t * __restrict pwc, const char * __restrict s,
-    size_t n, mbstate_t * __restrict ps)
-{
-	_GB18030State *gs;
-	wchar_t wch;
-	int ch, len, ocount;
-	size_t ncopy;
+_GB18030_mbrtowc(wchar_t* __restrict pwc, const char* __restrict s,
+                 size_t n, mbstate_t* __restrict ps) {
+    _GB18030State* gs;
+    wchar_t wch;
+    int ch, len, ocount;
+    size_t ncopy;
+    gs = (_GB18030State*)ps;
 
-	gs = (_GB18030State *)ps;
+    if (gs->count < 0 || gs->count > sizeof(gs->bytes)) {
+        errno = EINVAL;
+        return ((size_t) - 1);
+    }
 
-	if (gs->count < 0 || gs->count > sizeof(gs->bytes)) {
-		errno = EINVAL;
-		return ((size_t)-1);
-	}
+    if (s == NULL) {
+        s = "";
+        n = 1;
+        pwc = NULL;
+    }
 
-	if (s == NULL) {
-		s = "";
-		n = 1;
-		pwc = NULL;
-	}
+    ncopy = MIN(MIN(n, MB_CUR_MAX), sizeof(gs->bytes) - gs->count);
+    memcpy(gs->bytes + gs->count, s, ncopy);
+    ocount = gs->count;
+    gs->count += ncopy;
+    s = (char*)gs->bytes;
+    n = gs->count;
 
-	ncopy = MIN(MIN(n, MB_CUR_MAX), sizeof(gs->bytes) - gs->count);
-	memcpy(gs->bytes + gs->count, s, ncopy);
-	ocount = gs->count;
-	gs->count += ncopy;
-	s = (char *)gs->bytes;
-	n = gs->count;
+    if (n == 0)
+        /* Incomplete multibyte sequence */
+    {
+        return ((size_t) - 2);
+    }
 
-	if (n == 0)
-		/* Incomplete multibyte sequence */
-		return ((size_t)-2);
+    /*
+     * Single byte:     [00-7f]
+     * Two byte:        [81-fe][40-7e,80-fe]
+     * Four byte:       [81-fe][30-39][81-fe][30-39]
+     */
+    ch = (unsigned char) * s++;
 
-	/*
-	 * Single byte:		[00-7f]
-	 * Two byte:		[81-fe][40-7e,80-fe]
-	 * Four byte:		[81-fe][30-39][81-fe][30-39]
-	 */
-	ch = (unsigned char)*s++;
-	if (ch <= 0x7f) {
-		len = 1;
-		wch = ch;
-	} else if (ch >= 0x81 && ch <= 0xfe) {
-		wch = ch;
-		if (n < 2)
-			return ((size_t)-2);
-		ch = (unsigned char)*s++;
-		if ((ch >= 0x40 && ch <= 0x7e) || (ch >= 0x80 && ch <= 0xfe)) {
-			wch = (wch << 8) | ch;
-			len = 2;
-		} else if (ch >= 0x30 && ch <= 0x39) {
-			/*
-			 * Strip high bit off the wide character we will
-			 * eventually output so that it is positive when
-			 * cast to wint_t on 32-bit twos-complement machines.
-			 */
-			wch = ((wch & 0x7f) << 8) | ch;
-			if (n < 3)
-				return ((size_t)-2);
-			ch = (unsigned char)*s++;
-			if (ch < 0x81 || ch > 0xfe)
-				goto ilseq;
-			wch = (wch << 8) | ch;
-			if (n < 4)
-				return ((size_t)-2);
-			ch = (unsigned char)*s++;
-			if (ch < 0x30 || ch > 0x39)
-				goto ilseq;
-			wch = (wch << 8) | ch;
-			len = 4;
-		} else
-			goto ilseq;
-	} else
-		goto ilseq;
+    if (ch <= 0x7f) {
+        len = 1;
+        wch = ch;
+    } else if (ch >= 0x81 && ch <= 0xfe) {
+        wch = ch;
 
-	if (pwc != NULL)
-		*pwc = wch;
-	gs->count = 0;
-	return (wch == L'\0' ? 0 : len - ocount);
+        if (n < 2) {
+            return ((size_t) - 2);
+        }
+
+        ch = (unsigned char) * s++;
+
+        if ((ch >= 0x40 && ch <= 0x7e) || (ch >= 0x80 && ch <= 0xfe)) {
+            wch = (wch << 8) | ch;
+            len = 2;
+        } else if (ch >= 0x30 && ch <= 0x39) {
+            /*
+             * Strip high bit off the wide character we will
+             * eventually output so that it is positive when
+             * cast to wint_t on 32-bit twos-complement machines.
+             */
+            wch = ((wch & 0x7f) << 8) | ch;
+
+            if (n < 3) {
+                return ((size_t) - 2);
+            }
+
+            ch = (unsigned char) * s++;
+
+            if (ch < 0x81 || ch > 0xfe) {
+                goto ilseq;
+            }
+
+            wch = (wch << 8) | ch;
+
+            if (n < 4) {
+                return ((size_t) - 2);
+            }
+
+            ch = (unsigned char) * s++;
+
+            if (ch < 0x30 || ch > 0x39) {
+                goto ilseq;
+            }
+
+            wch = (wch << 8) | ch;
+            len = 4;
+        } else {
+            goto ilseq;
+        }
+    } else {
+        goto ilseq;
+    }
+
+    if (pwc != NULL) {
+        *pwc = wch;
+    }
+
+    gs->count = 0;
+    return (wch == L'\0' ? 0 : len - ocount);
 ilseq:
-	errno = EILSEQ;
-	return ((size_t)-1);
+    errno = EILSEQ;
+    return ((size_t) - 1);
 }
 
 static size_t
-_GB18030_wcrtomb(char * __restrict s, wchar_t wc, mbstate_t * __restrict ps)
-{
-	_GB18030State *gs;
-	size_t len;
-	int c;
+_GB18030_wcrtomb(char* __restrict s, wchar_t wc, mbstate_t* __restrict ps) {
+    _GB18030State* gs;
+    size_t len;
+    int c;
+    gs = (_GB18030State*)ps;
 
-	gs = (_GB18030State *)ps;
+    if (gs->count != 0) {
+        errno = EINVAL;
+        return ((size_t) - 1);
+    }
 
-	if (gs->count != 0) {
-		errno = EINVAL;
-		return ((size_t)-1);
-	}
+    if (s == NULL)
+        /* Reset to initial shift state (no-op) */
+    {
+        return (1);
+    }
 
-	if (s == NULL)
-		/* Reset to initial shift state (no-op) */
-		return (1);
-	if ((wc & ~0x7fffffff) != 0)
-		goto ilseq;
-	if (wc & 0x7f000000) {
-		/* Replace high bit that mbrtowc() removed. */
-		wc |= 0x80000000;
-		c = (wc >> 24) & 0xff;
-		if (c < 0x81 || c > 0xfe)
-			goto ilseq;
-		*s++ = c;
-		c = (wc >> 16) & 0xff;
-		if (c < 0x30 || c > 0x39)
-			goto ilseq;
-		*s++ = c;
-		c = (wc >> 8) & 0xff;
-		if (c < 0x81 || c > 0xfe)
-			goto ilseq;
-		*s++ = c;
-		c = wc & 0xff;
-		if (c < 0x30 || c > 0x39)
-			goto ilseq;
-		*s++ = c;
-		len = 4;
-	} else if (wc & 0x00ff0000)
-		goto ilseq;
-	else if (wc & 0x0000ff00) {
-		c = (wc >> 8) & 0xff;
-		if (c < 0x81 || c > 0xfe)
-			goto ilseq;
-		*s++ = c;
-		c = wc & 0xff;
-		if (c < 0x40 || c == 0x7f || c == 0xff)
-			goto ilseq;
-		*s++ = c;
-		len = 2;
-	} else if (wc <= 0x7f) {
-		*s++ = wc;
-		len = 1;
-	} else
-		goto ilseq;
+    if ((wc & ~0x7fffffff) != 0) {
+        goto ilseq;
+    }
 
-	return (len);
+    if (wc & 0x7f000000) {
+        /* Replace high bit that mbrtowc() removed. */
+        wc |= 0x80000000;
+        c = (wc >> 24) & 0xff;
+
+        if (c < 0x81 || c > 0xfe) {
+            goto ilseq;
+        }
+
+        *s++ = c;
+        c = (wc >> 16) & 0xff;
+
+        if (c < 0x30 || c > 0x39) {
+            goto ilseq;
+        }
+
+        *s++ = c;
+        c = (wc >> 8) & 0xff;
+
+        if (c < 0x81 || c > 0xfe) {
+            goto ilseq;
+        }
+
+        *s++ = c;
+        c = wc & 0xff;
+
+        if (c < 0x30 || c > 0x39) {
+            goto ilseq;
+        }
+
+        *s++ = c;
+        len = 4;
+    } else if (wc & 0x00ff0000) {
+        goto ilseq;
+    } else if (wc & 0x0000ff00) {
+        c = (wc >> 8) & 0xff;
+
+        if (c < 0x81 || c > 0xfe) {
+            goto ilseq;
+        }
+
+        *s++ = c;
+        c = wc & 0xff;
+
+        if (c < 0x40 || c == 0x7f || c == 0xff) {
+            goto ilseq;
+        }
+
+        *s++ = c;
+        len = 2;
+    } else if (wc <= 0x7f) {
+        *s++ = wc;
+        len = 1;
+    } else {
+        goto ilseq;
+    }
+
+    return (len);
 ilseq:
-	errno = EILSEQ;
-	return ((size_t)-1);
+    errno = EILSEQ;
+    return ((size_t) - 1);
 }

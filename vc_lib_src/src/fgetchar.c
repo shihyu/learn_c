@@ -30,18 +30,16 @@
 *
 *******************************************************************************/
 
-int __cdecl _fgetchar (
-        void
-        )
-{
-        return(getc(stdin));
+int __cdecl _fgetchar(
+    void
+) {
+    return (getc(stdin));
 }
 
 #undef getchar
 
-int __cdecl getchar (
-        void
-        )
-{
-        return _fgetchar();
+int __cdecl getchar(
+    void
+) {
+    return _fgetchar();
 }

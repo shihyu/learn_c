@@ -2,7 +2,7 @@
 #include <exception>
 _X_STD_BEGIN
 
-_CRTIMP2 _Prhand _Raise_handler = 0;	// define raise handler pointer
+_CRTIMP2 _Prhand _Raise_handler = 0;    // define raise handler pointer
 
 _X_STD_END
 

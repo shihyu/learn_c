@@ -50,310 +50,238 @@
 
 extern "C"
 {
-extern __inline int (__cdecl _isalpha_l) (
+    extern __inline int (__cdecl _isalpha_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isalpha_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isalpha_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isalpha) (
+    extern __inline int (__cdecl isalpha)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _ALPHA);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _ALPHA);
+        } else {
+            return (_isalpha_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isalpha_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isupper_l) (
+    extern __inline int (__cdecl _isupper_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isupper_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isupper_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isupper) (
+    extern __inline int (__cdecl isupper)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _UPPER);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _UPPER);
+        } else {
+            return (_isupper_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isupper_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _islower_l) (
+    extern __inline int (__cdecl _islower_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _islower_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _islower_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl islower) (
+    extern __inline int (__cdecl islower)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _LOWER);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _LOWER);
+        } else {
+            return (_islower_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_islower_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isdigit_l) (
+    extern __inline int (__cdecl _isdigit_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isdigit_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isdigit_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isdigit) (
+    extern __inline int (__cdecl isdigit)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _DIGIT);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _DIGIT);
+        } else {
+            return (_isdigit_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isdigit_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isxdigit_l) (
+    extern __inline int (__cdecl _isxdigit_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isxdigit_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isxdigit_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isxdigit) (
+    extern __inline int (__cdecl isxdigit)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _HEX);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _HEX);
+        } else {
+            return (_isxdigit_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isxdigit_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isspace_l) (
+    extern __inline int (__cdecl _isspace_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isspace_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isspace_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isspace) (
+    extern __inline int (__cdecl isspace)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _SPACE);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _SPACE);
+        } else {
+            return (_isspace_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isspace_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _ispunct_l) (
+    extern __inline int (__cdecl _ispunct_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _ispunct_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _ispunct_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl ispunct) (
+    extern __inline int (__cdecl ispunct)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _PUNCT);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _PUNCT);
+        } else {
+            return (_ispunct_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_ispunct_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isalnum_l) (
+    extern __inline int (__cdecl _isalnum_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isalnum_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isalnum_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isalnum) (
+    extern __inline int (__cdecl isalnum)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _ALPHA|_DIGIT);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _ALPHA | _DIGIT);
+        } else {
+            return (_isalnum_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isalnum_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isprint_l) (
+    extern __inline int (__cdecl _isprint_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isprint_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isprint_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isprint) (
+    extern __inline int (__cdecl isprint)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _BLANK|_PUNCT|_ALPHA|_DIGIT);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _BLANK | _PUNCT | _ALPHA | _DIGIT);
+        } else {
+            return (_isprint_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isprint_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _isgraph_l) (
+    extern __inline int (__cdecl _isgraph_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _isgraph_l(c, _loc_update.GetLocaleT());
+    }
 
-    return _isgraph_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl isgraph) (
+    extern __inline int (__cdecl isgraph)(
         int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _PUNCT|_ALPHA|_DIGIT);
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _PUNCT | _ALPHA | _DIGIT);
+        } else {
+            return (_isgraph_l)(c, NULL);
+        }
     }
-    else
-    {
-        return (_isgraph_l)(c, NULL);
-    }
-}
 
-extern __inline int (__cdecl _iscntrl_l) (
+    extern __inline int (__cdecl _iscntrl_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
-
-    return _iscntrl_l(c, _loc_update.GetLocaleT());
-}
-
-extern __inline int (__cdecl iscntrl) (
-        int c
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return __fast_ch_check(c, _CONTROL);
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return _iscntrl_l(c, _loc_update.GetLocaleT());
     }
-    else
-    {
-        return (_iscntrl_l)(c, NULL);
+
+    extern __inline int (__cdecl iscntrl)(
+        int c
+    ) {
+        if (__locale_changed == 0) {
+            return __fast_ch_check(c, _CONTROL);
+        } else {
+            return (_iscntrl_l)(c, NULL);
+        }
     }
-}
 
-extern __inline int (__cdecl __isascii) (
+    extern __inline int (__cdecl __isascii)(
         int c
-        )
-{
-    return __isascii(c);
-}
+    ) {
+        return __isascii(c);
+    }
 
-extern __inline int (__cdecl __toascii) (
+    extern __inline int (__cdecl __toascii)(
         int c
-        )
-{
-    return __toascii(c);
-}
+    ) {
+        return __toascii(c);
+    }
 
-extern __inline int (__cdecl _iscsymf_l) (
+    extern __inline int (__cdecl _iscsymf_l)(
         int c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return (_isalpha_l)(c, plocinfo) || (c) == '_';
-}
-extern __inline int (__cdecl __iscsymf) (
+    }
+    extern __inline int (__cdecl __iscsymf)(
         int c
-        )
-{
-    return __iscsymf(c);
-}
+    ) {
+        return __iscsymf(c);
+    }
 
-extern __inline int (__cdecl _iscsym_l) (
+    extern __inline int (__cdecl _iscsym_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    return (_isalnum_l)(c, plocinfo) || (c) == '_';
-}
+    ) {
+        return (_isalnum_l)(c, plocinfo) || (c) == '_';
+    }
 
-extern __inline int (__cdecl __iscsym) (
+    extern __inline int (__cdecl __iscsym)(
         int c
-        )
-{
-    return __iscsym((unsigned char)(c));
-}
+    ) {
+        return __iscsym((unsigned char)(c));
+    }
 }

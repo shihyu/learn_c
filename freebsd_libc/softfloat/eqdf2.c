@@ -14,9 +14,7 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/eqdf2.c,v 1.1 2004/05/14 12:13:04 cog
 flag __eqdf2(float64, float64);
 
 flag
-__eqdf2(float64 a, float64 b)
-{
-
-	/* libgcc1.c says !(a == b) */
-	return !float64_eq(a, b);
+__eqdf2(float64 a, float64 b) {
+    /* libgcc1.c says !(a == b) */
+    return !float64_eq(a, b);
 }

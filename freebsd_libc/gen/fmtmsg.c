@@ -33,130 +33,155 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/fmtmsg.c,v 1.5 2003/05/01 19:03:13 nectar E
 #include <string.h>
 
 /* Default value for MSGVERB. */
-#define	DFLT_MSGVERB	"label:severity:text:action:tag"
+#define DFLT_MSGVERB    "label:severity:text:action:tag"
 
 /* Maximum valid size for a MSGVERB. */
-#define	MAX_MSGVERB	sizeof(DFLT_MSGVERB)
+#define MAX_MSGVERB sizeof(DFLT_MSGVERB)
 
-static char	*printfmt(char *, long, const char *, int, const char *,
-		    const char *, const char *);
-static char	*nextcomp(const char *);
+static char* printfmt(char*, long, const char*, int, const char*,
+                      const char*, const char*);
+static char* nextcomp(const char*);
 static const char
-		*sevinfo(int);
-static int	 validmsgverb(const char *);
+* sevinfo(int);
+static int   validmsgverb(const char*);
 
-static const char *validlist[] = {
-	"label", "severity", "text", "action", "tag", NULL
+static const char* validlist[] = {
+    "label", "severity", "text", "action", "tag", NULL
 };
 
 int
-fmtmsg(long class, const char *label, int sev, const char *text,
-    const char *action, const char *tag)
-{
-	FILE *fp;
-	char *env, *msgverb, *output;
+fmtmsg(long class, const char* label, int sev, const char* text,
+       const char* action, const char* tag) {
+    FILE* fp;
+    char* env, *msgverb, *output;
 
-	if (class & MM_PRINT) {
-		if ((env = getenv("MSGVERB")) != NULL && *env != '\0' &&
-		    strlen(env) <= strlen(DFLT_MSGVERB)) {
-			if ((msgverb = strdup(env)) == NULL)
-				return (MM_NOTOK);
-			else if (validmsgverb(msgverb) == 0) {
-				free(msgverb);
-				goto def;
-			}
-		} else {
-def:
-			if ((msgverb = strdup(DFLT_MSGVERB)) == NULL)
-				return (MM_NOTOK);
-		}
-		output = printfmt(msgverb, class, label, sev, text, action,
-		    tag);
-		if (output == NULL) {
-			free(msgverb);
-			return (MM_NOTOK);
-		}
-		if (*output != '\0')
-			fprintf(stderr, "%s", output);
-		free(msgverb);
-		free(output);
-	}
-	if (class & MM_CONSOLE) {
-		output = printfmt(DFLT_MSGVERB, class, label, sev, text,
-		    action, tag);
-		if (output == NULL)
-			return (MM_NOCON);
-		if (*output != '\0') {
-			if ((fp = fopen("/dev/console", "a")) == NULL) {
-				free(output);
-				return (MM_NOCON);
-			}
-			fprintf(fp, "%s", output);
-			fclose(fp);
-		}
-		free(output);
-	}
-	return (MM_OK);
+    if (class & MM_PRINT) {
+        if ((env = getenv("MSGVERB")) != NULL && *env != '\0' &&
+                strlen(env) <= strlen(DFLT_MSGVERB)) {
+            if ((msgverb = strdup(env)) == NULL) {
+                return (MM_NOTOK);
+            } else if (validmsgverb(msgverb) == 0) {
+                free(msgverb);
+                goto def;
+            }
+        } else {
+        def:
+
+            if ((msgverb = strdup(DFLT_MSGVERB)) == NULL) {
+                return (MM_NOTOK);
+            }
+        }
+
+        output = printfmt(msgverb, class, label, sev, text, action,
+                          tag);
+
+        if (output == NULL) {
+            free(msgverb);
+            return (MM_NOTOK);
+        }
+
+        if (*output != '\0') {
+            fprintf(stderr, "%s", output);
+        }
+
+        free(msgverb);
+        free(output);
+    }
+
+    if (class & MM_CONSOLE) {
+        output = printfmt(DFLT_MSGVERB, class, label, sev, text,
+                          action, tag);
+
+        if (output == NULL) {
+            return (MM_NOCON);
+        }
+
+        if (*output != '\0') {
+            if ((fp = fopen("/dev/console", "a")) == NULL) {
+                free(output);
+                return (MM_NOCON);
+            }
+
+            fprintf(fp, "%s", output);
+            fclose(fp);
+        }
+
+        free(output);
+    }
+
+    return (MM_OK);
 }
 
-#define INSERT_COLON							\
-	if (*output != '\0')						\
-		strlcat(output, ": ", size)
-#define INSERT_NEWLINE							\
-	if (*output != '\0')						\
-		strlcat(output, "\n", size)
-#define INSERT_SPACE							\
-	if (*output != '\0')						\
-		strlcat(output, " ", size)
+#define INSERT_COLON                            \
+    if (*output != '\0')                        \
+        strlcat(output, ": ", size)
+#define INSERT_NEWLINE                          \
+    if (*output != '\0')                        \
+        strlcat(output, "\n", size)
+#define INSERT_SPACE                            \
+    if (*output != '\0')                        \
+        strlcat(output, " ", size)
 
 /*
  * Returns NULL on memory allocation failure, otherwise returns a pointer to
  * a newly malloc()'d output buffer.
  */
-static char *
-printfmt(char *msgverb, long class, const char *label, int sev,
-    const char *text, const char *act, const char *tag)
-{
-	size_t size;
-	char *comp, *output;
-	const char *sevname;
+static char*
+printfmt(char* msgverb, long class, const char* label, int sev,
+         const char* text, const char* act, const char* tag) {
+    size_t size;
+    char* comp, *output;
+    const char* sevname;
+    size = 32;
 
-	size = 32;
-	if (label != MM_NULLLBL)
-		size += strlen(label);
-	if ((sevname = sevinfo(sev)) != NULL)
-		size += strlen(sevname);
-	if (text != MM_NULLTXT)
-		size += strlen(text);
-	if (text != MM_NULLACT)
-		size += strlen(act);
-	if (tag != MM_NULLTAG)
-		size += strlen(tag);
+    if (label != MM_NULLLBL) {
+        size += strlen(label);
+    }
 
-	if ((output = malloc(size)) == NULL)
-		return (NULL);
-	*output = '\0';
-	while ((comp = nextcomp(msgverb)) != NULL) {
-		if (strcmp(comp, "label") == 0 && label != MM_NULLLBL) {
-			INSERT_COLON;
-			strlcat(output, label, size);
-		} else if (strcmp(comp, "severity") == 0 && sevname != NULL) {
-			INSERT_COLON;
-			strlcat(output, sevinfo(sev), size);
-		} else if (strcmp(comp, "text") == 0 && text != MM_NULLTXT) {
-			INSERT_COLON;
-			strlcat(output, text, size);
-		} else if (strcmp(comp, "action") == 0 && act != MM_NULLACT) {
-			INSERT_NEWLINE;
-			strlcat(output, "TO FIX: ", size);
-			strlcat(output, act, size);
-		} else if (strcmp(comp, "tag") == 0 && tag != MM_NULLTAG) {
-			INSERT_SPACE;
-			strlcat(output, tag, size);
-		}
-	}
-	INSERT_NEWLINE;
-	return (output);
+    if ((sevname = sevinfo(sev)) != NULL) {
+        size += strlen(sevname);
+    }
+
+    if (text != MM_NULLTXT) {
+        size += strlen(text);
+    }
+
+    if (text != MM_NULLACT) {
+        size += strlen(act);
+    }
+
+    if (tag != MM_NULLTAG) {
+        size += strlen(tag);
+    }
+
+    if ((output = malloc(size)) == NULL) {
+        return (NULL);
+    }
+
+    *output = '\0';
+
+    while ((comp = nextcomp(msgverb)) != NULL) {
+        if (strcmp(comp, "label") == 0 && label != MM_NULLLBL) {
+            INSERT_COLON;
+            strlcat(output, label, size);
+        } else if (strcmp(comp, "severity") == 0 && sevname != NULL) {
+            INSERT_COLON;
+            strlcat(output, sevinfo(sev), size);
+        } else if (strcmp(comp, "text") == 0 && text != MM_NULLTXT) {
+            INSERT_COLON;
+            strlcat(output, text, size);
+        } else if (strcmp(comp, "action") == 0 && act != MM_NULLACT) {
+            INSERT_NEWLINE;
+            strlcat(output, "TO FIX: ", size);
+            strlcat(output, act, size);
+        } else if (strcmp(comp, "tag") == 0 && tag != MM_NULLTAG) {
+            INSERT_SPACE;
+            strlcat(output, tag, size);
+        }
+    }
+
+    INSERT_NEWLINE;
+    return (output);
 }
 
 /*
@@ -164,57 +189,63 @@ printfmt(char *msgverb, long class, const char *label, int sev,
  * indicate that there are no remaining components.  This function must be
  * called until it returns NULL in order for the local state to be cleared.
  */
-static char *
-nextcomp(const char *msgverb)
-{
-	static char lmsgverb[MAX_MSGVERB], *state;
-	char *retval;
-	
-	if (*lmsgverb == '\0') {
-		strlcpy(lmsgverb, msgverb, sizeof(lmsgverb));
-		retval = strtok_r(lmsgverb, ":", &state);
-	} else {
-		retval = strtok_r(NULL, ":", &state);
-	}
-	if (retval == NULL)
-		*lmsgverb = '\0';
-	return (retval);
+static char*
+nextcomp(const char* msgverb) {
+    static char lmsgverb[MAX_MSGVERB], *state;
+    char* retval;
+
+    if (*lmsgverb == '\0') {
+        strlcpy(lmsgverb, msgverb, sizeof(lmsgverb));
+        retval = strtok_r(lmsgverb, ":", &state);
+    } else {
+        retval = strtok_r(NULL, ":", &state);
+    }
+
+    if (retval == NULL) {
+        *lmsgverb = '\0';
+    }
+
+    return (retval);
 }
 
-static const char *
-sevinfo(int sev)
-{
+static const char*
+sevinfo(int sev) {
+    switch (sev) {
+    case MM_HALT:
+        return ("HALT");
 
-	switch (sev) {
-	case MM_HALT:
-		return ("HALT");
-	case MM_ERROR:
-		return ("ERROR");
-	case MM_WARNING:
-		return ("WARNING");
-	case MM_INFO:
-		return ("INFO");
-	default:
-		return (NULL);
-	}
+    case MM_ERROR:
+        return ("ERROR");
+
+    case MM_WARNING:
+        return ("WARNING");
+
+    case MM_INFO:
+        return ("INFO");
+
+    default:
+        return (NULL);
+    }
 }
 
 /*
  * Returns 1 if the msgverb list is valid, otherwise 0.
  */
 static int
-validmsgverb(const char *msgverb)
-{
-	char *msgcomp;
-	int i, equality;
+validmsgverb(const char* msgverb) {
+    char* msgcomp;
+    int i, equality;
+    equality = 0;
 
-	equality = 0;
-	while ((msgcomp = nextcomp(msgverb)) != NULL) {
-		equality--;
-		for (i = 0; validlist[i] != NULL; i++) {
-			if (strcmp(msgcomp, validlist[i]) == 0)
-				equality++;
-		}
-	}
-	return (!equality);
+    while ((msgcomp = nextcomp(msgverb)) != NULL) {
+        equality--;
+
+        for (i = 0; validlist[i] != NULL; i++) {
+            if (strcmp(msgcomp, validlist[i]) == 0) {
+                equality++;
+            }
+        }
+    }
+
+    return (!equality);
 }

@@ -33,7 +33,6 @@ int __defaultmatherr = 1;
 *
 *Exceptions:
 *******************************************************************************/
-int __CRTDECL _matherr (struct _exception *pexcept)
-{
+int __CRTDECL _matherr(struct _exception* pexcept) {
     return 0;
 }

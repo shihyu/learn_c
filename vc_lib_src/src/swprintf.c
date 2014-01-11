@@ -91,91 +91,84 @@ versions of (v)swprintf */
 
 #ifndef _COUNT_
 
-int __cdecl _swprintf (
-        wchar_t *string,
-        const wchar_t *format,
-        ...
-        )
+int __cdecl _swprintf(
+    wchar_t* string,
+    const wchar_t* format,
+    ...
+)
 #else  /* _COUNT_ */
 
 #ifndef _SWPRINTFS_ERROR_RETURN_FIX
 /* Here we implement _snwprintf without the
 return value bugfix */
 
-int __cdecl _snwprintf (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        ...
-        )
+int __cdecl _snwprintf(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    ...
+)
 #else  /* _SWPRINTFS_ERROR_RETURN_FIX */
-int __cdecl _swprintf_c (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        ...
-        )
+int __cdecl _swprintf_c(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    ...
+)
 #endif  /* _SWPRINTFS_ERROR_RETURN_FIX */
 
 #endif  /* _COUNT_ */
 
 {
-        FILE str;
-        REG1 FILE *outfile = &str;
-        va_list arglist;
-        REG2 int retval;
-
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
+    FILE str;
+    REG1 FILE* outfile = &str;
+    va_list arglist;
+    REG2 int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
 #ifdef _COUNT_
-        _VALIDATE_RETURN( (count == 0) || (string != NULL), EINVAL, -1 );
+    _VALIDATE_RETURN((count == 0) || (string != NULL), EINVAL, -1);
 #else  /* _COUNT_ */
-        _VALIDATE_RETURN( (string != NULL), EINVAL, -1 );
+    _VALIDATE_RETURN((string != NULL), EINVAL, -1);
 #endif  /* _COUNT_ */
-        va_start(arglist, format);
-
-        outfile->_flag = _IOWRT|_IOSTRG;
-        outfile->_ptr = outfile->_base = (char *) string;
+    va_start(arglist, format);
+    outfile->_flag = _IOWRT | _IOSTRG;
+    outfile->_ptr = outfile->_base = (char*) string;
 #ifndef _COUNT_
-        outfile->_cnt = MAXSTR;
+    outfile->_cnt = MAXSTR;
 #else  /* _COUNT_ */
-        if(count>(INT_MAX/sizeof(wchar_t)))
-        {
-            /* old-style functions allow any large value to mean unbounded */
-            outfile->_cnt = INT_MAX;
-        }
-        else
-        {
-            outfile->_cnt = (int)(count*sizeof(wchar_t));
-        }
+
+    if (count > (INT_MAX / sizeof(wchar_t))) {
+        /* old-style functions allow any large value to mean unbounded */
+        outfile->_cnt = INT_MAX;
+    } else {
+        outfile->_cnt = (int)(count * sizeof(wchar_t));
+    }
+
 #endif  /* _COUNT_ */
-
-        retval = _woutput_l(outfile,format,NULL,arglist);
-
+    retval = _woutput_l(outfile, format, NULL, arglist);
 #ifndef _SWPRINTFS_ERROR_RETURN_FIX
-
-        _putc_nolock('\0',outfile); /* no-lock version */
-        _putc_nolock('\0',outfile); /* 2nd null byte for wchar_t version */
-
-        return(retval);
+    _putc_nolock('\0', outfile); /* no-lock version */
+    _putc_nolock('\0', outfile); /* 2nd null byte for wchar_t version */
+    return (retval);
 #else  /* _SWPRINTFS_ERROR_RETURN_FIX */
-        if((retval >= 0) && (_putc_nolock('\0',outfile) != EOF) && (_putc_nolock('\0',outfile) != EOF))
-            return(retval);
 
-        string[0] = 0;
-        return -1;
+    if ((retval >= 0) && (_putc_nolock('\0', outfile) != EOF) && (_putc_nolock('\0', outfile) != EOF)) {
+        return (retval);
+    }
+
+    string[0] = 0;
+    return -1;
 #endif  /* _SWPRINTFS_ERROR_RETURN_FIX */
 }
 
 #ifndef _COUNT_
 
-int __cdecl __swprintf_l (
-        wchar_t *string,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl __swprintf_l(
+    wchar_t* string,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
     va_start(arglist, plocinfo);
 #pragma warning(push)
@@ -190,14 +183,13 @@ int __cdecl __swprintf_l (
 /* Here we implement _snwprintf without the
 return value bugfix */
 
-int __cdecl _snwprintf_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _snwprintf_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
     va_start(arglist, plocinfo);
 #pragma warning(push)
@@ -207,17 +199,15 @@ int __cdecl _snwprintf_l (
 }
 
 #else  /* _SWPRINTFS_ERROR_RETURN_FIX */
-int __cdecl _swprintf_c_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _swprintf_c_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
     va_start(arglist, plocinfo);
-
     return _vswprintf_c_l(string, count, format, plocinfo, arglist);
 }
 
@@ -226,92 +216,74 @@ int __cdecl _swprintf_c_l (
 #endif  /* _COUNT_ */
 
 #ifndef _COUNT_
-int __cdecl swprintf_s (
-        wchar_t *string,
-        size_t sizeInWords,
-        const wchar_t *format,
-        ...
-        )
-{
+int __cdecl swprintf_s(
+    wchar_t* string,
+    size_t sizeInWords,
+    const wchar_t* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vswprintf_s_l(string, sizeInWords, format, NULL, arglist);
 }
 
-int __cdecl _snwprintf_s (
-        wchar_t *string,
-        size_t sizeInWords,
-        size_t count,
-        const wchar_t *format,
-        ...
-        )
-{
+int __cdecl _snwprintf_s(
+    wchar_t* string,
+    size_t sizeInWords,
+    size_t count,
+    const wchar_t* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vsnwprintf_s_l(string, sizeInWords, count, format, NULL, arglist);
 }
 
-int __cdecl _swprintf_p (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        ...
-        )
-{
+int __cdecl _swprintf_p(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vswprintf_p_l(string, count, format, NULL, arglist);
 }
 
-int __cdecl _swprintf_s_l (
-        wchar_t *string,
-        size_t sizeInWords,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _swprintf_s_l(
+    wchar_t* string,
+    size_t sizeInWords,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vswprintf_s_l(string, sizeInWords, format, plocinfo, arglist);
 }
 
-int __cdecl _snwprintf_s_l (
-        wchar_t *string,
-        size_t sizeInWords,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _snwprintf_s_l(
+    wchar_t* string,
+    size_t sizeInWords,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vsnwprintf_s_l(string, sizeInWords, count, format, plocinfo, arglist);
 }
 
-int __cdecl _swprintf_p_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _swprintf_p_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vswprintf_p_l(string, count, format, plocinfo, arglist);
 }
 
@@ -337,53 +309,42 @@ int __cdecl _swprintf_p_l (
 *******************************************************************************/
 
 #ifndef _COUNT_
-int __cdecl _scwprintf (
-        const wchar_t *format,
-        ...
-        )
-{
-        va_list arglist;
-
-        va_start(arglist, format);
-
-        return _vscwprintf(format, arglist);
+int __cdecl _scwprintf(
+    const wchar_t* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return _vscwprintf(format, arglist);
 }
 
-int __cdecl _scwprintf_p (
-        const wchar_t *format,
-        ...
-        )
-{
-        va_list arglist;
-
-        va_start(arglist, format);
-
-        return _vscwprintf_p(format, arglist);
+int __cdecl _scwprintf_p(
+    const wchar_t* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return _vscwprintf_p(format, arglist);
 }
 
-int __cdecl _scwprintf_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _scwprintf_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
     va_start(arglist, plocinfo);
-
-    return _vscwprintf_l(format, plocinfo,arglist);
+    return _vscwprintf_l(format, plocinfo, arglist);
 }
 
-int __cdecl _scwprintf_p_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-
-        va_start(arglist, plocinfo);
-
-        return _vscwprintf_p_l(format, plocinfo, arglist);
+int __cdecl _scwprintf_p_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return _vscwprintf_p_l(format, plocinfo, arglist);
 }
 
 #endif  /* _COUNT_ */

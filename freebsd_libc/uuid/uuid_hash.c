@@ -32,18 +32,17 @@
 /*
  * uuid_hash() - generate a hash value.
  * See also:
- *	http://www.opengroup.org/onlinepubs/009629399/uuid_hash.htm
+ *  http://www.opengroup.org/onlinepubs/009629399/uuid_hash.htm
  */
 uint16_t
-uuid_hash(const uuid_t *u, uint32_t *status)
-{
+uuid_hash(const uuid_t* u, uint32_t* status) {
+    if (status) {
+        *status = uuid_s_ok;
+    }
 
-	if (status)
-		*status = uuid_s_ok;
-
-	/*
-	 * Use the most frequently changing bits in the UUID as the hash
-	 * value. This should yield a good enough distribution...
-	 */
-	return ((u) ? u->time_low & 0xffff : 0);
+    /*
+     * Use the most frequently changing bits in the UUID as the hash
+     * value. This should yield a good enough distribution...
+     */
+    return ((u) ? u->time_low & 0xffff : 0);
 }

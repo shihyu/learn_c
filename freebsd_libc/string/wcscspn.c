@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wcscspn.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
+ *  citrus Id: wcscspn.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
 #include <sys/cdefs.h>
@@ -38,23 +38,27 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcscspn.c,v 1.6 2002/09/21 00:29:23 tjr 
 
 size_t
 wcscspn(s, set)
-	const wchar_t *s;
-	const wchar_t *set;
+const wchar_t* s;
+const wchar_t* set;
 {
-	const wchar_t *p;
-	const wchar_t *q;
+    const wchar_t* p;
+    const wchar_t* q;
+    p = s;
 
-	p = s;
-	while (*p) {
-		q = set;
-		while (*q) {
-			if (*p == *q)
-				goto done;
-			q++;
-		}
-		p++;
-	}
+    while (*p) {
+        q = set;
+
+        while (*q) {
+            if (*p == *q) {
+                goto done;
+            }
+
+            q++;
+        }
+
+        p++;
+    }
 
 done:
-	return (p - s);
+    return (p - s);
 }

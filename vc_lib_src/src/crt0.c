@@ -53,12 +53,12 @@ wWinMain(
     HINSTANCE hPrevInstance,
     LPWSTR lpCmdLine,
     int nShowCmd
-    );
+);
 
 #ifdef WPRFLAG
-_TUCHAR * __cdecl _wwincmdln(void);
+_TUCHAR* __cdecl _wwincmdln(void);
 #else  /* WPRFLAG */
-_TUCHAR * __cdecl _wincmdln(void);
+_TUCHAR* __cdecl _wincmdln(void);
 #endif  /* WPRFLAG */
 
 /*
@@ -66,13 +66,13 @@ _TUCHAR * __cdecl _wincmdln(void);
  */
 
 #ifdef WPRFLAG
-wchar_t *_wcmdln;           /* points to wide command line */
+wchar_t* _wcmdln;           /* points to wide command line */
 #else  /* WPRFLAG */
-char *_acmdln;              /* points to command line */
+char* _acmdln;              /* points to command line */
 #endif  /* WPRFLAG */
 
-char *_aenvptr = NULL;      /* points to environment block */
-wchar_t *_wenvptr = NULL;   /* points to wide environment block */
+char* _aenvptr = NULL;      /* points to environment block */
+wchar_t* _wenvptr = NULL;   /* points to wide environment block */
 
 
 static void __cdecl fast_error_exit(int);   /* Error exit via ExitProcess */
@@ -167,179 +167,179 @@ int __app_type = _CONSOLE_APP;
 static
 int
 __tmainCRTStartup(
-         void
-         );
+    void
+);
 
 int
 _tmainCRTStartup(
-        void
-        )
-{
-        /*
-         * The /GS security cookie must be initialized before any exception
-         * handling targetting the current image is registered.  No function
-         * using exception handling can be called in the current image until
-         * after __security_init_cookie has been called.
-         */
-        __security_init_cookie();
-
-        return __tmainCRTStartup();
+    void
+) {
+    /*
+     * The /GS security cookie must be initialized before any exception
+     * handling targetting the current image is registered.  No function
+     * using exception handling can be called in the current image until
+     * after __security_init_cookie has been called.
+     */
+    __security_init_cookie();
+    return __tmainCRTStartup();
 }
 
 __declspec(noinline)
 int
 __tmainCRTStartup(
-         void
-         )
-{
-        unsigned int osplatform = 0;
-        unsigned int winver = 0;
-        unsigned int winmajor = 0;
-        unsigned int winminor = 0;
-        unsigned int osver = 0;
-        int initret;
-        int mainret=0;
-        OSVERSIONINFOA *posvi;
-        int managedapp;
+    void
+) {
+    unsigned int osplatform = 0;
+    unsigned int winver = 0;
+    unsigned int winmajor = 0;
+    unsigned int winminor = 0;
+    unsigned int osver = 0;
+    int initret;
+    int mainret = 0;
+    OSVERSIONINFOA* posvi;
+    int managedapp;
 #ifdef _WINMAIN_
-        _TUCHAR *lpszCommandLine;
-        STARTUPINFO StartupInfo;
+    _TUCHAR* lpszCommandLine;
+    STARTUPINFO StartupInfo;
 
-        __try {
-                        /*
-                        Note: MSDN specifically notes that GetStartupInfo returns no error, and throws unspecified SEH if it fails, so
-                        the very general exception handler below is appropriate
-                        */
-            GetStartupInfo( &StartupInfo );
-        } __except(EXCEPTION_EXECUTE_HANDLER) {
-            return 255;
-        }
+    __try {
+        /*
+        Note: MSDN specifically notes that GetStartupInfo returns no error, and throws unspecified SEH if it fails, so
+        the very general exception handler below is appropriate
+        */
+        GetStartupInfo(&StartupInfo);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return 255;
+    }
+
 #endif  /* _WINMAIN_ */
-        /*
-         * Dynamically allocate the OSVERSIONINFOA buffer, so we avoid
-         * triggering the /GS buffer overrun detection.  That can't be
-         * used here, since the guard cookie isn't available until we
-         * initialize it from here!
-         */
-        posvi = (OSVERSIONINFOA *)HeapAlloc(GetProcessHeap(), 0, sizeof(OSVERSIONINFOA));
-        if (!posvi) {
-            fast_error_exit(_RT_HEAP);
-            return 255;
-        }
+    /*
+     * Dynamically allocate the OSVERSIONINFOA buffer, so we avoid
+     * triggering the /GS buffer overrun detection.  That can't be
+     * used here, since the guard cookie isn't available until we
+     * initialize it from here!
+     */
+    posvi = (OSVERSIONINFOA*)HeapAlloc(GetProcessHeap(), 0, sizeof(OSVERSIONINFOA));
 
-        /*
-         * Get the full Win32 version
-         */
-        posvi->dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-        if ( !GetVersionExA(posvi) ) {
-            HeapFree(GetProcessHeap(), 0, posvi);
-            return 255;
-        }
+    if (!posvi) {
+        fast_error_exit(_RT_HEAP);
+        return 255;
+    }
 
-        osplatform = posvi->dwPlatformId;
-        winmajor = posvi->dwMajorVersion;
-        winminor = posvi->dwMinorVersion;
+    /*
+     * Get the full Win32 version
+     */
+    posvi->dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
 
-        /*
-         * The somewhat bizarre calculations of _osver and _winver are
-         * required for backward compatibility (used to use GetVersion)
-         */
-        osver = (posvi->dwBuildNumber) & 0x07fff;
+    if (!GetVersionExA(posvi)) {
         HeapFree(GetProcessHeap(), 0, posvi);
-        if ( osplatform != VER_PLATFORM_WIN32_NT )
-            osver |= 0x08000;
-        winver = (winmajor << 8) + winminor;
+        return 255;
+    }
 
-        _set_osplatform(osplatform);
-        _set_winver(winver);
-        _set_winmajor(winmajor);
-        _set_winminor(winminor);
-        _set_osver(osver);
+    osplatform = posvi->dwPlatformId;
+    winmajor = posvi->dwMajorVersion;
+    winminor = posvi->dwMinorVersion;
+    /*
+     * The somewhat bizarre calculations of _osver and _winver are
+     * required for backward compatibility (used to use GetVersion)
+     */
+    osver = (posvi->dwBuildNumber) & 0x07fff;
+    HeapFree(GetProcessHeap(), 0, posvi);
 
-        /*
-         * Determine if this is a managed application
-         */
-        managedapp = check_managed_app();
+    if (osplatform != VER_PLATFORM_WIN32_NT) {
+        osver |= 0x08000;
+    }
 
-        if ( !_heap_init(1) )               /* initialize heap */
-            fast_error_exit(_RT_HEAPINIT);  /* write message and die */
+    winver = (winmajor << 8) + winminor;
+    _set_osplatform(osplatform);
+    _set_winver(winver);
+    _set_winmajor(winmajor);
+    _set_winminor(winminor);
+    _set_osver(osver);
+    /*
+     * Determine if this is a managed application
+     */
+    managedapp = check_managed_app();
 
-        if( !_mtinit() )                    /* initialize multi-thread */
-            fast_error_exit(_RT_THREAD);    /* write message and die */
+    if (!_heap_init(1)) {               /* initialize heap */
+        fast_error_exit(_RT_HEAPINIT);    /* write message and die */
+    }
 
-        /* Enable buffer count checking if linking against static lib */
-        _CrtSetCheckCount(TRUE);
+    if (!_mtinit()) {                   /* initialize multi-thread */
+        fast_error_exit(_RT_THREAD);    /* write message and die */
+    }
 
-        /*
-         * Initialize the Runtime Checks stuff
-         */
+    /* Enable buffer count checking if linking against static lib */
+    _CrtSetCheckCount(TRUE);
+    /*
+     * Initialize the Runtime Checks stuff
+     */
 #ifdef _RTC
-        _RTC_Initialize();
+    _RTC_Initialize();
 #endif  /* _RTC */
-        /*
-         * Guard the remainder of the initialization code and the call
-         * to user's main, or WinMain, function in a __try/__except
-         * statement.
-         */
+    /*
+     * Guard the remainder of the initialization code and the call
+     * to user's main, or WinMain, function in a __try/__except
+     * statement.
+     */
 
-        __try {
+    __try {
+        if (_ioinit() < 0) {            /* initialize lowio */
+            _amsg_exit(_RT_LOWIOINIT);
+        }
 
-            if ( _ioinit() < 0 )            /* initialize lowio */
-                _amsg_exit(_RT_LOWIOINIT);
+        /* get wide cmd line info */
+        _tcmdln = (_TSCHAR*)GetCommandLineT();
+        /* get wide environ info */
+        _tenvptr = (_TSCHAR*)GetEnvironmentStringsT();
 
-            /* get wide cmd line info */
-            _tcmdln = (_TSCHAR *)GetCommandLineT();
+        if (_tsetargv() < 0) {
+            _amsg_exit(_RT_SPACEARG);
+        }
 
-            /* get wide environ info */
-            _tenvptr = (_TSCHAR *)GetEnvironmentStringsT();
+        if (_tsetenvp() < 0) {
+            _amsg_exit(_RT_SPACEENV);
+        }
 
-            if ( _tsetargv() < 0 )
-                _amsg_exit(_RT_SPACEARG);
-            if ( _tsetenvp() < 0 )
-                _amsg_exit(_RT_SPACEENV);
+        initret = _cinit(TRUE);                  /* do C data initialize */
 
-            initret = _cinit(TRUE);                  /* do C data initialize */
-            if (initret != 0)
-                _amsg_exit(initret);
+        if (initret != 0) {
+            _amsg_exit(initret);
+        }
 
 #ifdef _WINMAIN_
-
-
-            lpszCommandLine = _twincmdln();
-            mainret = _tWinMain( (HINSTANCE)&__ImageBase,
-                                 NULL,
-                                 lpszCommandLine,
-                                 StartupInfo.dwFlags & STARTF_USESHOWWINDOW
-                                      ? StartupInfo.wShowWindow
-                                      : SW_SHOWDEFAULT
-                                );
+        lpszCommandLine = _twincmdln();
+        mainret = _tWinMain((HINSTANCE)&__ImageBase,
+                            NULL,
+                            lpszCommandLine,
+                            StartupInfo.dwFlags & STARTF_USESHOWWINDOW
+                            ? StartupInfo.wShowWindow
+                            : SW_SHOWDEFAULT
+                           );
 #else  /* _WINMAIN_ */
-            _tinitenv = _tenviron;
-            mainret = _tmain(__argc, _targv, _tenviron);
+        _tinitenv = _tenviron;
+        mainret = _tmain(__argc, _targv, _tenviron);
 #endif  /* _WINMAIN_ */
 
-            if ( !managedapp )
-                exit(mainret);
-
-            _cexit();
-
+        if (!managedapp) {
+            exit(mainret);
         }
-        __except ( _XcptFilter(GetExceptionCode(), GetExceptionInformation()) )
-        {
-            /*
-             * Should never reach here
-             */
 
-            mainret = GetExceptionCode();
+        _cexit();
+    } __except (_XcptFilter(GetExceptionCode(), GetExceptionInformation())) {
+        /*
+         * Should never reach here
+         */
+        mainret = GetExceptionCode();
 
-            if ( !managedapp )
-                _exit(mainret);
+        if (!managedapp) {
+            _exit(mainret);
+        }
 
-            _c_exit();
+        _c_exit();
+    } /* end of try - except */
 
-        } /* end of try - except */
-
-        return mainret;
+    return mainret;
 }
 
 
@@ -360,24 +360,23 @@ __tmainCRTStartup(
 *
 *******************************************************************************/
 
-static void __cdecl fast_error_exit (
-        int rterrnum
-        )
-{
+static void __cdecl fast_error_exit(
+    int rterrnum
+) {
     /*
      * Note that here there is no other option other then to use __error_mode
      * as even if we use _set_error_mode, there is very slim possiblity if
      * proper _ser_error_mode forwarding is really working.
      */
 #ifdef _WINMAIN_
-        if ( __error_mode == _OUT_TO_STDERR )
+    if (__error_mode == _OUT_TO_STDERR)
 #else  /* _WINMAIN_ */
-        if ( __error_mode != _OUT_TO_MSGBOX )
+    if (__error_mode != _OUT_TO_MSGBOX)
 #endif  /* _WINMAIN_ */
-            _FF_MSGBANNER();    /* write run-time error banner */
+        _FF_MSGBANNER();    /* write run-time error banner */
 
-        _NMSG_WRITE(rterrnum);  /* write message */
-        __crtExitProcess(255);  /* normally _exit(255) */
+    _NMSG_WRITE(rterrnum);  /* write message */
+    __crtExitProcess(255);  /* normally _exit(255) */
 }
 
 /***
@@ -398,34 +397,38 @@ static void __cdecl fast_error_exit (
 *
 *******************************************************************************/
 
-static int __cdecl check_managed_app (
-        void
-        )
-{
-        PIMAGE_DOS_HEADER pDOSHeader;
-        PIMAGE_NT_HEADERS pPEHeader;
+static int __cdecl check_managed_app(
+    void
+) {
+    PIMAGE_DOS_HEADER pDOSHeader;
+    PIMAGE_NT_HEADERS pPEHeader;
+    pDOSHeader = &__ImageBase;
 
-        pDOSHeader = &__ImageBase;
-        if ( pDOSHeader == NULL || pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE )
-            return 0;
+    if (pDOSHeader == NULL || pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE) {
+        return 0;
+    }
 
-        pPEHeader = (PIMAGE_NT_HEADERS)((char *)pDOSHeader +
-                                        pDOSHeader->e_lfanew);
+    pPEHeader = (PIMAGE_NT_HEADERS)((char*)pDOSHeader +
+                                    pDOSHeader->e_lfanew);
 
-        if ( pPEHeader->Signature != IMAGE_NT_SIGNATURE )
-            return 0;
+    if (pPEHeader->Signature != IMAGE_NT_SIGNATURE) {
+        return 0;
+    }
 
-        if (pPEHeader->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC)
-            return 0;
+    if (pPEHeader->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC) {
+        return 0;
+    }
 
-        /* prefast assumes we are overflowing __ImageBase */
+    /* prefast assumes we are overflowing __ImageBase */
 #pragma warning(push)
 #pragma warning(disable:26000)
-        if (pPEHeader->OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR)
-            return 0;
-#pragma warning(push)
 
-        return pPEHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0;
+    if (pPEHeader->OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR) {
+        return 0;
+    }
+
+#pragma warning(push)
+    return pPEHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0;
 }
 
 #ifndef WPRFLAG

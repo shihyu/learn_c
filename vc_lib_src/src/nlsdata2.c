@@ -25,7 +25,8 @@ threadlocinfo __initiallocinfo = {
     1,                                        /* refcount                 */
     _CLOCALECP,                               /* lc_codepage              */
     _CLOCALECP,                               /* lc_collate_cp            */
-    {   _CLOCALEHANDLE,                       /* lc_handle[_ALL]          */
+    {
+        _CLOCALEHANDLE,                       /* lc_handle[_ALL]          */
         _CLOCALEHANDLE,                       /* lc_handle[_COLLATE]      */
         _CLOCALEHANDLE,                       /* lc_handle[_CTYPE]        */
         _CLOCALEHANDLE,                       /* lc_handle[_MONETARY]     */
@@ -68,14 +69,14 @@ pthreadlocinfo __ptlocinfo = &__initiallocinfo;
 /*
  *  Locale handles.
  */
-LCID __lc_handle[] =
-    {   _CLOCALEHANDLE,                       /* lc_handle[_ALL]          */
-        _CLOCALEHANDLE,                       /* lc_handle[_COLLATE]      */
-        _CLOCALEHANDLE,                       /* lc_handle[_CTYPE]        */
-        _CLOCALEHANDLE,                       /* lc_handle[_MONETARY]     */
-        _CLOCALEHANDLE,                       /* lc_handle[_NUMERIC]      */
-        _CLOCALEHANDLE                        /* lc_handle[_TIME]         */
-    };
+LCID __lc_handle[] = {
+    _CLOCALEHANDLE,                       /* lc_handle[_ALL]          */
+    _CLOCALEHANDLE,                       /* lc_handle[_COLLATE]      */
+    _CLOCALEHANDLE,                       /* lc_handle[_CTYPE]        */
+    _CLOCALEHANDLE,                       /* lc_handle[_MONETARY]     */
+    _CLOCALEHANDLE,                       /* lc_handle[_NUMERIC]      */
+    _CLOCALEHANDLE                        /* lc_handle[_TIME]         */
+};
 
 /*
  *  Code page.
@@ -91,8 +92,7 @@ UINT __lc_collate_cp = _CLOCALECP;
  */
 int __lc_clike = 1;
 
-_locale_tstruct __initiallocalestructinfo =
-{
+_locale_tstruct __initiallocalestructinfo = {
     &__initiallocinfo,
     &__initialmbcinfo
 };

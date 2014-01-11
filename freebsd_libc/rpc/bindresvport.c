@@ -1,4 +1,4 @@
-/*	$NetBSD: bindresvport.c,v 1.19 2000/07/06 03:03:59 christos Exp $	*/
+/*  $NetBSD: bindresvport.c,v 1.19 2000/07/06 03:03:59 christos Exp $   */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "from: @(#)bindresvport.c 1.8 88/02/08 SMI";
-static char *sccsid = "from: @(#)bindresvport.c	2.2 88/07/29 4.0 RPCSRC";
+static char* sccsid2 = "from: @(#)bindresvport.c 1.8 88/02/08 SMI";
+static char* sccsid = "from: @(#)bindresvport.c	2.2 88/07/29 4.0 RPCSRC";
 #endif
 /* from: $OpenBSD: bindresvport.c,v 1.7 1996/07/30 16:25:47 downsj Exp $ */
 #include <sys/cdefs.h>
@@ -63,10 +63,10 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/bindresvport.c,v 1.16 2004/10/16 06:11:34 o
  */
 int
 bindresvport(sd, sin)
-	int sd;
-	struct sockaddr_in *sin;
+int sd;
+struct sockaddr_in* sin;
 {
-	return bindresvport_sa(sd, (struct sockaddr *)sin);
+    return bindresvport_sa(sd, (struct sockaddr*)sin);
 }
 
 /*
@@ -74,88 +74,101 @@ bindresvport(sd, sin)
  */
 int
 bindresvport_sa(sd, sa)
-	int sd;
-	struct sockaddr *sa;
+int sd;
+struct sockaddr* sa;
 {
-	int old, error, af;
-	struct sockaddr_storage myaddr;
-	struct sockaddr_in *sin;
+    int old, error, af;
+    struct sockaddr_storage myaddr;
+    struct sockaddr_in* sin;
 #ifdef INET6
-	struct sockaddr_in6 *sin6;
+    struct sockaddr_in6* sin6;
 #endif
-	int proto, portrange, portlow;
-	u_int16_t *portp;
-	socklen_t salen;
+    int proto, portrange, portlow;
+    u_int16_t* portp;
+    socklen_t salen;
 
-	if (sa == NULL) {
-		salen = sizeof(myaddr);
-		sa = (struct sockaddr *)&myaddr;
+    if (sa == NULL) {
+        salen = sizeof(myaddr);
+        sa = (struct sockaddr*)&myaddr;
 
-		if (_getsockname(sd, sa, &salen) == -1)
-			return -1;	/* errno is correctly set */
+        if (_getsockname(sd, sa, &salen) == -1) {
+            return -1;    /* errno is correctly set */
+        }
 
-		af = sa->sa_family;
-		memset(sa, 0, salen);
-	} else
-		af = sa->sa_family;
+        af = sa->sa_family;
+        memset(sa, 0, salen);
+    } else {
+        af = sa->sa_family;
+    }
 
-	switch (af) {
-	case AF_INET:
-		proto = IPPROTO_IP;
-		portrange = IP_PORTRANGE;
-		portlow = IP_PORTRANGE_LOW;
-		sin = (struct sockaddr_in *)sa;
-		salen = sizeof(struct sockaddr_in);
-		portp = &sin->sin_port;
-		break;
+    switch (af) {
+    case AF_INET:
+        proto = IPPROTO_IP;
+        portrange = IP_PORTRANGE;
+        portlow = IP_PORTRANGE_LOW;
+        sin = (struct sockaddr_in*)sa;
+        salen = sizeof(struct sockaddr_in);
+        portp = &sin->sin_port;
+        break;
 #ifdef INET6
-	case AF_INET6:
-		proto = IPPROTO_IPV6;
-		portrange = IPV6_PORTRANGE;
-		portlow = IPV6_PORTRANGE_LOW;
-		sin6 = (struct sockaddr_in6 *)sa;
-		salen = sizeof(struct sockaddr_in6);
-		portp = &sin6->sin6_port;
-		break;
+
+    case AF_INET6:
+        proto = IPPROTO_IPV6;
+        portrange = IPV6_PORTRANGE;
+        portlow = IPV6_PORTRANGE_LOW;
+        sin6 = (struct sockaddr_in6*)sa;
+        salen = sizeof(struct sockaddr_in6);
+        portp = &sin6->sin6_port;
+        break;
 #endif
-	default:
-		errno = EPFNOSUPPORT;
-		return (-1);
-	}
-	sa->sa_family = af;
-	sa->sa_len = salen;
 
-	if (*portp == 0) {
-		socklen_t oldlen = sizeof(old);
+    default:
+        errno = EPFNOSUPPORT;
+        return (-1);
+    }
 
-		error = _getsockopt(sd, proto, portrange, &old, &oldlen);
-		if (error < 0)
-			return (error);
+    sa->sa_family = af;
+    sa->sa_len = salen;
 
-		error = _setsockopt(sd, proto, portrange, &portlow,
-		    sizeof(portlow));
-		if (error < 0)
-			return (error);
-	}
+    if (*portp == 0) {
+        socklen_t oldlen = sizeof(old);
+        error = _getsockopt(sd, proto, portrange, &old, &oldlen);
 
-	error = _bind(sd, sa, salen);
+        if (error < 0) {
+            return (error);
+        }
 
-	if (*portp == 0) {
-		int saved_errno = errno;
+        error = _setsockopt(sd, proto, portrange, &portlow,
+                            sizeof(portlow));
 
-		if (error < 0) {
-			if (_setsockopt(sd, proto, portrange, &old,
-			    sizeof(old)) < 0)
-				errno = saved_errno;
-			return (error);
-		}
+        if (error < 0) {
+            return (error);
+        }
+    }
 
-		if (sa != (struct sockaddr *)&myaddr) {
-			/* Hmm, what did the kernel assign? */
-			if (_getsockname(sd, sa, &salen) < 0)
-				errno = saved_errno;
-			return (error);
-		}
-	}
-	return (error);
+    error = _bind(sd, sa, salen);
+
+    if (*portp == 0) {
+        int saved_errno = errno;
+
+        if (error < 0) {
+            if (_setsockopt(sd, proto, portrange, &old,
+                            sizeof(old)) < 0) {
+                errno = saved_errno;
+            }
+
+            return (error);
+        }
+
+        if (sa != (struct sockaddr*)&myaddr) {
+            /* Hmm, what did the kernel assign? */
+            if (_getsockname(sd, sa, &salen) < 0) {
+                errno = saved_errno;
+            }
+
+            return (error);
+        }
+    }
+
+    return (error);
 }

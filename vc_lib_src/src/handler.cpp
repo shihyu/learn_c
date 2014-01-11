@@ -27,9 +27,8 @@ _PNH _pnhHeap;
 *******************************************************************************/
 
 extern "C"
-void __cdecl _initp_heap_handler(void *enull)
-{
-        _pnhHeap = (_PNH) enull;
+void __cdecl _initp_heap_handler(void* enull) {
+    _pnhHeap = (_PNH) enull;
 }
 
 
@@ -48,21 +47,16 @@ void __cdecl _initp_heap_handler(void *enull)
 *
 *******************************************************************************/
 _PNH __cdecl _set_new_handler(
-        _PNH pnh
-        )
-{
-        _PNH pnhOld;
-
-        /* lock the heap */
-        _mlock(_HEAP_LOCK);
-
-        pnhOld = (_PNH) _decode_pointer(_pnhHeap);
-        _pnhHeap = (_PNH) _encode_pointer(pnh);
-
-        /* unlock the heap */
-        _munlock(_HEAP_LOCK);
-
-        return(pnhOld);
+    _PNH pnh
+) {
+    _PNH pnhOld;
+    /* lock the heap */
+    _mlock(_HEAP_LOCK);
+    pnhOld = (_PNH) _decode_pointer(_pnhHeap);
+    _pnhHeap = (_PNH) _encode_pointer(pnh);
+    /* unlock the heap */
+    _munlock(_HEAP_LOCK);
+    return (pnhOld);
 }
 
 
@@ -81,12 +75,10 @@ _PNH __cdecl _set_new_handler(
 *
 *******************************************************************************/
 _CRTIMP _PNH __cdecl _set_new_handler(
-        int pnh
-        )
-{
-        _ASSERTE(pnh == 0);
-
-        return _set_new_handler(static_cast<_PNH>(NULL));
+    int pnh
+) {
+    _ASSERTE(pnh == 0);
+    return _set_new_handler(static_cast<_PNH>(NULL));
 }
 
 /***
@@ -104,11 +96,10 @@ _CRTIMP _PNH __cdecl _set_new_handler(
 *       Currently installed new handler
 *
 *******************************************************************************/
-_PNH __cdecl _query_new_handler (
-        void
-        )
-{
-        return (_PNH) _decode_pointer(_pnhHeap);
+_PNH __cdecl _query_new_handler(
+    void
+) {
+    return (_PNH) _decode_pointer(_pnhHeap);
 }
 
 
@@ -127,13 +118,13 @@ _PNH __cdecl _query_new_handler (
 *       may throw bad_alloc
 *
 *******************************************************************************/
-extern "C" int __cdecl _callnewh(size_t size)
-{
-        {
-            _PNH pnh = (_PNH) _decode_pointer(_pnhHeap);
+extern "C" int __cdecl _callnewh(size_t size) {
+    {
+        _PNH pnh = (_PNH) _decode_pointer(_pnhHeap);
 
-            if ( (pnh == NULL) || ((*pnh)(size) == 0) )
-                return 0;
+        if ((pnh == NULL) || ((*pnh)(size) == 0)) {
+            return 0;
         }
-        return 1;
+    }
+    return 1;
 }

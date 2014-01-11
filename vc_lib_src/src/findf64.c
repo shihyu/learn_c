@@ -29,7 +29,7 @@
 #define _USE_INT64 1
 #endif  /* _USE_INT64 */
 
-__time64_t __cdecl __time64_t_from_ft(FILETIME * pft);
+__time64_t __cdecl __time64_t_from_ft(FILETIME* pft);
 
 /***
 *long _findfirst(wildspec, finddata) - Find first matching file
@@ -58,67 +58,64 @@ __time64_t __cdecl __time64_t_from_ft(FILETIME * pft);
 #if _USE_INT64
 
 intptr_t __cdecl _tfindfirst64(
-        const _TSCHAR * szWild,
-        struct _tfinddata64_t * pfd
-        )
+    const _TSCHAR* szWild,
+    struct _tfinddata64_t* pfd
+)
 
 #else  /* _USE_INT64 */
 
 intptr_t __cdecl _tfindfirst64i32(
-        const _TSCHAR * szWild,
-        struct _tfinddata64i32_t * pfd
-        )
+    const _TSCHAR* szWild,
+    struct _tfinddata64i32_t* pfd
+)
 
 #endif  /* _USE_INT64 */
 
 {
-        WIN32_FIND_DATA wfd;
-        HANDLE          hFile;
-        DWORD           err;
+    WIN32_FIND_DATA wfd;
+    HANDLE          hFile;
+    DWORD           err;
+    _VALIDATE_RETURN((pfd != NULL), EINVAL, -1);
+    /* We assert to make sure the underlying Win32 struct WIN32_FIND_DATA's
+    cFileName member doesn't have an array size greater than ours */
+    _VALIDATE_RETURN((sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
+    _VALIDATE_RETURN((szWild != NULL), EINVAL, -1);
 
-        _VALIDATE_RETURN( (pfd != NULL), EINVAL, -1);
+    if ((hFile = FindFirstFile(szWild, &wfd)) == INVALID_HANDLE_VALUE) {
+        err = GetLastError();
 
-        /* We assert to make sure the underlying Win32 struct WIN32_FIND_DATA's
-        cFileName member doesn't have an array size greater than ours */
+        switch (err) {
+        case ERROR_NO_MORE_FILES:
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            errno = ENOENT;
+            break;
 
-        _VALIDATE_RETURN( (sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
-        _VALIDATE_RETURN( (szWild != NULL), EINVAL, -1);
+        case ERROR_NOT_ENOUGH_MEMORY:
+            errno = ENOMEM;
+            break;
 
-        if ((hFile = FindFirstFile(szWild, &wfd)) == INVALID_HANDLE_VALUE) {
-            err = GetLastError();
-            switch (err) {
-                case ERROR_NO_MORE_FILES:
-                case ERROR_FILE_NOT_FOUND:
-                case ERROR_PATH_NOT_FOUND:
-                    errno = ENOENT;
-                    break;
-
-                case ERROR_NOT_ENOUGH_MEMORY:
-                    errno = ENOMEM;
-                    break;
-
-                default:
-                    errno = EINVAL;
-                    break;
-            }
-            return (-1);
+        default:
+            errno = EINVAL;
+            break;
         }
 
-        pfd->attrib       = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)
-                            ? 0 : wfd.dwFileAttributes;
-        pfd->time_create  = __time64_t_from_ft(&wfd.ftCreationTime);
-        pfd->time_access  = __time64_t_from_ft(&wfd.ftLastAccessTime);
-        pfd->time_write   = __time64_t_from_ft(&wfd.ftLastWriteTime);
+        return (-1);
+    }
+
+    pfd->attrib       = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)
+                        ? 0 : wfd.dwFileAttributes;
+    pfd->time_create  = __time64_t_from_ft(&wfd.ftCreationTime);
+    pfd->time_access  = __time64_t_from_ft(&wfd.ftLastAccessTime);
+    pfd->time_write   = __time64_t_from_ft(&wfd.ftLastWriteTime);
 #if _USE_INT64
-        pfd->size         = ((__int64)(wfd.nFileSizeHigh)) * (0x100000000i64) +
-                            (__int64)(wfd.nFileSizeLow);
+    pfd->size         = ((__int64)(wfd.nFileSizeHigh)) * (0x100000000i64) +
+                        (__int64)(wfd.nFileSizeLow);
 #else  /* _USE_INT64 */
     pfd->size         = wfd.nFileSizeLow;
 #endif  /* _USE_INT64 */
-
-        _ERRCHECK(_tcscpy_s(pfd->name, _countof(pfd->name), wfd.cFileName));
-
-        return ((intptr_t)hFile);
+    _ERRCHECK(_tcscpy_s(pfd->name, _countof(pfd->name), wfd.cFileName));
+    return ((intptr_t)hFile);
 }
 
 /***
@@ -146,57 +143,56 @@ intptr_t __cdecl _tfindfirst64i32(
 
 #if _USE_INT64
 
-int __cdecl _tfindnext64(intptr_t hFile, struct _tfinddata64_t * pfd)
+int __cdecl _tfindnext64(intptr_t hFile, struct _tfinddata64_t* pfd)
 
 #else  /* _USE_INT64 */
 
-int __cdecl _tfindnext64i32(intptr_t hFile, struct _tfinddata64i32_t * pfd)
+int __cdecl _tfindnext64i32(intptr_t hFile, struct _tfinddata64i32_t* pfd)
 
 #endif  /* _USE_INT64 */
 
 {
-        WIN32_FIND_DATA wfd;
-        DWORD           err;
+    WIN32_FIND_DATA wfd;
+    DWORD           err;
+    _VALIDATE_RETURN(((HANDLE)hFile != INVALID_HANDLE_VALUE), EINVAL, -1);
+    _VALIDATE_RETURN((pfd != NULL), EINVAL, -1);
+    _VALIDATE_RETURN((sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
 
-        _VALIDATE_RETURN( ((HANDLE)hFile != INVALID_HANDLE_VALUE), EINVAL, -1);
-        _VALIDATE_RETURN( (pfd != NULL), EINVAL, -1);
-        _VALIDATE_RETURN( (sizeof(pfd->name) <= sizeof(wfd.cFileName)), ENOMEM, -1);
+    if (!FindNextFile((HANDLE)hFile, &wfd)) {
+        err = GetLastError();
 
-        if (!FindNextFile((HANDLE)hFile, &wfd)) {
-            err = GetLastError();
-            switch (err) {
-                case ERROR_NO_MORE_FILES:
-                case ERROR_FILE_NOT_FOUND:
-                case ERROR_PATH_NOT_FOUND:
-                    errno = ENOENT;
-                    break;
+        switch (err) {
+        case ERROR_NO_MORE_FILES:
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            errno = ENOENT;
+            break;
 
-                case ERROR_NOT_ENOUGH_MEMORY:
-                    errno = ENOMEM;
-                    break;
+        case ERROR_NOT_ENOUGH_MEMORY:
+            errno = ENOMEM;
+            break;
 
-                default:
-                    errno = EINVAL;
-                    break;
-            }
-            return (-1);
+        default:
+            errno = EINVAL;
+            break;
         }
 
-        pfd->attrib       = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)
-                            ? 0 : wfd.dwFileAttributes;
-        pfd->time_create  = __time64_t_from_ft(&wfd.ftCreationTime);
-        pfd->time_access  = __time64_t_from_ft(&wfd.ftLastAccessTime);
-        pfd->time_write   = __time64_t_from_ft(&wfd.ftLastWriteTime);
+        return (-1);
+    }
+
+    pfd->attrib       = (wfd.dwFileAttributes == FILE_ATTRIBUTE_NORMAL)
+                        ? 0 : wfd.dwFileAttributes;
+    pfd->time_create  = __time64_t_from_ft(&wfd.ftCreationTime);
+    pfd->time_access  = __time64_t_from_ft(&wfd.ftLastAccessTime);
+    pfd->time_write   = __time64_t_from_ft(&wfd.ftLastWriteTime);
 #if _USE_INT64
-        pfd->size         = ((__int64)(wfd.nFileSizeHigh)) * (0x100000000i64) +
-                            (__int64)(wfd.nFileSizeLow);
+    pfd->size         = ((__int64)(wfd.nFileSizeHigh)) * (0x100000000i64) +
+                        (__int64)(wfd.nFileSizeLow);
 #else  /* _USE_INT64 */
-        pfd->size         = wfd.nFileSizeLow;
+    pfd->size         = wfd.nFileSizeLow;
 #endif  /* _USE_INT64 */
-
-        _ERRCHECK(_tcscpy_s(pfd->name, _countof(pfd->name), wfd.cFileName));
-
-        return (0);
+    _ERRCHECK(_tcscpy_s(pfd->name, _countof(pfd->name), wfd.cFileName));
+    return (0);
 }
 
 #if !defined (_UNICODE) && !_USE_INT64
@@ -224,33 +220,31 @@ int __cdecl _tfindnext64i32(intptr_t hFile, struct _tfinddata64i32_t * pfd)
 *
 *******************************************************************************/
 
-__time64_t __cdecl __time64_t_from_ft(FILETIME * pft)
-{
-        SYSTEMTIME st;
-        FILETIME lft;
+__time64_t __cdecl __time64_t_from_ft(FILETIME* pft) {
+    SYSTEMTIME st;
+    FILETIME lft;
 
-        /* 0 FILETIME returns a -1 time_t */
+    /* 0 FILETIME returns a -1 time_t */
 
-        if (!pft->dwLowDateTime && !pft->dwHighDateTime) {
-            return ((__time64_t)-1);
-        }
+    if (!pft->dwLowDateTime && !pft->dwHighDateTime) {
+        return ((__time64_t) - 1);
+    }
 
-        /*
-         * Convert to a broken down local time value
-         */
-        if ( !FileTimeToLocalFileTime(pft, &lft) ||
-             !FileTimeToSystemTime(&lft, &st) )
-        {
-            return ((__time64_t)-1);
-        }
+    /*
+     * Convert to a broken down local time value
+     */
+    if (!FileTimeToLocalFileTime(pft, &lft) ||
+            !FileTimeToSystemTime(&lft, &st)) {
+        return ((__time64_t) - 1);
+    }
 
-        return ( __loctotime64_t(st.wYear,
-                                 st.wMonth,
-                                 st.wDay,
-                                 st.wHour,
-                                 st.wMinute,
-                                 st.wSecond,
-                                 -1) );
+    return (__loctotime64_t(st.wYear,
+                            st.wMonth,
+                            st.wDay,
+                            st.wHour,
+                            st.wMinute,
+                            st.wSecond,
+                            -1));
 }
 
 #endif  /* !defined (_UNICODE) && !_USE_INT64 */

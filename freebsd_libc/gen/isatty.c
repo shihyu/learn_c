@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,11 +38,10 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/isatty.c,v 1.6 2007/01/09 00:27:54 imp Exp 
 
 int
 isatty(fd)
-	int fd;
+int fd;
 {
-	int retval;
-	struct termios t;
-
-	retval = (tcgetattr(fd, &t) != -1);
-	return(retval);
+    int retval;
+    struct termios t;
+    retval = (tcgetattr(fd, &t) != -1);
+    return (retval);
 }

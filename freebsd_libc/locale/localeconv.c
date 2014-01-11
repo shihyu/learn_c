@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2001 Alexey Zelkin <phantom@FreeBSD.org>
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -13,8 +13,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *  This product includes software developed by the University of
+ *  California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -43,13 +43,13 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/localeconv.c,v 1.13 2003/06/26 10:46:16 
 #include "lmonetary.h"
 #include "lnumeric.h"
 
-/* 
+/*
  * The localeconv() function constructs a struct lconv from the current
  * monetary and numeric locales.
  *
  * Because localeconv() may be called many times (especially by library
- * routines like printf() & strtod()), the approprate members of the 
- * lconv structure are computed only when the monetary or numeric 
+ * routines like printf() & strtod()), the approprate members of the
+ * lconv structure are computed only when the monetary or numeric
  * locale has been changed.
  */
 int __mlocale_changed = 1;
@@ -58,54 +58,49 @@ int __nlocale_changed = 1;
 /*
  * Return the current locale conversion.
  */
-struct lconv *
-localeconv()
-{
+struct lconv*
+localeconv() {
     static struct lconv ret;
 
     if (__mlocale_changed) {
-	/* LC_MONETARY part */
-        struct lc_monetary_T * mptr; 
-
+        /* LC_MONETARY part */
+        struct lc_monetary_T* mptr;
 #define M_ASSIGN_STR(NAME) (ret.NAME = (char*)mptr->NAME)
 #define M_ASSIGN_CHAR(NAME) (ret.NAME = mptr->NAME[0])
-
-	mptr = __get_current_monetary_locale();
-	M_ASSIGN_STR(int_curr_symbol);
-	M_ASSIGN_STR(currency_symbol);
-	M_ASSIGN_STR(mon_decimal_point);
-	M_ASSIGN_STR(mon_thousands_sep);
-	M_ASSIGN_STR(mon_grouping);
-	M_ASSIGN_STR(positive_sign);
-	M_ASSIGN_STR(negative_sign);
-	M_ASSIGN_CHAR(int_frac_digits);
-	M_ASSIGN_CHAR(frac_digits);
-	M_ASSIGN_CHAR(p_cs_precedes);
-	M_ASSIGN_CHAR(p_sep_by_space);
-	M_ASSIGN_CHAR(n_cs_precedes);
-	M_ASSIGN_CHAR(n_sep_by_space);
-	M_ASSIGN_CHAR(p_sign_posn);
-	M_ASSIGN_CHAR(n_sign_posn);
-	M_ASSIGN_CHAR(int_p_cs_precedes);
-	M_ASSIGN_CHAR(int_n_cs_precedes);
-	M_ASSIGN_CHAR(int_p_sep_by_space);
-	M_ASSIGN_CHAR(int_n_sep_by_space);
-	M_ASSIGN_CHAR(int_p_sign_posn);
-	M_ASSIGN_CHAR(int_n_sign_posn);
-	__mlocale_changed = 0;
+        mptr = __get_current_monetary_locale();
+        M_ASSIGN_STR(int_curr_symbol);
+        M_ASSIGN_STR(currency_symbol);
+        M_ASSIGN_STR(mon_decimal_point);
+        M_ASSIGN_STR(mon_thousands_sep);
+        M_ASSIGN_STR(mon_grouping);
+        M_ASSIGN_STR(positive_sign);
+        M_ASSIGN_STR(negative_sign);
+        M_ASSIGN_CHAR(int_frac_digits);
+        M_ASSIGN_CHAR(frac_digits);
+        M_ASSIGN_CHAR(p_cs_precedes);
+        M_ASSIGN_CHAR(p_sep_by_space);
+        M_ASSIGN_CHAR(n_cs_precedes);
+        M_ASSIGN_CHAR(n_sep_by_space);
+        M_ASSIGN_CHAR(p_sign_posn);
+        M_ASSIGN_CHAR(n_sign_posn);
+        M_ASSIGN_CHAR(int_p_cs_precedes);
+        M_ASSIGN_CHAR(int_n_cs_precedes);
+        M_ASSIGN_CHAR(int_p_sep_by_space);
+        M_ASSIGN_CHAR(int_n_sep_by_space);
+        M_ASSIGN_CHAR(int_p_sign_posn);
+        M_ASSIGN_CHAR(int_n_sign_posn);
+        __mlocale_changed = 0;
     }
 
     if (__nlocale_changed) {
-	/* LC_NUMERIC part */
-        struct lc_numeric_T * nptr; 
-
+        /* LC_NUMERIC part */
+        struct lc_numeric_T* nptr;
 #define N_ASSIGN_STR(NAME) (ret.NAME = (char*)nptr->NAME)
-
-	nptr = __get_current_numeric_locale();
-	N_ASSIGN_STR(decimal_point);
-	N_ASSIGN_STR(thousands_sep);
-	N_ASSIGN_STR(grouping);
-	__nlocale_changed = 0;
+        nptr = __get_current_numeric_locale();
+        N_ASSIGN_STR(decimal_point);
+        N_ASSIGN_STR(thousands_sep);
+        N_ASSIGN_STR(grouping);
+        __nlocale_changed = 0;
     }
 
     return (&ret);

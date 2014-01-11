@@ -38,8 +38,7 @@ extern int errno;
  */
 __weak_reference(__error_unthreaded, __error);
 
-int *
-__error_unthreaded()
-{
-	return(&errno);
+int*
+__error_unthreaded() {
+    return (&errno);
 }

@@ -56,32 +56,32 @@ typedef enum _EXCEPTION_DISPOSITION {
 struct _EXCEPTION_RECORD;
 struct _CONTEXT;
 
-EXCEPTION_DISPOSITION __cdecl _except_handler (
-    __in struct _EXCEPTION_RECORD *_ExceptionRecord,
-    __in void * _EstablisherFrame,
-    __inout struct _CONTEXT *_ContextRecord,
-    __inout void * _DispatcherContext
-    );
+EXCEPTION_DISPOSITION __cdecl _except_handler(
+    __in struct _EXCEPTION_RECORD* _ExceptionRecord,
+    __in void* _EstablisherFrame,
+    __inout struct _CONTEXT* _ContextRecord,
+    __inout void* _DispatcherContext
+);
 
 #elif defined (_M_IA64)
 
 /*
  * Declarations to keep IA64 compiler happy
  */
-typedef struct _EXCEPTION_POINTERS *Exception_info_ptr;
+typedef struct _EXCEPTION_POINTERS* Exception_info_ptr;
 struct _EXCEPTION_RECORD;
 struct _CONTEXT;
 struct _DISPATCHER_CONTEXT;
 
 
-_CRTIMP EXCEPTION_DISPOSITION __cdecl __C_specific_handler (
-    __in struct _EXCEPTION_RECORD *_ExceptionRecord,
+_CRTIMP EXCEPTION_DISPOSITION __cdecl __C_specific_handler(
+    __in struct _EXCEPTION_RECORD* _ExceptionRecord,
     __in unsigned __int64 _MemoryStackFp,
     __in unsigned __int64 _BackingStoreFp,
-    __inout struct _CONTEXT *_ContextRecord,
-    __inout struct _DISPATCHER_CONTEXT *_DispatcherContext,
+    __inout struct _CONTEXT* _ContextRecord,
+    __inout struct _DISPATCHER_CONTEXT* _DispatcherContext,
     __in unsigned __int64 _GlobalPointer
-    );
+);
 
 #elif defined (_M_AMD64)
 
@@ -108,7 +108,7 @@ struct _CONTEXT;
 #define abnormal_termination        _abnormal_termination
 
 unsigned long __cdecl _exception_code(void);
-void *        __cdecl _exception_info(void);
+void*         __cdecl _exception_info(void);
 int           __cdecl _abnormal_termination(void);
 
 #endif  /* _MSC_VER */
@@ -128,7 +128,7 @@ int           __cdecl _abnormal_termination(void);
  * for convenience, define a type name for a pointer to signal-handler
  */
 
-typedef void (__cdecl * _PHNDLR)(int);
+typedef void (__cdecl* _PHNDLR)(int);
 
 /*
  * Exception-action table used by the C runtime to identify and dispose of
@@ -180,8 +180,8 @@ extern int _Num_FPE;
  * return values and prototype for the exception filter function used in the
  * C startup
  */
-int __cdecl __CppXcptFilter(__in unsigned long _ExceptionNum, __in struct _EXCEPTION_POINTERS * _ExceptionPtr);
-int __cdecl _XcptFilter(__in unsigned long _ExceptionNum, __in struct _EXCEPTION_POINTERS * _ExceptionPtr);
+int __cdecl __CppXcptFilter(__in unsigned long _ExceptionNum, __in struct _EXCEPTION_POINTERS* _ExceptionPtr);
+int __cdecl _XcptFilter(__in unsigned long _ExceptionNum, __in struct _EXCEPTION_POINTERS* _ExceptionPtr);
 
 #endif  /* _INTERNAL_IFSTRIP_ */
 

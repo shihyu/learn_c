@@ -33,42 +33,40 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wctype.c,v 1.3 2004/03/27 08:59:21 tjr E
 
 #undef iswctype
 int
-iswctype(wint_t wc, wctype_t charclass)
-{
-
-	return (__istype(wc, charclass));
+iswctype(wint_t wc, wctype_t charclass) {
+    return (__istype(wc, charclass));
 }
 
 wctype_t
-wctype(const char *property)
-{
-	struct {
-		const char	*name;
-		wctype_t	 mask;
-	} props[] = {
-		{ "alnum",	_CTYPE_A|_CTYPE_D },
-		{ "alpha",	_CTYPE_A },
-		{ "blank",	_CTYPE_B },
-		{ "cntrl",	_CTYPE_C },
-		{ "digit",	_CTYPE_D },
-		{ "graph",	_CTYPE_G },
-		{ "lower",	_CTYPE_L },
-		{ "print",	_CTYPE_R },
-		{ "punct",	_CTYPE_P },
-		{ "space",	_CTYPE_S },
-		{ "upper",	_CTYPE_U },
-		{ "xdigit",	_CTYPE_X },
-		{ "ideogram",	_CTYPE_I },	/* BSD extension */
-		{ "special",	_CTYPE_T },	/* BSD extension */
-		{ "phonogram",	_CTYPE_Q },	/* BSD extension */
-		{ "rune",	0xFFFFFF00L },	/* BSD extension */
-		{ NULL,		0UL },		/* Default */
-	};
-	int i;
+wctype(const char* property) {
+    struct {
+        const char*  name;
+        wctype_t     mask;
+    } props[] = {
+        { "alnum",  _CTYPE_A | _CTYPE_D },
+        { "alpha",  _CTYPE_A },
+        { "blank",  _CTYPE_B },
+        { "cntrl",  _CTYPE_C },
+        { "digit",  _CTYPE_D },
+        { "graph",  _CTYPE_G },
+        { "lower",  _CTYPE_L },
+        { "print",  _CTYPE_R },
+        { "punct",  _CTYPE_P },
+        { "space",  _CTYPE_S },
+        { "upper",  _CTYPE_U },
+        { "xdigit", _CTYPE_X },
+        { "ideogram",   _CTYPE_I }, /* BSD extension */
+        { "special",    _CTYPE_T }, /* BSD extension */
+        { "phonogram",  _CTYPE_Q }, /* BSD extension */
+        { "rune",   0xFFFFFF00L },  /* BSD extension */
+        { NULL,     0UL },      /* Default */
+    };
+    int i;
+    i = 0;
 
-	i = 0;
-	while (props[i].name != NULL && strcmp(props[i].name, property) != 0)
-		i++;
+    while (props[i].name != NULL && strcmp(props[i].name, property) != 0) {
+        i++;
+    }
 
-	return (props[i].mask);
+    return (props[i].mask);
 }

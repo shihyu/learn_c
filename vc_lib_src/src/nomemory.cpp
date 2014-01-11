@@ -3,11 +3,11 @@
 #include <yvals.h>
 _STD_BEGIN
 
-_MRTIMP2 void __cdecl _Nomemory()
-	{	// report out of memory
-	static const _XSTD bad_alloc nomem;
-	_RAISE(nomem);
-	}
+_MRTIMP2 void __cdecl _Nomemory() {
+    // report out of memory
+    static const _XSTD bad_alloc nomem;
+    _RAISE(nomem);
+}
 _STD_END
 
 /*

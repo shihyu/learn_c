@@ -17,8 +17,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the NetBSD
- *	Foundation, Inc. and its contributors.
+ *  This product includes software developed by the NetBSD
+ *  Foundation, Inc. and its contributors.
  * 4. Neither the name of The NetBSD Foundation nor the names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
@@ -49,12 +49,10 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/fpgetmask.c,v 1.1 2004/05/14 12:13:04
 #include "softfloat.h"
 
 #ifdef __weak_alias
-__weak_alias(fpgetmask,_fpgetmask)
+__weak_alias(fpgetmask, _fpgetmask)
 #endif
 
 fp_except
-fpgetmask(void)
-{
-
-	return float_exception_mask;
+fpgetmask(void) {
+    return float_exception_mask;
 }

@@ -34,13 +34,10 @@ unsigned int _outputformat = 0;
 *       Input parameters are validated. Refer to the validation section of the function.
 *
 *******************************************************************************/
-_CRTIMP unsigned int _set_output_format(unsigned int options)
-{
+_CRTIMP unsigned int _set_output_format(unsigned int options) {
     unsigned int old = _outputformat;
-
     /* validation section */
     _VALIDATE_RETURN((options & ~_TWO_DIGIT_EXPONENT) == 0, EINVAL, old);
-
     _outputformat = options;
     return old;
 }
@@ -59,7 +56,6 @@ _CRTIMP unsigned int _set_output_format(unsigned int options)
 *Exceptions:
 *
 *******************************************************************************/
-_CRTIMP unsigned int _get_output_format()
-{
+_CRTIMP unsigned int _get_output_format() {
     return _outputformat;
 }

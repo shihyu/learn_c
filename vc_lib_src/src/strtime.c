@@ -40,43 +40,37 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl _tstrtime_s (
-        _TSCHAR *buffer,
-        size_t sizeInChars
-        )
-{
-        int hours, minutes, seconds;
-        SYSTEMTIME dt;                       /* Win32 time structure */
-
-        _VALIDATE_RETURN_ERRCODE( ( buffer != NULL && sizeInChars > 0 ), EINVAL )
-        _RESET_STRING(buffer, sizeInChars);
-        _VALIDATE_RETURN_ERRCODE( ( sizeInChars >= 9 ), ERANGE )
-
-        GetLocalTime(&dt);
-
-        hours = dt.wHour;
-        minutes = dt.wMinute;
-        seconds = dt.wSecond;
-
-        /* store the components of the time into the string */
-        /* store separators */
-        buffer[2] = buffer[5] = _T(':');
-        /* store end of string */
-        buffer[8] = _T('\0');
-        /* store tens of hour */
-        buffer[0] = (_TSCHAR) (hours   / 10 + _T('0'));
-        /* store units of hour */
-        buffer[1] = (_TSCHAR) (hours   % 10 + _T('0'));
-        /* store tens of minute */
-        buffer[3] = (_TSCHAR) (minutes / 10 + _T('0'));
-        /* store units of minute */
-        buffer[4] = (_TSCHAR) (minutes % 10 + _T('0'));
-        /* store tens of second */
-        buffer[6] = (_TSCHAR) (seconds / 10 + _T('0'));
-        /* store units of second */
-        buffer[7] = (_TSCHAR) (seconds % 10 + _T('0'));
-
-        return 0;
+errno_t __cdecl _tstrtime_s(
+    _TSCHAR* buffer,
+    size_t sizeInChars
+) {
+    int hours, minutes, seconds;
+    SYSTEMTIME dt;                       /* Win32 time structure */
+    _VALIDATE_RETURN_ERRCODE((buffer != NULL && sizeInChars > 0), EINVAL)
+    _RESET_STRING(buffer, sizeInChars);
+    _VALIDATE_RETURN_ERRCODE((sizeInChars >= 9), ERANGE)
+    GetLocalTime(&dt);
+    hours = dt.wHour;
+    minutes = dt.wMinute;
+    seconds = dt.wSecond;
+    /* store the components of the time into the string */
+    /* store separators */
+    buffer[2] = buffer[5] = _T(':');
+    /* store end of string */
+    buffer[8] = _T('\0');
+    /* store tens of hour */
+    buffer[0] = (_TSCHAR)(hours   / 10 + _T('0'));
+    /* store units of hour */
+    buffer[1] = (_TSCHAR)(hours   % 10 + _T('0'));
+    /* store tens of minute */
+    buffer[3] = (_TSCHAR)(minutes / 10 + _T('0'));
+    /* store units of minute */
+    buffer[4] = (_TSCHAR)(minutes % 10 + _T('0'));
+    /* store tens of second */
+    buffer[6] = (_TSCHAR)(seconds / 10 + _T('0'));
+    /* store units of second */
+    buffer[7] = (_TSCHAR)(seconds % 10 + _T('0'));
+    return 0;
 }
 
 /***
@@ -95,16 +89,16 @@ errno_t __cdecl _tstrtime_s (
 *
 *******************************************************************************/
 
-_TSCHAR * __cdecl _tstrtime (
-        _TSCHAR *buffer
-        )
-{
+_TSCHAR* __cdecl _tstrtime(
+    _TSCHAR* buffer
+) {
     // This function assumes that buffer is 9 characters in size
-    errno_t e = _tstrtime_s( buffer, 9 );
-    if ( e != 0 )
-    {
+    errno_t e = _tstrtime_s(buffer, 9);
+
+    if (e != 0) {
         return NULL;
     }
+
     return buffer;
 }
 

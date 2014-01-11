@@ -52,18 +52,16 @@ intptr_t _confh = -2;       /* console output */
 *
 *******************************************************************************/
 
-void __cdecl __initconin (
-        void
-        )
-{
-        _coninpfh = (intptr_t)CreateFile( "CONIN$",
+void __cdecl __initconin(
+    void
+) {
+    _coninpfh = (intptr_t)CreateFile("CONIN$",
                                      GENERIC_READ | GENERIC_WRITE,
                                      FILE_SHARE_READ | FILE_SHARE_WRITE,
                                      NULL,
                                      OPEN_EXISTING,
                                      0,
-                                     NULL );
-
+                                     NULL);
 }
 
 
@@ -84,17 +82,16 @@ void __cdecl __initconin (
 *
 *******************************************************************************/
 
-void __cdecl __initconout (
-        void
-        )
-{
-        _confh = (intptr_t)CreateFile( "CONOUT$",
+void __cdecl __initconout(
+    void
+) {
+    _confh = (intptr_t)CreateFile("CONOUT$",
                                   GENERIC_WRITE,
                                   FILE_SHARE_READ | FILE_SHARE_WRITE,
                                   NULL,
                                   OPEN_EXISTING,
                                   0,
-                                  NULL );
+                                  NULL);
 }
 
 
@@ -114,15 +111,14 @@ void __cdecl __initconout (
 *
 *******************************************************************************/
 
-void __cdecl __termcon (
-        void
-        )
-{
-        if ( _confh != -1 && _confh != -2 ) {
-                CloseHandle( (HANDLE)_confh );
-        }
+void __cdecl __termcon(
+    void
+) {
+    if (_confh != -1 && _confh != -2) {
+        CloseHandle((HANDLE)_confh);
+    }
 
-        if ( _coninpfh != -1 && _coninpfh != -2 ) {
-                CloseHandle( (HANDLE)_coninpfh );
-        }
+    if (_coninpfh != -1 && _coninpfh != -2) {
+        CloseHandle((HANDLE)_coninpfh);
+    }
 }

@@ -30,15 +30,13 @@
 *
 *******************************************************************************/
 
-int __cdecl abs (
-        int number
-        )
-{
-        return( number>=0 ? number : -number );
+int __cdecl abs(
+    int number
+) {
+    return (number >= 0 ? number : -number);
 }
 __int64 __cdecl _abs64(
-        __int64 num
-        )
-{
-        return (num >=0 ? num : -num);
+    __int64 num
+) {
+    return (num >= 0 ? num : -num);
 }

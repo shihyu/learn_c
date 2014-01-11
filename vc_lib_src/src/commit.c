@@ -33,44 +33,40 @@
 *
 *******************************************************************************/
 
-int __cdecl _commit (
-        int filedes
-        )
-{
-        int retval;
+int __cdecl _commit(
+    int filedes
+) {
+    int retval;
+    /* if filedes out of range, complain */
+    _CHECK_FH_RETURN(filedes, EBADF, -1);
+    _VALIDATE_RETURN((filedes >= 0 && (unsigned)filedes < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_RETURN((_osfile(filedes) & FOPEN), EBADF, -1);
+    _lock_fh(filedes);
 
-        /* if filedes out of range, complain */
-        _CHECK_FH_RETURN( filedes, EBADF, -1 );
-        _VALIDATE_RETURN((filedes >= 0 && (unsigned)filedes < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_RETURN((_osfile(filedes) & FOPEN), EBADF, -1);
-
-        _lock_fh(filedes);
-        __try {
-                if (_osfile(filedes) & FOPEN) {
-
-        if ( !FlushFileBuffers((HANDLE)_get_osfhandle(filedes)) ) {
+    __try {
+        if (_osfile(filedes) & FOPEN) {
+            if (!FlushFileBuffers((HANDLE)_get_osfhandle(filedes))) {
                 retval = GetLastError();
-        }
-        else {
+            } else {
                 retval = 0;     /* return success */
-        }
+            }
 
-        /* map the OS return code to C errno value and return code */
-        if (retval == 0)
+            /* map the OS return code to C errno value and return code */
+            if (retval == 0) {
                 goto good;
+            }
 
-        _doserrno = retval;
-
-                }
+            _doserrno = retval;
+        }
 
         errno = EBADF;
         retval = -1;
+        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
+    good :
+        ;
+    } __finally {
+        _unlock_fh(filedes);
+    }
 
-        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-good :
-        ; }
-        __finally {
-                _unlock_fh(filedes);
-        }
-        return (retval);
+    return (retval);
 }

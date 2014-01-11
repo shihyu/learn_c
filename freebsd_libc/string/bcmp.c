@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1987, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,17 +39,22 @@ __FBSDID("$FreeBSD: src/lib/libc/string/bcmp.c,v 1.6 2007/01/09 00:28:11 imp Exp
  * bcmp -- vax cmpc3 instruction
  */
 int
-bcmp(const void *b1, const void *b2, size_t length)
-{
-	char *p1, *p2;
+bcmp(const void* b1, const void* b2, size_t length) {
+    char* p1, *p2;
 
-	if (length == 0)
-		return (0);
-	p1 = (char *)b1;
-	p2 = (char *)b2;
-	do
-		if (*p1++ != *p2++)
-			break;
-	while (--length);
-	return (length);
+    if (length == 0) {
+        return (0);
+    }
+
+    p1 = (char*)b1;
+    p2 = (char*)b2;
+
+    do
+        if (*p1++ != *p2++) {
+            break;
+        }
+
+    while (--length);
+
+    return (length);
 }

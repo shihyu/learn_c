@@ -32,24 +32,28 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/rpmatch.c,v 1.1 2005/01/09 03:55:13 tjr 
 #include <stdlib.h>
 
 int
-rpmatch(const char *response)
-{
-	regex_t yes, no;
-	int ret;
+rpmatch(const char* response) {
+    regex_t yes, no;
+    int ret;
 
-	if (regcomp(&yes, nl_langinfo(YESEXPR), REG_EXTENDED|REG_NOSUB) != 0)
-		return (-1);
-	if (regcomp(&no, nl_langinfo(NOEXPR), REG_EXTENDED|REG_NOSUB) != 0) {
-		regfree(&yes);
-		return (-1);
-	}
-	if (regexec(&yes, response, 0, NULL, 0) == 0)
-		ret = 1;
-	else if (regexec(&no, response, 0, NULL, 0) == 0)
-		ret = 0;
-	else
-		ret = -1;
-	regfree(&yes);
-	regfree(&no);
-	return (ret);
+    if (regcomp(&yes, nl_langinfo(YESEXPR), REG_EXTENDED | REG_NOSUB) != 0) {
+        return (-1);
+    }
+
+    if (regcomp(&no, nl_langinfo(NOEXPR), REG_EXTENDED | REG_NOSUB) != 0) {
+        regfree(&yes);
+        return (-1);
+    }
+
+    if (regexec(&yes, response, 0, NULL, 0) == 0) {
+        ret = 1;
+    } else if (regexec(&no, response, 0, NULL, 0) == 0) {
+        ret = 0;
+    } else {
+        ret = -1;
+    }
+
+    regfree(&yes);
+    regfree(&no);
+    return (ret);
 }

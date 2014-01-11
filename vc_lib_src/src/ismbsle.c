@@ -46,39 +46,41 @@
 *******************************************************************************/
 
 extern "C" int __cdecl _ismbslead_l(
-        const unsigned char *string,
-        const unsigned char *current,
-        _locale_t plocinfo
-        )
-{
-        /* validation section */
-        _VALIDATE_RETURN(string != NULL, EINVAL, 0);
-        _VALIDATE_RETURN(current != NULL, EINVAL, 0);
+    const unsigned char* string,
+    const unsigned char* current,
+    _locale_t plocinfo
+) {
+    /* validation section */
+    _VALIDATE_RETURN(string != NULL, EINVAL, 0);
+    _VALIDATE_RETURN(current != NULL, EINVAL, 0);
+    _LocaleUpdate _loc_update(plocinfo);
 
-        _LocaleUpdate _loc_update(plocinfo);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return 0;
+    }
 
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return 0;
-
-        while (string <= current && *string) {
-            if ( _ismbblead_l((*string), _loc_update.GetLocaleT()) ) {
-                if (string++ == current)        /* check lead byte */
-                    return -1;
-                if (!(*string))
-                    return 0;
+    while (string <= current && *string) {
+        if (_ismbblead_l((*string), _loc_update.GetLocaleT())) {
+            if (string++ == current) {      /* check lead byte */
+                return -1;
             }
-            ++string;
+
+            if (!(*string)) {
+                return 0;
+            }
         }
 
-        return 0;
+        ++string;
+    }
+
+    return 0;
 }
 
 extern "C" int (__cdecl _ismbslead)(
-        const unsigned char *string,
-        const unsigned char *current
-        )
-{
-        return _ismbslead_l(string, current, NULL);
+    const unsigned char* string,
+    const unsigned char* current
+) {
+    return _ismbslead_l(string, current, NULL);
 }
 
 #endif  /* _MBCS */

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	Regents of the University of California.  All rights reserved.
+ *  Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,22 +49,26 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/closedir.c,v 1.11 2007/01/09 00:27:53 imp E
  */
 int
 closedir(dirp)
-	DIR *dirp;
+DIR* dirp;
 {
-	int fd;
+    int fd;
 
-	if (__isthreaded)
-		_pthread_mutex_lock((pthread_mutex_t *)&dirp->dd_lock);
-	_seekdir(dirp, dirp->dd_rewind);	/* free seekdir storage */
-	fd = dirp->dd_fd;
-	dirp->dd_fd = -1;
-	dirp->dd_loc = 0;
-	free((void *)dirp->dd_buf);
-	_reclaim_telldir(dirp);
-	if (__isthreaded) {
-		_pthread_mutex_unlock((pthread_mutex_t *)&dirp->dd_lock);
-		_pthread_mutex_destroy((pthread_mutex_t *)&dirp->dd_lock);
-	}
-	free((void *)dirp);
-	return(_close(fd));
+    if (__isthreaded) {
+        _pthread_mutex_lock((pthread_mutex_t*)&dirp->dd_lock);
+    }
+
+    _seekdir(dirp, dirp->dd_rewind);    /* free seekdir storage */
+    fd = dirp->dd_fd;
+    dirp->dd_fd = -1;
+    dirp->dd_loc = 0;
+    free((void*)dirp->dd_buf);
+    _reclaim_telldir(dirp);
+
+    if (__isthreaded) {
+        _pthread_mutex_unlock((pthread_mutex_t*)&dirp->dd_lock);
+        _pthread_mutex_destroy((pthread_mutex_t*)&dirp->dd_lock);
+    }
+
+    free((void*)dirp);
+    return (_close(fd));
 }

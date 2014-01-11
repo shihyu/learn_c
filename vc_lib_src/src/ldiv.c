@@ -33,21 +33,19 @@
 *
 *******************************************************************************/
 
-ldiv_t __cdecl ldiv (
-        long numer,
-        long denom
-        )
-{
-        ldiv_t result;
+ldiv_t __cdecl ldiv(
+    long numer,
+    long denom
+) {
+    ldiv_t result;
+    result.quot = numer / denom;
+    result.rem = numer % denom;
 
-        result.quot = numer / denom;
-        result.rem = numer % denom;
+    if (numer < 0 && result.rem > 0) {
+        /* did division wrong; must fix up */
+        ++result.quot;
+        result.rem -= denom;
+    }
 
-        if (numer < 0 && result.rem > 0) {
-                /* did division wrong; must fix up */
-                ++result.quot;
-                result.rem -= denom;
-        }
-
-        return result;
+    return result;
 }

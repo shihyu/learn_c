@@ -34,58 +34,60 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/lmessages.c,v 1.14 2003/06/26 10:46:16 p
 
 #define LCMESSAGES_SIZE_FULL (sizeof(struct lc_messages_T) / sizeof(char *))
 #define LCMESSAGES_SIZE_MIN \
-		(offsetof(struct lc_messages_T, yesstr) / sizeof(char *))
+        (offsetof(struct lc_messages_T, yesstr) / sizeof(char *))
 
 static char empty[] = "";
 
 static const struct lc_messages_T _C_messages_locale = {
-	"^[yY]" ,	/* yesexpr */
-	"^[nN]" ,	/* noexpr */
-	"yes" , 	/* yesstr */
-	"no"		/* nostr */
+    "^[yY]" ,   /* yesexpr */
+    "^[nN]" ,   /* noexpr */
+    "yes" ,     /* yesstr */
+    "no"        /* nostr */
 };
 
 static struct lc_messages_T _messages_locale;
-static int	_messages_using_locale;
-static char	*_messages_locale_buf;
+static int  _messages_using_locale;
+static char* _messages_locale_buf;
 
 int
-__messages_load_locale(const char *name)
-{
-	int ret;
+__messages_load_locale(const char* name) {
+    int ret;
+    ret = __part_load_locale(name, &_messages_using_locale,
+                             &_messages_locale_buf, "LC_MESSAGES",
+                             LCMESSAGES_SIZE_FULL, LCMESSAGES_SIZE_MIN,
+                             (const char**)&_messages_locale);
 
-	ret = __part_load_locale(name, &_messages_using_locale,
-		  &_messages_locale_buf, "LC_MESSAGES",
-		  LCMESSAGES_SIZE_FULL, LCMESSAGES_SIZE_MIN,
-		  (const char **)&_messages_locale);
-	if (ret == _LDP_LOADED) {
-		if (_messages_locale.yesstr == NULL)
-			_messages_locale.yesstr = empty;
-		if (_messages_locale.nostr == NULL)
-			_messages_locale.nostr = empty;
-	}
-	return (ret);
+    if (ret == _LDP_LOADED) {
+        if (_messages_locale.yesstr == NULL) {
+            _messages_locale.yesstr = empty;
+        }
+
+        if (_messages_locale.nostr == NULL) {
+            _messages_locale.nostr = empty;
+        }
+    }
+
+    return (ret);
 }
 
-struct lc_messages_T *
-__get_current_messages_locale(void)
-{
-	return (_messages_using_locale
-		? &_messages_locale
-		: (struct lc_messages_T *)&_C_messages_locale);
+struct lc_messages_T*
+__get_current_messages_locale(void) {
+    return (_messages_using_locale
+            ? &_messages_locale
+            : (struct lc_messages_T*)&_C_messages_locale);
 }
 
 #ifdef LOCALE_DEBUG
 void
 msgdebug() {
-printf(	"yesexpr = %s\n"
-	"noexpr = %s\n"
-	"yesstr = %s\n"
-	"nostr = %s\n",
-	_messages_locale.yesexpr,
-	_messages_locale.noexpr,
-	_messages_locale.yesstr,
-	_messages_locale.nostr
-);
+    printf("yesexpr = %s\n"
+           "noexpr = %s\n"
+           "yesstr = %s\n"
+           "nostr = %s\n",
+           _messages_locale.yesexpr,
+           _messages_locale.noexpr,
+           _messages_locale.yesstr,
+           _messages_locale.nostr
+          );
 }
 #endif /* LOCALE_DEBUG */

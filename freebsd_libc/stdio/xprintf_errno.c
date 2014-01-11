@@ -37,29 +37,27 @@
 #include "printf.h"
 
 int
-__printf_arginfo_errno(const struct printf_info *pi __unused, size_t n, int *argt)
-{
-
-	assert(n >= 1);
-	argt[0] = PA_INT;
-	return (1);
+__printf_arginfo_errno(const struct printf_info* pi __unused, size_t n, int* argt) {
+    assert(n >= 1);
+    argt[0] = PA_INT;
+    return (1);
 }
 
 int
-__printf_render_errno(struct __printf_io *io, const struct printf_info *pi __unused, const void *const *arg)
-{
-	int ret, error;
-	char buf[64];
-	const char *p;
+__printf_render_errno(struct __printf_io* io, const struct printf_info* pi __unused, const void* const* arg) {
+    int ret, error;
+    char buf[64];
+    const char* p;
+    ret = 0;
+    error = *((const int*)arg[0]);
 
-	ret = 0;
-	error = *((const int *)arg[0]);
-	if (error >= 0 && error < sys_nerr) {
-		p = strerror(error);
-		return (__printf_out(io, pi, p, strlen(p)));
-	}
-	sprintf(buf, "errno=%d/0x%x", error, error);
-	ret += __printf_out(io, pi, buf, strlen(buf));
-	__printf_flush(io);
-	return(ret);
+    if (error >= 0 && error < sys_nerr) {
+        p = strerror(error);
+        return (__printf_out(io, pi, p, strlen(p)));
+    }
+
+    sprintf(buf, "errno=%d/0x%x", error, error);
+    ret += __printf_out(io, pi, buf, strlen(buf));
+    __printf_flush(io);
+    return (ret);
 }

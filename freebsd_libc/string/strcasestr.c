@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -39,23 +39,27 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strcasestr.c,v 1.4 2007/01/09 00:28:12 i
 /*
  * Find the first occurrence of find in s, ignore case.
  */
-char *
+char*
 strcasestr(s, find)
-	const char *s, *find;
+const char* s, *find;
 {
-	char c, sc;
-	size_t len;
+    char c, sc;
+    size_t len;
 
-	if ((c = *find++) != 0) {
-		c = tolower((unsigned char)c);
-		len = strlen(find);
-		do {
-			do {
-				if ((sc = *s++) == 0)
-					return (NULL);
-			} while ((char)tolower((unsigned char)sc) != c);
-		} while (strncasecmp(s, find, len) != 0);
-		s--;
-	}
-	return ((char *)s);
+    if ((c = *find++) != 0) {
+        c = tolower((unsigned char)c);
+        len = strlen(find);
+
+        do {
+            do {
+                if ((sc = *s++) == 0) {
+                    return (NULL);
+                }
+            } while ((char)tolower((unsigned char)sc) != c);
+        } while (strncasecmp(s, find, len) != 0);
+
+        s--;
+    }
+
+    return ((char*)s);
 }

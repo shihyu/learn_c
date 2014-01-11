@@ -1,4 +1,4 @@
-/*	$NetBSD: fpgetround.c,v 1.2 2002/01/13 21:45:50 thorpej Exp $	*/
+/*  $NetBSD: fpgetround.c,v 1.2 2002/01/13 21:45:50 thorpej Exp $   */
 
 /*
  * Written by J.T. Conklin, Apr 10, 1995
@@ -12,10 +12,8 @@ __FBSDID("$FreeBSD: src/lib/libc/sparc64/gen/fpgetround.c,v 1.1 2002/09/14 18:06
 #include <ieeefp.h>
 
 fp_rnd_t
-fpgetround()
-{
-	unsigned int x;
-
-	__asm__("st %%fsr,%0" : "=m" (x));
-	return ((fp_rnd_t)FSR_GET_RD(x));
+fpgetround() {
+    unsigned int x;
+    __asm__("st %%fsr,%0" : "=m"(x));
+    return ((fp_rnd_t)FSR_GET_RD(x));
 }

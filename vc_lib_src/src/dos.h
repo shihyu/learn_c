@@ -37,11 +37,11 @@ extern "C" {
 #ifndef _DISKFREE_T_DEFINED
 /* _getdiskfree structure (duplicated in DIRECT.H) */
 struct _diskfree_t {
-        unsigned total_clusters;
-        unsigned avail_clusters;
-        unsigned sectors_per_cluster;
-        unsigned bytes_per_sector;
-        };
+    unsigned total_clusters;
+    unsigned avail_clusters;
+    unsigned sectors_per_cluster;
+    unsigned bytes_per_sector;
+};
 
 #define _DISKFREE_T_DEFINED
 #endif  /* _DISKFREE_T_DEFINED */
@@ -57,7 +57,7 @@ struct _diskfree_t {
 
 /* Function prototypes */
 #ifndef _GETDISKFREE_DEFINED
-_CRTIMP __checkReturn unsigned __cdecl _getdiskfree(__in unsigned _Drive, __out struct _diskfree_t * _DiskFree);
+_CRTIMP __checkReturn unsigned __cdecl _getdiskfree(__in unsigned _Drive, __out struct _diskfree_t* _DiskFree);
 #define _GETDISKFREE_DEFINED
 #endif  /* _GETDISKFREE_DEFINED */
 

@@ -36,8 +36,8 @@ _CRTALLOC(".CRT$XIC") static _PIFV pinit = __onexitinit;
  * manipulated by _onexit()/atexit().
  * NOTE - the pointers are stored encoded.
  */
-extern _PVFV *__onexitbegin;
-extern _PVFV *__onexitend;
+extern _PVFV* __onexitbegin;
+extern _PVFV* __onexitend;
 
 /*
  * Define increments (in entries) for growing the _onexit/atexit table
@@ -46,7 +46,7 @@ extern _PVFV *__onexitend;
 #define MAXINCR     512
 
 static _onexit_t __cdecl _onexit_nolock(_onexit_t);
-static _onexit_t __cdecl _dllonexit_nolock(_onexit_t, _PVFV **, _PVFV **);
+static _onexit_t __cdecl _dllonexit_nolock(_onexit_t, _PVFV**, _PVFV**);
 
 /***
 *_onexit(func), atexit(func) - add function to be executed upon exit
@@ -79,91 +79,86 @@ static _onexit_t __cdecl _dllonexit_nolock(_onexit_t, _PVFV **, _PVFV **);
 *
 *******************************************************************************/
 
-_onexit_t __cdecl _onexit (
-        _onexit_t func
-        )
-{
-        _onexit_t retval;
+_onexit_t __cdecl _onexit(
+    _onexit_t func
+) {
+    _onexit_t retval;
+    _lockexit();
 
-        _lockexit();
+    __try {
+        retval = _onexit_nolock(func);
+    } __finally {
+        _unlockexit();
+    }
 
-        __try {
-            retval = _onexit_nolock(func);
-        }
-        __finally {
-            _unlockexit();
-        }
-
-        return retval;
+    return retval;
 }
 
 
-static _onexit_t __cdecl _onexit_nolock (
-        _onexit_t func
-        )
-{
-        _PVFV * p;
-        size_t  oldsize;
-        _PVFV * onexitbegin = (_PVFV *)_decode_pointer(__onexitbegin);
-        _PVFV * onexitend = (_PVFV *)_decode_pointer(__onexitend);
+static _onexit_t __cdecl _onexit_nolock(
+    _onexit_t func
+) {
+    _PVFV* p;
+    size_t  oldsize;
+    _PVFV* onexitbegin = (_PVFV*)_decode_pointer(__onexitbegin);
+    _PVFV* onexitend = (_PVFV*)_decode_pointer(__onexitend);
 
-        /* overflow check */
-        if (onexitend < onexitbegin ||
-            ((char *)onexitend - (char *)onexitbegin) + sizeof(_PVFV) < sizeof(_PVFV))
-        {
-            return NULL;
-        }
+    /* overflow check */
+    if (onexitend < onexitbegin ||
+            ((char*)onexitend - (char*)onexitbegin) + sizeof(_PVFV) < sizeof(_PVFV)) {
+        return NULL;
+    }
 
+    /*
+     * First, make sure the table has room for a new entry
+     */
+    if ((oldsize = _msize_crt(onexitbegin))
+            < ((size_t)((char*)onexitend -
+                        (char*)onexitbegin) + sizeof(_PVFV))) {
         /*
-         * First, make sure the table has room for a new entry
+         * not enough room, try to grow the table. first, try to double it.
          */
-        if ( (oldsize = _msize_crt(onexitbegin))
-                < ((size_t)((char *)onexitend -
-            (char *)onexitbegin) + sizeof(_PVFV)) )
-        {
+        size_t newsize = oldsize + __min(oldsize, (MAXINCR * sizeof(_PVFV)));
+
+        if (newsize < oldsize ||
+                (p = (_PVFV*)_realloc_crt(onexitbegin, newsize)) == NULL) {
             /*
-             * not enough room, try to grow the table. first, try to double it.
+             * failed, try to grow by MININCR
              */
-            size_t newsize = oldsize + __min(oldsize, (MAXINCR * sizeof(_PVFV)));
-            if ( newsize < oldsize ||
-                 (p = (_PVFV *)_realloc_crt(onexitbegin, newsize)) == NULL )
-            {
+            newsize = oldsize + MININCR * sizeof(_PVFV);
+
+            if (newsize < oldsize ||
+                    (p = (_PVFV*)_realloc_crt(onexitbegin, newsize)) == NULL)
                 /*
-                 * failed, try to grow by MININCR
+                 * failed again. don't do anything rash, just fail
                  */
-                newsize = oldsize + MININCR * sizeof(_PVFV);
-                if ( newsize < oldsize ||
-                     (p = (_PVFV *)_realloc_crt(onexitbegin, newsize)) == NULL )
-                    /*
-                     * failed again. don't do anything rash, just fail
-                     */
-                    return NULL;
+            {
+                return NULL;
             }
-
-            /*
-             * update __onexitend and __onexitbegin
-             */
-#pragma warning(suppress: 22008) /* prefast is confused */
-            onexitend = p + (onexitend - onexitbegin);
-            onexitbegin = p;
-            __onexitbegin = (_PVFV *)_encode_pointer(onexitbegin);
         }
 
         /*
-         * Put the new entry into the table and update the end-of-table
-         * pointer.
+         * update __onexitend and __onexitbegin
          */
-         *(onexitend++) = (_PVFV)func;
-        __onexitend = (_PVFV *)_encode_pointer(onexitend);
+#pragma warning(suppress: 22008) /* prefast is confused */
+        onexitend = p + (onexitend - onexitbegin);
+        onexitbegin = p;
+        __onexitbegin = (_PVFV*)_encode_pointer(onexitbegin);
+    }
 
-        return func;
+    /*
+     * Put the new entry into the table and update the end-of-table
+     * pointer.
+     */
+    *(onexitend++) = (_PVFV)func;
+    __onexitend = (_PVFV*)_encode_pointer(onexitend);
+    return func;
 }
 
-int __cdecl atexit (
-        _PVFV func
-        )
-{
-        return (_onexit((_onexit_t)func) == NULL) ? -1 : 0;
+int __cdecl atexit(
+    _PVFV func
+) {
+    return (_onexit((_onexit_t)func) == NULL) ? -1 : 0;
 }
 
 
@@ -199,25 +194,24 @@ int __cdecl atexit (
 *
 *******************************************************************************/
 
-int __cdecl __onexitinit (
-        void
-        )
-{
-        _PVFV * onexitbegin;
+int __cdecl __onexitinit(
+    void
+) {
+    _PVFV* onexitbegin;
+    onexitbegin = (_PVFV*)_calloc_crt(32, sizeof(_PVFV));
+    __onexitend = __onexitbegin = (_PVFV*)_encode_pointer(onexitbegin);
 
-        onexitbegin = (_PVFV *)_calloc_crt(32, sizeof(_PVFV));
-        __onexitend = __onexitbegin = (_PVFV *)_encode_pointer(onexitbegin);
+    if (onexitbegin == NULL)
+        /*
+         * cannot allocate minimal required size. return
+         * fatal runtime error.
+         */
+    {
+        return _RT_ONEXIT;
+    }
 
-        if ( onexitbegin == NULL )
-            /*
-             * cannot allocate minimal required size. return
-             * fatal runtime error.
-             */
-            return _RT_ONEXIT;
-
-        *onexitbegin = (_PVFV) NULL;
-
-        return 0;
+    *onexitbegin = (_PVFV) NULL;
+    return 0;
 }
 
 
@@ -259,77 +253,70 @@ int __cdecl __onexitinit (
 *
 *******************************************************************************/
 
-_onexit_t __cdecl __dllonexit (
-        _onexit_t func,
-        _PVFV ** pbegin,
-        _PVFV ** pend
-        )
-{
-        _onexit_t retval;
+_onexit_t __cdecl __dllonexit(
+    _onexit_t func,
+    _PVFV** pbegin,
+    _PVFV** pend
+) {
+    _onexit_t retval;
+    _lockexit();
 
-        _lockexit();
+    __try {
+        retval = _dllonexit_nolock(func, pbegin, pend);
+    } __finally {
+        _unlockexit();
+    }
 
-        __try {
-            retval = _dllonexit_nolock(func, pbegin, pend);
-        }
-        __finally {
-            _unlockexit();
-        }
-
-        return retval;
+    return retval;
 }
 
-static _onexit_t __cdecl _dllonexit_nolock (
-        _onexit_t func,
-        _PVFV ** pbegin,
-        _PVFV ** pend
-        )
-{
-        _PVFV   *p=NULL;
-        size_t oldsize;
+static _onexit_t __cdecl _dllonexit_nolock(
+    _onexit_t func,
+    _PVFV** pbegin,
+    _PVFV** pend
+) {
+    _PVFV*   p = NULL;
+    size_t oldsize;
 
+    /*
+     * First, make sure the table has room for a new entry
+     */
+    if ((oldsize = _msize_crt(*pbegin)) <= (size_t)((char*)(*pend) -
+            (char*)(*pbegin))) {
         /*
-         * First, make sure the table has room for a new entry
+         * not enough room, try to grow the table
          */
-        if ( (oldsize = _msize_crt(*pbegin)) <= (size_t)((char *)(*pend) -
-            (char *)(*pbegin)) )
-        {
-            /*
-             * not enough room, try to grow the table
-             */
-            size_t grow=__min(oldsize, MAXINCR * sizeof(_PVFV));
-            if((_HEAP_MAXREQ-grow<oldsize) ||
-                ((p = (_PVFV *)_realloc_crt((*pbegin), oldsize + grow)) == NULL))
-            {
-                /*
-                 * failed, try to grow by ONEXITTBLINCR
-                 */
-                grow=MININCR * sizeof(_PVFV);
-                if ( (_HEAP_MAXREQ-grow<oldsize) ||
-                    ((p = (_PVFV *)_realloc_crt((*pbegin), oldsize + grow)) == NULL ))
-                {
-                    /*
-                     * failed again. don't do anything rash, just fail
-                     */
-                    return NULL;
-                }
-            }
+        size_t grow = __min(oldsize, MAXINCR * sizeof(_PVFV));
 
+        if ((_HEAP_MAXREQ - grow < oldsize) ||
+                ((p = (_PVFV*)_realloc_crt((*pbegin), oldsize + grow)) == NULL)) {
             /*
-             * update (*pend) and (*pbegin)
+             * failed, try to grow by ONEXITTBLINCR
              */
-            (*pend) = p + ((*pend) - (*pbegin));
-            (*pbegin) = p;
+            grow = MININCR * sizeof(_PVFV);
+
+            if ((_HEAP_MAXREQ - grow < oldsize) ||
+                    ((p = (_PVFV*)_realloc_crt((*pbegin), oldsize + grow)) == NULL)) {
+                /*
+                 * failed again. don't do anything rash, just fail
+                 */
+                return NULL;
+            }
         }
 
         /*
-         * Put the new entry into the table and update the end-of-table
-         * pointer.
+         * update (*pend) and (*pbegin)
          */
-         *((*pend)++) = (_PVFV)func;
+        (*pend) = p + ((*pend) - (*pbegin));
+        (*pbegin) = p;
+    }
 
-        return func;
-
+    /*
+     * Put the new entry into the table and update the end-of-table
+     * pointer.
+     */
+    *((*pend)++) = (_PVFV)func;
+    return func;
 }
 
 #endif  /* CRTDLL */

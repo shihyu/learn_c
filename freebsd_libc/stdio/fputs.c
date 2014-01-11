@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -49,20 +49,19 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fputs.c,v 1.12 2007/01/09 00:28:06 imp Ex
  */
 int
 fputs(s, fp)
-	const char * __restrict s;
-	FILE * __restrict fp;
+const char* __restrict s;
+FILE* __restrict fp;
 {
-	int retval;
-	struct __suio uio;
-	struct __siov iov;
-
-	iov.iov_base = (void *)s;
-	iov.iov_len = uio.uio_resid = strlen(s);
-	uio.uio_iov = &iov;
-	uio.uio_iovcnt = 1;
-	FLOCKFILE(fp);
-	ORIENT(fp, -1);
-	retval = __sfvwrite(fp, &uio);
-	FUNLOCKFILE(fp);
-	return (retval);
+    int retval;
+    struct __suio uio;
+    struct __siov iov;
+    iov.iov_base = (void*)s;
+    iov.iov_len = uio.uio_resid = strlen(s);
+    uio.uio_iov = &iov;
+    uio.uio_iovcnt = 1;
+    FLOCKFILE(fp);
+    ORIENT(fp, -1);
+    retval = __sfvwrite(fp, &uio);
+    FUNLOCKFILE(fp);
+    return (retval);
 }

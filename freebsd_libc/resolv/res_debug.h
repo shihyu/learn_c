@@ -26,10 +26,10 @@
 #else
 #   define Dprint(cond, args) if (cond) {fprintf args;} else {}
 #   define DprintQ(cond, args, query, size) if (cond) {\
-			fprintf args;\
-			res_pquery(statp, query, size, stdout);\
-		} else {}
+            fprintf args;\
+            res_pquery(statp, query, size, stdout);\
+        } else {}
 #endif
 
-#endif /* _RES_DEBUG_H_ */ 
+#endif /* _RES_DEBUG_H_ */
 /*! \file */

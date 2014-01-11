@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,49 +42,59 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/tempnam.c,v 1.11 2007/01/09 00:28:07 imp 
 #include <paths.h>
 
 __warn_references(tempnam,
-    "warning: tempnam() possibly used unsafely; consider using mkstemp()");
+                  "warning: tempnam() possibly used unsafely; consider using mkstemp()");
 
-extern char *_mktemp(char *);
+extern char* _mktemp(char*);
 
-char *
+char*
 tempnam(dir, pfx)
-	const char *dir, *pfx;
+const char* dir, *pfx;
 {
-	int sverrno;
-	char *f, *name;
+    int sverrno;
+    char* f, *name;
 
-	if (!(name = malloc(MAXPATHLEN)))
-		return(NULL);
+    if (!(name = malloc(MAXPATHLEN))) {
+        return (NULL);
+    }
 
-	if (!pfx)
-		pfx = "tmp.";
+    if (!pfx) {
+        pfx = "tmp.";
+    }
 
-	if (issetugid() == 0 && (f = getenv("TMPDIR"))) {
-		(void)snprintf(name, MAXPATHLEN, "%s%s%sXXXXXX", f,
-		    *(f + strlen(f) - 1) == '/'? "": "/", pfx);
-		if ((f = _mktemp(name)))
-			return(f);
-	}
+    if (issetugid() == 0 && (f = getenv("TMPDIR"))) {
+        (void)snprintf(name, MAXPATHLEN, "%s%s%sXXXXXX", f,
+                       *(f + strlen(f) - 1) == '/' ? "" : "/", pfx);
 
-	if ((f = (char *)dir)) {
-		(void)snprintf(name, MAXPATHLEN, "%s%s%sXXXXXX", f,
-		    *(f + strlen(f) - 1) == '/'? "": "/", pfx);
-		if ((f = _mktemp(name)))
-			return(f);
-	}
+        if ((f = _mktemp(name))) {
+            return (f);
+        }
+    }
 
-	f = P_tmpdir;
-	(void)snprintf(name, MAXPATHLEN, "%s%sXXXXXX", f, pfx);
-	if ((f = _mktemp(name)))
-		return(f);
+    if ((f = (char*)dir)) {
+        (void)snprintf(name, MAXPATHLEN, "%s%s%sXXXXXX", f,
+                       *(f + strlen(f) - 1) == '/' ? "" : "/", pfx);
 
-	f = _PATH_TMP;
-	(void)snprintf(name, MAXPATHLEN, "%s%sXXXXXX", f, pfx);
-	if ((f = _mktemp(name)))
-		return(f);
+        if ((f = _mktemp(name))) {
+            return (f);
+        }
+    }
 
-	sverrno = errno;
-	free(name);
-	errno = sverrno;
-	return(NULL);
+    f = P_tmpdir;
+    (void)snprintf(name, MAXPATHLEN, "%s%sXXXXXX", f, pfx);
+
+    if ((f = _mktemp(name))) {
+        return (f);
+    }
+
+    f = _PATH_TMP;
+    (void)snprintf(name, MAXPATHLEN, "%s%sXXXXXX", f, pfx);
+
+    if ((f = _mktemp(name))) {
+        return (f);
+    }
+
+    sverrno = errno;
+    free(name);
+    errno = sverrno;
+    return (NULL);
 }

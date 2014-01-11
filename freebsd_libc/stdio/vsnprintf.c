@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -41,35 +41,44 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/vsnprintf.c,v 1.23 2007/01/09 00:28:08 im
 #include "local.h"
 
 int
-vsnprintf(char * __restrict str, size_t n, const char * __restrict fmt,
-    __va_list ap)
-{
-	size_t on;
-	int ret;
-	char dummy[2];
-	FILE f;
-	struct __sFILEX ext;
+vsnprintf(char* __restrict str, size_t n, const char* __restrict fmt,
+          __va_list ap) {
+    size_t on;
+    int ret;
+    char dummy[2];
+    FILE f;
+    struct __sFILEX ext;
+    on = n;
 
-	on = n;
-	if (n != 0)
-		n--;
-	if (n > INT_MAX)
-		n = INT_MAX;
-	/* Stdio internals do not deal correctly with zero length buffer */
-	if (n == 0) {
-		if (on > 0)
-	  		*str = '\0';
-		str = dummy;
-		n = 1;
-	}
-	f._file = -1;
-	f._flags = __SWR | __SSTR;
-	f._bf._base = f._p = (unsigned char *)str;
-	f._bf._size = f._w = n;
-	f._extra = &ext;
-	INITEXTRA(&f);
-	ret = __vfprintf(&f, fmt, ap);
-	if (on > 0)
-		*f._p = '\0';
-	return (ret);
+    if (n != 0) {
+        n--;
+    }
+
+    if (n > INT_MAX) {
+        n = INT_MAX;
+    }
+
+    /* Stdio internals do not deal correctly with zero length buffer */
+    if (n == 0) {
+        if (on > 0) {
+            *str = '\0';
+        }
+
+        str = dummy;
+        n = 1;
+    }
+
+    f._file = -1;
+    f._flags = __SWR | __SSTR;
+    f._bf._base = f._p = (unsigned char*)str;
+    f._bf._size = f._w = n;
+    f._extra = &ext;
+    INITEXTRA(&f);
+    ret = __vfprintf(&f, fmt, ap);
+
+    if (on > 0) {
+        *f._p = '\0';
+    }
+
+    return (ret);
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,17 +41,20 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/gethostname.c,v 1.8 2007/01/09 00:27:54 imp
 
 int
 gethostname(name, namelen)
-	char *name;
-	size_t namelen;
+char* name;
+size_t namelen;
 {
-	int mib[2];
+    int mib[2];
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_HOSTNAME;
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_HOSTNAME;
-	if (sysctl(mib, 2, name, &namelen, NULL, 0) == -1) {
-		if (errno == ENOMEM)
-			errno = ENAMETOOLONG;
-		return (-1);
-	}
-	return (0);
+    if (sysctl(mib, 2, name, &namelen, NULL, 0) == -1) {
+        if (errno == ENOMEM) {
+            errno = ENAMETOOLONG;
+        }
+
+        return (-1);
+    }
+
+    return (0);
 }

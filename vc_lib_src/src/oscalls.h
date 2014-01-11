@@ -40,7 +40,7 @@ extern "C" {
 #if defined (_DEBUG) && defined (_WIN32)
 
 void DbgBreakPoint(void);
-int DbgPrint(__in_z __format_string char *_Format, ...);
+int DbgPrint(__in_z __format_string char* _Format, ...);
 
 #endif  /* defined (_DEBUG) && defined (_WIN32) */
 
@@ -64,14 +64,14 @@ typedef struct _FTIME {         /* ftime */
     unsigned short minutes : 6;
     unsigned short hours   : 5;
 } FTIME;
-typedef FTIME   *PFTIME;
+typedef FTIME*   PFTIME;
 
 typedef struct _FDATE {         /* fdate */
     unsigned short day     : 5;
     unsigned short month   : 4;
     unsigned short year    : 7;
 } FDATE;
-typedef FDATE   *PFDATE;
+typedef FDATE*   PFDATE;
 
 #else  /* _WIN32 */
 

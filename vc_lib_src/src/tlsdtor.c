@@ -33,11 +33,11 @@
 
 typedef struct TlsDtorNode {
     int count;
-    struct TlsDtorNode *next;
+    struct TlsDtorNode* next;
     _PVFV funcs[FUNCS_PER_NODE];
 } TlsDtorNode;
 
-static __declspec(thread) TlsDtorNode *dtor_list;
+static __declspec(thread) TlsDtorNode* dtor_list;
 static __declspec(thread) TlsDtorNode dtor_list_head;
 
 /*
@@ -60,23 +60,24 @@ static __declspec(thread) TlsDtorNode dtor_list_head;
 
 int __cdecl __tlregdtor(
     _PVFV func
-    )
-{
+) {
     if (dtor_list == NULL) {
         dtor_list = &dtor_list_head;
         dtor_list_head.count = 0;
-    }
-    else if (dtor_list->count == FUNCS_PER_NODE) {
-        TlsDtorNode *pnode = (TlsDtorNode *)_malloc_crt(sizeof(TlsDtorNode));
+    } else if (dtor_list->count == FUNCS_PER_NODE) {
+        TlsDtorNode* pnode = (TlsDtorNode*)_malloc_crt(sizeof(TlsDtorNode));
+
         if (pnode == NULL) {
             return -1;
         }
+
         pnode->count = 0;
         pnode->next = dtor_list;
         dtor_list = pnode;
         /* this helps prefast make sure dtor_list->count is 0 */
         dtor_list->count = 0;
     }
+
     dtor_list->funcs[dtor_list->count++] = func;
     return 0;
 }
@@ -108,9 +109,8 @@ static BOOL WINAPI __dyn_tls_dtor(
     HANDLE  hDllHandle,
     DWORD   dwReason,
     LPVOID  lpreserved
-    )
-{
-    TlsDtorNode *pnode, *pnext;
+) {
+    TlsDtorNode* pnode, *pnext;
     int i;
 
     if (dwReason != DLL_THREAD_DETACH && dwReason != DLL_PROCESS_DETACH) {
@@ -123,13 +123,15 @@ static BOOL WINAPI __dyn_tls_dtor(
                 (*pnode->funcs[i])();
             }
         }
+
         /*
          * Free every TlsDtorNode except the original one, which is statically
          * allocated.
          */
         pnext = pnode->next;
+
         if (pnext != NULL) {
-            _free_crt((void *)pnode);
+            _free_crt((void*)pnode);
         }
     }
 

@@ -35,30 +35,29 @@
 *
 *******************************************************************************/
 
-int __cdecl _tremove (
-        const _TSCHAR *path
-        )
-{
-        ULONG dosretval;
+int __cdecl _tremove(
+    const _TSCHAR* path
+) {
+    ULONG dosretval;
 
-        if (!DeleteFile((LPTSTR)path))
-            dosretval = GetLastError();
-        else
-            dosretval = 0;
+    if (!DeleteFile((LPTSTR)path)) {
+        dosretval = GetLastError();
+    } else {
+        dosretval = 0;
+    }
 
-        if (dosretval) {
-            /* error occured -- map error code and return */
-            _dosmaperr(dosretval);
-            return -1;
-        }
+    if (dosretval) {
+        /* error occured -- map error code and return */
+        _dosmaperr(dosretval);
+        return -1;
+    }
 
-        return 0;
+    return 0;
 }
 
-int __cdecl _tunlink (
-        const _TSCHAR *path
-        )
-{
-        /* remove is synonym for unlink */
-        return _tremove(path);
+int __cdecl _tunlink(
+    const _TSCHAR* path
+) {
+    /* remove is synonym for unlink */
+    return _tremove(path);
 }

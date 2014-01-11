@@ -48,222 +48,193 @@
 
 extern "C"
 {
-extern __inline int (__cdecl _isleadbyte_l) (
+    extern __inline int (__cdecl _isleadbyte_l)(
         int c,
         _locale_t plocinfo
-        )
-{
-    _LocaleUpdate _loc_update(plocinfo);
-    return (_loc_update.GetLocaleT()->locinfo->pctype[(unsigned char)(c)] & _LEADBYTE);
-}
+    ) {
+        _LocaleUpdate _loc_update(plocinfo);
+        return (_loc_update.GetLocaleT()->locinfo->pctype[(unsigned char)(c)] & _LEADBYTE);
+    }
 
-extern __inline int (__cdecl isleadbyte) (
+    extern __inline int (__cdecl isleadbyte)(
         int c
-        )
-{
+    ) {
         return _isleadbyte_l(c, NULL);
-}
+    }
 
-extern __inline int (__cdecl _iswalpha_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswalpha_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswalpha_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswalpha) (
+    extern __inline int (__cdecl iswalpha)(
         wint_t c
-        )
-{
+    ) {
         return iswalpha(c);
-}
+    }
 
-extern __inline int (__cdecl _iswupper_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswupper_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswupper_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswupper) (
+    extern __inline int (__cdecl iswupper)(
         wint_t c
-        )
-{
+    ) {
         return iswupper(c);
-}
+    }
 
-extern __inline int (__cdecl _iswlower_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswlower_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswlower_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswlower) (
+    extern __inline int (__cdecl iswlower)(
         wint_t c
-        )
-{
+    ) {
         return iswlower(c);
-}
+    }
 
-extern __inline int (__cdecl _iswdigit_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswdigit_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswdigit_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswdigit) (
+    extern __inline int (__cdecl iswdigit)(
         wint_t c
-        )
-{
+    ) {
         return iswdigit(c);
-}
+    }
 
-extern __inline int (__cdecl _iswxdigit_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswxdigit_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswxdigit_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswxdigit) (
+    extern __inline int (__cdecl iswxdigit)(
         wint_t c
-        )
-{
+    ) {
         return iswxdigit(c);
-}
+    }
 
-extern __inline int (__cdecl _iswspace_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswspace_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswspace_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswspace) (
+    extern __inline int (__cdecl iswspace)(
         wint_t c
-        )
-{
+    ) {
         return iswspace(c);
-}
+    }
 
-extern __inline int (__cdecl _iswpunct_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswpunct_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswpunct_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswpunct) (
+    extern __inline int (__cdecl iswpunct)(
         wint_t c
-        )
-{
+    ) {
         return iswpunct(c);
-}
+    }
 
-extern __inline int (__cdecl _iswalnum_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswalnum_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswalnum_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswalnum) (
+    extern __inline int (__cdecl iswalnum)(
         wint_t c
-        )
-{
+    ) {
         return iswalnum(c);
-}
+    }
 
-extern __inline int (__cdecl _iswprint_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswprint_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswprint_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswprint) (
+    extern __inline int (__cdecl iswprint)(
         wint_t c
-        )
-{
+    ) {
         return iswprint(c);
-}
+    }
 
-extern __inline int (__cdecl _iswgraph_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswgraph_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswgraph_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswgraph) (
+    extern __inline int (__cdecl iswgraph)(
         wint_t c
-        )
-{
+    ) {
         return iswgraph(c);
-}
+    }
 
-extern __inline int (__cdecl _iswcntrl_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswcntrl_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswcntrl_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl iswcntrl) (
+    extern __inline int (__cdecl iswcntrl)(
         wint_t c
-        )
-{
+    ) {
         return iswcntrl(c);
-}
+    }
 
-extern __inline int (__cdecl iswascii) (
+    extern __inline int (__cdecl iswascii)(
         wint_t c
-        )
-{
+    ) {
         return iswascii(c);
-}
+    }
 
-extern __inline int (__cdecl _iswcsym_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswcsym_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswcsym_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl __iswcsym) (
+    extern __inline int (__cdecl __iswcsym)(
         wint_t c
-        )
-{
+    ) {
         return __iswcsym(c);
-}
+    }
 
-extern __inline int (__cdecl _iswcsymf_l) (
-    wint_t c,
+    extern __inline int (__cdecl _iswcsymf_l)(
+        wint_t c,
         _locale_t plocinfo
-        )
-{
+    ) {
         return _iswcsymf_l(c, plocinfo);
-}
+    }
 
-extern __inline int (__cdecl __iswcsymf) (
+    extern __inline int (__cdecl __iswcsymf)(
         wint_t c
-        )
-{
+    ) {
         return __iswcsymf(c);
-}
+    }
 
 }

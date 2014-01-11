@@ -21,6 +21,6 @@
 
 #include <mbstok_s.inl>
 
-_REDIRECT_TO_L_VERSION_3(unsigned char *, _mbstok_s, unsigned char *, const unsigned char *, unsigned char **)
+_REDIRECT_TO_L_VERSION_3(unsigned char*, _mbstok_s, unsigned char*, const unsigned char*, unsigned char**)
 
 #endif  /* _MBCS */

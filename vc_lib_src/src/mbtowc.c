@@ -46,80 +46,76 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _mbtowc_l (
-        wchar_t  *pwc,
-        const char *s,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
-    if ( !s || n == 0 )
+extern "C" int __cdecl _mbtowc_l(
+    wchar_t*  pwc,
+    const char* s,
+    size_t n,
+    _locale_t plocinfo
+) {
+    if (!s || n == 0)
         /* indicate do not have state-dependent encodings,
            handle zero length string */
-        return 0;
-
-    if ( !*s )
     {
-        /* handle NULL char */
-        if (pwc)
-            *pwc = 0;
         return 0;
     }
 
+    if (!*s) {
+        /* handle NULL char */
+        if (pwc) {
+            *pwc = 0;
+        }
+
+        return 0;
+    }
 
     _LocaleUpdate _loc_update(plocinfo);
-    _ASSERTE (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
+    _ASSERTE(_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE )
-    {
-        if (pwc)
-            *pwc = (wchar_t)(unsigned char)*s;
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
+        if (pwc) {
+            *pwc = (wchar_t)(unsigned char) * s;
+        }
+
         return sizeof(char);
     }
 
-    if ( _isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT()) )
-    {
+    if (_isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT())) {
         /* multi-byte char */
-
-        if ( (_loc_update.GetLocaleT()->locinfo->mb_cur_max <= 1) || ((int)n < _loc_update.GetLocaleT()->locinfo->mb_cur_max) ||
-             (MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                  MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                                  s,
-                                  _loc_update.GetLocaleT()->locinfo->mb_cur_max,
-                                  pwc,
-                                  (pwc) ? 1 : 0 ) == 0) )
-        {
+        if ((_loc_update.GetLocaleT()->locinfo->mb_cur_max <= 1) || ((int)n < _loc_update.GetLocaleT()->locinfo->mb_cur_max) ||
+                (MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                     MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                                     s,
+                                     _loc_update.GetLocaleT()->locinfo->mb_cur_max,
+                                     pwc,
+                                     (pwc) ? 1 : 0) == 0)) {
             /* validate high byte of mbcs char */
-            if ( (n < (size_t)_loc_update.GetLocaleT()->locinfo->mb_cur_max) || (!*(s + 1)) )
-            {
+            if ((n < (size_t)_loc_update.GetLocaleT()->locinfo->mb_cur_max) || (!*(s + 1))) {
                 errno = EILSEQ;
                 return -1;
             }
         }
+
         return _loc_update.GetLocaleT()->locinfo->mb_cur_max;
-    }
-    else {
+    } else {
         /* single byte char */
-         if ( MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                  MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                                  s,
-                                  1,
-                                  pwc,
-                                  (pwc) ? 1 : 0 ) == 0 )
-        {
+        if (MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                                s,
+                                1,
+                                pwc,
+                                (pwc) ? 1 : 0) == 0) {
             errno = EILSEQ;
             return -1;
         }
+
         return sizeof(char);
     }
-
 }
 
 extern "C" int __cdecl mbtowc(
-        wchar_t  *pwc,
-        const char *s,
-        size_t n
-        )
-{
+    wchar_t*  pwc,
+    const char* s,
+    size_t n
+) {
     return _mbtowc_l(pwc, s, n, NULL);
 }

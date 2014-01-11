@@ -6,13 +6,14 @@ _C_STD_BEGIN
 #ifdef _Feraise
 #undef _Feraise
 #endif
-void __CLRCALL_PURE_OR_CDECL _Feraise(int except)
-	{	/* report floating-point exception */
-	if ((except & (_FE_DIVBYZERO | _FE_INVALID)) != 0)
-		errno = EDOM;
-	else if ((except & (_FE_UNDERFLOW | _FE_OVERFLOW)) != 0)
-		errno = ERANGE;
-	}
+void __CLRCALL_PURE_OR_CDECL _Feraise(int except) {
+    /* report floating-point exception */
+    if ((except & (_FE_DIVBYZERO | _FE_INVALID)) != 0) {
+        errno = EDOM;
+    } else if ((except & (_FE_UNDERFLOW | _FE_OVERFLOW)) != 0) {
+        errno = ERANGE;
+    }
+}
 _C_STD_END
 
 /*

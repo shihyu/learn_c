@@ -30,7 +30,7 @@
 #define Intcast (int)(long)
 #define Double_Align
 #define X64_bit_pointers
-#ifdef gcc_bug	/* XXX Why does arithchk report sudden underflow here? */
+#ifdef gcc_bug  /* XXX Why does arithchk report sudden underflow here? */
 #define Sudden_Underflow
 #endif
 

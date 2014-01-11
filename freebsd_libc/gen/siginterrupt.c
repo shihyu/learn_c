@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,20 +44,23 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/siginterrupt.c,v 1.5 2007/01/09 00:27:55 im
  */
 int
 siginterrupt(sig, flag)
-	int sig, flag;
+int sig, flag;
 {
-	extern sigset_t _sigintr;
-	struct sigaction sa;
-	int ret;
+    extern sigset_t _sigintr;
+    struct sigaction sa;
+    int ret;
 
-	if ((ret = _sigaction(sig, (struct sigaction *)0, &sa)) < 0)
-		return (ret);
-	if (flag) {
-		sigaddset(&_sigintr, sig);
-		sa.sa_flags &= ~SA_RESTART;
-	} else {
-		sigdelset(&_sigintr, sig);
-		sa.sa_flags |= SA_RESTART;
-	}
-	return (_sigaction(sig, &sa, (struct sigaction *)0));
+    if ((ret = _sigaction(sig, (struct sigaction*)0, &sa)) < 0) {
+        return (ret);
+    }
+
+    if (flag) {
+        sigaddset(&_sigintr, sig);
+        sa.sa_flags &= ~SA_RESTART;
+    } else {
+        sigdelset(&_sigintr, sig);
+        sa.sa_flags |= SA_RESTART;
+    }
+
+    return (_sigaction(sig, &sa, (struct sigaction*)0));
 }

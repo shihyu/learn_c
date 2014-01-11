@@ -61,27 +61,25 @@ _CRTALLOC(".CRT$XLZ") PIMAGE_TLS_CALLBACK __xl_z = 0;
 
 #ifdef _WIN64
 
-_CRTALLOC(".rdata$T") const IMAGE_TLS_DIRECTORY64 _tls_used =
-{
-        (ULONGLONG) &_tls_start,        // start of tls data
-        (ULONGLONG) &_tls_end,          // end of tls data
-        (ULONGLONG) &_tls_index,        // address of tls_index
-        (ULONGLONG) (&__xl_a+1),        // pointer to call back array
-        (ULONG) 0,                      // size of tls zero fill
-        (ULONG) 0                       // characteristics
+_CRTALLOC(".rdata$T") const IMAGE_TLS_DIRECTORY64 _tls_used = {
+    (ULONGLONG)& _tls_start,        // start of tls data
+    (ULONGLONG)& _tls_end,          // end of tls data
+    (ULONGLONG)& _tls_index,        // address of tls_index
+    (ULONGLONG)(&__xl_a + 1),       // pointer to call back array
+    (ULONG) 0,                      // size of tls zero fill
+    (ULONG) 0                       // characteristics
 };
 
 #else  /* _WIN64 */
 
 _CRTALLOC(".rdata$T")
-const IMAGE_TLS_DIRECTORY _tls_used =
-{
-        (ULONG)(ULONG_PTR) &_tls_start, // start of tls data
-        (ULONG)(ULONG_PTR) &_tls_end,   // end of tls data
-        (ULONG)(ULONG_PTR) &_tls_index, // address of tls_index
-        (ULONG)(ULONG_PTR) (&__xl_a+1), // pointer to call back array
-        (ULONG) 0,                      // size of tls zero fill
-        (ULONG) 0                       // characteristics
+const IMAGE_TLS_DIRECTORY _tls_used = {
+    (ULONG)(ULONG_PTR)& _tls_start, // start of tls data
+    (ULONG)(ULONG_PTR)& _tls_end,   // end of tls data
+    (ULONG)(ULONG_PTR)& _tls_index, // address of tls_index
+    (ULONG)(ULONG_PTR)(&__xl_a + 1), // pointer to call back array
+    (ULONG) 0,                      // size of tls zero fill
+    (ULONG) 0                       // characteristics
 };
 
 #endif  /* _WIN64 */

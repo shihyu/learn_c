@@ -38,33 +38,27 @@
 __weak_reference(__isinf, isinf);
 
 int
-__isinf(double d)
-{
-	union IEEEd2bits u;
-
-	u.d = d;
-	return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
+__isinf(double d) {
+    union IEEEd2bits u;
+    u.d = d;
+    return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
 }
 
 int
-__isinff(float f)
-{
-	union IEEEf2bits u;
-
-	u.f = f;
-	return (u.bits.exp == 255 && u.bits.man == 0);
+__isinff(float f) {
+    union IEEEf2bits u;
+    u.f = f;
+    return (u.bits.exp == 255 && u.bits.man == 0);
 }
 
 int
-__isinfl(long double e)
-{
-	union IEEEl2bits u;
-
-	u.e = e;
-	mask_nbit_l(u);
+__isinfl(long double e) {
+    union IEEEl2bits u;
+    u.e = e;
+    mask_nbit_l(u);
 #ifndef __alpha__
-	return (u.bits.exp == 32767 && u.bits.manl == 0 && u.bits.manh == 0);
+    return (u.bits.exp == 32767 && u.bits.manl == 0 && u.bits.manh == 0);
 #else
-	return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
+    return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
 #endif
 }

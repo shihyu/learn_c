@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,26 +42,34 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/times.c,v 1.4 2007/01/09 00:27:55 imp Exp $
  * Convert usec to clock ticks; could do (usec * CLK_TCK) / 1000000,
  * but this would overflow if we switch to nanosec.
  */
-#define	CONVTCK(r)	(r.tv_sec * CLK_TCK + r.tv_usec / (1000000 / CLK_TCK))
+#define CONVTCK(r)  (r.tv_sec * CLK_TCK + r.tv_usec / (1000000 / CLK_TCK))
 
 clock_t
 times(tp)
-	struct tms *tp;
+struct tms* tp;
 {
-	struct rusage ru;
-	struct timespec t;
-	clock_t c;
+    struct rusage ru;
+    struct timespec t;
+    clock_t c;
 
-	if (getrusage(RUSAGE_SELF, &ru) < 0)
-		return ((clock_t)-1);
-	tp->tms_utime = CONVTCK(ru.ru_utime);
-	tp->tms_stime = CONVTCK(ru.ru_stime);
-	if (getrusage(RUSAGE_CHILDREN, &ru) < 0)
-		return ((clock_t)-1);
-	tp->tms_cutime = CONVTCK(ru.ru_utime);
-	tp->tms_cstime = CONVTCK(ru.ru_stime);
-	if (clock_gettime(CLOCK_MONOTONIC, &t))
-		return ((clock_t)-1);
-	c = t.tv_sec * CLK_TCK + t.tv_nsec / (1000000000 / CLK_TCK);
-	return (c);
+    if (getrusage(RUSAGE_SELF, &ru) < 0) {
+        return ((clock_t) - 1);
+    }
+
+    tp->tms_utime = CONVTCK(ru.ru_utime);
+    tp->tms_stime = CONVTCK(ru.ru_stime);
+
+    if (getrusage(RUSAGE_CHILDREN, &ru) < 0) {
+        return ((clock_t) - 1);
+    }
+
+    tp->tms_cutime = CONVTCK(ru.ru_utime);
+    tp->tms_cstime = CONVTCK(ru.ru_stime);
+
+    if (clock_gettime(CLOCK_MONOTONIC, &t)) {
+        return ((clock_t) - 1);
+    }
+
+    c = t.tv_sec * CLK_TCK + t.tv_nsec / (1000000000 / CLK_TCK);
+    return (c);
 }

@@ -40,56 +40,49 @@
 *******************************************************************************/
 
 size_t __cdecl _mbstrlen_l(
-        const char *s,
-        _locale_t plocinfo
-        )
-{
+    const char* s,
+    _locale_t plocinfo
+) {
     size_t n;
     _LocaleUpdate _loc_update(plocinfo);
+    _ASSERTE(_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
 
-    _ASSERTE (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
-
-    if ( _loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 )
+    if (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1)
         /* handle single byte character sets */
+    {
         return strlen(s);
-
+    }
 
     /* verify all valid MB chars */
-    if ( MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                              MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                              s,
-                              -1,
-                              NULL,
-                              0 ) == 0 )
-    {
+    if (MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                            MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                            s,
+                            -1,
+                            NULL,
+                            0) == 0) {
         /* bad MB char */
         errno = EILSEQ;
-        return (size_t)-1;
+        return (size_t) - 1;
     }
 
     /* count MB chars */
     for (n = 0; *s; n++, s++) {
-        if ( _isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT()) )
-        {
-            if (*++s == '\0')
+        if (_isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT())) {
+            if (*++s == '\0') {
                 break;
+            }
         }
     }
 
-
-    return(n);
+    return (n);
 }
 
 size_t __cdecl _mbstrlen(
-        const char *s
-        )
-{
-    if (__locale_changed == 0)
-    {
+    const char* s
+) {
+    if (__locale_changed == 0) {
         return strlen(s);
-    }
-    else
-    {
+    } else {
         return _mbstrlen_l(s, NULL);
     }
 }

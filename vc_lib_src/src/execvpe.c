@@ -60,117 +60,124 @@ _mbschr((p), XSLASHCHAR)) )
 *
 *******************************************************************************/
 
-intptr_t __cdecl _texecvpe (
-        REG3 const _TSCHAR *filename,
-        const _TSCHAR * const *argvector,
-        const _TSCHAR * const *envptr
-        )
-{
-        _TSCHAR *envbuf = NULL;
-        REG1 _TSCHAR *env;
-        _TSCHAR *bbuf = NULL;
-        REG2 _TSCHAR *buf;
-        _TSCHAR *pfin;
+intptr_t __cdecl _texecvpe(
+    REG3 const _TSCHAR* filename,
+    const _TSCHAR* const* argvector,
+    const _TSCHAR* const* envptr
+) {
+    _TSCHAR* envbuf = NULL;
+    REG1 _TSCHAR* env;
+    _TSCHAR* bbuf = NULL;
+    REG2 _TSCHAR* buf;
+    _TSCHAR* pfin;
+    /* validation section */
+    _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(argvector != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*argvector != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(**argvector != _T('\0'), EINVAL, -1);
+    /* it is ok to reset errno here, because if exec succeeds, we'll lose errno,
+     * and if exec fails, errno will be set to something != 0
+     */
+    errno = 0;
+    _texecve(filename, argvector, envptr);
 
-        /* validation section */
-        _VALIDATE_RETURN(filename != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*filename != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(argvector != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*argvector != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(**argvector != _T('\0'), EINVAL, -1);
+    if ((errno != ENOENT)
+            || (_tcschr(filename, SLASHCHAR) != NULL)
+            || (_tcschr(filename, XSLASHCHAR) != NULL)
+            || *filename && *(filename + 1) == _T(':')
+            || (_ERRCHECK_EINVAL(_tdupenv_s_crt(&envbuf, NULL, _T("PATH"))) != 0)
+            || envbuf == NULL
+       ) {
+        goto reterror;
+    }
 
-        /* it is ok to reset errno here, because if exec succeeds, we'll lose errno,
-         * and if exec fails, errno will be set to something != 0
-         */
-        errno = 0;
+    /* allocate a buffer to hold alternate pathnames for the executable
+     */
+    if ((buf = bbuf = _calloc_crt(_MAX_PATH, sizeof(_TSCHAR))) == NULL) {
+        goto reterror;
+    }
 
-        _texecve(filename,argvector,envptr);
+    env = envbuf;
 
-        if ( (errno != ENOENT)
-        || (_tcschr(filename, SLASHCHAR) != NULL)
-        || (_tcschr(filename, XSLASHCHAR) != NULL)
-        || *filename && *(filename+1) == _T(':')
-        || (_ERRCHECK_EINVAL(_tdupenv_s_crt(&envbuf, NULL, _T("PATH"))) != 0)
-        || envbuf == NULL
-        )
-                goto reterror;
-
-        /* allocate a buffer to hold alternate pathnames for the executable
-         */
-        if ( (buf = bbuf = _calloc_crt(_MAX_PATH, sizeof(_TSCHAR))) == NULL )
-            goto reterror;
-
-        env = envbuf;
-        do {
-            /* copy a component into bbuf[], taking care not to overflow it
-                */
-            while ( (*env) && (*env != _T(';')) && (buf < (bbuf + (_MAX_PATH-2))) )
-            {
-                if(_istleadbyte(*env))
-                {
-                    if(env[1]==_T('\0') || buf+1>=(bbuf + (_MAX_PATH-2)))
-                    {
-                        /* dump if leadbyte followed by 0, or if leadbyte would be last item in buffer */
-                        break;
-                    }
-                    /* copy leadbyte char; already checked for space for two */
-                    *buf++ = *env++;
+    do {
+        /* copy a component into bbuf[], taking care not to overflow it
+            */
+        while ((*env) && (*env != _T(';')) && (buf < (bbuf + (_MAX_PATH - 2)))) {
+            if (_istleadbyte(*env)) {
+                if (env[1] == _T('\0') || buf + 1 >= (bbuf + (_MAX_PATH - 2))) {
+                    /* dump if leadbyte followed by 0, or if leadbyte would be last item in buffer */
+                    break;
                 }
+
+                /* copy leadbyte char; already checked for space for two */
                 *buf++ = *env++;
             }
 
-            *buf = _T('\0');
-            if (buf > bbuf)
-            {
-                pfin = --buf;
-            }
-            else
-            {
-                pfin = buf;
-            }
-            buf = bbuf;
+            *buf++ = *env++;
+        }
 
+        *buf = _T('\0');
+
+        if (buf > bbuf) {
+            pfin = --buf;
+        } else {
+            pfin = buf;
+        }
+
+        buf = bbuf;
 #ifdef _MBCS
-            if (*pfin == SLASHCHAR) {
-                    if (pfin != _mbsrchr(buf,SLASHCHAR))
-                            /* *pfin is the second byte of a double-byte
-                                * character
-                                */
-                            _ERRCHECK(strcat_s( buf, _MAX_PATH, SLASH ));
+
+        if (*pfin == SLASHCHAR) {
+            if (pfin != _mbsrchr(buf, SLASHCHAR))
+                /* *pfin is the second byte of a double-byte
+                    * character
+                    */
+            {
+                _ERRCHECK(strcat_s(buf, _MAX_PATH, SLASH));
             }
-            else if (*pfin != XSLASHCHAR)
-                    _ERRCHECK(strcat_s(buf, _MAX_PATH, SLASH));
+        } else if (*pfin != XSLASHCHAR) {
+            _ERRCHECK(strcat_s(buf, _MAX_PATH, SLASH));
+        }
+
 #else  /* _MBCS */
-            if (*pfin != SLASHCHAR && *pfin != XSLASHCHAR)
-                    _ERRCHECK(_tcscat_s(buf, _MAX_PATH, SLASH));
+
+        if (*pfin != SLASHCHAR && *pfin != XSLASHCHAR) {
+            _ERRCHECK(_tcscat_s(buf, _MAX_PATH, SLASH));
+        }
+
 #endif  /* _MBCS */
 
-            /* check that the final path will be of legal size. if so,
-                * build it. otherwise, return to the caller (return value
-                * and errno rename set from initial call to _execve()).
-                */
-            if ( (_tcslen(buf) + _tcslen(filename)) < _MAX_PATH )
-                    _ERRCHECK(_tcscat_s(buf, _MAX_PATH, filename));
-            else
-                    break;
+        /* check that the final path will be of legal size. if so,
+            * build it. otherwise, return to the caller (return value
+            * and errno rename set from initial call to _execve()).
+            */
+        if ((_tcslen(buf) + _tcslen(filename)) < _MAX_PATH) {
+            _ERRCHECK(_tcscat_s(buf, _MAX_PATH, filename));
+        } else {
+            break;
+        }
 
-            _texecve(buf, argvector, envptr);
+        _texecve(buf, argvector, envptr);
 
-            if ( (errno != ENOENT)
+        if ((errno != ENOENT)
 #ifdef _MBCS
-            && (!ISPSLASH(buf) || !ISPSLASH(buf+1)) )
+                && (!ISPSLASH(buf) || !ISPSLASH(buf + 1)))
 #else  /* _MBCS */
-            && (!ISSLASH(*buf) || !ISSLASH(*(buf+1))) )
+                && (!ISSLASH(*buf) || !ISSLASH(*(buf + 1))))
 #endif  /* _MBCS */
-                    break;
-
-        } while ( *env && env++ );
+            break;
+    } while (*env && env++);
 
 reterror:
-        if (bbuf != NULL)
-                _free_crt(bbuf);
-        if (envbuf != NULL)
-                _free_crt(envbuf);
 
-        return(-1);
+    if (bbuf != NULL) {
+        _free_crt(bbuf);
+    }
+
+    if (envbuf != NULL) {
+        _free_crt(envbuf);
+    }
+
+    return (-1);
 }

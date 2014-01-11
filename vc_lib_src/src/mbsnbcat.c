@@ -41,79 +41,77 @@
 *
 *******************************************************************************/
 
-extern "C" unsigned char * __cdecl _mbsnbcat_l(
-        unsigned char *dst,
-        const unsigned char *src,
-        size_t cnt,
-        _locale_t plocinfo
-        )
-{
-        unsigned char *start;
+extern "C" unsigned char* __cdecl _mbsnbcat_l(
+    unsigned char* dst,
+    const unsigned char* src,
+    size_t cnt,
+    _locale_t plocinfo
+) {
+    unsigned char* start;
 
-        if (!cnt)
-                return(dst);
+    if (!cnt) {
+        return (dst);
+    }
 
-        /* validation section */
-        _VALIDATE_RETURN(dst != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(src != NULL, EINVAL, NULL);
+    /* validation section */
+    _VALIDATE_RETURN(dst != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(src != NULL, EINVAL, NULL);
+    _LocaleUpdate _loc_update(plocinfo);
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
 
-        _LocaleUpdate _loc_update(plocinfo);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return (unsigned char*)strncat((char*)dst, (const char*)src, cnt);
+    }
 
-        _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return (unsigned char *)strncat((char *)dst, (const char *)src, cnt);
-        _END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
+    start = dst;
 
-        start = dst;
-        while (*dst++)
-                ;
-        --dst;          // dst now points to end of dst string
+    while (*dst++)
+        ;
 
-        /* if last char in string is a lead byte, back up pointer */
-        if ( dst!=start && _mbsbtype_l(start, (int) ((dst - start) - 1), _loc_update.GetLocaleT()) == _MBC_LEAD )
-        {
-            --dst;
-        }
+    --dst;          // dst now points to end of dst string
 
-        /* copy over the characters */
+    /* if last char in string is a lead byte, back up pointer */
+    if (dst != start && _mbsbtype_l(start, (int)((dst - start) - 1), _loc_update.GetLocaleT()) == _MBC_LEAD) {
+        --dst;
+    }
 
-        while (cnt--) {
+    /* copy over the characters */
 
-            if ( _ismbblead_l(*src, _loc_update.GetLocaleT()) ) {
-                *dst++ = *src++;
-                if (cnt == 0) {   /* write null if cnt exhausted */
-                    dst[-1] = '\0';
-                    break;
-                }
-                cnt--;
-                if ((*dst++ = *src++)=='\0') { /* or if no trail byte */
-                    dst[-2] = '\0';
-                    break;
-                }
-            }
-            else if ((*dst++ = *src++) == '\0')
+    while (cnt--) {
+        if (_ismbblead_l(*src, _loc_update.GetLocaleT())) {
+            *dst++ = *src++;
+
+            if (cnt == 0) {   /* write null if cnt exhausted */
+                dst[-1] = '\0';
                 break;
+            }
 
-        }
+            cnt--;
 
-        if ( dst!=start && _mbsbtype_l(start, (int) ((dst - start) - 1), _loc_update.GetLocaleT()) == _MBC_LEAD )
-        {
-            dst[-1] = '\0';
+            if ((*dst++ = *src++) == '\0') { /* or if no trail byte */
+                dst[-2] = '\0';
+                break;
+            }
+        } else if ((*dst++ = *src++) == '\0') {
+            break;
         }
-        else
-        {
-            *dst = '\0';
-        }
+    }
 
-        return(start);
+    if (dst != start && _mbsbtype_l(start, (int)((dst - start) - 1), _loc_update.GetLocaleT()) == _MBC_LEAD) {
+        dst[-1] = '\0';
+    } else {
+        *dst = '\0';
+    }
+
+    return (start);
 }
 
-extern "C" unsigned char * (__cdecl _mbsnbcat)(
-        unsigned char *dst,
-        const unsigned char *src,
-        size_t cnt
-        )
-{
+extern "C" unsigned char* (__cdecl _mbsnbcat)(
+    unsigned char* dst,
+    const unsigned char* src,
+    size_t cnt
+) {
     _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     return _mbsnbcat_l(dst, src, cnt, NULL);
     _END_SECURE_CRT_DEPRECATION_DISABLE

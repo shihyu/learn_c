@@ -14,9 +14,7 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/gedf2.c,v 1.1 2004/05/14 12:13:04 cog
 flag __gedf2(float64, float64);
 
 flag
-__gedf2(float64 a, float64 b)
-{
-
-	/* libgcc1.c says (a >= b) - 1 */
-	return float64_le(b, a) - 1;
+__gedf2(float64 a, float64 b) {
+    /* libgcc1.c says (a >= b) - 1 */
+    return float64_le(b, a) - 1;
 }

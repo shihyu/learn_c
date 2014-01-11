@@ -35,9 +35,8 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _loaddll(char * szName)
-{
-        return ((intptr_t)LoadLibrary(szName));
+intptr_t __cdecl _loaddll(char* szName) {
+    return ((intptr_t)LoadLibrary(szName));
 }
 
 /***
@@ -58,10 +57,10 @@ intptr_t __cdecl _loaddll(char * szName)
 *
 *******************************************************************************/
 
-int __cdecl _unloaddll(intptr_t hMod)
-{
-        if (!FreeLibrary((HANDLE)hMod)) {
-            return ((int)GetLastError());
-        }
-        return (0);
+int __cdecl _unloaddll(intptr_t hMod) {
+    if (!FreeLibrary((HANDLE)hMod)) {
+        return ((int)GetLastError());
+    }
+
+    return (0);
 }

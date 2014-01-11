@@ -40,43 +40,40 @@
 *******************************************************************************/
 
 
-int __cdecl _setmode (
-        int fh,
-        int mode
-        )
-{
-        int retval;
+int __cdecl _setmode(
+    int fh,
+    int mode
+) {
+    int retval;
+    _VALIDATE_RETURN(((mode == _O_TEXT) ||
+                      (mode == _O_BINARY) ||
+                      (mode == _O_WTEXT) ||
+                      (mode == _O_U8TEXT) ||
+                      (mode == _O_U16TEXT)),
+                     EINVAL, -1);
+    _CHECK_FH_RETURN(fh, EBADF, -1);
+    _VALIDATE_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
+    /* lock the file */
+    _lock_fh(fh);
 
-        _VALIDATE_RETURN(((mode == _O_TEXT) ||
-                          (mode == _O_BINARY) ||
-                          (mode == _O_WTEXT) ||
-                          (mode == _O_U8TEXT) ||
-                          (mode == _O_U16TEXT)),
-                         EINVAL, -1);
-        _CHECK_FH_RETURN( fh, EBADF, -1 );
-        _VALIDATE_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
-
-        /* lock the file */
-        _lock_fh(fh);
-
-        __try {
-                if ( _osfile(fh) & FOPEN )
-                        /* set the text/binary mode */
-                        retval = _setmode_nolock(fh, mode);
-                else {
-                        errno = EBADF;
-                        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-                        retval = -1;
-                }
+    __try {
+        if (_osfile(fh) & FOPEN)
+            /* set the text/binary mode */
+        {
+            retval = _setmode_nolock(fh, mode);
+        } else {
+            errno = EBADF;
+            _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
+            retval = -1;
         }
-        __finally {
-                /* unlock the file */
-                _unlock_fh(fh);
-        }
+    } __finally {
+        /* unlock the file */
+        _unlock_fh(fh);
+    }
 
-        /* Return to user (_setmode_nolock sets errno, if needed) */
-        return(retval);
+    /* Return to user (_setmode_nolock sets errno, if needed) */
+    return (retval);
 }
 
 /***
@@ -97,71 +94,60 @@ int __cdecl _setmode (
 *
 *******************************************************************************/
 
-int __cdecl _setmode_nolock (
-        REG1 int fh,
-        int mode
-        )
-{
-        int oldmode;
-        int oldtextmode;
+int __cdecl _setmode_nolock(
+    REG1 int fh,
+    int mode
+) {
+    int oldmode;
+    int oldtextmode;
+    oldmode = _osfile(fh) & FTEXT;
+    oldtextmode = _textmode(fh);
 
+    switch (mode) {
+    case _O_BINARY :
+        _osfile(fh) &= ~FTEXT;
+        break;
 
-        oldmode = _osfile(fh) & FTEXT;
-        oldtextmode = _textmode(fh);
+    case _O_TEXT :
+        _osfile(fh) |= FTEXT;
+        _textmode(fh) = __IOINFO_TM_ANSI;
+        break;
 
-        switch(mode) {
-            case _O_BINARY :
-                _osfile(fh) &= ~FTEXT;
-                break;
+    case _O_U8TEXT :
+        _osfile(fh) |= FTEXT;
+        _textmode(fh) = __IOINFO_TM_UTF8;
+        break;
 
-            case _O_TEXT :
-                _osfile(fh) |= FTEXT;
-                _textmode(fh) = __IOINFO_TM_ANSI;
-                break;
+    case _O_U16TEXT:
+    case _O_WTEXT :
+        _osfile(fh) |= FTEXT;
+        _textmode(fh) = __IOINFO_TM_UTF16LE;
+        break;
+    }
 
-            case _O_U8TEXT :
-                _osfile(fh) |= FTEXT;
-                _textmode(fh) = __IOINFO_TM_UTF8;
-                break;
+    if (oldmode == 0) {
+        return _O_BINARY;
+    }
 
-            case _O_U16TEXT:
-            case _O_WTEXT :
-                _osfile(fh) |= FTEXT;
-                _textmode(fh) = __IOINFO_TM_UTF16LE;
-                break;
-        }
-
-        if(oldmode == 0) {
-            return _O_BINARY;
-        }
-
-        if(oldtextmode == __IOINFO_TM_ANSI) {
-            return _O_TEXT;
-        }
-        else {
-            return _O_WTEXT;
-        }
+    if (oldtextmode == __IOINFO_TM_ANSI) {
+        return _O_TEXT;
+    } else {
+        return _O_WTEXT;
+    }
 }
 
-errno_t __cdecl _set_fmode(int mode)
-{
+errno_t __cdecl _set_fmode(int mode) {
     _VALIDATE_RETURN_ERRCODE(((mode == _O_TEXT) || (mode == _O_BINARY) || (mode == _O_WTEXT)), EINVAL);
-
     _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     InterlockedExchange(&_fmode, mode);
     _END_SECURE_CRT_DEPRECATION_DISABLE
-
     return 0;
-
 }
 
-errno_t __cdecl _get_fmode(int * pMode)
-{
+errno_t __cdecl _get_fmode(int* pMode) {
     _VALIDATE_RETURN_ERRCODE((pMode != NULL), EINVAL);
-
     _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     *pMode = _fmode;
     _END_SECURE_CRT_DEPRECATION_DISABLE
-
     return 0;
 }

@@ -36,58 +36,55 @@
 *
 *******************************************************************************/
 
-int __cdecl _setmaxstdio (
-        int maxnum
-        )
-{
-        void **newpiob;
-        int i;
-        int retval;
+int __cdecl _setmaxstdio(
+    int maxnum
+) {
+    void** newpiob;
+    int i;
+    int retval;
+    /*
+     * Make sure the request is reasonable.
+     */
+    _VALIDATE_RETURN(((maxnum >= _IOB_ENTRIES) && (maxnum <= _NHANDLE_)), EINVAL, -1);
+    _mlock(_IOB_SCAN_LOCK);
 
-        /*
-         * Make sure the request is reasonable.
-         */
-        _VALIDATE_RETURN(((maxnum >= _IOB_ENTRIES) && (maxnum <= _NHANDLE_)), EINVAL, -1);
-
-        _mlock(_IOB_SCAN_LOCK);
-        __try {
-
+    __try {
         /*
          * Try to reallocate the __piob array.
          */
-        if ( maxnum > _nstream ) {
-            if ( (newpiob = _recalloc_crt( __piob, maxnum, sizeof(void *) ))
-                 != NULL )
-            {
+        if (maxnum > _nstream) {
+            if ((newpiob = _recalloc_crt(__piob, maxnum, sizeof(void*)))
+                    != NULL) {
                 /*
                  * Initialize new __piob entries to NULL
                  */
-                for ( i = _nstream ; i < maxnum ; i++ )
+                for (i = _nstream ; i < maxnum ; i++) {
                     newpiob[i] = NULL;
+                }
 
                 retval = _nstream = maxnum;
                 __piob = newpiob;
-            }
-            else
+            } else {
                 retval = -1;
-        }
-        else if ( maxnum == _nstream )
+            }
+        } else if (maxnum == _nstream) {
             retval = _nstream;
-        else {  /* maxnum < _nstream */
+        } else { /* maxnum < _nstream */
             retval = maxnum;
+
             /*
              * Clean up the portion of the __piob[] to be freed.
              */
-            for ( i = _nstream - 1 ; i >= maxnum ; i-- )
+            for (i = _nstream - 1 ; i >= maxnum ; i--)
+
                 /*
                  * If __piob[i] is non-NULL, free up the _FILEX struct it
                  * points to.
                  */
-                if ( __piob[i] != NULL )
-                    if ( !inuse( (FILE *)__piob[i] ) ) {
-                        _free_crt( __piob[i] );
-                    }
-                    else {
+                if (__piob[i] != NULL)
+                    if (!inuse((FILE*)__piob[i])) {
+                        _free_crt(__piob[i]);
+                    } else {
                         /*
                          * _FILEX is still inuse! Don't free any anything and
                          * return failure to the caller.
@@ -96,23 +93,20 @@ int __cdecl _setmaxstdio (
                         break;
                     }
 
-            if ( retval != -1 )
-                if ( (newpiob = _recalloc_crt( __piob, maxnum, sizeof(void *) ))
-                     != NULL )
-                {
+            if (retval != -1)
+                if ((newpiob = _recalloc_crt(__piob, maxnum, sizeof(void*)))
+                        != NULL) {
                     _nstream = maxnum;      /* retval already set to maxnum */
                     __piob = newpiob;
-                }
-                else
+                } else {
                     retval = -1;
+                }
         }
+    } __finally {
+        _munlock(_IOB_SCAN_LOCK);
+    }
 
-        }
-        __finally {
-            _munlock(_IOB_SCAN_LOCK);
-        }
-
-        return retval;
+    return retval;
 }
 
 
@@ -132,9 +126,8 @@ int __cdecl _setmaxstdio (
 *
 *******************************************************************************/
 
-int __cdecl _getmaxstdio (
-        void
-        )
-{
-        return _nstream;
+int __cdecl _getmaxstdio(
+    void
+) {
+    return _nstream;
 }

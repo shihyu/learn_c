@@ -34,13 +34,10 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/i386_get_ldt.c,v 1.11 2004/01/09 16:52
 #include <machine/sysarch.h>
 
 int
-i386_get_ldt(int start, union descriptor *descs, int num)
-{
-	struct i386_ldt_args p;
-
-	p.start = start;
-	p.descs = descs;
-	p.num   = num;
-
-	return sysarch(I386_GET_LDT, &p);
+i386_get_ldt(int start, union descriptor* descs, int num) {
+    struct i386_ldt_args p;
+    p.start = start;
+    p.descs = descs;
+    p.num   = num;
+    return sysarch(I386_GET_LDT, &p);
 }

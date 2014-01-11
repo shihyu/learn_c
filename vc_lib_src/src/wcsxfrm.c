@@ -58,70 +58,60 @@
 *
 *******************************************************************************/
 
-extern "C" size_t __cdecl _wcsxfrm_l (
-        wchar_t *_string1,
-        const wchar_t *_string2,
-        size_t _count,
-        _locale_t plocinfo
-        )
-{
+extern "C" size_t __cdecl _wcsxfrm_l(
+    wchar_t* _string1,
+    const wchar_t* _string2,
+    size_t _count,
+    _locale_t plocinfo
+) {
     int size = INT_MAX;
-
     /* validation section */
     _VALIDATE_RETURN(_count <= INT_MAX, EINVAL, INT_MAX);
     _VALIDATE_RETURN(_string1 != NULL || _count == 0, EINVAL, INT_MAX);
     _VALIDATE_RETURN(_string2 != NULL, EINVAL, INT_MAX);
-
     _LocaleUpdate _loc_update(plocinfo);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE] == _CLOCALEHANDLE )
-    {
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE] == _CLOCALEHANDLE) {
+        _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
         wcsncpy(_string1, _string2, _count);
-_END_SECURE_CRT_DEPRECATION_DISABLE
+        _END_SECURE_CRT_DEPRECATION_DISABLE
         return wcslen(_string2);
     }
 
-    if ( 0 == (size = __crtLCMapStringW(_loc_update.GetLocaleT(),
-                    _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
-                    LCMAP_SORTKEY,
-                    _string2,
-                    -1,
-                    NULL,
-                    0,
-                    _loc_update.GetLocaleT()->locinfo->lc_collate_cp )) )
-    {
+    if (0 == (size = __crtLCMapStringW(_loc_update.GetLocaleT(),
+                                       _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
+                                       LCMAP_SORTKEY,
+                                       _string2,
+                                       -1,
+                                       NULL,
+                                       0,
+                                       _loc_update.GetLocaleT()->locinfo->lc_collate_cp))) {
         errno = EILSEQ;
         size = INT_MAX;
-    } else
-    {
-        if ( size <= (int)_count)
-        {
-            if ( 0 == (size = __crtLCMapStringW(
-                            _loc_update.GetLocaleT(),
-                            _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
-                            LCMAP_SORTKEY,
-                            _string2,
-                            -1,
-                            (wchar_t *)_string1,
-                            (int)_count,
-                            _loc_update.GetLocaleT()->locinfo->lc_collate_cp )) )
-            {
+    } else {
+        if (size <= (int)_count) {
+            if (0 == (size = __crtLCMapStringW(
+                                 _loc_update.GetLocaleT(),
+                                 _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
+                                 LCMAP_SORTKEY,
+                                 _string2,
+                                 -1,
+                                 (wchar_t*)_string1,
+                                 (int)_count,
+                                 _loc_update.GetLocaleT()->locinfo->lc_collate_cp))) {
                 errno = EILSEQ;
                 size = INT_MAX; /* default error */
-            } else
-            {
+            } else {
                 // Note that the size that LCMapStringW returns for
                 // LCMAP_SORTKEY is number of bytes needed. That's why it
                 // is safe to convert the buffer to wide char from end.
                 _count = size--;
-                for (;_count-- > 0;)
-                {
-                    _string1[_count] = (wchar_t)((unsigned char *)_string1)[_count];
+
+                for (; _count-- > 0;) {
+                    _string1[_count] = (wchar_t)((unsigned char*)_string1)[_count];
                 }
             }
-        } else
-        {
+        } else {
             *_string1 = '\0';
             errno = ERANGE;
             size--;
@@ -131,13 +121,11 @@ _END_SECURE_CRT_DEPRECATION_DISABLE
     return (size_t)size;
 }
 
-extern "C" size_t __cdecl wcsxfrm (
-        wchar_t *_string1,
-        const wchar_t *_string2,
-        size_t _count
-        )
-{
-
+extern "C" size_t __cdecl wcsxfrm(
+    wchar_t* _string1,
+    const wchar_t* _string2,
+    size_t _count
+) {
     return _wcsxfrm_l(_string1, _string2, _count, NULL);
 }
 

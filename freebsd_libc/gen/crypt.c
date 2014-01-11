@@ -31,7 +31,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-/* from static char sccsid[] = "@(#)crypt.c	5.11 (Berkeley) 6/25/91"; */
+/* from static char sccsid[] = "@(#)crypt.c 5.11 (Berkeley) 6/25/91"; */
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/cdefs.h>
@@ -49,46 +49,42 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/crypt.c,v 1.9 2007/01/09 00:27:53 imp Exp $
  */
 
 __warn_references(des_setkey,
-	"WARNING!  des_setkey(3) not present in the system!");
+                  "WARNING!  des_setkey(3) not present in the system!");
 
 /* ARGSUSED */
 int
-des_setkey(const char *key __unused)
-{
-	fprintf(stderr, "WARNING!  des_setkey(3) not present in the system!\n");
-	return (0);
+des_setkey(const char* key __unused) {
+    fprintf(stderr, "WARNING!  des_setkey(3) not present in the system!\n");
+    return (0);
 }
 
 __warn_references(des_cipher,
-	"WARNING!  des_cipher(3) not present in the system!");
+                  "WARNING!  des_cipher(3) not present in the system!");
 
 /* ARGSUSED */
 int
-des_cipher(const char *in, char *out, long salt __unused, int num_iter __unused)
-{
-	fprintf(stderr, "WARNING!  des_cipher(3) not present in the system!\n");
-	bcopy(in, out, 8);
-	return (0);
+des_cipher(const char* in, char* out, long salt __unused, int num_iter __unused) {
+    fprintf(stderr, "WARNING!  des_cipher(3) not present in the system!\n");
+    bcopy(in, out, 8);
+    return (0);
 }
 
 __warn_references(setkey,
-	"WARNING!  setkey(3) not present in the system!");
+                  "WARNING!  setkey(3) not present in the system!");
 
 /* ARGSUSED */
 int
-setkey(const char *key __unused)
-{
-	fprintf(stderr, "WARNING!  setkey(3) not present in the system!\n");
-	return (0);
+setkey(const char* key __unused) {
+    fprintf(stderr, "WARNING!  setkey(3) not present in the system!\n");
+    return (0);
 }
 
 __warn_references(encrypt,
-	"WARNING!  encrypt(3) not present in the system!");
+                  "WARNING!  encrypt(3) not present in the system!");
 
 /* ARGSUSED */
 int
-encrypt(char *block __unused, int flag __unused)
-{
-	fprintf(stderr, "WARNING!  encrypt(3) not present in the system!\n");
-	return (0);
+encrypt(char* block __unused, int flag __unused) {
+    fprintf(stderr, "WARNING!  encrypt(3) not present in the system!\n");
+    return (0);
 }

@@ -71,83 +71,83 @@ extern int __env_initialized;
 #define _tenvptr     _aenvptr
 #endif  /* WPRFLAG */
 
-int __cdecl _tsetenvp (
-        void
-        )
-{
-        _TSCHAR *p;
-        _TSCHAR **env;              /* _environ ptr traversal pointer */
-        int numstrings;             /* number of environment strings */
-        int cchars;
-
+int __cdecl _tsetenvp(
+    void
+) {
+    _TSCHAR* p;
+    _TSCHAR** env;              /* _environ ptr traversal pointer */
+    int numstrings;             /* number of environment strings */
+    int cchars;
 #if !defined (CRTDLL) && defined (_MBCS)
-        /* If necessary, initialize the multibyte ctype table. */
-        if ( __mbctype_initialized == 0 )
-            __initmbctable();
+
+    /* If necessary, initialize the multibyte ctype table. */
+    if (__mbctype_initialized == 0) {
+        __initmbctable();
+    }
+
 #endif  /* !defined (CRTDLL) && defined (_MBCS) */
+    numstrings = 0;
+    p = _tenvptr;
 
-        numstrings = 0;
+    /*
+     * We called __crtGetEnvironmentStrings[AW] just before this,
+     * so if _[aw]envptr is NULL, we failed to get the environment.
+     * Return an error.
+     */
+    if (p == NULL) {
+        return -1;
+    }
 
-        p = _tenvptr;
+    /*
+     * NOTE: starting with single null indicates no environ.
+     * Count the number of strings. Skip drive letter settings
+     * ("=C:=C:\foo" type) by skipping all environment variables
+     * that begin with '=' character.
+     */
 
-        /*
-         * We called __crtGetEnvironmentStrings[AW] just before this,
-         * so if _[aw]envptr is NULL, we failed to get the environment.
-         * Return an error.
-         */
-        if (p == NULL)
-            return -1;
-
-        /*
-         * NOTE: starting with single null indicates no environ.
-         * Count the number of strings. Skip drive letter settings
-         * ("=C:=C:\foo" type) by skipping all environment variables
-         * that begin with '=' character.
-         */
-
-        while (*p != _T('\0')) {
-            /* don't count "=..." type */
-            if (*p != _T('='))
-                ++numstrings;
-            p += _tcslen(p) + 1;
+    while (*p != _T('\0')) {
+        /* don't count "=..." type */
+        if (*p != _T('=')) {
+            ++numstrings;
         }
 
-        /* need pointer for each string, plus one null ptr at end */
-        if ( (_tenviron = env = (_TSCHAR **)
-            _calloc_crt((numstrings+1), sizeof(_TSCHAR *))) == NULL )
-            return -1;
+        p += _tcslen(p) + 1;
+    }
 
-        /* copy strings to malloc'd memory and save pointers in _environ */
-        for ( p = _tenvptr ; *p != L'\0' ; p += cchars )
-        {
-            cchars = (int)_tcslen(p) + 1;
-            /* don't copy "=..." type */
-            if (*p != _T('=')) {
-                if ( (*env = (_TSCHAR *)_calloc_crt(cchars, sizeof(_TSCHAR)))
-                     == NULL )
-                {
-                    _free_crt(_tenviron);
-                    _tenviron = NULL;
-                    return -1;
-                }
-                _ERRCHECK(_tcscpy_s(*env, cchars, p));
-                env++;
+    /* need pointer for each string, plus one null ptr at end */
+    if ((_tenviron = env = (_TSCHAR**)
+                           _calloc_crt((numstrings + 1), sizeof(_TSCHAR*))) == NULL) {
+        return -1;
+    }
+
+    /* copy strings to malloc'd memory and save pointers in _environ */
+    for (p = _tenvptr ; *p != L'\0' ; p += cchars) {
+        cchars = (int)_tcslen(p) + 1;
+
+        /* don't copy "=..." type */
+        if (*p != _T('=')) {
+            if ((*env = (_TSCHAR*)_calloc_crt(cchars, sizeof(_TSCHAR)))
+                    == NULL) {
+                _free_crt(_tenviron);
+                _tenviron = NULL;
+                return -1;
             }
+
+            _ERRCHECK(_tcscpy_s(*env, cchars, p));
+            env++;
         }
+    }
 
-        _free_crt(_tenvptr);
-        _tenvptr = NULL;
-
-        /* and a final NULL pointer */
-        *env = NULL;
-
+    _free_crt(_tenvptr);
+    _tenvptr = NULL;
+    /* and a final NULL pointer */
+    *env = NULL;
 #ifndef CRTDLL
-        /*
-         * Set flag for getenv() and _putenv() to know the environment
-         * has been set up.
-         */
-        __env_initialized = 1;
+    /*
+     * Set flag for getenv() and _putenv() to know the environment
+     * has been set up.
+     */
+    __env_initialized = 1;
 #endif  /* CRTDLL */
-
-        return 0;
+    return 0;
 }

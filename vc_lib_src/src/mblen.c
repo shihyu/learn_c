@@ -43,68 +43,64 @@
 *******************************************************************************/
 
 extern "C" int __cdecl _mblen_l
-        (
-        const char * s,
-        size_t n,
-        _locale_t plocinfo
-        )
-{
-    if ( !s || !(*s) || (n == 0) )
+(
+    const char* s,
+    size_t n,
+    _locale_t plocinfo
+) {
+    if (!s || !(*s) || (n == 0))
         /* indicate do not have state-dependent encodings,
            empty string length is 0 */
+    {
         return 0;
+    }
 
     _LocaleUpdate _loc_update(plocinfo);
+    _ASSERTE(_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
 
-    _ASSERTE (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
-
-
-    if ( _isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT()) )
-    {
+    if (_isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT())) {
         /* multi-byte char */
 
         /* verify valid MB char */
-        if ( _loc_update.GetLocaleT()->locinfo->mb_cur_max <= 1 ||
-             (int)n < _loc_update.GetLocaleT()->locinfo->mb_cur_max ||
-             MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                  MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                                  s,
-                                  _loc_update.GetLocaleT()->locinfo->mb_cur_max,
-                                  NULL,
-                                  0 ) == 0 )
+        if (_loc_update.GetLocaleT()->locinfo->mb_cur_max <= 1 ||
+                (int)n < _loc_update.GetLocaleT()->locinfo->mb_cur_max ||
+                MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                    MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                                    s,
+                                    _loc_update.GetLocaleT()->locinfo->mb_cur_max,
+                                    NULL,
+                                    0) == 0)
             /* bad MB char */
+        {
             return -1;
-        else
+        } else {
             return _loc_update.GetLocaleT()->locinfo->mb_cur_max;
-    }
-    else {
+        }
+    } else {
         /* single byte char */
 
         /* verify valid SB char */
-        if ( MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                  MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                                  s,
-                                  1,
-                                  NULL,
-                                  0 ) == 0 )
+        if (MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                                s,
+                                1,
+                                NULL,
+                                0) == 0) {
             return -1;
+        }
+
         return sizeof(char);
     }
-
 }
 
 extern "C" int __cdecl mblen
-        (
-        const char * s,
-        size_t n
-        )
-{
-    if (__locale_changed == 0)
-    {
+(
+    const char* s,
+    size_t n
+) {
+    if (__locale_changed == 0) {
         return _mblen_l(s, n, &__initiallocalestructinfo);
-    }
-    else
-    {
+    } else {
         return _mblen_l(s, n, NULL);
     }
 }

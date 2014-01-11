@@ -65,7 +65,7 @@ typedef long double _LDOUBLE;
 #endif  /* _LDSUPPORT */
 
 typedef struct {
-        double x;
+    double x;
 } _CRT_DOUBLE;
 
 typedef struct {
@@ -73,10 +73,10 @@ typedef struct {
 } _CRT_FLOAT;
 
 typedef struct {
-        /*
-         * Assume there is a long double type
-         */
-        long double x;
+    /*
+     * Assume there is a long double type
+     */
+    long double x;
 } _LONGDOUBLE;
 
 #define _CRT_DOUBLE_COMPONENTS_MANTISSA_BITS 52
@@ -86,9 +86,12 @@ typedef struct {
 typedef union {
     double d;
     struct {
-        unsigned __int64 mantissa: _CRT_DOUBLE_COMPONENTS_MANTISSA_BITS;    /* 52 */
-        unsigned __int64 exponent: _CRT_DOUBLE_COMPONENTS_EXPONENT_BITS;    /* 11 */
-        unsigned __int64 sign: _CRT_DOUBLE_COMPONENTS_SIGN_BITS;            /*  1 */
+    unsigned __int64 mantissa:
+        _CRT_DOUBLE_COMPONENTS_MANTISSA_BITS;    /* 52 */
+    unsigned __int64 exponent:
+        _CRT_DOUBLE_COMPONENTS_EXPONENT_BITS;    /* 11 */
+    unsigned __int64 sign:
+        _CRT_DOUBLE_COMPONENTS_SIGN_BITS;            /*  1 */
     };
 } _CRT_DOUBLE_COMPONENTS;
 
@@ -130,51 +133,49 @@ typedef enum {
  * typedef for _fltout
  */
 
-typedef struct _strflt
-{
-        int sign;             /* zero if positive otherwise negative */
-        int decpt;            /* exponent of floating point number */
-        int flag;             /* zero if okay otherwise IEEE overflow */
-        char *mantissa;       /* pointer to mantissa in string form */
+typedef struct _strflt {
+    int sign;             /* zero if positive otherwise negative */
+    int decpt;            /* exponent of floating point number */
+    int flag;             /* zero if okay otherwise IEEE overflow */
+    char* mantissa;       /* pointer to mantissa in string form */
 }
-        *STRFLT;
+* STRFLT;
 
 
 /*
  * typedef for _fltin
  */
 
-typedef struct _flt
-{
-        int flags;
-        int nbytes;          /* number of characters read */
-        long lval;
-        double dval;         /* the returned floating point number */
+typedef struct _flt {
+    int flags;
+    int nbytes;          /* number of characters read */
+    long lval;
+    double dval;         /* the returned floating point number */
 }
-        *FLT;
+* FLT;
 
 
 /* floating point conversion routines, keep in sync with mrt32\include\convert.h */
 
-errno_t _cftoe(__in double * _Value, __out_bcount_z(3 + _Dec + 5 + 1) char * _Buf, __in size_t _SizeInBytes, __in int _Dec, __in int _Caps);
-errno_t _cftoa(__in double * _Value, __out_bcount_z(1 + 4 + _Dec + 6) char * _Buf, __in size_t _SizeInBytes, __in int _Dec, __in int _Caps);
-errno_t _cftof(__in double * _Value, __out_bcount_z(_SizeInBytes) char * _Buf, __in size_t _SizeInBytes, __in int _Dec);
-errno_t __cdecl _fptostr(__out_bcount_z(_SizeInBytes) char * _Buf, __in size_t _SizeInBytes, __in int _Digits, __inout STRFLT _PtFlt);
-_CRTIMP __checkReturn int __cdecl _atodbl(__out _CRT_DOUBLE * _Result, __in_z char * _Str);
-_CRTIMP __checkReturn int __cdecl _atoldbl(__out _LDOUBLE * _Result, __in_z char * _Str);
-_CRTIMP __checkReturn int __cdecl _atoflt(__out _CRT_FLOAT * _Result, __in_z char * _Str);
-_CRTIMP __checkReturn int __cdecl _atodbl_l(__out _CRT_DOUBLE * _Result, __in_z char * _Str, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _atoldbl_l(__out _LDOUBLE * _Result, __in_z char * _Str, __in_opt _locale_t _Locale);
-_CRTIMP __checkReturn int __cdecl _atoflt_l(__out _CRT_FLOAT * _Result, __in_z char * _Str,__in_opt _locale_t _Locale);
+errno_t _cftoe(__in double* _Value, __out_bcount_z(3 + _Dec + 5 + 1) char* _Buf, __in size_t _SizeInBytes, __in int _Dec, __in int _Caps);
+errno_t _cftoa(__in double* _Value, __out_bcount_z(1 + 4 + _Dec + 6) char* _Buf, __in size_t _SizeInBytes, __in int _Dec, __in int _Caps);
+errno_t _cftof(__in double* _Value, __out_bcount_z(_SizeInBytes) char* _Buf, __in size_t _SizeInBytes, __in int _Dec);
+errno_t __cdecl _fptostr(__out_bcount_z(_SizeInBytes) char* _Buf, __in size_t _SizeInBytes, __in int _Digits, __inout STRFLT _PtFlt);
+_CRTIMP __checkReturn int __cdecl _atodbl(__out _CRT_DOUBLE* _Result, __in_z char* _Str);
+_CRTIMP __checkReturn int __cdecl _atoldbl(__out _LDOUBLE* _Result, __in_z char* _Str);
+_CRTIMP __checkReturn int __cdecl _atoflt(__out _CRT_FLOAT* _Result, __in_z char* _Str);
+_CRTIMP __checkReturn int __cdecl _atodbl_l(__out _CRT_DOUBLE* _Result, __in_z char* _Str, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _atoldbl_l(__out _LDOUBLE* _Result, __in_z char* _Str, __in_opt _locale_t _Locale);
+_CRTIMP __checkReturn int __cdecl _atoflt_l(__out _CRT_FLOAT* _Result, __in_z char* _Str, __in_opt _locale_t _Locale);
 
 
-STRFLT  __cdecl _fltout2( __in _CRT_DOUBLE _Dbl, __out STRFLT _Flt, __out_bcount_z(_SizeInBytes) char * _ResultStr, __in size_t _SizeInBytes);
-FLT     __cdecl _fltin2( __out FLT _Flt, __in_z const char * _Str, __in int _LenIgnore, __in int _ScaleIgnore, __in int _RadixIgnore, __in _locale_t _Locale );
-FLT     __cdecl _wfltin2( __out FLT _Fit, __in_z const wchar_t * _Str, __in int _LenIgnore, __in int _ScaleIgnore, __in int _RadixIgnore, __in _locale_t _Locale );
+STRFLT  __cdecl _fltout2(__in _CRT_DOUBLE _Dbl, __out STRFLT _Flt, __out_bcount_z(_SizeInBytes) char* _ResultStr, __in size_t _SizeInBytes);
+FLT     __cdecl _fltin2(__out FLT _Flt, __in_z const char* _Str, __in int _LenIgnore, __in int _ScaleIgnore, __in int _RadixIgnore, __in _locale_t _Locale);
+FLT     __cdecl _wfltin2(__out FLT _Fit, __in_z const wchar_t* _Str, __in int _LenIgnore, __in int _ScaleIgnore, __in int _RadixIgnore, __in _locale_t _Locale);
 
-INTRNCVT_STATUS _ld12tod(__in _LDBL12 *_Ifp, __out _CRT_DOUBLE *_D);
-INTRNCVT_STATUS _ld12tof(__in _LDBL12 *_Ifp, __out _CRT_FLOAT *_F);
-INTRNCVT_STATUS _ld12told(__in _LDBL12 *_Ifp, __out _LDOUBLE *_Ld);
+INTRNCVT_STATUS _ld12tod(__in _LDBL12* _Ifp, __out _CRT_DOUBLE* _D);
+INTRNCVT_STATUS _ld12tof(__in _LDBL12* _Ifp, __out _CRT_FLOAT* _F);
+INTRNCVT_STATUS _ld12told(__in _LDBL12* _Ifp, __out _LDOUBLE* _Ld);
 
 /*
  * floating point helper routines
@@ -185,20 +186,20 @@ INTRNCVT_STATUS _ld12told(__in _LDBL12 *_Ifp, __out _LDOUBLE *_Ld);
  * code is needed.
  */
 
-errno_t __cdecl _cfltcvt(double *arg, char *buffer, size_t sizeInBytes,
+errno_t __cdecl _cfltcvt(double* arg, char* buffer, size_t sizeInBytes,
                          int format, int precision,
                          int caps);
-errno_t __cdecl _cfltcvt_l(double *arg, char *buffer, size_t sizeInBytes,
-                         int format, int precision,
-                         int caps, _locale_t plocinfo);
+errno_t __cdecl _cfltcvt_l(double* arg, char* buffer, size_t sizeInBytes,
+                           int format, int precision,
+                           int caps, _locale_t plocinfo);
 
-void __cdecl _cropzeros(char *_Buf);
-void __cdecl _cropzeros_l(char *_Buf, _locale_t _Locale);
-void __cdecl _fassign(int flag, char  *argument, char *number);
-void __cdecl _fassign_l(int flag, char  *argument, char *number, _locale_t);
-void __cdecl _forcdecpt(char *_Buf);
-void __cdecl _forcdecpt_l(char *_Buf, _locale_t _Locale);
-int __cdecl _positive(double *arg);
+void __cdecl _cropzeros(char* _Buf);
+void __cdecl _cropzeros_l(char* _Buf, _locale_t _Locale);
+void __cdecl _fassign(int flag, char*  argument, char* number);
+void __cdecl _fassign_l(int flag, char*  argument, char* number, _locale_t);
+void __cdecl _forcdecpt(char* _Buf);
+void __cdecl _forcdecpt_l(char* _Buf, _locale_t _Locale);
+int __cdecl _positive(double* arg);
 
 /*
  * table of pointers to floating point helper routines
@@ -251,9 +252,9 @@ typedef void (* PF9)(char*, _locale_t);
 
 unsigned int __strgtold12_l
 (
-    __out _LDBL12 *pld12,
-    __out_z const char * *p_end_ptr,
-    __in_z const char * str,
+    __out _LDBL12* pld12,
+    __out_z const char** p_end_ptr,
+    __in_z const char* str,
     __in int mult12,
     __in int scale,
     __in int decpt,
@@ -267,9 +268,9 @@ unsigned int __strgtold12_l
 
 unsigned int __strgtold12
 (
-    __out _LDBL12 *pld12,
-    __out_z const char * *p_end_ptr,
-    __in_z const char * str,
+    __out _LDBL12* pld12,
+    __out_z const char** p_end_ptr,
+    __in_z const char* str,
     __in int mult12,
     __in int scale,
     __in int decpt,
@@ -278,9 +279,9 @@ unsigned int __strgtold12
 
 unsigned int __wstrgtold12_l
 (
-    __out _LDBL12 *pld12,
-    __out_z const wchar_t * *p_end_ptr,
-    __in_z const wchar_t * str,
+    __out _LDBL12* pld12,
+    __out_z const wchar_t** p_end_ptr,
+    __in_z const wchar_t* str,
     __in int mult12,
     __in int scale,
     __in int decpt,
@@ -290,9 +291,9 @@ unsigned int __wstrgtold12_l
 
 unsigned int __wstrgtold12
 (
-    __out _LDBL12 *pld12,
-    __out_z const wchar_t * *p_end_ptr,
-    __in_z const wchar_t * str,
+    __out _LDBL12* pld12,
+    __out_z const wchar_t** p_end_ptr,
+    __in_z const wchar_t* str,
     __in int mult12,
     __in int scale,
     __in int decpt,
@@ -301,45 +302,45 @@ unsigned int __wstrgtold12
 
 unsigned __STRINGTOLD
 (
-        __out _LDOUBLE *pld,
-        __out_z const char  * *p_end_ptr,
-        __in_z const char  *str,
-        __in int mult12
+    __out _LDOUBLE* pld,
+    __out_z const char**  p_end_ptr,
+    __in_z const char*  str,
+    __in int mult12
 );
 
 unsigned __STRINGTOLD_L
 (
-        __out _LDOUBLE *pld,
-        __out_z const char  * *p_end_ptr,
-        __in_z const char  *str,
-        __in int mult12,
+    __out _LDOUBLE* pld,
+    __out_z const char**  p_end_ptr,
+    __in_z const char*  str,
+    __in int mult12,
     __in _locale_t _Locale
 );
 
 unsigned __WSTRINGTOLD
 (
-        __out _LDOUBLE *pld,
-    __out_z const wchar_t  * *p_end_ptr,
-    __in_z const wchar_t  *str,
+    __out _LDOUBLE* pld,
+    __out_z const wchar_t**  p_end_ptr,
+    __in_z const wchar_t*  str,
     __in int mult12
 );
 
 unsigned __WSTRINGTOLD_L
 (
-        __out _LDOUBLE *pld,
-    __out_z const wchar_t  * *p_end_ptr,
-    __in_z const wchar_t  *str,
+    __out _LDOUBLE* pld,
+    __out_z const wchar_t**  p_end_ptr,
+    __in_z const wchar_t*  str,
     __in int mult12,
     __in _locale_t _Locale
 );
 
 FLT __cdecl _fltinf_l
 (
-        __in_ecount(len) const char *str,
-        __in int len,
-        __in int scale,
-        __in int decpt,
-        __in _locale_t _Locale
+    __in_ecount(len) const char* str,
+    __in int len,
+    __in int scale,
+    __in int decpt,
+    __in _locale_t _Locale
 );
 
 #ifdef _M_IX86

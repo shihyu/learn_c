@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,56 +49,78 @@ __FBSDID("$FreeBSD: src/lib/libc/inet/inet_network.c,v 1.4 2007/06/03 17:20:26 u
  */
 in_addr_t
 inet_network(cp)
-	const char *cp;
+const char* cp;
 {
-	in_addr_t val, base, n;
-	char c;
-	in_addr_t parts[4], *pp = parts;
-	int i, digit;
-
+    in_addr_t val, base, n;
+    char c;
+    in_addr_t parts[4], *pp = parts;
+    int i, digit;
 again:
-	val = 0; base = 10; digit = 0;
-	if (*cp == '0')
-		digit = 1, base = 8, cp++;
-	if (*cp == 'x' || *cp == 'X')
-		base = 16, cp++;
-	while ((c = *cp) != 0) {
-		if (isdigit((unsigned char)c)) {
-			if (base == 8U && (c == '8' || c == '9'))
-				return (INADDR_NONE);
-			val = (val * base) + (c - '0');
-			cp++;
-			digit = 1;
-			continue;
-		}
-		if (base == 16U && isxdigit((unsigned char)c)) {
-			val = (val << 4) +
-			      (c + 10 - (islower((unsigned char)c) ? 'a' : 'A'));
-			cp++;
-			digit = 1;
-			continue;
-		}
-		break;
-	}
-	if (!digit)
-		return (INADDR_NONE);
-	if (*cp == '.') {
-		if (pp >= parts + 4 || val > 0xffU)
-			return (INADDR_NONE);
-		*pp++ = val, cp++;
-		goto again;
-	}
-	if (*cp && !isspace(*cp&0xff))
-		return (INADDR_NONE);
-	*pp++ = val;
-	n = pp - parts;
-	if (n > 4U)
-		return (INADDR_NONE);
-	for (val = 0, i = 0; i < n; i++) {
-		val <<= 8;
-		val |= parts[i] & 0xff;
-	}
-	return (val);
+    val = 0;
+    base = 10;
+    digit = 0;
+
+    if (*cp == '0') {
+        digit = 1, base = 8, cp++;
+    }
+
+    if (*cp == 'x' || *cp == 'X') {
+        base = 16, cp++;
+    }
+
+    while ((c = *cp) != 0) {
+        if (isdigit((unsigned char)c)) {
+            if (base == 8U && (c == '8' || c == '9')) {
+                return (INADDR_NONE);
+            }
+
+            val = (val * base) + (c - '0');
+            cp++;
+            digit = 1;
+            continue;
+        }
+
+        if (base == 16U && isxdigit((unsigned char)c)) {
+            val = (val << 4) +
+                  (c + 10 - (islower((unsigned char)c) ? 'a' : 'A'));
+            cp++;
+            digit = 1;
+            continue;
+        }
+
+        break;
+    }
+
+    if (!digit) {
+        return (INADDR_NONE);
+    }
+
+    if (*cp == '.') {
+        if (pp >= parts + 4 || val > 0xffU) {
+            return (INADDR_NONE);
+        }
+
+        *pp++ = val, cp++;
+        goto again;
+    }
+
+    if (*cp && !isspace(*cp & 0xff)) {
+        return (INADDR_NONE);
+    }
+
+    *pp++ = val;
+    n = pp - parts;
+
+    if (n > 4U) {
+        return (INADDR_NONE);
+    }
+
+    for (val = 0, i = 0; i < n; i++) {
+        val <<= 8;
+        val |= parts[i] & 0xff;
+    }
+
+    return (val);
 }
 
 /*

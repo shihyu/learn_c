@@ -1,8 +1,8 @@
-/*	$KAME: if_nametoindex.c,v 1.6 2000/11/24 08:18:54 itojun Exp $	*/
+/*  $KAME: if_nametoindex.c,v 1.6 2000/11/24 08:18:54 itojun Exp $  */
 
 /*-
  * Copyright (c) 1997, 2000
- *	Berkeley Software Design, Inc.  All rights reserved.
+ *  Berkeley Software Design, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,7 +22,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	BSDI Id: if_nametoindex.c,v 2.3 2000/04/17 22:38:05 dab Exp
+ *  BSDI Id: if_nametoindex.c,v 2.3 2000/04/17 22:38:05 dab Exp
  */
 
 #include <sys/cdefs.h>
@@ -61,39 +61,44 @@ __FBSDID("$FreeBSD: src/lib/libc/net/if_nametoindex.c,v 1.5 2003/05/01 19:03:14 
  */
 
 unsigned int
-if_nametoindex(const char *ifname)
-{
-	int s;
-	struct ifreq ifr;
-	struct ifaddrs *ifaddrs, *ifa;
-	unsigned int ni;
+if_nametoindex(const char* ifname) {
+    int s;
+    struct ifreq ifr;
+    struct ifaddrs* ifaddrs, *ifa;
+    unsigned int ni;
+    s = _socket(AF_INET, SOCK_DGRAM, 0);
 
-	s = _socket(AF_INET, SOCK_DGRAM, 0);
-	if (s != -1) {
-		strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
-		if (_ioctl(s, SIOCGIFINDEX, &ifr) != -1) {
-			_close(s);
-			return (ifr.ifr_index);
-		}
-		_close(s);
-	}
+    if (s != -1) {
+        strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
 
-	if (getifaddrs(&ifaddrs) < 0)
-		return(0);
+        if (_ioctl(s, SIOCGIFINDEX, &ifr) != -1) {
+            _close(s);
+            return (ifr.ifr_index);
+        }
 
-	ni = 0;
+        _close(s);
+    }
 
-	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr &&
-		    ifa->ifa_addr->sa_family == AF_LINK &&
-		    strcmp(ifa->ifa_name, ifname) == 0) {
-			ni = ((struct sockaddr_dl*)ifa->ifa_addr)->sdl_index;
-			break;
-		}
-	}
+    if (getifaddrs(&ifaddrs) < 0) {
+        return (0);
+    }
 
-	freeifaddrs(ifaddrs);
-	if (!ni)
-		errno = ENXIO;
-	return(ni);
+    ni = 0;
+
+    for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr &&
+                ifa->ifa_addr->sa_family == AF_LINK &&
+                strcmp(ifa->ifa_name, ifname) == 0) {
+            ni = ((struct sockaddr_dl*)ifa->ifa_addr)->sdl_index;
+            break;
+        }
+    }
+
+    freeifaddrs(ifaddrs);
+
+    if (!ni) {
+        errno = ENXIO;
+    }
+
+    return (ni);
 }

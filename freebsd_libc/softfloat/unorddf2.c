@@ -14,13 +14,12 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/unorddf2.c,v 1.1 2004/05/14 12:13:04 
 flag __unorddf2(float64, float64);
 
 flag
-__unorddf2(float64 a, float64 b)
-{
-	/*
-	 * The comparison is unordered if either input is a NaN.
-	 * Test for this by comparing each operand with itself.
-	 * We must perform both comparisons to correctly check for
-	 * signalling NaNs.
-	 */
-	return 1 ^ (float64_eq(a, a) & float64_eq(b, b));
+__unorddf2(float64 a, float64 b) {
+    /*
+     * The comparison is unordered if either input is a NaN.
+     * Test for this by comparing each operand with itself.
+     * We must perform both comparisons to correctly check for
+     * signalling NaNs.
+     */
+    return 1 ^ (float64_eq(a, a) & float64_eq(b, b));
 }

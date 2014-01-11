@@ -39,16 +39,16 @@
 *
 *******************************************************************************/
 
-wchar_t * __cdecl _wcsset (
-        wchar_t * string,
-        wchar_t val
-        )
-{
-        wchar_t *start = string;
+wchar_t* __cdecl _wcsset(
+    wchar_t* string,
+    wchar_t val
+) {
+    wchar_t* start = string;
 
-        while (*string)
-                *string++ = (wchar_t)val;
+    while (*string) {
+        *string++ = (wchar_t)val;
+    }
 
-        return(start);
+    return (start);
 }
 

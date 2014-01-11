@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -41,19 +41,17 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/vsprintf.c,v 1.15 2007/01/09 00:28:08 imp
 #include "local.h"
 
 int
-vsprintf(char * __restrict str, const char * __restrict fmt, __va_list ap)
-{
-	int ret;
-	FILE f;
-	struct __sFILEX ext;
-
-	f._file = -1;
-	f._flags = __SWR | __SSTR;
-	f._bf._base = f._p = (unsigned char *)str;
-	f._bf._size = f._w = INT_MAX;
-	f._extra = &ext;
-	INITEXTRA(&f);
-	ret = __vfprintf(&f, fmt, ap);
-	*f._p = 0;
-	return (ret);
+vsprintf(char* __restrict str, const char* __restrict fmt, __va_list ap) {
+    int ret;
+    FILE f;
+    struct __sFILEX ext;
+    f._file = -1;
+    f._flags = __SWR | __SSTR;
+    f._bf._base = f._p = (unsigned char*)str;
+    f._bf._size = f._w = INT_MAX;
+    f._extra = &ext;
+    INITEXTRA(&f);
+    ret = __vfprintf(&f, fmt, ap);
+    *f._p = 0;
+    return (ret);
 }

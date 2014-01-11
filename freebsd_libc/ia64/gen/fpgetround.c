@@ -30,10 +30,8 @@
 #include <ieeefp.h>
 
 fp_rnd_t
-fpgetround(void)
-{
-	uint64_t fpsr;
-
-	__asm __volatile("mov %0=ar.fpsr" : "=r"(fpsr));
-	return ((fp_rnd_t)((fpsr >> 10) & 3));
+fpgetround(void) {
+    uint64_t fpsr;
+    __asm __volatile("mov %0=ar.fpsr" : "=r"(fpsr));
+    return ((fp_rnd_t)((fpsr >> 10) & 3));
 }

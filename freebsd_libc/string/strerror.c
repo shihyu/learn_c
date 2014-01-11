@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,7 +42,7 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strerror.c,v 1.16 2007/01/09 00:28:12 im
 #include <string.h>
 #include <stdio.h>
 
-#define	UPREFIX		"Unknown error"
+#define UPREFIX     "Unknown error"
 
 /*
  * Define a buffer size big enough to describe a 64-bit signed integer
@@ -50,77 +50,79 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strerror.c,v 1.16 2007/01/09 00:28:12 im
  * (1 byte); finally, we get the prefix, delimiter (": ") and a trailing
  * NUL from UPREFIX.
  */
-#define	EBUFSIZE	(20 + 2 + sizeof(UPREFIX))
+#define EBUFSIZE    (20 + 2 + sizeof(UPREFIX))
 
 /*
  * Doing this by hand instead of linking with stdio(3) avoids bloat for
  * statically linked binaries.
  */
 static void
-errstr(int num, char *uprefix, char *buf, size_t len)
-{
-	char *t;
-	unsigned int uerr;
-	char tmp[EBUFSIZE];
+errstr(int num, char* uprefix, char* buf, size_t len) {
+    char* t;
+    unsigned int uerr;
+    char tmp[EBUFSIZE];
+    t = tmp + sizeof(tmp);
+    *--t = '\0';
+    uerr = (num >= 0) ? num : -num;
 
-	t = tmp + sizeof(tmp);
-	*--t = '\0';
-	uerr = (num >= 0) ? num : -num;
-	do {
-		*--t = "0123456789"[uerr % 10];
-	} while (uerr /= 10);
-	if (num < 0)
-		*--t = '-';
-	*--t = ' ';
-	*--t = ':';
-	strlcpy(buf, uprefix, len);
-	strlcat(buf, t, len);
+    do {
+        *--t = "0123456789"[uerr % 10];
+    } while (uerr /= 10);
+
+    if (num < 0) {
+        *--t = '-';
+    }
+
+    *--t = ' ';
+    *--t = ':';
+    strlcpy(buf, uprefix, len);
+    strlcat(buf, t, len);
 }
 
 int
-strerror_r(int errnum, char *strerrbuf, size_t buflen)
-{
-	int retval = 0;
+strerror_r(int errnum, char* strerrbuf, size_t buflen) {
+    int retval = 0;
 #if defined(NLS)
-	int saved_errno = errno;
-	nl_catd catd;
-	catd = catopen("libc", NL_CAT_LOCALE);
+    int saved_errno = errno;
+    nl_catd catd;
+    catd = catopen("libc", NL_CAT_LOCALE);
 #endif
 
-	if (errnum < 1 || errnum >= sys_nerr) {
-		errstr(errnum,
+    if (errnum < 1 || errnum >= sys_nerr) {
+        errstr(errnum,
 #if defined(NLS)
-			catgets(catd, 1, 0xffff, UPREFIX),
+               catgets(catd, 1, 0xffff, UPREFIX),
 #else
-			UPREFIX,
+               UPREFIX,
 #endif
-			strerrbuf, buflen);
-		retval = EINVAL;
-	} else {
-		if (strlcpy(strerrbuf,
+               strerrbuf, buflen);
+        retval = EINVAL;
+    } else {
+        if (strlcpy(strerrbuf,
 #if defined(NLS)
-			catgets(catd, 1, errnum, sys_errlist[errnum]),
+                    catgets(catd, 1, errnum, sys_errlist[errnum]),
 #else
-			sys_errlist[errnum],
+                    sys_errlist[errnum],
 #endif
-			buflen) >= buflen)
-		retval = ERANGE;
-	}
+                    buflen) >= buflen) {
+            retval = ERANGE;
+        }
+    }
 
 #if defined(NLS)
-	catclose(catd);
-	errno = saved_errno;
+    catclose(catd);
+    errno = saved_errno;
 #endif
-
-	return (retval);
+    return (retval);
 }
 
-char *
-strerror(int num)
-{
-	static char ebuf[NL_TEXTMAX];
+char*
+strerror(int num) {
+    static char ebuf[NL_TEXTMAX];
 
-	if (strerror_r(num, ebuf, sizeof(ebuf)) != 0)
-	errno = EINVAL;
-	return (ebuf);
+    if (strerror_r(num, ebuf, sizeof(ebuf)) != 0) {
+        errno = EINVAL;
+    }
+
+    return (ebuf);
 }

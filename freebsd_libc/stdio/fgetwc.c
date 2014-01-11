@@ -41,56 +41,57 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fgetwc.c,v 1.12 2004/07/20 08:27:27 tjr E
  * MT-safe version.
  */
 wint_t
-fgetwc(FILE *fp)
-{
-	wint_t r;
-
-	FLOCKFILE(fp);
-	ORIENT(fp, 1);
-	r = __fgetwc(fp);
-	FUNLOCKFILE(fp);
-
-	return (r);
+fgetwc(FILE* fp) {
+    wint_t r;
+    FLOCKFILE(fp);
+    ORIENT(fp, 1);
+    r = __fgetwc(fp);
+    FUNLOCKFILE(fp);
+    return (r);
 }
 
 /*
  * Non-MT-safe version.
  */
 wint_t
-__fgetwc(FILE *fp)
-{
-	wchar_t wc;
-	size_t nconv;
+__fgetwc(FILE* fp) {
+    wchar_t wc;
+    size_t nconv;
 
-	if (fp->_r <= 0 && __srefill(fp))
-		return (WEOF);
-	if (MB_CUR_MAX == 1) {
-		/* Fast path for single-byte encodings. */
-		wc = *fp->_p++;
-		fp->_r--;
-		return (wc);
-	}
-	do {
-		nconv = __mbrtowc(&wc, fp->_p, fp->_r, &fp->_extra->mbstate);
-		if (nconv == (size_t)-1)
-			break;
-		else if (nconv == (size_t)-2)
-			continue;
-		else if (nconv == 0) {
-			/*
-			 * Assume that the only valid representation of
-			 * the null wide character is a single null byte.
-			 */
-			fp->_p++;
-			fp->_r--;
-			return (L'\0');
-		} else {
-			fp->_p += nconv;
-			fp->_r -= nconv;
-			return (wc);
-		}
-	} while (__srefill(fp) == 0);
-	fp->_flags |= __SERR;
-	errno = EILSEQ;
-	return (WEOF);
+    if (fp->_r <= 0 && __srefill(fp)) {
+        return (WEOF);
+    }
+
+    if (MB_CUR_MAX == 1) {
+        /* Fast path for single-byte encodings. */
+        wc = *fp->_p++;
+        fp->_r--;
+        return (wc);
+    }
+
+    do {
+        nconv = __mbrtowc(&wc, fp->_p, fp->_r, &fp->_extra->mbstate);
+
+        if (nconv == (size_t) - 1) {
+            break;
+        } else if (nconv == (size_t) - 2) {
+            continue;
+        } else if (nconv == 0) {
+            /*
+             * Assume that the only valid representation of
+             * the null wide character is a single null byte.
+             */
+            fp->_p++;
+            fp->_r--;
+            return (L'\0');
+        } else {
+            fp->_p += nconv;
+            fp->_r -= nconv;
+            return (wc);
+        }
+    } while (__srefill(fp) == 0);
+
+    fp->_flags |= __SERR;
+    errno = EILSEQ;
+    return (WEOF);
 }

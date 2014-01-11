@@ -39,100 +39,78 @@
 *
 *******************************************************************************/
 
-int __cdecl printf (
-        const char *format,
-        ...
-        )
+int __cdecl printf(
+    const char* format,
+    ...
+)
 /*
  * stdout 'PRINT', 'F'ormatted
  */
 {
-        va_list arglist;
-        int buffing;
-        int retval;
+    va_list arglist;
+    int buffing;
+    int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
+    va_start(arglist, format);
+    _lock_str2(1, stdout);
 
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
-        va_start(arglist, format);
-
-        _lock_str2(1, stdout);
-        __try {
-
+    __try {
         buffing = _stbuf(stdout);
-
-        retval = _output_l(stdout,format,NULL,arglist);
-
+        retval = _output_l(stdout, format, NULL, arglist);
         _ftbuf(buffing, stdout);
+    } __finally {
+        _unlock_str2(1, stdout);
+    }
 
-        }
-        __finally {
-            _unlock_str2(1, stdout);
-        }
-
-        return(retval);
+    return (retval);
 }
 
-int __cdecl _printf_l (
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _printf_l(
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vprintf_l(format, plocinfo, arglist);
 }
 
 
-int __cdecl _printf_s_l (
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _printf_s_l(
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vprintf_s_l(format, plocinfo, arglist);
 }
 
-int __cdecl printf_s (
-        const char *format,
-        ...
-        )
-{
+int __cdecl printf_s(
+    const char* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vprintf_s_l(format, NULL, arglist);
 }
 
-int __cdecl _printf_p_l (
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+int __cdecl _printf_p_l(
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vprintf_p_l(format, plocinfo, arglist);
 }
 
-int __cdecl _printf_p (
-        const char *format,
-        ...
-        )
-{
+int __cdecl _printf_p(
+    const char* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vprintf_p_l(format, NULL, arglist);
 }
 
@@ -150,8 +128,7 @@ static UINT_PTR __enable_percent_n = 0;
  *   and then provide a malicious %n specifier.  The cookie is ORed with 1
  *   because a zero cookie is a possibility.
  ******************************************************************************/
-int __cdecl _set_printf_count_output(int value)
-{
+int __cdecl _set_printf_count_output(int value) {
     int old = (__enable_percent_n == (__security_cookie | 1));
     __enable_percent_n = (value ? (__security_cookie | 1) : 0);
     return old;
@@ -163,7 +140,6 @@ int __cdecl _set_printf_count_output(int value)
  *Purpose:
  *   Checks whether %n format specifier for printf family functions is enabled
  ******************************************************************************/
-int __cdecl _get_printf_count_output()
-{
-    return ( __enable_percent_n == (__security_cookie | 1));
+int __cdecl _get_printf_count_output() {
+    return (__enable_percent_n == (__security_cookie | 1));
 }

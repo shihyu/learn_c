@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -49,23 +49,22 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/puts.c,v 1.11 2007/01/09 00:28:07 imp Exp
  */
 int
 puts(s)
-	char const *s;
+char const* s;
 {
-	int retval;
-	size_t c = strlen(s);
-	struct __suio uio;
-	struct __siov iov[2];
-
-	iov[0].iov_base = (void *)s;
-	iov[0].iov_len = c;
-	iov[1].iov_base = "\n";
-	iov[1].iov_len = 1;
-	uio.uio_resid = c + 1;
-	uio.uio_iov = &iov[0];
-	uio.uio_iovcnt = 2;
-	FLOCKFILE(stdout);
-	ORIENT(stdout, -1);
-	retval = __sfvwrite(stdout, &uio) ? EOF : '\n';
-	FUNLOCKFILE(stdout);
-	return (retval);
+    int retval;
+    size_t c = strlen(s);
+    struct __suio uio;
+    struct __siov iov[2];
+    iov[0].iov_base = (void*)s;
+    iov[0].iov_len = c;
+    iov[1].iov_base = "\n";
+    iov[1].iov_len = 1;
+    uio.uio_resid = c + 1;
+    uio.uio_iov = &iov[0];
+    uio.uio_iovcnt = 2;
+    FLOCKFILE(stdout);
+    ORIENT(stdout, -1);
+    retval = __sfvwrite(stdout, &uio) ? EOF : '\n';
+    FUNLOCKFILE(stdout);
+    return (retval);
 }

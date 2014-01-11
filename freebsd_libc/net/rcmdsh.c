@@ -1,20 +1,20 @@
-/*	$OpenBSD: rcmdsh.c,v 1.5 1998/04/25 16:23:58 millert Exp $	*/
+/*  $OpenBSD: rcmdsh.c,v 1.5 1998/04/25 16:23:58 millert Exp $  */
 
 /*
  * Copyright (c) 2001, MagniComp
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright 
+ * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
- *    the documentation and/or other materials provided with the distribution. 
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the MagniComp nor the names of its contributors may
  *    be used to endorse or promote products derived from this software
- *    without specific prior written permission. 
+ *    without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -50,7 +50,7 @@ __FBSDID("$FreeBSD: src/lib/libc/net/rcmdsh.c,v 1.5 2003/02/27 13:40:00 nectar E
 #include <unistd.h>
 
 #ifndef _PATH_RSH
-#define	_PATH_RSH	"/usr/bin/rsh"
+#define _PATH_RSH   "/usr/bin/rsh"
 #endif
 
 /*
@@ -60,111 +60,125 @@ __FBSDID("$FreeBSD: src/lib/libc/net/rcmdsh.c,v 1.5 2003/02/27 13:40:00 nectar E
  */
 int
 rcmdsh(ahost, rport, locuser, remuser, cmd, rshprog)
-	char **ahost;
-	int rport;
-	const char *locuser, *remuser, *cmd, *rshprog;
+char** ahost;
+int rport;
+const char* locuser, *remuser, *cmd, *rshprog;
 {
-	struct addrinfo hints, *res;
-	int cpid, sp[2], error;
-	char *p;
-	struct passwd *pw;
-	char num[8];
-	static char hbuf[NI_MAXHOST];
+    struct addrinfo hints, *res;
+    int cpid, sp[2], error;
+    char* p;
+    struct passwd* pw;
+    char num[8];
+    static char hbuf[NI_MAXHOST];
 
-	/* What rsh/shell to use. */
-	if (rshprog == NULL)
-		rshprog = _PATH_RSH;
+    /* What rsh/shell to use. */
+    if (rshprog == NULL) {
+        rshprog = _PATH_RSH;
+    }
 
-	/* locuser must exist on this host. */
-	if ((pw = getpwnam(locuser)) == NULL) {
-		(void)fprintf(stderr, "rcmdsh: unknown user: %s\n", locuser);
-		return (-1);
-	}
+    /* locuser must exist on this host. */
+    if ((pw = getpwnam(locuser)) == NULL) {
+        (void)fprintf(stderr, "rcmdsh: unknown user: %s\n", locuser);
+        return (-1);
+    }
 
-	/* Validate remote hostname. */
-	if (strcmp(*ahost, "localhost") != 0) {
-		memset(&hints, 0, sizeof(hints));
-		hints.ai_flags = AI_CANONNAME;
-		hints.ai_family = PF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
-		(void)snprintf(num, sizeof(num), "%u",
-		    (unsigned int)ntohs(rport));
-		error = getaddrinfo(*ahost, num, &hints, &res);
-		if (error) {
-			fprintf(stderr, "rcmdsh: getaddrinfo: %s\n",
-				gai_strerror(error));
-			return (-1);
-		}
-		if (res->ai_canonname) {
-			strncpy(hbuf, res->ai_canonname, sizeof(hbuf) - 1);
-			hbuf[sizeof(hbuf) - 1] = '\0';
-			*ahost = hbuf;
-		}
-		freeaddrinfo(res);
-	}
+    /* Validate remote hostname. */
+    if (strcmp(*ahost, "localhost") != 0) {
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_flags = AI_CANONNAME;
+        hints.ai_family = PF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+        (void)snprintf(num, sizeof(num), "%u",
+                       (unsigned int)ntohs(rport));
+        error = getaddrinfo(*ahost, num, &hints, &res);
 
-	/* Get a socketpair we'll use for stdin and stdout. */
-	if (socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, sp) == -1) {
-		perror("rcmdsh: socketpair");
-		return (-1);
-	}
+        if (error) {
+            fprintf(stderr, "rcmdsh: getaddrinfo: %s\n",
+                    gai_strerror(error));
+            return (-1);
+        }
 
-	cpid = fork();
-	if (cpid == -1) {
-		perror("rcmdsh: fork failed");
-		return (-1);
-	} else if (cpid == 0) {
-		/*
-		 * Child.  We use sp[1] to be stdin/stdout, and close sp[0].
-		 */
-		(void)close(sp[0]);
-		if (dup2(sp[1], 0) == -1 || dup2(0, 1) == -1) {
-			perror("rcmdsh: dup2 failed");
-			_exit(255);
-		}
-		/* Fork again to lose parent. */
-		cpid = fork();
-		if (cpid == -1) {
-			perror("rcmdsh: fork to lose parent failed");
-			_exit(255);
-		}
-		if (cpid > 0)
-			_exit(0);
+        if (res->ai_canonname) {
+            strncpy(hbuf, res->ai_canonname, sizeof(hbuf) - 1);
+            hbuf[sizeof(hbuf) - 1] = '\0';
+            *ahost = hbuf;
+        }
 
-		/* In grandchild here.  Become local user for rshprog. */
-		if (setuid(pw->pw_uid) == -1) {
-			(void)fprintf(stderr, "rcmdsh: setuid(%u): %s\n",
-			    pw->pw_uid, strerror(errno));
-			_exit(255);
-		}
+        freeaddrinfo(res);
+    }
 
-		/*
-		 * If remote host is "localhost" and local and remote users
-		 * are the same, avoid running remote shell for efficiency.
-		 */
-		if (strcmp(*ahost, "localhost") == 0 &&
-		    strcmp(locuser, remuser) == 0) {
-			if (pw->pw_shell[0] == '\0')
-				rshprog = _PATH_BSHELL;
-			else
-				rshprog = pw->pw_shell;
-			p = strrchr(rshprog, '/');
-			execlp(rshprog, p ? p + 1 : rshprog, "-c", cmd,
-			    (char *)NULL);
-		} else {
-			p = strrchr(rshprog, '/');
-			execlp(rshprog, p ? p + 1 : rshprog, *ahost, "-l",
-			    remuser, cmd, (char *)NULL);
-		}
-		(void)fprintf(stderr, "rcmdsh: execlp %s failed: %s\n",
-		    rshprog, strerror(errno));
-		_exit(255);
-	} else {
-		/* Parent. close sp[1], return sp[0]. */
-		(void)close(sp[1]);
-		/* Reap child. */
-		(void)wait(NULL);
-		return (sp[0]);
-	}
-	/* NOTREACHED */
+    /* Get a socketpair we'll use for stdin and stdout. */
+    if (socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, sp) == -1) {
+        perror("rcmdsh: socketpair");
+        return (-1);
+    }
+
+    cpid = fork();
+
+    if (cpid == -1) {
+        perror("rcmdsh: fork failed");
+        return (-1);
+    } else if (cpid == 0) {
+        /*
+         * Child.  We use sp[1] to be stdin/stdout, and close sp[0].
+         */
+        (void)close(sp[0]);
+
+        if (dup2(sp[1], 0) == -1 || dup2(0, 1) == -1) {
+            perror("rcmdsh: dup2 failed");
+            _exit(255);
+        }
+
+        /* Fork again to lose parent. */
+        cpid = fork();
+
+        if (cpid == -1) {
+            perror("rcmdsh: fork to lose parent failed");
+            _exit(255);
+        }
+
+        if (cpid > 0) {
+            _exit(0);
+        }
+
+        /* In grandchild here.  Become local user for rshprog. */
+        if (setuid(pw->pw_uid) == -1) {
+            (void)fprintf(stderr, "rcmdsh: setuid(%u): %s\n",
+                          pw->pw_uid, strerror(errno));
+            _exit(255);
+        }
+
+        /*
+         * If remote host is "localhost" and local and remote users
+         * are the same, avoid running remote shell for efficiency.
+         */
+        if (strcmp(*ahost, "localhost") == 0 &&
+                strcmp(locuser, remuser) == 0) {
+            if (pw->pw_shell[0] == '\0') {
+                rshprog = _PATH_BSHELL;
+            } else {
+                rshprog = pw->pw_shell;
+            }
+
+            p = strrchr(rshprog, '/');
+            execlp(rshprog, p ? p + 1 : rshprog, "-c", cmd,
+                   (char*)NULL);
+        } else {
+            p = strrchr(rshprog, '/');
+            execlp(rshprog, p ? p + 1 : rshprog, *ahost, "-l",
+                   remuser, cmd, (char*)NULL);
+        }
+
+        (void)fprintf(stderr, "rcmdsh: execlp %s failed: %s\n",
+                      rshprog, strerror(errno));
+        _exit(255);
+    } else {
+        /* Parent. close sp[1], return sp[0]. */
+        (void)close(sp[1]);
+        /* Reap child. */
+        (void)wait(NULL);
+        return (sp[0]);
+    }
+
+    /* NOTREACHED */
 }

@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
     b = 50;
     c = 2.5;
     d = 5;
-    x =(double)(a - b) + (c * d) /(double)b;
+    x = (double)(a - b) + (c * d) / (double)b;
     printf("%lf\n", (a - b) + (c * d) / b);
     printf("x=%d\n", x);
     return 0;

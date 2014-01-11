@@ -1,4 +1,4 @@
-/*	$NetBSD: flt_rounds.c,v 1.4.10.3 2002/03/22 20:41:53 nathanw Exp $	*/
+/*  $NetBSD: flt_rounds.c,v 1.4.10.3 2002/03/22 20:41:53 nathanw Exp $  */
 
 /*
  * Copyright (c) 1996 Mark Brinicombe
@@ -15,7 +15,7 @@
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
  *      This product includes software developed by Mark Brinicombe
- *	for the NetBSD Project.
+ *  for the NetBSD Project.
  * 4. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission
  *
@@ -38,17 +38,15 @@ __FBSDID("$FreeBSD: src/lib/libc/powerpc/gen/flt_rounds.c,v 1.1 2004/02/12 09:11
 #include <machine/float.h>
 
 static const int map[] = {
-	1,	/* round to nearest */
-	0,	/* round to zero */
-	2,	/* round to positive infinity */
-	3	/* round to negative infinity */
+    1,  /* round to nearest */
+    0,  /* round to zero */
+    2,  /* round to positive infinity */
+    3   /* round to negative infinity */
 };
 
 int
-__flt_rounds()
-{
-	uint64_t fpscr;
-
-	__asm__ __volatile("mffs %0" : "=f"(fpscr));
-	return map[(fpscr & 0x03)];
+__flt_rounds() {
+    uint64_t fpscr;
+    __asm__ __volatile("mffs %0" : "=f"(fpscr));
+    return map[(fpscr & 0x03)];
 }

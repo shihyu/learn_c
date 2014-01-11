@@ -16,12 +16,11 @@
 #include <errno.h>
 
 size_t __cdecl _heapused(
-        size_t *pUsed,
-        size_t *pCommit
-        )
-{
-        errno = ENOSYS;
-        return( 0 );
+    size_t* pUsed,
+    size_t* pCommit
+) {
+    errno = ENOSYS;
+    return (0);
 }
 
 
@@ -38,22 +37,17 @@ size_t __cdecl _heapused(
 #include <stdlib.h>
 
 
-size_t __cdecl _heapused(size_t *pUsed, size_t *pCommit)
-{
+size_t __cdecl _heapused(size_t* pUsed, size_t* pCommit) {
     size_t retval;
-
     /* lock the heap */
     _mlock(_HEAP_LOCK);
-
     retval = _heapused_nolock(pUsed, pCommit);
-
     /* release the heap lock */
     _munlock(_HEAP_LOCK);
-
     return retval;
 }
 
-size_t __cdecl _heapused_nolock(size_t *pUsed, size_t *pCommit)
+size_t __cdecl _heapused_nolock(size_t* pUsed, size_t* pCommit)
 
 {
     _PBLKDESC p;
@@ -62,11 +56,10 @@ size_t __cdecl _heapused_nolock(size_t *pUsed, size_t *pCommit)
     size_t usedbytes;   /* bytes devoted to in-use blocks */
     size_t freebytes;   /* bytes devoted to free blocks */
     size_t rsrvbytes;   /* total bytes of reserved address space */
-    void * * pageptr ;
+    void** pageptr ;
 
-    if ( (p = _heap_desc.pfirstdesc) == NULL
-      || _heap_desc.pfirstdesc == &_heap_desc.sentinel )
-    {
+    if ((p = _heap_desc.pfirstdesc) == NULL
+            || _heap_desc.pfirstdesc == &_heap_desc.sentinel) {
         return 0 ;  /* invalid heap */
     }
 
@@ -74,28 +67,19 @@ size_t __cdecl _heapused_nolock(size_t *pUsed, size_t *pCommit)
      * Scan through the heap, counting free and used blocks.
      * Include the overhead of each block and its heap descriptor.
      */
-
     freebytes = 0 ;
     usedbytes = 0 ;
 
-    while (p != NULL)
-    {
-
+    while (p != NULL) {
         next = p->pnextdesc;
 
-        if (p == &_heap_desc.sentinel)
-        {
-            if (next != NULL)
-            {
+        if (p == &_heap_desc.sentinel) {
+            if (next != NULL) {
                 return 0 ;
             }
-        }
-        else if (_IS_FREE(p))
-        {
+        } else if (_IS_FREE(p)) {
             freebytes += _BLKSIZE(p) + _HDRSIZE;
-        }
-        else if (_IS_INUSE(p))
-        {
+        } else if (_IS_INUSE(p)) {
             usedbytes += _BLKSIZE(p) + _HDRSIZE;
         }
 
@@ -107,13 +91,10 @@ size_t __cdecl _heapused_nolock(size_t *pUsed, size_t *pCommit)
      * _heap_descpages points to the head of a singly-linked list of the pages.
      * The descriptors for in-use blocks are considered in-use memory.
      */
-
     pageptr = _heap_descpages;
-
     rsrvbytes = 0 ;
 
-    while ( pageptr )
-    {
+    while (pageptr) {
         rsrvbytes += _HEAP_EMPTYLIST_SIZE ;
         pageptr = * pageptr ;
     }
@@ -124,16 +105,17 @@ size_t __cdecl _heapused_nolock(size_t *pUsed, size_t *pCommit)
      * Loop through the region descriptor table
      */
 
-    for ( index=0 ; index < _HEAP_REGIONMAX ; index++ )
-    {
+    for (index = 0 ; index < _HEAP_REGIONMAX ; index++) {
         rsrvbytes += _heap_regions[index]._totalsize ;
     }
 
-    if ( pUsed )
+    if (pUsed) {
         * pUsed = usedbytes ;
+    }
 
-    if ( pCommit )
+    if (pCommit) {
         * pCommit = freebytes + usedbytes ;
+    }
 
     return rsrvbytes ;
 }

@@ -1,4 +1,4 @@
-/*	$OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp $	*/
+/*  $OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp $ */
 
 /*
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
@@ -28,7 +28,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *rcsid = "$OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp $";
+static char* rcsid = "$OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp $";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/string/strlcat.c,v 1.10 2004/10/16 06:32:43 obrien Exp $");
@@ -45,31 +45,36 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strlcat.c,v 1.10 2004/10/16 06:32:43 obr
  */
 size_t
 strlcat(dst, src, siz)
-	char *dst;
-	const char *src;
-	size_t siz;
+char* dst;
+const char* src;
+size_t siz;
 {
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
-	size_t dlen;
+    char* d = dst;
+    const char* s = src;
+    size_t n = siz;
+    size_t dlen;
 
-	/* Find the end of dst and adjust bytes left but don't go past end */
-	while (n-- != 0 && *d != '\0')
-		d++;
-	dlen = d - dst;
-	n = siz - dlen;
+    /* Find the end of dst and adjust bytes left but don't go past end */
+    while (n-- != 0 && *d != '\0') {
+        d++;
+    }
 
-	if (n == 0)
-		return(dlen + strlen(s));
-	while (*s != '\0') {
-		if (n != 1) {
-			*d++ = *s;
-			n--;
-		}
-		s++;
-	}
-	*d = '\0';
+    dlen = d - dst;
+    n = siz - dlen;
 
-	return(dlen + (s - src));	/* count does not include NUL */
+    if (n == 0) {
+        return (dlen + strlen(s));
+    }
+
+    while (*s != '\0') {
+        if (n != 1) {
+            *d++ = *s;
+            n--;
+        }
+
+        s++;
+    }
+
+    *d = '\0';
+    return (dlen + (s - src));  /* count does not include NUL */
 }

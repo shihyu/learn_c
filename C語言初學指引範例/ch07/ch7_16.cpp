@@ -6,19 +6,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void swap(int &a,int &b)
-{
- int temp;
- temp=a;
- a=b;
- b=temp;
+void swap(int& a, int& b) {
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
 }
 
-void main(void)
-{
- int m=20,n=60;
- printf("跑传玡(m,n)=(%d,%d)\n",m,n);
- swap(m,n);
- printf("跑传(m,n)=(%d,%d)\n",m,n);
- /*  system("pause");  */
+void main(void) {
+    int m = 20, n = 60;
+    printf("跑传玡(m,n)=(%d,%d)\n", m, n);
+    swap(m, n);
+    printf("跑传(m,n)=(%d,%d)\n", m, n);
+    /*  system("pause");  */
 }

@@ -21,23 +21,23 @@
 #if defined (_AMD64_)
 
 PRUNTIME_FUNCTION
-RtlLookupFunctionEntry (
+RtlLookupFunctionEntry(
     IN ULONG64 ControlPc,
     OUT PULONG64 ImageBase,
     IN OUT PVOID HistoryTable OPTIONAL
-    );
+);
 
 PVOID
-RtlVirtualUnwind (
+RtlVirtualUnwind(
     IN ULONG HandlerType,
     IN ULONG64 ImageBase,
     IN ULONG64 ControlPc,
     IN PRUNTIME_FUNCTION FunctionEntry,
     IN OUT PCONTEXT ContextRecord,
-    OUT PVOID *HandlerData,
+    OUT PVOID* HandlerData,
     OUT PULONG64 EstablisherFrame,
     IN OUT PVOID ContextPointers OPTIONAL
-    );
+);
 
 #define UNW_FLAG_NHANDLER 0x00
 
@@ -58,14 +58,14 @@ typedef struct _FRAME_POINTERS {
 } FRAME_POINTERS, *PFRAME_POINTERS;
 
 PRUNTIME_FUNCTION
-RtlLookupFunctionEntry (
+RtlLookupFunctionEntry(
     IN ULONGLONG ControlPc,
     OUT PULONGLONG ImageBase,
     OUT PULONGLONG TargetGp
-    );
+);
 
 ULONGLONG
-RtlVirtualUnwind (
+RtlVirtualUnwind(
     IN ULONGLONG ImageBase,
     IN ULONGLONG ControlPc,
     IN PRUNTIME_FUNCTION FunctionEntry,
@@ -73,7 +73,7 @@ RtlVirtualUnwind (
     OUT PBOOLEAN InFunction,
     OUT PFRAME_POINTERS EstablisherFrame,
     IN OUT PVOID ContextPointers OPTIONAL
-    );
+);
 
 #endif  /* defined (_IA64_) */
 
@@ -139,7 +139,6 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
 #endif  /* defined (_X86_) */
 {
     volatile UINT_PTR cookie[2];
-
     /*
      * Set up a fake exception, and report it via UnhandledExceptionFilter.
      * We can't raise a true exception because the stack (and therefore
@@ -148,7 +147,6 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
      * __security_check_cookie, so it is attributed to the function where the
      * buffer overrun was detected.
      */
-
 #if defined (_X86_)
     /*
      * On x86, we reserve some extra stack which won't be used.  That is to
@@ -157,15 +155,12 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
      * a CALL, after the calling frame has been released in the epilogue of
      * that function.
      */
-
-    volatile ULONG dw[(sizeof(CONTEXT) + sizeof(EXCEPTION_RECORD))/sizeof(ULONG)];
-
+    volatile ULONG dw[(sizeof(CONTEXT) + sizeof(EXCEPTION_RECORD)) / sizeof(ULONG)];
     /*
      * Save the state in the context record immediately.  Hopefully, since
      * opts are disabled, this will happen without modifying ECX, which has
      * the local cookie which failed the check.
      */
-
     __asm {
         mov dword ptr [GS_ContextRecord.Eax], eax
         mov dword ptr [GS_ContextRecord.Ecx], ecx
@@ -200,11 +195,8 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
 
         mov eax, dword ptr dw
     }
-
     GS_ContextRecord.ContextFlags = CONTEXT_CONTROL;
-
     GS_ExceptionRecord.ExceptionAddress  = (PVOID)(ULONG_PTR)GS_ContextRecord.Eip;
-
 #elif defined (_AMD64_)
     /*
      * On AMD64/EM64T, __security_check_cookie branched to __report_gsfailure
@@ -212,16 +204,15 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
      * of the caller to __security_check_cookie, which is the function with
      * the buffer overrun.
      */
-
     ULONG64 ControlPc;
     ULONG64 EstablisherFrame;
     PRUNTIME_FUNCTION FunctionEntry;
     PVOID HandlerData;
     ULONG64 ImageBase;
-
     RtlCaptureContext(&GS_ContextRecord);
     ControlPc = GS_ContextRecord.Rip;
     FunctionEntry = RtlLookupFunctionEntry(ControlPc, &ImageBase, NULL);
+
     if (FunctionEntry != NULL) {
         RtlVirtualUnwind(UNW_FLAG_NHANDLER,
                          ImageBase,
@@ -233,12 +224,11 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
                          NULL);
     } else {
         GS_ContextRecord.Rip = (ULONGLONG) _ReturnAddress();
-        GS_ContextRecord.Rsp = (ULONGLONG) _AddressOfReturnAddress()+8;
+        GS_ContextRecord.Rsp = (ULONGLONG) _AddressOfReturnAddress() + 8;
     }
 
     GS_ExceptionRecord.ExceptionAddress = (PVOID)GS_ContextRecord.Rip;
     GS_ContextRecord.Rcx = StackCookie;
-
 #elif defined (_IA64_)
     /*
      * On IA64, __security_check_cookie branched to __report_gsfailure with a
@@ -246,7 +236,6 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
      * caller to __security_check_cookie, which is the function with the
      * buffer overrun.
      */
-
     ULONGLONG ControlPc;
     FRAME_POINTERS EstablisherFrame;
     PRUNTIME_FUNCTION FunctionEntry;
@@ -254,17 +243,16 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
     ULONGLONG ImageBase;
     ULONGLONG TargetGp;
     int frames;
-
     RtlCaptureContext(&GS_ContextRecord);
     ControlPc = GS_ContextRecord.BrRp;
 
-    for (frames = 0; frames < 2; ++frames)
-    {
+    for (frames = 0; frames < 2; ++frames) {
         FunctionEntry = RtlLookupFunctionEntry(ControlPc, &ImageBase, &TargetGp);
-        if (FunctionEntry == NULL)
-        {
+
+        if (FunctionEntry == NULL) {
             break;
         }
+
         ControlPc = RtlVirtualUnwind(ImageBase,
                                      ControlPc,
                                      FunctionEntry,
@@ -277,44 +265,36 @@ __declspec(noreturn) void __cdecl __report_gsfailure(ULONGLONG StackCookie)
 
     GS_ExceptionRecord.ExceptionAddress  = (PVOID)ControlPc;
     GS_ContextRecord.IntV0 = StackCookie;
-
 #else  /* defined (_IA64_) */
 #error Unknown platform!
 #endif  /* defined (_IA64_) */
-
     GS_ExceptionRecord.ExceptionCode  = STATUS_STACK_BUFFER_OVERRUN;
     GS_ExceptionRecord.ExceptionFlags = EXCEPTION_NONCONTINUABLE;
-
     /*
      * Save the global cookie and cookie complement locally - using an array
      * to defeat any potential stack-packing.
      */
-
     cookie[0] = __security_cookie;
     cookie[1] = __security_cookie_complement;
-
 #if defined (_CRTBLD) && !defined (_SYSCRT)
     DebuggerWasPresent = IsDebuggerPresent();
     _CRT_DEBUGGER_HOOK(_CRT_DEBUGGER_GSFAILURE);
 #endif  /* defined (_CRTBLD) && !defined (_SYSCRT) */
-
     /* Make sure any filter already in place is deleted. */
     SetUnhandledExceptionFilter(NULL);
-
-    UnhandledExceptionFilter((EXCEPTION_POINTERS *)&GS_ExceptionPointers);
-
+    UnhandledExceptionFilter((EXCEPTION_POINTERS*)&GS_ExceptionPointers);
 #if defined (_CRTBLD) && !defined (_SYSCRT)
+
     /*
      * If we make it back from Watson, then the user may have asked to debug
      * the app.  If we weren't under a debugger before invoking Watson,
      * re-signal the VS CRT debugger hook, so a newly attached debugger gets
      * a chance to break into the process.
      */
-    if (!DebuggerWasPresent)
-    {
+    if (!DebuggerWasPresent) {
         _CRT_DEBUGGER_HOOK(_CRT_DEBUGGER_GSFAILURE);
     }
-#endif  /* defined (_CRTBLD) && !defined (_SYSCRT) */
 
+#endif  /* defined (_CRTBLD) && !defined (_SYSCRT) */
     TerminateProcess(GetCurrentProcess(), STATUS_STACK_BUFFER_OVERRUN);
 }

@@ -32,14 +32,13 @@
 /*
  * uuid_create() - create an UUID.
  * See also:
- *	http://www.opengroup.org/onlinepubs/009629399/uuid_create.htm
+ *  http://www.opengroup.org/onlinepubs/009629399/uuid_create.htm
  */
 void
-uuid_create(uuid_t *u, uint32_t *status)
-{
+uuid_create(uuid_t* u, uint32_t* status) {
+    if (status) {
+        *status = uuid_s_ok;
+    }
 
-	if (status)
-		*status = uuid_s_ok;
-
-	uuidgen(u, 1);
+    uuidgen(u, 1);
 }

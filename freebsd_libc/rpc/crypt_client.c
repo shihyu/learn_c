@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1996
- *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
+ *  Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -12,7 +12,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by Bill Paul.
+ *  This product includes software developed by Bill Paul.
  * 4. Neither the name of the author nor the names of any co-contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -44,58 +44,61 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/crypt_client.c,v 1.9 2003/02/16 17:29:10 ne
 
 int
 _des_crypt_call(buf, len, dparms)
-	char *buf;
-	int len;
-	struct desparams *dparms;
+char* buf;
+int len;
+struct desparams* dparms;
 {
-	CLIENT *clnt;
-	desresp  *result_1;
-	desargs  des_crypt_1_arg;
-	struct netconfig *nconf;
-	void *localhandle;
-	int stat;
+    CLIENT* clnt;
+    desresp*  result_1;
+    desargs  des_crypt_1_arg;
+    struct netconfig* nconf;
+    void* localhandle;
+    int stat;
+    nconf = NULL;
+    localhandle = setnetconfig();
 
-	nconf = NULL;
-	localhandle = setnetconfig();
-	while ((nconf = getnetconfig(localhandle)) != NULL) {
-		if (nconf->nc_protofmly != NULL &&
-		     strcmp(nconf->nc_protofmly, NC_LOOPBACK) == 0)
-			break;
-	}
-	if (nconf == NULL) {
-		warnx("getnetconfig: %s", nc_sperror());
-		return(DESERR_HWERROR);
-	}
-	clnt = clnt_tp_create(NULL, CRYPT_PROG, CRYPT_VERS, nconf);
-	if (clnt == (CLIENT *) NULL) {
-		endnetconfig(localhandle);
-		return(DESERR_HWERROR);
-	}
-	endnetconfig(localhandle);
+    while ((nconf = getnetconfig(localhandle)) != NULL) {
+        if (nconf->nc_protofmly != NULL &&
+                strcmp(nconf->nc_protofmly, NC_LOOPBACK) == 0) {
+            break;
+        }
+    }
 
-	des_crypt_1_arg.desbuf.desbuf_len = len;
-	des_crypt_1_arg.desbuf.desbuf_val = buf;
-	des_crypt_1_arg.des_dir = dparms->des_dir;
-	des_crypt_1_arg.des_mode = dparms->des_mode;
-	bcopy(dparms->des_ivec, des_crypt_1_arg.des_ivec, 8);
-	bcopy(dparms->des_key, des_crypt_1_arg.des_key, 8);
+    if (nconf == NULL) {
+        warnx("getnetconfig: %s", nc_sperror());
+        return (DESERR_HWERROR);
+    }
 
-	result_1 = des_crypt_1(&des_crypt_1_arg, clnt);
-	if (result_1 == (desresp *) NULL) {
-		clnt_destroy(clnt);
-		return(DESERR_HWERROR);
-	}
+    clnt = clnt_tp_create(NULL, CRYPT_PROG, CRYPT_VERS, nconf);
 
-	stat = result_1->stat;
+    if (clnt == (CLIENT*) NULL) {
+        endnetconfig(localhandle);
+        return (DESERR_HWERROR);
+    }
 
-	if (result_1->stat == DESERR_NONE ||
-	    result_1->stat == DESERR_NOHWDEVICE) {
-		bcopy(result_1->desbuf.desbuf_val, buf, len);
-		bcopy(result_1->des_ivec, dparms->des_ivec, 8);
-	}
+    endnetconfig(localhandle);
+    des_crypt_1_arg.desbuf.desbuf_len = len;
+    des_crypt_1_arg.desbuf.desbuf_val = buf;
+    des_crypt_1_arg.des_dir = dparms->des_dir;
+    des_crypt_1_arg.des_mode = dparms->des_mode;
+    bcopy(dparms->des_ivec, des_crypt_1_arg.des_ivec, 8);
+    bcopy(dparms->des_key, des_crypt_1_arg.des_key, 8);
+    result_1 = des_crypt_1(&des_crypt_1_arg, clnt);
 
-	clnt_freeres(clnt, (xdrproc_t)xdr_desresp, result_1);
-	clnt_destroy(clnt);
+    if (result_1 == (desresp*) NULL) {
+        clnt_destroy(clnt);
+        return (DESERR_HWERROR);
+    }
 
-	return(stat);
+    stat = result_1->stat;
+
+    if (result_1->stat == DESERR_NONE ||
+            result_1->stat == DESERR_NOHWDEVICE) {
+        bcopy(result_1->desbuf.desbuf_val, buf, len);
+        bcopy(result_1->des_ivec, dparms->des_ivec, 8);
+    }
+
+    clnt_freeres(clnt, (xdrproc_t)xdr_desresp, result_1);
+    clnt_destroy(clnt);
+    return (stat);
 }

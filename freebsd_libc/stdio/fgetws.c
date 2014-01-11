@@ -37,64 +37,76 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fgetws.c,v 1.6 2004/10/03 15:48:32 stefan
 #include "local.h"
 #include "mblocal.h"
 
-wchar_t *
-fgetws(wchar_t * __restrict ws, int n, FILE * __restrict fp)
-{
-	wchar_t *wsp;
-	size_t nconv;
-	const char *src;
-	unsigned char *nl;
+wchar_t*
+fgetws(wchar_t* __restrict ws, int n, FILE* __restrict fp) {
+    wchar_t* wsp;
+    size_t nconv;
+    const char* src;
+    unsigned char* nl;
+    FLOCKFILE(fp);
+    ORIENT(fp, 1);
 
-	FLOCKFILE(fp);
-	ORIENT(fp, 1);
+    if (n <= 0) {
+        errno = EINVAL;
+        goto error;
+    }
 
-	if (n <= 0) {
-		errno = EINVAL;
-		goto error;
-	}
+    if (fp->_r <= 0 && __srefill(fp))
+        /* EOF */
+    {
+        goto error;
+    }
 
-	if (fp->_r <= 0 && __srefill(fp))
-		/* EOF */
-		goto error;
-	wsp = ws;
-	do {
-		src = fp->_p;
-		nl = memchr(fp->_p, '\n', fp->_r);
-		nconv = __mbsnrtowcs(wsp, &src,
-		    nl != NULL ? (nl - fp->_p + 1) : fp->_r,
-		    n - 1, &fp->_extra->mbstate);
-		if (nconv == (size_t)-1)
-			/* Conversion error */
-			goto error;
-		if (src == NULL) {
-			/*
-			 * We hit a null byte. Increment the character count,
-			 * since mbsnrtowcs()'s return value doesn't include
-			 * the terminating null, then resume conversion
-			 * after the null.
-			 */
-			nconv++;
-			src = memchr(fp->_p, '\0', fp->_r);
-			src++;
-		}
-		fp->_r -= (unsigned char *)src - fp->_p;
-		fp->_p = (unsigned char *)src;
-		n -= nconv;
-		wsp += nconv;
-	} while (wsp[-1] != L'\n' && n > 1 && (fp->_r > 0 ||
-	    __srefill(fp) == 0));
-	if (wsp == ws)
-		/* EOF */
-		goto error;
-	if (!__mbsinit(&fp->_extra->mbstate))
-		/* Incomplete character */
-		goto error;
-	*wsp++ = L'\0';
-	FUNLOCKFILE(fp);
+    wsp = ws;
 
-	return (ws);
+    do {
+        src = fp->_p;
+        nl = memchr(fp->_p, '\n', fp->_r);
+        nconv = __mbsnrtowcs(wsp, &src,
+                             nl != NULL ? (nl - fp->_p + 1) : fp->_r,
+                             n - 1, &fp->_extra->mbstate);
 
+        if (nconv == (size_t) - 1)
+            /* Conversion error */
+        {
+            goto error;
+        }
+
+        if (src == NULL) {
+            /*
+             * We hit a null byte. Increment the character count,
+             * since mbsnrtowcs()'s return value doesn't include
+             * the terminating null, then resume conversion
+             * after the null.
+             */
+            nconv++;
+            src = memchr(fp->_p, '\0', fp->_r);
+            src++;
+        }
+
+        fp->_r -= (unsigned char*)src - fp->_p;
+        fp->_p = (unsigned char*)src;
+        n -= nconv;
+        wsp += nconv;
+    } while (wsp[-1] != L'\n' && n > 1 && (fp->_r > 0 ||
+                                           __srefill(fp) == 0));
+
+    if (wsp == ws)
+        /* EOF */
+    {
+        goto error;
+    }
+
+    if (!__mbsinit(&fp->_extra->mbstate))
+        /* Incomplete character */
+    {
+        goto error;
+    }
+
+    *wsp++ = L'\0';
+    FUNLOCKFILE(fp);
+    return (ws);
 error:
-	FUNLOCKFILE(fp);
-	return (NULL);
+    FUNLOCKFILE(fp);
+    return (NULL);
 }

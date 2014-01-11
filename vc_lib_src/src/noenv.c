@@ -19,10 +19,18 @@
 #define _CALLING __cdecl
 #endif  /* _M_CEE_PURE */
 
-int _CALLING _setenvp(void) { return 0; }
+int _CALLING _setenvp(void) {
+    return 0;
+}
 
-void * _CALLING __crtGetEnvironmentStringsA(void) { return NULL; }
+void* _CALLING __crtGetEnvironmentStringsA(void) {
+    return NULL;
+}
 
-int _CALLING _wsetenvp(void) { return 0; }
+int _CALLING _wsetenvp(void) {
+    return 0;
+}
 
-void * _CALLING __crtGetEnvironmentStringsW(void) { return NULL; }
+void* _CALLING __crtGetEnvironmentStringsW(void) {
+    return NULL;
+}

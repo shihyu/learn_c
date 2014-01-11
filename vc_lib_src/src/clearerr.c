@@ -32,24 +32,19 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl clearerr_s (FILE * stream)
-{
-        _VALIDATE_RETURN_ERRCODE((stream != NULL), EINVAL);
+errno_t __cdecl clearerr_s(FILE* stream) {
+    _VALIDATE_RETURN_ERRCODE((stream != NULL), EINVAL);
+    _lock_str(stream);
 
-        _lock_str(stream);
-        __try {
-
+    __try {
         /* Clear stdio level flags */
-        stream->_flag &= ~(_IOERR|_IOEOF);
-
+        stream->_flag &= ~(_IOERR | _IOEOF);
         /* Clear lowio level flags */
-
         _osfile_safe(_fileno(stream)) &= ~(FEOFLAG);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        }
-        __finally {
-            _unlock_str(stream);
-        }
     return 0;
 }
 
@@ -70,10 +65,9 @@ errno_t __cdecl clearerr_s (FILE * stream)
 *
 *******************************************************************************/
 
-void __cdecl clearerr (
-        FILE *stream
-        )
-{
+void __cdecl clearerr(
+    FILE* stream
+) {
     clearerr_s(stream);
 }
 

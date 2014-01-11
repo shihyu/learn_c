@@ -29,13 +29,14 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/reallocf.c,v 1.4 2002/03/22 21:53:10 obr
 
 #include <stdlib.h>
 
-void *
-reallocf(void *ptr, size_t size)
-{
-	void *nptr;
+void*
+reallocf(void* ptr, size_t size) {
+    void* nptr;
+    nptr = realloc(ptr, size);
 
-	nptr = realloc(ptr, size);
-	if (!nptr && ptr)
-		free(ptr);
-	return (nptr);
+    if (!nptr && ptr) {
+        free(ptr);
+    }
+
+    return (nptr);
 }

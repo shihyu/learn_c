@@ -23,43 +23,43 @@ extern int _newmode;    /* malloc new() handler mode */
 
 #ifndef _WIN64
 
-void *V6_HeapAlloc(size_t size)
-{
-    void *pvReturn = NULL;
-    if ( size <= __sbh_threshold )
-    {
-        _mlock( _HEAP_LOCK );
+void* V6_HeapAlloc(size_t size) {
+    void* pvReturn = NULL;
+
+    if (size <= __sbh_threshold) {
+        _mlock(_HEAP_LOCK);
+
         __try {
             pvReturn = __sbh_alloc_block((int)size);
-        }
-        __finally {
-            _munlock( _HEAP_LOCK );
+        } __finally {
+            _munlock(_HEAP_LOCK);
         }
     }
+
     return pvReturn;
 }
 
 #ifdef CRTDLL
-void *V5_HeapAlloc(size_t size)
-{
-    void * pvReturn = NULL;
+void* V5_HeapAlloc(size_t size) {
+    void* pvReturn = NULL;
 
     /* round up to the nearest paragraph */
-    if ( size ) {
+    if (size) {
         size = (size + _OLD_PARASIZE - 1) & ~(_OLD_PARASIZE - 1);
     } else {
         size = _OLD_PARASIZE;
     }
 
-    if ( size  <= __old_sbh_threshold ) {
+    if (size  <= __old_sbh_threshold) {
         _mlock(_HEAP_LOCK);
+
         __try {
             pvReturn = __old_sbh_alloc_block(size >> _OLD_PARASHIFT);
-        }
-        __finally {
+        } __finally {
             _munlock(_HEAP_LOCK);
         }
     }
+
     return pvReturn;
 }
 #endif  /* CRTDLL */
@@ -85,11 +85,11 @@ void *V5_HeapAlloc(size_t size)
 *
 *******************************************************************************/
 
-__forceinline void * __cdecl _heap_alloc (size_t size)
+__forceinline void* __cdecl _heap_alloc(size_t size)
 
 {
 #ifndef _WIN64
-    void *pvReturn;
+    void* pvReturn;
 #endif  /* _WIN64 */
 
     if (_crtheap == 0) {
@@ -101,30 +101,30 @@ __forceinline void * __cdecl _heap_alloc (size_t size)
 #ifdef _WIN64
     return HeapAlloc(_crtheap, 0, size ? size : 1);
 #else  /* _WIN64 */
+
     if (__active_heap == __SYSTEM_HEAP) {
         return HeapAlloc(_crtheap, 0, size ? size : 1);
-    } else
-    if ( __active_heap == __V6_HEAP ) {
+    } else if (__active_heap == __V6_HEAP) {
         if (pvReturn = V6_HeapAlloc(size)) {
             return pvReturn;
         }
     }
+
 #ifdef CRTDLL
-    else if ( __active_heap == __V5_HEAP )
-    {
+    else if (__active_heap == __V5_HEAP) {
         if (pvReturn = V5_HeapAlloc(size)) {
             return pvReturn;
         }
     }
+
 #endif  /* CRTDLL */
 
-    if (size == 0)
+    if (size == 0) {
         size = 1;
+    }
 
     size = (size + BYTES_PER_PARA - 1) & ~(BYTES_PER_PARA - 1);
-
     return HeapAlloc(_crtheap, 0, size);
-
 #endif  /* _WIN64 */
 }
 
@@ -151,33 +151,31 @@ __forceinline void * __cdecl _heap_alloc (size_t size)
 *
 *******************************************************************************/
 
-void * __cdecl _malloc_base (size_t size)
-{
-    void *res = NULL;
+void* __cdecl _malloc_base(size_t size) {
+    void* res = NULL;
 
     //  validate size
     if (size <= _HEAP_MAXREQ) {
         for (;;) {
-
             //  allocate memory block
             res = _heap_alloc(size);
 
             //  if successful allocation, return pointer to memory
             //  if new handling turned off altogether, return NULL
 
-            if (res != NULL)
-            {
+            if (res != NULL) {
                 break;
             }
-            if (_newmode == 0)
-            {
+
+            if (_newmode == 0) {
                 errno = ENOMEM;
                 break;
             }
 
             //  call installed new handler
-            if (!_callnewh(size))
+            if (!_callnewh(size)) {
                 break;
+            }
 
             //  new handler was successful -- try to allocate again
         }
@@ -188,9 +186,10 @@ void * __cdecl _malloc_base (size_t size)
     }
 
     RTCCALLBACK(_RTC_Allocate_hook, (res, size, 0));
-    if (res == NULL)
-    {
+
+    if (res == NULL) {
         errno = ENOMEM;
     }
+
     return res;
 }

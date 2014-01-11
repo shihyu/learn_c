@@ -58,104 +58,88 @@
 *
 *******************************************************************************/
 
-_MRTIMP2_NCEEPURE size_t __CLRCALL_PURE_OR_CDECL _Wcsxfrm (
-        wchar_t *_string1,
-        wchar_t *_end1,
-        const wchar_t *_string2,
-        const wchar_t *_end2,
-        const _Collvec *ploc
-        )
-{
-        size_t _n1 = _end1 - _string1;
-        size_t _n2 = _end2 - _string2;
-        size_t size = (size_t)-1;
-        unsigned char *bbuffer=NULL;
-        LCID handle;
+_MRTIMP2_NCEEPURE size_t __CLRCALL_PURE_OR_CDECL _Wcsxfrm(
+    wchar_t* _string1,
+    wchar_t* _end1,
+    const wchar_t* _string2,
+    const wchar_t* _end2,
+    const _Collvec* ploc
+) {
+    size_t _n1 = _end1 - _string1;
+    size_t _n2 = _end2 - _string2;
+    size_t size = (size_t) - 1;
+    unsigned char* bbuffer = NULL;
+    LCID handle;
 
-        if (ploc == 0)
-        {
-            handle = ___lc_handle_func()[LC_COLLATE];
+    if (ploc == 0) {
+        handle = ___lc_handle_func()[LC_COLLATE];
+    } else {
+        handle = ploc->_Hand;
+    }
+
+    if (handle == _CLOCALEHANDLE) {
+        if (_n2 <= _n1) {
+            memcpy(_string1, _string2, _n2 * sizeof(wchar_t));
         }
-        else
-        {
-            handle = ploc->_Hand;
-        }
 
-        if (handle == _CLOCALEHANDLE)
-        {
-            if (_n2 <= _n1)
-            {
-                memcpy(_string1, _string2, _n2 * sizeof (wchar_t));
-            }
-            size=_n2;
-        }
-        else
-        {
-
-            /*
-            * When using LCMAP_SORTKEY, LCMapStringW handles BYTES not wide
-            * chars. We use a byte buffer to hold bytes and then convert the
-            * byte string to a wide char string and return this so it can be
-            * compared using wcscmp(). User's buffer is _n1 wide chars, so
-            * use an internal buffer of _n1 bytes.
-            */
-
-            if (NULL != (bbuffer = (unsigned char *)_malloc_crt(_n1)))
-            {
+        size = _n2;
+    } else {
+        /*
+        * When using LCMAP_SORTKEY, LCMapStringW handles BYTES not wide
+        * chars. We use a byte buffer to hold bytes and then convert the
+        * byte string to a wide char string and return this so it can be
+        * compared using wcscmp(). User's buffer is _n1 wide chars, so
+        * use an internal buffer of _n1 bytes.
+        */
+        if (NULL != (bbuffer = (unsigned char*)_malloc_crt(_n1))) {
+            if (0 == (size = __crtLCMapStringW(NULL, handle,
+                                               LCMAP_SORTKEY,
+                                               _string2,
+                                               (int)_n2,
+                                               (wchar_t*)bbuffer,
+                                               (int)_n1,
+                                               ___lc_collate_cp_func()))) {
+                /* buffer not big enough, get size required. */
                 if (0 == (size = __crtLCMapStringW(NULL, handle,
                                                    LCMAP_SORTKEY,
                                                    _string2,
                                                    (int)_n2,
-                                                   (wchar_t *)bbuffer,
-                                                   (int)_n1,
-                                                   ___lc_collate_cp_func())))
-                {
-                    /* buffer not big enough, get size required. */
+                                                   NULL,
+                                                   0,
+                                                   ___lc_collate_cp_func()))) {
+                    size = INT_MAX; /* default error */
+                }
+            } else {
+                size_t i;
+                /* string successfully mapped, convert to wide char */
 
-                    if (0 == (size = __crtLCMapStringW(NULL, handle,
-                                                       LCMAP_SORTKEY,
-                                                       _string2,
-                                                       (int)_n2,
-                                                       NULL,
-                                                       0,
-                                                       ___lc_collate_cp_func())))
-                    {
-                        size = INT_MAX; /* default error */
-                    }
-                } else {
-                    size_t i;
-                    /* string successfully mapped, convert to wide char */
-
-                    for (i = 0; i < size; i++)
-                    {
-                        _string1[i] = (wchar_t)bbuffer[i];
-                    }
+                for (i = 0; i < size; i++) {
+                    _string1[i] = (wchar_t)bbuffer[i];
                 }
             }
         }
+    }
 
-        if(bbuffer)
-        {
-            _free_crt(bbuffer);
-        }
+    if (bbuffer) {
+        _free_crt(bbuffer);
+    }
 
-        return (size_t)size;
+    return (size_t)size;
 }
 
 #ifdef MRTDLL
-_MRTIMP2_NCEEPURE size_t __CLRCALL_PURE_OR_CDECL _Wcsxfrm (
-        unsigned short *_string1,
-        unsigned short *_end1,
-        const unsigned short *_string2,
-        const unsigned short *_end2,
-        const _Collvec *ploc
-        )
-    {
+_MRTIMP2_NCEEPURE size_t __CLRCALL_PURE_OR_CDECL _Wcsxfrm(
+    unsigned short* _string1,
+    unsigned short* _end1,
+    const unsigned short* _string2,
+    const unsigned short* _end2,
+    const _Collvec* ploc
+) {
     return _Wcsxfrm(
-        (wchar_t *)_string1,
-        (wchar_t *)_end1,
-        (const wchar_t *)_string2,
-        (const wchar_t *)_end2,
-        ploc);
-    }
+               (wchar_t*)_string1,
+               (wchar_t*)_end1,
+               (const wchar_t*)_string2,
+               (const wchar_t*)_end2,
+               ploc);
+}
 #endif  /* MRTDLL */

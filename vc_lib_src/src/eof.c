@@ -37,52 +37,41 @@
 *
 *******************************************************************************/
 
-int __cdecl _eof (
-        int filedes
-        )
-{
-        __int64 here;
-        __int64 end;
-        int retval;
+int __cdecl _eof(
+    int filedes
+) {
+    __int64 here;
+    __int64 end;
+    int retval;
+    _CHECK_FH_CLEAR_OSSERR_RETURN(filedes, EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((filedes >= 0 && (unsigned)filedes < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(filedes) & FOPEN), EBADF, -1);
+    /* Lock the file */
+    _lock_fh(filedes);
 
-        _CHECK_FH_CLEAR_OSSERR_RETURN( filedes, EBADF, -1 );
-        _VALIDATE_CLEAR_OSSERR_RETURN((filedes >= 0 && (unsigned)filedes < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(filedes) & FOPEN), EBADF, -1);
-
-
-        /* Lock the file */
-        _lock_fh(filedes);
-        __try {
-                if ( _osfile(filedes) & FOPEN ) {
-
-
-        /* See if the current position equals the end of the file. */
-
-        if ( ((here = _lseeki64_nolock(filedes, 0i64, SEEK_CUR)) == -1i64) ||
-             ((end = _lseeki64_nolock(filedes, 0i64, SEEK_END)) == -1i64) )
+    __try {
+        if (_osfile(filedes) & FOPEN) {
+            /* See if the current position equals the end of the file. */
+            if (((here = _lseeki64_nolock(filedes, 0i64, SEEK_CUR)) == -1i64) ||
+                    ((end = _lseeki64_nolock(filedes, 0i64, SEEK_END)) == -1i64)) {
                 retval = -1;
-        else if ( here == end )
+            } else if (here == end) {
                 retval = 1;
-        else {
+            } else {
                 _lseeki64_nolock(filedes, here, SEEK_SET);
                 retval = 0;
+            }
+        } else {
+            errno = EBADF;
+            _doserrno = 0;
+            retval = -1;
+            _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
         }
+    } __finally {
+        /* Unlock the file */
+        _unlock_fh(filedes);
+    }
 
-
-                }
-                else {
-                        errno = EBADF;
-                        _doserrno = 0;
-                        retval = -1;
-                        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-                }
-        }
-        __finally {
-                /* Unlock the file */
-                _unlock_fh(filedes);
-        }
-
-
-        /* Done */
-        return(retval);
+    /* Done */
+    return (retval);
 }

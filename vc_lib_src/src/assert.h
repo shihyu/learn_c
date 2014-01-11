@@ -38,7 +38,7 @@
 extern "C" {
 #endif  /* __cplusplus */
 
-_CRTIMP void __cdecl _wassert(__in_z const wchar_t * _Message, __in_z const wchar_t *_File, __in unsigned _Line);
+_CRTIMP void __cdecl _wassert(__in_z const wchar_t* _Message, __in_z const wchar_t* _File, __in unsigned _Line);
 
 #ifdef __cplusplus
 }

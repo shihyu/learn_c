@@ -26,5 +26,6 @@ int main(void) {
     } else {
         printf("您輸入了不合法的分數\n");
     }
+
     return 0;
 }

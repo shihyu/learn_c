@@ -38,19 +38,17 @@
 *******************************************************************************/
 
 extern "C" void __cdecl _mbccpy_l(
-        unsigned char *dst,
-        const unsigned char *src,
-        _locale_t plocinfo
-        )
-{
+    unsigned char* dst,
+    const unsigned char* src,
+    _locale_t plocinfo
+) {
     /* _mbccpy_s_l sets errno */
     _mbccpy_s_l(dst, 2, NULL, src, plocinfo);
 }
 
 extern "C" void (__cdecl _mbccpy)(
-        unsigned char *dst,
-        const unsigned char *src
-        )
-{
+    unsigned char* dst,
+    const unsigned char* src
+) {
     _mbccpy_s_l(dst, 2, NULL, src, NULL);
 }

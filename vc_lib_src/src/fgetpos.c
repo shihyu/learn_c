@@ -36,17 +36,16 @@
 *
 *******************************************************************************/
 
-int __cdecl fgetpos (
-        FILE *stream,
-        fpos_t *pos
-        )
-{
+int __cdecl fgetpos(
+    FILE* stream,
+    fpos_t* pos
+) {
+    _VALIDATE_RETURN((stream != NULL), EINVAL, -1);
+    _VALIDATE_RETURN((pos != NULL), EINVAL, -1);
 
-        _VALIDATE_RETURN((stream != NULL), EINVAL, -1);
-        _VALIDATE_RETURN((pos != NULL), EINVAL, -1);
-
-        if ( (*pos = _ftelli64(stream)) != -1i64 )
-                return(0);
-        else
-                return(-1);
+    if ((*pos = _ftelli64(stream)) != -1i64) {
+        return (0);
+    } else {
+        return (-1);
+    }
 }

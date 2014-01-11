@@ -38,33 +38,29 @@
 *
 *******************************************************************************/
 
-int __cdecl vfwscanf (
-        WINPUTFN winputfn,
-        FILE *stream,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list arglist
-        )
+int __cdecl vfwscanf(
+    WINPUTFN winputfn,
+    FILE* stream,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list arglist
+)
 /*
  * 'F'ile (stream) 'W'char_t 'SCAN', 'F'ormatted
  */
 {
-        int retval;
+    int retval;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
-        _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
-
-        _lock_str(stream);
-        __try {
-
+    __try {
         retval = (winputfn(stream, format, plocinfo, arglist));
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        }
-        __finally {
-            _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 /***
@@ -86,27 +82,25 @@ int __cdecl vfwscanf (
 *Exceptions:
 *
 *******************************************************************************/
-int __cdecl fwscanf (
-        FILE *stream,
-        const wchar_t *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vfwscanf(_winput_l, stream, format, NULL, arglist);
+int __cdecl fwscanf(
+    FILE* stream,
+    const wchar_t* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vfwscanf(_winput_l, stream, format, NULL, arglist);
 }
 
-int __cdecl _fwscanf_l (
-        FILE *stream,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vfwscanf(_winput_l, stream, format, plocinfo, arglist);
+int __cdecl _fwscanf_l(
+    FILE* stream,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vfwscanf(_winput_l, stream, format, plocinfo, arglist);
 }
 
 /***
@@ -118,26 +112,24 @@ int __cdecl _fwscanf_l (
 *Exceptions:
 *
 *******************************************************************************/
-int __cdecl fwscanf_s (
-        FILE *stream,
-        const wchar_t *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vfwscanf(_winput_s_l, stream, format, NULL, arglist);
+int __cdecl fwscanf_s(
+    FILE* stream,
+    const wchar_t* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vfwscanf(_winput_s_l, stream, format, NULL, arglist);
 }
 
-int __cdecl _fwscanf_s_l (
-        FILE *stream,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vfwscanf(_winput_s_l, stream, format, plocinfo, arglist);
+int __cdecl _fwscanf_s_l(
+    FILE* stream,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vfwscanf(_winput_s_l, stream, format, plocinfo, arglist);
 }
 

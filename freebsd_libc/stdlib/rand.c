@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -48,63 +48,64 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/rand.c,v 1.16 2007/01/09 00:28:10 imp Ex
 #endif /* TEST */
 
 static int
-do_rand(unsigned long *ctx)
-{
+do_rand(unsigned long* ctx) {
 #ifdef  USE_WEAK_SEEDING
-/*
- * Historic implementation compatibility.
- * The random sequences do not vary much with the seed,
- * even with overflowing.
- */
-	return ((*ctx = *ctx * 1103515245 + 12345) % ((u_long)RAND_MAX + 1));
+    /*
+     * Historic implementation compatibility.
+     * The random sequences do not vary much with the seed,
+     * even with overflowing.
+     */
+    return ((*ctx = *ctx * 1103515245 + 12345) % ((u_long)RAND_MAX + 1));
 #else   /* !USE_WEAK_SEEDING */
-/*
- * Compute x = (7^5 * x) mod (2^31 - 1)
- * wihout overflowing 31 bits:
- *      (2^31 - 1) = 127773 * (7^5) + 2836
- * From "Random number generators: good ones are hard to find",
- * Park and Miller, Communications of the ACM, vol. 31, no. 10,
- * October 1988, p. 1195.
- */
-	long hi, lo, x;
+    /*
+     * Compute x = (7^5 * x) mod (2^31 - 1)
+     * wihout overflowing 31 bits:
+     *      (2^31 - 1) = 127773 * (7^5) + 2836
+     * From "Random number generators: good ones are hard to find",
+     * Park and Miller, Communications of the ACM, vol. 31, no. 10,
+     * October 1988, p. 1195.
+     */
+    long hi, lo, x;
 
-	/* Can't be initialized with 0, so use another value. */
-	if (*ctx == 0)
-		*ctx = 123459876;
-	hi = *ctx / 127773;
-	lo = *ctx % 127773;
-	x = 16807 * lo - 2836 * hi;
-	if (x < 0)
-		x += 0x7fffffff;
-	return ((*ctx = x) % ((u_long)RAND_MAX + 1));
+    /* Can't be initialized with 0, so use another value. */
+    if (*ctx == 0) {
+        *ctx = 123459876;
+    }
+
+    hi = *ctx / 127773;
+    lo = *ctx % 127773;
+    x = 16807 * lo - 2836 * hi;
+
+    if (x < 0) {
+        x += 0x7fffffff;
+    }
+
+    return ((*ctx = x) % ((u_long)RAND_MAX + 1));
 #endif  /* !USE_WEAK_SEEDING */
 }
 
 
 int
-rand_r(unsigned int *ctx)
-{
-	u_long val = (u_long) *ctx;
-	int r = do_rand(&val);
-
-	*ctx = (unsigned int) val;
-	return (r);
+rand_r(unsigned int* ctx) {
+    u_long val = (u_long) * ctx;
+    int r = do_rand(&val);
+    *ctx = (unsigned int) val;
+    return (r);
 }
 
 
 static u_long next = 1;
 
 int
-rand()
-{
-	return (do_rand(&next));
+rand() {
+    return (do_rand(&next));
 }
 
 void
 srand(seed)
 u_int seed;
 {
-	next = seed;
+    next = seed;
 }
 
 
@@ -116,49 +117,46 @@ u_int seed;
  * secure random(4) interface.
  */
 void
-sranddev()
-{
-	int fd, done;
+sranddev() {
+    int fd, done;
+    done = 0;
+    fd = _open("/dev/random", O_RDONLY, 0);
 
-	done = 0;
-	fd = _open("/dev/random", O_RDONLY, 0);
-	if (fd >= 0) {
-		if (_read(fd, (void *) &next, sizeof(next)) == sizeof(next))
-			done = 1;
-		_close(fd);
-	}
+    if (fd >= 0) {
+        if (_read(fd, (void*) &next, sizeof(next)) == sizeof(next)) {
+            done = 1;
+        }
 
-	if (!done) {
-		struct timeval tv;
-		unsigned long junk;
+        _close(fd);
+    }
 
-		gettimeofday(&tv, NULL);
-		srand((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ junk);
-	}
+    if (!done) {
+        struct timeval tv;
+        unsigned long junk;
+        gettimeofday(&tv, NULL);
+        srand((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ junk);
+    }
 }
 
 
 #ifdef TEST
 
-main()
-{
+main() {
     int i;
     unsigned myseed;
-
     printf("seeding rand with 0x19610910: \n");
     srand(0x19610910);
-
     printf("generating three pseudo-random numbers:\n");
-    for (i = 0; i < 3; i++)
-    {
-	printf("next random number = %d\n", rand());
+
+    for (i = 0; i < 3; i++) {
+        printf("next random number = %d\n", rand());
     }
 
     printf("generating the same sequence with rand_r:\n");
     myseed = 0x19610910;
-    for (i = 0; i < 3; i++)
-    {
-	printf("next random number = %d\n", rand_r(&myseed));
+
+    for (i = 0; i < 3; i++) {
+        printf("next random number = %d\n", rand_r(&myseed));
     }
 
     return 0;

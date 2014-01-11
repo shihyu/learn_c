@@ -34,58 +34,63 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mbsnrtowcs.c,v 1.1 2004/07/21 10:54:57 t
 #include "mblocal.h"
 
 size_t
-mbsnrtowcs(wchar_t * __restrict dst, const char ** __restrict src,
-    size_t nms, size_t len, mbstate_t * __restrict ps)
-{
-	static mbstate_t mbs;
+mbsnrtowcs(wchar_t* __restrict dst, const char** __restrict src,
+           size_t nms, size_t len, mbstate_t* __restrict ps) {
+    static mbstate_t mbs;
 
-	if (ps == NULL)
-		ps = &mbs;
-	return (__mbsnrtowcs(dst, src, nms, len, ps));
+    if (ps == NULL) {
+        ps = &mbs;
+    }
+
+    return (__mbsnrtowcs(dst, src, nms, len, ps));
 }
 
 size_t
-__mbsnrtowcs_std(wchar_t * __restrict dst, const char ** __restrict src,
-    size_t nms, size_t len, mbstate_t * __restrict ps)
-{
-	const char *s;
-	size_t nchr;
-	wchar_t wc;
-	size_t nb;
+__mbsnrtowcs_std(wchar_t* __restrict dst, const char** __restrict src,
+                 size_t nms, size_t len, mbstate_t* __restrict ps) {
+    const char* s;
+    size_t nchr;
+    wchar_t wc;
+    size_t nb;
+    s = *src;
+    nchr = 0;
 
-	s = *src;
-	nchr = 0;
+    if (dst == NULL) {
+        for (;;) {
+            if ((nb = __mbrtowc(&wc, s, nms, ps)) == (size_t) - 1)
+                /* Invalid sequence - mbrtowc() sets errno. */
+            {
+                return ((size_t) - 1);
+            } else if (nb == 0 || nb == (size_t) - 2) {
+                return (nchr);
+            }
 
-	if (dst == NULL) {
-		for (;;) {
-			if ((nb = __mbrtowc(&wc, s, nms, ps)) == (size_t)-1)
-				/* Invalid sequence - mbrtowc() sets errno. */
-				return ((size_t)-1);
-			else if (nb == 0 || nb == (size_t)-2)
-				return (nchr);
-			s += nb;
-			nms -= nb;
-			nchr++;
-		}
-		/*NOTREACHED*/
-	}
+            s += nb;
+            nms -= nb;
+            nchr++;
+        }
 
-	while (len-- > 0) {
-		if ((nb = __mbrtowc(dst, s, nms, ps)) == (size_t)-1) {
-			*src = s;
-			return ((size_t)-1);
-		} else if (nb == (size_t)-2) {
-			*src = s + nms;
-			return (nchr);
-		} else if (nb == 0) {
-			*src = NULL;
-			return (nchr);
-		}
-		s += nb;
-		nms -= nb;
-		nchr++;
-		dst++;
-	}
-	*src = s;
-	return (nchr);
+        /*NOTREACHED*/
+    }
+
+    while (len-- > 0) {
+        if ((nb = __mbrtowc(dst, s, nms, ps)) == (size_t) - 1) {
+            *src = s;
+            return ((size_t) - 1);
+        } else if (nb == (size_t) - 2) {
+            *src = s + nms;
+            return (nchr);
+        } else if (nb == 0) {
+            *src = NULL;
+            return (nchr);
+        }
+
+        s += nb;
+        nms -= nb;
+        nchr++;
+        dst++;
+    }
+
+    *src = s;
+    return (nchr);
 }

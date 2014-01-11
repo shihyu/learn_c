@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1980, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,13 +36,13 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/valloc.c,v 1.5 2007/01/09 00:27:56 imp Exp 
 #include <stdlib.h>
 #include <unistd.h>
 
-void *
-valloc(size_t i)
-{
-	void	*ret;
+void*
+valloc(size_t i) {
+    void*    ret;
 
-	if (posix_memalign(&ret, getpagesize(), i) != 0)
-		ret = NULL;
+    if (posix_memalign(&ret, getpagesize(), i) != 0) {
+        ret = NULL;
+    }
 
-	return ret;
+    return ret;
 }

@@ -7,13 +7,13 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/setprogname.c,v 1.8 2002/03/29 22:43:41 mar
 #include "libc_private.h"
 
 void
-setprogname(const char *progname)
-{
-	const char *p;
+setprogname(const char* progname) {
+    const char* p;
+    p = strrchr(progname, '/');
 
-	p = strrchr(progname, '/');
-	if (p != NULL)
-		__progname = p + 1;
-	else
-		__progname = progname;
+    if (p != NULL) {
+        __progname = p + 1;
+    } else {
+        __progname = progname;
+    }
 }

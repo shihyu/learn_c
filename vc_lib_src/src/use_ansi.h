@@ -1,7 +1,7 @@
 /***
 *use_ansi.h - pragmas for ANSI Standard C++ libraries
 *
-*	Copyright (c) Microsoft Corporation. All rights reserved.
+*   Copyright (c) Microsoft Corporation. All rights reserved.
 *
 *Purpose:
 *       This header is intended to force the use of the appropriate ANSI
@@ -31,9 +31,9 @@
 #if defined(_DLL) && !defined(_STATIC_CPPLIB)
 #ifdef _DEBUG
 #pragma comment(lib,"msvcprtd")
-#else	/* _DEBUG */
+#else   /* _DEBUG */
 #pragma comment(lib,"msvcprt")
-#endif	/* _DEBUG */
+#endif  /* _DEBUG */
 
 #if !defined(_STL_NOFORCE_MANIFEST)
 
@@ -73,7 +73,7 @@
         "publicKeyToken='" _VC_ASSEMBLY_PUBLICKEYTOKEN "'\"")
 #endif
 
-#endif	/* _M_IX86 */
+#endif  /* _M_IX86 */
 
 #ifdef _M_AMD64
 
@@ -91,7 +91,7 @@
         "publicKeyToken='" _VC_ASSEMBLY_PUBLICKEYTOKEN "'\"")
 #endif
 
-#endif	/* _M_AMD64 */
+#endif  /* _M_AMD64 */
 
 #ifdef _M_IA64
 
@@ -111,18 +111,18 @@
 
 #endif
 
-#endif	/* !defined(_STL_NOFORCE_MANIFEST) && !defined(_VC_NODEFAULTLIB) */
+#endif  /* !defined(_STL_NOFORCE_MANIFEST) && !defined(_VC_NODEFAULTLIB) */
 
-#else	/* _DLL && !STATIC_CPPLIB */
+#else   /* _DLL && !STATIC_CPPLIB */
 #ifdef _DEBUG
 #pragma comment(lib,"libcpmtd")
-#else	/* _DEBUG */
+#else   /* _DEBUG */
 #pragma comment(lib,"libcpmt")
-#endif	/* _DEBUG */
-#endif	/* _DLL && !STATIC_CPPLIB */
+#endif  /* _DEBUG */
+#endif  /* _DLL && !STATIC_CPPLIB */
 
 #endif /* !defined(_M_CEE_PURE) && !defined(MRTDLL) */
 
 #endif  /* _CRT_NOPRAGMA_LIBS */
 
-#endif	/* _USE_ANSI_CPP */
+#endif  /* _USE_ANSI_CPP */

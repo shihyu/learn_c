@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,48 +44,55 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/daemon.c,v 1.8 2007/01/09 00:27:53 imp Exp 
 
 int
 daemon(nochdir, noclose)
-	int nochdir, noclose;
+int nochdir, noclose;
 {
-	struct sigaction osa, sa;
-	int fd;
-	pid_t newgrp;
-	int oerrno;
-	int osa_ok;
+    struct sigaction osa, sa;
+    int fd;
+    pid_t newgrp;
+    int oerrno;
+    int osa_ok;
+    /* A SIGHUP may be thrown when the parent exits below. */
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = SIG_IGN;
+    sa.sa_flags = 0;
+    osa_ok = _sigaction(SIGHUP, &sa, &osa);
 
-	/* A SIGHUP may be thrown when the parent exits below. */
-	sigemptyset(&sa.sa_mask);
-	sa.sa_handler = SIG_IGN;
-	sa.sa_flags = 0;
-	osa_ok = _sigaction(SIGHUP, &sa, &osa);
+    switch (fork()) {
+    case -1:
+        return (-1);
 
-	switch (fork()) {
-	case -1:
-		return (-1);
-	case 0:
-		break;
-	default:
-		_exit(0);
-	}
+    case 0:
+        break;
 
-	newgrp = setsid();
-	oerrno = errno;
-	if (osa_ok != -1)
-		_sigaction(SIGHUP, &osa, NULL);
+    default:
+        _exit(0);
+    }
 
-	if (newgrp == -1) {
-		errno = oerrno;
-		return (-1);
-	}
+    newgrp = setsid();
+    oerrno = errno;
 
-	if (!nochdir)
-		(void)chdir("/");
+    if (osa_ok != -1) {
+        _sigaction(SIGHUP, &osa, NULL);
+    }
 
-	if (!noclose && (fd = _open(_PATH_DEVNULL, O_RDWR, 0)) != -1) {
-		(void)_dup2(fd, STDIN_FILENO);
-		(void)_dup2(fd, STDOUT_FILENO);
-		(void)_dup2(fd, STDERR_FILENO);
-		if (fd > 2)
-			(void)_close(fd);
-	}
-	return (0);
+    if (newgrp == -1) {
+        errno = oerrno;
+        return (-1);
+    }
+
+    if (!nochdir) {
+        (void)chdir("/");
+    }
+
+    if (!noclose && (fd = _open(_PATH_DEVNULL, O_RDWR, 0)) != -1) {
+        (void)_dup2(fd, STDIN_FILENO);
+        (void)_dup2(fd, STDOUT_FILENO);
+        (void)_dup2(fd, STDERR_FILENO);
+
+        if (fd > 2) {
+            (void)_close(fd);
+        }
+    }
+
+    return (0);
 }

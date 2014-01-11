@@ -34,15 +34,15 @@
 
 #define _POSIX1E_ACL_STRING_PERM_MAXSIZE 3       /* read, write, exec */
 
-int	_posix1e_acl_check(acl_t acl);
-int	_posix1e_acl_sort(acl_t acl);
-int	_posix1e_acl(acl_t acl, acl_type_t type);
-int	_posix1e_acl_id_to_name(acl_tag_t tag, uid_t id, ssize_t buf_len,
-	    char *buf);
-int	_posix1e_acl_perm_to_string(acl_perm_t perm, ssize_t buf_len,
-	    char *buf);
-int	_posix1e_acl_string_to_perm(char *string, acl_perm_t *perm);
-int	_posix1e_acl_add_entry(acl_t acl, acl_tag_t tag, uid_t id,
-	    acl_perm_t perm);
+int _posix1e_acl_check(acl_t acl);
+int _posix1e_acl_sort(acl_t acl);
+int _posix1e_acl(acl_t acl, acl_type_t type);
+int _posix1e_acl_id_to_name(acl_tag_t tag, uid_t id, ssize_t buf_len,
+                            char* buf);
+int _posix1e_acl_perm_to_string(acl_perm_t perm, ssize_t buf_len,
+                                char* buf);
+int _posix1e_acl_string_to_perm(char* string, acl_perm_t* perm);
+int _posix1e_acl_add_entry(acl_t acl, acl_tag_t tag, uid_t id,
+                           acl_perm_t perm);
 
 #endif

@@ -56,62 +56,57 @@ _CRTIMP
 #endif  /* !defined (_M_CEE) */
 
 #ifdef __USE_CONTEXT
-void * __fileDECL bsearch_s (
-    REG4 const void *key,
-    const void *base,
+void* __fileDECL bsearch_s(
+    REG4 const void* key,
+    const void* base,
     size_t num,
     size_t width,
-    int (__fileDECL *compare)(void *, const void *, const void *),
-    void *context
-    )
+    int (__fileDECL* compare)(void*, const void*, const void*),
+    void* context
+)
 #else  /* __USE_CONTEXT */
-void * __fileDECL bsearch (
-    REG4 const void *key,
-    const void *base,
+void* __fileDECL bsearch(
+    REG4 const void* key,
+    const void* base,
     size_t num,
     size_t width,
-    int (__fileDECL *compare)(const void *, const void *)
-    )
+    int (__fileDECL* compare)(const void*, const void*)
+)
 #endif  /* __USE_CONTEXT */
 {
-    REG1 char *lo = (char *)base;
-    REG2 char *hi = (char *)base + (num - 1) * width;
-    REG3 char *mid;
+    REG1 char* lo = (char*)base;
+    REG2 char* hi = (char*)base + (num - 1) * width;
+    REG3 char* mid;
     size_t half;
     int result;
-
     /* validation section */
     _VALIDATE_RETURN(base != NULL || num == 0, EINVAL, NULL);
     _VALIDATE_RETURN(width > 0, EINVAL, NULL);
     _VALIDATE_RETURN(compare != NULL, EINVAL, NULL);
 
-        /*
-        We allow a NULL key here because it breaks some older code and because we do not dereference
-        this ourselves so we can't be sure that it's a problem for the comparison function
-        */
+    /*
+    We allow a NULL key here because it breaks some older code and because we do not dereference
+    this ourselves so we can't be sure that it's a problem for the comparison function
+    */
 
-    while (lo <= hi)
-    {
-        if ((half = num / 2) != 0)
-        {
+    while (lo <= hi) {
+        if ((half = num / 2) != 0) {
             mid = lo + (num & 1 ? half : (half - 1)) * width;
-            if (!(result = __COMPARE(context, key, mid)))
-                return(mid);
-            else if (result < 0)
-            {
+
+            if (!(result = __COMPARE(context, key, mid))) {
+                return (mid);
+            } else if (result < 0) {
                 hi = mid - width;
-                num = num & 1 ? half : half-1;
-            }
-            else
-            {
+                num = num & 1 ? half : half - 1;
+            } else {
                 lo = mid + width;
                 num = half;
             }
-        }
-        else if (num)
+        } else if (num) {
             return (__COMPARE(context, key, lo) ? NULL : lo);
-        else
+        } else {
             break;
+        }
     }
 
     return NULL;

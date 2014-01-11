@@ -34,56 +34,46 @@
 *
 *******************************************************************************/
 
-int __cdecl fputc (
-        int ch,
-        FILE *str
-        )
-{
-        int retval=0;
+int __cdecl fputc(
+    int ch,
+    FILE* str
+) {
+    int retval = 0;
+    _VALIDATE_RETURN((str != NULL), EINVAL, EOF);
+    _lock_str(str);
 
-        _VALIDATE_RETURN((str != NULL), EINVAL, EOF);
-
-        _lock_str(str);
-        __try {
-
+    __try {
         _VALIDATE_STREAM_ANSI_SETRET(str, EINVAL, retval, EOF);
-                if(retval==0)
-                {
-                        retval = _putc_nolock(ch,str);
-                }
 
+        if (retval == 0) {
+            retval = _putc_nolock(ch, str);
         }
-        __finally {
-            _unlock_str(str);
-        }
+    } __finally {
+        _unlock_str(str);
+    }
 
-        return(retval);
+    return (retval);
 }
 
 #undef putc
 
-int __cdecl putc (
-        int ch,
-        FILE *str
-        )
-{
-        int retval=0;
+int __cdecl putc(
+    int ch,
+    FILE* str
+) {
+    int retval = 0;
+    _VALIDATE_RETURN((str != NULL), EINVAL, EOF);
+    _lock_str(str);
 
-        _VALIDATE_RETURN((str != NULL), EINVAL, EOF);
-
-        _lock_str(str);
-        __try {
-
+    __try {
         _VALIDATE_STREAM_ANSI_SETRET(("Invalid ANSI I/O on unicode stream", str), EINVAL, retval, EOF);
-                if(retval==0)
-                {
-                        retval = _putc_nolock(ch,str);
-                }
 
+        if (retval == 0) {
+            retval = _putc_nolock(ch, str);
         }
-        __finally {
-            _unlock_str(str);
-        }
+    } __finally {
+        _unlock_str(str);
+    }
 
-        return(retval);
+    return (retval);
 }

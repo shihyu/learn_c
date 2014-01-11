@@ -31,14 +31,12 @@ __FBSDID("$FreeBSD: src/lib/libc/ia64/gen/fpsetmask.c,v 1.4 2003/10/22 09:00:07 
 #include <ieeefp.h>
 
 fp_except_t
-fpsetmask(fp_except_t mask)
-{
-	u_int64_t fpsr;
-	u_int64_t oldmask;
-
-	__asm __volatile("mov %0=ar.fpsr" : "=r" (fpsr));
-	oldmask = ~fpsr & 0x3d;
-	fpsr = (fpsr & ~0x3d) | (~mask & 0x3d);
-	__asm __volatile("mov ar.fpsr=%0" :: "r" (fpsr));
-	return (oldmask);
+fpsetmask(fp_except_t mask) {
+    u_int64_t fpsr;
+    u_int64_t oldmask;
+    __asm __volatile("mov %0=ar.fpsr" : "=r"(fpsr));
+    oldmask = ~fpsr & 0x3d;
+    fpsr = (fpsr & ~0x3d) | (~mask & 0x3d);
+    __asm __volatile("mov ar.fpsr=%0" :: "r"(fpsr));
+    return (oldmask);
 }

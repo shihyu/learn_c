@@ -21,31 +21,27 @@ namespace msclr {
     namespace delegate_map {
         namespace internal {
 
-        template <typename CLASS> class delegate_proxy_factory
-        {
-            typedef typename CLASS::delegate_proxy_type proxy_type;
-            gcroot<proxy_type^> m_gc_managed_native_delegate_proxy;
+            template <typename CLASS> class delegate_proxy_factory {
+                typedef typename CLASS::delegate_proxy_type proxy_type;
+                gcroot<proxy_type^> m_gc_managed_native_delegate_proxy;
 
             public:
-            delegate_proxy_factory() {}
+                delegate_proxy_factory() {}
 
-            virtual ~delegate_proxy_factory()
-            {
-                if((proxy_type^)m_gc_managed_native_delegate_proxy != nullptr)
-                {
-                    m_gc_managed_native_delegate_proxy->detach();
+                virtual ~delegate_proxy_factory() {
+                    if ((proxy_type^)m_gc_managed_native_delegate_proxy != nullptr) {
+                        m_gc_managed_native_delegate_proxy->detach();
+                    }
                 }
-            }
 
-            proxy_type^ get_proxy(CLASS* pNativeTarget)
-            {
-                if((proxy_type^)m_gc_managed_native_delegate_proxy == nullptr)
-                {
-                    m_gc_managed_native_delegate_proxy = gcnew proxy_type(pNativeTarget);
+                proxy_type^ get_proxy(CLASS* pNativeTarget) {
+                    if ((proxy_type^)m_gc_managed_native_delegate_proxy == nullptr) {
+                        m_gc_managed_native_delegate_proxy = gcnew proxy_type(pNativeTarget);
+                    }
+
+                    return (proxy_type^)m_gc_managed_native_delegate_proxy;
                 }
-                return (proxy_type^)m_gc_managed_native_delegate_proxy;
-            }
-        };
+            };
 
         }
     }

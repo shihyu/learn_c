@@ -43,75 +43,69 @@
 *
 *******************************************************************************/
 
-extern "C" unsigned char * __cdecl _mbsset_l(
-        unsigned char *string,
-        unsigned int val,
-        _locale_t plocinfo
-        )
-{
-        unsigned char  *start = string;
-        unsigned char highval, lowval;
-        _LocaleUpdate _loc_update(plocinfo);
+extern "C" unsigned char* __cdecl _mbsset_l(
+    unsigned char* string,
+    unsigned int val,
+    _locale_t plocinfo
+) {
+    unsigned char*  start = string;
+    unsigned char highval, lowval;
+    _LocaleUpdate _loc_update(plocinfo);
+    /* validation section */
+    _VALIDATE_RETURN(string != NULL, EINVAL, NULL);
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
 
-        /* validation section */
-        _VALIDATE_RETURN(string != NULL, EINVAL, NULL);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return (unsigned char*)_strset((char*)string, val);
+    }
 
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-                return (unsigned char *)_strset((char *)string, val);
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
 
-        if (highval = (unsigned char) (val>>8)) {
+    if (highval = (unsigned char)(val >> 8)) {
+        /* 2-byte value */
+        lowval = (unsigned char)(val & 0x00ff);
 
-                /* 2-byte value */
-
-                lowval = (unsigned char)(val & 0x00ff);
-
-                if(lowval=='\0')
-                {
-                    _ASSERTE(("invalid MBCS pair passed to mbsset",0));
-
-                    /* Ideally we would return NULL here and signal an error
-                       condition. But since this function has no other
-                       error modes, there would be a good chance of crashing
-                       the caller. So instead we fill the string with spaces
-                       to ensure that no information leaks through
-                       unexpectedly. Anyway, we do set errno to EINVAL.
-                    */
-                    errno = EINVAL;
-                    lowval=highval=' ';
-                }
-
-                while (*string) {
-
-                        *string++ = highval;
-                        if (*string)
-                                *string++ = lowval;
-                        else
-                                /* don't orphan lead byte */
-                                string[-1] = ' ';
-                        }
-
+        if (lowval == '\0') {
+            _ASSERTE(("invalid MBCS pair passed to mbsset", 0));
+            /* Ideally we would return NULL here and signal an error
+               condition. But since this function has no other
+               error modes, there would be a good chance of crashing
+               the caller. So instead we fill the string with spaces
+               to ensure that no information leaks through
+               unexpectedly. Anyway, we do set errno to EINVAL.
+            */
+            errno = EINVAL;
+            lowval = highval = ' ';
         }
 
-        else {
-                /* single byte value */
+        while (*string) {
+            *string++ = highval;
 
-                while (*string)
-                        *string++ = (unsigned char)val;
+            if (*string) {
+                *string++ = lowval;
+            } else
+                /* don't orphan lead byte */
+            {
+                string[-1] = ' ';
+            }
         }
+    } else {
+        /* single byte value */
+        while (*string) {
+            *string++ = (unsigned char)val;
+        }
+    }
 
-        return(start);
+    return (start);
 }
 
-extern "C" unsigned char * (__cdecl _mbsset)(
-        unsigned char *string,
-        unsigned int val
-        )
-{
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+extern "C" unsigned char* (__cdecl _mbsset)(
+    unsigned char* string,
+    unsigned int val
+) {
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     return _mbsset_l(string, val, NULL);
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
 }
 
 #endif  /* _MBCS */

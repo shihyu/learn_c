@@ -40,27 +40,25 @@ extern IMAGE_DOS_HEADER __ImageBase;
 
 BOOL __cdecl _ValidateImageBase(
     PBYTE pImageBase
-    )
-{
+) {
     PIMAGE_DOS_HEADER      pDOSHeader;
     PIMAGE_NT_HEADERS      pNTHeader;
     PIMAGE_OPTIONAL_HEADER pOptHeader;
-
     pDOSHeader = (PIMAGE_DOS_HEADER)pImageBase;
-    if (pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE)
-    {
+
+    if (pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE) {
         return FALSE;
     }
 
     pNTHeader = (PIMAGE_NT_HEADERS)((PBYTE)pDOSHeader + pDOSHeader->e_lfanew);
-    if (pNTHeader->Signature != IMAGE_NT_SIGNATURE)
-    {
+
+    if (pNTHeader->Signature != IMAGE_NT_SIGNATURE) {
         return FALSE;
     }
 
     pOptHeader = (PIMAGE_OPTIONAL_HEADER)&pNTHeader->OptionalHeader;
-    if (pOptHeader->Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC)
-    {
+
+    if (pOptHeader->Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC) {
         return FALSE;
     }
 
@@ -88,15 +86,13 @@ BOOL __cdecl _ValidateImageBase(
 PIMAGE_SECTION_HEADER __cdecl _FindPESection(
     PBYTE     pImageBase,
     DWORD_PTR rva
-    )
-{
+) {
     PIMAGE_NT_HEADERS     pNTHeader;
     PIMAGE_SECTION_HEADER pSection;
     unsigned int          iSection;
-
     pNTHeader =
         (PIMAGE_NT_HEADERS)
-            (pImageBase + ((PIMAGE_DOS_HEADER)pImageBase)->e_lfanew);
+        (pImageBase + ((PIMAGE_DOS_HEADER)pImageBase)->e_lfanew);
 
     //
     // Find the section holding the desired address.  We make no assumptions
@@ -104,12 +100,10 @@ PIMAGE_SECTION_HEADER __cdecl _FindPESection(
     // always appear to be sorted by ascending section RVA).
     //
     for (iSection = 0, pSection = IMAGE_FIRST_SECTION(pNTHeader);
-         iSection < pNTHeader->FileHeader.NumberOfSections;
-         ++iSection, ++pSection)
-    {
+            iSection < pNTHeader->FileHeader.NumberOfSections;
+            ++iSection, ++pSection) {
         if (rva >= pSection->VirtualAddress &&
-            rva <  pSection->VirtualAddress + pSection->Misc.VirtualSize)
-        {
+                rva <  pSection->VirtualAddress + pSection->Misc.VirtualSize) {
             //
             // Section found
             //
@@ -148,12 +142,10 @@ PIMAGE_SECTION_HEADER __cdecl _FindPESection(
 
 BOOL __cdecl _IsNonwritableInCurrentImage(
     PBYTE pTarget
-    )
-{
+) {
     PBYTE                 pImageBase;
     DWORD_PTR             rvaTarget;
     PIMAGE_SECTION_HEADER pSection;
-
     pImageBase = (PBYTE)&__ImageBase;
 
     __try {
@@ -164,8 +156,7 @@ BOOL __cdecl _IsNonwritableInCurrentImage(
         // is for security purposes.  If we don't have a PE image, return
         // failure.
         //
-        if (!_ValidateImageBase(pImageBase))
-        {
+        if (!_ValidateImageBase(pImageBase)) {
             return FALSE;
         }
 
@@ -176,8 +167,8 @@ BOOL __cdecl _IsNonwritableInCurrentImage(
         //
         rvaTarget = pTarget - pImageBase;
         pSection = _FindPESection(pImageBase, rvaTarget);
-        if (pSection == NULL)
-        {
+
+        if (pSection == NULL) {
             return FALSE;
         }
 
@@ -186,9 +177,7 @@ BOOL __cdecl _IsNonwritableInCurrentImage(
         // located within a writable section, returning a failure if yes.
         //
         return (pSection->Characteristics & IMAGE_SCN_MEM_WRITE) == 0;
-    }
-    __except (GetExceptionCode() == STATUS_ACCESS_VIOLATION)
-    {
+    } __except (GetExceptionCode() == STATUS_ACCESS_VIOLATION) {
         //
         // Just return failure if the PE image is corrupted in any way that
         // triggers an AV.

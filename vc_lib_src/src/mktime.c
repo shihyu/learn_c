@@ -31,7 +31,7 @@
 /*
  * Core function for both _mktime32() and _mkgmtime32()
  */
-static __time32_t __cdecl _make__time32_t( struct tm *, int);
+static __time32_t __cdecl _make__time32_t(struct tm*, int);
 
 
 /***
@@ -62,11 +62,10 @@ static __time32_t __cdecl _make__time32_t( struct tm *, int);
 *
 *******************************************************************************/
 
-_CRTIMP __time32_t __cdecl _mktime32 (
-        struct tm *tb
-        )
-{
-        return( _make__time32_t(tb, 1) );
+_CRTIMP __time32_t __cdecl _mktime32(
+    struct tm* tb
+) {
+    return (_make__time32_t(tb, 1));
 }
 
 
@@ -91,11 +90,10 @@ _CRTIMP __time32_t __cdecl _mktime32 (
 *
 *******************************************************************************/
 
-_CRTIMP __time32_t __cdecl _mkgmtime32 (
-        struct tm *tb
-        )
-{
-        return( _make__time32_t(tb, 0) );
+_CRTIMP __time32_t __cdecl _mkgmtime32(
+    struct tm* tb
+) {
+    return (_make__time32_t(tb, 0));
 }
 
 
@@ -126,176 +124,177 @@ _CRTIMP __time32_t __cdecl _mkgmtime32 (
 *******************************************************************************/
 
 static __time32_t __cdecl _make__time32_t (
-        struct tm *tb,
-        int ultflag
-        )
-{
-        __time32_t tmptm1, tmptm2, tmptm3;
-        struct tm tbtemp;
-        long dstbias = 0;
-        long timezone = 0;
+    struct tm* tb,
+    int ultflag
+) {
+    __time32_t tmptm1, tmptm2, tmptm3;
+    struct tm tbtemp;
+    long dstbias = 0;
+    long timezone = 0;
+    _VALIDATE_RETURN((tb != NULL), EINVAL, ((__time32_t)(-1)))
 
-        _VALIDATE_RETURN( ( tb != NULL ), EINVAL, ( ( __time32_t )( -1 ) ) )
+    /*
+     * First, make sure tm_year is reasonably close to being in range.
+     */
+    if (((tmptm1 = tb->tm_year) < _BASE_YEAR - 1) || (tmptm1 > _MAX_YEAR
+            + 1)) {
+        goto err_mktime;
+    }
+
+    /*
+     * Adjust month value so it is in the range 0 - 11.  This is because
+     * we don't know how many days are in months 12, 13, 14, etc.
+     */
+
+    if ((tb->tm_mon < 0) || (tb->tm_mon > 11)) {
+        /*
+         * no danger of overflow because the range check above.
+         */
+        tmptm1 += (tb->tm_mon / 12);
+
+        if ((tb->tm_mon %= 12) < 0) {
+            tb->tm_mon += 12;
+            tmptm1--;
+        }
 
         /*
-         * First, make sure tm_year is reasonably close to being in range.
+         * Make sure year count is still in range.
          */
-        if ( ((tmptm1 = tb->tm_year) < _BASE_YEAR - 1) || (tmptm1 > _MAX_YEAR
-          + 1) )
+        if ((tmptm1 < _BASE_YEAR - 1) || (tmptm1 > _MAX_YEAR + 1)) {
             goto err_mktime;
+        }
+    }
 
+    /***** HERE: tmptm1 holds number of elapsed years *****/
+    /*
+     * Calculate days elapsed minus one, in the given year, to the given
+     * month. Check for leap year and adjust if necessary.
+     */
+    tmptm2 = _days[tb->tm_mon];
+
+    if (!(tmptm1 & 3) && (tb->tm_mon > 1)) {
+        tmptm2++;
+    }
+
+    /*
+     * Calculate elapsed days since base date (midnight, 1/1/70, UTC)
+     *
+     *
+     * 365 days for each elapsed year since 1970, plus one more day for
+     * each elapsed leap year. no danger of overflow because of the range
+     * check (above) on tmptm1.
+     */
+    tmptm3 = (tmptm1 - _BASE_YEAR) * 365L + ((tmptm1 - 1L) >> 2)
+             - _LEAP_YEAR_ADJUST;
+    /*
+     * elapsed days to current month (still no possible overflow)
+     */
+    tmptm3 += tmptm2;
+    /*
+     * elapsed days to current date. overflow is now possible.
+     */
+    tmptm1 = tmptm3 + (tmptm2 = (__time32_t)(tb->tm_mday));
+
+    if (ChkAdd(tmptm1, tmptm3, tmptm2)) {
+        goto err_mktime;
+    }
+
+    /***** HERE: tmptm1 holds number of elapsed days *****/
+    /*
+     * Calculate elapsed hours since base date
+     */
+    tmptm2 = tmptm1 * 24L;
+
+    if (ChkMul(tmptm2, tmptm1, 24L)) {
+        goto err_mktime;
+    }
+
+    tmptm1 = tmptm2 + (tmptm3 = (__time32_t)tb->tm_hour);
+
+    if (ChkAdd(tmptm1, tmptm2, tmptm3)) {
+        goto err_mktime;
+    }
+
+    /***** HERE: tmptm1 holds number of elapsed hours *****/
+    /*
+     * Calculate elapsed minutes since base date
+     */
+    tmptm2 = tmptm1 * 60L;
+
+    if (ChkMul(tmptm2, tmptm1, 60L)) {
+        goto err_mktime;
+    }
+
+    tmptm1 = tmptm2 + (tmptm3 = (__time32_t)tb->tm_min);
+
+    if (ChkAdd(tmptm1, tmptm2, tmptm3)) {
+        goto err_mktime;
+    }
+
+    /***** HERE: tmptm1 holds number of elapsed minutes *****/
+    /*
+     * Calculate elapsed seconds since base date
+     */
+    tmptm2 = tmptm1 * 60L;
+
+    if (ChkMul(tmptm2, tmptm1, 60L)) {
+        goto err_mktime;
+    }
+
+    tmptm1 = tmptm2 + (tmptm3 = (__time32_t)tb->tm_sec);
+
+    if (ChkAdd(tmptm1, tmptm2, tmptm3)) {
+        goto err_mktime;
+    }
+
+    /***** HERE: tmptm1 holds number of elapsed seconds *****/
+
+    if (ultflag) {
+        /*
+         * Adjust for timezone. No need to check for overflow since
+         * localtime() will check its arg value
+         */
+        __tzset();
+        _ERRCHECK(_get_dstbias(&dstbias));
+        _ERRCHECK(_get_timezone(&timezone));
+        tmptm1 += timezone;
 
         /*
-         * Adjust month value so it is in the range 0 - 11.  This is because
-         * we don't know how many days are in months 12, 13, 14, etc.
+         * Convert this second count back into a time block structure.
+         * If localtime returns NULL, return an error.
          */
+        if (_localtime32_s(&tbtemp, &tmptm1) != 0) {
+            goto err_mktime;
+        }
 
-        if ( (tb->tm_mon < 0) || (tb->tm_mon > 11) ) {
+        /*
+         * Now must compensate for DST. The ANSI rules are to use the
+         * passed-in tm_isdst flag if it is non-negative. Otherwise,
+         * compute if DST applies. Recall that tbtemp has the time without
+         * DST compensation, but has set tm_isdst correctly.
+         */
+        if ((tb->tm_isdst > 0) || ((tb->tm_isdst < 0) &&
+                                   (tbtemp.tm_isdst > 0))) {
+            tmptm1 += dstbias;
 
-            /*
-             * no danger of overflow because the range check above.
-             */
-            tmptm1 += (tb->tm_mon / 12);
-
-            if ( (tb->tm_mon %= 12) < 0 ) {
-                tb->tm_mon += 12;
-                tmptm1--;
+            if (_localtime32_s(&tbtemp, &tmptm1) != 0) {
+                goto err_mktime;
             }
-
-            /*
-             * Make sure year count is still in range.
-             */
-            if ( (tmptm1 < _BASE_YEAR - 1) || (tmptm1 > _MAX_YEAR + 1) )
-                goto err_mktime;
         }
-
-        /***** HERE: tmptm1 holds number of elapsed years *****/
-
-        /*
-         * Calculate days elapsed minus one, in the given year, to the given
-         * month. Check for leap year and adjust if necessary.
-         */
-        tmptm2 = _days[tb->tm_mon];
-        if ( !(tmptm1 & 3) && (tb->tm_mon > 1) )
-                tmptm2++;
-
-        /*
-         * Calculate elapsed days since base date (midnight, 1/1/70, UTC)
-         *
-         *
-         * 365 days for each elapsed year since 1970, plus one more day for
-         * each elapsed leap year. no danger of overflow because of the range
-         * check (above) on tmptm1.
-         */
-        tmptm3 = (tmptm1 - _BASE_YEAR) * 365L + ((tmptm1 - 1L) >> 2)
-          - _LEAP_YEAR_ADJUST;
-
-        /*
-         * elapsed days to current month (still no possible overflow)
-         */
-        tmptm3 += tmptm2;
-
-        /*
-         * elapsed days to current date. overflow is now possible.
-         */
-        tmptm1 = tmptm3 + (tmptm2 = (__time32_t)(tb->tm_mday));
-        if ( ChkAdd(tmptm1, tmptm3, tmptm2) )
+    } else {
+        if (_gmtime32_s(&tbtemp, &tmptm1) != 0) {
             goto err_mktime;
-
-        /***** HERE: tmptm1 holds number of elapsed days *****/
-
-        /*
-         * Calculate elapsed hours since base date
-         */
-        tmptm2 = tmptm1 * 24L;
-        if ( ChkMul(tmptm2, tmptm1, 24L) )
-            goto err_mktime;
-
-        tmptm1 = tmptm2 + (tmptm3 = (__time32_t)tb->tm_hour);
-        if ( ChkAdd(tmptm1, tmptm2, tmptm3) )
-            goto err_mktime;
-
-        /***** HERE: tmptm1 holds number of elapsed hours *****/
-
-        /*
-         * Calculate elapsed minutes since base date
-         */
-
-        tmptm2 = tmptm1 * 60L;
-        if ( ChkMul(tmptm2, tmptm1, 60L) )
-            goto err_mktime;
-
-        tmptm1 = tmptm2 + (tmptm3 = (__time32_t)tb->tm_min);
-        if ( ChkAdd(tmptm1, tmptm2, tmptm3) )
-            goto err_mktime;
-
-        /***** HERE: tmptm1 holds number of elapsed minutes *****/
-
-        /*
-         * Calculate elapsed seconds since base date
-         */
-
-        tmptm2 = tmptm1 * 60L;
-        if ( ChkMul(tmptm2, tmptm1, 60L) )
-            goto err_mktime;
-
-        tmptm1 = tmptm2 + (tmptm3 = (__time32_t)tb->tm_sec);
-        if ( ChkAdd(tmptm1, tmptm2, tmptm3) )
-            goto err_mktime;
-
-        /***** HERE: tmptm1 holds number of elapsed seconds *****/
-
-        if  ( ultflag ) {
-
-            /*
-             * Adjust for timezone. No need to check for overflow since
-             * localtime() will check its arg value
-             */
-
-            __tzset();
-
-            _ERRCHECK(_get_dstbias(&dstbias));
-            _ERRCHECK(_get_timezone(&timezone));
-
-            tmptm1 += timezone;
-
-            /*
-             * Convert this second count back into a time block structure.
-             * If localtime returns NULL, return an error.
-             */
-            if ( _localtime32_s(&tbtemp, &tmptm1) != 0 )
-                goto err_mktime;
-
-            /*
-             * Now must compensate for DST. The ANSI rules are to use the
-             * passed-in tm_isdst flag if it is non-negative. Otherwise,
-             * compute if DST applies. Recall that tbtemp has the time without
-             * DST compensation, but has set tm_isdst correctly.
-             */
-            if ( (tb->tm_isdst > 0) || ((tb->tm_isdst < 0) &&
-              (tbtemp.tm_isdst > 0)) ) {
-                tmptm1 += dstbias;
-                if ( _localtime32_s(&tbtemp, &tmptm1) != 0 )
-                    goto err_mktime;
-            }
-
         }
-        else {
-            if ( _gmtime32_s(&tbtemp, &tmptm1) != 0 )
-                goto err_mktime;
-        }
+    }
 
-        /***** HERE: tmptm1 holds number of elapsed seconds, adjusted *****/
-        /*****       for local time if requested                      *****/
-
-        *tb = tbtemp;
-        return (__time32_t)tmptm1;
-
+    /***** HERE: tmptm1 holds number of elapsed seconds, adjusted *****/
+    /*****       for local time if requested                      *****/
+    *tb = tbtemp;
+    return (__time32_t)tmptm1;
 err_mktime:
-        /*
-         * All errors come to here
-         */
-
-        errno = EINVAL;
-        return (__time32_t)(-1);
+    /*
+     * All errors come to here
+     */
+    errno = EINVAL;
+    return (__time32_t)(-1);
 }

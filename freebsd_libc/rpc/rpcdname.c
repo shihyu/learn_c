@@ -45,25 +45,32 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/rpcdname.c,v 1.5 2004/10/16 06:11:35 obrien
 #include <string.h>
 #include "un-namespace.h"
 
-static char *default_domain = 0;
+static char* default_domain = 0;
 
-static char *
-get_default_domain()
-{
-	char temp[256];
+static char*
+get_default_domain() {
+    char temp[256];
 
-	if (default_domain)
-		return (default_domain);
-	if (getdomainname(temp, sizeof(temp)) < 0)
-		return (0);
-	if ((int) strlen(temp) > 0) {
-		default_domain = (char *)malloc((strlen(temp)+(unsigned)1));
-		if (default_domain == 0)
-			return (0);
-		(void) strcpy(default_domain, temp);
-		return (default_domain);
-	}
-	return (0);
+    if (default_domain) {
+        return (default_domain);
+    }
+
+    if (getdomainname(temp, sizeof(temp)) < 0) {
+        return (0);
+    }
+
+    if ((int) strlen(temp) > 0) {
+        default_domain = (char*)malloc((strlen(temp) + (unsigned)1));
+
+        if (default_domain == 0) {
+            return (0);
+        }
+
+        (void) strcpy(default_domain, temp);
+        return (default_domain);
+    }
+
+    return (0);
 }
 
 /*
@@ -74,9 +81,11 @@ get_default_domain()
  */
 int
 __rpc_get_default_domain(domain)
-	char **domain;
+char** domain;
 {
-	if ((*domain = get_default_domain()) != 0)
-		return (0);
-	return (-1);
+    if ((*domain = get_default_domain()) != 0) {
+        return (0);
+    }
+
+    return (-1);
 }

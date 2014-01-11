@@ -43,59 +43,51 @@
 *******************************************************************************/
 
 double __cdecl _atof_l(
-        REG1 const char *nptr,
-        _locale_t plocinfo
-        )
-{
+    REG1 const char* nptr,
+    _locale_t plocinfo
+) {
+    struct _flt fltstruct;      /* temporary structure */
+    _LocaleUpdate _loc_update(plocinfo);
+    /* validation section */
+    _VALIDATE_RETURN(nptr != NULL, EINVAL, 0.0);
 
-        struct _flt fltstruct;      /* temporary structure */
-        _LocaleUpdate _loc_update(plocinfo);
+    /* scan past leading space/tab characters */
 
-        /* validation section */
-        _VALIDATE_RETURN(nptr != NULL, EINVAL, 0.0);
+    while (_isspace_l((int)(unsigned char)*nptr, _loc_update.GetLocaleT())) {
+        nptr++;
+    }
 
-        /* scan past leading space/tab characters */
-
-        while ( _isspace_l((int)(unsigned char)*nptr, _loc_update.GetLocaleT()) )
-                nptr++;
-
-        /* let _fltin routine do the rest of the work */
-
-        return( *(double *)&(_fltin2( &fltstruct, nptr, (int)strlen(nptr), 0, 0, _loc_update.GetLocaleT())->dval) );
+    /* let _fltin routine do the rest of the work */
+    return (*(double*) & (_fltin2(&fltstruct, nptr, (int)strlen(nptr), 0, 0, _loc_update.GetLocaleT())->dval));
 }
 
 double __cdecl atof(
-        REG1 const char *nptr
-        )
-{
+    REG1 const char* nptr
+) {
     return _atof_l(nptr, NULL);
 }
 
 unsigned int __strgtold12
 (
-    _LDBL12 *pld12,
-    const char * *p_end_ptr,
-    const char * str,
+    _LDBL12* pld12,
+    const char** p_end_ptr,
+    const char* str,
     int mult12,
     int scale,
     int decpt,
     int implicit_E
-)
-{
-        _LocaleUpdate _loc_update(NULL);
-
-        return __strgtold12_l(pld12, p_end_ptr, str, mult12, scale, decpt, implicit_E, _loc_update.GetLocaleT());
+) {
+    _LocaleUpdate _loc_update(NULL);
+    return __strgtold12_l(pld12, p_end_ptr, str, mult12, scale, decpt, implicit_E, _loc_update.GetLocaleT());
 }
 
 unsigned __STRINGTOLD
 (
-        _LDOUBLE *pld,
-        const char  * *p_end_ptr,
-        const char  *str,
-        int mult12
-)
-{
-        _LocaleUpdate _loc_update(NULL);
-
-        return __STRINGTOLD_L(pld, p_end_ptr, str, mult12, _loc_update.GetLocaleT());
+    _LDOUBLE* pld,
+    const char**  p_end_ptr,
+    const char*  str,
+    int mult12
+) {
+    _LocaleUpdate _loc_update(NULL);
+    return __STRINGTOLD_L(pld, p_end_ptr, str, mult12, _loc_update.GetLocaleT());
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,19 +43,18 @@ __FBSDID("$FreeBSD: src/lib/libc/sys/mmap.c,v 1.7 2007/07/04 23:27:38 peter Exp 
  * This function provides 64-bit offset padding that
  * is not supplied by GCC 1.X but is supplied by GCC 2.X.
  */
-void *
+void*
 mmap(addr, len, prot, flags, fd, offset)
-	void *	addr;
-	size_t	len;
-	int	prot;
-	int	flags;
-	int	fd;
-	off_t	offset;
+void*   addr;
+size_t  len;
+int prot;
+int flags;
+int fd;
+off_t   offset;
 {
-
-	if (__getosreldate() >= 700051)
-		return (__sys_mmap(addr, len, prot, flags, fd, offset));
-	else
-
-		return (__sys_freebsd6_mmap(addr, len, prot, flags, fd, 0, offset));
+    if (__getosreldate() >= 700051) {
+        return (__sys_mmap(addr, len, prot, flags, fd, offset));
+    } else {
+        return (__sys_freebsd6_mmap(addr, len, prot, flags, fd, 0, offset));
+    }
 }

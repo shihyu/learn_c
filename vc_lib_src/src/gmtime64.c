@@ -41,100 +41,86 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl _gmtime64_s (
-        struct tm *ptm,
-        const __time64_t *timp
-        )
-{
-        __time64_t caltim;/* = *timp; *//* calendar time to convert */
-        int islpyr = 0;                 /* is-current-year-a-leap-year flag */
-        int tmptim;
-        int *mdays;                     /* pointer to days or lpdays */
-        struct tm *ptb = ptm;
+errno_t __cdecl _gmtime64_s(
+    struct tm* ptm,
+    const __time64_t* timp
+) {
+    __time64_t caltim;/* = *timp; *//* calendar time to convert */
+    int islpyr = 0;                 /* is-current-year-a-leap-year flag */
+    int tmptim;
+    int* mdays;                     /* pointer to days or lpdays */
+    struct tm* ptb = ptm;
+    _VALIDATE_RETURN_ERRCODE((ptm != NULL), EINVAL)
+    memset(ptm, 0xff, sizeof(struct tm));
+    _VALIDATE_RETURN_ERRCODE((timp != NULL), EINVAL)
+    caltim = *timp;
+    _VALIDATE_RETURN_ERRCODE_NOEXC((caltim >= 0), EINVAL)
+    _VALIDATE_RETURN_ERRCODE((caltim <= _MAX__TIME64_T), EINVAL)
+    /*
+     * Determine the years since 1900. Start by ignoring leap years.
+     */
+    tmptim = (int)(caltim / _YEAR_SEC) + 70;
+    caltim -= ((__time64_t)(tmptim - 70) * _YEAR_SEC);
+    /*
+     * Correct for elapsed leap years
+     */
+    caltim -= ((__time64_t)_ELAPSED_LEAP_YEARS(tmptim) * _DAY_SEC);
 
-        _VALIDATE_RETURN_ERRCODE( ( ptm != NULL ), EINVAL )
+    /*
+     * If we have underflowed the __time64_t range (i.e., if caltim < 0),
+     * back up one year, adjusting the correction if necessary.
+     */
+    if (caltim < 0) {
+        caltim += (__time64_t)_YEAR_SEC;
+        tmptim--;
 
-        memset( ptm, 0xff, sizeof( struct tm ) );
-
-        _VALIDATE_RETURN_ERRCODE( ( timp != NULL ), EINVAL )
-        caltim = *timp;
-
-        _VALIDATE_RETURN_ERRCODE_NOEXC( (caltim>=0), EINVAL )
-        _VALIDATE_RETURN_ERRCODE( ( caltim <= _MAX__TIME64_T ), EINVAL)
-
-        /*
-         * Determine the years since 1900. Start by ignoring leap years.
-         */
-        tmptim = (int)(caltim / _YEAR_SEC) + 70;
-        caltim -= ((__time64_t)(tmptim - 70) * _YEAR_SEC);
-
-        /*
-         * Correct for elapsed leap years
-         */
-        caltim -= ((__time64_t)_ELAPSED_LEAP_YEARS(tmptim) * _DAY_SEC);
-
-        /*
-         * If we have underflowed the __time64_t range (i.e., if caltim < 0),
-         * back up one year, adjusting the correction if necessary.
-         */
-        if ( caltim < 0 ) {
-            caltim += (__time64_t)_YEAR_SEC;
-            tmptim--;
-            if ( _IS_LEAP_YEAR(tmptim) ) {
-                caltim += _DAY_SEC;
-                islpyr++;
-            }
+        if (_IS_LEAP_YEAR(tmptim)) {
+            caltim += _DAY_SEC;
+            islpyr++;
         }
-        else
-            if ( _IS_LEAP_YEAR(tmptim) )
-                islpyr++;
+    } else if (_IS_LEAP_YEAR(tmptim)) {
+        islpyr++;
+    }
 
-        /*
-         * tmptim now holds the value for tm_year. caltim now holds the
-         * number of elapsed seconds since the beginning of that year.
-         */
-        ptb->tm_year = tmptim;
+    /*
+     * tmptim now holds the value for tm_year. caltim now holds the
+     * number of elapsed seconds since the beginning of that year.
+     */
+    ptb->tm_year = tmptim;
+    /*
+     * Determine days since January 1 (0 - 365). This is the tm_yday value.
+     * Leave caltim with number of elapsed seconds in that day.
+     */
+    ptb->tm_yday = (int)(caltim / _DAY_SEC);
+    caltim -= (__time64_t)(ptb->tm_yday) * _DAY_SEC;
 
-        /*
-         * Determine days since January 1 (0 - 365). This is the tm_yday value.
-         * Leave caltim with number of elapsed seconds in that day.
-         */
-        ptb->tm_yday = (int)(caltim / _DAY_SEC);
-        caltim -= (__time64_t)(ptb->tm_yday) * _DAY_SEC;
+    /*
+     * Determine months since January (0 - 11) and day of month (1 - 31)
+     */
+    if (islpyr) {
+        mdays = _lpdays;
+    } else {
+        mdays = _days;
+    }
 
-        /*
-         * Determine months since January (0 - 11) and day of month (1 - 31)
-         */
-        if ( islpyr )
-            mdays = _lpdays;
-        else
-            mdays = _days;
+    for (tmptim = 1 ; mdays[tmptim] < ptb->tm_yday ; tmptim++) ;
 
-
-        for ( tmptim = 1 ; mdays[tmptim] < ptb->tm_yday ; tmptim++ ) ;
-
-        ptb->tm_mon = --tmptim;
-
-        ptb->tm_mday = ptb->tm_yday - mdays[tmptim];
-
-        /*
-         * Determine days since Sunday (0 - 6)
-         */
-        ptb->tm_wday = ((int)(*timp / _DAY_SEC) + _BASE_DOW) % 7;
-
-        /*
-         *  Determine hours since midnight (0 - 23), minutes after the hour
-         *  (0 - 59), and seconds after the minute (0 - 59).
-         */
-        ptb->tm_hour = (int)(caltim / 3600);
-        caltim -= (__time64_t)ptb->tm_hour * 3600L;
-
-        ptb->tm_min = (int)(caltim / 60);
-        ptb->tm_sec = (int)(caltim - (ptb->tm_min) * 60);
-
-        ptb->tm_isdst = 0;
-        return 0;
-
+    ptb->tm_mon = --tmptim;
+    ptb->tm_mday = ptb->tm_yday - mdays[tmptim];
+    /*
+     * Determine days since Sunday (0 - 6)
+     */
+    ptb->tm_wday = ((int)(*timp / _DAY_SEC) + _BASE_DOW) % 7;
+    /*
+     *  Determine hours since midnight (0 - 23), minutes after the hour
+     *  (0 - 59), and seconds after the minute (0 - 59).
+     */
+    ptb->tm_hour = (int)(caltim / 3600);
+    caltim -= (__time64_t)ptb->tm_hour * 3600L;
+    ptb->tm_min = (int)(caltim / 60);
+    ptb->tm_sec = (int)(caltim - (ptb->tm_min) * 60);
+    ptb->tm_isdst = 0;
+    return 0;
 }
 
 
@@ -156,21 +142,21 @@ errno_t __cdecl _gmtime64_s (
 *
 *******************************************************************************/
 
-struct tm * __cdecl _gmtime64 (
-        const __time64_t *timp
-        )
-{
-        errno_t e;
-        struct tm *ptm = __getgmtimebuf();                 /* will point to gmtime buffer */
-        if ( ptm == NULL )
-        {
-            return NULL;
-        }
+struct tm* __cdecl _gmtime64(
+    const __time64_t* timp
+) {
+    errno_t e;
+    struct tm* ptm = __getgmtimebuf();                 /* will point to gmtime buffer */
 
-        e = _gmtime64_s( ptm, timp );
-        if ( e != 0 )
-        {
-            return NULL;
-        }
-        return ptm;
+    if (ptm == NULL) {
+        return NULL;
+    }
+
+    e = _gmtime64_s(ptm, timp);
+
+    if (e != 0) {
+        return NULL;
+    }
+
+    return ptm;
 }

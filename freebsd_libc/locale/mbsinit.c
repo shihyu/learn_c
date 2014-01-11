@@ -31,8 +31,6 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mbsinit.c,v 1.3 2004/05/12 14:09:04 tjr 
 #include "mblocal.h"
 
 int
-mbsinit(const mbstate_t *ps)
-{
-
-	return (__mbsinit(ps));
+mbsinit(const mbstate_t* ps) {
+    return (__mbsinit(ps));
 }

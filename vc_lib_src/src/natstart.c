@@ -25,7 +25,7 @@ extern "C"
 volatile unsigned int __native_dllmain_reason = __NO_REASON;
 volatile unsigned int __native_vcclrit_reason = __NO_REASON;
 volatile __enative_startup_state __native_startup_state; /* process-wide state of native init */
-volatile void *__native_startup_lock; /* fiber ID currently doing native init */
+volatile void* __native_startup_lock; /* fiber ID currently doing native init */
 #if defined (__cplusplus)
 }
 #endif  /* defined (__cplusplus) */

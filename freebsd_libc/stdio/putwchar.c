@@ -40,8 +40,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/putwchar.c,v 1.3 2004/05/25 10:42:52 tjr 
  * Synonym for fputwc(wc, stdout).
  */
 wint_t
-putwchar(wchar_t wc)
-{
-
-	return (fputwc(wc, stdout));
+putwchar(wchar_t wc) {
+    return (fputwc(wc, stdout));
 }

@@ -35,21 +35,22 @@
 *
 *******************************************************************************/
 
-wchar_t * __cdecl wcsncpy (
-        wchar_t * dest,
-        const wchar_t * source,
-        size_t count
-        )
-{
-        wchar_t *start = dest;
+wchar_t* __cdecl wcsncpy(
+    wchar_t* dest,
+    const wchar_t* source,
+    size_t count
+) {
+    wchar_t* start = dest;
 
-        while (count && (*dest++ = *source++))    /* copy string */
-                count--;
+    while (count && (*dest++ = *source++)) {  /* copy string */
+        count--;
+    }
 
-        if (count)                              /* pad out with zeroes */
-                while (--count)
-                        *dest++ = L'\0';
+    if (count)                              /* pad out with zeroes */
+        while (--count) {
+            *dest++ = L'\0';
+        }
 
-        return(start);
+    return (start);
 }
 

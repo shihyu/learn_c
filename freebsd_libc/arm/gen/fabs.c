@@ -1,4 +1,4 @@
-/*	$NetBSD: fabs.c,v 1.2 2002/05/26 11:48:01 wiz Exp $	*/
+/*  $NetBSD: fabs.c,v 1.2 2002/05/26 11:48:01 wiz Exp $ */
 
 /*
  * Copyright (c) 1996 Mark Brinicombe
@@ -13,7 +13,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by Mark Brinicombe
+ *  This product includes software developed by Mark Brinicombe
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -38,9 +38,10 @@
 __FBSDID("$FreeBSD: src/lib/libc/arm/gen/fabs.c,v 1.1 2004/05/14 12:04:30 cognet Exp $");
 
 double
-fabs(double x)
-{
-	if (x < 0)
-		x = -x;
-	return(x);
+fabs(double x) {
+    if (x < 0) {
+        x = -x;
+    }
+
+    return (x);
 }

@@ -39,49 +39,55 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/dirname.c,v 1.7 2002/12/30 01:41:14 marcel 
 #include <string.h>
 #include <sys/param.h>
 
-char *
+char*
 dirname(path)
-	const char *path;
+const char* path;
 {
-	static char *bname = NULL;
-	const char *endp;
+    static char* bname = NULL;
+    const char* endp;
 
-	if (bname == NULL) {
-		bname = (char *)malloc(MAXPATHLEN);
-		if (bname == NULL)
-			return(NULL);
-	}
+    if (bname == NULL) {
+        bname = (char*)malloc(MAXPATHLEN);
 
-	/* Empty or NULL string gets treated as "." */
-	if (path == NULL || *path == '\0') {
-		(void)strcpy(bname, ".");
-		return(bname);
-	}
+        if (bname == NULL) {
+            return (NULL);
+        }
+    }
 
-	/* Strip trailing slashes */
-	endp = path + strlen(path) - 1;
-	while (endp > path && *endp == '/')
-		endp--;
+    /* Empty or NULL string gets treated as "." */
+    if (path == NULL || *path == '\0') {
+        (void)strcpy(bname, ".");
+        return (bname);
+    }
 
-	/* Find the start of the dir */
-	while (endp > path && *endp != '/')
-		endp--;
+    /* Strip trailing slashes */
+    endp = path + strlen(path) - 1;
 
-	/* Either the dir is "/" or there are no slashes */
-	if (endp == path) {
-		(void)strcpy(bname, *endp == '/' ? "/" : ".");
-		return(bname);
-	} else {
-		do {
-			endp--;
-		} while (endp > path && *endp == '/');
-	}
+    while (endp > path && *endp == '/') {
+        endp--;
+    }
 
-	if (endp - path + 2 > MAXPATHLEN) {
-		errno = ENAMETOOLONG;
-		return(NULL);
-	}
-	(void)strncpy(bname, path, endp - path + 1);
-	bname[endp - path + 1] = '\0';
-	return(bname);
+    /* Find the start of the dir */
+    while (endp > path && *endp != '/') {
+        endp--;
+    }
+
+    /* Either the dir is "/" or there are no slashes */
+    if (endp == path) {
+        (void)strcpy(bname, *endp == '/' ? "/" : ".");
+        return (bname);
+    } else {
+        do {
+            endp--;
+        } while (endp > path && *endp == '/');
+    }
+
+    if (endp - path + 2 > MAXPATHLEN) {
+        errno = ENAMETOOLONG;
+        return (NULL);
+    }
+
+    (void)strncpy(bname, path, endp - path + 1);
+    bname[endp - path + 1] = '\0';
+    return (bname);
 }

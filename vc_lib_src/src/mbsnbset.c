@@ -59,85 +59,75 @@
 *
 *******************************************************************************/
 
-extern "C" unsigned char * __cdecl _mbsnbset_l(
-        unsigned char *string,
-        unsigned int val,
-        size_t count,
-        _locale_t plocinfo
-        )
-{
-        unsigned char *start = string;
-        unsigned char highval, lowval;
-        _LocaleUpdate _loc_update(plocinfo);
+extern "C" unsigned char* __cdecl _mbsnbset_l(
+    unsigned char* string,
+    unsigned int val,
+    size_t count,
+    _locale_t plocinfo
+) {
+    unsigned char* start = string;
+    unsigned char highval, lowval;
+    _LocaleUpdate _loc_update(plocinfo);
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
 
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return (unsigned char *)_strnset((char *)string, val, count);
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return (unsigned char*)_strnset((char*)string, val, count);
+    }
 
-        /* validation section */
-        _VALIDATE_RETURN(string != NULL || count == 0, EINVAL, NULL);
+    _END_SECURE_CRT_DEPRECATION_DISABLE
+    /* validation section */
+    _VALIDATE_RETURN(string != NULL || count == 0, EINVAL, NULL);
 
-        /*
-         * leadbyte flag indicates if the last byte we overwrote was
-         * a lead byte or not.
-         */
+    /*
+     * leadbyte flag indicates if the last byte we overwrote was
+     * a lead byte or not.
+     */
 
-        if (highval = (unsigned char)(val>>8)) {
+    if (highval = (unsigned char)(val >> 8)) {
+        /* double byte value */
+        lowval = (unsigned char)(val & 0x00ff);
 
-                /* double byte value */
-
-                lowval = (unsigned char)(val & 0x00ff);
-
-                if(lowval=='\0')
-                {
-                    _ASSERTE(("invalid MBCS pair passed to mbsnbset",0));
-
-                    /* Ideally we would return NULL here and signal an error
-                       condition. But since this function has no other
-                       error modes, there would be a good chance of crashing
-                       the caller. So instead we fill the string with spaces
-                       to ensure that no information leaks through
-                       unexpectedly. Anyway, we do set errno to EINVAL.
-                    */
-                    errno = EINVAL;
-                    lowval=highval=' ';
-                }
-
-                while ((count--) && *string) {
-
-                        /* pad with ' ' if no room for both bytes -- odd len */
-                        if ((!count--) || (!*(string+1))) {
-                                *string = ' ';
-                                break;
-                        }
-
-                        *string++ = highval;
-                        *string++ = lowval;
-                }
+        if (lowval == '\0') {
+            _ASSERTE(("invalid MBCS pair passed to mbsnbset", 0));
+            /* Ideally we would return NULL here and signal an error
+               condition. But since this function has no other
+               error modes, there would be a good chance of crashing
+               the caller. So instead we fill the string with spaces
+               to ensure that no information leaks through
+               unexpectedly. Anyway, we do set errno to EINVAL.
+            */
+            errno = EINVAL;
+            lowval = highval = ' ';
         }
 
-        else {
-                /* single byte value */
+        while ((count--) && *string) {
+            /* pad with ' ' if no room for both bytes -- odd len */
+            if ((!count--) || (!*(string + 1))) {
+                *string = ' ';
+                break;
+            }
 
-                while (count-- && *string) {
-                        *string++ = (unsigned char)val;
-                }
-
+            *string++ = highval;
+            *string++ = lowval;
         }
+    } else {
+        /* single byte value */
+        while (count-- && *string) {
+            *string++ = (unsigned char)val;
+        }
+    }
 
-        return( start );
+    return (start);
 }
 
-extern "C" unsigned char * (__cdecl _mbsnbset)(
-        unsigned char *string,
-        unsigned int val,
-        size_t count
-        )
-{
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+extern "C" unsigned char* (__cdecl _mbsnbset)(
+    unsigned char* string,
+    unsigned int val,
+    size_t count
+) {
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     return _mbsnbset_l(string, val, count, NULL);
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
 }
 
 #endif  /* _MBCS */

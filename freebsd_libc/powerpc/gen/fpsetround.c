@@ -1,4 +1,4 @@
-/*	$NetBSD: fpsetround.c,v 1.3 2002/01/13 21:45:48 thorpej Exp $	*/
+/*  $NetBSD: fpsetround.c,v 1.3 2002/01/13 21:45:48 thorpej Exp $   */
 
 /*
  * Copyright (c) 1999 The NetBSD Foundation, Inc.
@@ -17,8 +17,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the NetBSD
- *	Foundation, Inc. and its contributors.
+ *  This product includes software developed by the NetBSD
+ *  Foundation, Inc. and its contributors.
  * 4. Neither the name of The NetBSD Foundation nor the names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
@@ -44,14 +44,12 @@ __FBSDID("$FreeBSD: src/lib/libc/powerpc/gen/fpsetround.c,v 1.1 2004/02/12 09:11
 #include <ieeefp.h>
 
 fp_rnd_t
-fpsetround(fp_rnd_t rnd_dir)
-{
-	u_int64_t fpscr;
-	fp_rnd_t old;
-
-	__asm__ __volatile("mffs %0" : "=f"(fpscr));
-	old = (fp_rnd_t)(fpscr & 0x3);
-	fpscr = (fpscr & 0xfffffffc) | rnd_dir;
-	__asm__ __volatile("mtfsf 0xff,%0" :: "f"(fpscr));
-	return (old);
+fpsetround(fp_rnd_t rnd_dir) {
+    u_int64_t fpscr;
+    fp_rnd_t old;
+    __asm__ __volatile("mffs %0" : "=f"(fpscr));
+    old = (fp_rnd_t)(fpscr & 0x3);
+    fpscr = (fpscr & 0xfffffffc) | rnd_dir;
+    __asm__ __volatile("mtfsf 0xff,%0" :: "f"(fpscr));
+    return (old);
 }

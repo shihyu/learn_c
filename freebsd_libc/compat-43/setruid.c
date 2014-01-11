@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,8 +36,6 @@ __FBSDID("$FreeBSD: src/lib/libc/compat-43/setruid.c,v 1.4 2007/01/09 00:27:49 i
 #include <unistd.h>
 
 int
-setruid(uid_t ruid)
-{
-
-	return (setreuid(ruid, -1));
+setruid(uid_t ruid) {
+    return (setreuid(ruid, -1));
 }

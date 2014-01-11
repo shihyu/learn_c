@@ -35,53 +35,52 @@
 *
 *******************************************************************************/
 
-int __cdecl _putts (
-        const _TCHAR *string
-        )
-{
-        int buffing;
+int __cdecl _putts(
+    const _TCHAR* string
+) {
+    int buffing;
 #ifndef _UNICODE
-        size_t length;
-        size_t ndone;
+    size_t length;
+    size_t ndone;
 #endif  /* _UNICODE */
-        int retval = _TEOF; /* error */
-
-        _VALIDATE_RETURN( (string != NULL), EINVAL, _TEOF );
+    int retval = _TEOF; /* error */
+    _VALIDATE_RETURN((string != NULL), EINVAL, _TEOF);
 #ifndef _UNICODE
-        _VALIDATE_STREAM_ANSI_RETURN(stdout, EINVAL, EOF);
+    _VALIDATE_STREAM_ANSI_RETURN(stdout, EINVAL, EOF);
 #endif  /* _UNICODE */
+    _lock_str2(1, stdout);
 
-        _lock_str2(1, stdout);
-        __try {
-
+    __try {
         buffing = _stbuf(stdout);
-
 #ifdef _UNICODE
+
         while (*string) {
-            if (_putwchar_nolock(*string++) == WEOF)
+            if (_putwchar_nolock(*string++) == WEOF) {
                 goto done;
+            }
         }
-        if (_putwchar_nolock(L'\n') != WEOF)
-            retval = 0;     /* success */
+
+        if (_putwchar_nolock(L'\n') != WEOF) {
+            retval = 0;    /* success */
+        }
+
 #else  /* _UNICODE */
         length = strlen(string);
-        ndone = _fwrite_nolock(string,1,length,stdout);
+        ndone = _fwrite_nolock(string, 1, length, stdout);
 
         if (ndone == length) {
-            _putc_nolock('\n',stdout);
+            _putc_nolock('\n', stdout);
             retval = 0;     /* success */
         }
-#endif  /* _UNICODE */
 
+#endif  /* _UNICODE */
 #ifdef _UNICODE
-done:
+    done:
 #endif  /* _UNICODE */
         _ftbuf(buffing, stdout);
+    } __finally {
+        _unlock_str2(1, stdout);
+    }
 
-        }
-        __finally {
-            _unlock_str2(1, stdout);
-        }
-
-        return retval;
+    return retval;
 }

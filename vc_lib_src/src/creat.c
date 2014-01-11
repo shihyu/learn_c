@@ -36,13 +36,12 @@
 *
 *******************************************************************************/
 
-int __cdecl _tcreat (
-        const _TSCHAR *path,
-        int pmode
-        )
-{
-        /* creat is just the same as open... */
-        int fh = -1;
-        errno_t e = _tsopen_s(&fh, path, _O_CREAT + _O_TRUNC + _O_RDWR, _SH_DENYNO, pmode);
-        return (e == 0 ? fh : -1);
+int __cdecl _tcreat(
+    const _TSCHAR* path,
+    int pmode
+) {
+    /* creat is just the same as open... */
+    int fh = -1;
+    errno_t e = _tsopen_s(&fh, path, _O_CREAT + _O_TRUNC + _O_RDWR, _SH_DENYNO, pmode);
+    return (e == 0 ? fh : -1);
 }

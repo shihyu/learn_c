@@ -33,21 +33,19 @@
 *
 *******************************************************************************/
 
-div_t __cdecl div (
-        int numer,
-        int denom
-        )
-{
-        div_t result;
+div_t __cdecl div(
+    int numer,
+    int denom
+) {
+    div_t result;
+    result.quot = numer / denom;
+    result.rem = numer % denom;
 
-        result.quot = numer / denom;
-        result.rem = numer % denom;
+    if (numer < 0 && result.rem > 0) {
+        /* did division wrong; must fix up */
+        ++result.quot;
+        result.rem -= denom;
+    }
 
-        if (numer < 0 && result.rem > 0) {
-                /* did division wrong; must fix up */
-                ++result.quot;
-                result.rem -= denom;
-        }
-
-        return result;
+    return result;
 }

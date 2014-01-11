@@ -46,103 +46,91 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _wctomb_s_l (
-        int *pRetValue,
-        char *dst,
-        size_t sizeInBytes,
-        wchar_t wchar,
-        _locale_t plocinfo
-        )
-{
-    if (dst == NULL && sizeInBytes > 0)
-    {
+extern "C" int __cdecl _wctomb_s_l(
+    int* pRetValue,
+    char* dst,
+    size_t sizeInBytes,
+    wchar_t wchar,
+    _locale_t plocinfo
+) {
+    if (dst == NULL && sizeInBytes > 0) {
         /* indicate do not have state-dependent encodings */
-        if (pRetValue != NULL)
-        {
+        if (pRetValue != NULL) {
             *pRetValue = 0;
         }
+
         return 0;
     }
 
-    if (pRetValue != NULL)
-    {
+    if (pRetValue != NULL) {
         *pRetValue = -1;
     }
 
     /* validation section */
     /* we need to cast sizeInBytes to int, so we make sure we are not going to truncate sizeInBytes */
     _VALIDATE_RETURN_ERRCODE(sizeInBytes <= INT_MAX, EINVAL);
-
-
     _LocaleUpdate _loc_update(plocinfo);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE )
-    {
-        if ( wchar > 255 )  /* validate high byte */
-        {
-            if (dst != NULL && sizeInBytes > 0)
-            {
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
+        if (wchar > 255) {  /* validate high byte */
+            if (dst != NULL && sizeInBytes > 0) {
                 memset(dst, 0, sizeInBytes);
             }
+
             errno = EILSEQ;
             return errno;
         }
 
-        if (dst != NULL)
-        {
+        if (dst != NULL) {
             _VALIDATE_RETURN_ERRCODE(sizeInBytes > 0, ERANGE);
             *dst = (char) wchar;
         }
-        if (pRetValue != NULL)
-        {
+
+        if (pRetValue != NULL) {
             *pRetValue = 1;
         }
+
         return 0;
-    }
-    else
-    {
+    } else {
         int size;
         BOOL defused = 0;
 
-        if ( ((size = WideCharToMultiByte( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                                           0,
-                                           &wchar,
-                                           1,
-                                           dst,
-                                           (int)sizeInBytes,
-                                           NULL,
-                                           &defused) ) == 0) ||
-             (defused) )
-        {
-            if (size == 0 && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-            {
-                if (dst != NULL && sizeInBytes > 0)
-                {
+        if (((size = WideCharToMultiByte(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                                         0,
+                                         &wchar,
+                                         1,
+                                         dst,
+                                         (int)sizeInBytes,
+                                         NULL,
+                                         &defused)) == 0) ||
+                (defused)) {
+            if (size == 0 && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                if (dst != NULL && sizeInBytes > 0) {
                     memset(dst, 0, sizeInBytes);
                 }
+
                 _VALIDATE_RETURN_ERRCODE(("Buffer too small", 0), ERANGE);
             }
+
             errno = EILSEQ;
             return errno;
         }
 
-        if (pRetValue != NULL)
-        {
+        if (pRetValue != NULL) {
             *pRetValue = size;
         }
+
         return 0;
     }
-
 }
 
-extern "C" errno_t __cdecl wctomb_s (
-        int *pRetValue,
-        char *dst,
-        size_t sizeInBytes,
-        wchar_t wchar
-        )
-{
-        return _wctomb_s_l(pRetValue, dst, sizeInBytes, wchar, NULL);
+extern "C" errno_t __cdecl wctomb_s(
+    int* pRetValue,
+    char* dst,
+    size_t sizeInBytes,
+    wchar_t wchar
+) {
+    return _wctomb_s_l(pRetValue, dst, sizeInBytes, wchar, NULL);
 }
 
 /***
@@ -170,28 +158,24 @@ extern "C" errno_t __cdecl wctomb_s (
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _wctomb_l (
-        char *s,
-        wchar_t wchar,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _wctomb_l(
+    char* s,
+    wchar_t wchar,
+    _locale_t plocinfo
+) {
     int retval = -1;
     errno_t e;
     _LocaleUpdate _loc_update(plocinfo);
-
     e = _wctomb_s_l(&retval, s, _loc_update.GetLocaleT()->locinfo->mb_cur_max, wchar, _loc_update.GetLocaleT());
     return (e == 0 ? retval : -1);
 }
 
-extern "C" int __cdecl wctomb (
-        char *s,
-        wchar_t wchar
-        )
-{
+extern "C" int __cdecl wctomb(
+    char* s,
+    wchar_t wchar
+) {
     int retval = -1;
     errno_t e;
-
     e = _wctomb_s_l(&retval, s, MB_CUR_MAX, wchar, NULL);
     return (e == 0 ? retval : -1);
 }

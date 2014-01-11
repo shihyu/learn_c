@@ -26,50 +26,50 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	$NetBSD: SYS.h,v 1.8 2002/01/14 00:55:56 thorpej Exp $
+ *  $NetBSD: SYS.h,v 1.8 2002/01/14 00:55:56 thorpej Exp $
  * $FreeBSD: src/lib/libc/powerpc/SYS.h,v 1.6 2003/01/18 23:26:04 obrien Exp $
  */
 
 #include <sys/syscall.h>
 #include <machine/asm.h>
 
-#define _SYSCALL(x)						\
-	.text;							\
-	.align 2;						\
-	li	0,(__CONCAT(SYS_,x));				\
-	sc
+#define _SYSCALL(x)                     \
+    .text;                          \
+    .align 2;                       \
+    li  0,(__CONCAT(SYS_,x));               \
+    sc
 
-#define	SYSCALL(x)						\
-	.text;							\
-	.align 2;						\
-2:	b	PIC_PLT(CNAME(HIDENAME(cerror)));		\
-ENTRY(__CONCAT(__sys_,x));					\
-	.weak	CNAME(x);					\
-	.set	CNAME(x),CNAME(__CONCAT(__sys_,x));		\
-	.weak	CNAME(__CONCAT(_,x));				\
-	.set	CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x));	\
-	_SYSCALL(x);						\
-	bso	2b
+#define SYSCALL(x)                      \
+    .text;                          \
+    .align 2;                       \
+2:  b   PIC_PLT(CNAME(HIDENAME(cerror)));       \
+ENTRY(__CONCAT(__sys_,x));                  \
+    .weak   CNAME(x);                   \
+    .set    CNAME(x),CNAME(__CONCAT(__sys_,x));     \
+    .weak   CNAME(__CONCAT(_,x));               \
+    .set    CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+    _SYSCALL(x);                        \
+    bso 2b
 
-#define	PSEUDO(x)						\
-	.text;							\
-	.align 2;						\
-ENTRY(__CONCAT(__sys_,x));					\
-	.weak	CNAME(__CONCAT(_,x));				\
-	.set	CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x));	\
-	_SYSCALL(x);						\
-	bnslr;							\
-	b	PIC_PLT(CNAME(HIDENAME(cerror)))
+#define PSEUDO(x)                       \
+    .text;                          \
+    .align 2;                       \
+ENTRY(__CONCAT(__sys_,x));                  \
+    .weak   CNAME(__CONCAT(_,x));               \
+    .set    CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+    _SYSCALL(x);                        \
+    bnslr;                          \
+    b   PIC_PLT(CNAME(HIDENAME(cerror)))
 
-#define	RSYSCALL(x)						\
-	.text;							\
-	.align 2;						\
-2:	b	PIC_PLT(CNAME(HIDENAME(cerror)));		\
-ENTRY(__CONCAT(__sys_,x));					\
-	.weak	CNAME(x);					\
-	.set	CNAME(x),CNAME(__CONCAT(__sys_,x));		\
-	.weak	CNAME(__CONCAT(_,x));				\
-	.set	CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x));	\
-	_SYSCALL(x);						\
-	bnslr;							\
-	b	PIC_PLT(CNAME(HIDENAME(cerror)))
+#define RSYSCALL(x)                     \
+    .text;                          \
+    .align 2;                       \
+2:  b   PIC_PLT(CNAME(HIDENAME(cerror)));       \
+ENTRY(__CONCAT(__sys_,x));                  \
+    .weak   CNAME(x);                   \
+    .set    CNAME(x),CNAME(__CONCAT(__sys_,x));     \
+    .weak   CNAME(__CONCAT(_,x));               \
+    .set    CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)); \
+    _SYSCALL(x);                        \
+    bnslr;                          \
+    b   PIC_PLT(CNAME(HIDENAME(cerror)))

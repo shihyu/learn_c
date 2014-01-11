@@ -58,23 +58,21 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _iswctype_l (
-        wint_t c,
-        wctype_t mask,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _iswctype_l(
+    wint_t c,
+    wctype_t mask,
+    _locale_t plocinfo
+) {
     wint_t d;
 
-    if ( c == WEOF )
+    if (c == WEOF) {
         d = 0;
-    else if ( c < 256 )
+    } else if (c < 256) {
         d = (int)(_pwctype[c] & mask);
-    else
-    {
+    } else {
         _LocaleUpdate _loc_update(plocinfo);
 
-        if ( __crtGetStringTypeW(
+        if (__crtGetStringTypeW(
                     _loc_update.GetLocaleT(),
                     CT_CTYPE1,
                     (LPCWSTR)&c,
@@ -82,31 +80,30 @@ extern "C" int __cdecl _iswctype_l (
                     &d,
                     _loc_update.GetLocaleT()->locinfo->lc_codepage,
                     _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE]
-                    ) == 0)
+                ) == 0) {
             d = 0;
+        }
     }
 
     return (int)(d & mask);
 }
 
-extern "C" int __cdecl iswctype (
-        wint_t c,
-        wctype_t mask
-        )
-{
-    if (c == WEOF)
-    {
+extern "C" int __cdecl iswctype(
+    wint_t c,
+    wctype_t mask
+) {
+    if (c == WEOF) {
         return 0;
     }
-    if (c < 256)
-    {
+
+    if (c < 256) {
         return (int)(_pwctype[c] & mask);
     }
 
-    if (__locale_changed == 0)
-    {
+    if (__locale_changed == 0) {
         wint_t d;
-        if ( __crtGetStringTypeW(
+
+        if (__crtGetStringTypeW(
                     &__initiallocalestructinfo,
                     CT_CTYPE1,
                     (LPCWSTR)&c,
@@ -114,8 +111,9 @@ extern "C" int __cdecl iswctype (
                     &d,
                     __initiallocinfo.lc_codepage,
                     __initiallocinfo.lc_handle[LC_CTYPE]
-                    ) == 0)
+                ) == 0) {
             d = 0;
+        }
     }
 
     return _iswctype_l(c, mask, NULL);
@@ -141,10 +139,9 @@ extern "C" int __cdecl iswctype (
  *       Returns 0 on any error.
  *
  *******************************************************************************/
-extern "C" int __cdecl is_wctype (
-        wint_t c,
-        wctype_t mask
-        )
-{
+extern "C" int __cdecl is_wctype(
+    wint_t c,
+    wctype_t mask
+) {
     return iswctype(c, mask);
 }

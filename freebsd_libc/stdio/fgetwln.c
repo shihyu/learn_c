@@ -34,34 +34,38 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fgetwln.c,v 1.2 2004/08/06 17:00:09 tjr E
 #include "libc_private.h"
 #include "local.h"
 
-wchar_t *
-fgetwln(FILE * __restrict fp, size_t *lenp)
-{
-	wint_t wc;
-	size_t len;
+wchar_t*
+fgetwln(FILE* __restrict fp, size_t* lenp) {
+    wint_t wc;
+    size_t len;
+    FLOCKFILE(fp);
+    ORIENT(fp, 1);
+    len = 0;
 
-	FLOCKFILE(fp);
-	ORIENT(fp, 1);
+    while ((wc = __fgetwc(fp)) != WEOF) {
+#define GROW    512
 
-	len = 0;
-	while ((wc = __fgetwc(fp)) != WEOF) {
-#define	GROW	512
-		if (len * sizeof(wchar_t) >= fp->_lb._size &&
-		    __slbexpand(fp, (len + GROW) * sizeof(wchar_t)))
-			goto error;
-		*((wchar_t *)fp->_lb._base + len++) = wc;
-		if (wc == L'\n')
-			break;
-	}
-	if (len == 0)
-		goto error;
+        if (len * sizeof(wchar_t) >= fp->_lb._size &&
+                __slbexpand(fp, (len + GROW) * sizeof(wchar_t))) {
+            goto error;
+        }
 
-	FUNLOCKFILE(fp);
-	*lenp = len;
-	return ((wchar_t *)fp->_lb._base);
+        *((wchar_t*)fp->_lb._base + len++) = wc;
 
+        if (wc == L'\n') {
+            break;
+        }
+    }
+
+    if (len == 0) {
+        goto error;
+    }
+
+    FUNLOCKFILE(fp);
+    *lenp = len;
+    return ((wchar_t*)fp->_lb._base);
 error:
-	FUNLOCKFILE(fp);
-	*lenp = 0;
-	return (NULL);
+    FUNLOCKFILE(fp);
+    *lenp = 0;
+    return (NULL);
 }

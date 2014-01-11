@@ -48,77 +48,72 @@
 *
 *******************************************************************************/
 
-extern "C" errno_t __cdecl _gcvt_s (
-        char *buf,
-        size_t sizeInChars,
-        double value,
-        int ndec
-        )
-{
-        STRFLT string;
-        int    magnitude;
-        _CRT_DOUBLE *pdvalue = (_CRT_DOUBLE *)&value;
-
-        REG1 char *str;
-        REG2 char *stop;
-        errno_t e;
+extern "C" errno_t __cdecl _gcvt_s(
+    char* buf,
+    size_t sizeInChars,
+    double value,
+    int ndec
+) {
+    STRFLT string;
+    int    magnitude;
+    _CRT_DOUBLE* pdvalue = (_CRT_DOUBLE*)&value;
+    REG1 char* str;
+    REG2 char* stop;
+    errno_t e;
     _locale_t plocinfo = NULL;
     _LocaleUpdate _loc_update(plocinfo);
+    struct _strflt strfltstruct;    /* temporary buffers */
+    char   resultstring[22 /* MAX_MAN_DIGITS+1 */];
+    /* validation section */
+    _VALIDATE_RETURN_ERRCODE(buf != NULL, EINVAL);
+    _VALIDATE_RETURN_ERRCODE(sizeInChars > 0, EINVAL);
+    _RESET_STRING(buf, sizeInChars);
+    _VALIDATE_RETURN_ERRCODE((size_t)ndec < sizeInChars, ERANGE);
+    /* _cftoe and _cftof (used below) are more strict in validating sizeInChars */
+    /* get the magnitude of the number */
+    string = _fltout2(*pdvalue, &strfltstruct, resultstring, _countof(resultstring));
+    magnitude = string->decpt - 1;
 
-        struct _strflt strfltstruct;    /* temporary buffers */
-        char   resultstring[22 /* MAX_MAN_DIGITS+1 */];
+    /* output the result according to the Fortran G format as outlined in
+       Fortran language specification */
 
+    if (magnitude < -1  ||  magnitude > ndec - 1)
+        /* then  Ew.d  d = ndec */
+    {
+        e = _cftoe(&value, buf, sizeInChars, ndec - 1, 0);
+    } else
+        /* Fw.d  where d = ndec-string->decpt */
+    {
+        e = _cftof(&value, buf, sizeInChars, ndec - string->decpt);
+    }
 
-        /* validation section */
-        _VALIDATE_RETURN_ERRCODE(buf != NULL, EINVAL);
-        _VALIDATE_RETURN_ERRCODE(sizeInChars > 0, EINVAL);
-        _RESET_STRING(buf, sizeInChars);
-        _VALIDATE_RETURN_ERRCODE((size_t)ndec < sizeInChars, ERANGE);
-        /* _cftoe and _cftof (used below) are more strict in validating sizeInChars */
+    if (e == 0) {
+        /* remove the trailing zeroes before the exponent; we don't need to check for sizeInChars */
+        str = buf;
 
-        /* get the magnitude of the number */
-
-        string = _fltout2( *pdvalue, &strfltstruct, resultstring, _countof(resultstring) );
-
-        magnitude = string->decpt - 1;
-
-        /* output the result according to the Fortran G format as outlined in
-           Fortran language specification */
-
-        if ( magnitude < -1  ||  magnitude > ndec-1 )
-                /* then  Ew.d  d = ndec */
-                e = _cftoe( &value, buf, sizeInChars, ndec-1, 0);
-        else
-                /* Fw.d  where d = ndec-string->decpt */
-                e = _cftof( &value, buf, sizeInChars, ndec-string->decpt );
-
-        if (e == 0)
-        {
-                /* remove the trailing zeroes before the exponent; we don't need to check for sizeInChars */
-                str = buf;
-                while (*str && *str != *__LCONV(_loc_update.GetLocaleT()->locinfo)->decimal_point)
-                        str++;
-
-                if (*str++)
-                {
-                        while (*str && *str != 'e')
-                                str++;
-
-                        stop = str--;
-
-                        while (*str == '0')
-                                str--;
-
-                        while (*++str = *stop++)
-                                ;
-                }
-        }
-        else
-        {
-                errno = e;
+        while (*str && *str != *__LCONV(_loc_update.GetLocaleT()->locinfo)->decimal_point) {
+            str++;
         }
 
-        return e;
+        if (*str++) {
+            while (*str && *str != 'e') {
+                str++;
+            }
+
+            stop = str--;
+
+            while (*str == '0') {
+                str--;
+            }
+
+            while (*++str = *stop++)
+                ;
+        }
+    } else {
+        errno = e;
+    }
+
+    return e;
 }
 
 /***
@@ -153,16 +148,16 @@ extern "C" errno_t __cdecl _gcvt_s (
 *
 *******************************************************************************/
 
-char * __cdecl _gcvt (
-        double value,
-        int ndec,
-        char *buf
-        )
-{
-        errno_t e = _gcvt_s(buf, (size_t)-1, value, ndec);
-        if (e != 0)
-        {
-                return NULL;
-        }
-        return buf;
+char* __cdecl _gcvt(
+    double value,
+    int ndec,
+    char* buf
+) {
+    errno_t e = _gcvt_s(buf, (size_t) - 1, value, ndec);
+
+    if (e != 0) {
+        return NULL;
+    }
+
+    return buf;
 }

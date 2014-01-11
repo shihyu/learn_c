@@ -16,8 +16,8 @@
 #include <unknwn.h>
 #include <minternal.h>
 
-volatile __declspec(appdomain) __MPNH __mpnhHeap= (__MPNH) _encoded_null();
-volatile __declspec(appdomain) _new_handler_m __nhmHeap= (_new_handler_m) _encoded_null();
+volatile __declspec(appdomain) __MPNH __mpnhHeap = (__MPNH) _encoded_null();
+volatile __declspec(appdomain) _new_handler_m __nhmHeap = (_new_handler_m) _encoded_null();
 
 /***
 *int _callnewh - call the appropriate new handler
@@ -34,59 +34,51 @@ volatile __declspec(appdomain) _new_handler_m __nhmHeap= (_new_handler_m) _encod
 *       may throw bad_alloc
 *
 *******************************************************************************/
-static int __cdecl _callnewh_thunk(size_t size)
-{
+static int __cdecl _callnewh_thunk(size_t size) {
     __MPNH pnh = (__MPNH) _decode_pointer(__mpnhHeap);
 
-    if (pnh != NULL)
-    {
+    if (pnh != NULL) {
         return (*pnh)(size);
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }
 
-static void __clrcall _callnewh_cleanup(void)
-{
-    _PNH pnh=_query_new_handler();
+static void __clrcall _callnewh_cleanup(void) {
+    _PNH pnh = _query_new_handler();
     __MPNH enull = (__MPNH) _encoded_null();
-    if(pnh==_callnewh_thunk && __mpnhHeap!=enull)
-    {
+
+    if (pnh == _callnewh_thunk && __mpnhHeap != enull) {
         _set_new_handler((_PNH)NULL);
     }
-    __mpnhHeap=enull;
+
+    __mpnhHeap = enull;
 }
 
 static int __cdecl _callnewhandler_thunk
 (
     size_t size
-)
-{
+) {
     _new_handler_m pnh = (_new_handler_m) _decode_pointer(__nhmHeap);
 
-    if ( pnh != NULL)
-    {
+    if (pnh != NULL) {
         pnh();
-    }
-    else
-    {
+    } else {
         return 0;
     }
 
     return 1;
 }
 
-static void __clrcall _callnewhandler_cleanup(void)
-{
-    _PNH pnh=_query_new_handler();
+static void __clrcall _callnewhandler_cleanup(void) {
+    _PNH pnh = _query_new_handler();
     _new_handler_m enull = (_new_handler_m) _encoded_null();
-    if(pnh==_callnewhandler_thunk && __nhmHeap!=enull)
-    {
+
+    if (pnh == _callnewhandler_thunk && __nhmHeap != enull) {
         _set_new_handler((_PNH)NULL);
     }
-    __nhmHeap=enull;
+
+    __nhmHeap = enull;
 }
 
 /***
@@ -106,35 +98,29 @@ static void __clrcall _callnewhandler_cleanup(void)
 __MPNH _MRTIMP __cdecl _set_new_handler
 (
     __MPNH pnh
-)
-{
-    if(_atexit_m_appdomain(_callnewh_cleanup)!=0)
-    {
+) {
+    if (_atexit_m_appdomain(_callnewh_cleanup) != 0) {
         return NULL;
     }
 
     __MPNH pnhOld = (__MPNH) _decode_pointer(__mpnhHeap);
     __mpnhHeap = (__MPNH) _encode_pointer(pnh);
     _set_new_handler((_PNH)_callnewh_thunk);
-
-    return(pnhOld);
+    return (pnhOld);
 }
 
 std::_new_handler_m _MRTIMP __cdecl std::set_new_handler
 (
     std::_new_handler_m pnh
-) throw()
-{
-    if(_atexit_m_appdomain(_callnewhandler_cleanup)!=0)
-    {
+) throw() {
+    if (_atexit_m_appdomain(_callnewhandler_cleanup) != 0) {
         return NULL;
     }
 
     _new_handler_m pnhOld = (_new_handler_m) _decode_pointer(__nhmHeap);
     __nhmHeap = (_new_handler_m) _encode_pointer(pnh);
     _set_new_handler((_PNH)_callnewhandler_thunk);
-
-    return(pnhOld);
+    return (pnhOld);
 }
 
 /***
@@ -155,25 +141,22 @@ std::_new_handler_m _MRTIMP __cdecl std::set_new_handler
 __MPNH __cdecl __query_new_handler_m
 (
     void
-)
-{
+) {
     return (__MPNH) _decode_pointer(__mpnhHeap);
 }
 
-typedef void (__clrcall *_PHNDLR_m)(int);
+typedef void (__clrcall* _PHNDLR_m)(int);
 volatile __declspec(appdomain) static _PHNDLR_m __psignal_func[NSIG];
 
-class __signal_init
-{
+class __signal_init {
 public:
-        __signal_init()
-        {
-                _PHNDLR_m enull = (_PHNDLR_m) _encoded_null();
-                for(int i=0; i<NSIG; ++i)
-                {
-                        __psignal_func[i]=enull;
-                }
-        };
+    __signal_init() {
+        _PHNDLR_m enull = (_PHNDLR_m) _encoded_null();
+
+        for (int i = 0; i < NSIG; ++i) {
+            __psignal_func[i] = enull;
+        }
+    };
 };
 
 #pragma warning(push)
@@ -182,28 +165,26 @@ public:
 #pragma warning(pop)
 static __signal_init _init;
 
-static void __cdecl __signal_thunk(int i)
-{
+static void __cdecl __signal_thunk(int i) {
     _PHNDLR_m local_func = (_PHNDLR_m) _decode_pointer(__psignal_func[i]);
-    if (local_func != NULL)
-    {
+
+    if (local_func != NULL) {
         local_func(i);
     }
 }
 
-static void __clrcall _signal_cleanup(void)
-{
+static void __clrcall _signal_cleanup(void) {
     _PHNDLR_m enull = (_PHNDLR_m) _encoded_null();
-    for(int i=0; i<NSIG; ++i)
-    {
-        if(__psignal_func[i]!=enull)
-        {
-            _PHNDLR _handler=signal(i, SIG_GET);
-            if(_handler==__signal_thunk)
-            {
+
+    for (int i = 0; i < NSIG; ++i) {
+        if (__psignal_func[i] != enull) {
+            _PHNDLR _handler = signal(i, SIG_GET);
+
+            if (_handler == __signal_thunk) {
                 signal(i, SIG_DFL);
             }
-            __psignal_func[i]=enull;
+
+            __psignal_func[i] = enull;
         }
     }
 }
@@ -279,40 +260,31 @@ static void __clrcall _signal_cleanup(void)
 *       None.
 *
 *******************************************************************************/
-_MRTIMP _PHNDLR_m __cdecl signal(int signum, _PHNDLR_m sigact)
-{
-    if(signum<0 || signum>=NSIG)
-    {
+_MRTIMP _PHNDLR_m __cdecl signal(int signum, _PHNDLR_m sigact) {
+    if (signum < 0 || signum >= NSIG) {
         /* call signal to allow it to do error detection and handling, but without setting us up */
         signal(signum, static_cast<_PHNDLR>(NULL));
-        return (void (__clrcall *)(int))-1;
+        return (void (__clrcall*)(int)) - 1;
     }
 
-    if(_atexit_m_appdomain(_signal_cleanup)!=0)
-    {
+    if (_atexit_m_appdomain(_signal_cleanup) != 0) {
         return NULL;
     }
 
     _PHNDLR_m __psignal_func_old = (_PHNDLR_m) _decode_pointer(__psignal_func[signum]);
     __psignal_func[signum] = (_PHNDLR_m) _encode_pointer(sigact);
-    void (__cdecl *pnative_signal_func_old)(int) = signal(signum, (void (__cdecl *)(int))__signal_thunk);
-    if (pnative_signal_func_old == __signal_thunk)
-    {
+    void (__cdecl * pnative_signal_func_old)(int) = signal(signum, (void (__cdecl*)(int))__signal_thunk);
+
+    if (pnative_signal_func_old == __signal_thunk) {
         return __psignal_func_old;
-    }
-    else if (pnative_signal_func_old == NULL)
-    {
+    } else if (pnative_signal_func_old == NULL) {
         return NULL;
-    }
-    else
-    {
-        return (void (__clrcall *)(int))-1;
+    } else {
+        return (void (__clrcall*)(int)) - 1;
     }
 }
 
-_MRTIMP _PHNDLR_m __cdecl signal(int signum, int sigact)
-{
+_MRTIMP _PHNDLR_m __cdecl signal(int signum, int sigact) {
     _VALIDATE_RETURN(sigact == NULL, EINVAL, NULL);
-
     return signal(signum, static_cast<_PHNDLR_m>(NULL));
 }

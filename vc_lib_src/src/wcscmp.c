@@ -42,21 +42,22 @@
 *
 *******************************************************************************/
 
-int __cdecl wcscmp (
-        const wchar_t * src,
-        const wchar_t * dst
-        )
-{
-        int ret = 0 ;
+int __cdecl wcscmp(
+    const wchar_t* src,
+    const wchar_t* dst
+) {
+    int ret = 0 ;
 
-        while( ! (ret = (int)(*src - *dst)) && *dst)
-                ++src, ++dst;
+    while (!(ret = (int)(*src - *dst)) && *dst) {
+        ++src, ++dst;
+    }
 
-        if ( ret < 0 )
-                ret = -1 ;
-        else if ( ret > 0 )
-                ret = 1 ;
+    if (ret < 0) {
+        ret = -1 ;
+    } else if (ret > 0) {
+        ret = 1 ;
+    }
 
-        return( ret );
+    return (ret);
 }
 

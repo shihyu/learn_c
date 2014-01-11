@@ -31,55 +31,45 @@
 *Exceptions:
 *******************************************************************************/
 
-void * __cdecl memmove (
-        void * dst,
-        const void * src,
-        size_t count
-        )
-{
-        void * ret = dst;
-
+void* __cdecl memmove(
+    void* dst,
+    const void* src,
+    size_t count
+) {
+    void* ret = dst;
 #if defined (_M_IA64) || defined (_M_AMD64)
-
-        {
-
-
+    {
         __declspec(dllimport)
-
-
-        void RtlMoveMemory( void *, const void *, size_t count );
-
-        RtlMoveMemory( dst, src, count );
-
-        }
-
+        void RtlMoveMemory(void*, const void*, size_t count);
+        RtlMoveMemory(dst, src, count);
+    }
 #else  /* defined (_M_IA64) || defined (_M_AMD64) */
-        if (dst <= src || (char *)dst >= ((char *)src + count)) {
-                /*
-                 * Non-Overlapping Buffers
-                 * copy from lower addresses to higher addresses
-                 */
-                while (count--) {
-                        *(char *)dst = *(char *)src;
-                        dst = (char *)dst + 1;
-                        src = (char *)src + 1;
-                }
-        }
-        else {
-                /*
-                 * Overlapping Buffers
-                 * copy from higher addresses to lower addresses
-                 */
-                dst = (char *)dst + count - 1;
-                src = (char *)src + count - 1;
 
-                while (count--) {
-                        *(char *)dst = *(char *)src;
-                        dst = (char *)dst - 1;
-                        src = (char *)src - 1;
-                }
+    if (dst <= src || (char*)dst >= ((char*)src + count)) {
+        /*
+         * Non-Overlapping Buffers
+         * copy from lower addresses to higher addresses
+         */
+        while (count--) {
+            *(char*)dst = *(char*)src;
+            dst = (char*)dst + 1;
+            src = (char*)src + 1;
         }
+    } else {
+        /*
+         * Overlapping Buffers
+         * copy from higher addresses to lower addresses
+         */
+        dst = (char*)dst + count - 1;
+        src = (char*)src + count - 1;
+
+        while (count--) {
+            *(char*)dst = *(char*)src;
+            dst = (char*)dst - 1;
+            src = (char*)src - 1;
+        }
+    }
+
 #endif  /* defined (_M_IA64) || defined (_M_AMD64) */
-
-        return(ret);
+    return (ret);
 }

@@ -1,6 +1,6 @@
 /* $FreeBSD: src/lib/libc/sys/stack_protector.c,v 1.2 2007/06/05 08:24:34 des Exp $ */
-/* $NetBSD: stack_protector.c,v 1.4 2006/11/22 17:23:25 christos Exp $	*/
-/* $OpenBSD: stack_protector.c,v 1.10 2006/03/31 05:34:44 deraadt Exp $	*/
+/* $NetBSD: stack_protector.c,v 1.4 2006/11/22 17:23:25 christos Exp $  */
+/* $OpenBSD: stack_protector.c,v 1.10 2006/03/31 05:34:44 deraadt Exp $ */
 /*
  * Copyright (c) 2002 Hiroaki Etoh, Federico G. Schwindt, and Miodrag Vallat.
  * All rights reserved.
@@ -39,78 +39,71 @@ __FBSDID("$FreeBSD: src/lib/libc/sys/stack_protector.c,v 1.2 2007/06/05 08:24:34
 #include <syslog.h>
 #include <unistd.h>
 
-extern int __sysctl(int *name, u_int namelen, void *oldp, size_t *oldlenp,
-    void *newp, size_t newlen);
+extern int __sysctl(int* name, u_int namelen, void* oldp, size_t* oldlenp,
+                    void* newp, size_t newlen);
 
 long __stack_chk_guard[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 static void __guard_setup(void) __attribute__((__constructor__, __used__));
-static void __fail(const char *);
+static void __fail(const char*);
 void __stack_chk_fail(void);
 void __chk_fail(void);
 void __stack_chk_fail_local(void);
 
 /*LINTED used*/
 static void
-__guard_setup(void)
-{
-	int mib[2];
-	size_t len;
+__guard_setup(void) {
+    int mib[2];
+    size_t len;
 
-	if (__stack_chk_guard[0] != 0)
-		return;
+    if (__stack_chk_guard[0] != 0) {
+        return;
+    }
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_ARND;
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_ARND;
+    len = sizeof(__stack_chk_guard);
 
-	len = sizeof(__stack_chk_guard);
-	if (__sysctl(mib, 2, __stack_chk_guard, &len, NULL, 0) == -1 ||
-	    len != sizeof(__stack_chk_guard)) {
-		/* If sysctl was unsuccessful, use the "terminator canary". */
-		((unsigned char *)(void *)__stack_chk_guard)[0] = 0;
-		((unsigned char *)(void *)__stack_chk_guard)[1] = 0;
-		((unsigned char *)(void *)__stack_chk_guard)[2] = '\n';
-		((unsigned char *)(void *)__stack_chk_guard)[3] = 255;
-	}
+    if (__sysctl(mib, 2, __stack_chk_guard, &len, NULL, 0) == -1 ||
+            len != sizeof(__stack_chk_guard)) {
+        /* If sysctl was unsuccessful, use the "terminator canary". */
+        ((unsigned char*)(void*)__stack_chk_guard)[0] = 0;
+        ((unsigned char*)(void*)__stack_chk_guard)[1] = 0;
+        ((unsigned char*)(void*)__stack_chk_guard)[2] = '\n';
+        ((unsigned char*)(void*)__stack_chk_guard)[3] = 255;
+    }
 }
 
 /*ARGSUSED*/
 static void
-__fail(const char *msg)
-{
-	struct sigaction sa;
-	sigset_t mask;
-
-	/* Immediately block all signal handlers from running code */
-	(void)sigfillset(&mask);
-	(void)sigdelset(&mask, SIGABRT);
-	(void)sigprocmask(SIG_BLOCK, &mask, NULL);
-
-	/* This may fail on a chroot jail... */
-	syslog(LOG_CRIT, msg);
-
-	(void)memset(&sa, 0, sizeof(sa));
-	(void)sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sa.sa_handler = SIG_DFL;
-	(void)sigaction(SIGABRT, &sa, NULL);
-	(void)kill(getpid(), SIGABRT);
-	_exit(127);
+__fail(const char* msg) {
+    struct sigaction sa;
+    sigset_t mask;
+    /* Immediately block all signal handlers from running code */
+    (void)sigfillset(&mask);
+    (void)sigdelset(&mask, SIGABRT);
+    (void)sigprocmask(SIG_BLOCK, &mask, NULL);
+    /* This may fail on a chroot jail... */
+    syslog(LOG_CRIT, msg);
+    (void)memset(&sa, 0, sizeof(sa));
+    (void)sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = SIG_DFL;
+    (void)sigaction(SIGABRT, &sa, NULL);
+    (void)kill(getpid(), SIGABRT);
+    _exit(127);
 }
 
 void
-__stack_chk_fail(void)
-{
-	__fail("stack overflow detected; terminated");
+__stack_chk_fail(void) {
+    __fail("stack overflow detected; terminated");
 }
 
 void
-__chk_fail(void)
-{
-	__fail("buffer overflow detected; terminated");
+__chk_fail(void) {
+    __fail("buffer overflow detected; terminated");
 }
 
 void
-__stack_chk_fail_local(void)
-{
-	__stack_chk_fail();
+__stack_chk_fail_local(void) {
+    __stack_chk_fail();
 }

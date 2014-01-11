@@ -28,8 +28,7 @@
 *
 *******************************************************************************/
 
-int _wchartodigit(wchar_t ch)
-{
+int _wchartodigit(wchar_t ch) {
 #define DIGIT_RANGE_TEST(zero)  \
     if (ch < zero)              \
         return -1;              \
@@ -37,10 +36,9 @@ int _wchartodigit(wchar_t ch)
     {                           \
         return ch - zero;       \
     }
-
     DIGIT_RANGE_TEST(0x0030)        // 0030;DIGIT ZERO
-    if (ch < 0xFF10)                // FF10;FULLWIDTH DIGIT ZERO
-    {
+
+    if (ch < 0xFF10) {              // FF10;FULLWIDTH DIGIT ZERO
         DIGIT_RANGE_TEST(0x0660)    // 0660;ARABIC-INDIC DIGIT ZERO
         DIGIT_RANGE_TEST(0x06F0)    // 06F0;EXTENDED ARABIC-INDIC DIGIT ZERO
         DIGIT_RANGE_TEST(0x0966)    // 0966;DEVANAGARI DIGIT ZERO
@@ -57,17 +55,15 @@ int _wchartodigit(wchar_t ch)
         DIGIT_RANGE_TEST(0x1040)    // 1040;MYANMAR DIGIT ZERO
         DIGIT_RANGE_TEST(0x17E0)    // 17E0;KHMER DIGIT ZERO
         DIGIT_RANGE_TEST(0x1810)    // 1810;MONGOLIAN DIGIT ZERO
-
-
         return -1;
     }
+
 #undef DIGIT_RANGE_TEST
 
-                                    // FF10;FULLWIDTH DIGIT ZERO
-    if (ch < 0xFF10 + 10)
-    {
+    // FF10;FULLWIDTH DIGIT ZERO
+    if (ch < 0xFF10 + 10) {
         return ch - 0xFF10;
     }
-    return -1;
 
+    return -1;
 }

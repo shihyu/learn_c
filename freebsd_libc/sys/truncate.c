@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,12 +44,12 @@ __FBSDID("$FreeBSD: src/lib/libc/sys/truncate.c,v 1.5 2007/07/04 23:27:38 peter 
  */
 int
 truncate(path, length)
-	const char	*path;
-	off_t	length;
+const char*  path;
+off_t   length;
 {
-
-	if (__getosreldate() >= 700051)
-		return(__sys_truncate(path, length));
-	else
-		return(__sys_freebsd6_truncate(path, 0, length));
+    if (__getosreldate() >= 700051) {
+        return (__sys_truncate(path, length));
+    } else {
+        return (__sys_freebsd6_truncate(path, 0, length));
+    }
 }

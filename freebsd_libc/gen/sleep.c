@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,26 +42,32 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/sleep.c,v 1.32 2007/01/09 00:27:55 imp Exp 
 
 unsigned int
 __sleep(seconds)
-	unsigned int seconds;
+unsigned int seconds;
 {
-	struct timespec time_to_sleep;
-	struct timespec time_remaining;
+    struct timespec time_to_sleep;
+    struct timespec time_remaining;
 
-	/*
-	 * Avoid overflow when `seconds' is huge.  This assumes that
-	 * the maximum value for a time_t is >= INT_MAX.
-	 */
-	if (seconds > INT_MAX)
-		return (seconds - INT_MAX + __sleep(INT_MAX));
+    /*
+     * Avoid overflow when `seconds' is huge.  This assumes that
+     * the maximum value for a time_t is >= INT_MAX.
+     */
+    if (seconds > INT_MAX) {
+        return (seconds - INT_MAX + __sleep(INT_MAX));
+    }
 
-	time_to_sleep.tv_sec = seconds;
-	time_to_sleep.tv_nsec = 0;
-	if (_nanosleep(&time_to_sleep, &time_remaining) != -1)
-		return (0);
-	if (errno != EINTR)
-		return (seconds);		/* best guess */
-	return (time_remaining.tv_sec +
-		(time_remaining.tv_nsec != 0)); /* round up */
+    time_to_sleep.tv_sec = seconds;
+    time_to_sleep.tv_nsec = 0;
+
+    if (_nanosleep(&time_to_sleep, &time_remaining) != -1) {
+        return (0);
+    }
+
+    if (errno != EINTR) {
+        return (seconds);    /* best guess */
+    }
+
+    return (time_remaining.tv_sec +
+            (time_remaining.tv_nsec != 0)); /* round up */
 }
 
 __weak_reference(__sleep, sleep);

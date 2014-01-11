@@ -45,41 +45,38 @@
 *
 *******************************************************************************/
 
-int __cdecl _tutime32 (
-        const _TSCHAR *fname,
-        struct __utimbuf32 *times
-        )
-{
-        int fh;
-        int retval;
-        int errno_local;
+int __cdecl _tutime32(
+    const _TSCHAR* fname,
+    struct __utimbuf32* times
+) {
+    int fh;
+    int retval;
+    int errno_local;
+    _VALIDATE_RETURN((fname != NULL), EINVAL, -1)
 
-        _VALIDATE_RETURN( ( fname != NULL ), EINVAL, -1 )
+    /* open file, fname, since filedate system call needs a handle.  Note
+     * _utime definition says you must have write permission for the file
+     * to change its time, so open file for write only.  Also, must force
+     * it to open in binary mode so we dont remove ^Z's from binary files.
+     */
 
-        /* open file, fname, since filedate system call needs a handle.  Note
-         * _utime definition says you must have write permission for the file
-         * to change its time, so open file for write only.  Also, must force
-         * it to open in binary mode so we dont remove ^Z's from binary files.
-         */
+    if (_tsopen_s(&fh, fname, _O_RDWR | _O_BINARY, _SH_DENYNO, 0) != 0) {
+        return (-1);
+    }
 
-        if (_tsopen_s(&fh, fname, _O_RDWR | _O_BINARY, _SH_DENYNO, 0) != 0)
-                return(-1);
+    retval = _futime32(fh, times);
 
-        retval = _futime32(fh, times);
+    if (retval == -1) {
+        errno_local = errno;
+    }
 
-        if ( retval == -1 )
-        {
-            errno_local = errno;
-        }
+    _close(fh);
 
-        _close(fh);
+    if (retval == -1) {
+        errno = errno_local;
+    }
 
-        if ( retval == -1 )
-        {
-            errno = errno_local;
-        }
-
-        return(retval);
+    return (retval);
 }
 
 #ifndef _UNICODE
@@ -103,85 +100,79 @@ int __cdecl _tutime32 (
 *
 *******************************************************************************/
 
-int __cdecl _futime32 (
-        int fh,
-        struct __utimbuf32 *times
-        )
-{
-        struct tm tmb;
+int __cdecl _futime32(
+    int fh,
+    struct __utimbuf32* times
+) {
+    struct tm tmb;
+    SYSTEMTIME SystemTime;
+    FILETIME LocalFileTime;
+    FILETIME LastWriteTime;
+    FILETIME LastAccessTime;
+    struct __utimbuf32 deftimes;
+    _CHECK_FH_RETURN(fh, EBADF, -1);
+    _VALIDATE_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
 
-        SYSTEMTIME SystemTime;
-        FILETIME LocalFileTime;
-        FILETIME LastWriteTime;
-        FILETIME LastAccessTime;
-        struct __utimbuf32 deftimes;
+    if (times == NULL) {
+        _time32(&deftimes.modtime);
+        deftimes.actime = deftimes.modtime;
+        times = &deftimes;
+    }
 
-        _CHECK_FH_RETURN( fh, EBADF, -1 );
-        _VALIDATE_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
+    if (_localtime32_s(&tmb, &times->modtime) != 0) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-        if (times == NULL) {
-                _time32(&deftimes.modtime);
-                deftimes.actime = deftimes.modtime;
-                times = &deftimes;
-        }
+    SystemTime.wYear   = (WORD)(tmb.tm_year + 1900);
+    SystemTime.wMonth  = (WORD)(tmb.tm_mon + 1);
+    SystemTime.wDay    = (WORD)(tmb.tm_mday);
+    SystemTime.wHour   = (WORD)(tmb.tm_hour);
+    SystemTime.wMinute = (WORD)(tmb.tm_min);
+    SystemTime.wSecond = (WORD)(tmb.tm_sec);
+    SystemTime.wMilliseconds = 0;
 
-        if (_localtime32_s(&tmb, &times->modtime) != 0) {
-                errno = EINVAL;
-                return(-1);
-        }
+    if (!SystemTimeToFileTime(&SystemTime, &LocalFileTime) ||
+            !LocalFileTimeToFileTime(&LocalFileTime, &LastWriteTime)) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-        SystemTime.wYear   = (WORD)(tmb.tm_year + 1900);
-        SystemTime.wMonth  = (WORD)(tmb.tm_mon + 1);
-        SystemTime.wDay    = (WORD)(tmb.tm_mday);
-        SystemTime.wHour   = (WORD)(tmb.tm_hour);
-        SystemTime.wMinute = (WORD)(tmb.tm_min);
-        SystemTime.wSecond = (WORD)(tmb.tm_sec);
-        SystemTime.wMilliseconds = 0;
+    if (_localtime32_s(&tmb, &times->actime) != 0) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-        if ( !SystemTimeToFileTime( &SystemTime, &LocalFileTime ) ||
-             !LocalFileTimeToFileTime( &LocalFileTime, &LastWriteTime ) )
-        {
-                errno = EINVAL;
-                return(-1);
-        }
+    SystemTime.wYear   = (WORD)(tmb.tm_year + 1900);
+    SystemTime.wMonth  = (WORD)(tmb.tm_mon + 1);
+    SystemTime.wDay    = (WORD)(tmb.tm_mday);
+    SystemTime.wHour   = (WORD)(tmb.tm_hour);
+    SystemTime.wMinute = (WORD)(tmb.tm_min);
+    SystemTime.wSecond = (WORD)(tmb.tm_sec);
+    SystemTime.wMilliseconds = 0;
 
-        if (_localtime32_s(&tmb, &times->actime) != 0) {
-                errno = EINVAL;
-                return(-1);
-        }
+    if (!SystemTimeToFileTime(&SystemTime, &LocalFileTime) ||
+            !LocalFileTimeToFileTime(&LocalFileTime, &LastAccessTime)) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-        SystemTime.wYear   = (WORD)(tmb.tm_year + 1900);
-        SystemTime.wMonth  = (WORD)(tmb.tm_mon + 1);
-        SystemTime.wDay    = (WORD)(tmb.tm_mday);
-        SystemTime.wHour   = (WORD)(tmb.tm_hour);
-        SystemTime.wMinute = (WORD)(tmb.tm_min);
-        SystemTime.wSecond = (WORD)(tmb.tm_sec);
-        SystemTime.wMilliseconds = 0;
+    /* set the date via the filedate system call and return. failing
+     * this call implies the new file times are not supported by the
+     * underlying file system.
+     */
 
-        if ( !SystemTimeToFileTime( &SystemTime, &LocalFileTime ) ||
-             !LocalFileTimeToFileTime( &LocalFileTime, &LastAccessTime ) )
-        {
-                errno = EINVAL;
-                return(-1);
-        }
+    if (!SetFileTime((HANDLE)_get_osfhandle(fh),
+                     NULL,
+                     &LastAccessTime,
+                     &LastWriteTime
+                    )) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-        /* set the date via the filedate system call and return. failing
-         * this call implies the new file times are not supported by the
-         * underlying file system.
-         */
-
-        if (!SetFileTime((HANDLE)_get_osfhandle(fh),
-                                NULL,
-                                &LastAccessTime,
-                                &LastWriteTime
-                               ))
-        {
-                errno = EINVAL;
-                return(-1);
-        }
-
-        return(0);
+    return (0);
 }
 
 #endif  /* _UNICODE */

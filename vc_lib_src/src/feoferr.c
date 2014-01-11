@@ -37,12 +37,11 @@
 *
 *******************************************************************************/
 
-int __cdecl feof (
-        FILE *stream
-        )
-{
-        _VALIDATE_RETURN((stream != NULL),EINVAL, 0);
-        return( ((stream)->_flag & _IOEOF) );
+int __cdecl feof(
+    FILE* stream
+) {
+    _VALIDATE_RETURN((stream != NULL), EINVAL, 0);
+    return (((stream)->_flag & _IOEOF));
 }
 
 
@@ -64,10 +63,9 @@ int __cdecl feof (
 *
 *******************************************************************************/
 
-int __cdecl ferror (
-        FILE *stream
-        )
-{
-        _VALIDATE_RETURN((stream != NULL),EINVAL, 0);
-        return( ((stream)->_flag & _IOERR) );
+int __cdecl ferror(
+    FILE* stream
+) {
+    _VALIDATE_RETURN((stream != NULL), EINVAL, 0);
+    return (((stream)->_flag & _IOERR));
 }

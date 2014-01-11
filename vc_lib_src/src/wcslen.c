@@ -35,14 +35,13 @@
 *
 *******************************************************************************/
 
-size_t __cdecl wcslen (
-        const wchar_t * wcs
-        )
-{
-        const wchar_t *eos = wcs;
+size_t __cdecl wcslen(
+    const wchar_t* wcs
+) {
+    const wchar_t* eos = wcs;
 
-        while( *eos++ ) ;
+    while (*eos++) ;
 
-        return( (size_t)(eos - wcs - 1) );
+    return ((size_t)(eos - wcs - 1));
 }
 

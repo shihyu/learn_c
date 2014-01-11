@@ -26,41 +26,41 @@
  * $FreeBSD: src/lib/libc/sparc64/sys/__sparc_utrap_private.h,v 1.4 2002/05/13 04:35:08 jake Exp $
  */
 
-#ifndef	___SPARC_UTRAP_PRIVATE_H_
-#define	___SPARC_UTRAP_PRIVATE_H_
+#ifndef ___SPARC_UTRAP_PRIVATE_H_
+#define ___SPARC_UTRAP_PRIVATE_H_
 
-#define	UF_DONE(uf) do {						\
-	uf->uf_pc = uf->uf_npc;						\
-	uf->uf_npc = uf->uf_pc + 4;					\
+#define UF_DONE(uf) do {                        \
+    uf->uf_pc = uf->uf_npc;                     \
+    uf->uf_npc = uf->uf_pc + 4;                 \
 } while (0)
 
 struct utrapframe {
-	u_long	uf_global[8];
-	u_long	uf_out[8];
-	u_long	uf_pc;
-	u_long	uf_npc;
-	u_long	uf_sfar;
-	u_long	uf_sfsr;
-	u_long	uf_tar;
-	u_long	uf_type;
-	u_long	uf_state;
-	u_long	uf_fsr;
+    u_long  uf_global[8];
+    u_long  uf_out[8];
+    u_long  uf_pc;
+    u_long  uf_npc;
+    u_long  uf_sfar;
+    u_long  uf_sfsr;
+    u_long  uf_tar;
+    u_long  uf_type;
+    u_long  uf_state;
+    u_long  uf_fsr;
 };
 
 extern char __sparc_utrap_fp_disabled[];
 extern char __sparc_utrap_gen[];
 
-int __emul_insn(struct utrapframe *uf);
-u_long __emul_fetch_reg(struct utrapframe *uf, int reg);
-void __emul_store_reg(struct utrapframe *uf, int reg, u_long val);
-u_long __emul_f3_op2(struct utrapframe *uf, u_int insn);
-u_long __emul_f3_memop_addr(struct utrapframe *uf, u_int insn);
-int __unaligned_fixup(struct utrapframe *uf);
+int __emul_insn(struct utrapframe* uf);
+u_long __emul_fetch_reg(struct utrapframe* uf, int reg);
+void __emul_store_reg(struct utrapframe* uf, int reg, u_long val);
+u_long __emul_f3_op2(struct utrapframe* uf, u_int insn);
+u_long __emul_f3_memop_addr(struct utrapframe* uf, u_int insn);
+int __unaligned_fixup(struct utrapframe* uf);
 
-void __sparc_utrap(struct utrapframe *);
+void __sparc_utrap(struct utrapframe*);
 
-void __utrap_write(const char *);
+void __utrap_write(const char*);
 void __utrap_kill_self(int);
-void __utrap_panic(const char *);
+void __utrap_panic(const char*);
 
 #endif

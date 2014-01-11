@@ -44,43 +44,39 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _strcoll_l (
-        const char *_string1,
-        const char *_string2,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _strcoll_l(
+    const char* _string1,
+    const char* _string2,
+    _locale_t plocinfo
+) {
     int ret;
     _LocaleUpdate _loc_update(plocinfo);
-
     /* validation section */
     _VALIDATE_RETURN(_string1 != NULL, EINVAL, _NLSCMPERROR);
     _VALIDATE_RETURN(_string2 != NULL, EINVAL, _NLSCMPERROR);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE] == _CLOCALEHANDLE )
-            return strcmp(_string1, _string2);
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE] == _CLOCALEHANDLE) {
+        return strcmp(_string1, _string2);
+    }
 
-    if ( 0 == (ret = __crtCompareStringA(
-                    _loc_update.GetLocaleT(), _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
-                               SORT_STRINGSORT,
-                               _string1,
-                               -1,
-                               _string2,
-                               -1,
-                    _loc_update.GetLocaleT()->locinfo->lc_collate_cp )) )
-    {
+    if (0 == (ret = __crtCompareStringA(
+                        _loc_update.GetLocaleT(), _loc_update.GetLocaleT()->locinfo->lc_handle[LC_COLLATE],
+                        SORT_STRINGSORT,
+                        _string1,
+                        -1,
+                        _string2,
+                        -1,
+                        _loc_update.GetLocaleT()->locinfo->lc_collate_cp))) {
         errno = EINVAL;
         return _NLSCMPERROR;
     }
 
     return (ret - 2);
-
 }
 
-extern "C" int __cdecl strcoll (
-        const char *_string1,
-        const char *_string2
-        )
-{
+extern "C" int __cdecl strcoll(
+    const char* _string1,
+    const char* _string2
+) {
     return _strcoll_l(_string1, _string2, NULL);
 }

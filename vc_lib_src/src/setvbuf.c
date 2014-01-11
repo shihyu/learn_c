@@ -41,52 +41,45 @@
 *
 *******************************************************************************/
 
-int __cdecl setvbuf (
-        FILE *str,
-        char *buffer,
-        int type,
-        size_t size
-        )
-{
-        REG1 FILE *stream;
-        int retval=0;   /* assume good return */
+int __cdecl setvbuf(
+    FILE* str,
+    char* buffer,
+    int type,
+    size_t size
+) {
+    REG1 FILE* stream;
+    int retval = 0; /* assume good return */
+    _VALIDATE_RETURN((str != NULL), EINVAL, -1);
+    /*
+     * (1) Make sure type is one of the three legal values.
+     * (2) If we are buffering, make sure size is between 2 and INT_MAX.
+     */
+    _VALIDATE_RETURN((type == _IONBF) || (type == _IOFBF) || (type == _IOLBF), EINVAL, -1);
 
-        _VALIDATE_RETURN( (str != NULL), EINVAL, -1 );
+    if ((type == _IOFBF) || (type == _IOLBF)) {
+        _VALIDATE_RETURN(((2 <= size) && (size <= INT_MAX)), EINVAL, -1);
+    }
 
-        /*
-         * (1) Make sure type is one of the three legal values.
-         * (2) If we are buffering, make sure size is between 2 and INT_MAX.
-         */
-        _VALIDATE_RETURN( (type == _IONBF) || (type == _IOFBF) || (type == _IOLBF), EINVAL, -1 );
+    /*
+     * force size to be even by masking down to the nearest multiple
+     * of 2
+     */
+    size &= (size_t)~1;
+    /*
+     * Init stream pointers
+     */
+    stream = str;
+    /*
+     * Lock the file
+     */
+    _lock_str(stream);
 
-        if ((type == _IOFBF) || (type == _IOLBF))
-        {
-            _VALIDATE_RETURN( ((2 <= size) && (size <= INT_MAX)), EINVAL, -1 );
-        }
-
-        /*
-         * force size to be even by masking down to the nearest multiple
-         * of 2
-         */
-        size &= (size_t)~1;
-
-        /*
-         * Init stream pointers
-         */
-        stream = str;
-
-        /*
-         * Lock the file
-         */
-        _lock_str(stream);
-        __try {
-
+    __try {
         /*
          * Flush the current buffer and free it, if it is ours.
          */
         _flush(stream);
         _freebuf(stream);
-
         /*
          * Clear a bunch of bits in stream->_flag (all bits related to
          * buffering and those which used to be in stream2->_flag2). Most
@@ -100,11 +93,10 @@ int __cdecl setvbuf (
          * CASE 1: No Buffering.
          */
         if (type & _IONBF) {
-                stream->_flag |= _IONBF;
-                buffer = (char *)&(stream->_charbuf);
-                size = 2;
+            stream->_flag |= _IONBF;
+            buffer = (char*) & (stream->_charbuf);
+            size = 2;
         }
-
         /*
          * NOTE: Cases 2 and 3 (below) cover type == _IOFBF or type == _IOLBF
          * Line buffering is treated as the same as full buffering, so the
@@ -112,30 +104,29 @@ int __cdecl setvbuf (
          * defined to be 0, full buffering is simply assumed whenever _IONBF
          * is not set.
          */
-
         /*
          * CASE 2: Default Buffering -- Allocate a buffer for the user.
          */
-        else if ( buffer == NULL ) {
-                if ( (buffer = _malloc_crt(size)) == NULL ) {
+        else if (buffer == NULL) {
+            if ((buffer = _malloc_crt(size)) == NULL) {
 #ifndef CRTDLL
-                        /*
-                         * force library pre-termination procedure (placed here
-                         * because the code path should almost never be hit)
-                         */
-                        _cflush++;
+                /*
+                 * force library pre-termination procedure (placed here
+                 * because the code path should almost never be hit)
+                 */
+                _cflush++;
 #endif  /* CRTDLL */
-                        retval = -1;
-                        goto done;
-                }
-                stream->_flag |= _IOMYBUF | _IOSETVBUF;
-        }
+                retval = -1;
+                goto done;
+            }
 
+            stream->_flag |= _IOMYBUF | _IOSETVBUF;
+        }
         /*
          * CASE 3: User Buffering -- Use the buffer supplied by the user.
          */
         else {
-                stream->_flag |= _IOYOURBUF | _IOSETVBUF;
+            stream->_flag |= _IOYOURBUF | _IOSETVBUF;
         }
 
         /*
@@ -144,12 +135,11 @@ int __cdecl setvbuf (
         stream->_bufsiz = (int)size;
         stream->_ptr = stream->_base = buffer;
         stream->_cnt = 0;
-done:
+    done:
+        ;
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        ; }
-        __finally {
-                _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }

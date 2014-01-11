@@ -38,11 +38,11 @@ extern "C" {
 /* Declare reference to errno */
 #ifndef _CRT_ERRNO_DEFINED
 #define _CRT_ERRNO_DEFINED
-_CRTIMP extern int * __cdecl _errno(void);
+_CRTIMP extern int* __cdecl _errno(void);
 #define errno   (*_errno())
 
 errno_t __cdecl _set_errno(__in int _Value);
-errno_t __cdecl _get_errno(__out int * _Value);
+errno_t __cdecl _get_errno(__out int* _Value);
 #endif  /* _CRT_ERRNO_DEFINED */
 
 /* Define offsetof macro */

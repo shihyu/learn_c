@@ -32,14 +32,11 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/swscanf.c,v 1.1 2002/09/23 12:40:06 tjr E
 #include <wchar.h>
 
 int
-swscanf(const wchar_t * __restrict str, const wchar_t * __restrict fmt, ...)
-{
-	va_list ap;
-	int r;
-
-	va_start(ap, fmt);
-	r = vswscanf(str, fmt, ap);
-	va_end(ap);
-
-	return (r);
+swscanf(const wchar_t* __restrict str, const wchar_t* __restrict fmt, ...) {
+    va_list ap;
+    int r;
+    va_start(ap, fmt);
+    r = vswscanf(str, fmt, ap);
+    va_end(ap);
+    return (r);
 }

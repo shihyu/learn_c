@@ -27,19 +27,17 @@
 #define __LCID_EXISTS   0x200   //  language is installed
 
 //  local structure definitions
-typedef struct tagLOCALETAB
-{
-    CHAR *  szName;
+typedef struct tagLOCALETAB {
+    CHAR*   szName;
     CHAR    chAbbrev[4];
 } LOCALETAB;
 
-typedef struct tagRGLOCINFO
-{
+typedef struct tagRGLOCINFO {
     LCID        lcid;
     char        chILanguage[8];
-    char *      pchSEngLanguage;
+    char*       pchSEngLanguage;
     char        chSAbbrevLangName[4];
-    char *      pchSEngCountry;
+    char*       pchSEngCountry;
     char        chSAbbrevCtryName[4];
     char        chIDefaultCodepage[8];
     char        chIDefaultAnsiCodepage[8];
@@ -47,22 +45,22 @@ typedef struct tagRGLOCINFO
 
 //  function prototypes
 BOOL __cdecl __get_qualified_locale(const LPLC_STRINGS, LPLC_ID, LPLC_STRINGS);
-static BOOL TranslateName(const LOCALETAB *, int, const char **);
+static BOOL TranslateName(const LOCALETAB*, int, const char**);
 
-static void GetLcidFromLangCountry (_psetloc_struct _psetloc_data);
+static void GetLcidFromLangCountry(_psetloc_struct _psetloc_data);
 static BOOL CALLBACK LangCountryEnumProc(LPSTR);
 
-static void GetLcidFromLanguage (_psetloc_struct _psetloc_data);
+static void GetLcidFromLanguage(_psetloc_struct _psetloc_data);
 static BOOL CALLBACK LanguageEnumProc(LPSTR);
 
-static void GetLcidFromCountry (_psetloc_struct _psetloc_data);
+static void GetLcidFromCountry(_psetloc_struct _psetloc_data);
 static BOOL CALLBACK CountryEnumProc(LPSTR);
 
-static void GetLcidFromDefault (_psetloc_struct _psetloc_data);
+static void GetLcidFromDefault(_psetloc_struct _psetloc_data);
 
-static int ProcessCodePage (LPSTR lpCodePageStr, _psetloc_struct _psetloc_data);
+static int ProcessCodePage(LPSTR lpCodePageStr, _psetloc_struct _psetloc_data);
 static BOOL TestDefaultCountry(LCID);
-static BOOL TestDefaultLanguage (LCID lcid, BOOL bTestPrimary, _psetloc_struct _psetloc_data);
+static BOOL TestDefaultLanguage(LCID lcid, BOOL bTestPrimary, _psetloc_struct _psetloc_data);
 
 static int __stdcall crtGetLocaleInfoA(LCID, LCTYPE, LPSTR, int);
 
@@ -70,8 +68,7 @@ static LCID LcidFromHexString(LPSTR);
 static int GetPrimaryLen(LPSTR);
 
 //  non-NLS language string table
-__declspec(selectany) const LOCALETAB __rg_language[] =
-{
+__declspec(selectany) const LOCALETAB __rg_language[] = {
     {"american",                    "ENU"},
     {"american english",            "ENU"},
     {"american-english",            "ENU"},
@@ -140,8 +137,7 @@ __declspec(selectany) const LOCALETAB __rg_language[] =
 };
 
 //  non-NLS country/region string table
-__declspec( selectany ) const LOCALETAB __rg_country[] =
-{
+__declspec(selectany) const LOCALETAB __rg_country[] = {
     {"america",                     "USA"},
     {"britain",                     "GBR"},
     {"china",                       "CHN"},
@@ -168,8 +164,7 @@ __declspec( selectany ) const LOCALETAB __rg_country[] =
 };
 
 //  LANGID's of locales of nondefault languages
-__declspec( selectany ) const LANGID __rglangidNotDefault[] =
-{
+__declspec(selectany) const LANGID __rglangidNotDefault[] = {
     MAKELANGID(LANG_FRENCH, SUBLANG_FRENCH_CANADIAN),
     MAKELANGID(LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC),
     MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN_LUXEMBOURG),
@@ -201,25 +196,21 @@ __declspec( selectany ) const LANGID __rglangidNotDefault[] =
 *
 *******************************************************************************/
 BOOL __cdecl __get_qualified_locale(const LPLC_STRINGS lpInStr, LPLC_ID lpOutId,
-                                    LPLC_STRINGS lpOutStr)
-{
+                                    LPLC_STRINGS lpOutStr) {
     int     iCodePage;
     unsigned int osplatform = 0;
     _psetloc_struct    _psetloc_data = &_getptd()->_setloc_data;
 
     //  initialize pointer to call locale info routine based on operating system
 
-    if (!lpInStr)
-    {
+    if (!lpInStr) {
         //  if no input defined, just use default LCID
         GetLcidFromDefault(_psetloc_data);
-    }
-    else
-    {
+    } else {
         _psetloc_data->pchLanguage = lpInStr->szLanguage;
-
         //  convert non-NLS country strings to three-letter abbreviations
         _psetloc_data->pchCountry = lpInStr->szCountry;
+
         if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry)
             TranslateName(__rg_country,
                           sizeof(__rg_country) / sizeof(LOCALETAB) - 1,
@@ -227,15 +218,11 @@ BOOL __cdecl __get_qualified_locale(const LPLC_STRINGS lpInStr, LPLC_ID lpOutId,
 
         _psetloc_data->iLcidState = 0;
 
-        if (_psetloc_data->pchLanguage && *_psetloc_data->pchLanguage)
-        {
-            if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry)
-            {
+        if (_psetloc_data->pchLanguage && *_psetloc_data->pchLanguage) {
+            if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry) {
                 //  both language and country strings defined
                 GetLcidFromLangCountry(_psetloc_data);
-            }
-            else
-            {
+            } else {
                 //  language string defined, but country string undefined
                 GetLcidFromLanguage(_psetloc_data);
             }
@@ -245,28 +232,19 @@ BOOL __cdecl __get_qualified_locale(const LPLC_STRINGS lpInStr, LPLC_ID lpOutId,
                 //  convert non-NLS language strings to three-letter abbrevs
                 if (TranslateName(__rg_language,
                                   sizeof(__rg_language) / sizeof(LOCALETAB) - 1,
-                                  &_psetloc_data->pchLanguage))
-                {
-                    if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry)
-                    {
+                                  &_psetloc_data->pchLanguage)) {
+                    if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry) {
                         GetLcidFromLangCountry(_psetloc_data);
-                    }
-                    else
-                    {
+                    } else {
                         GetLcidFromLanguage(_psetloc_data);
                     }
                 }
             }
-        }
-        else
-        {
-            if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry)
-            {
+        } else {
+            if (_psetloc_data->pchCountry && *_psetloc_data->pchCountry) {
                 //  country string defined, but language string undefined
                 GetLcidFromCountry(_psetloc_data);
-            }
-            else
-            {
+            } else {
                 //  both language and country strings undefined
                 GetLcidFromDefault(_psetloc_data);
             }
@@ -274,44 +252,50 @@ BOOL __cdecl __get_qualified_locale(const LPLC_STRINGS lpInStr, LPLC_ID lpOutId,
     }
 
     //  test for error in LCID processing
-    if (!_psetloc_data->iLcidState)
+    if (!_psetloc_data->iLcidState) {
         return FALSE;
+    }
 
     //  process codepage value
-    iCodePage = ProcessCodePage(lpInStr ? lpInStr->szCodePage: NULL, _psetloc_data);
+    iCodePage = ProcessCodePage(lpInStr ? lpInStr->szCodePage : NULL, _psetloc_data);
 
     //  verify codepage validity
     if (!iCodePage || iCodePage == CP_UTF7 || iCodePage == CP_UTF8 ||
-        !IsValidCodePage((WORD)iCodePage))
+            !IsValidCodePage((WORD)iCodePage)) {
         return FALSE;
+    }
 
     //  verify locale is installed
-    if (!IsValidLocale(_psetloc_data->lcidLanguage, LCID_INSTALLED))
+    if (!IsValidLocale(_psetloc_data->lcidLanguage, LCID_INSTALLED)) {
         return FALSE;
+    }
 
     //  set numeric LCID and codepage results
-    if (lpOutId)
-    {
+    if (lpOutId) {
         lpOutId->wLanguage = LANGIDFROMLCID(_psetloc_data->lcidLanguage);
         lpOutId->wCountry = LANGIDFROMLCID(_psetloc_data->lcidCountry);
         lpOutId->wCodePage = (WORD)iCodePage;
     }
 
     //  set string language, country, and codepage results
-    if (lpOutStr)
-    {
+    if (lpOutStr) {
         // Norwegian-Nynorsk is special case because Langauge and country pair
         // for Norwegian-Nynorsk and Norwegian is same ie. Norwegian_Norway
-        if ( lpOutId->wLanguage ==  0x0814)
+        if (lpOutId->wLanguage ==  0x0814) {
             _ERRCHECK(strcpy_s(lpOutStr->szLanguage, _countof(lpOutStr->szLanguage), "Norwegian-Nynorsk"));
-        else if (GetLocaleInfoA(_psetloc_data->lcidLanguage, LOCALE_SENGLANGUAGE,
-                                 lpOutStr->szLanguage, MAX_LANG_LEN) == 0)
+        } else if (GetLocaleInfoA(_psetloc_data->lcidLanguage, LOCALE_SENGLANGUAGE,
+                                  lpOutStr->szLanguage, MAX_LANG_LEN) == 0) {
             return FALSE;
+        }
+
         if (GetLocaleInfoA(_psetloc_data->lcidCountry, LOCALE_SENGCOUNTRY,
-                                 lpOutStr->szCountry, MAX_CTRY_LEN) == 0)
+                           lpOutStr->szCountry, MAX_CTRY_LEN) == 0) {
             return FALSE;
-        _itoa_s((int)iCodePage, (char *)lpOutStr->szCodePage, MAX_CP_LEN, 10);
+        }
+
+        _itoa_s((int)iCodePage, (char*)lpOutStr->szCodePage, MAX_CP_LEN, 10);
     }
+
     return TRUE;
 }
 
@@ -333,27 +317,26 @@ BOOL __cdecl __get_qualified_locale(const LPLC_STRINGS lpInStr, LPLC_ID lpOutId,
 *Exceptions:
 *
 *******************************************************************************/
-static BOOL TranslateName (
-    const LOCALETAB * lpTable,
+static BOOL TranslateName(
+    const LOCALETAB* lpTable,
     int               high,
-    const char **     ppchName)
-{
+    const char**      ppchName) {
     int     i;
     int     cmp = 1;
     int     low = 0;
 
     //  typical binary search - do until no more to search or match
-    while (low <= high && cmp != 0)
-    {
+    while (low <= high && cmp != 0) {
         i = (low + high) / 2;
-        cmp = _stricmp(*ppchName, (const char *)(*(lpTable + i)).szName);
+        cmp = _stricmp(*ppchName, (const char*)(*(lpTable + i)).szName);
 
-        if (cmp == 0)
+        if (cmp == 0) {
             *ppchName = (*(lpTable + i)).chAbbrev;
-        else if (cmp < 0)
+        } else if (cmp < 0) {
             high = i - 1;
-        else
+        } else {
             low = i + 1;
+        }
     }
 
     return !cmp;
@@ -382,25 +365,24 @@ static BOOL TranslateName (
 *Exceptions:
 *
 *******************************************************************************/
-static void GetLcidFromLangCountry (_psetloc_struct _psetloc_data)
-{
+static void GetLcidFromLangCountry(_psetloc_struct _psetloc_data) {
     //  initialize static variables for callback use
     _psetloc_data->bAbbrevLanguage = strlen(_psetloc_data->pchLanguage) == 3;
     _psetloc_data->bAbbrevCountry = strlen(_psetloc_data->pchCountry) == 3;
     _psetloc_data->lcidLanguage = 0;
     _psetloc_data->iPrimaryLen = _psetloc_data->bAbbrevLanguage ?
-                             2 : GetPrimaryLen(_psetloc_data->pchLanguage);
-
+                                 2 : GetPrimaryLen(_psetloc_data->pchLanguage);
     EnumSystemLocalesA(LangCountryEnumProc, LCID_INSTALLED);
 
     //  locale value is invalid if the language was not installed or the language
     //  was not available for the country specified
     if (!(_psetloc_data->iLcidState & __LCID_LANGUAGE) ||
-        !(_psetloc_data->iLcidState & __LCID_EXISTS) ||
-        !(_psetloc_data->iLcidState & (__LCID_FULL |
-                                    __LCID_PRIMARY |
-                                    __LCID_DEFAULT)))
+            !(_psetloc_data->iLcidState & __LCID_EXISTS) ||
+            !(_psetloc_data->iLcidState & (__LCID_FULL |
+                                           __LCID_PRIMARY |
+                                           __LCID_DEFAULT))) {
         _psetloc_data->iLcidState = 0;
+    }
 }
 
 /***
@@ -431,64 +413,56 @@ static void GetLcidFromLangCountry (_psetloc_struct _psetloc_data)
 *Exceptions:
 *
 *******************************************************************************/
-static BOOL CALLBACK LangCountryEnumProc (LPSTR lpLcidString)
-{
+static BOOL CALLBACK LangCountryEnumProc(LPSTR lpLcidString) {
     _psetloc_struct    _psetloc_data = &_getptd()->_setloc_data;
     LCID    lcid = LcidFromHexString(lpLcidString);
     char    rgcInfo[120];
 
     //  test locale country against input value
     if (GetLocaleInfoA(lcid,
-                             _psetloc_data->bAbbrevCountry ?
-                             LOCALE_SABBREVCTRYNAME : LOCALE_SENGCOUNTRY,
-                             rgcInfo, sizeof(rgcInfo)) == 0)
-    {
+                       _psetloc_data->bAbbrevCountry ?
+                       LOCALE_SABBREVCTRYNAME : LOCALE_SENGCOUNTRY,
+                       rgcInfo, sizeof(rgcInfo)) == 0) {
         //  set error condition and exit
         _psetloc_data->iLcidState = 0;
         return TRUE;
     }
-    if (!_stricmp(_psetloc_data->pchCountry, rgcInfo))
-    {
+
+    if (!_stricmp(_psetloc_data->pchCountry, rgcInfo)) {
         //  country matched - test for language match
         if (GetLocaleInfoA(lcid,
-                                 _psetloc_data->bAbbrevLanguage ?
-                                 LOCALE_SABBREVLANGNAME : LOCALE_SENGLANGUAGE,
-                                 rgcInfo, sizeof(rgcInfo)) == 0)
-        {
+                           _psetloc_data->bAbbrevLanguage ?
+                           LOCALE_SABBREVLANGNAME : LOCALE_SENGLANGUAGE,
+                           rgcInfo, sizeof(rgcInfo)) == 0) {
             //  set error condition and exit
             _psetloc_data->iLcidState = 0;
             return TRUE;
         }
-        if (!_stricmp(_psetloc_data->pchLanguage, rgcInfo))
-        {
+
+        if (!_stricmp(_psetloc_data->pchLanguage, rgcInfo)) {
             //  language matched also - set state and value
             _psetloc_data->iLcidState |= (__LCID_FULL |
-                                       __LCID_LANGUAGE |
-                                       __LCID_EXISTS);
+                                          __LCID_LANGUAGE |
+                                          __LCID_EXISTS);
             _psetloc_data->lcidLanguage = _psetloc_data->lcidCountry = lcid;
         }
-
         //  test if match already for primary langauage
-        else if (!(_psetloc_data->iLcidState & __LCID_PRIMARY))
-        {
+        else if (!(_psetloc_data->iLcidState & __LCID_PRIMARY)) {
             //  if not, use _psetloc_data->iPrimaryLen to partial match language string
-            if (_psetloc_data->iPrimaryLen && !_strnicmp(_psetloc_data->pchLanguage, rgcInfo, _psetloc_data->iPrimaryLen))
-            {
+            if (_psetloc_data->iPrimaryLen && !_strnicmp(_psetloc_data->pchLanguage, rgcInfo, _psetloc_data->iPrimaryLen)) {
                 //  primary language matched - set state and country LCID
                 _psetloc_data->iLcidState |= __LCID_PRIMARY;
                 _psetloc_data->lcidCountry = lcid;
 
                 //  if language is primary only (no subtype), set language LCID
-                if ((int)strlen(_psetloc_data->pchLanguage) == _psetloc_data->iPrimaryLen)
+                if ((int)strlen(_psetloc_data->pchLanguage) == _psetloc_data->iPrimaryLen) {
                     _psetloc_data->lcidLanguage = lcid;
+                }
             }
-
             //  test if default language already defined
-            else if (!(_psetloc_data->iLcidState & __LCID_DEFAULT))
-            {
+            else if (!(_psetloc_data->iLcidState & __LCID_DEFAULT)) {
                 //  if not, test if locale language is default for country
-                if (TestDefaultCountry(lcid))
-                {
+                if (TestDefaultCountry(lcid)) {
                     //  default language for country - set state, value
                     _psetloc_data->iLcidState |= __LCID_DEFAULT;
                     _psetloc_data->lcidCountry = lcid;
@@ -496,67 +470,64 @@ static BOOL CALLBACK LangCountryEnumProc (LPSTR lpLcidString)
             }
         }
     }
+
     //  test if input language both exists and default primary language defined
     if ((_psetloc_data->iLcidState & (__LCID_LANGUAGE | __LCID_EXISTS)) !=
-                      (__LCID_LANGUAGE | __LCID_EXISTS))
-    {
+            (__LCID_LANGUAGE | __LCID_EXISTS)) {
         //  test language match to determine whether it is installed
         if (GetLocaleInfoA(lcid, _psetloc_data->bAbbrevLanguage ? LOCALE_SABBREVLANGNAME
-                                                       : LOCALE_SENGLANGUAGE,
-                           rgcInfo, sizeof(rgcInfo)) == 0)
-        {
+                           : LOCALE_SENGLANGUAGE,
+                           rgcInfo, sizeof(rgcInfo)) == 0) {
             //  set error condition and exit
             _psetloc_data->iLcidState = 0;
             return TRUE;
         }
 
-        if (!_stricmp(_psetloc_data->pchLanguage, rgcInfo))
-        {
+        if (!_stricmp(_psetloc_data->pchLanguage, rgcInfo)) {
             //  language matched - set bit for existance
             _psetloc_data->iLcidState |= __LCID_EXISTS;
 
-            if (_psetloc_data->bAbbrevLanguage)
-            {
+            if (_psetloc_data->bAbbrevLanguage) {
                 //  abbreviation - set state
                 //  also set language LCID if not set already
                 _psetloc_data->iLcidState |= __LCID_LANGUAGE;
-                if (!_psetloc_data->lcidLanguage)
-                    _psetloc_data->lcidLanguage = lcid;
-            }
 
+                if (!_psetloc_data->lcidLanguage) {
+                    _psetloc_data->lcidLanguage = lcid;
+                }
+            }
             //  test if language is primary only (no sublanguage)
-            else if (_psetloc_data->iPrimaryLen && ((int)strlen(_psetloc_data->pchLanguage) == _psetloc_data->iPrimaryLen))
-            {
+            else if (_psetloc_data->iPrimaryLen && ((int)strlen(_psetloc_data->pchLanguage) == _psetloc_data->iPrimaryLen)) {
                 //  primary language only - test if default LCID
-                if (TestDefaultLanguage(lcid, TRUE, _psetloc_data))
-                {
+                if (TestDefaultLanguage(lcid, TRUE, _psetloc_data)) {
                     //  default primary language - set state
                     //  also set LCID if not set already
                     _psetloc_data->iLcidState |= __LCID_LANGUAGE;
-                    if (!_psetloc_data->lcidLanguage)
+
+                    if (!_psetloc_data->lcidLanguage) {
                         _psetloc_data->lcidLanguage = lcid;
+                    }
                 }
-            }
-            else
-            {
+            } else {
                 //  language with sublanguage - set state
                 //  also set LCID if not set already
                 _psetloc_data->iLcidState |= __LCID_LANGUAGE;
-                if (!_psetloc_data->lcidLanguage)
+
+                if (!_psetloc_data->lcidLanguage) {
                     _psetloc_data->lcidLanguage = lcid;
+                }
             }
-        }
-        else if (!_psetloc_data->bAbbrevLanguage && _psetloc_data->iPrimaryLen
-                               && !_stricmp(_psetloc_data->pchLanguage, rgcInfo))
-        {
+        } else if (!_psetloc_data->bAbbrevLanguage && _psetloc_data->iPrimaryLen
+                   && !_stricmp(_psetloc_data->pchLanguage, rgcInfo)) {
             //  primary language match - test for default language only
-            if (TestDefaultLanguage(lcid, FALSE, _psetloc_data))
-            {
+            if (TestDefaultLanguage(lcid, FALSE, _psetloc_data)) {
                 //  default primary language - set state
                 //  also set LCID if not set already
                 _psetloc_data->iLcidState |= __LCID_LANGUAGE;
-                if (!_psetloc_data->lcidLanguage)
+
+                if (!_psetloc_data->lcidLanguage) {
                     _psetloc_data->lcidLanguage = lcid;
+                }
             }
         }
     }
@@ -587,18 +558,17 @@ static BOOL CALLBACK LangCountryEnumProc (LPSTR lpLcidString)
 *Exceptions:
 *
 *******************************************************************************/
-static void GetLcidFromLanguage (_psetloc_struct _psetloc_data)
-{
+static void GetLcidFromLanguage(_psetloc_struct _psetloc_data) {
     //  initialize static variables for callback use
     _psetloc_data->bAbbrevLanguage = strlen(_psetloc_data->pchLanguage) == 3;
     _psetloc_data->iPrimaryLen = _psetloc_data->bAbbrevLanguage ? 2 : GetPrimaryLen(_psetloc_data->pchLanguage);
-
     EnumSystemLocalesA(LanguageEnumProc, LCID_INSTALLED);
 
     //  locale value is invalid if the language was not installed
     //  or the language was not available for the country specified
-    if (!(_psetloc_data->iLcidState & __LCID_FULL))
+    if (!(_psetloc_data->iLcidState & __LCID_FULL)) {
         _psetloc_data->iLcidState = 0;
+    }
 }
 
 /***
@@ -620,39 +590,32 @@ static void GetLcidFromLanguage (_psetloc_struct _psetloc_data)
 *Exceptions:
 *
 *******************************************************************************/
-static BOOL CALLBACK LanguageEnumProc (LPSTR lpLcidString)
-{
+static BOOL CALLBACK LanguageEnumProc(LPSTR lpLcidString) {
     _psetloc_struct    _psetloc_data = &_getptd()->_setloc_data;
     LCID    lcid = LcidFromHexString(lpLcidString);
     char    rgcInfo[120];
 
     //  test locale for language specified
     if (GetLocaleInfoA(lcid, _psetloc_data->bAbbrevLanguage ? LOCALE_SABBREVLANGNAME
-                                                   : LOCALE_SENGLANGUAGE,
-                       rgcInfo, sizeof(rgcInfo)) == 0)
-    {
+                       : LOCALE_SENGLANGUAGE,
+                       rgcInfo, sizeof(rgcInfo)) == 0) {
         //  set error condition and exit
         _psetloc_data->iLcidState = 0;
         return TRUE;
     }
 
-    if (!_stricmp(_psetloc_data->pchLanguage, rgcInfo))
-    {
+    if (!_stricmp(_psetloc_data->pchLanguage, rgcInfo)) {
         //  language matched - test if locale country is default
         //  or if locale is implied in the language string
-        if (_psetloc_data->bAbbrevLanguage || TestDefaultLanguage(lcid, TRUE, _psetloc_data))
-        {
+        if (_psetloc_data->bAbbrevLanguage || TestDefaultLanguage(lcid, TRUE, _psetloc_data)) {
             //  this locale has the default country
             _psetloc_data->lcidLanguage = _psetloc_data->lcidCountry = lcid;
             _psetloc_data->iLcidState |= __LCID_FULL;
         }
-    }
-    else if (!_psetloc_data->bAbbrevLanguage && _psetloc_data->iPrimaryLen
-                              && !_stricmp(_psetloc_data->pchLanguage, rgcInfo))
-    {
+    } else if (!_psetloc_data->bAbbrevLanguage && _psetloc_data->iPrimaryLen
+               && !_stricmp(_psetloc_data->pchLanguage, rgcInfo)) {
         //  primary language matched - test if locale country is default
-        if (TestDefaultLanguage(lcid, FALSE, _psetloc_data))
-        {
+        if (TestDefaultLanguage(lcid, FALSE, _psetloc_data)) {
             //  this is the default country
             _psetloc_data->lcidLanguage = _psetloc_data->lcidCountry = lcid;
             _psetloc_data->iLcidState |= __LCID_FULL;
@@ -682,16 +645,15 @@ static BOOL CALLBACK LanguageEnumProc (LPSTR lpLcidString)
 *Exceptions:
 *
 *******************************************************************************/
-static void GetLcidFromCountry (_psetloc_struct _psetloc_data)
-{
+static void GetLcidFromCountry(_psetloc_struct _psetloc_data) {
     _psetloc_data->bAbbrevCountry = strlen(_psetloc_data->pchCountry) == 3;
-
     EnumSystemLocalesA(CountryEnumProc, LCID_INSTALLED);
 
     //  locale value is invalid if the country was not defined or
     //  no default language was found
-    if (!(_psetloc_data->iLcidState & __LCID_FULL))
+    if (!(_psetloc_data->iLcidState & __LCID_FULL)) {
         _psetloc_data->iLcidState = 0;
+    }
 }
 
 /***
@@ -713,31 +675,29 @@ static void GetLcidFromCountry (_psetloc_struct _psetloc_data)
 *Exceptions:
 *
 *******************************************************************************/
-static BOOL CALLBACK CountryEnumProc (LPSTR lpLcidString)
-{
+static BOOL CALLBACK CountryEnumProc(LPSTR lpLcidString) {
     _psetloc_struct    _psetloc_data = &_getptd()->_setloc_data;
     LCID    lcid = LcidFromHexString(lpLcidString);
     char    rgcInfo[120];
 
     //  test locale for country specified
     if (GetLocaleInfoA(lcid, _psetloc_data->bAbbrevCountry ? LOCALE_SABBREVCTRYNAME
-                                                  : LOCALE_SENGCOUNTRY,
-                       rgcInfo, sizeof(rgcInfo)) == 0)
-    {
+                       : LOCALE_SENGCOUNTRY,
+                       rgcInfo, sizeof(rgcInfo)) == 0) {
         //  set error condition and exit
         _psetloc_data->iLcidState = 0;
         return TRUE;
     }
-    if (!_stricmp(_psetloc_data->pchCountry, rgcInfo))
-    {
+
+    if (!_stricmp(_psetloc_data->pchCountry, rgcInfo)) {
         //  language matched - test if locale country is default
-        if (TestDefaultCountry(lcid))
-        {
+        if (TestDefaultCountry(lcid)) {
             //  this locale has the default language
             _psetloc_data->lcidLanguage = _psetloc_data->lcidCountry = lcid;
             _psetloc_data->iLcidState |= __LCID_FULL;
         }
     }
+
     return (_psetloc_data->iLcidState & __LCID_FULL) == 0;
 }
 
@@ -757,8 +717,7 @@ static BOOL CALLBACK CountryEnumProc (LPSTR lpLcidString)
 *Exceptions:
 *
 *******************************************************************************/
-static void GetLcidFromDefault (_psetloc_struct _psetloc_data)
-{
+static void GetLcidFromDefault(_psetloc_struct _psetloc_data) {
     _psetloc_data->iLcidState |= (__LCID_FULL | __LCID_LANGUAGE);
     _psetloc_data->lcidLanguage = _psetloc_data->lcidCountry = GetUserDefaultLCID();
 }
@@ -780,24 +739,24 @@ static void GetLcidFromDefault (_psetloc_struct _psetloc_data)
 *Exceptions:
 *
 *******************************************************************************/
-static int ProcessCodePage (LPSTR lpCodePageStr, _psetloc_struct _psetloc_data)
-{
+static int ProcessCodePage(LPSTR lpCodePageStr, _psetloc_struct _psetloc_data) {
     char    chCodePage[8];
 
-    if (!lpCodePageStr || !*lpCodePageStr || !strcmp(lpCodePageStr, "ACP"))
-    {
+    if (!lpCodePageStr || !*lpCodePageStr || !strcmp(lpCodePageStr, "ACP")) {
         //  get ANSI codepage for the country LCID
         if (GetLocaleInfoA(_psetloc_data->lcidCountry, LOCALE_IDEFAULTANSICODEPAGE,
-                                 chCodePage, sizeof(chCodePage)) == 0)
+                           chCodePage, sizeof(chCodePage)) == 0) {
             return 0;
+        }
+
         lpCodePageStr = chCodePage;
-    }
-    else if (!strcmp(lpCodePageStr, "OCP"))
-    {
+    } else if (!strcmp(lpCodePageStr, "OCP")) {
         //  get OEM codepage for the country LCID
         if (GetLocaleInfoA(_psetloc_data->lcidCountry, LOCALE_IDEFAULTCODEPAGE,
-                                 chCodePage, sizeof(chCodePage)) == 0)
+                           chCodePage, sizeof(chCodePage)) == 0) {
             return 0;
+        }
+
         lpCodePageStr = chCodePage;
     }
 
@@ -822,16 +781,16 @@ static int ProcessCodePage (LPSTR lpCodePageStr, _psetloc_struct _psetloc_data)
 *Exceptions:
 *
 *******************************************************************************/
-static BOOL TestDefaultCountry (LCID lcid)
-{
+static BOOL TestDefaultCountry(LCID lcid) {
     LANGID  langid = LANGIDFROMLCID(lcid);
     int     i;
 
-    for (i = 0; i < sizeof(__rglangidNotDefault) / sizeof(LANGID); i++)
-    {
-        if (langid == __rglangidNotDefault[i])
+    for (i = 0; i < sizeof(__rglangidNotDefault) / sizeof(LANGID); i++) {
+        if (langid == __rglangidNotDefault[i]) {
             return FALSE;
+        }
     }
+
     return TRUE;
 }
 
@@ -854,23 +813,24 @@ static BOOL TestDefaultCountry (LCID lcid)
 *Exceptions:
 *
 *******************************************************************************/
-static BOOL TestDefaultLanguage (LCID lcid, BOOL bTestPrimary, _psetloc_struct _psetloc_data)
-{
+static BOOL TestDefaultLanguage(LCID lcid, BOOL bTestPrimary, _psetloc_struct _psetloc_data) {
     char    rgcInfo[120];
     LCID    lcidDefault = MAKELCID(MAKELANGID(PRIMARYLANGID(LANGIDFROMLCID(lcid)),
-                                                  SUBLANG_DEFAULT), SORT_DEFAULT);
+                                   SUBLANG_DEFAULT), SORT_DEFAULT);
 
     if (GetLocaleInfoA(lcidDefault, LOCALE_ILANGUAGE, rgcInfo,
-                                          sizeof(rgcInfo)) == 0)
+                       sizeof(rgcInfo)) == 0) {
         return FALSE;
+    }
 
-    if (lcid != LcidFromHexString(rgcInfo))
-    {
+    if (lcid != LcidFromHexString(rgcInfo)) {
         //  test if string contains an implicit sublanguage by
         //  having a character other than upper/lowercase letters.
-        if (bTestPrimary && GetPrimaryLen(_psetloc_data->pchLanguage) == (int)strlen(_psetloc_data->pchLanguage))
+        if (bTestPrimary && GetPrimaryLen(_psetloc_data->pchLanguage) == (int)strlen(_psetloc_data->pchLanguage)) {
             return FALSE;
+        }
     }
+
     return TRUE;
 }
 
@@ -889,17 +849,17 @@ static BOOL TestDefaultLanguage (LCID lcid, BOOL bTestPrimary, _psetloc_struct _
 *Exceptions:
 *
 *******************************************************************************/
-static LCID LcidFromHexString (LPSTR lpHexString)
-{
+static LCID LcidFromHexString(LPSTR lpHexString) {
     char    ch;
     DWORD   lcid = 0;
 
-    while (ch = *lpHexString++)
-    {
-        if (ch >= 'a' && ch <= 'f')
+    while (ch = *lpHexString++) {
+        if (ch >= 'a' && ch <= 'f') {
             ch += '9' + 1 - 'a';
-        else if (ch >= 'A' && ch <= 'F')
+        } else if (ch >= 'A' && ch <= 'F') {
             ch += '9' + 1 - 'A';
+        }
+
         lcid = lcid * 0x10 + ch - '0';
     }
 
@@ -922,14 +882,12 @@ static LCID LcidFromHexString (LPSTR lpHexString)
 *Exceptions:
 *
 *******************************************************************************/
-static int GetPrimaryLen (LPSTR pchLanguage)
-{
+static int GetPrimaryLen(LPSTR pchLanguage) {
     int     len = 0;
     char    ch;
-
     ch = *pchLanguage++;
-    while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))
-    {
+
+    while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
         len++;
         ch = *pchLanguage++;
     }

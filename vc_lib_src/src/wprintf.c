@@ -39,99 +39,77 @@
 *
 *******************************************************************************/
 
-int __cdecl wprintf (
-        const wchar_t *format,
-        ...
-        )
+int __cdecl wprintf(
+    const wchar_t* format,
+    ...
+)
 /*
  * stdout 'W'char_t 'PRINT', 'F'ormatted
  */
 {
-        va_list arglist;
-        int buffing;
-        int retval;
+    va_list arglist;
+    int buffing;
+    int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
+    va_start(arglist, format);
+    _lock_str2(1, stdout);
 
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
-        va_start(arglist, format);
-
-        _lock_str2(1, stdout);
-        __try {
-
+    __try {
         buffing = _stbuf(stdout);
-
-        retval = _woutput_l(stdout,format,NULL,arglist);
-
+        retval = _woutput_l(stdout, format, NULL, arglist);
         _ftbuf(buffing, stdout);
+    } __finally {
+        _unlock_str2(1, stdout);
+    }
 
-        }
-        __finally {
-            _unlock_str2(1, stdout);
-        }
-
-        return(retval);
+    return (retval);
 }
 
-errno_t __cdecl _wprintf_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+errno_t __cdecl _wprintf_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vwprintf_l(format, plocinfo, arglist);
 }
 
-errno_t __cdecl _wprintf_s_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+errno_t __cdecl _wprintf_s_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vwprintf_s_l(format, plocinfo, arglist);
 }
 
-errno_t __cdecl wprintf_s (
-        const wchar_t *format,
-        ...
-        )
-{
+errno_t __cdecl wprintf_s(
+    const wchar_t* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vwprintf_s_l(format, NULL, arglist);
 }
 
-errno_t __cdecl _wprintf_p_l (
-        const wchar_t *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
+errno_t __cdecl _wprintf_p_l(
+    const wchar_t* format,
+    _locale_t plocinfo,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, plocinfo);
-
     return _vwprintf_p_l(format, plocinfo, arglist);
 }
 
-errno_t __cdecl _wprintf_p (
-        const wchar_t *format,
-        ...
-        )
-{
+errno_t __cdecl _wprintf_p(
+    const wchar_t* format,
+    ...
+) {
     va_list arglist;
-
     va_start(arglist, format);
-
     return _vwprintf_p_l(format, NULL, arglist);
 }
 

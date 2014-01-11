@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,16 +43,18 @@ __FBSDID("$FreeBSD: src/lib/libc/string/memcmp.c,v 1.5 2007/01/09 00:28:12 imp E
  */
 int
 memcmp(s1, s2, n)
-	const void *s1, *s2;
-	size_t n;
+const void* s1, *s2;
+size_t n;
 {
-	if (n != 0) {
-		const unsigned char *p1 = s1, *p2 = s2;
+    if (n != 0) {
+        const unsigned char* p1 = s1, *p2 = s2;
 
-		do {
-			if (*p1++ != *p2++)
-				return (*--p1 - *--p2);
-		} while (--n != 0);
-	}
-	return (0);
+        do {
+            if (*p1++ != *p2++) {
+                return (*--p1 - *--p2);
+            }
+        } while (--n != 0);
+    }
+
+    return (0);
 }

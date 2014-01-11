@@ -46,7 +46,7 @@
 #undef  _USE_32BIT_TIME_T
 #endif  /* _WIN64 */
 #else  /* _USE_32BIT_TIME_T */
-#if _INTEGRAL_MAX_BITS < 64   
+#if _INTEGRAL_MAX_BITS < 64
 #define _USE_32BIT_TIME_T
 #endif  /* _INTEGRAL_MAX_BITS < 64    */
 #endif  /* _USE_32BIT_TIME_T */
@@ -57,7 +57,7 @@ typedef _W64 long __time32_t;   /* 32-bit time value */
 #endif  /* _TIME32_T_DEFINED */
 
 #ifndef _TIME64_T_DEFINED
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 typedef __int64 __time64_t;     /* 64-bit time value */
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 #define _TIME64_T_DEFINED

@@ -32,18 +32,16 @@ __FBSDID("$FreeBSD: src/lib/libc/sparc64/sys/__sparc_utrap_install.c,v 1.3 2004/
 
 int
 __sparc_utrap_install(utrap_entry_t type, utrap_handler_t new_precise,
-    utrap_handler_t new_deferred, utrap_handler_t *old_precise,
-    utrap_handler_t *old_deferred)
-{
-	struct sparc_utrap_install_args uia;
-	struct sparc_utrap_args ua[1];
-
-	ua[0].type = type;
-	ua[0].new_precise = new_precise;
-	ua[0].new_deferred = new_deferred;
-	ua[0].old_precise = old_precise;
-	ua[0].old_deferred = old_deferred;
-	uia.num = 1;
-	uia.handlers = ua;
-	return (sysarch(SPARC_UTRAP_INSTALL, &uia));
+                      utrap_handler_t new_deferred, utrap_handler_t* old_precise,
+                      utrap_handler_t* old_deferred) {
+    struct sparc_utrap_install_args uia;
+    struct sparc_utrap_args ua[1];
+    ua[0].type = type;
+    ua[0].new_precise = new_precise;
+    ua[0].new_deferred = new_deferred;
+    ua[0].old_precise = old_precise;
+    ua[0].old_deferred = old_deferred;
+    uia.num = 1;
+    uia.handlers = ua;
+    return (sysarch(SPARC_UTRAP_INSTALL, &uia));
 }

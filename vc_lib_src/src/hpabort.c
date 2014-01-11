@@ -28,10 +28,9 @@
 *
 *******************************************************************************/
 
-void __cdecl _heap_abort (
-        void
-        )
-{
-        _amsg_exit(_RT_HEAP);           /* heap error */
-        /*** PROCESS TERMINATED ***/
+void __cdecl _heap_abort(
+    void
+) {
+    _amsg_exit(_RT_HEAP);           /* heap error */
+    /*** PROCESS TERMINATED ***/
 }

@@ -59,7 +59,7 @@ typedef bad_typeid Bad_typeid;
 
 #ifndef _SYSCRT
 struct __type_info_node {
-    void *memPtr;
+    void* memPtr;
     __type_info_node* next;
 };
 
@@ -79,7 +79,7 @@ public:
 #endif  /* _SYSCRT */
     _CRTIMP __checkReturn const char* __thiscall raw_name() const;
 private:
-    void *_m_data;
+    void* _m_data;
     char _m_d_name[1];
     __thiscall type_info(__in const type_info& _Rhs);
     type_info& __thiscall operator=(__in const type_info& _Rhs);
@@ -91,30 +91,30 @@ private:
 
 class _CRTIMP bad_cast : public std::exception {
 public:
-    __CLR_OR_THIS_CALL bad_cast(__in_z const char * _Message = "bad cast");
-    __CLR_OR_THIS_CALL bad_cast(__in const bad_cast & _Bad_cast);
+    __CLR_OR_THIS_CALL bad_cast(__in_z const char* _Message = "bad cast");
+    __CLR_OR_THIS_CALL bad_cast(__in const bad_cast& _Bad_cast);
     virtual __CLR_OR_THIS_CALL ~bad_cast();
 #ifndef _INTERNAL_IFSTRIP_
 #ifdef CRTDLL
 private:
     /* This is aliased to public:bad_cast(const char * const &) to provide */
     /* the old, non-conformant constructor. */
-    bad_cast(__in_z const char * const * _Message);
+    bad_cast(__in_z const char* const* _Message);
 #endif  /* CRTDLL */
 #endif  /* _INTERNAL_IFSTRIP_ */
 };
 
 class _CRTIMP bad_typeid : public std::exception {
 public:
-    bad_typeid(__in_z const char * _Message = "bad typeid");
-    bad_typeid(__in const bad_typeid &);
+    bad_typeid(__in_z const char* _Message = "bad typeid");
+    bad_typeid(__in const bad_typeid&);
     virtual ~bad_typeid();
 };
 
 class _CRTIMP __non_rtti_object : public bad_typeid {
 public:
-    __non_rtti_object(__in_z const char * _Message);
-    __non_rtti_object(__in const __non_rtti_object &);
+    __non_rtti_object(__in_z const char* _Message);
+    __non_rtti_object(__in const __non_rtti_object&);
     virtual ~__non_rtti_object();
 };
 

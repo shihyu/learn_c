@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Margo Seltzer.
@@ -32,7 +32,7 @@
 
 #ifndef lint
 static char copyright[] =
-"@(#) Copyright (c) 1991, 1993\n\
+    "@(#) Copyright (c) 1991, 1993\n\
 	The Regents of the University of California.  All rights reserved.\n";
 #endif /* not lint */
 
@@ -47,40 +47,39 @@ __FBSDID("$FreeBSD: src/lib/libc/db/test/hash.tests/tseq.c,v 1.4 2007/01/09 00:2
 #include <stdio.h>
 #include <db.h>
 
-#define INITIAL	25000
-#define MAXWORDS    25000	       /* # of elements in search table */
+#define INITIAL 25000
+#define MAXWORDS    25000          /* # of elements in search table */
 
 
-char	wp[8192];
-char	cp[8192];
+char    wp[8192];
+char    cp[8192];
 main(argc, argv)
-char **argv;
+char** argv;
 {
-	DBT item, key, res;
-	DB	*dbp;
-	FILE *fp;
-	int	stat;
+    DBT item, key, res;
+    DB*  dbp;
+    FILE* fp;
+    int stat;
 
-	if (!(dbp = dbopen( "hashtest", O_RDONLY, 0400, DB_HASH, NULL))) {
-		/* create table */
-		fprintf(stderr, "cannot open: hash table\n" );
-		exit(1);
-	}
+    if (!(dbp = dbopen("hashtest", O_RDONLY, 0400, DB_HASH, NULL))) {
+        /* create table */
+        fprintf(stderr, "cannot open: hash table\n");
+        exit(1);
+    }
 
-/*
-* put info in structure, and structure in the item
-*/
-	for ( stat = (dbp->seq) (dbp, &res, &item, 1 );
-	      stat == 0;
-	      stat = (dbp->seq) (dbp, &res, &item, 0 ) ) {
+    /*
+    * put info in structure, and structure in the item
+    */
+    for (stat = (dbp->seq)(dbp, &res, &item, 1);
+            stat == 0;
+            stat = (dbp->seq)(dbp, &res, &item, 0)) {
+        bcopy(res.data, wp, res.size);
+        wp[res.size] = 0;
+        bcopy(item.data, cp, item.size);
+        cp[item.size] = 0;
+        printf("%s %s\n", wp, cp);
+    }
 
-	      bcopy ( res.data, wp, res.size );
-	      wp[res.size] = 0;
-	      bcopy ( item.data, cp, item.size );
-	      cp[item.size] = 0;
-
-	      printf ( "%s %s\n", wp, cp );
-	}
-	(dbp->close)(dbp);
-	exit(0);
+    (dbp->close)(dbp);
+    exit(0);
 }

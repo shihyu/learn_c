@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -48,12 +48,16 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/seekdir.c,v 1.6 2007/01/09 00:27:55 imp Exp
  */
 void
 seekdir(dirp, loc)
-	DIR *dirp;
-	long loc;
+DIR* dirp;
+long loc;
 {
-	if (__isthreaded)
-		_pthread_mutex_lock((pthread_mutex_t *)&dirp->dd_lock);
-	_seekdir(dirp, loc);
-	if (__isthreaded)
-		_pthread_mutex_unlock((pthread_mutex_t *)&dirp->dd_lock);
+    if (__isthreaded) {
+        _pthread_mutex_lock((pthread_mutex_t*)&dirp->dd_lock);
+    }
+
+    _seekdir(dirp, loc);
+
+    if (__isthreaded) {
+        _pthread_mutex_unlock((pthread_mutex_t*)&dirp->dd_lock);
+    }
 }

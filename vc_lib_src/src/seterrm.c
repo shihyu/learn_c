@@ -33,7 +33,6 @@
 *
 *******************************************************************************/
 
-void __cdecl _seterrormode(int mode)
-{
-        SetErrorMode(mode);
+void __cdecl _seterrormode(int mode) {
+    SetErrorMode(mode);
 }

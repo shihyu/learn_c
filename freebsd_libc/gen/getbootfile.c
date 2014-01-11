@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,16 +38,17 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getbootfile.c,v 1.9 2007/01/09 00:27:53 imp
 
 #include <paths.h>
 
-const char *
-getbootfile(void)
-{
-	static char name[MAXPATHLEN];
-	size_t size = sizeof name;
-	int mib[2];
+const char*
+getbootfile(void) {
+    static char name[MAXPATHLEN];
+    size_t size = sizeof name;
+    int mib[2];
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_BOOTFILE;
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_BOOTFILE;
-	if (sysctl(mib, 2, name, &size, NULL, 0) == -1)
-		return ("/boot/kernel/kernel");
-	return (name);
+    if (sysctl(mib, 2, name, &size, NULL, 0) == -1) {
+        return ("/boot/kernel/kernel");
+    }
+
+    return (name);
 }

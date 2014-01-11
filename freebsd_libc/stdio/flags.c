@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -50,41 +50,41 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/flags.c,v 1.10 2007/01/09 00:28:06 imp Ex
  */
 int
 __sflags(mode, optr)
-	const char *mode;
-	int *optr;
+const char* mode;
+int* optr;
 {
-	int ret, m, o;
+    int ret, m, o;
 
-	switch (*mode++) {
+    switch (*mode++) {
+    case 'r':   /* open for reading */
+        ret = __SRD;
+        m = O_RDONLY;
+        o = 0;
+        break;
 
-	case 'r':	/* open for reading */
-		ret = __SRD;
-		m = O_RDONLY;
-		o = 0;
-		break;
+    case 'w':   /* open for writing */
+        ret = __SWR;
+        m = O_WRONLY;
+        o = O_CREAT | O_TRUNC;
+        break;
 
-	case 'w':	/* open for writing */
-		ret = __SWR;
-		m = O_WRONLY;
-		o = O_CREAT | O_TRUNC;
-		break;
+    case 'a':   /* open for appending */
+        ret = __SWR;
+        m = O_WRONLY;
+        o = O_CREAT | O_APPEND;
+        break;
 
-	case 'a':	/* open for appending */
-		ret = __SWR;
-		m = O_WRONLY;
-		o = O_CREAT | O_APPEND;
-		break;
+    default:    /* illegal mode */
+        errno = EINVAL;
+        return (0);
+    }
 
-	default:	/* illegal mode */
-		errno = EINVAL;
-		return (0);
-	}
+    /* [rwa]\+ or [rwa]b\+ means read and write */
+    if (*mode == '+' || (*mode == 'b' && mode[1] == '+')) {
+        ret = __SRW;
+        m = O_RDWR;
+    }
 
-	/* [rwa]\+ or [rwa]b\+ means read and write */
-	if (*mode == '+' || (*mode == 'b' && mode[1] == '+')) {
-		ret = __SRW;
-		m = O_RDWR;
-	}
-	*optr = m | o;
-	return (ret);
+    *optr = m | o;
+    return (ret);
 }

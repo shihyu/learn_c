@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1987, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,138 +45,154 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/mktemp.c,v 1.29 2007/01/09 00:28:07 imp E
 #include <unistd.h>
 #include "un-namespace.h"
 
-char *_mktemp(char *);
+char* _mktemp(char*);
 
-static int _gettemp(char *, int *, int, int);
+static int _gettemp(char*, int*, int, int);
 
 static const unsigned char padchar[] =
-"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 int
 mkstemps(path, slen)
-	char *path;
-	int slen;
+char* path;
+int slen;
 {
-	int fd;
-
-	return (_gettemp(path, &fd, 0, slen) ? fd : -1);
+    int fd;
+    return (_gettemp(path, &fd, 0, slen) ? fd : -1);
 }
 
 int
 mkstemp(path)
-	char *path;
+char* path;
 {
-	int fd;
-
-	return (_gettemp(path, &fd, 0, 0) ? fd : -1);
+    int fd;
+    return (_gettemp(path, &fd, 0, 0) ? fd : -1);
 }
 
-char *
+char*
 mkdtemp(path)
-	char *path;
+char* path;
 {
-	return (_gettemp(path, (int *)NULL, 1, 0) ? path : (char *)NULL);
+    return (_gettemp(path, (int*)NULL, 1, 0) ? path : (char*)NULL);
 }
 
-char *
+char*
 _mktemp(path)
-	char *path;
+char* path;
 {
-	return (_gettemp(path, (int *)NULL, 0, 0) ? path : (char *)NULL);
+    return (_gettemp(path, (int*)NULL, 0, 0) ? path : (char*)NULL);
 }
 
 __warn_references(mktemp,
-    "warning: mktemp() possibly used unsafely; consider using mkstemp()");
+                  "warning: mktemp() possibly used unsafely; consider using mkstemp()");
 
-char *
+char*
 mktemp(path)
-	char *path;
+char* path;
 {
-	return (_mktemp(path));
+    return (_mktemp(path));
 }
 
 static int
 _gettemp(path, doopen, domkdir, slen)
-	char *path;
-	int *doopen;
-	int domkdir;
-	int slen;
+char* path;
+int* doopen;
+int domkdir;
+int slen;
 {
-	char *start, *trv, *suffp;
-	char *pad;
-	struct stat sbuf;
-	int rval;
-	uint32_t rand;
+    char* start, *trv, *suffp;
+    char* pad;
+    struct stat sbuf;
+    int rval;
+    uint32_t rand;
 
-	if (doopen != NULL && domkdir) {
-		errno = EINVAL;
-		return (0);
-	}
+    if (doopen != NULL && domkdir) {
+        errno = EINVAL;
+        return (0);
+    }
 
-	for (trv = path; *trv != '\0'; ++trv)
-		;
-	trv -= slen;
-	suffp = trv;
-	--trv;
-	if (trv < path) {
-		errno = EINVAL;
-		return (0);
-	}
+    for (trv = path; *trv != '\0'; ++trv)
+        ;
 
-	/* Fill space with random characters */
-	while (trv >= path && *trv == 'X') {
-		rand = arc4random() % (sizeof(padchar) - 1);
-		*trv-- = padchar[rand];
-	}
-	start = trv + 1;
+    trv -= slen;
+    suffp = trv;
+    --trv;
 
-	/*
-	 * check the target directory.
-	 */
-	if (doopen != NULL || domkdir) {
-		for (; trv > path; --trv) {
-			if (*trv == '/') {
-				*trv = '\0';
-				rval = stat(path, &sbuf);
-				*trv = '/';
-				if (rval != 0)
-					return (0);
-				if (!S_ISDIR(sbuf.st_mode)) {
-					errno = ENOTDIR;
-					return (0);
-				}
-				break;
-			}
-		}
-	}
+    if (trv < path) {
+        errno = EINVAL;
+        return (0);
+    }
 
-	for (;;) {
-		if (doopen) {
-			if ((*doopen =
-			    _open(path, O_CREAT|O_EXCL|O_RDWR, 0600)) >= 0)
-				return (1);
-			if (errno != EEXIST)
-				return (0);
-		} else if (domkdir) {
-			if (mkdir(path, 0700) == 0)
-				return (1);
-			if (errno != EEXIST)
-				return (0);
-		} else if (lstat(path, &sbuf))
-			return (errno == ENOENT);
+    /* Fill space with random characters */
+    while (trv >= path && *trv == 'X') {
+        rand = arc4random() % (sizeof(padchar) - 1);
+        *trv-- = padchar[rand];
+    }
 
-		/* If we have a collision, cycle through the space of filenames */
-		for (trv = start;;) {
-			if (*trv == '\0' || trv == suffp)
-				return (0);
-			pad = strchr(padchar, *trv);
-			if (pad == NULL || *++pad == '\0')
-				*trv++ = padchar[0];
-			else {
-				*trv++ = *pad;
-				break;
-			}
-		}
-	}
-	/*NOTREACHED*/
+    start = trv + 1;
+
+    /*
+     * check the target directory.
+     */
+    if (doopen != NULL || domkdir) {
+        for (; trv > path; --trv) {
+            if (*trv == '/') {
+                *trv = '\0';
+                rval = stat(path, &sbuf);
+                *trv = '/';
+
+                if (rval != 0) {
+                    return (0);
+                }
+
+                if (!S_ISDIR(sbuf.st_mode)) {
+                    errno = ENOTDIR;
+                    return (0);
+                }
+
+                break;
+            }
+        }
+    }
+
+    for (;;) {
+        if (doopen) {
+            if ((*doopen =
+                        _open(path, O_CREAT | O_EXCL | O_RDWR, 0600)) >= 0) {
+                return (1);
+            }
+
+            if (errno != EEXIST) {
+                return (0);
+            }
+        } else if (domkdir) {
+            if (mkdir(path, 0700) == 0) {
+                return (1);
+            }
+
+            if (errno != EEXIST) {
+                return (0);
+            }
+        } else if (lstat(path, &sbuf)) {
+            return (errno == ENOENT);
+        }
+
+        /* If we have a collision, cycle through the space of filenames */
+        for (trv = start;;) {
+            if (*trv == '\0' || trv == suffp) {
+                return (0);
+            }
+
+            pad = strchr(padchar, *trv);
+
+            if (pad == NULL || *++pad == '\0') {
+                *trv++ = padchar[0];
+            } else {
+                *trv++ = *pad;
+                break;
+            }
+        }
+    }
+
+    /*NOTREACHED*/
 }

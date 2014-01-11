@@ -3,14 +3,16 @@
 _C_STD_BEGIN
 
 _MRTIMP2_NCEEPURE long double __CLRCALL_PURE_OR_CDECL _LPoly(long double x,
-	const long double *tab, int n)
-	{	/* compute polynomial */
-	long double y;
+        const long double* tab, int n) {
+    /* compute polynomial */
+    long double y;
 
-	for (y = *tab; 0 <= --n; )
-		y = y * x + *++tab;
-	return (y);
-	}
+    for (y = *tab; 0 <= --n;) {
+        y = y * x + *++tab;
+    }
+
+    return (y);
+}
 _C_STD_END
 
 /*

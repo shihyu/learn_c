@@ -66,13 +66,13 @@ _CRTIMP void __cdecl _CRT_DEBUGGER_HOOK(int);
 
 #ifndef _DEBUG
 
- /****************************************************************************
- *
- * Debug OFF
- * Debug OFF
- * Debug OFF
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Debug OFF
+* Debug OFF
+* Debug OFF
+*
+***************************************************************************/
 
 #ifdef __cplusplus
 
@@ -91,10 +91,10 @@ _CRTIMP void __cdecl _CRT_DEBUGGER_HOOK(int);
 #define _realloc_crt                    realloc
 #define _recalloc_crt                   _recalloc
 #else  /* defined (_SYSCRT) || defined (MRTDLL) || defined (_M_CEE_PURE) */
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _malloc_crt(__in size_t _Size);
-_CRTIMP __checkReturn __bcount_opt(_Size*_Count) void * __cdecl _calloc_crt(__in size_t _Count, __in size_t _Size);
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _realloc_crt(__inout_opt void *_Ptr, __in size_t _Size);
-_CRTIMP __checkReturn __bcount_opt(_Size*_Count) void * __cdecl _recalloc_crt(__inout_opt void *_Ptr, __in size_t _Count, __in size_t _Size);
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _malloc_crt(__in size_t _Size);
+_CRTIMP __checkReturn __bcount_opt(_Size* _Count) void* __cdecl _calloc_crt(__in size_t _Count, __in size_t _Size);
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _realloc_crt(__inout_opt void* _Ptr, __in size_t _Size);
+_CRTIMP __checkReturn __bcount_opt(_Size* _Count) void* __cdecl _recalloc_crt(__inout_opt void* _Ptr, __in size_t _Count, __in size_t _Size);
 #endif  /* defined (_SYSCRT) || defined (MRTDLL) || defined (_M_CEE_PURE) */
 
 #define _malloc_base                    malloc
@@ -126,13 +126,13 @@ _CRTIMP __checkReturn __bcount_opt(_Size*_Count) void * __cdecl _recalloc_crt(__
 #else  /* _DEBUG */
 
 
- /****************************************************************************
- *
- * Debug ON
- * Debug ON
- * Debug ON
- *
- ***************************************************************************/
+/****************************************************************************
+*
+* Debug ON
+* Debug ON
+* Debug ON
+*
+***************************************************************************/
 
 #define _THISFILE   __FILE__
 
@@ -156,103 +156,103 @@ _CRTIMP __checkReturn __bcount_opt(_Size*_Count) void * __cdecl _recalloc_crt(__
  * Prototypes for malloc, free, realloc, etc are in malloc.h
  */
 
-_CRTIMP __checkReturn __bcount_opt(_Size) void * __cdecl _malloc_base(
-        __in size_t _Size
-        );
-
-__checkReturn __bcount_opt(_Size) void * __cdecl _nh_malloc_base (
-        __in size_t _Size,
-        __in int _NhFlag
-        );
-
-__checkReturn __bcount_opt(_Size) void * __cdecl _nh_malloc_dbg (
-        __in size_t _Size,
-        __in int _NhFlag,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-__checkReturn __bcount_opt(_Size) void * __cdecl _heap_alloc_dbg(
-        __in size_t _Size,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
-
-__checkReturn __bcount_opt(_Size*_Count) void * __cdecl _calloc_base(
-        size_t _Count,
-        size_t _Size
-        );
-
-__checkReturn __bcount_opt(_NewSize) void * __cdecl _realloc_base(
-        __inout_opt void * _Memory,
-        __in size_t _NewSize
-        );
-
-__checkReturn __bcount_opt(_NewSize) void * __cdecl _recalloc_base
-(
-        __inout_opt void * _Memory,
-        __in size_t _Count,
-        __in size_t _Size
+_CRTIMP __checkReturn __bcount_opt(_Size) void* __cdecl _malloc_base(
+    __in size_t _Size
 );
 
-__checkReturn __bcount_opt(_NewSize) void * __cdecl _expand_base(
-        __inout_opt void * _Memory,
-        __in size_t _NewSize
-        );
+__checkReturn __bcount_opt(_Size) void* __cdecl _nh_malloc_base(
+    __in size_t _Size,
+    __in int _NhFlag
+);
+
+__checkReturn __bcount_opt(_Size) void* __cdecl _nh_malloc_dbg(
+    __in size_t _Size,
+    __in int _NhFlag,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+__checkReturn __bcount_opt(_Size) void* __cdecl _heap_alloc_dbg(
+    __in size_t _Size,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
+
+__checkReturn __bcount_opt(_Size* _Count) void* __cdecl _calloc_base(
+    size_t _Count,
+    size_t _Size
+);
+
+__checkReturn __bcount_opt(_NewSize) void* __cdecl _realloc_base(
+    __inout_opt void* _Memory,
+    __in size_t _NewSize
+);
+
+__checkReturn __bcount_opt(_NewSize) void* __cdecl _recalloc_base
+(
+    __inout_opt void* _Memory,
+    __in size_t _Count,
+    __in size_t _Size
+);
+
+__checkReturn __bcount_opt(_NewSize) void* __cdecl _expand_base(
+    __inout_opt void* _Memory,
+    __in size_t _NewSize
+);
 
 _CRTIMP void __cdecl _free_base(
-        __inout_opt void * _Memory
-        );
-
-__checkReturn size_t __cdecl _msize_base (
-        __in void * _Memory
-        );
-
-void    __cdecl _aligned_free_base(
-        __inout_opt void * _Memory
-        );
-
-__checkReturn __bcount_opt(_Size) void *  __cdecl _aligned_malloc_base(
-        __in size_t _Size,
-        __in size_t _Alignment
-        );
-
-__checkReturn __bcount_opt(_Size) void *  __cdecl _aligned_offset_malloc_base(
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in size_t _Offset
-        );
-
-__checkReturn __bcount_opt(_Size) void *  __cdecl _aligned_realloc_base(
-        __inout_opt void * _Memory,
-        __in size_t _Size,
-        __in size_t _Alignment
-        );
-
-__checkReturn __bcount_opt(_Size) void *  __cdecl _aligned_recalloc_base
-(
-        __inout_opt void * _Memory,
-        __in size_t _Count,
-        __in size_t _Size,
-        __in size_t _Alignment
+    __inout_opt void* _Memory
 );
 
-__checkReturn __bcount_opt(_Size) void *  __cdecl _aligned_offset_realloc_base(
-        __inout_opt void * _Memory,
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in size_t _Offset
-        );
+__checkReturn size_t __cdecl _msize_base(
+    __in void* _Memory
+);
 
-__checkReturn __bcount_opt(_Size) void *  __cdecl _aligned_offset_recalloc_base
+void    __cdecl _aligned_free_base(
+    __inout_opt void* _Memory
+);
+
+__checkReturn __bcount_opt(_Size) void*   __cdecl _aligned_malloc_base(
+    __in size_t _Size,
+    __in size_t _Alignment
+);
+
+__checkReturn __bcount_opt(_Size) void*   __cdecl _aligned_offset_malloc_base(
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in size_t _Offset
+);
+
+__checkReturn __bcount_opt(_Size) void*   __cdecl _aligned_realloc_base(
+    __inout_opt void* _Memory,
+    __in size_t _Size,
+    __in size_t _Alignment
+);
+
+__checkReturn __bcount_opt(_Size) void*   __cdecl _aligned_recalloc_base
 (
-        __inout_opt void * _Memory,
-        __in size_t _Count,
-        __in size_t _Size,
-        __in size_t _Alignment,
-        __in size_t _Offset
+    __inout_opt void* _Memory,
+    __in size_t _Count,
+    __in size_t _Size,
+    __in size_t _Alignment
+);
+
+__checkReturn __bcount_opt(_Size) void*   __cdecl _aligned_offset_realloc_base(
+    __inout_opt void* _Memory,
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in size_t _Offset
+);
+
+__checkReturn __bcount_opt(_Size) void*   __cdecl _aligned_offset_recalloc_base
+(
+    __inout_opt void* _Memory,
+    __in size_t _Count,
+    __in size_t _Size,
+    __in size_t _Alignment,
+    __in size_t _Offset
 );
 
 
@@ -263,41 +263,41 @@ void __cdecl __freeCrtMemory();
  */
 
 
-__checkReturn __bcount_opt(_Size*_Count) void * __cdecl _calloc_dbg_nolock(
-        __in size_t _Count,
-        __in size_t _Size,
-        __in int _BlockType,
-        __in_z_opt char * _Filename,
-        __in int _LineNumber
-        );
+__checkReturn __bcount_opt(_Size* _Count) void* __cdecl _calloc_dbg_nolock(
+    __in size_t _Count,
+    __in size_t _Size,
+    __in int _BlockType,
+    __in_z_opt char* _Filename,
+    __in int _LineNumber
+);
 
 
-__checkReturn __bcount_opt(_Size) void * __cdecl _realloc_dbg_nolock(
-        __inout_opt void * _Memory,
-        __in size_t _Size,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
-        );
+__checkReturn __bcount_opt(_Size) void* __cdecl _realloc_dbg_nolock(
+    __inout_opt void* _Memory,
+    __in size_t _Size,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
+);
 
-__checkReturn __bcount_opt(_Size) void * __cdecl _recalloc_dbg_nolock
+__checkReturn __bcount_opt(_Size) void* __cdecl _recalloc_dbg_nolock
 (
-        __inout_opt void * _Memory,
-        __in size_t _Count,
-        __in size_t _Size,
-        __in int _BlockType,
-        __in_z_opt const char * _Filename,
-        __in int _LineNumber
+    __inout_opt void* _Memory,
+    __in size_t _Count,
+    __in size_t _Size,
+    __in int _BlockType,
+    __in_z_opt const char* _Filename,
+    __in int _LineNumber
 );
 
 void __cdecl _free_base_nolock(
-        __inout_opt void * _Memory
-        );
+    __inout_opt void* _Memory
+);
 
 void __cdecl _free_dbg_nolock(
-        __inout_opt void *_Memory,
-        __in int _BlockType
-        );
+    __inout_opt void* _Memory,
+    __in int _BlockType
+);
 
 /*
  * For diagnostic purpose, blocks are allocated with extra information and
@@ -307,29 +307,28 @@ void __cdecl _free_dbg_nolock(
 
 #define nNoMansLandSize 4
 
-typedef struct _CrtMemBlockHeader
-{
-        struct _CrtMemBlockHeader * pBlockHeaderNext;
-        struct _CrtMemBlockHeader * pBlockHeaderPrev;
-        char *                      szFileName;
-        int                         nLine;
+typedef struct _CrtMemBlockHeader {
+    struct _CrtMemBlockHeader* pBlockHeaderNext;
+    struct _CrtMemBlockHeader* pBlockHeaderPrev;
+    char*                       szFileName;
+    int                         nLine;
 #ifdef _WIN64
-        /* These items are reversed on Win64 to eliminate gaps in the struct
-         * and ensure that sizeof(struct)%16 == 0, so 16-byte alignment is
-         * maintained in the debug heap.
-         */
-        int                         nBlockUse;
-        size_t                      nDataSize;
+    /* These items are reversed on Win64 to eliminate gaps in the struct
+     * and ensure that sizeof(struct)%16 == 0, so 16-byte alignment is
+     * maintained in the debug heap.
+     */
+    int                         nBlockUse;
+    size_t                      nDataSize;
 #else  /* _WIN64 */
-        size_t                      nDataSize;
-        int                         nBlockUse;
+    size_t                      nDataSize;
+    int                         nBlockUse;
 #endif  /* _WIN64 */
-        long                        lRequest;
-        unsigned char               gap[nNoMansLandSize];
-        /* followed by:
-         *  unsigned char           data[nDataSize];
-         *  unsigned char           anotherGap[nNoMansLandSize];
-         */
+    long                        lRequest;
+    unsigned char               gap[nNoMansLandSize];
+    /* followed by:
+     *  unsigned char           data[nDataSize];
+     *  unsigned char           anotherGap[nNoMansLandSize];
+     */
 } _CrtMemBlockHeader;
 
 #define pbData(pblock) ((unsigned char *)((_CrtMemBlockHeader *)pblock + 1))
@@ -337,9 +336,9 @@ typedef struct _CrtMemBlockHeader
 
 
 _CRTIMP void __cdecl _CrtSetDbgBlockType(
-        __in_opt void * _Memory,
-        __in int _BlockType
-        );
+    __in_opt void* _Memory,
+    __in int _BlockType
+);
 
 #define _BLOCK_TYPE_IS_VALID(use) (_BLOCK_TYPE(use) == _CLIENT_BLOCK || \
                                               (use) == _NORMAL_BLOCK || \
@@ -349,14 +348,14 @@ _CRTIMP void __cdecl _CrtSetDbgBlockType(
 extern _CRT_ALLOC_HOOK _pfnAllocHook; /* defined in dbghook.c */
 
 int __cdecl _CrtDefaultAllocHook(
-        int,
-        void *,
-        size_t,
-        int,
-        long,
-        const unsigned char *,
-        int
-        );
+    int,
+    void*,
+    size_t,
+    int,
+    long,
+    const unsigned char*,
+    int
+);
 
 
 /*    Adding some defines which are used in dbgrpt.c */
@@ -366,17 +365,17 @@ int __cdecl _CrtDefaultAllocHook(
 #define DBGRPT_INVALIDMSG "_CrtDbgReport: String too long or Invalid characters in String"
 
 typedef struct ReportHookNode {
-        struct ReportHookNode *prev;
-        struct ReportHookNode *next;
-        unsigned refcount;
-        _CRT_REPORT_HOOK pfnHookFunc;
+    struct ReportHookNode* prev;
+    struct ReportHookNode* next;
+    unsigned refcount;
+    _CRT_REPORT_HOOK pfnHookFunc;
 } ReportHookNode;
 
 typedef struct ReportHookNodeW {
-        struct ReportHookNodeW *prev;
-        struct ReportHookNodeW *next;
-        unsigned refcount;
-        _CRT_REPORT_HOOKW pfnHookFunc;
+    struct ReportHookNodeW* prev;
+    struct ReportHookNodeW* next;
+    unsigned refcount;
+    _CRT_REPORT_HOOKW pfnHookFunc;
 } ReportHookNodeW;
 
 #endif  /* _DEBUG */

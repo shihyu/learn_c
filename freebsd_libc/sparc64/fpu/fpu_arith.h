@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -30,8 +30,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)fpu_arith.h	8.1 (Berkeley) 6/11/93
- *	$NetBSD: fpu_arith.h,v 1.3 2000/07/24 04:11:03 mycroft Exp $
+ *  @(#)fpu_arith.h 8.1 (Berkeley) 6/11/93
+ *  $NetBSD: fpu_arith.h,v 1.3 2000/07/24 04:11:03 mycroft Exp $
  * $FreeBSD: src/lib/libc/sparc64/fpu/fpu_arith.h,v 1.3 2007/01/09 00:28:05 imp Exp $
  */
 
@@ -43,20 +43,20 @@
  * carry bit.
  *
  * In the worst case, you can compute the carry from x+y as
- *	(unsigned)(x + y) < (unsigned)x
+ *  (unsigned)(x + y) < (unsigned)x
  * and from x+y+c as
- *	((unsigned)(x + y + c) <= (unsigned)x && (y|c) != 0)
+ *  ((unsigned)(x + y + c) <= (unsigned)x && (y|c) != 0)
  * for example.
  */
 
 /* set up for extended-precision arithemtic */
-#define	FPU_DECL_CARRY
+#define FPU_DECL_CARRY
 
 /*
  * We have three kinds of add:
- *	add with carry:					  r = x + y + c
- *	add (ignoring current carry) and set carry:	c'r = x + y + 0
- *	add with carry and set carry:			c'r = x + y + c
+ *  add with carry:                   r = x + y + c
+ *  add (ignoring current carry) and set carry: c'r = x + y + 0
+ *  add with carry and set carry:           c'r = x + y + c
  * The macros use `C' for `use carry' and `S' for `set carry'.
  * Note that the state of the carry is undefined after ADDC and SUBC,
  * so if all you have for these is `add with carry and set carry',
@@ -68,20 +68,20 @@
  * or set it from a value.  SET_CARRY turns 0 into no-carry, nonzero
  * into carry; GET_CARRY sets its argument to 0 or 1.
  */
-#define	FPU_ADDC(r, x, y) \
-	__asm __volatile("addx %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
-#define	FPU_ADDS(r, x, y) \
-	__asm __volatile("addcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
-#define	FPU_ADDCS(r, x, y) \
-	__asm __volatile("addxcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
-#define	FPU_SUBC(r, x, y) \
-	__asm __volatile("subx %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
-#define	FPU_SUBS(r, x, y) \
-	__asm __volatile("subcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
-#define	FPU_SUBCS(r, x, y) \
-	__asm __volatile("subxcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
+#define FPU_ADDC(r, x, y) \
+    __asm __volatile("addx %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
+#define FPU_ADDS(r, x, y) \
+    __asm __volatile("addcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
+#define FPU_ADDCS(r, x, y) \
+    __asm __volatile("addxcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
+#define FPU_SUBC(r, x, y) \
+    __asm __volatile("subx %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
+#define FPU_SUBS(r, x, y) \
+    __asm __volatile("subcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
+#define FPU_SUBCS(r, x, y) \
+    __asm __volatile("subxcc %1,%2,%0" : "=r"(r) : "r"(x), "r"(y))
 
-#define	FPU_GET_CARRY(r) __asm __volatile("addx %%g0,%%g0,%0" : "=r"(r))
-#define	FPU_SET_CARRY(v) __asm __volatile("addcc %0,-1,%%g0" : : "r"(v))
+#define FPU_GET_CARRY(r) __asm __volatile("addx %%g0,%%g0,%0" : "=r"(r))
+#define FPU_SET_CARRY(v) __asm __volatile("addcc %0,-1,%%g0" : : "r"(v))
 
-#define	FPU_SHL1_BY_ADD	/* shift left 1 faster by ADDC than (a<<1)|(b>>31) */
+#define FPU_SHL1_BY_ADD /* shift left 1 faster by ADDC than (a<<1)|(b>>31) */

@@ -42,13 +42,11 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_free.c,v 1.5 2002/03/22 21:52:38 ob
  * ACL data object identified by obj_p.
  */
 int
-acl_free(void *obj_p)
-{
+acl_free(void* obj_p) {
+    if (obj_p) {
+        free(obj_p);
+        obj_p = NULL;
+    }
 
-	if (obj_p) {
-		free(obj_p);
-		obj_p = NULL;
-	}
-
-	return (0);
+    return (0);
 }

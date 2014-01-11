@@ -53,81 +53,78 @@
 #endif  /* _SECURE_VERSION */
 
 #ifdef _SECURE_VERSION
-char * __cdecl strtok_s (
-        char * string,
-        const char * control,
-        char ** context
-        )
+char* __cdecl strtok_s(
+    char* string,
+    const char* control,
+    char** context
+)
 #else  /* _SECURE_VERSION */
-char * __cdecl strtok (
-        char * string,
-        const char * control
-        )
+char* __cdecl strtok(
+    char* string,
+    const char* control
+)
 #endif  /* _SECURE_VERSION */
 {
-        unsigned char *str;
-        const unsigned char *ctrl = control;
-
-        unsigned char map[32];
-        int count;
-
+    unsigned char* str;
+    const unsigned char* ctrl = control;
+    unsigned char map[32];
+    int count;
 #ifdef _SECURE_VERSION
-
-        /* validation section */
-        _VALIDATE_RETURN(context != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(string != NULL || *context != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(control != NULL, EINVAL, NULL);
-
-        /* no static storage is needed for the secure version */
-
+    /* validation section */
+    _VALIDATE_RETURN(context != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(string != NULL || *context != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(control != NULL, EINVAL, NULL);
+    /* no static storage is needed for the secure version */
 #else  /* _SECURE_VERSION */
-
-        _ptiddata ptd = _getptd();
-
+    _ptiddata ptd = _getptd();
 #endif  /* _SECURE_VERSION */
 
-        /* Clear control map */
-        for (count = 0; count < 32; count++)
-                map[count] = 0;
+    /* Clear control map */
+    for (count = 0; count < 32; count++) {
+        map[count] = 0;
+    }
 
-        /* Set bits in delimiter table */
-        do {
-                map[*ctrl >> 3] |= (1 << (*ctrl & 7));
-        } while (*ctrl++);
+    /* Set bits in delimiter table */
+    do {
+        map[*ctrl >> 3] |= (1 << (*ctrl & 7));
+    } while (*ctrl++);
 
-        /* Initialize str */
+    /* Initialize str */
 
-        /* If string is NULL, set str to the saved
-         * pointer (i.e., continue breaking tokens out of the string
-         * from the last strtok call) */
-        if (string)
-                str = string;
-        else
-                str = _TOKEN;
+    /* If string is NULL, set str to the saved
+     * pointer (i.e., continue breaking tokens out of the string
+     * from the last strtok call) */
+    if (string) {
+        str = string;
+    } else {
+        str = _TOKEN;
+    }
 
-        /* Find beginning of token (skip over leading delimiters). Note that
-         * there is no token iff this loop sets str to point to the terminal
-         * null (*str == '\0') */
-        while ( (map[*str >> 3] & (1 << (*str & 7))) && *str )
-                str++;
+    /* Find beginning of token (skip over leading delimiters). Note that
+     * there is no token iff this loop sets str to point to the terminal
+     * null (*str == '\0') */
+    while ((map[*str >> 3] & (1 << (*str & 7))) && *str) {
+        str++;
+    }
 
-        string = str;
+    string = str;
 
-        /* Find the end of the token. If it is not the end of the string,
-         * put a null there. */
-        for ( ; *str ; str++ )
-                if ( map[*str >> 3] & (1 << (*str & 7)) ) {
-                        *str++ = '\0';
-                        break;
-                }
+    /* Find the end of the token. If it is not the end of the string,
+     * put a null there. */
+    for (; *str ; str++)
+        if (map[*str >> 3] & (1 << (*str & 7))) {
+            *str++ = '\0';
+            break;
+        }
 
-        /* Update nextoken (or the corresponding field in the per-thread data
-         * structure */
-        _TOKEN = str;
+    /* Update nextoken (or the corresponding field in the per-thread data
+     * structure */
+    _TOKEN = str;
 
-        /* Determine if a token has been found. */
-        if ( string == str )
-                return NULL;
-        else
-                return string;
+    /* Determine if a token has been found. */
+    if (string == str) {
+        return NULL;
+    } else {
+        return string;
+    }
 }

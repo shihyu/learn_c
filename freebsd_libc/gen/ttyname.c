@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -53,68 +53,78 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/ttyname.c,v 1.24 2007/01/09 00:27:55 imp Ex
 
 static char ttyname_buf[sizeof(_PATH_DEV) + MAXNAMLEN];
 
-static once_t		ttyname_init_once = ONCE_INITIALIZER;
-static thread_key_t	ttyname_key;
-static int		ttyname_keycreated = 0;
+static once_t       ttyname_init_once = ONCE_INITIALIZER;
+static thread_key_t ttyname_key;
+static int      ttyname_keycreated = 0;
 
 int
-ttyname_r(int fd, char *buf, size_t len)
-{
-	struct stat	sb;
-	struct fiodgname_arg fgn;
-	size_t used;
+ttyname_r(int fd, char* buf, size_t len) {
+    struct stat sb;
+    struct fiodgname_arg fgn;
+    size_t used;
+    *buf = '\0';
 
-	*buf = '\0';
+    /* Must be a terminal. */
+    if (!isatty(fd)) {
+        return (ENOTTY);
+    }
 
-	/* Must be a terminal. */
-	if (!isatty(fd))
-		return (ENOTTY);
-	/* Must be a character device. */
-	if (_fstat(fd, &sb) || !S_ISCHR(sb.st_mode))
-		return (ENOTTY);
-	/* Must have enough room */
-	if (len <= sizeof(_PATH_DEV))
-		return (ERANGE);
+    /* Must be a character device. */
+    if (_fstat(fd, &sb) || !S_ISCHR(sb.st_mode)) {
+        return (ENOTTY);
+    }
 
-	strcpy(buf, _PATH_DEV);
-	used = strlen(buf);
-	fgn.len = len - used;
-	fgn.buf = buf + used;
-	if (!_ioctl(fd, FIODGNAME, &fgn))
-		return (0);
-	used = strlen(buf);
-	devname_r(sb.st_rdev, S_IFCHR, buf + used, len - used);
-	return (0);
+    /* Must have enough room */
+    if (len <= sizeof(_PATH_DEV)) {
+        return (ERANGE);
+    }
+
+    strcpy(buf, _PATH_DEV);
+    used = strlen(buf);
+    fgn.len = len - used;
+    fgn.buf = buf + used;
+
+    if (!_ioctl(fd, FIODGNAME, &fgn)) {
+        return (0);
+    }
+
+    used = strlen(buf);
+    devname_r(sb.st_rdev, S_IFCHR, buf + used, len - used);
+    return (0);
 }
 
 static void
-ttyname_keycreate(void)
-{
-	ttyname_keycreated = (thr_keycreate(&ttyname_key, free) == 0);
+ttyname_keycreate(void) {
+    ttyname_keycreated = (thr_keycreate(&ttyname_key, free) == 0);
 }
 
-char *
-ttyname(int fd)
-{
-	char	*buf;
+char*
+ttyname(int fd) {
+    char*    buf;
 
-	if (thr_main() != 0)
-		buf = ttyname_buf;
-	else {
-		if (thr_once(&ttyname_init_once, ttyname_keycreate) != 0 ||
-		    !ttyname_keycreated)
-			return (NULL);
-		if ((buf = thr_getspecific(ttyname_key)) == NULL) {
-			if ((buf = malloc(sizeof ttyname_buf)) == NULL)
-				return (NULL);
-			if (thr_setspecific(ttyname_key, buf) != 0) {
-				free(buf);
-				return (NULL);
-			}
-		}
-	}
+    if (thr_main() != 0) {
+        buf = ttyname_buf;
+    } else {
+        if (thr_once(&ttyname_init_once, ttyname_keycreate) != 0 ||
+                !ttyname_keycreated) {
+            return (NULL);
+        }
 
-	if (ttyname_r(fd, buf, sizeof ttyname_buf) != 0)
-		return (NULL);
-	return (buf);
+        if ((buf = thr_getspecific(ttyname_key)) == NULL) {
+            if ((buf = malloc(sizeof ttyname_buf)) == NULL) {
+                return (NULL);
+            }
+
+            if (thr_setspecific(ttyname_key, buf) != 0) {
+                free(buf);
+                return (NULL);
+            }
+        }
+    }
+
+    if (ttyname_r(fd, buf, sizeof ttyname_buf) != 0) {
+        return (NULL);
+    }
+
+    return (buf);
 }

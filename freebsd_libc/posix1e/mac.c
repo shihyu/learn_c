@@ -48,7 +48,7 @@
 
 #include <sys/mac.h>
 
-static int	internal_initialized;
+static int  internal_initialized;
 
 /*
  * Maintain a list of default label preparations for various object
@@ -58,349 +58,362 @@ static int	internal_initialized;
  */
 static LIST_HEAD(, label_default) label_default_head;
 struct label_default {
-	char				*ld_name;
-	char				*ld_labels;
-	LIST_ENTRY(label_default)	 ld_entries;
+    char*                ld_name;
+    char*                ld_labels;
+    LIST_ENTRY(label_default)    ld_entries;
 };
 
 static void
-mac_destroy_labels(void)
-{
-	struct label_default *ld;
+mac_destroy_labels(void) {
+    struct label_default* ld;
 
-	while ((ld = LIST_FIRST(&label_default_head))) {
-		free(ld->ld_name);
-		free(ld->ld_labels);
-		LIST_REMOVE(ld, ld_entries);
-		free(ld);
-	}
+    while ((ld = LIST_FIRST(&label_default_head))) {
+        free(ld->ld_name);
+        free(ld->ld_labels);
+        LIST_REMOVE(ld, ld_entries);
+        free(ld);
+    }
 }
 
 static void
-mac_destroy_internal(void)
-{
-
-	mac_destroy_labels();
-
-	internal_initialized = 0;
+mac_destroy_internal(void) {
+    mac_destroy_labels();
+    internal_initialized = 0;
 }
 
 static int
-mac_add_type(const char *name, const char *labels)
-{
-	struct label_default *ld, *ld_new;
-	char *name_dup, *labels_dup;
+mac_add_type(const char* name, const char* labels) {
+    struct label_default* ld, *ld_new;
+    char* name_dup, *labels_dup;
+    /*
+     * Speculatively allocate all the memory now to avoid allocating
+     * later when we will someday hold a mutex.
+     */
+    name_dup = strdup(name);
 
-	/*
-	 * Speculatively allocate all the memory now to avoid allocating
-	 * later when we will someday hold a mutex.
-	 */
-	name_dup = strdup(name);
-	if (name_dup == NULL) {
-		errno = ENOMEM;
-		return (-1);
-	}
-	labels_dup = strdup(labels);
-	if (labels_dup == NULL) {
-		free(name_dup);
-		errno = ENOMEM;
-		return (-1);
-	}
-	ld_new = malloc(sizeof(*ld));
-	if (ld_new == NULL) {
-		free(name_dup);
-		free(labels_dup);
-		errno = ENOMEM;
-		return (-1);
-	}
+    if (name_dup == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
 
-	/*
-	 * If the type is already present, replace the current entry
-	 * rather than add a new instance.
-	 */
-	for (ld = LIST_FIRST(&label_default_head); ld != NULL;
-	    ld = LIST_NEXT(ld, ld_entries)) {
-		if (strcmp(name, ld->ld_name) == 0)
-			break;
-	}
+    labels_dup = strdup(labels);
 
-	if (ld != NULL) {
-		free(ld->ld_labels);
-		ld->ld_labels = labels_dup;
-		labels_dup = NULL;
-	} else {
-		ld = ld_new;
-		ld->ld_name = name_dup;
-		ld->ld_labels = labels_dup;
+    if (labels_dup == NULL) {
+        free(name_dup);
+        errno = ENOMEM;
+        return (-1);
+    }
 
-		ld_new = NULL;
-		name_dup = NULL;
-		labels_dup = NULL;
+    ld_new = malloc(sizeof(*ld));
 
-		LIST_INSERT_HEAD(&label_default_head, ld, ld_entries);
-	}
+    if (ld_new == NULL) {
+        free(name_dup);
+        free(labels_dup);
+        errno = ENOMEM;
+        return (-1);
+    }
 
-	if (name_dup != NULL)
-		free(name_dup);
-	if (labels_dup != NULL)
-		free(labels_dup);
-	if (ld_new != NULL)
-		free(ld_new);
+    /*
+     * If the type is already present, replace the current entry
+     * rather than add a new instance.
+     */
+    for (ld = LIST_FIRST(&label_default_head); ld != NULL;
+            ld = LIST_NEXT(ld, ld_entries)) {
+        if (strcmp(name, ld->ld_name) == 0) {
+            break;
+        }
+    }
 
-	return (0);
+    if (ld != NULL) {
+        free(ld->ld_labels);
+        ld->ld_labels = labels_dup;
+        labels_dup = NULL;
+    } else {
+        ld = ld_new;
+        ld->ld_name = name_dup;
+        ld->ld_labels = labels_dup;
+        ld_new = NULL;
+        name_dup = NULL;
+        labels_dup = NULL;
+        LIST_INSERT_HEAD(&label_default_head, ld, ld_entries);
+    }
+
+    if (name_dup != NULL) {
+        free(name_dup);
+    }
+
+    if (labels_dup != NULL) {
+        free(labels_dup);
+    }
+
+    if (ld_new != NULL) {
+        free(ld_new);
+    }
+
+    return (0);
 }
 
-static char *
-next_token(char **string)
-{
-	char *token;
+static char*
+next_token(char** string) {
+    char* token;
+    token = strsep(string, " \t");
 
-	token = strsep(string, " \t");
-	while (token != NULL && *token == '\0')
-		token = strsep(string, " \t");
+    while (token != NULL && *token == '\0') {
+        token = strsep(string, " \t");
+    }
 
-	return (token);
+    return (token);
 }
 
 static int
-mac_init_internal(int ignore_errors)
-{
-	const char *filename;
-	char line[LINE_MAX];
-	FILE *file;
-	int error;
+mac_init_internal(int ignore_errors) {
+    const char* filename;
+    char line[LINE_MAX];
+    FILE* file;
+    int error;
+    error = 0;
+    LIST_INIT(&label_default_head);
 
-	error = 0;
+    if (!issetugid() && getenv("MAC_CONFFILE") != NULL) {
+        filename = getenv("MAC_CONFFILE");
+    } else {
+        filename = MAC_CONFFILE;
+    }
 
-	LIST_INIT(&label_default_head);
+    file = fopen(filename, "r");
 
-	if (!issetugid() && getenv("MAC_CONFFILE") != NULL)
-		filename = getenv("MAC_CONFFILE");
-	else
-		filename = MAC_CONFFILE;
-	file = fopen(filename, "r");
-	if (file == NULL)
-		return (0);
+    if (file == NULL) {
+        return (0);
+    }
 
-	while (fgets(line, LINE_MAX, file)) {
-		char *comment, *parse, *statement;
+    while (fgets(line, LINE_MAX, file)) {
+        char* comment, *parse, *statement;
 
-		if (line[strlen(line)-1] == '\n')
-			line[strlen(line)-1] = '\0';
-		else {
-			if (ignore_errors)
-				continue;
-			fclose(file);
-			error = EINVAL;
-			goto just_return;
-		}
+        if (line[strlen(line) - 1] == '\n') {
+            line[strlen(line) - 1] = '\0';
+        } else {
+            if (ignore_errors) {
+                continue;
+            }
 
-		/* Remove any comment. */
-		comment = line;
-		parse = strsep(&comment, "#");
+            fclose(file);
+            error = EINVAL;
+            goto just_return;
+        }
 
-		/* Blank lines OK. */
-		statement = next_token(&parse);
-		if (statement == NULL)
-			continue;
+        /* Remove any comment. */
+        comment = line;
+        parse = strsep(&comment, "#");
+        /* Blank lines OK. */
+        statement = next_token(&parse);
 
-		if (strcmp(statement, "default_labels") == 0) {
-			char *name, *labels;
+        if (statement == NULL) {
+            continue;
+        }
 
-			name = next_token(&parse);
-			labels = next_token(&parse);
-			if (name == NULL || labels == NULL ||
-			    next_token(&parse) != NULL) {
-				if (ignore_errors)
-					continue;
-				error = EINVAL;
-				fclose(file);
-				goto just_return;
-			}
+        if (strcmp(statement, "default_labels") == 0) {
+            char* name, *labels;
+            name = next_token(&parse);
+            labels = next_token(&parse);
 
-			if (mac_add_type(name, labels) == -1) {
-				if (ignore_errors)
-					continue;
-				fclose(file);
-				goto just_return;
-			}
-		} else if (strcmp(statement, "default_ifnet_labels") == 0 ||
-		    strcmp(statement, "default_file_labels") == 0 ||
-		    strcmp(statement, "default_process_labels") == 0) {
-			char *labels, *type;
+            if (name == NULL || labels == NULL ||
+                    next_token(&parse) != NULL) {
+                if (ignore_errors) {
+                    continue;
+                }
 
-			if (strcmp(statement, "default_ifnet_labels") == 0)
-				type = "ifnet";
-			else if (strcmp(statement, "default_file_labels") == 0)
-				type = "file";
-			else if (strcmp(statement, "default_process_labels") ==
-			    0)
-				type = "process";
+                error = EINVAL;
+                fclose(file);
+                goto just_return;
+            }
 
-			labels = next_token(&parse);
-			if (labels == NULL || next_token(&parse) != NULL) {
-				if (ignore_errors)
-					continue;
-				error = EINVAL;
-				fclose(file);
-				goto just_return;
-			}
+            if (mac_add_type(name, labels) == -1) {
+                if (ignore_errors) {
+                    continue;
+                }
 
-			if (mac_add_type(type, labels) == -1) {
-				if (ignore_errors)
-					continue;
-				fclose(file);
-				goto just_return;
-			}
-		} else {
-			if (ignore_errors)
-				continue;
-			fclose(file);
-			error = EINVAL;
-			goto just_return;
-		}
-	}
+                fclose(file);
+                goto just_return;
+            }
+        } else if (strcmp(statement, "default_ifnet_labels") == 0 ||
+                   strcmp(statement, "default_file_labels") == 0 ||
+                   strcmp(statement, "default_process_labels") == 0) {
+            char* labels, *type;
 
-	fclose(file);
+            if (strcmp(statement, "default_ifnet_labels") == 0) {
+                type = "ifnet";
+            } else if (strcmp(statement, "default_file_labels") == 0) {
+                type = "file";
+            } else if (strcmp(statement, "default_process_labels") ==
+                       0) {
+                type = "process";
+            }
 
-	internal_initialized = 1;
+            labels = next_token(&parse);
 
+            if (labels == NULL || next_token(&parse) != NULL) {
+                if (ignore_errors) {
+                    continue;
+                }
+
+                error = EINVAL;
+                fclose(file);
+                goto just_return;
+            }
+
+            if (mac_add_type(type, labels) == -1) {
+                if (ignore_errors) {
+                    continue;
+                }
+
+                fclose(file);
+                goto just_return;
+            }
+        } else {
+            if (ignore_errors) {
+                continue;
+            }
+
+            fclose(file);
+            error = EINVAL;
+            goto just_return;
+        }
+    }
+
+    fclose(file);
+    internal_initialized = 1;
 just_return:
-	if (error != 0)
-		mac_destroy_internal();
-	return (error);
+
+    if (error != 0) {
+        mac_destroy_internal();
+    }
+
+    return (error);
 }
 
 static int
-mac_maybe_init_internal(void)
-{
-
-	if (!internal_initialized)
-		return (mac_init_internal(1));
-	else
-		return (0);
+mac_maybe_init_internal(void) {
+    if (!internal_initialized) {
+        return (mac_init_internal(1));
+    } else {
+        return (0);
+    }
 }
 
 int
-mac_reload(void)
-{
+mac_reload(void) {
+    if (internal_initialized) {
+        mac_destroy_internal();
+    }
 
-	if (internal_initialized)
-		mac_destroy_internal();
-	return (mac_init_internal(0));
+    return (mac_init_internal(0));
 }
 
 int
-mac_free(struct mac *mac)
-{
+mac_free(struct mac* mac) {
+    if (mac->m_string != NULL) {
+        free(mac->m_string);
+    }
 
-	if (mac->m_string != NULL)
-		free(mac->m_string);
-	free(mac);
-
-	return (0);
+    free(mac);
+    return (0);
 }
 
 int
-mac_from_text(struct mac **mac, const char *text)
-{
+mac_from_text(struct mac** mac, const char* text) {
+    *mac = (struct mac*) malloc(sizeof(**mac));
 
-	*mac = (struct mac *) malloc(sizeof(**mac));
-	if (*mac == NULL)
-		return (ENOMEM);
+    if (*mac == NULL) {
+        return (ENOMEM);
+    }
 
-	(*mac)->m_string = strdup(text);
-	if ((*mac)->m_string == NULL) {
-		free(*mac);
-		*mac = NULL;
-		return (ENOMEM);
-	}
+    (*mac)->m_string = strdup(text);
 
-	(*mac)->m_buflen = strlen((*mac)->m_string)+1;
+    if ((*mac)->m_string == NULL) {
+        free(*mac);
+        *mac = NULL;
+        return (ENOMEM);
+    }
 
-	return (0);
+    (*mac)->m_buflen = strlen((*mac)->m_string) + 1;
+    return (0);
 }
 
 int
-mac_to_text(struct mac *mac, char **text)
-{
+mac_to_text(struct mac* mac, char** text) {
+    *text = strdup(mac->m_string);
 
-	*text = strdup(mac->m_string);
-	if (*text == NULL)
-		return (ENOMEM);
-	return (0);
+    if (*text == NULL) {
+        return (ENOMEM);
+    }
+
+    return (0);
 }
 
 int
-mac_prepare(struct mac **mac, const char *elements)
-{
+mac_prepare(struct mac** mac, const char* elements) {
+    if (strlen(elements) >= MAC_MAX_LABEL_BUF_LEN) {
+        return (EINVAL);
+    }
 
-	if (strlen(elements) >= MAC_MAX_LABEL_BUF_LEN)
-		return (EINVAL);
+    *mac = (struct mac*) malloc(sizeof(**mac));
 
-	*mac = (struct mac *) malloc(sizeof(**mac));
-	if (*mac == NULL)
-		return (ENOMEM);
+    if (*mac == NULL) {
+        return (ENOMEM);
+    }
 
-	(*mac)->m_string = malloc(MAC_MAX_LABEL_BUF_LEN);
-	if ((*mac)->m_string == NULL) {
-		free(*mac);
-		*mac = NULL;
-		return (ENOMEM);
-	}
+    (*mac)->m_string = malloc(MAC_MAX_LABEL_BUF_LEN);
 
-	strcpy((*mac)->m_string, elements);
-	(*mac)->m_buflen = MAC_MAX_LABEL_BUF_LEN;
+    if ((*mac)->m_string == NULL) {
+        free(*mac);
+        *mac = NULL;
+        return (ENOMEM);
+    }
 
-	return (0);
+    strcpy((*mac)->m_string, elements);
+    (*mac)->m_buflen = MAC_MAX_LABEL_BUF_LEN;
+    return (0);
 }
 
 int
-mac_prepare_type(struct mac **mac, const char *name)
-{
-	struct label_default *ld;
-	int error;
+mac_prepare_type(struct mac** mac, const char* name) {
+    struct label_default* ld;
+    int error;
+    error = mac_maybe_init_internal();
 
-	error = mac_maybe_init_internal();
-	if (error != 0)
-		return (error);
+    if (error != 0) {
+        return (error);
+    }
 
-	for (ld = LIST_FIRST(&label_default_head); ld != NULL;
-	    ld = LIST_NEXT(ld, ld_entries)) {
-		if (strcmp(name, ld->ld_name) == 0)
-			return (mac_prepare(mac, ld->ld_labels));
-	}
+    for (ld = LIST_FIRST(&label_default_head); ld != NULL;
+            ld = LIST_NEXT(ld, ld_entries)) {
+        if (strcmp(name, ld->ld_name) == 0) {
+            return (mac_prepare(mac, ld->ld_labels));
+        }
+    }
 
-	errno = ENOENT;
-	return (-1);		/* XXXMAC: ENOLABEL */
+    errno = ENOENT;
+    return (-1);        /* XXXMAC: ENOLABEL */
 }
 
 int
-mac_prepare_ifnet_label(struct mac **mac)
-{
-
-	return (mac_prepare_type(mac, "ifnet"));
+mac_prepare_ifnet_label(struct mac** mac) {
+    return (mac_prepare_type(mac, "ifnet"));
 }
 
 int
-mac_prepare_file_label(struct mac **mac)
-{
-
-	return (mac_prepare_type(mac, "file"));
+mac_prepare_file_label(struct mac** mac) {
+    return (mac_prepare_type(mac, "file"));
 }
 
 int
-mac_prepare_packet_label(struct mac **mac)
-{
-
-	return (mac_prepare_type(mac, "packet"));
+mac_prepare_packet_label(struct mac** mac) {
+    return (mac_prepare_type(mac, "packet"));
 }
 
 int
-mac_prepare_process_label(struct mac **mac)
-{
-
-	return (mac_prepare_type(mac, "process"));
+mac_prepare_process_label(struct mac** mac) {
+    return (mac_prepare_type(mac, "process"));
 }
 
 /*
@@ -409,40 +422,46 @@ mac_prepare_process_label(struct mac **mac)
  * a given policy.
  */
 int
-mac_is_present(const char *policyname)
-{
-	int mib[5];
-	size_t siz;
-	char *mibname;
-	int error;
+mac_is_present(const char* policyname) {
+    int mib[5];
+    size_t siz;
+    char* mibname;
+    int error;
 
-	if (policyname != NULL) {
-		if (policyname[strcspn(policyname, ".=")] != '\0') {
-			errno = EINVAL;
-			return (-1);
-		}
-		mibname = malloc(sizeof("security.mac.") - 1 +
-		    strlen(policyname) + sizeof(".enabled"));
-		if (mibname == NULL)
-			return (-1);
-		strcpy(mibname, "security.mac.");
-		strcat(mibname, policyname);
-		strcat(mibname, ".enabled");
-		siz = 5;
-		error = sysctlnametomib(mibname, mib, &siz);
-		free(mibname);
-	} else {
-		siz = 3;
-		error = sysctlnametomib("security.mac", mib, &siz);
-	}
-	if (error == -1) {
-		switch (errno) {
-		case ENOTDIR:
-		case ENOENT:
-			return (0);
-		default:
-			return (error);
-		}
-	}
-	return (1);
+    if (policyname != NULL) {
+        if (policyname[strcspn(policyname, ".=")] != '\0') {
+            errno = EINVAL;
+            return (-1);
+        }
+
+        mibname = malloc(sizeof("security.mac.") - 1 +
+                         strlen(policyname) + sizeof(".enabled"));
+
+        if (mibname == NULL) {
+            return (-1);
+        }
+
+        strcpy(mibname, "security.mac.");
+        strcat(mibname, policyname);
+        strcat(mibname, ".enabled");
+        siz = 5;
+        error = sysctlnametomib(mibname, mib, &siz);
+        free(mibname);
+    } else {
+        siz = 3;
+        error = sysctlnametomib("security.mac", mib, &siz);
+    }
+
+    if (error == -1) {
+        switch (errno) {
+        case ENOTDIR:
+        case ENOENT:
+            return (0);
+
+        default:
+            return (error);
+        }
+    }
+
+    return (1);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Margo Seltzer.
@@ -40,16 +40,16 @@ __FBSDID("$FreeBSD: src/lib/libc/db/hash/hash_buf.c,v 1.8 2007/01/09 00:27:50 im
  * PACKAGE: hash
  *
  * DESCRIPTION:
- *	Contains buffer management
+ *  Contains buffer management
  *
  * ROUTINES:
  * External
- *	__buf_init
- *	__get_buf
- *	__buf_free
- *	__reclaim_buf
+ *  __buf_init
+ *  __get_buf
+ *  __buf_free
+ *  __reclaim_buf
  * Internal
- *	newbuf
+ *  newbuf
  */
 
 #include <sys/param.h>
@@ -67,27 +67,27 @@ __FBSDID("$FreeBSD: src/lib/libc/db/hash/hash_buf.c,v 1.8 2007/01/09 00:27:50 im
 #include "page.h"
 #include "extern.h"
 
-static BUFHEAD *newbuf(HTAB *, u_int32_t, BUFHEAD *);
+static BUFHEAD* newbuf(HTAB*, u_int32_t, BUFHEAD*);
 
 /* Unlink B from its place in the lru */
 #define BUF_REMOVE(B) { \
-	(B)->prev->next = (B)->next; \
-	(B)->next->prev = (B)->prev; \
+    (B)->prev->next = (B)->next; \
+    (B)->next->prev = (B)->prev; \
 }
 
 /* Insert B after P */
 #define BUF_INSERT(B, P) { \
-	(B)->next = (P)->next; \
-	(B)->prev = (P); \
-	(P)->next = (B); \
-	(B)->next->prev = (B); \
+    (B)->next = (P)->next; \
+    (B)->prev = (P); \
+    (P)->next = (B); \
+    (B)->next->prev = (B); \
 }
 
-#define	MRU	hashp->bufhead.next
-#define	LRU	hashp->bufhead.prev
+#define MRU hashp->bufhead.next
+#define LRU hashp->bufhead.prev
 
-#define MRU_INSERT(B)	BUF_INSERT((B), &hashp->bufhead)
-#define LRU_INSERT(B)	BUF_INSERT((B), LRU)
+#define MRU_INSERT(B)   BUF_INSERT((B), &hashp->bufhead)
+#define LRU_INSERT(B)   BUF_INSERT((B), LRU)
 
 /*
  * We are looking for a buffer with address "addr".  If prev_bp is NULL, then
@@ -98,53 +98,60 @@ static BUFHEAD *newbuf(HTAB *, u_int32_t, BUFHEAD *);
  * be valid.  Therefore, you must always verify that its address matches the
  * address you are seeking.
  */
-extern BUFHEAD *
+extern BUFHEAD*
 __get_buf(hashp, addr, prev_bp, newpage)
-	HTAB *hashp;
-	u_int32_t addr;
-	BUFHEAD *prev_bp;
-	int newpage;	/* If prev_bp set, indicates a new overflow page. */
+HTAB* hashp;
+u_int32_t addr;
+BUFHEAD* prev_bp;
+int newpage;    /* If prev_bp set, indicates a new overflow page. */
 {
-	BUFHEAD *bp;
-	u_int32_t is_disk_mask;
-	int is_disk, segment_ndx;
-	SEGMENT segp;
+    BUFHEAD* bp;
+    u_int32_t is_disk_mask;
+    int is_disk, segment_ndx;
+    SEGMENT segp;
+    is_disk = 0;
+    is_disk_mask = 0;
 
-	is_disk = 0;
-	is_disk_mask = 0;
-	if (prev_bp) {
-		bp = prev_bp->ovfl;
-		if (!bp || (bp->addr != addr))
-			bp = NULL;
-		if (!newpage)
-			is_disk = BUF_DISK;
-	} else {
-		/* Grab buffer out of directory */
-		segment_ndx = addr & (hashp->SGSIZE - 1);
+    if (prev_bp) {
+        bp = prev_bp->ovfl;
 
-		/* valid segment ensured by __call_hash() */
-		segp = hashp->dir[addr >> hashp->SSHIFT];
+        if (!bp || (bp->addr != addr)) {
+            bp = NULL;
+        }
+
+        if (!newpage) {
+            is_disk = BUF_DISK;
+        }
+    } else {
+        /* Grab buffer out of directory */
+        segment_ndx = addr & (hashp->SGSIZE - 1);
+        /* valid segment ensured by __call_hash() */
+        segp = hashp->dir[addr >> hashp->SSHIFT];
 #ifdef DEBUG
-		assert(segp != NULL);
+        assert(segp != NULL);
 #endif
-		bp = PTROF(segp[segment_ndx]);
-		is_disk_mask = ISDISK(segp[segment_ndx]);
-		is_disk = is_disk_mask || !hashp->new_file;
-	}
+        bp = PTROF(segp[segment_ndx]);
+        is_disk_mask = ISDISK(segp[segment_ndx]);
+        is_disk = is_disk_mask || !hashp->new_file;
+    }
 
-	if (!bp) {
-		bp = newbuf(hashp, addr, prev_bp);
-		if (!bp ||
-		    __get_page(hashp, bp->page, addr, !prev_bp, is_disk, 0))
-			return (NULL);
-		if (!prev_bp)
-			segp[segment_ndx] =
-			    (BUFHEAD *)((ptrdiff_t)bp | is_disk_mask);
-	} else {
-		BUF_REMOVE(bp);
-		MRU_INSERT(bp);
-	}
-	return (bp);
+    if (!bp) {
+        bp = newbuf(hashp, addr, prev_bp);
+
+        if (!bp ||
+                __get_page(hashp, bp->page, addr, !prev_bp, is_disk, 0)) {
+            return (NULL);
+        }
+
+        if (!prev_bp)
+            segp[segment_ndx] =
+                (BUFHEAD*)((ptrdiff_t)bp | is_disk_mask);
+    } else {
+        BUF_REMOVE(bp);
+        MRU_INSERT(bp);
+    }
+
+    return (bp);
 }
 
 /*
@@ -153,200 +160,230 @@ __get_buf(hashp, addr, prev_bp, newpage)
  *
  * If newbuf finds an error (returning NULL), it also sets errno.
  */
-static BUFHEAD *
+static BUFHEAD*
 newbuf(hashp, addr, prev_bp)
-	HTAB *hashp;
-	u_int32_t addr;
-	BUFHEAD *prev_bp;
+HTAB* hashp;
+u_int32_t addr;
+BUFHEAD* prev_bp;
 {
-	BUFHEAD *bp;		/* The buffer we're going to use */
-	BUFHEAD *xbp;		/* Temp pointer */
-	BUFHEAD *next_xbp;
-	SEGMENT segp;
-	int segment_ndx;
-	u_int16_t oaddr, *shortp;
+    BUFHEAD* bp;        /* The buffer we're going to use */
+    BUFHEAD* xbp;       /* Temp pointer */
+    BUFHEAD* next_xbp;
+    SEGMENT segp;
+    int segment_ndx;
+    u_int16_t oaddr, *shortp;
+    oaddr = 0;
+    bp = LRU;
 
-	oaddr = 0;
-	bp = LRU;
-	/*
-	 * If LRU buffer is pinned, the buffer pool is too small. We need to
-	 * allocate more buffers.
-	 */
-	if (hashp->nbufs || (bp->flags & BUF_PIN)) {
-		/* Allocate a new one */
-		if ((bp = (BUFHEAD *)malloc(sizeof(BUFHEAD))) == NULL)
-			return (NULL);
+    /*
+     * If LRU buffer is pinned, the buffer pool is too small. We need to
+     * allocate more buffers.
+     */
+    if (hashp->nbufs || (bp->flags & BUF_PIN)) {
+        /* Allocate a new one */
+        if ((bp = (BUFHEAD*)malloc(sizeof(BUFHEAD))) == NULL) {
+            return (NULL);
+        }
+
 #ifdef PURIFY
-		memset(bp, 0xff, sizeof(BUFHEAD));
+        memset(bp, 0xff, sizeof(BUFHEAD));
 #endif
-		if ((bp->page = (char *)malloc(hashp->BSIZE)) == NULL) {
-			free(bp);
-			return (NULL);
-		}
+
+        if ((bp->page = (char*)malloc(hashp->BSIZE)) == NULL) {
+            free(bp);
+            return (NULL);
+        }
+
 #ifdef PURIFY
-		memset(bp->page, 0xff, hashp->BSIZE);
+        memset(bp->page, 0xff, hashp->BSIZE);
 #endif
-		if (hashp->nbufs)
-			hashp->nbufs--;
-	} else {
-		/* Kick someone out */
-		BUF_REMOVE(bp);
-		/*
-		 * If this is an overflow page with addr 0, it's already been
-		 * flushed back in an overflow chain and initialized.
-		 */
-		if ((bp->addr != 0) || (bp->flags & BUF_BUCKET)) {
-			/*
-			 * Set oaddr before __put_page so that you get it
-			 * before bytes are swapped.
-			 */
-			shortp = (u_int16_t *)bp->page;
-			if (shortp[0])
-				oaddr = shortp[shortp[0] - 1];
-			if ((bp->flags & BUF_MOD) && __put_page(hashp, bp->page,
-			    bp->addr, (int)IS_BUCKET(bp->flags), 0))
-				return (NULL);
-			/*
-			 * Update the pointer to this page (i.e. invalidate it).
-			 *
-			 * If this is a new file (i.e. we created it at open
-			 * time), make sure that we mark pages which have been
-			 * written to disk so we retrieve them from disk later,
-			 * rather than allocating new pages.
-			 */
-			if (IS_BUCKET(bp->flags)) {
-				segment_ndx = bp->addr & (hashp->SGSIZE - 1);
-				segp = hashp->dir[bp->addr >> hashp->SSHIFT];
+
+        if (hashp->nbufs) {
+            hashp->nbufs--;
+        }
+    } else {
+        /* Kick someone out */
+        BUF_REMOVE(bp);
+
+        /*
+         * If this is an overflow page with addr 0, it's already been
+         * flushed back in an overflow chain and initialized.
+         */
+        if ((bp->addr != 0) || (bp->flags & BUF_BUCKET)) {
+            /*
+             * Set oaddr before __put_page so that you get it
+             * before bytes are swapped.
+             */
+            shortp = (u_int16_t*)bp->page;
+
+            if (shortp[0]) {
+                oaddr = shortp[shortp[0] - 1];
+            }
+
+            if ((bp->flags & BUF_MOD) && __put_page(hashp, bp->page,
+                                                    bp->addr, (int)IS_BUCKET(bp->flags), 0)) {
+                return (NULL);
+            }
+
+            /*
+             * Update the pointer to this page (i.e. invalidate it).
+             *
+             * If this is a new file (i.e. we created it at open
+             * time), make sure that we mark pages which have been
+             * written to disk so we retrieve them from disk later,
+             * rather than allocating new pages.
+             */
+            if (IS_BUCKET(bp->flags)) {
+                segment_ndx = bp->addr & (hashp->SGSIZE - 1);
+                segp = hashp->dir[bp->addr >> hashp->SSHIFT];
 #ifdef DEBUG
-				assert(segp != NULL);
+                assert(segp != NULL);
 #endif
 
-				if (hashp->new_file &&
-				    ((bp->flags & BUF_MOD) ||
-				    ISDISK(segp[segment_ndx])))
-					segp[segment_ndx] = (BUFHEAD *)BUF_DISK;
-				else
-					segp[segment_ndx] = NULL;
-			}
-			/*
-			 * Since overflow pages can only be access by means of
-			 * their bucket, free overflow pages associated with
-			 * this bucket.
-			 */
-			for (xbp = bp; xbp->ovfl;) {
-				next_xbp = xbp->ovfl;
-				xbp->ovfl = 0;
-				xbp = next_xbp;
+                if (hashp->new_file &&
+                        ((bp->flags & BUF_MOD) ||
+                         ISDISK(segp[segment_ndx]))) {
+                    segp[segment_ndx] = (BUFHEAD*)BUF_DISK;
+                } else {
+                    segp[segment_ndx] = NULL;
+                }
+            }
 
-				/* Check that ovfl pointer is up date. */
-				if (IS_BUCKET(xbp->flags) ||
-				    (oaddr != xbp->addr))
-					break;
+            /*
+             * Since overflow pages can only be access by means of
+             * their bucket, free overflow pages associated with
+             * this bucket.
+             */
+            for (xbp = bp; xbp->ovfl;) {
+                next_xbp = xbp->ovfl;
+                xbp->ovfl = 0;
+                xbp = next_xbp;
 
-				shortp = (u_int16_t *)xbp->page;
-				if (shortp[0])
-					/* set before __put_page */
-					oaddr = shortp[shortp[0] - 1];
-				if ((xbp->flags & BUF_MOD) && __put_page(hashp,
-				    xbp->page, xbp->addr, 0, 0))
-					return (NULL);
-				xbp->addr = 0;
-				xbp->flags = 0;
-				BUF_REMOVE(xbp);
-				LRU_INSERT(xbp);
-			}
-		}
-	}
+                /* Check that ovfl pointer is up date. */
+                if (IS_BUCKET(xbp->flags) ||
+                        (oaddr != xbp->addr)) {
+                    break;
+                }
 
-	/* Now assign this buffer */
-	bp->addr = addr;
+                shortp = (u_int16_t*)xbp->page;
+
+                if (shortp[0])
+                    /* set before __put_page */
+                {
+                    oaddr = shortp[shortp[0] - 1];
+                }
+
+                if ((xbp->flags & BUF_MOD) && __put_page(hashp,
+                        xbp->page, xbp->addr, 0, 0)) {
+                    return (NULL);
+                }
+
+                xbp->addr = 0;
+                xbp->flags = 0;
+                BUF_REMOVE(xbp);
+                LRU_INSERT(xbp);
+            }
+        }
+    }
+
+    /* Now assign this buffer */
+    bp->addr = addr;
 #ifdef DEBUG1
-	(void)fprintf(stderr, "NEWBUF1: %d->ovfl was %d is now %d\n",
-	    bp->addr, (bp->ovfl ? bp->ovfl->addr : 0), 0);
+    (void)fprintf(stderr, "NEWBUF1: %d->ovfl was %d is now %d\n",
+                  bp->addr, (bp->ovfl ? bp->ovfl->addr : 0), 0);
 #endif
-	bp->ovfl = NULL;
-	if (prev_bp) {
-		/*
-		 * If prev_bp is set, this is an overflow page, hook it in to
-		 * the buffer overflow links.
-		 */
+    bp->ovfl = NULL;
+
+    if (prev_bp) {
+        /*
+         * If prev_bp is set, this is an overflow page, hook it in to
+         * the buffer overflow links.
+         */
 #ifdef DEBUG1
-		(void)fprintf(stderr, "NEWBUF2: %d->ovfl was %d is now %d\n",
-		    prev_bp->addr, (prev_bp->ovfl ? bp->ovfl->addr : 0),
-		    (bp ? bp->addr : 0));
+        (void)fprintf(stderr, "NEWBUF2: %d->ovfl was %d is now %d\n",
+                      prev_bp->addr, (prev_bp->ovfl ? bp->ovfl->addr : 0),
+                      (bp ? bp->addr : 0));
 #endif
-		prev_bp->ovfl = bp;
-		bp->flags = 0;
-	} else
-		bp->flags = BUF_BUCKET;
-	MRU_INSERT(bp);
-	return (bp);
+        prev_bp->ovfl = bp;
+        bp->flags = 0;
+    } else {
+        bp->flags = BUF_BUCKET;
+    }
+
+    MRU_INSERT(bp);
+    return (bp);
 }
 
 extern void
 __buf_init(hashp, nbytes)
-	HTAB *hashp;
-	int nbytes;
+HTAB* hashp;
+int nbytes;
 {
-	BUFHEAD *bfp;
-	int npages;
-
-	bfp = &(hashp->bufhead);
-	npages = (nbytes + hashp->BSIZE - 1) >> hashp->BSHIFT;
-	npages = MAX(npages, MIN_BUFFERS);
-
-	hashp->nbufs = npages;
-	bfp->next = bfp;
-	bfp->prev = bfp;
-	/*
-	 * This space is calloc'd so these are already null.
-	 *
-	 * bfp->ovfl = NULL;
-	 * bfp->flags = 0;
-	 * bfp->page = NULL;
-	 * bfp->addr = 0;
-	 */
+    BUFHEAD* bfp;
+    int npages;
+    bfp = &(hashp->bufhead);
+    npages = (nbytes + hashp->BSIZE - 1) >> hashp->BSHIFT;
+    npages = MAX(npages, MIN_BUFFERS);
+    hashp->nbufs = npages;
+    bfp->next = bfp;
+    bfp->prev = bfp;
+    /*
+     * This space is calloc'd so these are already null.
+     *
+     * bfp->ovfl = NULL;
+     * bfp->flags = 0;
+     * bfp->page = NULL;
+     * bfp->addr = 0;
+     */
 }
 
 extern int
 __buf_free(hashp, do_free, to_disk)
-	HTAB *hashp;
-	int do_free, to_disk;
+HTAB* hashp;
+int do_free, to_disk;
 {
-	BUFHEAD *bp;
+    BUFHEAD* bp;
 
-	/* Need to make sure that buffer manager has been initialized */
-	if (!LRU)
-		return (0);
-	for (bp = LRU; bp != &hashp->bufhead;) {
-		/* Check that the buffer is valid */
-		if (bp->addr || IS_BUCKET(bp->flags)) {
-			if (to_disk && (bp->flags & BUF_MOD) &&
-			    __put_page(hashp, bp->page,
-			    bp->addr, IS_BUCKET(bp->flags), 0))
-				return (-1);
-		}
-		/* Check if we are freeing stuff */
-		if (do_free) {
-			if (bp->page)
-				free(bp->page);
-			BUF_REMOVE(bp);
-			free(bp);
-			bp = LRU;
-		} else
-			bp = bp->prev;
-	}
-	return (0);
+    /* Need to make sure that buffer manager has been initialized */
+    if (!LRU) {
+        return (0);
+    }
+
+    for (bp = LRU; bp != &hashp->bufhead;) {
+        /* Check that the buffer is valid */
+        if (bp->addr || IS_BUCKET(bp->flags)) {
+            if (to_disk && (bp->flags & BUF_MOD) &&
+                    __put_page(hashp, bp->page,
+                               bp->addr, IS_BUCKET(bp->flags), 0)) {
+                return (-1);
+            }
+        }
+
+        /* Check if we are freeing stuff */
+        if (do_free) {
+            if (bp->page) {
+                free(bp->page);
+            }
+
+            BUF_REMOVE(bp);
+            free(bp);
+            bp = LRU;
+        } else {
+            bp = bp->prev;
+        }
+    }
+
+    return (0);
 }
 
 extern void
 __reclaim_buf(hashp, bp)
-	HTAB *hashp;
-	BUFHEAD *bp;
+HTAB* hashp;
+BUFHEAD* bp;
 {
-	bp->ovfl = 0;
-	bp->addr = 0;
-	bp->flags = 0;
-	BUF_REMOVE(bp);
-	LRU_INSERT(bp);
+    bp->ovfl = 0;
+    bp->addr = 0;
+    bp->flags = 0;
+    BUF_REMOVE(bp);
+    LRU_INSERT(bp);
 }

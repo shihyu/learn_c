@@ -14,9 +14,7 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/negsf2.c,v 1.1 2004/05/14 12:13:04 co
 float32 __negsf2(float32);
 
 float32
-__negsf2(float32 a)
-{
-
-	/* libgcc1.c says INTIFY(-a) */
-	return a ^ 0x80000000;
+__negsf2(float32 a) {
+    /* libgcc1.c says INTIFY(-a) */
+    return a ^ 0x80000000;
 }

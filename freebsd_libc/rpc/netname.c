@@ -78,23 +78,23 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/netname.c,v 1.8 2004/10/16 06:11:35 obrien 
 #define INT_STRLEN_MAXIMUM(type) \
     ((TYPE_BIT(type) - TYPE_SIGNED(type)) * 302 / 1000 + 1 + TYPE_SIGNED(type))
 
-static char *OPSYS = "unix";
+static char* OPSYS = "unix";
 
 /*
  * Figure out my fully qualified network name
  */
 int
 getnetname(name)
-	char name[MAXNETNAMELEN+1];
+char name[MAXNETNAMELEN + 1];
 {
-	uid_t uid;
+    uid_t uid;
+    uid = geteuid();
 
-	uid = geteuid();
-	if (uid == 0) {
-		return (host2netname(name, (char *) NULL, (char *) NULL));
-	} else {
-		return (user2netname(name, uid, (char *) NULL));
-	}
+    if (uid == 0) {
+        return (host2netname(name, (char*) NULL, (char*) NULL));
+    } else {
+        return (user2netname(name, uid, (char*) NULL));
+    }
 }
 
 
@@ -103,23 +103,26 @@ getnetname(name)
  */
 int
 user2netname(netname, uid, domain)
-	char netname[MAXNETNAMELEN + 1];
-	const uid_t uid;
-	const char *domain;
+char netname[MAXNETNAMELEN + 1];
+const uid_t uid;
+const char* domain;
 {
-	char *dfltdom;
+    char* dfltdom;
 
-	if (domain == NULL) {
-		if (__rpc_get_default_domain(&dfltdom) != 0) {
-			return (0);
-		}
-		domain = dfltdom;
-	}
-	if (strlen(domain) + 1 + INT_STRLEN_MAXIMUM(u_long) + 1 + strlen(OPSYS) > MAXNETNAMELEN) {
-		return (0);
-	}
-	(void) sprintf(netname, "%s.%ld@%s", OPSYS, (u_long)uid, domain);	
-	return (1);
+    if (domain == NULL) {
+        if (__rpc_get_default_domain(&dfltdom) != 0) {
+            return (0);
+        }
+
+        domain = dfltdom;
+    }
+
+    if (strlen(domain) + 1 + INT_STRLEN_MAXIMUM(u_long) + 1 + strlen(OPSYS) > MAXNETNAMELEN) {
+        return (0);
+    }
+
+    (void) sprintf(netname, "%s.%ld@%s", OPSYS, (u_long)uid, domain);
+    return (1);
 }
 
 
@@ -128,26 +131,30 @@ user2netname(netname, uid, domain)
  */
 int
 host2netname(netname, host, domain)
-	char netname[MAXNETNAMELEN + 1];
-	const char *host;
-	const char *domain;
+char netname[MAXNETNAMELEN + 1];
+const char* host;
+const char* domain;
 {
-	char *dfltdom;
-	char hostname[MAXHOSTNAMELEN+1];
+    char* dfltdom;
+    char hostname[MAXHOSTNAMELEN + 1];
 
-	if (domain == NULL) {
-		if (__rpc_get_default_domain(&dfltdom) != 0) {
-			return (0);
-		}
-		domain = dfltdom;
-	}
-	if (host == NULL) {
-		(void) gethostname(hostname, sizeof(hostname));
-		host = hostname;
-	}
-	if (strlen(domain) + 1 + strlen(host) + 1 + strlen(OPSYS) > MAXNETNAMELEN) {
-		return (0);
-	} 
-	(void) sprintf(netname, "%s.%s@%s", OPSYS, host, domain);
-	return (1);
+    if (domain == NULL) {
+        if (__rpc_get_default_domain(&dfltdom) != 0) {
+            return (0);
+        }
+
+        domain = dfltdom;
+    }
+
+    if (host == NULL) {
+        (void) gethostname(hostname, sizeof(hostname));
+        host = hostname;
+    }
+
+    if (strlen(domain) + 1 + strlen(host) + 1 + strlen(OPSYS) > MAXNETNAMELEN) {
+        return (0);
+    }
+
+    (void) sprintf(netname, "%s.%s@%s", OPSYS, host, domain);
+    return (1);
 }

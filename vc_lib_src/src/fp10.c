@@ -16,8 +16,7 @@ void  _setdefaultprecision(void);
  * standard 53-bit precision version in fpinit.c.
  */
 
-void _setdefaultprecision()
-{
+void _setdefaultprecision() {
 #ifndef _M_AMD64
     _ERRCHECK(_controlfp_s(NULL, _PC_64, _MCW_PC));
 #endif  /* _M_AMD64 */

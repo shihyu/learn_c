@@ -34,11 +34,9 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/collcmp.c,v 1.18 2005/02/27 14:54:23 pha
  * Compare two characters using collate
  */
 
-int __collate_range_cmp(int c1, int c2)
-{
-	static char s1[2], s2[2];
-
-	s1[0] = c1;
-	s2[0] = c2;
-	return (strcoll(s1, s2));
+int __collate_range_cmp(int c1, int c2) {
+    static char s1[2], s2[2];
+    s1[0] = c1;
+    s2[0] = c2;
+    return (strcoll(s1, s2));
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Donn Seeley at UUNET Technologies, Inc.
@@ -44,13 +44,12 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/vscanf.c,v 1.13 2007/01/09 00:28:08 imp E
 
 int
 vscanf(fmt, ap)
-	const char * __restrict fmt;
-	__va_list ap;
+const char* __restrict fmt;
+__va_list ap;
 {
-	int retval;
-
-	FLOCKFILE(stdin);
-	retval = __svfscanf(stdin, fmt, ap);
-	FUNLOCKFILE(stdin);
-	return (retval);
+    int retval;
+    FLOCKFILE(stdin);
+    retval = __svfscanf(stdin, fmt, ap);
+    FUNLOCKFILE(stdin);
+    return (retval);
 }

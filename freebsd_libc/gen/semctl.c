@@ -35,23 +35,22 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/semctl.c,v 1.9 2003/02/16 17:29:09 nectar E
 #include <stdarg.h>
 #include <stdlib.h>
 
-extern int __semctl(int semid, int semnum, int cmd, union semun *arg);
+extern int __semctl(int semid, int semnum, int cmd, union semun* arg);
 
-int semctl(int semid, int semnum, int cmd, ...)
-{
-	va_list ap;
-	union semun semun;
-	union semun *semun_ptr;
+int semctl(int semid, int semnum, int cmd, ...) {
+    va_list ap;
+    union semun semun;
+    union semun* semun_ptr;
+    va_start(ap, cmd);
 
-	va_start(ap, cmd);
-	if (cmd == IPC_SET || cmd == IPC_STAT || cmd == GETALL
-	    || cmd == SETVAL || cmd == SETALL) {
-		semun = va_arg(ap, union semun);
-		semun_ptr = &semun;
-	} else {
-		semun_ptr = NULL;
-	}
-	va_end(ap);
+    if (cmd == IPC_SET || cmd == IPC_STAT || cmd == GETALL
+            || cmd == SETVAL || cmd == SETALL) {
+        semun = va_arg(ap, union semun);
+        semun_ptr = &semun;
+    } else {
+        semun_ptr = NULL;
+    }
 
-	return (__semctl(semid, semnum, cmd, semun_ptr));
+    va_end(ap);
+    return (__semctl(semid, semnum, cmd, semun_ptr));
 }

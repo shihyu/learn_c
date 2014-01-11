@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,30 +47,31 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/perror.c,v 1.9 2007/01/09 00:28:07 imp Ex
 
 void
 perror(s)
-	const char *s;
+const char* s;
 {
-	char msgbuf[NL_TEXTMAX];
-	struct iovec *v;
-	struct iovec iov[4];
+    char msgbuf[NL_TEXTMAX];
+    struct iovec* v;
+    struct iovec iov[4];
+    v = iov;
 
-	v = iov;
-	if (s != NULL && *s != '\0') {
-		v->iov_base = (char *)s;
-		v->iov_len = strlen(s);
-		v++;
-		v->iov_base = ": ";
-		v->iov_len = 2;
-		v++;
-	}
-	strerror_r(errno, msgbuf, sizeof(msgbuf));
-	v->iov_base = msgbuf;
-	v->iov_len = strlen(v->iov_base);
-	v++;
-	v->iov_base = "\n";
-	v->iov_len = 1;
-	FLOCKFILE(stderr);
-	__sflush(stderr);
-	(void)_writev(stderr->_file, iov, (v - iov) + 1);
-	stderr->_flags &= ~__SOFF;
-	FUNLOCKFILE(stderr);
+    if (s != NULL && *s != '\0') {
+        v->iov_base = (char*)s;
+        v->iov_len = strlen(s);
+        v++;
+        v->iov_base = ": ";
+        v->iov_len = 2;
+        v++;
+    }
+
+    strerror_r(errno, msgbuf, sizeof(msgbuf));
+    v->iov_base = msgbuf;
+    v->iov_len = strlen(v->iov_base);
+    v++;
+    v->iov_base = "\n";
+    v->iov_len = 1;
+    FLOCKFILE(stderr);
+    __sflush(stderr);
+    (void)_writev(stderr->_file, iov, (v - iov) + 1);
+    stderr->_flags &= ~__SOFF;
+    FUNLOCKFILE(stderr);
 }

@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 1995 Alex Tatmanjants <alex@elvisti.kiev.ua>
- *		at Electronni Visti IA, Kiev, Ukraine.
- *			All rights reserved.
+ *      at Electronni Visti IA, Kiev, Ukraine.
+ *          All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,51 +33,60 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strxfrm.c,v 1.15 2002/09/06 11:24:06 tjr
 #include "collate.h"
 
 size_t
-strxfrm(char * __restrict dest, const char * __restrict src, size_t len)
-{
-	int prim, sec, l;
-	size_t slen;
-	char *s, *ss;
+strxfrm(char* __restrict dest, const char* __restrict src, size_t len) {
+    int prim, sec, l;
+    size_t slen;
+    char* s, *ss;
 
-	if (!*src) {
-		if (len > 0)
-			*dest = '\0';
-		return 0;
-	}
+    if (!*src) {
+        if (len > 0) {
+            *dest = '\0';
+        }
 
-	if (__collate_load_error) {
-		slen = strlen(src);
-		if (len > 0) {
-			if (slen < len)
-				strcpy(dest, src);
-			else {
-				strncpy(dest, src, len - 1);
-				dest[len - 1] = '\0';
-			}
-		}
-		return slen;
-	}
+        return 0;
+    }
 
-	slen = 0;
-	prim = sec = 0;
-	ss = s = __collate_substitute(src);
-	while (*s) {
-		while (*s && !prim) {
-			__collate_lookup(s, &l, &prim, &sec);
-			s += l;
-		}
-		if (prim) {
-			if (len > 1) {
-				*dest++ = (char)prim;
-				len--;
-			}
-			slen++;
-			prim = 0;
-		}
-	}
-	free(ss);
-	if (len > 0)
-		*dest = '\0';
+    if (__collate_load_error) {
+        slen = strlen(src);
 
-	return slen;
+        if (len > 0) {
+            if (slen < len) {
+                strcpy(dest, src);
+            } else {
+                strncpy(dest, src, len - 1);
+                dest[len - 1] = '\0';
+            }
+        }
+
+        return slen;
+    }
+
+    slen = 0;
+    prim = sec = 0;
+    ss = s = __collate_substitute(src);
+
+    while (*s) {
+        while (*s && !prim) {
+            __collate_lookup(s, &l, &prim, &sec);
+            s += l;
+        }
+
+        if (prim) {
+            if (len > 1) {
+                *dest++ = (char)prim;
+                len--;
+            }
+
+            slen++;
+            prim = 0;
+        }
+    }
+
+    free(ss);
+
+    if (len > 0) {
+        *dest = '\0';
+    }
+
+    return slen;
 }

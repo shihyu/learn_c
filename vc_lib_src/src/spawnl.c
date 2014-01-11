@@ -42,48 +42,42 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _tspawnl (
-        int modeflag,
-        const _TSCHAR *pathname,
-        const _TSCHAR *arglist,
-        ...
-        )
-{
+intptr_t __cdecl _tspawnl(
+    int modeflag,
+    const _TSCHAR* pathname,
+    const _TSCHAR* arglist,
+    ...
+) {
 #ifdef _M_IX86
-
-        /* validation section */
-        _VALIDATE_RETURN(pathname != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*pathname != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
-
-        return(_tspawnve(modeflag,pathname,&arglist,NULL));
-
+    /* validation section */
+    _VALIDATE_RETURN(pathname != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*pathname != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
+    return (_tspawnve(modeflag, pathname, &arglist, NULL));
 #else  /* _M_IX86 */
-
-        va_list vargs;
-        _TSCHAR * argbuf[64];
-        _TSCHAR ** argv;
-        intptr_t result;
-
-        /* validation section */
-        _VALIDATE_RETURN(pathname != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*pathname != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
-
-        va_start(vargs, arglist);
+    va_list vargs;
+    _TSCHAR* argbuf[64];
+    _TSCHAR** argv;
+    intptr_t result;
+    /* validation section */
+    _VALIDATE_RETURN(pathname != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*pathname != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(arglist != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*arglist != _T('\0'), EINVAL, -1);
+    va_start(vargs, arglist);
 #ifdef WPRFLAG
-        argv = _wcapture_argv(&vargs, arglist, argbuf, 64);
+    argv = _wcapture_argv(&vargs, arglist, argbuf, 64);
 #else  /* WPRFLAG */
-        argv = _capture_argv(&vargs, arglist, argbuf, 64);
+    argv = _capture_argv(&vargs, arglist, argbuf, 64);
 #endif  /* WPRFLAG */
-        va_end(vargs);
+    va_end(vargs);
+    result = _tspawnve(modeflag, pathname, argv, NULL);
 
-        result = _tspawnve(modeflag,pathname,argv,NULL);
-        if (argv && argv != argbuf)
-            _free_crt(argv);
-        return result;
+    if (argv && argv != argbuf) {
+        _free_crt(argv);
+    }
 
+    return result;
 #endif  /* _M_IX86 */
 }

@@ -40,22 +40,25 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/__getosreldate.c,v 1.1 2007/07/04 23:27:38 
  */
 
 int
-__getosreldate(void)
-{
-	static int osreldate;
-	size_t len;
-	int oid[2];
-	int error, osrel;
+__getosreldate(void) {
+    static int osreldate;
+    size_t len;
+    int oid[2];
+    int error, osrel;
 
-	if (osreldate != 0)
-		return (osreldate);
-	
-	oid[0] = CTL_KERN;
-	oid[1] = KERN_OSRELDATE;
-	osrel = 0;
-	len = sizeof(osrel);
-	error = sysctl(oid, 2, &osrel, &len, NULL, 0);
-	if (error == 0 && osrel > 0 && len == sizeof(osrel))
-		osreldate = osrel;
-	return (osreldate);
+    if (osreldate != 0) {
+        return (osreldate);
+    }
+
+    oid[0] = CTL_KERN;
+    oid[1] = KERN_OSRELDATE;
+    osrel = 0;
+    len = sizeof(osrel);
+    error = sysctl(oid, 2, &osrel, &len, NULL, 0);
+
+    if (error == 0 && osrel > 0 && len == sizeof(osrel)) {
+        osreldate = osrel;
+    }
+
+    return (osreldate);
 }

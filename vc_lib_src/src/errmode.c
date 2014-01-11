@@ -37,31 +37,35 @@
 *
 *******************************************************************************/
 
-_CRTIMP int __cdecl _set_error_mode (
-        int em
-        )
-{
-        int retval=0;
-
+_CRTIMP int __cdecl _set_error_mode(
+    int em
+) {
+    int retval = 0;
 #if defined (CRTDLL) && !defined (_SYSCRT)
-        if (_set_errmode_server != _encoded_null())
-            return ((_set_error_mode_function) _decode_pointer(_set_errmode_server))(em);
-#endif  /* defined (CRTDLL) && !defined (_SYSCRT) */
-        switch (em) {
-            case _OUT_TO_DEFAULT:
-            case _OUT_TO_STDERR:
-            case _OUT_TO_MSGBOX:
-                retval = __error_mode;
-                __error_mode = em;
-                break;
-            case _REPORT_ERRMODE:
-                retval = __error_mode;
-                break;
-            default:
-                _VALIDATE_RETURN(("Invalid error_mode", 0), EINVAL, -1);
-        }
 
-        return retval;
+    if (_set_errmode_server != _encoded_null()) {
+        return ((_set_error_mode_function) _decode_pointer(_set_errmode_server))(em);
+    }
+
+#endif  /* defined (CRTDLL) && !defined (_SYSCRT) */
+
+    switch (em) {
+    case _OUT_TO_DEFAULT:
+    case _OUT_TO_STDERR:
+    case _OUT_TO_MSGBOX:
+        retval = __error_mode;
+        __error_mode = em;
+        break;
+
+    case _REPORT_ERRMODE:
+        retval = __error_mode;
+        break;
+
+    default:
+        _VALIDATE_RETURN(("Invalid error_mode", 0), EINVAL, -1);
+    }
+
+    return retval;
 }
 
 /***
@@ -85,15 +89,17 @@ _CRTIMP int __cdecl _set_error_mode (
 *
 *******************************************************************************/
 
-_CRTIMP void __cdecl __set_app_type (
-        int at
-        )
-{
+_CRTIMP void __cdecl __set_app_type(
+    int at
+) {
 #if defined (CRTDLL) && !defined (_SYSCRT)
-    if (__set_app_type_server != _encoded_null())
+
+    if (__set_app_type_server != _encoded_null()) {
         ((_set_app_type_function) _decode_pointer(__set_app_type_server))(at);
+    }
+
 #endif  /* defined (CRTDLL) && !defined (_SYSCRT) */
-        __app_type = at;
+    __app_type = at;
 }
 
 /***
@@ -116,11 +122,13 @@ _CRTIMP void __cdecl __set_app_type (
 *
 *******************************************************************************/
 
-_CRTIMP int __cdecl __get_app_type ()
-{
+_CRTIMP int __cdecl __get_app_type() {
 #if defined (CRTDLL) && !defined (_SYSCRT)
-    if (__get_app_type_server != _encoded_null())
+
+    if (__get_app_type_server != _encoded_null()) {
         return ((_get_app_type_function) _decode_pointer(__get_app_type_server))();
+    }
+
 #endif  /* defined (CRTDLL) && !defined (_SYSCRT) */
     return __app_type;
 }

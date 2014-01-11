@@ -45,49 +45,49 @@
 *
 *******************************************************************************/
 
-int  __cdecl _heap_findaddr (
-        void * address,
-        _PBLKDESC * ppdesc
-        )
-{
-        REG1 _PBLKDESC pcurr;
+int  __cdecl _heap_findaddr(
+    void* address,
+    _PBLKDESC* ppdesc
+) {
+    REG1 _PBLKDESC pcurr;
 
-        /*
-         * See if heap there's anything in the heap
-         */
+    /*
+     * See if heap there's anything in the heap
+     */
 
-        if (_heap_desc.pfirstdesc == &_heap_desc.sentinel)
-                return(_HEAPFIND_EMPTY);
+    if (_heap_desc.pfirstdesc == &_heap_desc.sentinel) {
+        return (_HEAPFIND_EMPTY);
+    }
 
-        /*
-         * See if entry is in the heap or not
-         */
+    /*
+     * See if entry is in the heap or not
+     */
 
-        if (_ADDRESS(_heap_desc.pfirstdesc) > address)
-                return(_HEAPFIND_BEFORE);
+    if (_ADDRESS(_heap_desc.pfirstdesc) > address) {
+        return (_HEAPFIND_BEFORE);
+    }
 
-        if (_ADDRESS(&_heap_desc.sentinel) <= address)
-                return(_HEAPFIND_AFTER);
+    if (_ADDRESS(&_heap_desc.sentinel) <= address) {
+        return (_HEAPFIND_AFTER);
+    }
 
-        /*
-         * Find the entry
-         */
+    /*
+     * Find the entry
+     */
 
-        for (pcurr = _heap_desc.pfirstdesc; TRUE; pcurr = pcurr->pnextdesc) {
+    for (pcurr = _heap_desc.pfirstdesc; TRUE; pcurr = pcurr->pnextdesc) {
+        if (_ADDRESS(pcurr->pnextdesc) > address) {
+            /* Address is contained in this entry */
+            *ppdesc = pcurr;
 
-                if ( _ADDRESS(pcurr->pnextdesc) > address ) {
-
-                        /* Address is contained in this entry */
-                        *ppdesc = pcurr;
-
-                        /* Check for an exact fit */
-                        if ( _ADDRESS(pcurr) == address)
-                                return(_HEAPFIND_EXACT);
-                        else
-                                return(_HEAPFIND_WITHIN);
-                }
+            /* Check for an exact fit */
+            if (_ADDRESS(pcurr) == address) {
+                return (_HEAPFIND_EXACT);
+            } else {
+                return (_HEAPFIND_WITHIN);
+            }
         }
-
+    }
 }
 
 #endif  /* WINHEAP */

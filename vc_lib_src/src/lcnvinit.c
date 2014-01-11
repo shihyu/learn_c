@@ -31,16 +31,14 @@
 #include <locale.h>
 #include <setlocal.h>
 
-int __lconv_init(void)
-{
-        __lconv_c.int_frac_digits = (char)UCHAR_MAX;
-        __lconv_c.frac_digits = (char)UCHAR_MAX;
-        __lconv_c.p_cs_precedes = (char)UCHAR_MAX;
-        __lconv_c.p_sep_by_space = (char)UCHAR_MAX;
-        __lconv_c.n_cs_precedes = (char)UCHAR_MAX;
-        __lconv_c.n_sep_by_space = (char)UCHAR_MAX;
-        __lconv_c.p_sign_posn = (char)UCHAR_MAX;
-        __lconv_c.n_sign_posn = (char)UCHAR_MAX;
-
-        return 0;
+int __lconv_init(void) {
+    __lconv_c.int_frac_digits = (char)UCHAR_MAX;
+    __lconv_c.frac_digits = (char)UCHAR_MAX;
+    __lconv_c.p_cs_precedes = (char)UCHAR_MAX;
+    __lconv_c.p_sep_by_space = (char)UCHAR_MAX;
+    __lconv_c.n_cs_precedes = (char)UCHAR_MAX;
+    __lconv_c.n_sep_by_space = (char)UCHAR_MAX;
+    __lconv_c.p_sign_posn = (char)UCHAR_MAX;
+    __lconv_c.n_sign_posn = (char)UCHAR_MAX;
+    return 0;
 }

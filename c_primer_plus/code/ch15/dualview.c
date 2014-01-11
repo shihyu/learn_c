@@ -35,8 +35,9 @@
 #define B_DASHED        0x2000
 #define STYLE_MASK      0x3000
 
-const char * colors[8] = {"black", "red", "green", "yellow",
-            "blue", "magenta", "cyan", "white"};
+const char* colors[8] = {"black", "red", "green", "yellow",
+                         "blue", "magenta", "cyan", "white"
+                        };
 struct box_props {
 
     unsigned int opaque         : 1;
@@ -46,31 +47,27 @@ struct box_props {
     unsigned int border_color   : 3;
     unsigned int border_style   : 2;
     unsigned int                : 2;
- };
+};
 
-union Views     /* look at data as struct or as unsigned short */
-{
+union Views {   /* look at data as struct or as unsigned short */
     struct box_props st_view;
     unsigned int     ui_view;
 };
 
-void show_settings(const struct box_props * pb);
+void show_settings(const struct box_props* pb);
 void show_settings1(unsigned short);
-char * itobs(unsigned int n, char * ps); 
+char* itobs(unsigned int n, char* ps);
 
-int main(void)
-{
+int main(void) {
     /* create Views object, initialize struct box view */
     union Views box = {{YES, YELLOW , YES, GREEN, DASHED}};
     char bin_str[8 * sizeof(unsigned int) + 1];
-
     printf("Original box settings:\n");
     show_settings(&box.st_view);
     printf("\nBox settings using unsigned int view:\n");
     show_settings1(box.ui_view);
-
     printf("bits are %s\n",
-        itobs(box.ui_view,bin_str));
+           itobs(box.ui_view, bin_str));
     box.ui_view &= ~FILL_MASK;          /* clear fill bits */
     box.ui_view |= (FILL_BLUE | FILL_GREEN); /* reset fill */
     box.ui_view ^= OPAQUE;               /* toggle opacity */
@@ -82,59 +79,76 @@ int main(void)
     printf("\nBox settings using unsigned int view:\n");
     show_settings1(box.ui_view);
     printf("bits are %s\n",
-    itobs(box.ui_view,bin_str));
-   
+           itobs(box.ui_view, bin_str));
     return 0;
 }
 
-void show_settings(const struct box_props * pb)
-{
+void show_settings(const struct box_props* pb) {
     printf("Box is %s.\n",
-            pb->opaque == YES? "opaque": "transparent");
+           pb->opaque == YES ? "opaque" : "transparent");
     printf("The fill color is %s.\n", colors[pb->fill_color]);
     printf("Border %s.\n",
-            pb->show_border == YES? "shown" : "not shown");
+           pb->show_border == YES ? "shown" : "not shown");
     printf("The border color is %s.\n", colors[pb->border_color]);
-    printf ("The border style is ");
-    switch(pb->border_style)
-    {
-        case SOLID  : printf("solid.\n"); break;
-        case DOTTED : printf("dotted.\n"); break;
-        case DASHED : printf("dashed.\n"); break;
-        default     : printf("unknown type.\n");
+    printf("The border style is ");
+
+    switch (pb->border_style) {
+    case SOLID  :
+        printf("solid.\n");
+        break;
+
+    case DOTTED :
+        printf("dotted.\n");
+        break;
+
+    case DASHED :
+        printf("dashed.\n");
+        break;
+
+    default     :
+        printf("unknown type.\n");
     }
 }
 
-void show_settings1(unsigned short us)
-{
+void show_settings1(unsigned short us) {
     printf("box is %s.\n",
-            us & OPAQUE == OPAQUE? "opaque": "transparent");
+           us & OPAQUE == OPAQUE ? "opaque" : "transparent");
     printf("The fill color is %s.\n",
-            colors[(us >> 1) & 07]);
+           colors[(us >> 1) & 07]);
     printf("Border %s.\n",
-            us & BORDER == BORDER? "shown" : "not shown");
-    printf ("The border style is ");
-    switch(us & STYLE_MASK)
-    {
-        case B_SOLID  : printf("solid.\n"); break;
-        case B_DOTTED : printf("dotted.\n"); break;
-        case B_DASHED : printf("dashed.\n"); break;
-        default       : printf("unknown type.\n");
-    }
-    printf("The border color is %s.\n",
-            colors[(us >> 9) & 07]);
+           us & BORDER == BORDER ? "shown" : "not shown");
+    printf("The border style is ");
 
+    switch (us & STYLE_MASK) {
+    case B_SOLID  :
+        printf("solid.\n");
+        break;
+
+    case B_DOTTED :
+        printf("dotted.\n");
+        break;
+
+    case B_DASHED :
+        printf("dashed.\n");
+        break;
+
+    default       :
+        printf("unknown type.\n");
+    }
+
+    printf("The border color is %s.\n",
+           colors[(us >> 9) & 07]);
 }
 
 /* convert int to binary string */
-char * itobs(unsigned int n, char * ps)
-{
+char* itobs(unsigned int n, char* ps) {
     int i;
     static int size = 8 * sizeof(unsigned int);
 
-    for (i = size - 1; i >= 0; i--, n >>= 1)
+    for (i = size - 1; i >= 0; i--, n >>= 1) {
         ps[i] = (01 & n) + '0';
+    }
+
     ps[size] = '\0';
-   
     return ps;
 }

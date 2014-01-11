@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -42,22 +42,20 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/sprintf.c,v 1.15 2007/01/09 00:28:07 imp 
 #include "local.h"
 
 int
-sprintf(char * __restrict str, char const * __restrict fmt, ...)
-{
-	int ret;
-	va_list ap;
-	FILE f;
-	struct __sFILEX ext;
-
-	f._file = -1;
-	f._flags = __SWR | __SSTR;
-	f._bf._base = f._p = (unsigned char *)str;
-	f._bf._size = f._w = INT_MAX;
-	f._extra = &ext;
-	INITEXTRA(&f);
-	va_start(ap, fmt);
-	ret = __vfprintf(&f, fmt, ap);
-	va_end(ap);
-	*f._p = 0;
-	return (ret);
+sprintf(char* __restrict str, char const* __restrict fmt, ...) {
+    int ret;
+    va_list ap;
+    FILE f;
+    struct __sFILEX ext;
+    f._file = -1;
+    f._flags = __SWR | __SSTR;
+    f._bf._base = f._p = (unsigned char*)str;
+    f._bf._size = f._w = INT_MAX;
+    f._extra = &ext;
+    INITEXTRA(&f);
+    va_start(ap, fmt);
+    ret = __vfprintf(&f, fmt, ap);
+    va_end(ap);
+    *f._p = 0;
+    return (ret);
 }

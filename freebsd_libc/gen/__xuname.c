@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,7 +28,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-/*static char sccsid[] = "From: @(#)uname.c	8.1 (Berkeley) 1/4/94";*/
+/*static char sccsid[] = "From: @(#)uname.c 8.1 (Berkeley) 1/4/94";*/
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/gen/__xuname.c,v 1.13 2007/01/09 00:27:52 imp Exp $");
@@ -41,98 +41,120 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/__xuname.c,v 1.13 2007/01/09 00:27:52 imp E
 #include <string.h>
 
 int
-__xuname(int namesize, void *namebuf)
-{
-	int mib[2], rval;
-	size_t len;
-	char *p;
-	int oerrno;
-	struct xutsname {
-		char	sysname[namesize];	/* Name of this OS. */
-		char	nodename[namesize];	/* Name of this network node. */
-		char	release[namesize];	/* Release level. */
-		char	version[namesize];	/* Version level. */
-		char	machine[namesize];	/* Hardware type. */
-	} *name;
+__xuname(int namesize, void* namebuf) {
+    int mib[2], rval;
+    size_t len;
+    char* p;
+    int oerrno;
+    struct xutsname {
+        char    sysname[namesize];  /* Name of this OS. */
+        char    nodename[namesize]; /* Name of this network node. */
+        char    release[namesize];  /* Release level. */
+        char    version[namesize];  /* Version level. */
+        char    machine[namesize];  /* Hardware type. */
+    } *name;
+    name = (struct xutsname*)namebuf;
+    rval = 0;
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_OSTYPE;
+    len = sizeof(name->sysname);
+    oerrno = errno;
 
-	name = (struct xutsname *)namebuf;
-	rval = 0;
+    if (sysctl(mib, 2, &name->sysname, &len, NULL, 0) == -1) {
+        if (errno == ENOMEM) {
+            errno = oerrno;
+        } else {
+            rval = -1;
+        }
+    }
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_OSTYPE;
-	len = sizeof(name->sysname);
-	oerrno = errno;
-	if (sysctl(mib, 2, &name->sysname, &len, NULL, 0) == -1) {
-		if(errno == ENOMEM)
-			errno = oerrno;
-		else
-			rval = -1;
-	}
-	name->sysname[sizeof(name->sysname) - 1] = '\0';
-	if ((p = getenv("UNAME_s")))
-		strlcpy(name->sysname, p, sizeof(name->sysname));
+    name->sysname[sizeof(name->sysname) - 1] = '\0';
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_HOSTNAME;
-	len = sizeof(name->nodename);
-	oerrno = errno;
-	if (sysctl(mib, 2, &name->nodename, &len, NULL, 0) == -1) {
-		if(errno == ENOMEM)
-			errno = oerrno;
-		else
-			rval = -1;
-	}
-	name->nodename[sizeof(name->nodename) - 1] = '\0';
+    if ((p = getenv("UNAME_s"))) {
+        strlcpy(name->sysname, p, sizeof(name->sysname));
+    }
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_OSRELEASE;
-	len = sizeof(name->release);
-	oerrno = errno;
-	if (sysctl(mib, 2, &name->release, &len, NULL, 0) == -1) {
-		if(errno == ENOMEM)
-			errno = oerrno;
-		else
-			rval = -1;
-	}
-	name->release[sizeof(name->release) - 1] = '\0';
-	if ((p = getenv("UNAME_r")))
-		strlcpy(name->release, p, sizeof(name->release));
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_HOSTNAME;
+    len = sizeof(name->nodename);
+    oerrno = errno;
 
-	/* The version may have newlines in it, turn them into spaces. */
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_VERSION;
-	len = sizeof(name->version);
-	oerrno = errno;
-	if (sysctl(mib, 2, &name->version, &len, NULL, 0) == -1) {
-		if (errno == ENOMEM)
-			errno = oerrno;
-		else
-			rval = -1;
-	}
-	name->version[sizeof(name->version) - 1] = '\0';
-	for (p = name->version; len--; ++p) {
-		if (*p == '\n' || *p == '\t') {
-			if (len > 1)
-				*p = ' ';
-			else
-				*p = '\0';
-		}
-	}
-	if ((p = getenv("UNAME_v")))
-		strlcpy(name->version, p, sizeof(name->version));
+    if (sysctl(mib, 2, &name->nodename, &len, NULL, 0) == -1) {
+        if (errno == ENOMEM) {
+            errno = oerrno;
+        } else {
+            rval = -1;
+        }
+    }
 
-	mib[0] = CTL_HW;
-	mib[1] = HW_MACHINE;
-	len = sizeof(name->machine);
-	oerrno = errno;
-	if (sysctl(mib, 2, &name->machine, &len, NULL, 0) == -1) {
-		if (errno == ENOMEM)
-			errno = oerrno;
-		else
-			rval = -1;
-	}
-	name->machine[sizeof(name->machine) - 1] = '\0';
-	if ((p = getenv("UNAME_m")))
-		strlcpy(name->machine, p, sizeof(name->machine));
-	return (rval);
+    name->nodename[sizeof(name->nodename) - 1] = '\0';
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_OSRELEASE;
+    len = sizeof(name->release);
+    oerrno = errno;
+
+    if (sysctl(mib, 2, &name->release, &len, NULL, 0) == -1) {
+        if (errno == ENOMEM) {
+            errno = oerrno;
+        } else {
+            rval = -1;
+        }
+    }
+
+    name->release[sizeof(name->release) - 1] = '\0';
+
+    if ((p = getenv("UNAME_r"))) {
+        strlcpy(name->release, p, sizeof(name->release));
+    }
+
+    /* The version may have newlines in it, turn them into spaces. */
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_VERSION;
+    len = sizeof(name->version);
+    oerrno = errno;
+
+    if (sysctl(mib, 2, &name->version, &len, NULL, 0) == -1) {
+        if (errno == ENOMEM) {
+            errno = oerrno;
+        } else {
+            rval = -1;
+        }
+    }
+
+    name->version[sizeof(name->version) - 1] = '\0';
+
+    for (p = name->version; len--; ++p) {
+        if (*p == '\n' || *p == '\t') {
+            if (len > 1) {
+                *p = ' ';
+            } else {
+                *p = '\0';
+            }
+        }
+    }
+
+    if ((p = getenv("UNAME_v"))) {
+        strlcpy(name->version, p, sizeof(name->version));
+    }
+
+    mib[0] = CTL_HW;
+    mib[1] = HW_MACHINE;
+    len = sizeof(name->machine);
+    oerrno = errno;
+
+    if (sysctl(mib, 2, &name->machine, &len, NULL, 0) == -1) {
+        if (errno == ENOMEM) {
+            errno = oerrno;
+        } else {
+            rval = -1;
+        }
+    }
+
+    name->machine[sizeof(name->machine) - 1] = '\0';
+
+    if ((p = getenv("UNAME_m"))) {
+        strlcpy(name->machine, p, sizeof(name->machine));
+    }
+
+    return (rval);
 }

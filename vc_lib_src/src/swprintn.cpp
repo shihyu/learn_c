@@ -75,60 +75,52 @@ versions of (v)swprintf */
 /* We don't pull in the inline version of _vswprintf_l in the headers
 Hence we have to prototype _vswprintf_l here to pull in the one in the
 library */
-int __cdecl _vswprintf_l (wchar_t *, size_t ,const wchar_t *, _locale_t, va_list );
+int __cdecl _vswprintf_l(wchar_t*, size_t , const wchar_t*, _locale_t, va_list);
 
 #if defined (_NATIVE_WCHAR_T_DEFINED)
 
-int __cdecl swprintf (
-        unsigned short *string,
-        size_t count,
-        const unsigned short *format,
-        ...
-        )
-{
-                va_list arglist;
-                va_start(arglist, format);
-                int ret = _vswprintf_l(reinterpret_cast<wchar_t *>(string), count, reinterpret_cast<const wchar_t *>(format), NULL, arglist);
-                va_end(arglist);
-                return ret;
+int __cdecl swprintf(
+    unsigned short* string,
+    size_t count,
+    const unsigned short* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    int ret = _vswprintf_l(reinterpret_cast<wchar_t*>(string), count, reinterpret_cast<const wchar_t*>(format), NULL, arglist);
+    va_end(arglist);
+    return ret;
 }
 #endif  /* defined (_NATIVE_WCHAR_T_DEFINED) */
 
-int __cdecl swprintf (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        ...
-        )
+int __cdecl swprintf(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    ...
+)
 
 {
-        FILE str;
-        REG1 FILE *outfile = &str;
-        va_list arglist;
-        REG2 int retval;
+    FILE str;
+    REG1 FILE* outfile = &str;
+    va_list arglist;
+    REG2 int retval;
+    va_start(arglist, format);
+    _ASSERTE(string != NULL);
+    _ASSERTE(format != NULL);
+    outfile->_flag = _IOWRT | _IOSTRG;
+    outfile->_ptr = outfile->_base = (char*) string;
 
-        va_start(arglist, format);
+    if (count > (INT_MAX / sizeof(wchar_t))) {
+        /* old-style functions allow any large value to mean unbounded */
+        outfile->_cnt = INT_MAX;
+    } else {
+        outfile->_cnt = (int)(count * sizeof(wchar_t));
+    }
 
-        _ASSERTE(string != NULL);
-        _ASSERTE(format != NULL);
-
-        outfile->_flag = _IOWRT|_IOSTRG;
-        outfile->_ptr = outfile->_base = (char *) string;
-        if(count>(INT_MAX/sizeof(wchar_t)))
-        {
-            /* old-style functions allow any large value to mean unbounded */
-            outfile->_cnt = INT_MAX;
-        }
-        else
-        {
-            outfile->_cnt = (int)(count*sizeof(wchar_t));
-        }
-
-        retval = _woutput_l(outfile,format,NULL,arglist);
-
-        _putc_nolock('\0',outfile); /* no-lock version */
-        _putc_nolock('\0',outfile); /* 2nd null byte for wchar_t version */
-
-        return(retval);
+    retval = _woutput_l(outfile, format, NULL, arglist);
+    _putc_nolock('\0', outfile); /* no-lock version */
+    _putc_nolock('\0', outfile); /* 2nd null byte for wchar_t version */
+    return (retval);
 }
 

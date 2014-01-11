@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,85 +47,108 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/readdir.c,v 1.13 2007/01/09 00:27:55 imp Ex
 /*
  * get next entry in a directory.
  */
-struct dirent *
+struct dirent*
 _readdir_unlocked(dirp)
-	DIR *dirp;
+DIR* dirp;
 {
-	struct dirent *dp;
+    struct dirent* dp;
 
-	for (;;) {
-		if (dirp->dd_loc >= dirp->dd_size) {
-			if (dirp->dd_flags & __DTF_READALL)
-				return (NULL);
-			dirp->dd_loc = 0;
-		}
-		if (dirp->dd_loc == 0 && !(dirp->dd_flags & __DTF_READALL)) {
-			dirp->dd_size = _getdirentries(dirp->dd_fd,
-			    dirp->dd_buf, dirp->dd_len, &dirp->dd_seek);
-			if (dirp->dd_size <= 0)
-				return (NULL);
-		}
-		dp = (struct dirent *)(dirp->dd_buf + dirp->dd_loc);
-		if ((long)dp & 03L)	/* bogus pointer check */
-			return (NULL);
-		if (dp->d_reclen <= 0 ||
-		    dp->d_reclen > dirp->dd_len + 1 - dirp->dd_loc)
-			return (NULL);
-		dirp->dd_loc += dp->d_reclen;
-		if (dp->d_ino == 0)
-			continue;
-		if (dp->d_type == DT_WHT && (dirp->dd_flags & DTF_HIDEW))
-			continue;
-		return (dp);
-	}
+    for (;;) {
+        if (dirp->dd_loc >= dirp->dd_size) {
+            if (dirp->dd_flags & __DTF_READALL) {
+                return (NULL);
+            }
+
+            dirp->dd_loc = 0;
+        }
+
+        if (dirp->dd_loc == 0 && !(dirp->dd_flags & __DTF_READALL)) {
+            dirp->dd_size = _getdirentries(dirp->dd_fd,
+                                           dirp->dd_buf, dirp->dd_len, &dirp->dd_seek);
+
+            if (dirp->dd_size <= 0) {
+                return (NULL);
+            }
+        }
+
+        dp = (struct dirent*)(dirp->dd_buf + dirp->dd_loc);
+
+        if ((long)dp & 03L) { /* bogus pointer check */
+            return (NULL);
+        }
+
+        if (dp->d_reclen <= 0 ||
+                dp->d_reclen > dirp->dd_len + 1 - dirp->dd_loc) {
+            return (NULL);
+        }
+
+        dirp->dd_loc += dp->d_reclen;
+
+        if (dp->d_ino == 0) {
+            continue;
+        }
+
+        if (dp->d_type == DT_WHT && (dirp->dd_flags & DTF_HIDEW)) {
+            continue;
+        }
+
+        return (dp);
+    }
 }
 
-struct dirent *
+struct dirent*
 readdir(dirp)
-	DIR *dirp;
+DIR* dirp;
 {
-	struct dirent	*dp;
+    struct dirent*   dp;
 
-	if (__isthreaded) {
-		_pthread_mutex_lock((pthread_mutex_t *)&dirp->dd_lock);
-		dp = _readdir_unlocked(dirp);
-		_pthread_mutex_unlock((pthread_mutex_t *)&dirp->dd_lock);
-	}
-	else
-		dp = _readdir_unlocked(dirp);
-	return (dp);
+    if (__isthreaded) {
+        _pthread_mutex_lock((pthread_mutex_t*)&dirp->dd_lock);
+        dp = _readdir_unlocked(dirp);
+        _pthread_mutex_unlock((pthread_mutex_t*)&dirp->dd_lock);
+    } else {
+        dp = _readdir_unlocked(dirp);
+    }
+
+    return (dp);
 }
 
 int
 readdir_r(dirp, entry, result)
-	DIR *dirp;
-	struct dirent *entry;
-	struct dirent **result;
+DIR* dirp;
+struct dirent* entry;
+struct dirent** result;
 {
-	struct dirent *dp;
-	int saved_errno;
+    struct dirent* dp;
+    int saved_errno;
+    saved_errno = errno;
+    errno = 0;
 
-	saved_errno = errno;
-	errno = 0;
-	if (__isthreaded) {
-		_pthread_mutex_lock((pthread_mutex_t *)&dirp->dd_lock);
-		if ((dp = _readdir_unlocked(dirp)) != NULL)
-			memcpy(entry, dp, _GENERIC_DIRSIZ(dp));
-		_pthread_mutex_unlock((pthread_mutex_t *)&dirp->dd_lock);
-	}
-	else if ((dp = _readdir_unlocked(dirp)) != NULL)
-		memcpy(entry, dp, _GENERIC_DIRSIZ(dp));
+    if (__isthreaded) {
+        _pthread_mutex_lock((pthread_mutex_t*)&dirp->dd_lock);
 
-	if (errno != 0) {
-		if (dp == NULL)
-			return (errno);
-	} else
-		errno = saved_errno;
+        if ((dp = _readdir_unlocked(dirp)) != NULL) {
+            memcpy(entry, dp, _GENERIC_DIRSIZ(dp));
+        }
 
-	if (dp != NULL)
-		*result = entry;
-	else
-		*result = NULL;
+        _pthread_mutex_unlock((pthread_mutex_t*)&dirp->dd_lock);
+    } else if ((dp = _readdir_unlocked(dirp)) != NULL) {
+        memcpy(entry, dp, _GENERIC_DIRSIZ(dp));
+    }
 
-	return (0);
+    if (errno != 0) {
+        if (dp == NULL) {
+            return (errno);
+        }
+    } else {
+        errno = saved_errno;
+    }
+
+    if (dp != NULL) {
+        *result = entry;
+    } else {
+        *result = NULL;
+    }
+
+    return (0);
 }

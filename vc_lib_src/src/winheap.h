@@ -65,7 +65,7 @@ typedef struct {
     };
 }   LinkerVersion;
 
-extern void __cdecl _GetLinkerVersion(__out LinkerVersion * plv);
+extern void __cdecl _GetLinkerVersion(__out LinkerVersion* plv);
 #endif  /* CRTDLL */
 
 /*  Definitions, declarations and prototypes for the small-block heap (VC++ 6.0) */
@@ -84,50 +84,45 @@ extern void __cdecl _GetLinkerVersion(__out LinkerVersion * plv);
 #define ENTRY_OFFSET        0x0000000cL     /*  offset of entry in para */
 #define OVERHEAD_PER_PAGE   0x00000010L     /*  sixteen bytes of overhead */
 #define MAX_FREE_ENTRY_SIZE (BYTES_PER_PAGE - OVERHEAD_PER_PAGE)
-#if GROUPS_PER_REGION > 0 && GROUPS_PER_REGION < 32  
-    #define BITV_COMMIT_INIT    (((1 << GROUPS_PER_REGION) - 1) << \
+#if GROUPS_PER_REGION > 0 && GROUPS_PER_REGION < 32
+#define BITV_COMMIT_INIT    (((1 << GROUPS_PER_REGION) - 1) << \
                                             (32 - GROUPS_PER_REGION))
-#elif GROUPS_PER_REGION == 32  
-    #define BITV_COMMIT_INIT    (((0) - 1) << \
+#elif GROUPS_PER_REGION == 32
+#define BITV_COMMIT_INIT    (((0) - 1) << \
                                             (32 - GROUPS_PER_REGION))
 #else  /* GROUPS_PER_REGION == 32   */
-    #error GROUPS_PER_REGION must be between 1 and 32 inclusive
+#error GROUPS_PER_REGION must be between 1 and 32 inclusive
 #endif  /* GROUPS_PER_REGION == 32   */
 #define MAX_ALLOC_DATA_SIZE     0x3f8
 #define MAX_ALLOC_ENTRY_SIZE    (MAX_ALLOC_DATA_SIZE + 0x8)
 
 typedef unsigned int    BITVEC;
 
-typedef struct tagListHead
-{
-    struct tagEntry *   pEntryNext;
-    struct tagEntry *   pEntryPrev;
+typedef struct tagListHead {
+    struct tagEntry*    pEntryNext;
+    struct tagEntry*    pEntryPrev;
 }
 LISTHEAD, *PLISTHEAD;
 
-typedef struct tagEntry
-{
+typedef struct tagEntry {
     int                 sizeFront;
-    struct tagEntry *   pEntryNext;
-    struct tagEntry *   pEntryPrev;
+    struct tagEntry*    pEntryNext;
+    struct tagEntry*    pEntryPrev;
 }
 ENTRY, *PENTRY;
 
-typedef struct tagEntryEnd
-{
+typedef struct tagEntryEnd {
     int                 sizeBack;
 }
 ENTRYEND, *PENTRYEND;
 
-typedef struct tagGroup
-{
+typedef struct tagGroup {
     int                 cntEntries;
     struct tagListHead  listHead[64];
 }
 GROUP, *PGROUP;
 
-typedef struct tagRegion
-{
+typedef struct tagRegion {
     int                 indGroupUse;
     char                cntRegionSize[64];
     BITVEC              bitvGroupHi[GROUPS_PER_REGION];
@@ -136,13 +131,12 @@ typedef struct tagRegion
 }
 REGION, *PREGION;
 
-typedef struct tagHeader
-{
+typedef struct tagHeader {
     BITVEC              bitvEntryHi;
     BITVEC              bitvEntryLo;
     BITVEC              bitvCommit;
-    void *              pHeapData;
-    struct tagRegion *  pRegion;
+    void*               pHeapData;
+    struct tagRegion*   pRegion;
 }
 HEADER, *PHEADER;
 
@@ -153,8 +147,8 @@ extern  HANDLE _crtheap;
  */
 extern size_t   __sbh_threshold;
 
-__checkReturn  __bcount_opt(_Size) void * __cdecl _nh_malloc(__in size_t _Size, __in int _NhFlag);
-__checkReturn  __bcount_opt(_Size) void * __cdecl _heap_alloc(__in size_t _Size);
+__checkReturn  __bcount_opt(_Size) void* __cdecl _nh_malloc(__in size_t _Size, __in int _NhFlag);
+__checkReturn  __bcount_opt(_Size) void* __cdecl _heap_alloc(__in size_t _Size);
 
 extern PHEADER  __sbh_pHeaderList;        /*  pointer to list start */
 extern PHEADER  __sbh_pHeaderScan;        /*  pointer to list rover */
@@ -170,31 +164,31 @@ extern int     __cdecl _set_sb_threshold(__in size_t _Size);
 extern int     __cdecl _heap_init(__in int _Mtflag);
 extern void    __cdecl _heap_term(void);
 
-extern _CRTIMP __checkReturn __bcount_opt(_Size) void *  __cdecl _malloc_base(__in size_t _Size);
+extern _CRTIMP __checkReturn __bcount_opt(_Size) void*   __cdecl _malloc_base(__in size_t _Size);
 
-extern _CRTIMP void    __cdecl _free_base(__inout_opt void * _Memory);
-extern __checkReturn __bcount_opt(_NewSize) void *  __cdecl _realloc_base(__inout_opt void * _Memory, __in size_t _NewSize);
-extern __checkReturn __bcount_opt(_Size*_Count) void *  __cdecl _recalloc_base(__inout_opt void * _Memory, __in size_t _Count, __in size_t _Size);
+extern _CRTIMP void    __cdecl _free_base(__inout_opt void* _Memory);
+extern __checkReturn __bcount_opt(_NewSize) void*   __cdecl _realloc_base(__inout_opt void* _Memory, __in size_t _NewSize);
+extern __checkReturn __bcount_opt(_Size* _Count) void*   __cdecl _recalloc_base(__inout_opt void* _Memory, __in size_t _Count, __in size_t _Size);
 
-extern __checkReturn __bcount_opt(_NewSize) void *  __cdecl _expand_base(__inout_opt void * _Memory, __in size_t _NewSize);
-extern __checkReturn __bcount_opt(_Count*_Size) void *  __cdecl _calloc_base(__in size_t _Count, __in size_t _Size);
+extern __checkReturn __bcount_opt(_NewSize) void*   __cdecl _expand_base(__inout_opt void* _Memory, __in size_t _NewSize);
+extern __checkReturn __bcount_opt(_Count* _Size) void*   __cdecl _calloc_base(__in size_t _Count, __in size_t _Size);
 
-extern __checkReturn size_t  __cdecl _msize_base(__in void * _Memory);
+extern __checkReturn size_t  __cdecl _msize_base(__in void* _Memory);
 
 extern __checkReturn int     __cdecl __sbh_heap_init(__in size_t _Threshold);
 
-extern __checkReturn __bcount_opt(_Size) void *  __cdecl __sbh_alloc_block(__in int _Size);
+extern __checkReturn __bcount_opt(_Size) void*   __cdecl __sbh_alloc_block(__in int _Size);
 extern __checkReturn __out_opt PHEADER __cdecl __sbh_alloc_new_region(void);
 extern __checkReturn int     __cdecl __sbh_alloc_new_group(__in PHEADER _Header);
 
-extern __checkReturn PHEADER __cdecl __sbh_find_block(__in void * _Block);
+extern __checkReturn PHEADER __cdecl __sbh_find_block(__in void* _Block);
 
 #ifdef _DEBUG
-extern __checkReturn int     __cdecl __sbh_verify_block(__in PHEADER _Header, __in void * _Block);
+extern __checkReturn int     __cdecl __sbh_verify_block(__in PHEADER _Header, __in void* _Block);
 #endif  /* _DEBUG */
 
-extern void    __cdecl __sbh_free_block(__in PHEADER _Header, __inout void * _Block);
-extern __checkReturn int     __cdecl __sbh_resize_block(__in PHEADER _Header, __inout void * _Block, __in int _Size);
+extern void    __cdecl __sbh_free_block(__in PHEADER _Header, __inout void* _Block);
+extern __checkReturn int     __cdecl __sbh_resize_block(__in PHEADER _Header, __inout void* _Block, __in int _Size);
 
 extern void    __cdecl __sbh_heapmin(void);
 
@@ -232,11 +226,11 @@ typedef unsigned char   __old_page_map_t;
 /*  allocation area. */
 
 typedef struct __old_sbh_page_struct {
-        __old_page_map_t *  p_starting_alloc_map;
-        size_t              free_paras_at_start;
-        __old_page_map_t    alloc_map[_OLD_PARAS_PER_PAGE + 1];
-        __old_page_map_t    reserved[_OLD_PADDING_PER_PAGE];
-        __old_para_t        alloc_blocks[_OLD_PARAS_PER_PAGE];
+    __old_page_map_t*   p_starting_alloc_map;
+    size_t              free_paras_at_start;
+    __old_page_map_t    alloc_map[_OLD_PARAS_PER_PAGE + 1];
+    __old_page_map_t    reserved[_OLD_PADDING_PER_PAGE];
+    __old_para_t        alloc_blocks[_OLD_PARAS_PER_PAGE];
 }       __old_sbh_page_t;
 
 #define _OLD_NO_PAGES       (__old_sbh_page_t *)-1
@@ -244,8 +238,8 @@ typedef struct __old_sbh_page_struct {
 /*  Type used in small block region desciptor type (see below). */
 
 typedef struct {
-        int     free_paras_in_page;
-        size_t  last_failed_alloc;
+    int     free_paras_in_page;
+    size_t  last_failed_alloc;
 }       __old_region_map_t;
 
 /*  Small-block heap region descriptor. Most often, the small-block heap */
@@ -253,13 +247,13 @@ typedef struct {
 /*  decriptor __small_block_heap (declared below). */
 
 struct __old_sbh_region_struct {
-        struct __old_sbh_region_struct *p_next_region;
-        struct __old_sbh_region_struct *p_prev_region;
-        __old_region_map_t *            p_starting_region_map;
-        __old_region_map_t *            p_first_uncommitted;
-        __old_sbh_page_t *              p_pages_begin;
-        __old_sbh_page_t *              p_pages_end;
-        __old_region_map_t              region_map[_OLD_PAGES_PER_REGION + 1];
+    struct __old_sbh_region_struct* p_next_region;
+    struct __old_sbh_region_struct* p_prev_region;
+    __old_region_map_t*             p_starting_region_map;
+    __old_region_map_t*             p_first_uncommitted;
+    __old_sbh_page_t*               p_pages_begin;
+    __old_sbh_page_t*               p_pages_end;
+    __old_region_map_t              region_map[_OLD_PAGES_PER_REGION + 1];
 };
 
 typedef struct __old_sbh_region_struct  __old_sbh_region_t;
@@ -271,19 +265,19 @@ extern size_t               __old_sbh_threshold;
 
 /*  Prototypes for internal functions of the old small-block heap. */
 
-void *    __cdecl __old_sbh_alloc_block(__in size_t _ParaReq);
-void *    __cdecl __old_sbh_alloc_block_from_page(__in __old_sbh_page_t * _Page,
+void*     __cdecl __old_sbh_alloc_block(__in size_t _ParaReq);
+void*     __cdecl __old_sbh_alloc_block_from_page(__in __old_sbh_page_t* _Page,
         __in size_t _FreeParaCount, __in size_t _ParaReq);
 void      __cdecl __old_sbh_decommit_pages(__in int _NumOfPages);
-__checkReturn __old_page_map_t * __cdecl __old_sbh_find_block(__in void * _Block, __out __old_sbh_region_t ** _Region,
-        __out __old_sbh_page_t ** _Page);
-void      __cdecl __old_sbh_free_block(__in __old_sbh_region_t * _Region, __in __old_sbh_page_t * _Page,
-        __inout __old_page_map_t * _Map);
+__checkReturn __old_page_map_t* __cdecl __old_sbh_find_block(__in void* _Block, __out __old_sbh_region_t** _Region,
+        __out __old_sbh_page_t** _Page);
+void      __cdecl __old_sbh_free_block(__in __old_sbh_region_t* _Region, __in __old_sbh_page_t* _Page,
+                                       __inout __old_page_map_t* _Map);
 int       __cdecl __old_sbh_heap_check(void);
-__checkReturn __out_opt __old_sbh_region_t * __cdecl __old_sbh_new_region(void);
-void      __cdecl __old_sbh_release_region(__in __old_sbh_region_t * _Region);
-int       __cdecl __old_sbh_resize_block(__in __old_sbh_region_t * _Region,
-        __in __old_sbh_page_t * _Page, __inout __old_page_map_t * _Map, size_t _Size);
+__checkReturn __out_opt __old_sbh_region_t* __cdecl __old_sbh_new_region(void);
+void      __cdecl __old_sbh_release_region(__in __old_sbh_region_t* _Region);
+int       __cdecl __old_sbh_resize_block(__in __old_sbh_region_t* _Region,
+        __in __old_sbh_page_t* _Page, __inout __old_page_map_t* _Map, size_t _Size);
 
 #endif  /* CRTDLL */
 

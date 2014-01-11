@@ -24,13 +24,11 @@
 *
 *******************************************************************************/
 
-void __cdecl _freea(void *ptr)
-{
-    if (ptr != NULL)
-    {
+void __cdecl _freea(void* ptr) {
+    if (ptr != NULL) {
         ptr = (char*)ptr - _ALLOCA_S_MARKER_SIZE;
-        if (*((unsigned int*)ptr) == _ALLOCA_S_HEAP_MARKER)
-        {
+
+        if (*((unsigned int*)ptr) == _ALLOCA_S_HEAP_MARKER) {
             free(ptr);
         }
     }

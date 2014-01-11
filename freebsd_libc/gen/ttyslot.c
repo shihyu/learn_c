@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,28 +39,31 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/ttyslot.c,v 1.5 2007/01/09 00:27:56 imp Exp
 #include <unistd.h>
 
 int
-ttyslot()
-{
-	struct ttyent *ttyp;
-	int slot;
-	char *p;
-	int cnt;
-	char *name;
+ttyslot() {
+    struct ttyent* ttyp;
+    int slot;
+    char* p;
+    int cnt;
+    char* name;
+    setttyent();
 
-	setttyent();
-	for (cnt = 0; cnt < 3; ++cnt)
-		if ( (name = ttyname(cnt)) ) {
-			if ( (p = rindex(name, '/')) )
-				++p;
-			else
-				p = name;
-			for (slot = 1; (ttyp = getttyent()); ++slot)
-				if (!strcmp(ttyp->ty_name, p)) {
-					endttyent();
-					return(slot);
-				}
-			break;
-		}
-	endttyent();
-	return(0);
+    for (cnt = 0; cnt < 3; ++cnt)
+        if ((name = ttyname(cnt))) {
+            if ((p = rindex(name, '/'))) {
+                ++p;
+            } else {
+                p = name;
+            }
+
+            for (slot = 1; (ttyp = getttyent()); ++slot)
+                if (!strcmp(ttyp->ty_name, p)) {
+                    endttyent();
+                    return (slot);
+                }
+
+            break;
+        }
+
+    endttyent();
+    return (0);
 }

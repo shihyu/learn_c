@@ -47,57 +47,48 @@
 *
 *******************************************************************************/
 
-_MRTIMP2_NCEEPURE int __CLRCALL_PURE_OR_CDECL _Strcoll (
-        const char *_string1,
-        const char *_end1,
-        const char *_string2,
-        const char *_end2,
-        const _Collvec *ploc
-        )
-{
-        int ret=0;
-        LCID handle;
-        UINT codepage;
-        int n1 = (int)(_end1 - _string1);
-        int n2 = (int)(_end2 - _string2);
+_MRTIMP2_NCEEPURE int __CLRCALL_PURE_OR_CDECL _Strcoll(
+    const char* _string1,
+    const char* _end1,
+    const char* _string2,
+    const char* _end2,
+    const _Collvec* ploc
+) {
+    int ret = 0;
+    LCID handle;
+    UINT codepage;
+    int n1 = (int)(_end1 - _string1);
+    int n2 = (int)(_end2 - _string2);
 
-        if (ploc == 0)
-        {
-            handle = ___lc_handle_func()[LC_COLLATE];
-            codepage = ___lc_collate_cp_func();
-        }
-        else
-        {
-            handle = ploc->_Hand;
-            codepage = ploc->_Page;
-        }
+    if (ploc == 0) {
+        handle = ___lc_handle_func()[LC_COLLATE];
+        codepage = ___lc_collate_cp_func();
+    } else {
+        handle = ploc->_Hand;
+        codepage = ploc->_Page;
+    }
 
-        if (handle == _CLOCALEHANDLE) {
-            int ans;
-            ans = memcmp(_string1, _string2, n1 < n2 ? n1 : n2);
-            ret=(ans != 0 || n1 == n2 ? ans : n1 < n2 ? -1 : +1);
+    if (handle == _CLOCALEHANDLE) {
+        int ans;
+        ans = memcmp(_string1, _string2, n1 < n2 ? n1 : n2);
+        ret = (ans != 0 || n1 == n2 ? ans : n1 < n2 ? -1 : +1);
+    } else {
+        if (0 == (ret = __crtCompareStringA(NULL,
+                                            handle,
+                                            SORT_STRINGSORT,
+                                            _string1,
+                                            n1,
+                                            _string2,
+                                            n2,
+                                            codepage))) {
+            errno = EINVAL;
+            ret = _NLSCMPERROR;
+        } else {
+            ret -= 2;
         }
-        else
-        {
-            if ( 0 == (ret = __crtCompareStringA( NULL,
-                                                  handle,
-                                                  SORT_STRINGSORT,
-                                                  _string1,
-                                                  n1,
-                                                  _string2,
-                                                  n2,
-                                                  codepage )) )
-            {
-                errno=EINVAL;
-                ret=_NLSCMPERROR;
-            }
-            else
-            {
-                ret-=2;
-            }
-        }
+    }
 
-        return ret;
+    return ret;
 }
 
 
@@ -114,12 +105,9 @@ _MRTIMP2_NCEEPURE int __CLRCALL_PURE_OR_CDECL _Strcoll (
 *
 *******************************************************************************/
 
-_MRTIMP2_NCEEPURE _Collvec __CLRCALL_PURE_OR_CDECL _Getcoll()
-{
-        _Collvec coll;
-
-        coll._Hand = ___lc_handle_func()[LC_COLLATE];
-        coll._Page = ___lc_collate_cp_func();
-
-        return (coll);
+_MRTIMP2_NCEEPURE _Collvec __CLRCALL_PURE_OR_CDECL _Getcoll() {
+    _Collvec coll;
+    coll._Hand = ___lc_handle_func()[LC_COLLATE];
+    coll._Page = ___lc_collate_cp_func();
+    return (coll);
 }

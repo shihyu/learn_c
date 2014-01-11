@@ -34,22 +34,19 @@
 #error ERROR - ONLY WIN32 TARGET SUPPORTED!
 #endif  /* _WIN32 */
 
-unsigned __cdecl _getdiskfree (
+unsigned __cdecl _getdiskfree(
     unsigned uDrive,
-    struct _diskfree_t * pdf
-)
-{
+    struct _diskfree_t* pdf
+) {
     char   Root[4];
-    char * pRoot;
-
+    char* pRoot;
     _VALIDATE_RETURN((pdf != NULL), EINVAL, ERROR_INVALID_PARAMETER);
-    _VALIDATE_RETURN(( uDrive <= 26 ), EINVAL, ERROR_INVALID_PARAMETER);
-    memset( pdf, 0, sizeof( struct _diskfree_t ) );
+    _VALIDATE_RETURN((uDrive <= 26), EINVAL, ERROR_INVALID_PARAMETER);
+    memset(pdf, 0, sizeof(struct _diskfree_t));
 
-    if ( uDrive == 0 ) {
+    if (uDrive == 0) {
         pRoot = NULL;
-    }
-    else {
+    } else {
         pRoot = &Root[0];
         Root[0] = (char)uDrive + (char)('A' - 1);
         Root[1] = ':';
@@ -57,18 +54,15 @@ unsigned __cdecl _getdiskfree (
         Root[3] = '\0';
     }
 
-
-    if ( !GetDiskFreeSpace( pRoot,
-        (LPDWORD)&(pdf->sectors_per_cluster),
-        (LPDWORD)&(pdf->bytes_per_sector),
-        (LPDWORD)&(pdf->avail_clusters),
-        (LPDWORD)&(pdf->total_clusters)) )
-    {
+    if (!GetDiskFreeSpace(pRoot,
+                          (LPDWORD) & (pdf->sectors_per_cluster),
+                          (LPDWORD) & (pdf->bytes_per_sector),
+                          (LPDWORD) & (pdf->avail_clusters),
+                          (LPDWORD) & (pdf->total_clusters))) {
         int err = GetLastError();
         errno = _get_errno_from_oserr(err);
-
-        return ( err );
+        return (err);
     }
 
-    return ( 0 );
+    return (0);
 }

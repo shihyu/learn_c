@@ -33,14 +33,12 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/i386_clr_watch.c,v 1.3 2002/10/21 03:4
 #include <machine/sysarch.h>
 
 int
-i386_clr_watch(int watchnum, struct dbreg * d)
-{
+i386_clr_watch(int watchnum, struct dbreg* d) {
+    if (watchnum < 0 || watchnum >= 4) {
+        return -1;
+    }
 
-	if (watchnum < 0 || watchnum >= 4)
-		return -1;
-
-	DBREG_DRX(d,7) = DBREG_DRX(d,7) & ~((0x3 << (watchnum*2)) | (0x0f << (watchnum*4+16)));
-        DBREG_DRX(d,watchnum) = 0;
-
-	return 0;
+    DBREG_DRX(d, 7) = DBREG_DRX(d, 7) & ~((0x3 << (watchnum * 2)) | (0x0f << (watchnum * 4 + 16)));
+    DBREG_DRX(d, watchnum) = 0;
+    return 0;
 }

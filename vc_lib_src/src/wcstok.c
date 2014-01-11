@@ -56,72 +56,73 @@
 #endif  /* _SECURE_VERSION */
 
 #ifdef _SECURE_VERSION
-wchar_t * __cdecl wcstok_s (
-        wchar_t * string,
-        const wchar_t * control,
-        wchar_t ** context
-        )
+wchar_t* __cdecl wcstok_s(
+    wchar_t* string,
+    const wchar_t* control,
+    wchar_t** context
+)
 #else  /* _SECURE_VERSION */
-wchar_t * __cdecl wcstok (
-        wchar_t * string,
-        const wchar_t * control
-        )
+wchar_t* __cdecl wcstok(
+    wchar_t* string,
+    const wchar_t* control
+)
 #endif  /* _SECURE_VERSION */
 {
-        wchar_t *token;
-        const wchar_t *ctl;
-
+    wchar_t* token;
+    const wchar_t* ctl;
 #ifdef _SECURE_VERSION
-
-        /* validation section */
-        _VALIDATE_RETURN(context != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(string != NULL || *context != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(control != NULL, EINVAL, NULL);
-
-        /* no static storage is needed for the secure version */
-
+    /* validation section */
+    _VALIDATE_RETURN(context != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(string != NULL || *context != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(control != NULL, EINVAL, NULL);
+    /* no static storage is needed for the secure version */
 #else  /* _SECURE_VERSION */
-
-        _ptiddata ptd = _getptd();
-
+    _ptiddata ptd = _getptd();
 #endif  /* _SECURE_VERSION */
 
-        /* If string==NULL, continue with previous string */
-        if (!string)
-                string = _TOKEN;
+    /* If string==NULL, continue with previous string */
+    if (!string) {
+        string = _TOKEN;
+    }
 
-        /* Find beginning of token (skip over leading delimiters). Note that
-         * there is no token iff this loop sets string to point to the terminal
-         * null (*string == '\0') */
+    /* Find beginning of token (skip over leading delimiters). Note that
+     * there is no token iff this loop sets string to point to the terminal
+     * null (*string == '\0') */
 
-        while (*string) {
-                for (ctl=control; *ctl && *ctl != *string; ctl++)
-                        ;
-                if (!*ctl) break;
-                string++;
+    while (*string) {
+        for (ctl = control; *ctl && *ctl != *string; ctl++)
+            ;
+
+        if (!*ctl) {
+            break;
         }
 
-        token = string;
+        string++;
+    }
 
-        /* Find the end of the token. If it is not the end of the string,
-         * put a null there. */
-        for ( ; *string ; string++ ) {
-                for (ctl=control; *ctl && *ctl != *string; ctl++)
-                        ;
-                if (*ctl) {
-                        *string++ = '\0';
-                        break;
-                }
+    token = string;
+
+    /* Find the end of the token. If it is not the end of the string,
+     * put a null there. */
+    for (; *string ; string++) {
+        for (ctl = control; *ctl && *ctl != *string; ctl++)
+            ;
+
+        if (*ctl) {
+            *string++ = '\0';
+            break;
         }
+    }
 
-        /* Update nextoken (or the corresponding field in the per-thread data
-         * structure */
-        _TOKEN = string;
+    /* Update nextoken (or the corresponding field in the per-thread data
+     * structure */
+    _TOKEN = string;
 
-        /* Determine if a token has been found. */
-        if ( token == string )
-                return NULL;
-        else
-                return token;
+    /* Determine if a token has been found. */
+    if (token == string) {
+        return NULL;
+    } else {
+        return token;
+    }
 }
 

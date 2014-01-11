@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -42,21 +42,26 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strncat.c,v 1.7 2007/01/09 00:28:12 imp 
  * Concatenate src on the end of dst.  At most strlen(dst)+n+1 bytes
  * are written at dst (at most n+1 bytes being appended).  Return dst.
  */
-char *
-strncat(char * __restrict dst, const char * __restrict src, size_t n)
-{
-	if (n != 0) {
-		char *d = dst;
-		const char *s = src;
+char*
+strncat(char* __restrict dst, const char* __restrict src, size_t n) {
+    if (n != 0) {
+        char* d = dst;
+        const char* s = src;
 
-		while (*d != 0)
-			d++;
-		do {
-			if ((*d = *s++) == 0)
-				break;
-			d++;
-		} while (--n != 0);
-		*d = 0;
-	}
-	return (dst);
+        while (*d != 0) {
+            d++;
+        }
+
+        do {
+            if ((*d = *s++) == 0) {
+                break;
+            }
+
+            d++;
+        } while (--n != 0);
+
+        *d = 0;
+    }
+
+    return (dst);
 }

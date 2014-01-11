@@ -85,15 +85,15 @@ extern "C" {
 _CRT_MANAGED_FP_DEPRECATE _CRTIMP unsigned int __cdecl _clearfp(void);
 #pragma warning(push)
 #pragma warning(disable: 4141)
-_CRT_MANAGED_FP_DEPRECATE _CRT_INSECURE_DEPRECATE(_controlfp_s) _CRTIMP unsigned int __cdecl _controlfp(__in unsigned int _NewValue,__in unsigned int _Mask);
+_CRT_MANAGED_FP_DEPRECATE _CRT_INSECURE_DEPRECATE(_controlfp_s) _CRTIMP unsigned int __cdecl _controlfp(__in unsigned int _NewValue, __in unsigned int _Mask);
 #pragma warning(pop)
 _CRT_MANAGED_FP_DEPRECATE _CRTIMP void __cdecl _set_controlfp(__in unsigned int _NewValue, __in unsigned int _Mask);
-_CRT_MANAGED_FP_DEPRECATE _CRTIMP errno_t __cdecl _controlfp_s(__out_opt unsigned int *_CurrentState, __in unsigned int _NewValue, __in unsigned int _Mask);
+_CRT_MANAGED_FP_DEPRECATE _CRTIMP errno_t __cdecl _controlfp_s(__out_opt unsigned int* _CurrentState, __in unsigned int _NewValue, __in unsigned int _Mask);
 _CRT_MANAGED_FP_DEPRECATE _CRTIMP unsigned int __cdecl _statusfp(void);
 _CRT_MANAGED_FP_DEPRECATE _CRTIMP void __cdecl _fpreset(void);
 
 #if defined (_M_IX86)
-_CRT_MANAGED_FP_DEPRECATE _CRTIMP void __cdecl _statusfp2(__out_opt unsigned int *_X86_status, __out_opt unsigned int *_SSE2_status);
+_CRT_MANAGED_FP_DEPRECATE _CRTIMP void __cdecl _statusfp2(__out_opt unsigned int* _X86_status, __out_opt unsigned int* _SSE2_status);
 #endif  /* defined (_M_IX86) */
 
 #define _clear87        _clearfp
@@ -171,15 +171,15 @@ _CRT_MANAGED_FP_DEPRECATE _CRTIMP void __cdecl _statusfp2(__out_opt unsigned int
 
 #endif  /* defined (_M_AMD64) */
 
-_CRT_MANAGED_FP_DEPRECATE _CRTIMP unsigned int __cdecl _control87(__in unsigned int _NewValue,__in unsigned int _Mask);
+_CRT_MANAGED_FP_DEPRECATE _CRTIMP unsigned int __cdecl _control87(__in unsigned int _NewValue, __in unsigned int _Mask);
 #if defined (_M_IX86)
 _CRT_MANAGED_FP_DEPRECATE _CRTIMP int __cdecl __control87_2(__in unsigned int _NewValue, __in unsigned int _Mask,
-                                  __out_opt unsigned int* _X86_cw, __out_opt unsigned int* _Sse2_cw);
+        __out_opt unsigned int* _X86_cw, __out_opt unsigned int* _Sse2_cw);
 #endif  /* defined (_M_IX86) */
 
 /* Global variable holding floating point error code */
 
-_CRTIMP extern __checkReturn int * __cdecl __fpecode(void);
+_CRTIMP extern __checkReturn int* __cdecl __fpecode(void);
 #define _fpecode        (*__fpecode())
 
 /* invalid subconditions (_SW_INVALID also set) */
@@ -209,8 +209,8 @@ _CRTIMP extern __checkReturn int * __cdecl __fpecode(void);
 /* IEEE recommended functions */
 
 #ifndef _SIGN_DEFINED
-_CRTIMP __checkReturn double __cdecl _copysign (__in double _Number, __in double _Sign);
-_CRTIMP __checkReturn double __cdecl _chgsign (__in double _X);
+_CRTIMP __checkReturn double __cdecl _copysign(__in double _Number, __in double _Sign);
+_CRTIMP __checkReturn double __cdecl _chgsign(__in double _X);
 #define _SIGN_DEFINED
 #endif  /* _SIGN_DEFINED */
 _CRTIMP __checkReturn double __cdecl _scalb(__in double _X, __in long _Y);

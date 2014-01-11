@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,56 +42,63 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/getsubopt.c,v 1.7 2007/01/09 00:28:10 im
  * tricky...  The extern variable suboptarg is a pointer to the token
  * which didn't match.
  */
-char *suboptarg;
+char* suboptarg;
 
 int
 getsubopt(optionp, tokens, valuep)
-	char **optionp, **valuep;
-	char * const *tokens;
+char** optionp, ** valuep;
+char* const* tokens;
 {
-	int cnt;
-	char *p;
+    int cnt;
+    char* p;
+    suboptarg = *valuep = NULL;
 
-	suboptarg = *valuep = NULL;
+    if (!optionp || !*optionp) {
+        return (-1);
+    }
 
-	if (!optionp || !*optionp)
-		return(-1);
+    /* skip leading white-space, commas */
+    for (p = *optionp; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
 
-	/* skip leading white-space, commas */
-	for (p = *optionp; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
+    if (!*p) {
+        *optionp = p;
+        return (-1);
+    }
 
-	if (!*p) {
-		*optionp = p;
-		return(-1);
-	}
+    /* save the start of the token, and skip the rest of the token. */
+    for (suboptarg = p;
+            *++p && *p != ',' && *p != '=' && *p != ' ' && *p != '\t';);
 
-	/* save the start of the token, and skip the rest of the token. */
-	for (suboptarg = p;
-	    *++p && *p != ',' && *p != '=' && *p != ' ' && *p != '\t';);
+    if (*p) {
+        /*
+         * If there's an equals sign, set the value pointer, and
+         * skip over the value part of the token.  Terminate the
+         * token.
+         */
+        if (*p == '=') {
+            *p = '\0';
 
-	if (*p) {
-		/*
-		 * If there's an equals sign, set the value pointer, and
-		 * skip over the value part of the token.  Terminate the
-		 * token.
-		 */
-		if (*p == '=') {
-			*p = '\0';
-			for (*valuep = ++p;
-			    *p && *p != ',' && *p != ' ' && *p != '\t'; ++p);
-			if (*p)
-				*p++ = '\0';
-		} else
-			*p++ = '\0';
-		/* Skip any whitespace or commas after this token. */
-		for (; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
-	}
+            for (*valuep = ++p;
+                    *p && *p != ',' && *p != ' ' && *p != '\t'; ++p);
 
-	/* set optionp for next round. */
-	*optionp = p;
+            if (*p) {
+                *p++ = '\0';
+            }
+        } else {
+            *p++ = '\0';
+        }
 
-	for (cnt = 0; *tokens; ++tokens, ++cnt)
-		if (!strcmp(suboptarg, *tokens))
-			return(cnt);
-	return(-1);
+        /* Skip any whitespace or commas after this token. */
+        for (; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
+    }
+
+    /* set optionp for next round. */
+    *optionp = p;
+
+    for (cnt = 0; *tokens; ++tokens, ++cnt)
+        if (!strcmp(suboptarg, *tokens)) {
+            return (cnt);
+        }
+
+    return (-1);
 }

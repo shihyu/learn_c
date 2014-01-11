@@ -85,7 +85,7 @@ extern "C" {
 #undef  _USE_32BIT_TIME_T
 #endif  /* _WIN64 */
 #else  /* _USE_32BIT_TIME_T */
-#if _INTEGRAL_MAX_BITS < 64   
+#if _INTEGRAL_MAX_BITS < 64
 #define _USE_32BIT_TIME_T
 #endif  /* _INTEGRAL_MAX_BITS < 64    */
 #endif  /* _USE_32BIT_TIME_T */
@@ -96,7 +96,7 @@ typedef _W64 long __time32_t;   /* 32-bit time value */
 #endif  /* _TIME32_T_DEFINED */
 
 #ifndef _TIME64_T_DEFINED
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 typedef __int64 __time64_t;     /* 64-bit time value */
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 #define _TIME64_T_DEFINED
@@ -122,80 +122,80 @@ typedef unsigned short wchar_t;
 #ifndef _STAT_DEFINED
 
 struct _stat32 {
-        _dev_t     st_dev;
-        _ino_t     st_ino;
-        unsigned short st_mode;
-        short      st_nlink;
-        short      st_uid;
-        short      st_gid;
-        _dev_t     st_rdev;
-        _off_t     st_size;
-        __time32_t st_atime;
-        __time32_t st_mtime;
-        __time32_t st_ctime;
-        };
+    _dev_t     st_dev;
+    _ino_t     st_ino;
+    unsigned short st_mode;
+    short      st_nlink;
+    short      st_uid;
+    short      st_gid;
+    _dev_t     st_rdev;
+    _off_t     st_size;
+    __time32_t st_atime;
+    __time32_t st_mtime;
+    __time32_t st_ctime;
+};
 
 #if !__STDC__
 /* Non-ANSI names for compatibility */
 struct stat {
-        _dev_t     st_dev;
-        _ino_t     st_ino;
-        unsigned short st_mode;
-        short      st_nlink;
-        short      st_uid;
-        short      st_gid;
-        _dev_t     st_rdev;
-        _off_t     st_size;
-        time_t st_atime;
-        time_t st_mtime;
-        time_t st_ctime;
-        };
+    _dev_t     st_dev;
+    _ino_t     st_ino;
+    unsigned short st_mode;
+    short      st_nlink;
+    short      st_uid;
+    short      st_gid;
+    _dev_t     st_rdev;
+    _off_t     st_size;
+    time_t st_atime;
+    time_t st_mtime;
+    time_t st_ctime;
+};
 
 #endif  /* !__STDC__ */
 
-#if _INTEGRAL_MAX_BITS >= 64   
+#if _INTEGRAL_MAX_BITS >= 64
 
 struct _stat32i64 {
-        _dev_t     st_dev;
-        _ino_t     st_ino;
-        unsigned short st_mode;
-        short      st_nlink;
-        short      st_uid;
-        short      st_gid;
-        _dev_t     st_rdev;
-        __int64    st_size;
-        __time32_t st_atime;
-        __time32_t st_mtime;
-        __time32_t st_ctime;
-        };
+    _dev_t     st_dev;
+    _ino_t     st_ino;
+    unsigned short st_mode;
+    short      st_nlink;
+    short      st_uid;
+    short      st_gid;
+    _dev_t     st_rdev;
+    __int64    st_size;
+    __time32_t st_atime;
+    __time32_t st_mtime;
+    __time32_t st_ctime;
+};
 
 struct _stat64i32 {
-        _dev_t     st_dev;
-        _ino_t     st_ino;
-        unsigned short st_mode;
-        short      st_nlink;
-        short      st_uid;
-        short      st_gid;
-        _dev_t     st_rdev;
-        _off_t     st_size;
-        __time64_t st_atime;
-        __time64_t st_mtime;
-        __time64_t st_ctime;
-        };
+    _dev_t     st_dev;
+    _ino_t     st_ino;
+    unsigned short st_mode;
+    short      st_nlink;
+    short      st_uid;
+    short      st_gid;
+    _dev_t     st_rdev;
+    _off_t     st_size;
+    __time64_t st_atime;
+    __time64_t st_mtime;
+    __time64_t st_ctime;
+};
 
 struct _stat64 {
-        _dev_t     st_dev;
-        _ino_t     st_ino;
-        unsigned short st_mode;
-        short      st_nlink;
-        short      st_uid;
-        short      st_gid;
-        _dev_t     st_rdev;
-        __int64    st_size;
-        __time64_t st_atime;
-        __time64_t st_mtime;
-        __time64_t st_ctime;
-        };
+    _dev_t     st_dev;
+    _ino_t     st_ino;
+    unsigned short st_mode;
+    short      st_nlink;
+    short      st_uid;
+    short      st_gid;
+    _dev_t     st_rdev;
+    __int64    st_size;
+    __time64_t st_atime;
+    __time64_t st_mtime;
+    __time64_t st_ctime;
+};
 
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
@@ -239,28 +239,28 @@ struct _stat64 {
 
 /* Function prototypes */
 
-_CRTIMP int __cdecl _fstat32(__in int _FileDes, __out struct _stat32 * _Stat);
-_CRTIMP int __cdecl _stat32(__in_z const char * _Name, __out struct _stat32 * _Stat);
+_CRTIMP int __cdecl _fstat32(__in int _FileDes, __out struct _stat32* _Stat);
+_CRTIMP int __cdecl _stat32(__in_z const char* _Name, __out struct _stat32* _Stat);
 
-#if _INTEGRAL_MAX_BITS >= 64   
-_CRTIMP int __cdecl _fstat32i64(__in int _FileDes, __out struct _stat32i64 * _Stat);
-_CRTIMP int __cdecl _fstat64i32(__in int _FileDes, __out struct _stat64i32 * _Stat);
-_CRTIMP int __cdecl _fstat64(__in int _FileDes, __out struct _stat64 * _Stat);
-_CRTIMP int __cdecl _stat32i64(__in_z const char * _Name, __out struct _stat32i64 * _Stat);
-_CRTIMP int __cdecl _stat64i32(__in_z const char * _Name, __out struct _stat64i32 * _Stat);
-_CRTIMP int __cdecl _stat64(__in_z const char * _Name, __out struct _stat64 * _Stat);
+#if _INTEGRAL_MAX_BITS >= 64
+_CRTIMP int __cdecl _fstat32i64(__in int _FileDes, __out struct _stat32i64* _Stat);
+_CRTIMP int __cdecl _fstat64i32(__in int _FileDes, __out struct _stat64i32* _Stat);
+_CRTIMP int __cdecl _fstat64(__in int _FileDes, __out struct _stat64* _Stat);
+_CRTIMP int __cdecl _stat32i64(__in_z const char* _Name, __out struct _stat32i64* _Stat);
+_CRTIMP int __cdecl _stat64i32(__in_z const char* _Name, __out struct _stat64i32* _Stat);
+_CRTIMP int __cdecl _stat64(__in_z const char* _Name, __out struct _stat64* _Stat);
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
 #ifndef _WSTAT_DEFINED
 
 /* also declared in wchar.h */
 
-_CRTIMP int __cdecl _wstat32(__in_z const wchar_t * _Name, __out struct _stat32 * _Stat);
+_CRTIMP int __cdecl _wstat32(__in_z const wchar_t* _Name, __out struct _stat32* _Stat);
 
-#if _INTEGRAL_MAX_BITS >= 64   
-_CRTIMP int __cdecl _wstat32i64(__in_z const wchar_t * _Name, __out struct _stat32i64 * _Stat);
-_CRTIMP int __cdecl _wstat64i32(__in_z const wchar_t * _Name, __out struct _stat64i32 * _Stat);
-_CRTIMP int __cdecl _wstat64(__in_z const wchar_t * _Name, __out struct _stat64 * _Stat);
+#if _INTEGRAL_MAX_BITS >= 64
+_CRTIMP int __cdecl _wstat32i64(__in_z const wchar_t* _Name, __out struct _stat32i64* _Stat);
+_CRTIMP int __cdecl _wstat64i32(__in_z const wchar_t* _Name, __out struct _stat64i32* _Stat);
+_CRTIMP int __cdecl _wstat64(__in_z const wchar_t* _Name, __out struct _stat64* _Stat);
 #endif  /* _INTEGRAL_MAX_BITS >= 64    */
 
 #define _WSTAT_DEFINED

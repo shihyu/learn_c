@@ -37,76 +37,70 @@
 *******************************************************************************/
 
 LPWSTR __cdecl __crtGetCommandLineW(
-        VOID
-        )
-{
-        static int f_use = 0;
+    VOID
+) {
+    static int f_use = 0;
 
-        /*
-         * Look for unstubbed 'preferred' flavor. Otherwise use available flavor.
-         * Must actually call the function to ensure it's not a stub.
-         */
+    /*
+     * Look for unstubbed 'preferred' flavor. Otherwise use available flavor.
+     * Must actually call the function to ensure it's not a stub.
+     */
 
-        if (0 == f_use)
-        {
-            if (NULL != GetCommandLineW())
-                f_use = USE_W;
-
-            else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
-                f_use = USE_A;
-
-            else
-                return 0;
-        }
-
-        /* Use "W" version */
-
-        if (USE_W == f_use)
-        {
-            return GetCommandLineW();
-        }
-
-        /* Use "A" version */
-
-        if (USE_A == f_use || f_use == 0)
-        {
-            int buff_size;
-            wchar_t *wbuffer;
-            LPSTR lpenv;
-
-            /*
-             * Convert strings and return the requested information.
-             */
-
-            lpenv = GetCommandLineA();
-
-            /* find out how big a buffer we need */
-            if ( 0 == (buff_size = MultiByteToWideChar( CP_ACP,
-                                                       MB_PRECOMPOSED,
-                                                       lpenv,
-                                                       -1,
-                                                       NULL,
-                                                       0 )) )
-                return 0;
-
-            /* allocate enough space for chars */
-            if (NULL == (wbuffer = (wchar_t *)
-                _calloc_crt(buff_size, sizeof(wchar_t))))
-                return 0;
-
-            if ( 0 != MultiByteToWideChar( CP_ACP,
-                                           MB_PRECOMPOSED,
-                                           lpenv,
-                                           -1,
-                                           wbuffer,
-                                           buff_size ) )
-            {
-                return (LPWSTR)wbuffer;
-            } else {
-                _free_crt(wbuffer);
-                return 0;
-            }
-        }
-        else   /* f_use is neither USE_A nor USE_W */
+    if (0 == f_use) {
+        if (NULL != GetCommandLineW()) {
+            f_use = USE_W;
+        } else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
+            f_use = USE_A;
+        } else {
             return 0;
+        }
+    }
+
+    /* Use "W" version */
+
+    if (USE_W == f_use) {
+        return GetCommandLineW();
+    }
+
+    /* Use "A" version */
+
+    if (USE_A == f_use || f_use == 0) {
+        int buff_size;
+        wchar_t* wbuffer;
+        LPSTR lpenv;
+        /*
+         * Convert strings and return the requested information.
+         */
+        lpenv = GetCommandLineA();
+
+        /* find out how big a buffer we need */
+        if (0 == (buff_size = MultiByteToWideChar(CP_ACP,
+                              MB_PRECOMPOSED,
+                              lpenv,
+                              -1,
+                              NULL,
+                              0))) {
+            return 0;
+        }
+
+        /* allocate enough space for chars */
+        if (NULL == (wbuffer = (wchar_t*)
+                               _calloc_crt(buff_size, sizeof(wchar_t)))) {
+            return 0;
+        }
+
+        if (0 != MultiByteToWideChar(CP_ACP,
+                                     MB_PRECOMPOSED,
+                                     lpenv,
+                                     -1,
+                                     wbuffer,
+                                     buff_size)) {
+            return (LPWSTR)wbuffer;
+        } else {
+            _free_crt(wbuffer);
+            return 0;
+        }
+    } else { /* f_use is neither USE_A nor USE_W */
+        return 0;
+    }
 }

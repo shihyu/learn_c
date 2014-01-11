@@ -37,17 +37,17 @@
 *
 *******************************************************************************/
 
-size_t __cdecl __wcsncnt (
-        const wchar_t *string,
-        size_t cnt
-        )
-{
-        size_t n = cnt;
-        wchar_t *cp = (wchar_t *)string;
+size_t __cdecl __wcsncnt(
+    const wchar_t* string,
+    size_t cnt
+) {
+    size_t n = cnt;
+    wchar_t* cp = (wchar_t*)string;
 
-        while (n-- && *cp)
-            cp++;
+    while (n-- && *cp) {
+        cp++;
+    }
 
-        return cnt - n - 1;
+    return cnt - n - 1;
 }
 

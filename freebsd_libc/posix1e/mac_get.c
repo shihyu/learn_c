@@ -35,52 +35,40 @@
 #include <sys/mac.h>
 #include <sys/socket.h>
 
-extern int __mac_get_fd(int fd, struct mac *mac_p);
-extern int __mac_get_file(const char *path_p, struct mac *mac_p);
-extern int __mac_get_link(const char *path_p, struct mac *mac_p);
-extern int __mac_get_pid(pid_t pid, struct mac *mac_p);
-extern int __mac_get_proc(struct mac *mac_p);
+extern int __mac_get_fd(int fd, struct mac* mac_p);
+extern int __mac_get_file(const char* path_p, struct mac* mac_p);
+extern int __mac_get_link(const char* path_p, struct mac* mac_p);
+extern int __mac_get_pid(pid_t pid, struct mac* mac_p);
+extern int __mac_get_proc(struct mac* mac_p);
 
 int
-mac_get_fd(int fd, struct mac *label)
-{
-
-	return (__mac_get_fd(fd, label));
+mac_get_fd(int fd, struct mac* label) {
+    return (__mac_get_fd(fd, label));
 }
 
 int
-mac_get_file(const char *path, struct mac *label)
-{
-
-	return (__mac_get_file(path, label));
+mac_get_file(const char* path, struct mac* label) {
+    return (__mac_get_file(path, label));
 }
 
 int
-mac_get_link(const char *path, struct mac *label)
-{
-
-	return (__mac_get_link(path, label));
+mac_get_link(const char* path, struct mac* label) {
+    return (__mac_get_link(path, label));
 }
 
 int
-mac_get_peer(int fd, struct mac *label)
-{
-	socklen_t len;
-
-	len = sizeof(*label);
-	return (getsockopt(fd, SOL_SOCKET, SO_PEERLABEL, label, &len));
+mac_get_peer(int fd, struct mac* label) {
+    socklen_t len;
+    len = sizeof(*label);
+    return (getsockopt(fd, SOL_SOCKET, SO_PEERLABEL, label, &len));
 }
 
 int
-mac_get_pid(pid_t pid, struct mac *label)
-{
-
-	return (__mac_get_pid(pid, label));
+mac_get_pid(pid_t pid, struct mac* label) {
+    return (__mac_get_pid(pid, label));
 }
 
 int
-mac_get_proc(struct mac *label)
-{
-
-	return (__mac_get_proc(label));
+mac_get_proc(struct mac* label) {
+    return (__mac_get_proc(label));
 }

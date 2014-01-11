@@ -40,47 +40,51 @@ static const char nogrouping[] = { CHAR_MAX, '\0' };
  * "3;3;-1" -> "\003\003\177\000"
  */
 
-const char *
-__fix_locale_grouping_str(const char *str)
-{
-	char *src, *dst;
-	char n;
+const char*
+__fix_locale_grouping_str(const char* str) {
+    char* src, *dst;
+    char n;
 
-	if (str == NULL || *str == '\0') {
-		return nogrouping;
-	}
+    if (str == NULL || *str == '\0') {
+        return nogrouping;
+    }
 
-	for (src = (char*)str, dst = (char*)str; *src != '\0'; src++) {
+    for (src = (char*)str, dst = (char*)str; *src != '\0'; src++) {
+        /* input string examples: "3;3", "3;2;-1" */
+        if (*src == ';') {
+            continue;
+        }
 
-		/* input string examples: "3;3", "3;2;-1" */
-		if (*src == ';')
-			continue;
-	
-		if (*src == '-' && *(src+1) == '1') {
-			*dst++ = CHAR_MAX;
-			src++;
-			continue;
-		}
+        if (*src == '-' && *(src + 1) == '1') {
+            *dst++ = CHAR_MAX;
+            src++;
+            continue;
+        }
 
-		if (!isdigit((unsigned char)*src)) {
-			/* broken grouping string */
-			return nogrouping;
-		}
+        if (!isdigit((unsigned char)*src)) {
+            /* broken grouping string */
+            return nogrouping;
+        }
 
-		/* assume all numbers <= 99 */
-		n = *src - '0';
-		if (isdigit((unsigned char)*(src+1))) {
-			src++;
-			n *= 10;
-			n += *src - '0';
-		}
+        /* assume all numbers <= 99 */
+        n = *src - '0';
 
-		*dst = n;
-		/* NOTE: assume all input started with "0" as 'no grouping' */
-		if (*dst == '\0')
-			return (dst == (char*)str) ? nogrouping : str;
-		dst++;
-	}
-	*dst = '\0';
-	return str;
+        if (isdigit((unsigned char) * (src + 1))) {
+            src++;
+            n *= 10;
+            n += *src - '0';
+        }
+
+        *dst = n;
+
+        /* NOTE: assume all input started with "0" as 'no grouping' */
+        if (*dst == '\0') {
+            return (dst == (char*)str) ? nogrouping : str;
+        }
+
+        dst++;
+    }
+
+    *dst = '\0';
+    return str;
 }

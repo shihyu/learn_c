@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1985, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,7 +36,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/ualarm.c,v 1.5 2007/01/09 00:27:56 imp Exp 
 #include <sys/time.h>
 #include <unistd.h>
 
-#define	USPS	1000000		/* # of microseconds in a second */
+#define USPS    1000000     /* # of microseconds in a second */
 
 /*
  * Generate a SIGALRM signal in ``usecs'' microseconds.
@@ -45,19 +45,19 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/ualarm.c,v 1.5 2007/01/09 00:27:56 imp Exp 
  */
 useconds_t
 ualarm(usecs, reload)
-	useconds_t usecs;
-	useconds_t reload;
+useconds_t usecs;
+useconds_t reload;
 {
-	struct itimerval new, old;
+    struct itimerval new, old;
+    new.it_interval.tv_usec = reload % USPS;
+    new.it_interval.tv_sec = reload / USPS;
+    new.it_value.tv_usec = usecs % USPS;
+    new.it_value.tv_sec = usecs / USPS;
 
-	new.it_interval.tv_usec = reload % USPS;
-	new.it_interval.tv_sec = reload / USPS;
+    if (setitimer(ITIMER_REAL, &new, &old) == 0) {
+        return (old.it_value.tv_sec * USPS + old.it_value.tv_usec);
+    }
 
-	new.it_value.tv_usec = usecs % USPS;
-	new.it_value.tv_sec = usecs / USPS;
-
-	if (setitimer(ITIMER_REAL, &new, &old) == 0)
-		return (old.it_value.tv_sec * USPS + old.it_value.tv_usec);
-	/* else */
-		return (-1);
+    /* else */
+    return (-1);
 }

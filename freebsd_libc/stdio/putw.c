@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,19 +44,18 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/putw.c,v 1.10 2007/01/09 00:28:07 imp Exp
 
 int
 putw(w, fp)
-	int w;
-	FILE *fp;
+int w;
+FILE* fp;
 {
-	int retval;
-	struct __suio uio;
-	struct __siov iov;
-
-	iov.iov_base = &w;
-	iov.iov_len = uio.uio_resid = sizeof(w);
-	uio.uio_iov = &iov;
-	uio.uio_iovcnt = 1;
-	FLOCKFILE(fp);
-	retval = __sfvwrite(fp, &uio);
-	FUNLOCKFILE(fp);
-	return (retval);
+    int retval;
+    struct __suio uio;
+    struct __siov iov;
+    iov.iov_base = &w;
+    iov.iov_len = uio.uio_resid = sizeof(w);
+    uio.uio_iov = &iov;
+    uio.uio_iovcnt = 1;
+    FLOCKFILE(fp);
+    retval = __sfvwrite(fp, &uio);
+    FUNLOCKFILE(fp);
+    return (retval);
 }

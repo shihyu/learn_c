@@ -33,25 +33,25 @@
 *
 *******************************************************************************/
 
-int __cdecl _trename (
-        const _TSCHAR *oldname,
-        const _TSCHAR *newname
-        )
-{
-        ULONG dosretval;
+int __cdecl _trename(
+    const _TSCHAR* oldname,
+    const _TSCHAR* newname
+) {
+    ULONG dosretval;
 
-        /* ask OS to move file */
+    /* ask OS to move file */
 
-        if (!MoveFile((LPTSTR)oldname, (LPTSTR)newname))
-            dosretval = GetLastError();
-        else
-            dosretval = 0;
+    if (!MoveFile((LPTSTR)oldname, (LPTSTR)newname)) {
+        dosretval = GetLastError();
+    } else {
+        dosretval = 0;
+    }
 
-        if (dosretval) {
-            /* error occured -- map error code and return */
-            _dosmaperr(dosretval);
-            return -1;
-        }
+    if (dosretval) {
+        /* error occured -- map error code and return */
+        _dosmaperr(dosretval);
+        return -1;
+    }
 
-        return 0;
+    return 0;
 }

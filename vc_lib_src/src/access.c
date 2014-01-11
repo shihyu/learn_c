@@ -38,14 +38,12 @@
 *
 *******************************************************************************/
 
-int __cdecl _taccess (
-        const _TSCHAR *path,
-        int amode
-        )
-{
+int __cdecl _taccess(
+    const _TSCHAR* path,
+    int amode
+) {
     errno_t e;
-    e = _taccess_s(path,amode);
-
+    e = _taccess_s(path, amode);
     return e ? -1 : 0 ;
 }
 
@@ -69,39 +67,35 @@ int __cdecl _taccess (
 *
 *******************************************************************************/
 
-errno_t __cdecl _taccess_s (
-        const _TSCHAR *path,
-        int amode
-        )
-{
+errno_t __cdecl _taccess_s(
+    const _TSCHAR* path,
+    int amode
+) {
+    DWORD attr;
+    _VALIDATE_CLEAR_OSSERR_RETURN_ERRCODE((path != NULL), EINVAL);
+    _VALIDATE_CLEAR_OSSERR_RETURN_ERRCODE(((amode & (~6)) == 0), EINVAL);
+    attr = GetFileAttributes((LPTSTR)path);
 
-        DWORD attr;
+    if (attr  == 0xffffffff) {
+        /* error occured -- map error code and return */
+        _dosmaperr(GetLastError());
+        return errno;
+    }
 
-        _VALIDATE_CLEAR_OSSERR_RETURN_ERRCODE( (path != NULL), EINVAL);
-        _VALIDATE_CLEAR_OSSERR_RETURN_ERRCODE( ((amode & (~6)) == 0), EINVAL);
+    if (attr & FILE_ATTRIBUTE_DIRECTORY) {
+        /* All directories have read & write access */
+        return 0;
+    }
 
-        attr = GetFileAttributes((LPTSTR)path);
-        if (attr  == 0xffffffff) {
-                /* error occured -- map error code and return */
-                _dosmaperr(GetLastError());
-                return errno;
-        }
-
-        if(attr & FILE_ATTRIBUTE_DIRECTORY)
-        {
-            /* All directories have read & write access */
-            return 0;
-        }
-
-        /* no error; see if returned premission settings OK */
-        if ( (attr & FILE_ATTRIBUTE_READONLY) && (amode & 2) ) {
-                /* no write permission on file, return error */
-                _doserrno = E_access;
-                errno = EACCES;
-                return errno;
-        }
-        else
-                /* file exists and has requested permission setting */
-                return 0;
-
+    /* no error; see if returned premission settings OK */
+    if ((attr & FILE_ATTRIBUTE_READONLY) && (amode & 2)) {
+        /* no write permission on file, return error */
+        _doserrno = E_access;
+        errno = EACCES;
+        return errno;
+    } else
+        /* file exists and has requested permission setting */
+    {
+        return 0;
+    }
 }

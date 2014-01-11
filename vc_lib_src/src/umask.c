@@ -23,18 +23,16 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl _umask_s (
-        int mode, int * poldmode
-        )
-{
-        _VALIDATE_RETURN_ERRCODE((poldmode != NULL), EINVAL);
-        *poldmode = _umaskval;
-        _VALIDATE_RETURN_ERRCODE(((mode & ~(_S_IREAD | _S_IWRITE)) == 0), EINVAL);
-
-        /* only user read/write permitted */
-        mode &= (_S_IREAD | _S_IWRITE);
-        _umaskval = mode;
-        return 0;
+errno_t __cdecl _umask_s(
+    int mode, int* poldmode
+) {
+    _VALIDATE_RETURN_ERRCODE((poldmode != NULL), EINVAL);
+    *poldmode = _umaskval;
+    _VALIDATE_RETURN_ERRCODE(((mode & ~(_S_IREAD | _S_IWRITE)) == 0), EINVAL);
+    /* only user read/write permitted */
+    mode &= (_S_IREAD | _S_IWRITE);
+    _umaskval = mode;
+    return 0;
 }
 
 /***
@@ -56,15 +54,12 @@ errno_t __cdecl _umask_s (
 *Exceptions:
 *
 *******************************************************************************/
-int __cdecl _umask (
-        int mode
-        )
-{
-        int oldmode = 0;
-
+int __cdecl _umask(
+    int mode
+) {
+    int oldmode = 0;
     /* silently ignore non-Windows modes */
-        mode &= (_S_IREAD | _S_IWRITE);
-
-        _umask_s(mode, &oldmode);
-        return oldmode;
+    mode &= (_S_IREAD | _S_IWRITE);
+    _umask_s(mode, &oldmode);
+    return oldmode;
 }

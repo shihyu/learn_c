@@ -31,19 +31,17 @@
 *
 *******************************************************************************/
 
-wint_t __cdecl _fgetwchar (
-        void
-        )
-{
-        return(getwc(stdin));
+wint_t __cdecl _fgetwchar(
+    void
+) {
+    return (getwc(stdin));
 }
 
 #undef getwchar
 
-wint_t __cdecl getwchar (
-        void
-        )
-{
-        return(_fgetwchar());
+wint_t __cdecl getwchar(
+    void
+) {
+    return (_fgetwchar());
 }
 

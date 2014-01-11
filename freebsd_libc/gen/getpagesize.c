@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,18 +47,20 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getpagesize.c,v 1.6 2007/01/09 00:27:54 imp
  */
 
 int
-getpagesize()
-{
-	int mib[2]; 
-	static int value;
-	size_t size;
+getpagesize() {
+    int mib[2];
+    static int value;
+    size_t size;
 
-	if (!value) {
-		mib[0] = CTL_HW;
-		mib[1] = HW_PAGESIZE;
-		size = sizeof value;
-		if (sysctl(mib, 2, &value, &size, NULL, 0) == -1)
-			return (-1);
-	}
-	return (value);
+    if (!value) {
+        mib[0] = CTL_HW;
+        mib[1] = HW_PAGESIZE;
+        size = sizeof value;
+
+        if (sysctl(mib, 2, &value, &size, NULL, 0) == -1) {
+            return (-1);
+        }
+    }
+
+    return (value);
 }

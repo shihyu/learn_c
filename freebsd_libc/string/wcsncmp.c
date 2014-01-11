@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,20 +40,24 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcsncmp.c,v 1.8 2007/01/09 00:28:12 imp 
 
 int
 wcsncmp(s1, s2, n)
-	const wchar_t *s1, *s2;
-	size_t n;
+const wchar_t* s1, *s2;
+size_t n;
 {
+    if (n == 0) {
+        return (0);
+    }
 
-	if (n == 0)
-		return (0);
-	do {
-		if (*s1 != *s2++) {
-			/* XXX assumes wchar_t = int */
-			return (*(const unsigned int *)s1 -
-			    *(const unsigned int *)--s2);
-		}
-		if (*s1++ == 0)
-			break;
-	} while (--n != 0);
-	return (0);
+    do {
+        if (*s1 != *s2++) {
+            /* XXX assumes wchar_t = int */
+            return (*(const unsigned int*)s1 -
+                    * (const unsigned int*)--s2);
+        }
+
+        if (*s1++ == 0) {
+            break;
+        }
+    } while (--n != 0);
+
+    return (0);
 }

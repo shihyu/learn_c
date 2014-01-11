@@ -36,45 +36,45 @@
 #ifndef _NSS_TLS_H_
 #define _NSS_TLS_H_
 
-#define NSS_TLS_HANDLING(name)					\
-static pthread_key_t name##_state_key;				\
-static	void	 name##_keyinit(void);				\
-static	int	 name##_getstate(struct name##_state **);	\
+#define NSS_TLS_HANDLING(name)                  \
+static pthread_key_t name##_state_key;              \
+static  void     name##_keyinit(void);              \
+static  int  name##_getstate(struct name##_state **);   \
 \
-static void								\
-name##_keyinit(void)							\
-{									\
-	(void)_pthread_key_create(&name##_state_key, name##_endstate);	\
-}									\
+static void                             \
+name##_keyinit(void)                            \
+{                                   \
+    (void)_pthread_key_create(&name##_state_key, name##_endstate);  \
+}                                   \
 \
-static int							\
-name##_getstate(struct name##_state **p)			\
-{								\
-	static struct name##_state st;				\
-	static pthread_once_t	keyinit = PTHREAD_ONCE_INIT;	\
-	int			rv;				\
-								\
-	if (!__isthreaded || _pthread_main_np() != 0) {		\
-		*p = &st;					\
-		return (0);					\
-	}							\
-	rv = _pthread_once(&keyinit, name##_keyinit);		\
-	if (rv != 0)						\
-		return (rv);					\
-	*p = _pthread_getspecific(name##_state_key);		\
-	if (*p != NULL)						\
-		return (0);					\
-	*p = calloc(1, sizeof(**p));				\
-	if (*p == NULL)						\
-		return (ENOMEM);				\
-	rv = _pthread_setspecific(name##_state_key, *p);	\
-	if (rv != 0) {						\
-		free(*p);					\
-		*p = NULL;					\
-	}							\
-	return (rv);						\
-}								\
-/* allow the macro invocation to end with a semicolon */	\
+static int                          \
+name##_getstate(struct name##_state **p)            \
+{                               \
+    static struct name##_state st;              \
+    static pthread_once_t   keyinit = PTHREAD_ONCE_INIT;    \
+    int         rv;             \
+                                \
+    if (!__isthreaded || _pthread_main_np() != 0) {     \
+        *p = &st;                   \
+        return (0);                 \
+    }                           \
+    rv = _pthread_once(&keyinit, name##_keyinit);       \
+    if (rv != 0)                        \
+        return (rv);                    \
+    *p = _pthread_getspecific(name##_state_key);        \
+    if (*p != NULL)                     \
+        return (0);                 \
+    *p = calloc(1, sizeof(**p));                \
+    if (*p == NULL)                     \
+        return (ENOMEM);                \
+    rv = _pthread_setspecific(name##_state_key, *p);    \
+    if (rv != 0) {                      \
+        free(*p);                   \
+        *p = NULL;                  \
+    }                           \
+    return (rv);                        \
+}                               \
+/* allow the macro invocation to end with a semicolon */    \
 struct _clashproof_bmVjdGFy
 
 #endif /* _NSS_TLS_H_ */

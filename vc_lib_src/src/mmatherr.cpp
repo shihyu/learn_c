@@ -19,11 +19,11 @@ int _matherr_flag = 9876;
 /*
  * Pointer to user-supplied _matherr routine if one has been supplied.
  */
-typedef int (__clrcall * _HANDLE_MATH_ERROR_M)(struct _exception *);
+typedef int (__clrcall* _HANDLE_MATH_ERROR_M)(struct _exception*);
 
 _HANDLE_MATH_ERROR_M pusermatherr = (_HANDLE_MATH_ERROR_M) _encoded_null();
 
-extern "C" _CRTIMP void __cdecl __setusermatherr( int (__cdecl *pf)(struct _exception *) );
+extern "C" _CRTIMP void __cdecl __setusermatherr(int (__cdecl* pf)(struct _exception*));
 
 /***
 *int _matherr(struct _exception *except) - handle math errors
@@ -39,16 +39,16 @@ extern "C" _CRTIMP void __cdecl __setusermatherr( int (__cdecl *pf)(struct _exce
 *
 *Exceptions:
 *******************************************************************************/
-extern "C" int __cdecl _matherr(struct _exception *pexcept)
-{
-
+extern "C" int __cdecl _matherr(struct _exception* pexcept) {
     /*
      * If user has supplied a _matherr implementation, pass control to
      * it and let it handle the error.
      */
     _HANDLE_MATH_ERROR_M pmatherr = (_HANDLE_MATH_ERROR_M) _decode_pointer(pusermatherr);
-    if ( pmatherr != NULL )
-            return pmatherr(pexcept);
+
+    if (pmatherr != NULL) {
+        return pmatherr(pexcept);
+    }
 
     return 0;
 }
@@ -66,11 +66,12 @@ extern "C" int __cdecl _matherr(struct _exception *pexcept)
 *Exceptions:
 *******************************************************************************/
 
-extern "C" _MRTIMP void __cdecl __setusermatherr_m( _HANDLE_MATH_ERROR_M pf)
-{
-        pusermatherr = (_HANDLE_MATH_ERROR_M) _encode_pointer(pf);
-        if (pf != 0) {
-            __setusermatherr(_matherr);
-        }
-        _matherr_flag = 0;
+extern "C" _MRTIMP void __cdecl __setusermatherr_m(_HANDLE_MATH_ERROR_M pf) {
+    pusermatherr = (_HANDLE_MATH_ERROR_M) _encode_pointer(pf);
+
+    if (pf != 0) {
+        __setusermatherr(_matherr);
+    }
+
+    _matherr_flag = 0;
 }

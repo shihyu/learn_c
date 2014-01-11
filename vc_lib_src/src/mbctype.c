@@ -48,8 +48,7 @@ _CRTALLOC(".CRT$XIC") static _PIFV pinit = __initmbctable;
 #define MAX_RANGES 8 /* max number of ranges needed given languages so far */
 
 /* character type info in ranges (pair of low/high), zeros indicate end */
-typedef struct
-{
+typedef struct {
     int             code_page;
     unsigned short  mbulinfo[NUM_ULINFO];
     unsigned char   rgrange[NUM_CTYPES][MAX_RANGES];
@@ -57,207 +56,208 @@ typedef struct
 
 extern "C"
 {
-threadmbcinfo __initialmbcinfo =
-{
-    0,
-    _CLOCALECP, /* _MB_CP_ANSI */
-    0,
-    0,
-    { 0, 0, 0, 0, 0, 0 },
-    {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-    0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-    0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
-    },
-    {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
-    0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73,
-    0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
-    0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
-    0x58, 0x59, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
-    }
-};
+    threadmbcinfo __initialmbcinfo = {
+        0,
+        _CLOCALECP, /* _MB_CP_ANSI */
+        0,
+        0,
+        { 0, 0, 0, 0, 0, 0 },
+        {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+            0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+            0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+            0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+            0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
+        },
+        {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
+            0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73,
+            0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
+            0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
+            0x58, 0x59, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
+        }
+    };
 
-/* MBCS ctype array */
-unsigned char _mbctype[NUM_CHARS] =
-{
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-    0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-    0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
-};
-unsigned char _mbcasemap[256] =
-{
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
-    0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73,
-    0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
-    0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
-    0x58, 0x59, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
-};
+    /* MBCS ctype array */
+    unsigned char _mbctype[NUM_CHARS] = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+        0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+        0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+        0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+        0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
+    };
+    unsigned char _mbcasemap[256] = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
+        0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73,
+        0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
+        0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
+        0x58, 0x59, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00 /* rest is zero */
+    };
 
-/* global variable to indicate current code page */
-int __mbcodepage = _CLOCALECP; /* __initialmbcinfo.mbcodepage; */
+    /* global variable to indicate current code page */
+    int __mbcodepage = _CLOCALECP; /* __initialmbcinfo.mbcodepage; */
 
-/* global flag indicating if current code page is a multibyte code page */
-int __ismbcodepage = 0; /*__initialmbcinfo.ismbcodepage; */
+    /* global flag indicating if current code page is a multibyte code page */
+    int __ismbcodepage = 0; /*__initialmbcinfo.ismbcodepage; */
 
-/* global variable to indicate current LCID */
-int __mblcid = 0; /* __initialmbcinfo.mblcid; */
+    /* global variable to indicate current LCID */
+    int __mblcid = 0; /* __initialmbcinfo.mblcid; */
 
-/* global variable to indicate current full-width-latin upper/lower info */
-unsigned short __mbulinfo[NUM_ULINFO]; /* __initialmbcinfo.mbulinfo */
+    /* global variable to indicate current full-width-latin upper/lower info */
+    unsigned short __mbulinfo[NUM_ULINFO]; /* __initialmbcinfo.mbulinfo */
 
-/* global pointer to the current per-thread mbc information structure. */
-pthreadmbcinfo __ptmbcinfo = &__initialmbcinfo;
+    /* global pointer to the current per-thread mbc information structure. */
+    pthreadmbcinfo __ptmbcinfo = &__initialmbcinfo;
 }
 
 static int fSystemSet;
 
 static char __rgctypeflag[NUM_CTYPES] = { _MS, _MP, _M1, _M2 };
 
-static code_page_info __rgcode_page_info[] =
-{
+static code_page_info __rgcode_page_info[] = {
     {
-      _KANJI_CP, /* Kanji (Japanese) Code Page */
-      { 0x8260, 0x8279,   /* Full-Width Latin Upper Range 1 */
-        0x8281 - 0x8260,  /* Full-Width Latin Case Difference 1 */
+        _KANJI_CP, /* Kanji (Japanese) Code Page */
+        {
+            0x8260, 0x8279,   /* Full-Width Latin Upper Range 1 */
+            0x8281 - 0x8260,  /* Full-Width Latin Case Difference 1 */
 
-        0x0000, 0x0000,   /* Full-Width Latin Upper Range 2 */
-        0x0000            /* Full-Width Latin Case Difference 2 */
+            0x0000, 0x0000,   /* Full-Width Latin Upper Range 2 */
+            0x0000            /* Full-Width Latin Case Difference 2 */
 #ifndef _WIN32
-        ,
-        0x8281, 0x829A,   /* Full-Width Latin Lower Range 1 */
+            ,
+            0x8281, 0x829A,   /* Full-Width Latin Lower Range 1 */
 
-        0x0000, 0x0000,   /* Full-Width Latin Lower Range 2 */
+            0x0000, 0x0000,   /* Full-Width Latin Lower Range 2 */
 
-        0x824F, 0x8258    /* Full-Width Latin Digit Range */
+            0x824F, 0x8258    /* Full-Width Latin Digit Range */
 #endif  /* _WIN32 */
-      },
-      {
-        { 0xA6, 0xDF, 0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
-        { 0xA1, 0xA5, 0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
-        { 0x81, 0x9F, 0xE0, 0xFC, 0,    0,    0, 0, }, /* Lead Byte Ranges */
-        { 0x40, 0x7E, 0x80, 0xFC, 0,    0,    0, 0, }, /* Trail Byte Ranges */
-      }
+        },
+        {
+            { 0xA6, 0xDF, 0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
+            { 0xA1, 0xA5, 0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
+            { 0x81, 0x9F, 0xE0, 0xFC, 0,    0,    0, 0, }, /* Lead Byte Ranges */
+            { 0x40, 0x7E, 0x80, 0xFC, 0,    0,    0, 0, }, /* Trail Byte Ranges */
+        }
     },
     {
-      _CHINESE_SIMP_CP, /* Chinese Simplified (PRC) Code Page */
-      { 0xA3C1, 0xA3DA,   /* Full-Width Latin Upper Range 1 */
-        0xA3E1 - 0xA3C1,  /* Full-Width Latin Case Difference 1 */
+        _CHINESE_SIMP_CP, /* Chinese Simplified (PRC) Code Page */
+        {
+            0xA3C1, 0xA3DA,   /* Full-Width Latin Upper Range 1 */
+            0xA3E1 - 0xA3C1,  /* Full-Width Latin Case Difference 1 */
 
-        0x0000, 0x0000,   /* Full-Width Latin Upper Range 2 */
-        0x0000            /* Full-Width Latin Case Difference 2 */
+            0x0000, 0x0000,   /* Full-Width Latin Upper Range 2 */
+            0x0000            /* Full-Width Latin Case Difference 2 */
 #ifndef _WIN32
-        ,
-        0xA3E1, 0xA3FA,   /* Full-Width Latin Lower Range 1 */
+            ,
+            0xA3E1, 0xA3FA,   /* Full-Width Latin Lower Range 1 */
 
-        0x0000, 0x0000,   /* Full-Width Latin Lower Range 2 */
+            0x0000, 0x0000,   /* Full-Width Latin Lower Range 2 */
 
-        0xA3B0, 0xA3B9    /* Full-Width Latin Digit Range */
+            0xA3B0, 0xA3B9    /* Full-Width Latin Digit Range */
 #endif  /* _WIN32 */
-      },
-      {
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
-        { 0x81, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Lead Byte Ranges */
-        { 0x40, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Trail Byte Ranges */
-      }
+        },
+        {
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
+            { 0x81, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Lead Byte Ranges */
+            { 0x40, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Trail Byte Ranges */
+        }
     },
     {
-      _KOREAN_WANGSUNG_CP, /* Wangsung (Korean) Code Page */
-      { 0xA3C1, 0xA3DA,   /* Full-Width Latin Upper Range 1 */
-        0xA3E1 - 0xA3C1,  /* Full-Width Latin Case Difference 1 */
+        _KOREAN_WANGSUNG_CP, /* Wangsung (Korean) Code Page */
+        {
+            0xA3C1, 0xA3DA,   /* Full-Width Latin Upper Range 1 */
+            0xA3E1 - 0xA3C1,  /* Full-Width Latin Case Difference 1 */
 
-        0x0000, 0x0000,   /* Full-Width Latin Upper Range 2 */
-        0x0000            /* Full-Width Latin Case Difference 2 */
+            0x0000, 0x0000,   /* Full-Width Latin Upper Range 2 */
+            0x0000            /* Full-Width Latin Case Difference 2 */
 #ifndef _WIN32
-        ,
-        0xA3E1, 0xA3FA,   /* Full-Width Latin Lower Range 1 */
+            ,
+            0xA3E1, 0xA3FA,   /* Full-Width Latin Lower Range 1 */
 
-        0x0000, 0x0000,   /* Full-Width Latin Lower Range 2 */
+            0x0000, 0x0000,   /* Full-Width Latin Lower Range 2 */
 
-        0xA3B0, 0xA3B9    /* Full-Width Latin Digit Range */
+            0xA3B0, 0xA3B9    /* Full-Width Latin Digit Range */
 #endif  /* _WIN32 */
-      },
-      {
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
-        { 0x81, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Lead Byte Ranges */
-        { 0x41, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Trail Byte Ranges */
-      }
+        },
+        {
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
+            { 0x81, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Lead Byte Ranges */
+            { 0x41, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Trail Byte Ranges */
+        }
     },
     {
-      _CHINESE_TRAD_CP, /* Chinese Traditional (Taiwan) Code Page */
-      { 0xA2CF, 0xA2E4,   /* Full-Width Latin Upper Range 1 */
-        0xA2E9 - 0xA2CF,  /* Full-Width Latin Case Difference 1 */
+        _CHINESE_TRAD_CP, /* Chinese Traditional (Taiwan) Code Page */
+        {
+            0xA2CF, 0xA2E4,   /* Full-Width Latin Upper Range 1 */
+            0xA2E9 - 0xA2CF,  /* Full-Width Latin Case Difference 1 */
 
-        0xA2E5, 0xA2E8,   /* Full-Width Latin Upper Range 2 */
-        0xA340 - 0XA2E5   /* Full-Width Latin Case Difference 2 */
+            0xA2E5, 0xA2E8,   /* Full-Width Latin Upper Range 2 */
+            0xA340 - 0XA2E5   /* Full-Width Latin Case Difference 2 */
 #ifndef _WIN32
-        ,
-        0xA2E9, 0xA2FE,   /* Full-Width Latin Lower Range 1 */
+            ,
+            0xA2E9, 0xA2FE,   /* Full-Width Latin Lower Range 1 */
 
-        0xA340, 0xA343,   /* Full-Width Latin Lower Range 2 */
+            0xA340, 0xA343,   /* Full-Width Latin Lower Range 2 */
 
-        0xA2AF, 0xA2B8    /* Full-Width Latin Digit Range */
+            0xA2AF, 0xA2B8    /* Full-Width Latin Digit Range */
 #endif  /* _WIN32 */
-      },
-      {
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
-        { 0x81, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Lead Byte Ranges */
-        { 0x40, 0x7E, 0xA1, 0xFE, 0,    0,    0, 0, }, /* Trail Byte Ranges */
-      }
+        },
+        {
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
+            { 0x81, 0xFE, 0,    0,    0,    0,    0, 0, }, /* Lead Byte Ranges */
+            { 0x40, 0x7E, 0xA1, 0xFE, 0,    0,    0, 0, }, /* Trail Byte Ranges */
+        }
     },
     {
-      _KOREAN_JOHAB_CP, /* Johab (Korean) Code Page */
-      { 0xDA51, 0xDA5E,   /* Full-Width Latin Upper Range 1 */
-        0xDA71 - 0xDA51,  /* Full-Width Latin Case Difference 1 */
+        _KOREAN_JOHAB_CP, /* Johab (Korean) Code Page */
+        {
+            0xDA51, 0xDA5E,   /* Full-Width Latin Upper Range 1 */
+            0xDA71 - 0xDA51,  /* Full-Width Latin Case Difference 1 */
 
-        0xDA5F, 0xDA6A,   /* Full-Width Latin Upper Range 2 */
-        0xDA91 - 0xDA5F   /* Full-Width Latin Case Difference 2 */
+            0xDA5F, 0xDA6A,   /* Full-Width Latin Upper Range 2 */
+            0xDA91 - 0xDA5F   /* Full-Width Latin Case Difference 2 */
 #ifndef _WIN32
-        ,
-        0xDA71, 0xDA7E,   /* Full-Width Latin Lower Range 1 */
+            ,
+            0xDA71, 0xDA7E,   /* Full-Width Latin Lower Range 1 */
 
-        0xDA91, 0xDA9C,   /* Full-Width Latin Lower Range 2 */
+            0xDA91, 0xDA9C,   /* Full-Width Latin Lower Range 2 */
 
-        0xDA40, 0xDA49    /* Full-Width Latin Digit Range */
+            0xDA40, 0xDA49    /* Full-Width Latin Digit Range */
 #endif  /* _WIN32 */
-      },
-      {
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
-        { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
-        { 0x81, 0xD3, 0xD8, 0xDE, 0xE0, 0xF9, 0, 0, }, /* Lead Byte Ranges */
-        { 0x31, 0x7E, 0x81, 0xFE, 0,    0,    0, 0, }, /* Trail Byte Ranges */
-      }
+        },
+        {
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Single Byte Ranges */
+            { 0,    0,    0,    0,    0,    0,    0, 0, }, /* Punctuation Ranges */
+            { 0x81, 0xD3, 0xD8, 0xDE, 0xE0, 0xF9, 0, 0, }, /* Lead Byte Ranges */
+            { 0x31, 0x7E, 0x81, 0xFE, 0,    0,    0, 0, }, /* Trail Byte Ranges */
+        }
     }
 };
 
@@ -278,29 +278,20 @@ extern "C" int __cdecl _setmbcp_nolock(int, pthreadmbcinfo);
 *
 *******************************************************************************/
 
-static int getSystemCP (int codepage)
-{
+static int getSystemCP(int codepage) {
     _locale_t plocinfo = NULL;
     _LocaleUpdate _loc_update(plocinfo);
     fSystemSet = 0;
 
     /* get system code page values if requested */
 
-    if (codepage == _MB_CP_OEM)
-    {
+    if (codepage == _MB_CP_OEM) {
         fSystemSet = 1;
         return GetOEMCP();
-    }
-
-    else if (codepage == _MB_CP_ANSI)
-    {
+    } else if (codepage == _MB_CP_ANSI) {
         fSystemSet = 1;
         return GetACP();
-    }
-
-    else
-    if (codepage == _MB_CP_LOCALE)
-    {
+    } else if (codepage == _MB_CP_LOCALE) {
         fSystemSet = 1;
         return __LC_CODEPAGE(_loc_update.GetLocaleT()->locinfo);
     }
@@ -325,20 +316,22 @@ static int getSystemCP (int codepage)
 *
 *******************************************************************************/
 
-static int CPtoLCID (int codepage)
-{
+static int CPtoLCID(int codepage) {
     switch (codepage) {
     case 932:
-        return MAKELCID(MAKELANGID(LANG_JAPANESE,SUBLANG_DEFAULT),
+        return MAKELCID(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
                         SORT_DEFAULT);
+
     case 936:
-        return MAKELCID(MAKELANGID(LANG_CHINESE,SUBLANG_CHINESE_SIMPLIFIED),
+        return MAKELCID(MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED),
                         SORT_DEFAULT);
+
     case 949:
-        return MAKELCID(MAKELANGID(LANG_KOREAN,SUBLANG_DEFAULT),
+        return MAKELCID(MAKELANGID(LANG_KOREAN, SUBLANG_DEFAULT),
                         SORT_DEFAULT);
+
     case 950:
-        return MAKELCID(MAKELANGID(LANG_CHINESE,SUBLANG_CHINESE_TRADITIONAL),
+        return MAKELCID(MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL),
                         SORT_DEFAULT);
     }
 
@@ -359,30 +352,31 @@ static int CPtoLCID (int codepage)
 *
 *******************************************************************************/
 
-static void setSBCS (pthreadmbcinfo ptmbci)
-{
+static void setSBCS(pthreadmbcinfo ptmbci) {
     int i;
 
     /* set for single-byte code page */
-    for (i = 0; i < NUM_CHARS; i++)
+    for (i = 0; i < NUM_CHARS; i++) {
         ptmbci->mbctype[i] = 0;
+    }
 
     /* code page has changed, set global flag */
     ptmbci->mbcodepage = 0;
-
     /* clear flag to indicate single-byte code */
     ptmbci->ismbcodepage = 0;
-
     ptmbci->mblcid = 0;
 
-    for (i = 0; i < NUM_ULINFO; i++)
+    for (i = 0; i < NUM_ULINFO; i++) {
         ptmbci->mbulinfo[i] = 0;
+    }
 
-    for ( i = 0 ; i < 257 ; i++ )
+    for (i = 0 ; i < 257 ; i++) {
         ptmbci->mbctype[i] = __initialmbcinfo.mbctype[i];
+    }
 
-    for ( i = 0 ; i < 256 ; i++ )
+    for (i = 0 ; i < 256 ; i++) {
         ptmbci->mbcasemap[i] = __initialmbcinfo.mbcasemap[i];
+    }
 }
 
 /***
@@ -398,9 +392,8 @@ static void setSBCS (pthreadmbcinfo ptmbci)
 *
 *******************************************************************************/
 
-static void setSBUpLow (pthreadmbcinfo ptmbci)
-{
-    BYTE *  pbPair;
+static void setSBUpLow(pthreadmbcinfo ptmbci) {
+    BYTE*   pbPair;
     UINT    ich;
     CPINFO  cpinfo;
     UCHAR   sbVector[256];
@@ -409,67 +402,55 @@ static void setSBUpLow (pthreadmbcinfo ptmbci)
     USHORT  wVector[256];
 
     //    test if codepage exists
-    if (GetCPInfo(ptmbci->mbcodepage, &cpinfo) != 0)
-    {
+    if (GetCPInfo(ptmbci->mbcodepage, &cpinfo) != 0) {
         //  if so, create vector 0-255
-        for (ich = 0; ich < 256; ich++)
+        for (ich = 0; ich < 256; ich++) {
             sbVector[ich] = (UCHAR) ich;
+        }
 
         //  set byte 0 and any leading byte value to non-alpha char ' '
         sbVector[0] = (UCHAR)' ';
+
         for (pbPair = &cpinfo.LeadByte[0]; *pbPair; pbPair += 2)
-            for (ich = *pbPair; ich <= *(pbPair + 1); ich++)
+            for (ich = *pbPair; ich <= *(pbPair + 1); ich++) {
                 sbVector[ich] = (UCHAR)' ';
+            }
 
         //  get char type for character vector
-
         __crtGetStringTypeA(NULL, CT_CTYPE1, (LPCSTR)sbVector, 256, wVector,
                             ptmbci->mbcodepage, ptmbci->mblcid, FALSE);
-
         //  get lower case mappings for character vector
-
         __crtLCMapStringA(NULL, ptmbci->mblcid, LCMAP_LOWERCASE, (LPCSTR)sbVector, 256,
-                                    (LPSTR)lowVector, 256, ptmbci->mbcodepage, FALSE);
-
+                          (LPSTR)lowVector, 256, ptmbci->mbcodepage, FALSE);
         //  get upper case mappings for character vector
-
         __crtLCMapStringA(NULL, ptmbci->mblcid, LCMAP_UPPERCASE, (LPCSTR)sbVector, 256,
-                                    (LPSTR)upVector, 256, ptmbci->mbcodepage, FALSE);
+                          (LPSTR)upVector, 256, ptmbci->mbcodepage, FALSE);
 
         //  set _SBUP, _SBLOW in ptmbci->mbctype if type is upper. lower
         //  set mapping array with lower or upper mapping value
 
         for (ich = 0; ich < 256; ich++)
-            if (wVector[ich] & _UPPER)
-            {
+            if (wVector[ich] & _UPPER) {
                 ptmbci->mbctype[ich + 1] |= _SBUP;
                 ptmbci->mbcasemap[ich] = lowVector[ich];
-            }
-            else if (wVector[ich] & _LOWER)
-            {
+            } else if (wVector[ich] & _LOWER) {
                 ptmbci->mbctype[ich + 1] |= _SBLOW;
                 ptmbci->mbcasemap[ich] = upVector[ich];
-            }
-            else
+            } else {
                 ptmbci->mbcasemap[ich] = 0;
-    }
-    else
-    {
+            }
+    } else {
         //  if no codepage, set 'A'-'Z' as upper, 'a'-'z' as lower
-
         for (ich = 0; ich < 256; ich++)
-            if (ich >= (UINT)'A' && ich <= (UINT)'Z')
-            {
+            if (ich >= (UINT)'A' && ich <= (UINT)'Z') {
                 ptmbci->mbctype[ich + 1] |= _SBUP;
                 ptmbci->mbcasemap[ich] = ich + ('a' - 'A');
-            }
-            else if (ich >= (UINT)'a' && ich <= (UINT)'z')
-            {
+            } else if (ich >= (UINT)'a' && ich <= (UINT)'z') {
                 ptmbci->mbctype[ich + 1] |= _SBLOW;
                 ptmbci->mbcasemap[ich] = ich - ('a' - 'A');
-            }
-            else
+            } else {
                 ptmbci->mbcasemap[ich] = 0;
+            }
     }
 }
 
@@ -492,25 +473,20 @@ static void setSBUpLow (pthreadmbcinfo ptmbci)
 *
 *******************************************************************************/
 
-extern "C" pthreadmbcinfo __cdecl __updatetmbcinfo(void)
-{
-        pthreadmbcinfo ptmbci;
+extern "C" pthreadmbcinfo __cdecl __updatetmbcinfo(void) {
+    pthreadmbcinfo ptmbci;
+    _ptiddata ptd = _getptd();
 
-        _ptiddata ptd = _getptd();
-        if (!(ptd->_ownlocale & __globallocalestatus)|| !ptd->ptlocinfo) {
+    if (!(ptd->_ownlocale & __globallocalestatus) || !ptd->ptlocinfo) {
         _mlock(_MB_CP_LOCK);
 
-        __try
-        {
-
-            if ( (ptmbci = ptd->ptmbcinfo) != __ptmbcinfo )
-            {
+        __try {
+            if ((ptmbci = ptd->ptmbcinfo) != __ptmbcinfo) {
                 /*
                  * Decrement the reference count in the old mbc info structure
                  * and free it, if necessary
                  */
-                    if ( (ptmbci != NULL) && (InterlockedDecrement((volatile LONG *)&(ptmbci->refcount)) == 0) && ptmbci != &__initialmbcinfo )
-                {
+                if ((ptmbci != NULL) && (InterlockedDecrement((volatile LONG*) & (ptmbci->refcount)) == 0) && ptmbci != &__initialmbcinfo) {
                     /*
                      * Free it
                      */
@@ -522,23 +498,20 @@ extern "C" pthreadmbcinfo __cdecl __updatetmbcinfo(void)
                  * reference count.
                  */
                 ptmbci = ptd->ptmbcinfo = __ptmbcinfo;
-                    InterlockedIncrement((volatile LONG *)&(ptmbci->refcount));
+                InterlockedIncrement((volatile LONG*) & (ptmbci->refcount));
             }
-        }
-        __finally
-        {
+        } __finally {
             _munlock(_MB_CP_LOCK);
         }
-        } else {
-            ptmbci = ptd->ptmbcinfo;
-        }
+    } else {
+        ptmbci = ptd->ptmbcinfo;
+    }
 
-        if(!ptmbci)
-        {
-            _amsg_exit(_RT_LOCALE);
-        }
+    if (!ptmbci) {
+        _amsg_exit(_RT_LOCALE);
+    }
 
-        return ptmbci;
+    return ptmbci;
 }
 
 
@@ -570,30 +543,23 @@ extern "C" pthreadmbcinfo __cdecl __updatetmbcinfo(void)
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _setmbcp (int codepage)
-{
+extern "C" int __cdecl _setmbcp(int codepage) {
     int retcode = -1;           /* initialize to failure */
     pthreadmbcinfo ptmbci;
     int i;
-
     _ptiddata ptd = _getptd();
-
     __updatetmbcinfo();
     ptmbci = ptd->ptmbcinfo;
-
-
     codepage = getSystemCP(codepage);
 
-    if ( codepage != ptmbci->mbcodepage )
-    {
+    if (codepage != ptmbci->mbcodepage) {
         /*
          * Always allocate space so that we don't have to take lock
          * for any update.
          */
-        ptmbci = (pthreadmbcinfo)_malloc_crt( sizeof(threadmbcinfo) );
+        ptmbci = (pthreadmbcinfo)_malloc_crt(sizeof(threadmbcinfo));
 
-        if (ptmbci != NULL)
-        {
+        if (ptmbci != NULL) {
             *ptmbci = *(ptd->ptmbcinfo);
             /*
              * Note that refcount for this structure is just one so
@@ -609,71 +575,79 @@ extern "C" int __cdecl _setmbcp (int codepage)
             /*
              * Install the codepage and copy the info into the struct
              */
-            if ( (retcode = _setmbcp_nolock(codepage, ptmbci)) == 0)
-            {
-                if (InterlockedDecrement((volatile LONG *)&ptd->ptmbcinfo->refcount) == 0 && ptd->ptmbcinfo != &__initialmbcinfo)
+            if ((retcode = _setmbcp_nolock(codepage, ptmbci)) == 0) {
+                if (InterlockedDecrement((volatile LONG*)&ptd->ptmbcinfo->refcount) == 0 && ptd->ptmbcinfo != &__initialmbcinfo) {
                     _free_crt(ptd->ptmbcinfo);
+                }
+
                 /*
                  * Assign and increment the refcount of this structure.
                  */
                 ptd->ptmbcinfo = ptmbci;
-                InterlockedIncrement((volatile LONG *)&(ptd->ptmbcinfo->refcount));
+                InterlockedIncrement((volatile LONG*) & (ptd->ptmbcinfo->refcount));
+
                 if (!(ptd->_ownlocale & _PER_THREAD_LOCALE_BIT) &&
                         !(__globallocalestatus & _GLOBAL_LOCALE_BIT)) {
-
                     _mlock(_MB_CP_LOCK);
-                    __try
-                    {
+
+                    __try {
                         /*
                          * Fill in the mbc info struct
                          */
                         __mbcodepage = ptmbci->mbcodepage;
                         __ismbcodepage = ptmbci->ismbcodepage;
                         __mblcid = ptmbci->mblcid;
-                        for ( i = 0 ; i < 5 ; i++ )
-                            __mbulinfo[i] = ptmbci->mbulinfo[i];
-                        for ( i = 0 ; i < 257 ; i++ )
-                            _mbctype[i] = ptmbci->mbctype[i];
-                        for ( i = 0 ; i < 256 ; i++ )
-                            _mbcasemap[i] = ptmbci->mbcasemap[i];
 
-                        if (InterlockedDecrement((volatile LONG *)&__ptmbcinfo->refcount) == 0 && __ptmbcinfo != &__initialmbcinfo)
+                        for (i = 0 ; i < 5 ; i++) {
+                            __mbulinfo[i] = ptmbci->mbulinfo[i];
+                        }
+
+                        for (i = 0 ; i < 257 ; i++) {
+                            _mbctype[i] = ptmbci->mbctype[i];
+                        }
+
+                        for (i = 0 ; i < 256 ; i++) {
+                            _mbcasemap[i] = ptmbci->mbcasemap[i];
+                        }
+
+                        if (InterlockedDecrement((volatile LONG*)&__ptmbcinfo->refcount) == 0 && __ptmbcinfo != &__initialmbcinfo) {
                             _free_crt(__ptmbcinfo);
+                        }
+
                         /*
                          * Update __ptmbcinfo
                          */
                         __ptmbcinfo = ptmbci;
-                        InterlockedIncrement((volatile LONG *)&ptmbci->refcount);
-                    }
-                    __finally
-                    {
+                        InterlockedIncrement((volatile LONG*)&ptmbci->refcount);
+                    } __finally {
                         _munlock(_MB_CP_LOCK);
                     }
                 }
-            }
-            else if (retcode == -1)
-            {
+            } else if (retcode == -1) {
                 /*
                  * Free up the newly malloc-ed struct (note: a free of
                  * NULL is legal)
                  */
-                if (ptmbci != &__initialmbcinfo)
+                if (ptmbci != &__initialmbcinfo) {
                     _free_crt(ptmbci);
+                }
+
                 errno = EINVAL;
                 /* note that if malloc fails, it sets errno to ENOMEM already */
             }
         }
-
-    }
-    else
+    } else
         /*
          * Not a new codepage after all. Nothing to do but return
          * success.
          */
+    {
         retcode = 0;
+    }
 
 #pragma warning(disable:4390)
-    if ( (retcode == -1) && (__ptmbcinfo == NULL) )
+
+    if ((retcode == -1) && (__ptmbcinfo == NULL))
         /*
          * Fatal error!
          */
@@ -682,115 +656,112 @@ extern "C" int __cdecl _setmbcp (int codepage)
     return retcode;
 }
 
-extern "C" int __cdecl _setmbcp_nolock(int codepage, pthreadmbcinfo ptmbci)
-{
-        unsigned int icp;
-        unsigned int irg;
-        unsigned int ich;
-        unsigned char *rgptr;
-        CPINFO cpinfo;
+extern "C" int __cdecl _setmbcp_nolock(int codepage, pthreadmbcinfo ptmbci) {
+    unsigned int icp;
+    unsigned int irg;
+    unsigned int ich;
+    unsigned char* rgptr;
+    CPINFO cpinfo;
+    codepage = getSystemCP(codepage);
 
-        codepage = getSystemCP(codepage);
+    /* user wants 'single-byte' MB code page */
+    if (codepage == _MB_CP_SBCS) {
+        setSBCS(ptmbci);
+        return 0;
+    }
 
-        /* user wants 'single-byte' MB code page */
-        if (codepage == _MB_CP_SBCS)
-        {
-            setSBCS(ptmbci);
-            return 0;
-        }
-
-        /* check for CRT code page info */
-        for (icp = 0;
+    /* check for CRT code page info */
+    for (icp = 0;
             icp < (sizeof(__rgcode_page_info) / sizeof(code_page_info));
-            icp++)
-        {
-            /* see if we have info for this code page */
-            if (__rgcode_page_info[icp].code_page == codepage)
-            {
-                /* clear the table */
-                for (ich = 0; ich < NUM_CHARS; ich++)
-                    ptmbci->mbctype[ich] = 0;
+            icp++) {
+        /* see if we have info for this code page */
+        if (__rgcode_page_info[icp].code_page == codepage) {
+            /* clear the table */
+            for (ich = 0; ich < NUM_CHARS; ich++) {
+                ptmbci->mbctype[ich] = 0;
+            }
 
-                /* for each type of info, load table */
-                for (irg = 0; irg < NUM_CTYPES; irg++)
-                {
-                    /* go through all the ranges for each type of info */
-                    for (rgptr = (unsigned char *)__rgcode_page_info[icp].rgrange[irg];
+            /* for each type of info, load table */
+            for (irg = 0; irg < NUM_CTYPES; irg++) {
+                /* go through all the ranges for each type of info */
+                for (rgptr = (unsigned char*)__rgcode_page_info[icp].rgrange[irg];
                         rgptr[0] && rgptr[1];
-                        rgptr += 2)
-                    {
-                        /* set the type for every character in range */
-                        for (ich = rgptr[0]; ich <= rgptr[1]; ich++)
-                            ptmbci->mbctype[ich + 1] |= __rgctypeflag[irg];
+                        rgptr += 2) {
+                    /* set the type for every character in range */
+                    for (ich = rgptr[0]; ich <= rgptr[1]; ich++) {
+                        ptmbci->mbctype[ich + 1] |= __rgctypeflag[irg];
                     }
                 }
-                /* code page has changed */
-                ptmbci->mbcodepage = codepage;
-                /* all the code pages we keep info for are truly multibyte */
-                ptmbci->ismbcodepage = 1;
-                ptmbci->mblcid = CPtoLCID(ptmbci->mbcodepage);
-                for (irg = 0; irg < NUM_ULINFO; irg++)
-                    ptmbci->mbulinfo[irg] = __rgcode_page_info[icp].mbulinfo[irg];
-
-                /* return success */
-                setSBUpLow(ptmbci);
-                return 0;
             }
-        }
 
-
-        /* code page not supported by CRT, try the OS */
-        if (GetCPInfo(codepage, &cpinfo) != 0) {
-            BYTE *lbptr;
-
-            /* clear the table */
-            for (ich = 0; ich < NUM_CHARS; ich++)
-                ptmbci->mbctype[ich] = 0;
-
+            /* code page has changed */
             ptmbci->mbcodepage = codepage;
-            ptmbci->mblcid = 0;
+            /* all the code pages we keep info for are truly multibyte */
+            ptmbci->ismbcodepage = 1;
+            ptmbci->mblcid = CPtoLCID(ptmbci->mbcodepage);
 
-            if (cpinfo.MaxCharSize > 1)
-            {
-                /* LeadByte range always terminated by two 0's */
-                for (lbptr = cpinfo.LeadByte; *lbptr && *(lbptr + 1); lbptr += 2)
-                {
-                    for (ich = *lbptr; ich <= *(lbptr + 1); ich++)
-                        ptmbci->mbctype[ich + 1] |= _M1;
-                }
-
-                /* All chars > 1 must be considered valid trail bytes */
-                for (ich = 0x01; ich < 0xFF; ich++)
-                    ptmbci->mbctype[ich + 1] |= _M2;
-
-                /* code page has changed */
-                ptmbci->mblcid = CPtoLCID(ptmbci->mbcodepage);
-
-                /* really a multibyte code page */
-                ptmbci->ismbcodepage = 1;
+            for (irg = 0; irg < NUM_ULINFO; irg++) {
+                ptmbci->mbulinfo[irg] = __rgcode_page_info[icp].mbulinfo[irg];
             }
-            else
-                /* single-byte code page */
-                ptmbci->ismbcodepage = 0;
 
-            for (irg = 0; irg < NUM_ULINFO; irg++)
-                ptmbci->mbulinfo[irg] = 0;
-
-            setSBUpLow(ptmbci);
             /* return success */
+            setSBUpLow(ptmbci);
             return 0;
         }
+    }
 
+    /* code page not supported by CRT, try the OS */
+    if (GetCPInfo(codepage, &cpinfo) != 0) {
+        BYTE* lbptr;
 
-        /* If system default call, don't fail - set to SBCS */
-        if (fSystemSet)
+        /* clear the table */
+        for (ich = 0; ich < NUM_CHARS; ich++) {
+            ptmbci->mbctype[ich] = 0;
+        }
+
+        ptmbci->mbcodepage = codepage;
+        ptmbci->mblcid = 0;
+
+        if (cpinfo.MaxCharSize > 1) {
+            /* LeadByte range always terminated by two 0's */
+            for (lbptr = cpinfo.LeadByte; *lbptr && *(lbptr + 1); lbptr += 2) {
+                for (ich = *lbptr; ich <= *(lbptr + 1); ich++) {
+                    ptmbci->mbctype[ich + 1] |= _M1;
+                }
+            }
+
+            /* All chars > 1 must be considered valid trail bytes */
+            for (ich = 0x01; ich < 0xFF; ich++) {
+                ptmbci->mbctype[ich + 1] |= _M2;
+            }
+
+            /* code page has changed */
+            ptmbci->mblcid = CPtoLCID(ptmbci->mbcodepage);
+            /* really a multibyte code page */
+            ptmbci->ismbcodepage = 1;
+        } else
+            /* single-byte code page */
         {
-            setSBCS(ptmbci);
-            return 0;
+            ptmbci->ismbcodepage = 0;
         }
 
-        /* return failure, code page not changed */
-        return -1;
+        for (irg = 0; irg < NUM_ULINFO; irg++) {
+            ptmbci->mbulinfo[irg] = 0;
+        }
+
+        setSBUpLow(ptmbci);
+        /* return success */
+        return 0;
+    }
+
+    /* If system default call, don't fail - set to SBCS */
+    if (fSystemSet) {
+        setSBCS(ptmbci);
+        return 0;
+    }
+
+    /* return failure, code page not changed */
+    return -1;
 }
 
 /***
@@ -807,14 +778,15 @@ extern "C" int __cdecl _setmbcp_nolock(int codepage, pthreadmbcinfo ptmbci)
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _getmbcp (void)
-{
+extern "C" int __cdecl _getmbcp(void) {
     _locale_t plocinfo = NULL;
     _LocaleUpdate _loc_update(plocinfo);
-    if ( _loc_update.GetLocaleT()->mbcinfo->ismbcodepage )
+
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage) {
         return _loc_update.GetLocaleT()->mbcinfo->mbcodepage;
-    else
+    } else {
         return 0;
+    }
 }
 
 
@@ -831,25 +803,21 @@ extern "C" int __cdecl _getmbcp (void)
 *
 *******************************************************************************/
 
-extern "C" int __cdecl __initmbctable (void)
-{
+extern "C" int __cdecl __initmbctable(void) {
 #ifdef CRTDLL
-
-        _setmbcp(_MB_CP_ANSI);
-
+    _setmbcp(_MB_CP_ANSI);
 #else  /* CRTDLL */
 
-        /*
-         * Ensure we only initialize _mbctype[] once
-         */
-        if ( __mbctype_initialized == 0 ) {
-            _setmbcp(_MB_CP_ANSI);
-            __mbctype_initialized = 1;
-        }
+    /*
+     * Ensure we only initialize _mbctype[] once
+     */
+    if (__mbctype_initialized == 0) {
+        _setmbcp(_MB_CP_ANSI);
+        __mbctype_initialized = 1;
+    }
 
 #endif  /* CRTDLL */
-
-        return 0;
+    return 0;
 }
 
 #endif  /* _MBCS */

@@ -49,21 +49,19 @@
 *
 *******************************************************************************/
 
-extern "C" unsigned char * __cdecl _mbstok_l(
-        unsigned char * string,
-        const unsigned char * sepset,
-        _locale_t plocinfo
-        )
-{
-        _ptiddata ptd = _getptd();
-        return _mbstok_s_l(string, sepset, &ptd->_mtoken, plocinfo);
+extern "C" unsigned char* __cdecl _mbstok_l(
+    unsigned char* string,
+    const unsigned char* sepset,
+    _locale_t plocinfo
+) {
+    _ptiddata ptd = _getptd();
+    return _mbstok_s_l(string, sepset, &ptd->_mtoken, plocinfo);
 }
 
-extern "C" unsigned char * __cdecl _mbstok(
-        unsigned char * string,
-        const unsigned char * sepset
-        )
-{
+extern "C" unsigned char* __cdecl _mbstok(
+    unsigned char* string,
+    const unsigned char* sepset
+) {
     /* We call the deprecated _mbstok_l (and not _mbstok_s_l) so that we keep one
      * single nextoken in the single thread case, i.e. the nextoken declared as static
      * inside _mbstok_l

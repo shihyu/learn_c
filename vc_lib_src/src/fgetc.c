@@ -32,61 +32,50 @@
 *
 *******************************************************************************/
 
-int __cdecl fgetc (
-        REG1 FILE *stream
-        )
-{
-        int retval=0;
+int __cdecl fgetc(
+    REG1 FILE* stream
+) {
+    int retval = 0;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (stream != NULL), EINVAL, EOF);
-
-        _lock_str(stream);
-        __try {
+    __try {
         _VALIDATE_STREAM_ANSI_SETRET(stream, EINVAL, retval, EOF);
 
-                if(retval==0)
-                {
-                        retval = _getc_nolock(stream);
-                }
-
+        if (retval == 0) {
+            retval = _getc_nolock(stream);
         }
-        __finally {
-            _unlock_str(stream);
-        }
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        return(retval);
+    return (retval);
 }
 
 #undef getc
 
-int __cdecl getc (
-        FILE *stream
-        )
-{
-        int retval=0;
+int __cdecl getc(
+    FILE* stream
+) {
+    int retval = 0;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (stream != NULL), EINVAL, EOF);
-
-        _lock_str(stream);
-        __try {
-
+    __try {
         _VALIDATE_STREAM_ANSI_SETRET(stream, EINVAL, retval, EOF);
-                if(retval==0)
-                {
-                        retval = _getc_nolock(stream);
-                }
 
+        if (retval == 0) {
+            retval = _getc_nolock(stream);
         }
-        __finally {
-            _unlock_str(stream);
-        }
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        return(retval);
+    return (retval);
 }
 
 _CRTIMP int (__cdecl _getc_nolock)(
-        FILE *stream
-        )
-{
+    FILE* stream
+) {
     return _getc_nolock(stream);
 }

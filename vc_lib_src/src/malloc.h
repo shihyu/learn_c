@@ -60,10 +60,10 @@ extern "C" {
 
 #ifndef _HEAPINFO_DEFINED
 typedef struct _heapinfo {
-        int * _pentry;
-        size_t _size;
-        int _useflag;
-        } _HEAPINFO;
+    int* _pentry;
+    size_t _size;
+    int _useflag;
+} _HEAPINFO;
 #define _HEAPINFO_DEFINED
 #endif  /* _HEAPINFO_DEFINED */
 
@@ -71,14 +71,14 @@ typedef struct _heapinfo {
 #ifndef _INTERNAL_IFSTRIP_
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP unsigned int * __cdecl __p__amblksiz(void);
+_CRTIMP unsigned int* __cdecl __p__amblksiz(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 
 #if !defined (_M_CEE_PURE)
 extern _CRT_INSECURE_DEPRECATE_GLOBALS(_get_amblksiz) unsigned int _amblksiz;
 #else  /* !defined (_M_CEE_PURE) */
-_CRT_INSECURE_DEPRECATE_GLOBALS(_get_amblksiz) _CRTIMP unsigned int * __cdecl __p__amblksiz(void);
+_CRT_INSECURE_DEPRECATE_GLOBALS(_get_amblksiz) _CRTIMP unsigned int* __cdecl __p__amblksiz(void);
 #define _amblksiz (*__p__amblksiz())
 #endif  /* !defined (_M_CEE_PURE) */
 
@@ -118,18 +118,18 @@ _CRT_INSECURE_DEPRECATE_GLOBALS(_get_amblksiz) _CRTIMP unsigned int * __cdecl __
 
 #ifndef _CRT_ALLOCATION_DEFINED
 #define _CRT_ALLOCATION_DEFINED
-_CRTIMP _CRT_JIT_INTRINSIC  _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_NumOfElements* _SizeOfElements)    void * __cdecl calloc(__in size_t _NumOfElements, __in size_t _SizeOfElements);
-_CRTIMP                     _CRTNOALIAS                                                                             void   __cdecl free(__inout_opt void * _Memory);
-_CRTIMP _CRT_JIT_INTRINSIC  _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void * __cdecl malloc(__in size_t _Size);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_NewSize)                           void * __cdecl realloc(__in_opt void * _Memory, __in size_t _NewSize);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size*_Count)                       void * __cdecl _recalloc(__in_opt void * _Memory, __in size_t _Count, __in size_t _Size);
-_CRTIMP                     _CRTNOALIAS                                                                             void   __cdecl _aligned_free(__inout_opt void * _Memory);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void * __cdecl _aligned_malloc(__in size_t _Size, __in size_t _Alignment);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void * __cdecl _aligned_offset_malloc(__in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void * __cdecl _aligned_realloc(__in_opt void * _Memory, __in size_t _Size, __in size_t _Alignment);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size*_Count)                       void * __cdecl _aligned_recalloc(__in_opt void * _Memory, __in size_t _Count, __in size_t _Size, __in size_t _Alignment);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void * __cdecl _aligned_offset_realloc(__in_opt void * _Memory, __in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
-_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size*_Count)                       void * __cdecl _aligned_offset_recalloc(__in_opt void * _Memory, __in size_t _Count, __in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
+_CRTIMP _CRT_JIT_INTRINSIC  _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_NumOfElements* _SizeOfElements)    void* __cdecl calloc(__in size_t _NumOfElements, __in size_t _SizeOfElements);
+_CRTIMP                     _CRTNOALIAS                                                                             void   __cdecl free(__inout_opt void* _Memory);
+_CRTIMP _CRT_JIT_INTRINSIC  _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void* __cdecl malloc(__in size_t _Size);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_NewSize)                           void* __cdecl realloc(__in_opt void* _Memory, __in size_t _NewSize);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size* _Count)                       void* __cdecl _recalloc(__in_opt void* _Memory, __in size_t _Count, __in size_t _Size);
+_CRTIMP                     _CRTNOALIAS                                                                             void   __cdecl _aligned_free(__inout_opt void* _Memory);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void* __cdecl _aligned_malloc(__in size_t _Size, __in size_t _Alignment);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void* __cdecl _aligned_offset_malloc(__in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void* __cdecl _aligned_realloc(__in_opt void* _Memory, __in size_t _Size, __in size_t _Alignment);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size* _Count)                       void* __cdecl _aligned_recalloc(__in_opt void* _Memory, __in size_t _Count, __in size_t _Size, __in size_t _Alignment);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size)                              void* __cdecl _aligned_offset_realloc(__in_opt void* _Memory, __in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
+_CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(_Size* _Count)                       void* __cdecl _aligned_offset_recalloc(__in_opt void* _Memory, __in size_t _Count, __in size_t _Size, __in size_t _Alignment, __in size_t _Offset);
 #endif  /* _CRT_ALLOCATION_DEFINED */
 
 #if defined (_DEBUG) && defined (_CRTDBG_MAP_ALLOC)
@@ -148,7 +148,7 @@ _CRTIMP                     _CRTNOALIAS _CRTRESTRICT __checkReturn __bcount_opt(
 #pragma pop_macro("_freea")
 #endif  /* defined (_DEBUG) && defined (_CRTDBG_MAP_ALLOC) */
 
-_CRTIMP int     __cdecl _resetstkoflw (void);
+_CRTIMP int     __cdecl _resetstkoflw(void);
 
 #define _MAX_WAIT_MALLOC_CRT 60000
 
@@ -162,25 +162,25 @@ _CRTIMP unsigned long __cdecl _set_malloc_crt_max_wait(__in unsigned long _NewVa
 #undef _msize
 #endif  /* defined (_DEBUG) && defined (_CRTDBG_MAP_ALLOC) */
 
-_CRTIMP __checkReturn __bcount_opt(_NewSize) void *  __cdecl _expand(__in void * _Memory, __in size_t _NewSize);
-_CRTIMP __checkReturn size_t  __cdecl _msize(__in void * _Memory);
+_CRTIMP __checkReturn __bcount_opt(_NewSize) void*   __cdecl _expand(__in void* _Memory, __in size_t _NewSize);
+_CRTIMP __checkReturn size_t  __cdecl _msize(__in void* _Memory);
 
 #if defined (_DEBUG) && defined (_CRTDBG_MAP_ALLOC)
 #pragma pop_macro("_expand")
 #pragma pop_macro("_msize")
 #endif  /* defined (_DEBUG) && defined (_CRTDBG_MAP_ALLOC) */
 
-__checkReturn __bcount(_Size) void *          __cdecl _alloca(__in size_t _Size);
+__checkReturn __bcount(_Size) void*           __cdecl _alloca(__in size_t _Size);
 _CRTIMP __checkReturn size_t  __cdecl _get_sbh_threshold(void);
 _CRTIMP int     __cdecl _set_sbh_threshold(__in size_t _NewValue);
 _CRTIMP errno_t __cdecl _set_amblksiz(__in size_t _Value);
-_CRTIMP errno_t __cdecl _get_amblksiz(__out size_t * _Value);
-_CRTIMP __checkReturn int     __cdecl _heapadd(__in void * _Memory, __in size_t _Size);
+_CRTIMP errno_t __cdecl _get_amblksiz(__out size_t* _Value);
+_CRTIMP __checkReturn int     __cdecl _heapadd(__in void* _Memory, __in size_t _Size);
 _CRTIMP __checkReturn int     __cdecl _heapchk(void);
 _CRTIMP __checkReturn int     __cdecl _heapmin(void);
 _CRTIMP int     __cdecl _heapset(__in unsigned int _Fill);
-_CRTIMP _CRT_MANAGED_HEAP_DEPRECATE int     __cdecl _heapwalk(__inout _HEAPINFO * _EntryInfo);
-_CRTIMP size_t  __cdecl _heapused(size_t * _Used, size_t * _Commit);
+_CRTIMP _CRT_MANAGED_HEAP_DEPRECATE int     __cdecl _heapwalk(__inout _HEAPINFO* _EntryInfo);
+_CRTIMP size_t  __cdecl _heapused(size_t* _Used, size_t* _Commit);
 
 _CRTIMP intptr_t __cdecl _get_heap_handle(void);
 
@@ -199,13 +199,12 @@ _CRTIMP intptr_t __cdecl _get_heap_handle(void);
 _STATIC_ASSERT(sizeof(unsigned int) <= _ALLOCA_S_MARKER_SIZE);
 
 #if !defined (__midl) && !defined (RC_INVOKED)
-__inline void *_MarkAllocaS(__out_opt __crt_typefix(unsigned int*) void *_Ptr, unsigned int _Marker)
-{
-    if (_Ptr)
-    {
+__inline void* _MarkAllocaS(__out_opt __crt_typefix(unsigned int*) void* _Ptr, unsigned int _Marker) {
+    if (_Ptr) {
         *((unsigned int*)_Ptr) = _Marker;
         _Ptr = (char*)_Ptr + _ALLOCA_S_MARKER_SIZE;
     }
+
     return _Ptr;
 }
 #endif  /* !defined (__midl) && !defined (RC_INVOKED) */
@@ -241,22 +240,22 @@ __pragma(warning(suppress: 6255)) \
 /* _freea must be in the header so that its allocator matches _malloca */
 #if !defined (__midl) && !defined (RC_INVOKED)
 #undef _freea
-_CRTNOALIAS __inline void __CRTDECL _freea(__inout_opt void * _Memory)
-{
+_CRTNOALIAS __inline void __CRTDECL _freea(__inout_opt void* _Memory) {
     unsigned int _Marker;
-    if (_Memory)
-    {
+
+    if (_Memory) {
         _Memory = (char*)_Memory - _ALLOCA_S_MARKER_SIZE;
-        _Marker = *(unsigned int *)_Memory;
-        if (_Marker == _ALLOCA_S_HEAP_MARKER)
-        {
+        _Marker = *(unsigned int*)_Memory;
+
+        if (_Marker == _ALLOCA_S_HEAP_MARKER) {
             free(_Memory);
         }
+
 #if defined (_ASSERTE)
-        else if (_Marker != _ALLOCA_S_STACK_MARKER)
-        {
+        else if (_Marker != _ALLOCA_S_STACK_MARKER) {
             _ASSERTE(("Corrupted pointer passed to _freea", 0));
         }
+
 #endif  /* defined (_ASSERTE) */
     }
 }

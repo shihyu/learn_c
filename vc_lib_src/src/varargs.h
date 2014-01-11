@@ -70,7 +70,7 @@ typedef _W64 unsigned int   uintptr_t;
 #ifdef _M_CEE_PURE
 typedef System::ArgIterator va_list;
 #else  /* _M_CEE_PURE */
-typedef char *  va_list;
+typedef char*   va_list;
 #endif  /* _M_CEE_PURE */
 #define _VA_LIST_DEFINED
 #endif  /* _VA_LIST_DEFINED */
@@ -124,7 +124,7 @@ typedef _VA_LIST va_list;
 
 #elif defined (_M_AMD64)
 
-extern void __cdecl __va_start(va_list *, ...);
+extern void __cdecl __va_start(va_list*, ...);
 
 #define va_dcl          va_list va_alist;
 

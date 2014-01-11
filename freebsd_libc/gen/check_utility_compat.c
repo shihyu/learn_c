@@ -41,35 +41,43 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/check_utility_compat.c,v 1.3 2003/05/01 19:
 #include <unistd.h>
 
 #ifndef LINE_MAX
-#define	LINE_MAX _POSIX2_LINE_MAX
+#define LINE_MAX _POSIX2_LINE_MAX
 #endif
 
-#define	_PATH_UTIL_COMPAT	"/etc/compat-FreeBSD-4-util"
-#define	_ENV_UTIL_COMPAT	"_COMPAT_FreeBSD_4"
+#define _PATH_UTIL_COMPAT   "/etc/compat-FreeBSD-4-util"
+#define _ENV_UTIL_COMPAT    "_COMPAT_FreeBSD_4"
 
 int
-check_utility_compat(const char *utility)
-{
-	char buf[LINE_MAX];
-	char *p, *bp;
-	int len;
+check_utility_compat(const char* utility) {
+    char buf[LINE_MAX];
+    char* p, *bp;
+    int len;
 
-	if ((p = getenv(_ENV_UTIL_COMPAT)) != NULL) {
-		strlcpy(buf, p, sizeof buf);
-	} else {
-		if ((len = readlink(_PATH_UTIL_COMPAT, buf, sizeof buf)) < 0)
-			return 0;
-		if (len > sizeof buf)
-			len = sizeof buf;
-		buf[len] = '\0';
-	}
-	if (buf[0] == '\0')
-		return 1;
+    if ((p = getenv(_ENV_UTIL_COMPAT)) != NULL) {
+        strlcpy(buf, p, sizeof buf);
+    } else {
+        if ((len = readlink(_PATH_UTIL_COMPAT, buf, sizeof buf)) < 0) {
+            return 0;
+        }
 
-	bp = buf;
-	while ((p = strsep(&bp, ",")) != NULL) {
-		if (strcmp(p, utility) == 0)
-			return 1;
-	}
-	return 0;
+        if (len > sizeof buf) {
+            len = sizeof buf;
+        }
+
+        buf[len] = '\0';
+    }
+
+    if (buf[0] == '\0') {
+        return 1;
+    }
+
+    bp = buf;
+
+    while ((p = strsep(&bp, ",")) != NULL) {
+        if (strcmp(p, utility) == 0) {
+            return 1;
+        }
+    }
+
+    return 0;
 }

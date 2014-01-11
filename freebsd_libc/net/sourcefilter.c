@@ -61,20 +61,20 @@ __FBSDID("$FreeBSD: src/lib/libc/net/sourcefilter.c,v 1.3 2007/07/04 00:55:50 pe
 #endif
 
 union sockunion {
-	struct sockaddr_storage	ss;
-	struct sockaddr		sa;
-	struct sockaddr_dl	sdl;
+    struct sockaddr_storage ss;
+    struct sockaddr     sa;
+    struct sockaddr_dl  sdl;
 #ifdef INET
-	struct sockaddr_in	sin;
+    struct sockaddr_in  sin;
 #endif
 #ifdef INET6
-	struct sockaddr_in6	sin6;
+    struct sockaddr_in6 sin6;
 #endif
 };
 typedef union sockunion sockunion_t;
 
 #ifndef MIN
-#define	MIN(a, b)	((a) < (b) ? (a) : (b))
+#define MIN(a, b)   ((a) < (b) ? (a) : (b))
 #endif
 
 /*
@@ -83,55 +83,59 @@ typedef union sockunion sockunion_t;
  * the newer, more portable, protocol independent API.
  */
 static uint32_t
-__inaddr_to_index(in_addr_t ifaddr)
-{
-	struct ifaddrs	*ifa;
-	struct ifaddrs	*ifaddrs;
-	char		*ifname;
-	int		 ifindex;
-	sockunion_t	*psu;
+__inaddr_to_index(in_addr_t ifaddr) {
+    struct ifaddrs*  ifa;
+    struct ifaddrs*  ifaddrs;
+    char*        ifname;
+    int      ifindex;
+    sockunion_t* psu;
 
-	if (getifaddrs(&ifaddrs) < 0)
-		return (0);
+    if (getifaddrs(&ifaddrs) < 0) {
+        return (0);
+    }
 
-	ifindex = 0;
-	ifname = NULL;
+    ifindex = 0;
+    ifname = NULL;
 
-	/*
-	 * Pass #1: Find the ifaddr entry corresponding to the
-	 * supplied IPv4 address. We should really use the ifindex
-	 * consistently for matches, however it is not available to
-	 * us on this pass.
-	 */
-	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-		psu = (sockunion_t *)ifa->ifa_addr;
-		if (psu && psu->ss.ss_family == AF_INET &&
-		    psu->sin.sin_addr.s_addr == ifaddr) {
-			ifname = ifa->ifa_name;
-			break;
-		}
-	}
-	if (ifname == NULL)
-		goto out;
+    /*
+     * Pass #1: Find the ifaddr entry corresponding to the
+     * supplied IPv4 address. We should really use the ifindex
+     * consistently for matches, however it is not available to
+     * us on this pass.
+     */
+    for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+        psu = (sockunion_t*)ifa->ifa_addr;
 
-	/*
-	 * Pass #2: Find the index of the interface matching the name
-	 * we obtained from looking up the IPv4 ifaddr in pass #1.
-	 * There must be a better way of doing this.
-	 */
-	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-		psu = (sockunion_t *)ifa->ifa_addr;
-		if (psu && psu->ss.ss_family == AF_LINK &&
-		    strcmp(ifa->ifa_name, ifname) == 0) {
-			ifindex = psu->sdl.sdl_index;
-			break;
-		}
-	}
-	assert(ifindex != 0);
+        if (psu && psu->ss.ss_family == AF_INET &&
+                psu->sin.sin_addr.s_addr == ifaddr) {
+            ifname = ifa->ifa_name;
+            break;
+        }
+    }
 
+    if (ifname == NULL) {
+        goto out;
+    }
+
+    /*
+     * Pass #2: Find the index of the interface matching the name
+     * we obtained from looking up the IPv4 ifaddr in pass #1.
+     * There must be a better way of doing this.
+     */
+    for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+        psu = (sockunion_t*)ifa->ifa_addr;
+
+        if (psu && psu->ss.ss_family == AF_LINK &&
+                strcmp(ifa->ifa_name, ifname) == 0) {
+            ifindex = psu->sdl.sdl_index;
+            break;
+        }
+    }
+
+    assert(ifindex != 0);
 out:
-	freeifaddrs(ifaddrs);
-	return (ifindex);
+    freeifaddrs(ifaddrs);
+    return (ifindex);
 }
 
 /*
@@ -143,63 +147,64 @@ out:
  */
 int
 setipv4sourcefilter(int s, struct in_addr interface, struct in_addr group,
-    uint32_t fmode, uint32_t numsrc, struct in_addr *slist)
-{
+                    uint32_t fmode, uint32_t numsrc, struct in_addr* slist) {
 #ifdef INET
-	sockunion_t	 tmpgroup;
-	struct in_addr	*pina;
-	sockunion_t	*psu, *tmpslist;
-	int		 err;
-	size_t		 i;
-	uint32_t	 ifindex;
+    sockunion_t  tmpgroup;
+    struct in_addr*  pina;
+    sockunion_t* psu, *tmpslist;
+    int      err;
+    size_t       i;
+    uint32_t     ifindex;
+    assert(s != -1);
+    tmpslist = NULL;
 
-	assert(s != -1);
+    if (!IN_MULTICAST(ntohl(group.s_addr)) ||
+            (fmode != MCAST_INCLUDE && fmode != MCAST_EXCLUDE)) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	tmpslist = NULL;
+    ifindex = __inaddr_to_index(interface.s_addr);
 
-	if (!IN_MULTICAST(ntohl(group.s_addr)) ||
-	    (fmode != MCAST_INCLUDE && fmode != MCAST_EXCLUDE)) {
-		errno = EINVAL;
-		return (-1);
-	}
+    if (ifindex == 0) {
+        errno = EADDRNOTAVAIL;
+        return (-1);
+    }
 
-	ifindex = __inaddr_to_index(interface.s_addr);
-	if (ifindex == 0) {
-		errno = EADDRNOTAVAIL;
-		return (-1);
-	}
+    memset(&tmpgroup, 0, sizeof(sockunion_t));
+    tmpgroup.sin.sin_family = AF_INET;
+    tmpgroup.sin.sin_len = sizeof(struct sockaddr_in);
+    tmpgroup.sin.sin_addr = group;
 
-	memset(&tmpgroup, 0, sizeof(sockunion_t));
-	tmpgroup.sin.sin_family = AF_INET;
-	tmpgroup.sin.sin_len = sizeof(struct sockaddr_in);
-	tmpgroup.sin.sin_addr = group;
+    if (numsrc != 0 || slist != NULL) {
+        tmpslist = calloc(numsrc, sizeof(sockunion_t));
 
-	if (numsrc != 0 || slist != NULL) {
-		tmpslist = calloc(numsrc, sizeof(sockunion_t));
-		if (tmpslist == NULL) {
-			errno = ENOMEM;
-			return (-1);
-		}
+        if (tmpslist == NULL) {
+            errno = ENOMEM;
+            return (-1);
+        }
 
-		pina = slist;
-		psu = tmpslist;
-		for (i = 0; i < numsrc; i++, pina++, psu++) {
-			psu->sin.sin_family = AF_INET;
-			psu->sin.sin_len = sizeof(struct sockaddr_in);
-			psu->sin.sin_addr = *pina;
-		}
-	}
+        pina = slist;
+        psu = tmpslist;
 
-	err = setsourcefilter(s, ifindex, (struct sockaddr *)&tmpgroup,
-	    sizeof(struct sockaddr_in), fmode, numsrc,
-	    (struct sockaddr_storage *)tmpslist);
+        for (i = 0; i < numsrc; i++, pina++, psu++) {
+            psu->sin.sin_family = AF_INET;
+            psu->sin.sin_len = sizeof(struct sockaddr_in);
+            psu->sin.sin_addr = *pina;
+        }
+    }
 
-	if (tmpslist != NULL)
-		free(tmpslist);
+    err = setsourcefilter(s, ifindex, (struct sockaddr*)&tmpgroup,
+                          sizeof(struct sockaddr_in), fmode, numsrc,
+                          (struct sockaddr_storage*)tmpslist);
 
-	return (err);
+    if (tmpslist != NULL) {
+        free(tmpslist);
+    }
+
+    return (err);
 #else /* !INET */
-	return (EAFNOSUPPORT);
+    return (EAFNOSUPPORT);
 #endif /* INET */
 }
 
@@ -213,120 +218,127 @@ setipv4sourcefilter(int s, struct in_addr interface, struct in_addr group,
  */
 int
 getipv4sourcefilter(int s, struct in_addr interface, struct in_addr group,
-    uint32_t *fmode, uint32_t *numsrc, struct in_addr *slist)
-{
-	sockunion_t	*psu, *tmpslist;
-	sockunion_t	 tmpgroup;
-	struct in_addr	*pina;
-	int		 err;
-	size_t		 i;
-	uint32_t	 ifindex, onumsrc;
+                    uint32_t* fmode, uint32_t* numsrc, struct in_addr* slist) {
+    sockunion_t* psu, *tmpslist;
+    sockunion_t  tmpgroup;
+    struct in_addr*  pina;
+    int      err;
+    size_t       i;
+    uint32_t     ifindex, onumsrc;
+    assert(s != -1);
+    assert(fmode != NULL);
+    assert(numsrc != NULL);
+    onumsrc = *numsrc;
+    *numsrc = 0;
+    tmpslist = NULL;
 
-	assert(s != -1);
-	assert(fmode != NULL);
-	assert(numsrc != NULL);
+    if (!IN_MULTICAST(ntohl(group.s_addr)) ||
+            (onumsrc != 0 && slist == NULL)) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	onumsrc = *numsrc;
-	*numsrc = 0;
-	tmpslist = NULL;
+    ifindex = __inaddr_to_index(interface.s_addr);
 
-	if (!IN_MULTICAST(ntohl(group.s_addr)) ||
-	    (onumsrc != 0 && slist == NULL)) {
-		errno = EINVAL;
-		return (-1);
-	}
+    if (ifindex == 0) {
+        errno = EADDRNOTAVAIL;
+        return (-1);
+    }
 
-	ifindex = __inaddr_to_index(interface.s_addr);
-	if (ifindex == 0) {
-		errno = EADDRNOTAVAIL;
-		return (-1);
-	}
+    memset(&tmpgroup, 0, sizeof(sockunion_t));
+    tmpgroup.sin.sin_family = AF_INET;
+    tmpgroup.sin.sin_len = sizeof(struct sockaddr_in);
+    tmpgroup.sin.sin_addr = group;
 
-	memset(&tmpgroup, 0, sizeof(sockunion_t));
-	tmpgroup.sin.sin_family = AF_INET;
-	tmpgroup.sin.sin_len = sizeof(struct sockaddr_in);
-	tmpgroup.sin.sin_addr = group;
+    if (onumsrc != 0 || slist != NULL) {
+        tmpslist = calloc(onumsrc, sizeof(sockunion_t));
 
-	if (onumsrc != 0 || slist != NULL) {
-		tmpslist = calloc(onumsrc, sizeof(sockunion_t));
-		if (tmpslist == NULL) {
-			errno = ENOMEM;
-			return (-1);
-		}
-	}
+        if (tmpslist == NULL) {
+            errno = ENOMEM;
+            return (-1);
+        }
+    }
 
-	err = getsourcefilter(s, ifindex, (struct sockaddr *)&tmpgroup,
-	    sizeof(struct sockaddr_in), fmode, numsrc,
-	    (struct sockaddr_storage *)tmpslist);
+    err = getsourcefilter(s, ifindex, (struct sockaddr*)&tmpgroup,
+                          sizeof(struct sockaddr_in), fmode, numsrc,
+                          (struct sockaddr_storage*)tmpslist);
 
-	if (tmpslist != NULL && *numsrc != 0) {
-		pina = slist;
-		psu = tmpslist;
-		for (i = 0; i < MIN(onumsrc, *numsrc); i++, psu++) {
-			if (psu->ss.ss_family != AF_INET)
-				continue;
-			*pina++ = psu->sin.sin_addr;
-		}
-		free(tmpslist);
-	}
+    if (tmpslist != NULL && *numsrc != 0) {
+        pina = slist;
+        psu = tmpslist;
 
-	return (err);
+        for (i = 0; i < MIN(onumsrc, *numsrc); i++, psu++) {
+            if (psu->ss.ss_family != AF_INET) {
+                continue;
+            }
+
+            *pina++ = psu->sin.sin_addr;
+        }
+
+        free(tmpslist);
+    }
+
+    return (err);
 }
 
 /*
  * Set protocol-independent source filter list in use on socket.
  */
 int
-setsourcefilter(int s, uint32_t interface, struct sockaddr *group,
-    socklen_t grouplen, uint32_t fmode, uint32_t numsrc,
-    struct sockaddr_storage *slist)
-{
-	struct __msfilterreq	 msfr;
-	sockunion_t		*psu;
-	int			 level, optname;
+setsourcefilter(int s, uint32_t interface, struct sockaddr* group,
+                socklen_t grouplen, uint32_t fmode, uint32_t numsrc,
+                struct sockaddr_storage* slist) {
+    struct __msfilterreq     msfr;
+    sockunion_t*     psu;
+    int          level, optname;
 
-	if (fmode != MCAST_INCLUDE && fmode != MCAST_EXCLUDE) {
-		errno = EINVAL;
-		return (-1);
-	}
+    if (fmode != MCAST_INCLUDE && fmode != MCAST_EXCLUDE) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	psu = (sockunion_t *)group;
-	switch (psu->ss.ss_family) {
+    psu = (sockunion_t*)group;
+
+    switch (psu->ss.ss_family) {
 #ifdef INET
-	case AF_INET:
-		if ((grouplen != sizeof(struct sockaddr_in) ||
-		    !IN_MULTICAST(ntohl(psu->sin.sin_addr.s_addr)))) {
-			errno = EINVAL;
-			return (-1);
-		}
-		level = IPPROTO_IP;
-		optname = IP_MSFILTER;
-		break;
+
+    case AF_INET:
+        if ((grouplen != sizeof(struct sockaddr_in) ||
+                !IN_MULTICAST(ntohl(psu->sin.sin_addr.s_addr)))) {
+            errno = EINVAL;
+            return (-1);
+        }
+
+        level = IPPROTO_IP;
+        optname = IP_MSFILTER;
+        break;
 #endif
 #ifdef INET6
-	case AF_INET6:
-		if (grouplen != sizeof(struct sockaddr_in6) ||
-		    !IN6_IS_ADDR_MULTICAST(&psu->sin6.sin6_addr)) {
-			errno = EINVAL;
-			return (-1);
-		}
-		level = IPPROTO_IPV6;
-		optname = IPV6_MSFILTER;
-		break;
+
+    case AF_INET6:
+        if (grouplen != sizeof(struct sockaddr_in6) ||
+                !IN6_IS_ADDR_MULTICAST(&psu->sin6.sin6_addr)) {
+            errno = EINVAL;
+            return (-1);
+        }
+
+        level = IPPROTO_IPV6;
+        optname = IPV6_MSFILTER;
+        break;
 #endif
-	default:
-		errno = EAFNOSUPPORT;
-		return (-1);
-	}
 
-	memset(&msfr, 0, sizeof(msfr));
-	msfr.msfr_ifindex = interface;
-	msfr.msfr_fmode = fmode;
-	msfr.msfr_nsrcs = numsrc;
-	memcpy(&msfr.msfr_group, &psu->ss, psu->ss.ss_len);
-	msfr.msfr_srcs = slist;		/* pointer */
+    default:
+        errno = EAFNOSUPPORT;
+        return (-1);
+    }
 
-	return (_setsockopt(s, level, optname, &msfr, sizeof(msfr)));
+    memset(&msfr, 0, sizeof(msfr));
+    msfr.msfr_ifindex = interface;
+    msfr.msfr_fmode = fmode;
+    msfr.msfr_nsrcs = numsrc;
+    memcpy(&msfr.msfr_group, &psu->ss, psu->ss.ss_len);
+    msfr.msfr_srcs = slist;     /* pointer */
+    return (_setsockopt(s, level, optname, &msfr, sizeof(msfr)));
 }
 
 /*
@@ -334,71 +346,75 @@ setsourcefilter(int s, uint32_t interface, struct sockaddr *group,
  * An slist of NULL may be used for guessing the required buffer size.
  */
 int
-getsourcefilter(int s, uint32_t interface, struct sockaddr *group,
-    socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc,
-    struct sockaddr_storage *slist)
-{
-	struct __msfilterreq	 msfr;
-	sockunion_t		*psu;
-	int			 err, level, optlen, optname;
+getsourcefilter(int s, uint32_t interface, struct sockaddr* group,
+                socklen_t grouplen, uint32_t* fmode, uint32_t* numsrc,
+                struct sockaddr_storage* slist) {
+    struct __msfilterreq     msfr;
+    sockunion_t*     psu;
+    int          err, level, optlen, optname;
 
-	if (interface == 0 || group == NULL || numsrc == NULL ||
-	    fmode == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
+    if (interface == 0 || group == NULL || numsrc == NULL ||
+            fmode == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	*numsrc = 0;
-	*fmode = 0;
+    *numsrc = 0;
+    *fmode = 0;
+    psu = (sockunion_t*)group;
 
-	psu = (sockunion_t *)group;
-	switch (psu->ss.ss_family) {
+    switch (psu->ss.ss_family) {
 #ifdef INET
-	case AF_INET:
-		if ((grouplen != sizeof(struct sockaddr_in) ||
-		    !IN_MULTICAST(ntohl(psu->sin.sin_addr.s_addr)))) {
-			errno = EINVAL;
-			return (-1);
-		}
-		level = IPPROTO_IP;
-		optname = IP_MSFILTER;
-		break;
+
+    case AF_INET:
+        if ((grouplen != sizeof(struct sockaddr_in) ||
+                !IN_MULTICAST(ntohl(psu->sin.sin_addr.s_addr)))) {
+            errno = EINVAL;
+            return (-1);
+        }
+
+        level = IPPROTO_IP;
+        optname = IP_MSFILTER;
+        break;
 #endif
 #ifdef INET6
-	case AF_INET6:
-		if (grouplen != sizeof(struct sockaddr_in6) ||
-		    !IN6_IS_ADDR_MULTICAST(&psu->sin6.sin6_addr)) {
-			errno = EINVAL;
-			return (-1);
-		}
-		level = IPPROTO_IPV6;
-		optname = IPV6_MSFILTER;
-		break;
+
+    case AF_INET6:
+        if (grouplen != sizeof(struct sockaddr_in6) ||
+                !IN6_IS_ADDR_MULTICAST(&psu->sin6.sin6_addr)) {
+            errno = EINVAL;
+            return (-1);
+        }
+
+        level = IPPROTO_IPV6;
+        optname = IPV6_MSFILTER;
+        break;
 #endif
-	default:
-		errno = EAFNOSUPPORT;
-		return (-1);
-		break;
-	}
 
-	optlen = sizeof(struct __msfilterreq);
-	memset(&msfr, 0, optlen);
-	msfr.msfr_ifindex = interface;
-	msfr.msfr_fmode = 0;
-	msfr.msfr_nsrcs = *numsrc;
-	memcpy(&msfr.msfr_group, &psu->ss, psu->ss.ss_len);
+    default:
+        errno = EAFNOSUPPORT;
+        return (-1);
+        break;
+    }
 
-	/*
-	 * msfr_srcs is a pointer to a vector of sockaddr_storage. It
-	 * may be NULL. The kernel will always return the total number
-	 * of filter entries for the group in msfr.msfr_nsrcs.
-	 */
-	msfr.msfr_srcs = slist;
-	err = _getsockopt(s, level, optname, &msfr, &optlen);
-	if (err == 0) {
-		*numsrc = msfr.msfr_nsrcs;
-		*fmode = msfr.msfr_fmode;
-	}
+    optlen = sizeof(struct __msfilterreq);
+    memset(&msfr, 0, optlen);
+    msfr.msfr_ifindex = interface;
+    msfr.msfr_fmode = 0;
+    msfr.msfr_nsrcs = *numsrc;
+    memcpy(&msfr.msfr_group, &psu->ss, psu->ss.ss_len);
+    /*
+     * msfr_srcs is a pointer to a vector of sockaddr_storage. It
+     * may be NULL. The kernel will always return the total number
+     * of filter entries for the group in msfr.msfr_nsrcs.
+     */
+    msfr.msfr_srcs = slist;
+    err = _getsockopt(s, level, optname, &msfr, &optlen);
 
-	return (err);
+    if (err == 0) {
+        *numsrc = msfr.msfr_nsrcs;
+        *fmode = msfr.msfr_fmode;
+    }
+
+    return (err);
 }

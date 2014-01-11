@@ -1,4 +1,4 @@
-/*	$NetBSD: authunix_prot.c,v 1.12 2000/01/22 22:19:17 mycroft Exp $	*/
+/*  $NetBSD: authunix_prot.c,v 1.12 2000/01/22 22:19:17 mycroft Exp $   */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "@(#)authunix_prot.c 1.15 87/08/11 Copyr 1984 Sun Micro";
-static char *sccsid = "@(#)authunix_prot.c	2.1 88/07/29 4.0 RPCSRC";
+static char* sccsid2 = "@(#)authunix_prot.c 1.15 87/08/11 Copyr 1984 Sun Micro";
+static char* sccsid = "@(#)authunix_prot.c	2.1 88/07/29 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/authunix_prot.c,v 1.9 2004/10/16 06:11:34 obrien Exp $");
@@ -57,20 +57,20 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/authunix_prot.c,v 1.9 2004/10/16 06:11:34 o
  */
 bool_t
 xdr_authunix_parms(xdrs, p)
-	XDR *xdrs;
-	struct authunix_parms *p;
+XDR* xdrs;
+struct authunix_parms* p;
 {
+    assert(xdrs != NULL);
+    assert(p != NULL);
 
-	assert(xdrs != NULL);
-	assert(p != NULL);
+    if (xdr_u_long(xdrs, &(p->aup_time))
+            && xdr_string(xdrs, &(p->aup_machname), MAX_MACHINE_NAME)
+            && xdr_int(xdrs, &(p->aup_uid))
+            && xdr_int(xdrs, &(p->aup_gid))
+            && xdr_array(xdrs, (caddr_t*) & (p->aup_gids),
+                         &(p->aup_len), NGRPS, sizeof(int), (xdrproc_t)xdr_int)) {
+        return (TRUE);
+    }
 
-	if (xdr_u_long(xdrs, &(p->aup_time))
-	    && xdr_string(xdrs, &(p->aup_machname), MAX_MACHINE_NAME)
-	    && xdr_int(xdrs, &(p->aup_uid))
-	    && xdr_int(xdrs, &(p->aup_gid))
-	    && xdr_array(xdrs, (caddr_t *)&(p->aup_gids),
-		    &(p->aup_len), NGRPS, sizeof(int), (xdrproc_t)xdr_int) ) {
-		return (TRUE);
-	}
-	return (FALSE);
+    return (FALSE);
 }

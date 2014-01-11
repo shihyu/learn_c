@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,225 +47,266 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/exec.c,v 1.23 2007/01/09 00:27:53 imp Exp $
 #include <stdarg.h>
 #include "un-namespace.h"
 
-extern char **environ;
+extern char** environ;
 
 int
-execl(const char *name, const char *arg, ...)
-{
-	va_list ap;
-	char **argv;
-	int n;
+execl(const char* name, const char* arg, ...) {
+    va_list ap;
+    char** argv;
+    int n;
+    va_start(ap, arg);
+    n = 1;
 
-	va_start(ap, arg);
-	n = 1;
-	while (va_arg(ap, char *) != NULL)
-		n++;
-	va_end(ap);
-	argv = alloca((n + 1) * sizeof(*argv));
-	if (argv == NULL) {
-		errno = ENOMEM;
-		return (-1);
-	}
-	va_start(ap, arg);
-	n = 1;
-	argv[0] = (char *)arg;
-	while ((argv[n] = va_arg(ap, char *)) != NULL)
-		n++;
-	va_end(ap);
-	return (_execve(name, argv, environ));
+    while (va_arg(ap, char*) != NULL) {
+        n++;
+    }
+
+    va_end(ap);
+    argv = alloca((n + 1) * sizeof(*argv));
+
+    if (argv == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+
+    va_start(ap, arg);
+    n = 1;
+    argv[0] = (char*)arg;
+
+    while ((argv[n] = va_arg(ap, char*)) != NULL) {
+        n++;
+    }
+
+    va_end(ap);
+    return (_execve(name, argv, environ));
 }
 
 int
-execle(const char *name, const char *arg, ...)
-{
-	va_list ap;
-	char **argv, **envp;
-	int n;
+execle(const char* name, const char* arg, ...) {
+    va_list ap;
+    char** argv, **envp;
+    int n;
+    va_start(ap, arg);
+    n = 1;
 
-	va_start(ap, arg);
-	n = 1;
-	while (va_arg(ap, char *) != NULL)
-		n++;
-	va_end(ap);
-	argv = alloca((n + 1) * sizeof(*argv));
-	if (argv == NULL) {
-		errno = ENOMEM;
-		return (-1);
-	}
-	va_start(ap, arg);
-	n = 1;
-	argv[0] = (char *)arg;
-	while ((argv[n] = va_arg(ap, char *)) != NULL)
-		n++;
-	envp = va_arg(ap, char **);
-	va_end(ap);
-	return (_execve(name, argv, envp));
+    while (va_arg(ap, char*) != NULL) {
+        n++;
+    }
+
+    va_end(ap);
+    argv = alloca((n + 1) * sizeof(*argv));
+
+    if (argv == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+
+    va_start(ap, arg);
+    n = 1;
+    argv[0] = (char*)arg;
+
+    while ((argv[n] = va_arg(ap, char*)) != NULL) {
+        n++;
+    }
+
+    envp = va_arg(ap, char**);
+    va_end(ap);
+    return (_execve(name, argv, envp));
 }
 
 int
-execlp(const char *name, const char *arg, ...)
-{
-	va_list ap;
-	char **argv;
-	int n;
+execlp(const char* name, const char* arg, ...) {
+    va_list ap;
+    char** argv;
+    int n;
+    va_start(ap, arg);
+    n = 1;
 
-	va_start(ap, arg);
-	n = 1;
-	while (va_arg(ap, char *) != NULL)
-		n++;
-	va_end(ap);
-	argv = alloca((n + 1) * sizeof(*argv));
-	if (argv == NULL) {
-		errno = ENOMEM;
-		return (-1);
-	}
-	va_start(ap, arg);
-	n = 1;
-	argv[0] = (char *)arg;
-	while ((argv[n] = va_arg(ap, char *)) != NULL)
-		n++;
-	va_end(ap);
-	return (execvp(name, argv));
+    while (va_arg(ap, char*) != NULL) {
+        n++;
+    }
+
+    va_end(ap);
+    argv = alloca((n + 1) * sizeof(*argv));
+
+    if (argv == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+
+    va_start(ap, arg);
+    n = 1;
+    argv[0] = (char*)arg;
+
+    while ((argv[n] = va_arg(ap, char*)) != NULL) {
+        n++;
+    }
+
+    va_end(ap);
+    return (execvp(name, argv));
 }
 
 int
 execv(name, argv)
-	const char *name;
-	char * const *argv;
+const char* name;
+char* const* argv;
 {
-	(void)_execve(name, argv, environ);
-	return (-1);
+    (void)_execve(name, argv, environ);
+    return (-1);
 }
 
 int
-execvp(const char *name, char * const *argv)
-{
-	const char *path;
+execvp(const char* name, char* const* argv) {
+    const char* path;
 
-	/* Get the path we're searching. */
-	if ((path = getenv("PATH")) == NULL)
-		path = _PATH_DEFPATH;
+    /* Get the path we're searching. */
+    if ((path = getenv("PATH")) == NULL) {
+        path = _PATH_DEFPATH;
+    }
 
-	return (execvP(name, path, argv));
+    return (execvP(name, path, argv));
 }
 
 int
 execvP(name, path, argv)
-	const char *name;
-	const char *path;
-	char * const *argv;
+const char* name;
+const char* path;
+char* const* argv;
 {
-	char **memp;
-	int cnt, lp, ln;
-	char *p;
-	int eacces, save_errno;
-	char *bp, *cur, buf[MAXPATHLEN];
-	struct stat sb;
+    char** memp;
+    int cnt, lp, ln;
+    char* p;
+    int eacces, save_errno;
+    char* bp, *cur, buf[MAXPATHLEN];
+    struct stat sb;
+    eacces = 0;
 
-	eacces = 0;
+    /* If it's an absolute or relative path name, it's easy. */
+    if (index(name, '/')) {
+        bp = (char*)name;
+        cur = NULL;
+        goto retry;
+    }
 
-	/* If it's an absolute or relative path name, it's easy. */
-	if (index(name, '/')) {
-		bp = (char *)name;
-		cur = NULL;
-		goto retry;
-	}
-	bp = buf;
+    bp = buf;
 
-	/* If it's an empty path name, fail in the usual POSIX way. */
-	if (*name == '\0') {
-		errno = ENOENT;
-		return (-1);
-	}
+    /* If it's an empty path name, fail in the usual POSIX way. */
+    if (*name == '\0') {
+        errno = ENOENT;
+        return (-1);
+    }
 
-	cur = alloca(strlen(path) + 1);
-	if (cur == NULL) {
-		errno = ENOMEM;
-		return (-1);
-	}
-	strcpy(cur, path);
-	while ((p = strsep(&cur, ":")) != NULL) {
-		/*
-		 * It's a SHELL path -- double, leading and trailing colons
-		 * mean the current directory.
-		 */
-		if (*p == '\0') {
-			p = ".";
-			lp = 1;
-		} else
-			lp = strlen(p);
-		ln = strlen(name);
+    cur = alloca(strlen(path) + 1);
 
-		/*
-		 * If the path is too long complain.  This is a possible
-		 * security issue; given a way to make the path too long
-		 * the user may execute the wrong program.
-		 */
-		if (lp + ln + 2 > sizeof(buf)) {
-			(void)_write(STDERR_FILENO, "execvP: ", 8);
-			(void)_write(STDERR_FILENO, p, lp);
-			(void)_write(STDERR_FILENO, ": path too long\n",
-			    16);
-			continue;
-		}
-		bcopy(p, buf, lp);
-		buf[lp] = '/';
-		bcopy(name, buf + lp + 1, ln);
-		buf[lp + ln + 1] = '\0';
+    if (cur == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
 
-retry:		(void)_execve(bp, argv, environ);
-		switch (errno) {
-		case E2BIG:
-			goto done;
-		case ELOOP:
-		case ENAMETOOLONG:
-		case ENOENT:
-			break;
-		case ENOEXEC:
-			for (cnt = 0; argv[cnt]; ++cnt)
-				;
-			memp = alloca((cnt + 2) * sizeof(char *));
-			if (memp == NULL) {
-				/* errno = ENOMEM; XXX override ENOEXEC? */
-				goto done;
-			}
-			memp[0] = "sh";
-			memp[1] = bp;
-			bcopy(argv + 1, memp + 2, cnt * sizeof(char *));
-			(void)_execve(_PATH_BSHELL, memp, environ);
-			goto done;
-		case ENOMEM:
-			goto done;
-		case ENOTDIR:
-			break;
-		case ETXTBSY:
-			/*
-			 * We used to retry here, but sh(1) doesn't.
-			 */
-			goto done;
-		default:
-			/*
-			 * EACCES may be for an inaccessible directory or
-			 * a non-executable file.  Call stat() to decide
-			 * which.  This also handles ambiguities for EFAULT
-			 * and EIO, and undocumented errors like ESTALE.
-			 * We hope that the race for a stat() is unimportant.
-			 */
-			save_errno = errno;
-			if (stat(bp, &sb) != 0)
-				break;
-			if (save_errno == EACCES) {
-				eacces = 1;
-				continue;
-			}
-			errno = save_errno;
-			goto done;
-		}
-	}
-	if (eacces)
-		errno = EACCES;
-	else
-		errno = ENOENT;
+    strcpy(cur, path);
+
+    while ((p = strsep(&cur, ":")) != NULL) {
+        /*
+         * It's a SHELL path -- double, leading and trailing colons
+         * mean the current directory.
+         */
+        if (*p == '\0') {
+            p = ".";
+            lp = 1;
+        } else {
+            lp = strlen(p);
+        }
+
+        ln = strlen(name);
+
+        /*
+         * If the path is too long complain.  This is a possible
+         * security issue; given a way to make the path too long
+         * the user may execute the wrong program.
+         */
+        if (lp + ln + 2 > sizeof(buf)) {
+            (void)_write(STDERR_FILENO, "execvP: ", 8);
+            (void)_write(STDERR_FILENO, p, lp);
+            (void)_write(STDERR_FILENO, ": path too long\n",
+                         16);
+            continue;
+        }
+
+        bcopy(p, buf, lp);
+        buf[lp] = '/';
+        bcopy(name, buf + lp + 1, ln);
+        buf[lp + ln + 1] = '\0';
+    retry:
+        (void)_execve(bp, argv, environ);
+
+        switch (errno) {
+        case E2BIG:
+            goto done;
+
+        case ELOOP:
+        case ENAMETOOLONG:
+        case ENOENT:
+            break;
+
+        case ENOEXEC:
+            for (cnt = 0; argv[cnt]; ++cnt)
+                ;
+
+            memp = alloca((cnt + 2) * sizeof(char*));
+
+            if (memp == NULL) {
+                /* errno = ENOMEM; XXX override ENOEXEC? */
+                goto done;
+            }
+
+            memp[0] = "sh";
+            memp[1] = bp;
+            bcopy(argv + 1, memp + 2, cnt * sizeof(char*));
+            (void)_execve(_PATH_BSHELL, memp, environ);
+            goto done;
+
+        case ENOMEM:
+            goto done;
+
+        case ENOTDIR:
+            break;
+
+        case ETXTBSY:
+            /*
+             * We used to retry here, but sh(1) doesn't.
+             */
+            goto done;
+
+        default:
+            /*
+             * EACCES may be for an inaccessible directory or
+             * a non-executable file.  Call stat() to decide
+             * which.  This also handles ambiguities for EFAULT
+             * and EIO, and undocumented errors like ESTALE.
+             * We hope that the race for a stat() is unimportant.
+             */
+            save_errno = errno;
+
+            if (stat(bp, &sb) != 0) {
+                break;
+            }
+
+            if (save_errno == EACCES) {
+                eacces = 1;
+                continue;
+            }
+
+            errno = save_errno;
+            goto done;
+        }
+    }
+
+    if (eacces) {
+        errno = EACCES;
+    } else {
+        errno = ENOENT;
+    }
+
 done:
-	return (-1);
+    return (-1);
 }

@@ -14,90 +14,95 @@
 #include <netdb.h>
 
 static void sigchld_handler() {
-  pid_t	PID;
-  int	status;
+    pid_t PID;
+    int   status;
 
-  while (PID = waitpid(-1, &status, WNOHANG) > 0)
-	printf("子程序 %d 結束.\n", PID);
+    while (PID = waitpid(-1, &status, WNOHANG) > 0) {
+        printf("子程序 %d 結束.\n", PID);
+    }
 
-  /* Re-install handler */
-  signal(SIGCHLD, sigchld_handler);
+    /* Re-install handler */
+    signal(SIGCHLD, sigchld_handler);
 }
 
-int main(int argc, char **argv) {
-  int		z, len_inet;
-  struct sockaddr_in	adr_srvr, adr_clnt;
-  int		sockfd, connfd;
-  pid_t		PID;
-  time_t	clock;
-  struct tm	*tm;
-  int		len_time, i;
-  char		buf[256];
-  
-  signal(SIGCHLD, sigchld_handler);
-  
-  memset(&adr_srvr, 0, sizeof(adr_srvr));
-  
-  if (argc ==2)
-	adr_srvr.sin_addr.s_addr = inet_addr(argv[1]);
-  else
-	adr_srvr.sin_addr.s_addr = inet_addr("192.168.1.20");
-  
+int main(int argc, char** argv) {
+    int       z, len_inet;
+    struct sockaddr_in    adr_srvr, adr_clnt;
+    int       sockfd, connfd;
+    pid_t     PID;
+    time_t    clock;
+    struct tm* tm;
+    int       len_time, i;
+    char      buf[256];
+    signal(SIGCHLD, sigchld_handler);
+    memset(&adr_srvr, 0, sizeof(adr_srvr));
 
-  adr_srvr.sin_family = AF_INET;
-  adr_srvr.sin_port = htons(9090);
- 
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd == -1) {
-	perror("socket error");
-	exit(1);
-  }
+    if (argc == 2) {
+        adr_srvr.sin_addr.s_addr = inet_addr(argv[1]);
+    } else {
+        adr_srvr.sin_addr.s_addr = inet_addr("192.168.1.20");
+    }
 
-  z = bind(sockfd, (struct sockaddr *)&adr_srvr, sizeof(adr_srvr));
-  if (z == -1) {
-	perror("bind error");
-	exit(1);
-  }
+    adr_srvr.sin_family = AF_INET;
+    adr_srvr.sin_port = htons(9090);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-  z = listen(sockfd, 10);
-  if (z == -1) {
-	perror("listen error");
-	exit(1);
-  }
+    if (sockfd == -1) {
+        perror("socket error");
+        exit(1);
+    }
 
-  while(1) {
-	len_inet = sizeof(adr_clnt);
-	connfd = accept(sockfd, (struct sockaddr *)&adr_clnt, &len_inet);
-	if (connfd == -1) {
-		perror("connect error");
-		exit(1);
-	}
-	
-	PID = fork();
+    z = bind(sockfd, (struct sockaddr*)&adr_srvr, sizeof(adr_srvr));
 
-	if (PID > 0) {
-		close(connfd);
-		continue;
-	}
+    if (z == -1) {
+        perror("bind error");
+        exit(1);
+    }
 
-	printf("子程序處理...\n");
-	close(sockfd);
-	for (i=0; i<10; i++) {
-		sleep(1);
-		time(&clock);
-		tm = gmtime(&clock);
-		len_time = strftime(buf, 256, "%A %T %D\n", tm);
-	
-		if (write(connfd, buf, len_time) == -1) {
-			perror("write error");
-			exit(1);
-		}
-	}
-	sleep(1);
-	sprintf(buf, "stop\n");
-	write(connfd, buf, sizeof(buf));
-	exit(0);
-  }
-  return 0;
+    z = listen(sockfd, 10);
+
+    if (z == -1) {
+        perror("listen error");
+        exit(1);
+    }
+
+    while (1) {
+        len_inet = sizeof(adr_clnt);
+        connfd = accept(sockfd, (struct sockaddr*)&adr_clnt, &len_inet);
+
+        if (connfd == -1) {
+            perror("connect error");
+            exit(1);
+        }
+
+        PID = fork();
+
+        if (PID > 0) {
+            close(connfd);
+            continue;
+        }
+
+        printf("子程序處理...\n");
+        close(sockfd);
+
+        for (i = 0; i < 10; i++) {
+            sleep(1);
+            time(&clock);
+            tm = gmtime(&clock);
+            len_time = strftime(buf, 256, "%A %T %D\n", tm);
+
+            if (write(connfd, buf, len_time) == -1) {
+                perror("write error");
+                exit(1);
+            }
+        }
+
+        sleep(1);
+        sprintf(buf, "stop\n");
+        write(connfd, buf, sizeof(buf));
+        exit(0);
+    }
+
+    return 0;
 }
 

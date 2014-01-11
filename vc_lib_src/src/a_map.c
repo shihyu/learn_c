@@ -41,18 +41,18 @@
 *
 *******************************************************************************/
 
-static int __cdecl strncnt (
-        const char *string,
-        int cnt
-        )
-{
-        int n = cnt;
-        char *cp = (char *)string;
+static int __cdecl strncnt(
+    const char* string,
+    int cnt
+) {
+    int n = cnt;
+    char* cp = (char*)string;
 
-        while (n-- && *cp)
-            cp++;
+    while (n-- && *cp) {
+        cp++;
+    }
 
-        return cnt - n - 1;
+    return cnt - n - 1;
 }
 
 
@@ -86,17 +86,16 @@ static int __cdecl strncnt (
 *******************************************************************************/
 
 static int __cdecl __crtLCMapStringA_stat(
-        _locale_t plocinfo,
-        LCID     Locale,
-        DWORD    dwMapFlags,
-        LPCSTR   lpSrcStr,
-        int      cchSrc,
-        LPSTR    lpDestStr,
-        int      cchDest,
-        int      code_page,
-        BOOL     bError
-        )
-{
+    _locale_t plocinfo,
+    LCID     Locale,
+    DWORD    dwMapFlags,
+    LPCSTR   lpSrcStr,
+    int      cchSrc,
+    LPSTR    lpDestStr,
+    int      cchDest,
+    int      code_page,
+    BOOL     bError
+) {
     static int f_use = 0;
 
     /*
@@ -106,10 +105,11 @@ static int __cdecl __crtLCMapStringA_stat(
      */
 
     if (0 == f_use) {
-        if (0 != LCMapStringW(0, LCMAP_LOWERCASE, L"\0", 1, NULL, 0))
+        if (0 != LCMapStringW(0, LCMAP_LOWERCASE, L"\0", 1, NULL, 0)) {
             f_use = USE_W;
-        else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
+        } else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
             f_use = USE_A;
+        }
     }
 
     /*
@@ -118,6 +118,7 @@ static int __cdecl __crtLCMapStringA_stat(
      */
     if (cchSrc > 0) {
         int cchSrcCnt = strncnt(lpSrcStr, cchSrc);
+
         /*
          * Include NULL in cchSrc if lpSrcStr terminated within cchSrc bytes.
          */
@@ -131,92 +132,107 @@ static int __cdecl __crtLCMapStringA_stat(
     /* Use "A" version */
 
     if (USE_A == f_use || f_use == 0) {
-        char *cbuffer = NULL;
-        char *cbuffer1 = NULL;
-        char *cbuffer2 = NULL;
+        char* cbuffer = NULL;
+        char* cbuffer1 = NULL;
+        char* cbuffer2 = NULL;
         int ret;
         int AnsiCP;
         int buff_size;
 
-        if (0 == Locale)
+        if (0 == Locale) {
             Locale = plocinfo->locinfo->lc_handle[LC_CTYPE];
-        if (0 == code_page)
-            code_page = plocinfo->locinfo->lc_codepage;
+        }
 
-        if ( -1 == (AnsiCP = __ansicp(Locale)))
+        if (0 == code_page) {
+            code_page = plocinfo->locinfo->lc_codepage;
+        }
+
+        if (-1 == (AnsiCP = __ansicp(Locale))) {
             return FALSE;
+        }
+
         /* LCMapStringA uses ANSI code page to map the string. Check if
          * codepage is ansi, if not convert the input string to ansi
          * codepage then map to a temporary string and then convert temp
          * string to DestStr.
          */
-        if ( AnsiCP != code_page)
-        {
+        if (AnsiCP != code_page) {
             cbuffer = __convertcp(code_page, AnsiCP, lpSrcStr, &cchSrc, NULL, 0);
-            if (cbuffer == NULL)
+
+            if (cbuffer == NULL) {
                 return FALSE;
+            }
+
             lpSrcStr = cbuffer;
-            if (0 == (buff_size = LCMapStringA( Locale,
-                                                dwMapFlags,
-                                                lpSrcStr,
-                                                cchSrc,
-                                                0,
-                                                0 )))
-            {
+
+            if (0 == (buff_size = LCMapStringA(Locale,
+                                               dwMapFlags,
+                                               lpSrcStr,
+                                               cchSrc,
+                                               0,
+                                               0))) {
                 ret = FALSE;
                 goto cleanupA;
             }
-            cbuffer1 = (char *)_calloca(sizeof(char), buff_size);
-            if ( cbuffer1 == NULL ) {
+
+            cbuffer1 = (char*)_calloca(sizeof(char), buff_size);
+
+            if (cbuffer1 == NULL) {
                 ret = FALSE;
                 goto cleanupA;
             }
+
             memset(cbuffer1, 0, sizeof(char) * buff_size);
 
-            if (0 == (buff_size = LCMapStringA( Locale,
-                                                dwMapFlags,
-                                                lpSrcStr,
-                                                cchSrc,
-                                                cbuffer1,
-                                                buff_size)))
-            {
+            if (0 == (buff_size = LCMapStringA(Locale,
+                                               dwMapFlags,
+                                               lpSrcStr,
+                                               cchSrc,
+                                               cbuffer1,
+                                               buff_size))) {
                 ret = FALSE;
             } else {
-                if ( NULL == (cbuffer2 = __convertcp(AnsiCP,
-                                         code_page,
-                                         cbuffer1,
-                                         &buff_size,
-                                         lpDestStr,
-                                         cchDest)))
+                if (NULL == (cbuffer2 = __convertcp(AnsiCP,
+                                                    code_page,
+                                                    cbuffer1,
+                                                    &buff_size,
+                                                    lpDestStr,
+                                                    cchDest))) {
                     ret = FALSE;
-                else
+                } else {
                     ret = buff_size;
-
+                }
             }
-cleanupA:
-            if ( cbuffer1 != NULL )
+
+        cleanupA:
+
+            if (cbuffer1 != NULL) {
                 _freea(cbuffer1);
-        } else
-        {
-            ret = LCMapStringA( Locale, dwMapFlags, lpSrcStr, cchSrc,
-                                lpDestStr, cchDest );
+            }
+        } else {
+            ret = LCMapStringA(Locale, dwMapFlags, lpSrcStr, cchSrc,
+                               lpDestStr, cchDest);
         }
-        if ( cbuffer != NULL)
+
+        if (cbuffer != NULL) {
             _free_crt(cbuffer);
-        if ( (cbuffer2 != NULL) && (lpDestStr != cbuffer2))
-             _free_crt(cbuffer2);
+        }
+
+        if ((cbuffer2 != NULL) && (lpDestStr != cbuffer2)) {
+            _free_crt(cbuffer2);
+        }
+
         return ret;
     }
 
     /* Use "W" version */
 
-    if (USE_W == f_use)
-    {
+    if (USE_W == f_use) {
         int retval = 0;
         int inbuff_size;
         int outbuff_size;
-        wchar_t *inwbuffer = NULL;
-        wchar_t *outwbuffer = NULL;
+        wchar_t* inwbuffer = NULL;
+        wchar_t* outwbuffer = NULL;
 
         /*
          * Convert string and return the requested information. Note that
@@ -232,146 +248,150 @@ cleanupA:
          * Use __lc_codepage for conversion if code_page not specified
          */
 
-        if (0 == code_page)
+        if (0 == code_page) {
             code_page = plocinfo->locinfo->lc_codepage;
+        }
 
         /* find out how big a buffer we need (includes NULL if any) */
-        if ( 0 == (inbuff_size =
-                   MultiByteToWideChar( code_page,
-                                        bError ? MB_PRECOMPOSED |
-                                            MB_ERR_INVALID_CHARS :
-                                            MB_PRECOMPOSED,
-                                        lpSrcStr,
-                                        cchSrc,
-                                        NULL,
-                                        0 )) )
+        if (0 == (inbuff_size =
+                      MultiByteToWideChar(code_page,
+                                          bError ? MB_PRECOMPOSED |
+                                          MB_ERR_INVALID_CHARS :
+                                          MB_PRECOMPOSED,
+                                          lpSrcStr,
+                                          cchSrc,
+                                          NULL,
+                                          0))) {
             return 0;
+        }
 
         /* allocate enough space for wide chars */
-        inwbuffer = (wchar_t *)_calloca( inbuff_size, sizeof(wchar_t) );
-        if ( inwbuffer == NULL ) {
+        inwbuffer = (wchar_t*)_calloca(inbuff_size, sizeof(wchar_t));
+
+        if (inwbuffer == NULL) {
             return 0;
         }
 
         /* do the conversion */
-        if ( 0 == MultiByteToWideChar( code_page,
-                                       MB_PRECOMPOSED,
-                                       lpSrcStr,
-                                       cchSrc,
-                                       inwbuffer,
-                                       inbuff_size) )
+        if (0 == MultiByteToWideChar(code_page,
+                                     MB_PRECOMPOSED,
+                                     lpSrcStr,
+                                     cchSrc,
+                                     inwbuffer,
+                                     inbuff_size)) {
             goto error_cleanup;
+        }
 
         /* get size required for string mapping */
-        if ( 0 == (retval = LCMapStringW( Locale,
-                                          dwMapFlags,
-                                          inwbuffer,
-                                          inbuff_size,
-                                          NULL,
-                                          0 )) )
-            goto error_cleanup;
-
-        if (dwMapFlags & LCMAP_SORTKEY) {
-            /* retval is size in BYTES */
-
-            if (0 != cchDest) {
-
-                if (retval > cchDest)
-                    goto error_cleanup;
-
-                /* do string mapping */
-                if ( 0 == LCMapStringW( Locale,
+        if (0 == (retval = LCMapStringW(Locale,
                                         dwMapFlags,
                                         inwbuffer,
                                         inbuff_size,
-                                        (LPWSTR)lpDestStr,
-                                        cchDest ) )
-                    goto error_cleanup;
-            }
+                                        NULL,
+                                        0))) {
+            goto error_cleanup;
         }
-        else {
+
+        if (dwMapFlags & LCMAP_SORTKEY) {
+            /* retval is size in BYTES */
+            if (0 != cchDest) {
+                if (retval > cchDest) {
+                    goto error_cleanup;
+                }
+
+                /* do string mapping */
+                if (0 == LCMapStringW(Locale,
+                                      dwMapFlags,
+                                      inwbuffer,
+                                      inbuff_size,
+                                      (LPWSTR)lpDestStr,
+                                      cchDest)) {
+                    goto error_cleanup;
+                }
+            }
+        } else {
             /* retval is size in wide chars */
-
             outbuff_size = retval;
-
             /* allocate enough space for wide chars (includes NULL if any) */
-            outwbuffer = (wchar_t *)_calloca( outbuff_size, sizeof(wchar_t) );
-            if ( outwbuffer == NULL ) {
+            outwbuffer = (wchar_t*)_calloca(outbuff_size, sizeof(wchar_t));
+
+            if (outwbuffer == NULL) {
                 goto error_cleanup;
             }
 
             /* do string mapping */
-            if ( 0 == LCMapStringW( Locale,
-                                    dwMapFlags,
-                                    inwbuffer,
-                                    inbuff_size,
-                                    outwbuffer,
-                                    outbuff_size ) )
+            if (0 == LCMapStringW(Locale,
+                                  dwMapFlags,
+                                  inwbuffer,
+                                  inbuff_size,
+                                  outwbuffer,
+                                  outbuff_size)) {
                 goto error_cleanup;
+            }
 
             if (0 == cchDest) {
                 /* get size required */
-                if ( 0 == (retval =
-                           WideCharToMultiByte( code_page,
-                                                0,
-                                                outwbuffer,
-                                                outbuff_size,
-                                                NULL,
-                                                0,
-                                                NULL,
-                                                NULL )) )
+                if (0 == (retval =
+                              WideCharToMultiByte(code_page,
+                                                  0,
+                                                  outwbuffer,
+                                                  outbuff_size,
+                                                  NULL,
+                                                  0,
+                                                  NULL,
+                                                  NULL))) {
                     goto error_cleanup;
-            }
-            else {
+                }
+            } else {
                 /* convert mapping */
-                if ( 0 == (retval =
-                           WideCharToMultiByte( code_page,
-                                                0,
-                                                outwbuffer,
-                                                outbuff_size,
-                                                lpDestStr,
-                                                cchDest,
-                                                NULL,
-                                                NULL )) )
+                if (0 == (retval =
+                              WideCharToMultiByte(code_page,
+                                                  0,
+                                                  outwbuffer,
+                                                  outbuff_size,
+                                                  lpDestStr,
+                                                  cchDest,
+                                                  NULL,
+                                                  NULL))) {
                     goto error_cleanup;
+                }
             }
         }
 
-error_cleanup:
-        if ( outwbuffer != NULL )
+    error_cleanup:
+
+        if (outwbuffer != NULL) {
             _freea(outwbuffer);
+        }
 
         _freea(inwbuffer);
-
         return retval;
-    }
-    else   /* f_use is neither USE_A nor USE_W */
+    } else { /* f_use is neither USE_A nor USE_W */
         return 0;
+    }
 }
 
 extern "C" int __cdecl __crtLCMapStringA(
-        _locale_t plocinfo,
-        LCID     Locale,
-        DWORD    dwMapFlags,
-        LPCSTR   lpSrcStr,
-        int      cchSrc,
-        LPSTR    lpDestStr,
-        int      cchDest,
-        int      code_page,
-        BOOL     bError
-        )
-{
+    _locale_t plocinfo,
+    LCID     Locale,
+    DWORD    dwMapFlags,
+    LPCSTR   lpSrcStr,
+    int      cchSrc,
+    LPSTR    lpDestStr,
+    int      cchDest,
+    int      code_page,
+    BOOL     bError
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
     return __crtLCMapStringA_stat(
-            _loc_update.GetLocaleT(),
-            Locale,
-            dwMapFlags,
-            lpSrcStr,
-            cchSrc,
-            lpDestStr,
-            cchDest,
-            code_page,
-            bError
-            );
+               _loc_update.GetLocaleT(),
+               Locale,
+               dwMapFlags,
+               lpSrcStr,
+               cchSrc,
+               lpDestStr,
+               cchDest,
+               code_page,
+               bError
+           );
 }

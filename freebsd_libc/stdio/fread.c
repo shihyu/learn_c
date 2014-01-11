@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -48,49 +48,54 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fread.c,v 1.14 2007/01/09 00:28:06 imp Ex
  */
 
 size_t
-fread(void * __restrict buf, size_t size, size_t count, FILE * __restrict fp)
-{
-	int ret;
-
-	FLOCKFILE(fp);
-	ret = __fread(buf, size, count, fp);
-	FUNLOCKFILE(fp);
-	return (ret);
+fread(void* __restrict buf, size_t size, size_t count, FILE* __restrict fp) {
+    int ret;
+    FLOCKFILE(fp);
+    ret = __fread(buf, size, count, fp);
+    FUNLOCKFILE(fp);
+    return (ret);
 }
 
 size_t
-__fread(void * __restrict buf, size_t size, size_t count, FILE * __restrict fp)
-{
-	size_t resid;
-	char *p;
-	int r;
-	size_t total;
+__fread(void* __restrict buf, size_t size, size_t count, FILE* __restrict fp) {
+    size_t resid;
+    char* p;
+    int r;
+    size_t total;
 
-	/*
-	 * The ANSI standard requires a return value of 0 for a count
-	 * or a size of 0.  Peculiarily, it imposes no such requirements
-	 * on fwrite; it only requires fread to be broken.
-	 */
-	if ((resid = count * size) == 0)
-		return (0);
-	ORIENT(fp, -1);
-	if (fp->_r < 0)
-		fp->_r = 0;
-	total = resid;
-	p = buf;
-	while (resid > (r = fp->_r)) {
-		(void)memcpy((void *)p, (void *)fp->_p, (size_t)r);
-		fp->_p += r;
-		/* fp->_r = 0 ... done in __srefill */
-		p += r;
-		resid -= r;
-		if (__srefill(fp)) {
-			/* no more input: return partial result */
-			return ((total - resid) / size);
-		}
-	}
-	(void)memcpy((void *)p, (void *)fp->_p, resid);
-	fp->_r -= resid;
-	fp->_p += resid;
-	return (count);
+    /*
+     * The ANSI standard requires a return value of 0 for a count
+     * or a size of 0.  Peculiarily, it imposes no such requirements
+     * on fwrite; it only requires fread to be broken.
+     */
+    if ((resid = count * size) == 0) {
+        return (0);
+    }
+
+    ORIENT(fp, -1);
+
+    if (fp->_r < 0) {
+        fp->_r = 0;
+    }
+
+    total = resid;
+    p = buf;
+
+    while (resid > (r = fp->_r)) {
+        (void)memcpy((void*)p, (void*)fp->_p, (size_t)r);
+        fp->_p += r;
+        /* fp->_r = 0 ... done in __srefill */
+        p += r;
+        resid -= r;
+
+        if (__srefill(fp)) {
+            /* no more input: return partial result */
+            return ((total - resid) / size);
+        }
+    }
+
+    (void)memcpy((void*)p, (void*)fp->_p, resid);
+    fp->_r -= resid;
+    fp->_p += resid;
+    return (count);
 }

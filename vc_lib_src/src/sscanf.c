@@ -26,46 +26,40 @@
 *       _(w)input_s depending on the first parameter.
 *
 *******************************************************************************/
-static int __cdecl vscan_fn (
-        TINPUTFN inputfn,
-        REG2 const _TCHAR *string,
+static int __cdecl vscan_fn(
+    TINPUTFN inputfn,
+    REG2 const _TCHAR* string,
 #ifdef _SNSCANF
-        size_t count,
+    size_t count,
 #endif  /* _SNSCANF */
-        const _TCHAR *format,
-        _locale_t plocinfo,
-        va_list arglist
-        )
+    const _TCHAR* format,
+    _locale_t plocinfo,
+    va_list arglist
+)
 /*
  * 'S'tring 'SCAN', 'F'ormatted
  */
 {
-        FILE str;
-        REG1 FILE *infile = &str;
-        REG2 int retval;
+    FILE str;
+    REG1 FILE* infile = &str;
+    REG2 int retval;
 #ifndef _SNSCANF
-        size_t count=_tcslen(string);
+    size_t count = _tcslen(string);
 #endif  /* _SNSCANF */
+    _VALIDATE_RETURN((string != NULL), EINVAL, EOF);
+    _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
+    infile->_flag = _IOREAD | _IOSTRG | _IOMYBUF;
+    infile->_ptr = infile->_base = (char*) string;
 
-        _VALIDATE_RETURN( (string != NULL), EINVAL, EOF);
-        _VALIDATE_RETURN( (format != NULL), EINVAL, EOF);
+    if (count > (INT_MAX / sizeof(_TCHAR))) {
+        /* old-style functions allow any large value to mean unbounded */
+        infile->_cnt = INT_MAX;
+    } else {
+        infile->_cnt = (int)count * sizeof(_TCHAR);
+    }
 
-        infile->_flag = _IOREAD|_IOSTRG|_IOMYBUF;
-        infile->_ptr = infile->_base = (char *) string;
-
-        if(count>(INT_MAX/sizeof(_TCHAR)))
-        {
-            /* old-style functions allow any large value to mean unbounded */
-            infile->_cnt = INT_MAX;
-        }
-        else
-        {
-            infile->_cnt = (int)count*sizeof(_TCHAR);
-        }
-
-        retval = (inputfn(infile, format, plocinfo, arglist));
-
-        return(retval);
+    retval = (inputfn(infile, format, plocinfo, arglist));
+    return (retval);
 }
 
 /***
@@ -132,65 +126,61 @@ static int __cdecl vscan_fn (
 *******************************************************************************/
 #ifdef _UNICODE
 #ifdef _SNSCANF
-int __cdecl _snwscanf (
+int __cdecl _snwscanf(
 #else  /* _SNSCANF */
-int __cdecl swscanf (
+int __cdecl swscanf(
 #endif  /* _SNSCANF */
 #else  /* _UNICODE */
 #ifdef _SNSCANF
-int __cdecl _snscanf (
+int __cdecl _snscanf(
 #else  /* _SNSCANF */
-int __cdecl sscanf (
+int __cdecl sscanf(
 #endif  /* _SNSCANF */
 #endif  /* _UNICODE */
-        REG2 const _TCHAR *string,
+    REG2 const _TCHAR* string,
 #ifdef _SNSCANF
-        size_t count,
+    size_t count,
 #endif  /* _SNSCANF */
-        const _TCHAR *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
+    const _TCHAR* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
 #ifdef _SNSCANF
-        return vscan_fn(_tinput_l, string, count, format, NULL, arglist);
+    return vscan_fn(_tinput_l, string, count, format, NULL, arglist);
 #else  /* _SNSCANF */
-        return vscan_fn(_tinput_l, string, format, NULL, arglist);
+    return vscan_fn(_tinput_l, string, format, NULL, arglist);
 #endif  /* _SNSCANF */
-
 }
 
 #ifdef _UNICODE
 #ifdef _SNSCANF
-int __cdecl _snwscanf_l (
+int __cdecl _snwscanf_l(
 #else  /* _SNSCANF */
-int __cdecl _swscanf_l (
+int __cdecl _swscanf_l(
 #endif  /* _SNSCANF */
 #else  /* _UNICODE */
 #ifdef _SNSCANF
-int __cdecl _snscanf_l (
+int __cdecl _snscanf_l(
 #else  /* _SNSCANF */
-int __cdecl _sscanf_l (
+int __cdecl _sscanf_l(
 #endif  /* _SNSCANF */
 #endif  /* _UNICODE */
-        REG2 const _TCHAR *string,
+    REG2 const _TCHAR* string,
 #ifdef _SNSCANF
-        size_t count,
+    size_t count,
 #endif  /* _SNSCANF */
-        const _TCHAR *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
+    const _TCHAR* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
 #ifdef _SNSCANF
-        return vscan_fn(_tinput_l, string, count, format, plocinfo, arglist);
+    return vscan_fn(_tinput_l, string, count, format, plocinfo, arglist);
 #else  /* _SNSCANF */
-        return vscan_fn(_tinput_l, string, format, plocinfo, arglist);
+    return vscan_fn(_tinput_l, string, format, plocinfo, arglist);
 #endif  /* _SNSCANF */
-
 }
 
 /***
@@ -205,64 +195,60 @@ int __cdecl _sscanf_l (
 *******************************************************************************/
 #ifdef _UNICODE
 #ifdef _SNSCANF
-int __cdecl _snwscanf_s (
+int __cdecl _snwscanf_s(
 #else  /* _SNSCANF */
-int __cdecl swscanf_s (
+int __cdecl swscanf_s(
 #endif  /* _SNSCANF */
 #else  /* _UNICODE */
 #ifdef _SNSCANF
-int __cdecl _snscanf_s (
+int __cdecl _snscanf_s(
 #else  /* _SNSCANF */
-int __cdecl sscanf_s (
+int __cdecl sscanf_s(
 #endif  /* _SNSCANF */
 #endif  /* _UNICODE */
-        REG2 const _TCHAR *string,
+    REG2 const _TCHAR* string,
 #ifdef _SNSCANF
-        size_t count,
+    size_t count,
 #endif  /* _SNSCANF */
-        const _TCHAR *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
+    const _TCHAR* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
 #ifdef _SNSCANF
-        return vscan_fn(_tinput_s_l, string, count, format, NULL, arglist);
+    return vscan_fn(_tinput_s_l, string, count, format, NULL, arglist);
 #else  /* _SNSCANF */
-        return vscan_fn(_tinput_s_l, string, format, NULL, arglist);
+    return vscan_fn(_tinput_s_l, string, format, NULL, arglist);
 #endif  /* _SNSCANF */
-
 }
 
 #ifdef _UNICODE
 #ifdef _SNSCANF
-int __cdecl _snwscanf_s_l (
+int __cdecl _snwscanf_s_l(
 #else  /* _SNSCANF */
-int __cdecl _swscanf_s_l (
+int __cdecl _swscanf_s_l(
 #endif  /* _SNSCANF */
 #else  /* _UNICODE */
 #ifdef _SNSCANF
-int __cdecl _snscanf_s_l (
+int __cdecl _snscanf_s_l(
 #else  /* _SNSCANF */
-int __cdecl _sscanf_s_l (
+int __cdecl _sscanf_s_l(
 #endif  /* _SNSCANF */
 #endif  /* _UNICODE */
-        REG2 const _TCHAR *string,
+    REG2 const _TCHAR* string,
 #ifdef _SNSCANF
-        size_t count,
+    size_t count,
 #endif  /* _SNSCANF */
-        const _TCHAR *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
+    const _TCHAR* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
 #ifdef _SNSCANF
-        return vscan_fn(_tinput_s_l, string, count, format, plocinfo, arglist);
+    return vscan_fn(_tinput_s_l, string, count, format, plocinfo, arglist);
 #else  /* _SNSCANF */
-        return vscan_fn(_tinput_s_l, string, format, plocinfo, arglist);
+    return vscan_fn(_tinput_s_l, string, format, plocinfo, arglist);
 #endif  /* _SNSCANF */
-
 }
 

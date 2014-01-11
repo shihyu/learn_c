@@ -73,7 +73,7 @@ wWinMain(
     HINSTANCE hPrevInstance,
     LPWSTR lpCmdLine,
     int nShowCmd
-    );
+);
 
 #define SPACECHAR   _T(' ')
 #define DQUOTECHAR  _T('\"')
@@ -87,7 +87,7 @@ wWinMain(
 
 extern int _adjust_fdiv;
 
-extern int * _imp___adjust_fdiv;
+extern int* _imp___adjust_fdiv;
 
 #endif  /* _M_IX86 */
 
@@ -102,7 +102,7 @@ extern void _setdefaultprecision();
 /*
  * Declare function used to install a user-supplied _matherr routine.
  */
-_CRTIMP void __setusermatherr( int (__cdecl *)(struct _exception *) );
+_CRTIMP void __setusermatherr(int (__cdecl*)(struct _exception*));
 
 
 /*
@@ -123,8 +123,8 @@ _CRTIMP void __setusermatherr( int (__cdecl *)(struct _exception *) );
 #endif  /* _M_IX86 */
 
 #if !defined (_M_IX86)
-extern int * _IMP___FMODE;      /* exported from the CRT DLL */
-extern int * _IMP___COMMODE;    /* these names are implementation-specific */
+extern int* _IMP___FMODE;       /* exported from the CRT DLL */
+extern int* _IMP___COMMODE;     /* these names are implementation-specific */
 #endif  /* !defined (_M_IX86) */
 
 extern int _fmode;          /* must match the definition in <stdlib.h> */
@@ -140,8 +140,8 @@ int __defaultmatherr;
 /*
  * routine in DLL to do initialization (in this case, C++ constructors)
  */
-extern int __cdecl _initterm_e(_PIFV *, _PIFV *);
-extern void __cdecl _initterm(_PVFV *, _PVFV *);
+extern int __cdecl _initterm_e(_PIFV*, _PIFV*);
+extern void __cdecl _initterm(_PVFV*, _PVFV*);
 
 /*
  * routine to check if this is a managed application
@@ -177,8 +177,8 @@ const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback;
  * NOTE - the pointers are stored encoded.
  */
 
-extern _PVFV *__onexitbegin;
-extern _PVFV *__onexitend;
+extern _PVFV* __onexitbegin;
+extern _PVFV* __onexitend;
 
 /*
  * All the below variables are made static global for this file. This facilitates
@@ -188,11 +188,11 @@ extern _PVFV *__onexitend;
  */
 
 static int argc;   /* three standard arguments to main */
-static _TSCHAR **argv;
-static _TSCHAR **envp;
+static _TSCHAR** argv;
+static _TSCHAR** envp;
 
 static int argret;
-static int mainret=0;
+static int mainret = 0;
 static int managedapp;
 static int has_cctor = 0;
 static _startupinfo    startinfo;
@@ -217,13 +217,11 @@ _CRTALLOC(".CRT$XCAA") static _PVFV pcppinit = pre_cpp_init;
 *
 *******************************************************************************/
 
-static int __cdecl pre_c_init(void)
-{
+static int __cdecl pre_c_init(void) {
     /*
      * Determine if this is a managed application
      */
     managedapp = check_managed_app();
-
     /*
      * Set __app_type properly
      */
@@ -232,35 +230,29 @@ static int __cdecl pre_c_init(void)
 #else  /* _WINMAIN_ */
     __set_app_type(_CONSOLE_APP);
 #endif  /* _WINMAIN_ */
-
     /*
      * Mark this module as an EXE file so that atexit/_onexit
      * will do the right thing when called, including for C++
      * d-tors.
      */
-    __onexitbegin = __onexitend = (_PVFV *)_encode_pointer((_PVFV *)(-1));
-
+    __onexitbegin = __onexitend = (_PVFV*)_encode_pointer((_PVFV*)(-1));
     /*
      * Propogate the _fmode and _commode variables to the DLL
      */
     *_IMP___FMODE = _fmode;
     *_IMP___COMMODE = _commode;
-
 #ifdef _M_IX86
     /*
      * Set the local copy of the Pentium FDIV adjustment flag
      */
-
     _adjust_fdiv = * _imp___adjust_fdiv;
 #endif  /* _M_IX86 */
-
     /*
      * Run the RTC initialization code for this DLL
      */
 #ifdef _RTC
     _RTC_Initialize();
 #endif  /* _RTC */
-
     /*
      * Call _setargv(), which will trigger a call to __setargv() if
      * SETARGV.OBJ is linked with the EXE.  If SETARGV.OBJ is not
@@ -276,16 +268,16 @@ static int __cdecl pre_c_init(void)
      * If the user has supplied a _matherr routine then set
      * __pusermatherr to point to it.
      */
-    if ( !__defaultmatherr )
+    if (!__defaultmatherr) {
         __setusermatherr(_matherr);
+    }
 
 #ifdef _M_IX86
     _setdefaultprecision();
 #endif  /* _M_IX86 */
 
     /* Enable per-thread locale if user asked for it */
-    if(__globallocalestatus == -1)
-    {
+    if (__globallocalestatus == -1) {
         _configthreadlocale(-1);
     }
 
@@ -306,22 +298,17 @@ static int __cdecl pre_c_init(void)
 *
 *******************************************************************************/
 
-static void __cdecl pre_cpp_init(void)
-{
+static void __cdecl pre_cpp_init(void) {
 #ifdef _RTC
     atexit(_RTC_Terminate);
 #endif  /* _RTC */
-
     /*
      * Get the arguments for the call to main. Note this must be
      * done explicitly, rather than as part of the dll's
      * initialization, to implement optional expansion of wild
      * card chars in filename args
      */
-
     startinfo.newmode = _newmode;
-
-
 #ifdef WPRFLAG
     argret = __wgetmainargs(&argc, &argv, &envp,
                             _dowildcard, &startinfo);
@@ -329,10 +316,12 @@ static void __cdecl pre_cpp_init(void)
     argret = __getmainargs(&argc, &argv, &envp,
                            _dowildcard, &startinfo);
 #endif  /* WPRFLAG */
-
 #ifndef _SYSCRT
-    if (argret < 0)
+
+    if (argret < 0) {
         _amsg_exit(_RT_SPACEARG);
+    }
+
 #endif  /* _SYSCRT */
 }
 
@@ -368,8 +357,8 @@ static void __cdecl pre_cpp_init(void)
 static
 int
 __tmainCRTStartup(
-         void
-         );
+    void
+);
 
 #ifdef _WINMAIN_
 
@@ -388,239 +377,231 @@ int mainCRTStartup(
 #endif  /* WPRFLAG */
 
 #endif  /* _WINMAIN_ */
-        void
-        )
-{
-        /*
-         * The /GS security cookie must be initialized before any exception
-         * handling targetting the current image is registered.  No function
-         * using exception handling can be called in the current image until
-         * after __security_init_cookie has been called.
-         */
-        __security_init_cookie();
-
-        return __tmainCRTStartup();
+    void
+) {
+    /*
+     * The /GS security cookie must be initialized before any exception
+     * handling targetting the current image is registered.  No function
+     * using exception handling can be called in the current image until
+     * after __security_init_cookie has been called.
+     */
+    __security_init_cookie();
+    return __tmainCRTStartup();
 }
 
 __declspec(noinline)
 int
 __tmainCRTStartup(
-        void
-        )
-{
+    void
+) {
 #ifdef _WINMAIN_
-        _TUCHAR *lpszCommandLine;
-        STARTUPINFO StartupInfo;
-        BOOL inDoubleQuote=FALSE;
+    _TUCHAR* lpszCommandLine;
+    STARTUPINFO StartupInfo;
+    BOOL inDoubleQuote = FALSE;
 
-        __try {
-                        /*
-                        Note: MSDN specifically notes that GetStartupInfo returns no error, and throws unspecified SEH if it fails, so
-                        the very general exception handler below is appropriate
-                        */
-            GetStartupInfo( &StartupInfo );
-        } __except(EXCEPTION_EXECUTE_HANDLER) {
-            return 255;
-        }
+    __try {
+        /*
+        Note: MSDN specifically notes that GetStartupInfo returns no error, and throws unspecified SEH if it fails, so
+        the very general exception handler below is appropriate
+        */
+        GetStartupInfo(&StartupInfo);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return 255;
+    }
+
 #endif  /* _WINMAIN_ */
 
+    /*
+     * Guard the initialization code and the call to user's main, or
+     * WinMain, function in a __try/__except statement.
+     */
+
+    __try {
+        /*
+         * There is a possiblity that the module where this object is
+         * linked into is a mixed module. In all the cases we gurantee that
+         * native initialization will occur before managed initialization.
+         * Also in anycase this code should never be called when some other
+         * code is initializing native code, that's why we exit in that case.
+         *
+         * Do runtime startup initializers.
+         *
+         * Note: the only possible entry we'll be executing here is for
+         * __lconv_init, pulled in from charmax.obj only if the EXE was
+         * compiled with -J.  All other .CRT$XI* initializers are only
+         * run as part of the CRT itself, and so for the CRT DLL model
+         * are not found in the EXE.  For that reason, we call _initterm,
+         * not _initterm_e, because __lconv_init will never return failure,
+         * and _initterm_e is not exported from the CRT DLL.
+         *
+         * Note further that, when using the CRT DLL, executing the
+         * .CRT$XI* initializers is only done for an EXE, not for a DLL
+         * using the CRT DLL.  That is to make sure the -J setting for
+         * the EXE is not overriden by that of any DLL.
+         */
+        void* lock_free = 0;
+        void* fiberid = ((PNT_TIB)NtCurrentTeb())->StackBase;
+        int nested = FALSE;
+
+        while ((lock_free = InterlockedCompareExchangePointer((volatile PVOID*)&__native_startup_lock, fiberid, 0)) != 0) {
+            if (lock_free == fiberid) {
+                nested = TRUE;
+                break;
+            }
+
+            /* some other thread is running native startup/shutdown during a cctor/domain unload.
+                Should only happen if this DLL was built using the Everett-compat loader lock fix in vcclrit.h
+            */
+            /* wait for the other thread to complete init before we return */
+            Sleep(1000);
+        }
+
+        if (__native_startup_state == __initializing) {
+            _amsg_exit(_RT_CRT_INIT_CONFLICT);
+        } else if (__native_startup_state == __uninitialized) {
+            __native_startup_state = __initializing;
+#ifndef _SYSCRT
+
+            if (_initterm_e(__xi_a, __xi_z) != 0) {
+                return 255;
+            }
+
+#else  /* _SYSCRT */
+            _initterm((_PVFV*)(void*)__xi_a, (_PVFV*)(void*)__xi_z);
+#endif  /* _SYSCRT */
+        } else {
+            has_cctor = 1;
+        }
 
         /*
-         * Guard the initialization code and the call to user's main, or
-         * WinMain, function in a __try/__except statement.
-         */
+        * do C++ constructors (initializers) specific to this EXE
+        */
+        if (__native_startup_state == __initializing) {
+            _initterm(__xc_a, __xc_z);
+            __native_startup_state = __initialized;
+        }
 
-        __try
-        {
-            /*
-             * There is a possiblity that the module where this object is
-             * linked into is a mixed module. In all the cases we gurantee that
-             * native initialization will occur before managed initialization.
-             * Also in anycase this code should never be called when some other
-             * code is initializing native code, that's why we exit in that case.
-             *
-             * Do runtime startup initializers.
-             *
-             * Note: the only possible entry we'll be executing here is for
-             * __lconv_init, pulled in from charmax.obj only if the EXE was
-             * compiled with -J.  All other .CRT$XI* initializers are only
-             * run as part of the CRT itself, and so for the CRT DLL model
-             * are not found in the EXE.  For that reason, we call _initterm,
-             * not _initterm_e, because __lconv_init will never return failure,
-             * and _initterm_e is not exported from the CRT DLL.
-             *
-             * Note further that, when using the CRT DLL, executing the
-             * .CRT$XI* initializers is only done for an EXE, not for a DLL
-             * using the CRT DLL.  That is to make sure the -J setting for
-             * the EXE is not overriden by that of any DLL.
-             */
-            void *lock_free=0;
-            void *fiberid=((PNT_TIB)NtCurrentTeb())->StackBase;
-            int nested=FALSE;
-            while((lock_free=InterlockedCompareExchangePointer((volatile PVOID *)&__native_startup_lock, fiberid, 0))!=0)
-            {
-                if(lock_free==fiberid)
-                {
-                    nested=TRUE;
-                    break;
-                }
+        _ASSERTE(__native_startup_state == __initialized);
 
-                /* some other thread is running native startup/shutdown during a cctor/domain unload.
-                    Should only happen if this DLL was built using the Everett-compat loader lock fix in vcclrit.h
-                */
-                /* wait for the other thread to complete init before we return */
-                Sleep(1000);
-            }
-
-            if (__native_startup_state == __initializing)
-            {
-                _amsg_exit( _RT_CRT_INIT_CONFLICT);
-            }
-            else if (__native_startup_state == __uninitialized)
-            {
-                __native_startup_state = __initializing;
-#ifndef _SYSCRT
-                if (_initterm_e( __xi_a, __xi_z ) != 0)
-                {
-                    return 255;
-                }
-#else  /* _SYSCRT */
-                _initterm((_PVFV *)(void *)__xi_a, (_PVFV *)(void *)__xi_z);
-#endif  /* _SYSCRT */
-            }
-            else
-            {
-                has_cctor = 1;
-            }
-
-            /*
-            * do C++ constructors (initializers) specific to this EXE
-            */
-            if (__native_startup_state == __initializing)
-            {
-                _initterm( __xc_a, __xc_z );
-                __native_startup_state = __initialized;
-            }
-            _ASSERTE(__native_startup_state == __initialized);
-            if(!nested)
-            {
-                /* For X86, the definition of InterlockedExchangePointer wrongly causes warning C4312 */
+        if (!nested) {
+            /* For X86, the definition of InterlockedExchangePointer wrongly causes warning C4312 */
 #pragma warning(push)
 #pragma warning(disable:4312)
-                InterlockedExchangePointer((volatile PVOID *)&__native_startup_lock, 0);
+            InterlockedExchangePointer((volatile PVOID*)&__native_startup_lock, 0);
 #pragma warning(pop)
-            }
+        }
 
-            /*
-             * If we have any dynamically initialized __declspec(thread)
-             * variables, then invoke their initialization for the primary
-             * thread used to start the process, by calling __dyn_tls_init
-             * through a callback defined in tlsdyn.obj.
-             */
-            if (__dyn_tls_init_callback != NULL &&
-                _IsNonwritableInCurrentImage((PBYTE)&__dyn_tls_init_callback))
-            {
-                __dyn_tls_init_callback(NULL, DLL_THREAD_ATTACH, NULL);
-            }
+        /*
+         * If we have any dynamically initialized __declspec(thread)
+         * variables, then invoke their initialization for the primary
+         * thread used to start the process, by calling __dyn_tls_init
+         * through a callback defined in tlsdyn.obj.
+         */
+        if (__dyn_tls_init_callback != NULL &&
+                _IsNonwritableInCurrentImage((PBYTE)&__dyn_tls_init_callback)) {
+            __dyn_tls_init_callback(NULL, DLL_THREAD_ATTACH, NULL);
+        }
 
-            /* Enable buffer count checking if linking against static lib */
-            _CrtSetCheckCount(TRUE);
-
+        /* Enable buffer count checking if linking against static lib */
+        _CrtSetCheckCount(TRUE);
 #ifdef _WINMAIN_
-            /*
-             * Skip past program name (first token in command line).
-             * Check for and handle quoted program name.
-             */
+        /*
+         * Skip past program name (first token in command line).
+         * Check for and handle quoted program name.
+         */
 #ifdef WPRFLAG
-            /* OS may not support "W" flavors */
-            if (_wcmdln == NULL)
-                return 255;
-            lpszCommandLine = (wchar_t *)_wcmdln;
+
+        /* OS may not support "W" flavors */
+        if (_wcmdln == NULL) {
+            return 255;
+        }
+
+        lpszCommandLine = (wchar_t*)_wcmdln;
 #else  /* WPRFLAG */
-            lpszCommandLine = (unsigned char *)_acmdln;
+        lpszCommandLine = (unsigned char*)_acmdln;
 #endif  /* WPRFLAG */
 
-            while (*lpszCommandLine > SPACECHAR ||
-                   (*lpszCommandLine&&inDoubleQuote)) {
-                /*
-                 * Flip the count from 1 to 0 or 0 to 1 if current character
-                 * is DOUBLEQUOTE
-                 */
-                if (*lpszCommandLine==DQUOTECHAR) inDoubleQuote=!inDoubleQuote;
+        while (*lpszCommandLine > SPACECHAR ||
+                (*lpszCommandLine && inDoubleQuote)) {
+            /*
+             * Flip the count from 1 to 0 or 0 to 1 if current character
+             * is DOUBLEQUOTE
+             */
+            if (*lpszCommandLine == DQUOTECHAR) {
+                inDoubleQuote = !inDoubleQuote;
+            }
+
 #ifdef _MBCS
-                if (_ismbblead(*lpszCommandLine)) {
-                    if (lpszCommandLine) {
-                        lpszCommandLine++;
-                    }
+
+            if (_ismbblead(*lpszCommandLine)) {
+                if (lpszCommandLine) {
+                    lpszCommandLine++;
                 }
+            }
+
 #endif  /* _MBCS */
-                ++lpszCommandLine;
-            }
+            ++lpszCommandLine;
+        }
 
-            /*
-             * Skip past any white space preceeding the second token.
-             */
-            while (*lpszCommandLine && (*lpszCommandLine <= SPACECHAR)) {
-                lpszCommandLine++;
-            }
+        /*
+         * Skip past any white space preceeding the second token.
+         */
+        while (*lpszCommandLine && (*lpszCommandLine <= SPACECHAR)) {
+            lpszCommandLine++;
+        }
 
 #ifdef WPRFLAG
-            mainret = wWinMain(
+        mainret = wWinMain(
 #else  /* WPRFLAG */
-            mainret = WinMain(
+        mainret = WinMain(
 #endif  /* WPRFLAG */
-                       (HINSTANCE)&__ImageBase,
-                       NULL,
-                       lpszCommandLine,
-                       StartupInfo.dwFlags & STARTF_USESHOWWINDOW
-                        ? StartupInfo.wShowWindow
-                        : SW_SHOWDEFAULT
-                      );
+                      (HINSTANCE)&__ImageBase,
+                      NULL,
+                      lpszCommandLine,
+                      StartupInfo.dwFlags & STARTF_USESHOWWINDOW
+                      ? StartupInfo.wShowWindow
+                      : SW_SHOWDEFAULT
+                  );
 #else  /* _WINMAIN_ */
-
 #ifdef WPRFLAG
-            __winitenv = envp;
-            mainret = wmain(argc, argv, envp);
+        __winitenv = envp;
+        mainret = wmain(argc, argv, envp);
 #else  /* WPRFLAG */
-            __initenv = envp;
-            mainret = main(argc, argv, envp);
+        __initenv = envp;
+        mainret = main(argc, argv, envp);
 #endif  /* WPRFLAG */
-
 #endif  /* _WINMAIN_ */
 
-            /*
-             * Note that if the exe is managed app, we don't really need to
-             * call exit or _c_exit. .cctor should be able to take care of
-             * this.
-             */
-            if ( !managedapp )
-                exit(mainret);
+        /*
+         * Note that if the exe is managed app, we don't really need to
+         * call exit or _c_exit. .cctor should be able to take care of
+         * this.
+         */
+        if (!managedapp)
+            exit(mainret);
+        if (has_cctor == 0)
+            _cexit();
+    } __except (_XcptFilter(GetExceptionCode(), GetExceptionInformation())) {
+        /*
+         * Should never reach here
+         */
+        mainret = GetExceptionCode();
 
-            if (has_cctor == 0)
-                _cexit();
-
+        /*
+         * Note that if the exe is managed app, we don't really need to
+         * call exit or _c_exit. .cctor should be able to take care of
+         * this.
+         */
+        if (!managedapp) {
+            _exit(mainret);
         }
-        __except ( _XcptFilter(GetExceptionCode(), GetExceptionInformation()) )
-        {
-            /*
-             * Should never reach here
-             */
 
-            mainret = GetExceptionCode();
+        if (has_cctor == 0) {
+            _cexit();
+        }
+    } /* end of try - except */
 
-            /*
-             * Note that if the exe is managed app, we don't really need to
-             * call exit or _c_exit. .cctor should be able to take care of
-             * this.
-             */
-            if ( !managedapp )
-                _exit(mainret);
-
-            if (has_cctor == 0)
-                _cexit();
-        } /* end of try - except */
-
-        return mainret;
+    return mainret;
 }
 
 /***
@@ -641,51 +622,60 @@ __tmainCRTStartup(
 *
 *******************************************************************************/
 
-static int __cdecl check_managed_app (
-        void
-        )
-{
-        PIMAGE_DOS_HEADER pDOSHeader;
-        PIMAGE_NT_HEADERS pPEHeader;
-        PIMAGE_OPTIONAL_HEADER32 pNTHeader32;
-        PIMAGE_OPTIONAL_HEADER64 pNTHeader64;
+static int __cdecl check_managed_app(
+    void
+) {
+    PIMAGE_DOS_HEADER pDOSHeader;
+    PIMAGE_NT_HEADERS pPEHeader;
+    PIMAGE_OPTIONAL_HEADER32 pNTHeader32;
+    PIMAGE_OPTIONAL_HEADER64 pNTHeader64;
+    pDOSHeader = (PIMAGE_DOS_HEADER)&__ImageBase;
 
-        pDOSHeader = (PIMAGE_DOS_HEADER)&__ImageBase;
-        if ( pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE )
-            return 0;
+    if (pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE) {
+        return 0;
+    }
 
-        pPEHeader = (PIMAGE_NT_HEADERS)((char *)pDOSHeader +
-                                        pDOSHeader->e_lfanew);
-        if ( pPEHeader->Signature != IMAGE_NT_SIGNATURE )
-            return 0;
+    pPEHeader = (PIMAGE_NT_HEADERS)((char*)pDOSHeader +
+                                    pDOSHeader->e_lfanew);
 
-        pNTHeader32 = (PIMAGE_OPTIONAL_HEADER32)&pPEHeader->OptionalHeader;
-        switch ( pNTHeader32->Magic ) {
-        case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
-            /* PE header */
-            /* prefast assumes we are overflowing __ImageBase */
+    if (pPEHeader->Signature != IMAGE_NT_SIGNATURE) {
+        return 0;
+    }
+
+    pNTHeader32 = (PIMAGE_OPTIONAL_HEADER32)&pPEHeader->OptionalHeader;
+
+    switch (pNTHeader32->Magic) {
+    case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
+        /* PE header */
+        /* prefast assumes we are overflowing __ImageBase */
 #pragma warning(push)
 #pragma warning(disable:26000)
-            if ( pNTHeader32->NumberOfRvaAndSizes <=
-                    IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR )
-                return 0;
-#pragma warning(pop)
-            return !! pNTHeader32 ->
-                      DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
-                      VirtualAddress;
-        case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
-            /* PE+ header */
-            pNTHeader64 = (PIMAGE_OPTIONAL_HEADER64)pNTHeader32;
-            if ( pNTHeader64->NumberOfRvaAndSizes <=
-                    IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR )
-                return 0;
-            return !! pNTHeader64 ->
-                      DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
-                      VirtualAddress;
+        if (pNTHeader32->NumberOfRvaAndSizes <=
+                IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR) {
+            return 0;
         }
 
-        /* Not PE or PE+, so not managed */
-        return 0;
+#pragma warning(pop)
+        return !! pNTHeader32 ->
+               DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
+               VirtualAddress;
+
+    case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
+        /* PE+ header */
+        pNTHeader64 = (PIMAGE_OPTIONAL_HEADER64)pNTHeader32;
+
+        if (pNTHeader64->NumberOfRvaAndSizes <=
+                IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR) {
+            return 0;
+        }
+
+        return !! pNTHeader64 ->
+               DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] .
+               VirtualAddress;
+    }
+
+    /* Not PE or PE+, so not managed */
+    return 0;
 }
 
 #endif  /* CRTDLL */

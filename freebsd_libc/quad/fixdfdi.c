@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -45,16 +45,17 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/fixdfdi.c,v 1.3 2007/01/09 00:28:03 imp Ex
  */
 quad_t
 __fixdfdi(x)
-	double x;
+double x;
 {
-	if (x < 0)
-		if (x <= QUAD_MIN)
-			return (QUAD_MIN);
-		else
-			return ((quad_t)-(u_quad_t)-x);
-	else
-		if (x >= QUAD_MAX)
-			return (QUAD_MAX);
-		else
-			return ((quad_t)(u_quad_t)x);
+    if (x < 0)
+        if (x <= QUAD_MIN) {
+            return (QUAD_MIN);
+        } else {
+            return ((quad_t) - (u_quad_t) - x);
+        }
+    else if (x >= QUAD_MAX) {
+        return (QUAD_MAX);
+    } else {
+        return ((quad_t)(u_quad_t)x);
+    }
 }

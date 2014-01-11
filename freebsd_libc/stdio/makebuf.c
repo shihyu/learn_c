@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -56,32 +56,38 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/makebuf.c,v 1.6 2007/01/09 00:28:07 imp E
  */
 void
 __smakebuf(fp)
-	FILE *fp;
+FILE* fp;
 {
-	void *p;
-	int flags;
-	size_t size;
-	int couldbetty;
+    void* p;
+    int flags;
+    size_t size;
+    int couldbetty;
 
-	if (fp->_flags & __SNBF) {
-		fp->_bf._base = fp->_p = fp->_nbuf;
-		fp->_bf._size = 1;
-		return;
-	}
-	flags = __swhatbuf(fp, &size, &couldbetty);
-	if ((p = malloc(size)) == NULL) {
-		fp->_flags |= __SNBF;
-		fp->_bf._base = fp->_p = fp->_nbuf;
-		fp->_bf._size = 1;
-		return;
-	}
-	__cleanup = _cleanup;
-	flags |= __SMBF;
-	fp->_bf._base = fp->_p = p;
-	fp->_bf._size = size;
-	if (couldbetty && isatty(fp->_file))
-		flags |= __SLBF;
-	fp->_flags |= flags;
+    if (fp->_flags & __SNBF) {
+        fp->_bf._base = fp->_p = fp->_nbuf;
+        fp->_bf._size = 1;
+        return;
+    }
+
+    flags = __swhatbuf(fp, &size, &couldbetty);
+
+    if ((p = malloc(size)) == NULL) {
+        fp->_flags |= __SNBF;
+        fp->_bf._base = fp->_p = fp->_nbuf;
+        fp->_bf._size = 1;
+        return;
+    }
+
+    __cleanup = _cleanup;
+    flags |= __SMBF;
+    fp->_bf._base = fp->_p = p;
+    fp->_bf._size = size;
+
+    if (couldbetty && isatty(fp->_file)) {
+        flags |= __SLBF;
+    }
+
+    fp->_flags |= flags;
 }
 
 /*
@@ -89,32 +95,33 @@ __smakebuf(fp)
  */
 int
 __swhatbuf(fp, bufsize, couldbetty)
-	FILE *fp;
-	size_t *bufsize;
-	int *couldbetty;
+FILE* fp;
+size_t* bufsize;
+int* couldbetty;
 {
-	struct stat st;
+    struct stat st;
 
-	if (fp->_file < 0 || _fstat(fp->_file, &st) < 0) {
-		*couldbetty = 0;
-		*bufsize = BUFSIZ;
-		return (__SNPT);
-	}
+    if (fp->_file < 0 || _fstat(fp->_file, &st) < 0) {
+        *couldbetty = 0;
+        *bufsize = BUFSIZ;
+        return (__SNPT);
+    }
 
-	/* could be a tty iff it is a character device */
-	*couldbetty = (st.st_mode & S_IFMT) == S_IFCHR;
-	if (st.st_blksize <= 0) {
-		*bufsize = BUFSIZ;
-		return (__SNPT);
-	}
+    /* could be a tty iff it is a character device */
+    *couldbetty = (st.st_mode & S_IFMT) == S_IFCHR;
 
-	/*
-	 * Optimise fseek() only if it is a regular file.  (The test for
-	 * __sseek is mainly paranoia.)  It is safe to set _blksize
-	 * unconditionally; it will only be used if __SOPT is also set.
-	 */
-	*bufsize = st.st_blksize;
-	fp->_blksize = st.st_blksize;
-	return ((st.st_mode & S_IFMT) == S_IFREG && fp->_seek == __sseek ?
-	    __SOPT : __SNPT);
+    if (st.st_blksize <= 0) {
+        *bufsize = BUFSIZ;
+        return (__SNPT);
+    }
+
+    /*
+     * Optimise fseek() only if it is a regular file.  (The test for
+     * __sseek is mainly paranoia.)  It is safe to set _blksize
+     * unconditionally; it will only be used if __SOPT is also set.
+     */
+    *bufsize = st.st_blksize;
+    fp->_blksize = st.st_blksize;
+    return ((st.st_mode & S_IFMT) == S_IFREG && fp->_seek == __sseek ?
+            __SOPT : __SNPT);
 }

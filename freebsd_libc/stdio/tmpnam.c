@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -42,20 +42,22 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/tmpnam.c,v 1.6 2007/01/09 00:28:07 imp Ex
 #include <unistd.h>
 
 __warn_references(tmpnam,
-    "warning: tmpnam() possibly used unsafely; consider using mkstemp()");
+                  "warning: tmpnam() possibly used unsafely; consider using mkstemp()");
 
-extern char *_mktemp(char *);
+extern char* _mktemp(char*);
 
-char *
+char*
 tmpnam(s)
-	char *s;
+char* s;
 {
-	static u_long tmpcount;
-	static char buf[L_tmpnam];
+    static u_long tmpcount;
+    static char buf[L_tmpnam];
 
-	if (s == NULL)
-		s = buf;
-	(void)snprintf(s, L_tmpnam, "%stmp.%lu.XXXXXX", P_tmpdir, tmpcount);
-	++tmpcount;
-	return (_mktemp(s));
+    if (s == NULL) {
+        s = buf;
+    }
+
+    (void)snprintf(s, L_tmpnam, "%stmp.%lu.XXXXXX", P_tmpdir, tmpcount);
+    ++tmpcount;
+    return (_mktemp(s));
 }

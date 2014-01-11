@@ -51,27 +51,26 @@ static int __cdecl flsall(int);
 *******************************************************************************/
 
 
-int __cdecl fflush (
-        REG1 FILE *stream
-        )
-{
-        int rc;
+int __cdecl fflush(
+    REG1 FILE* stream
+) {
+    int rc;
 
-        /* if stream is NULL, flush all streams
-         */
-        if ( stream == NULL )
-                return(flsall(FFLUSHNULL));
+    /* if stream is NULL, flush all streams
+     */
+    if (stream == NULL) {
+        return (flsall(FFLUSHNULL));
+    }
 
-        _lock_str(stream);
+    _lock_str(stream);
 
-        __try {
-                rc = _fflush_nolock(stream);
-        }
-        __finally {
-                _unlock_str(stream);
-        }
+    __try {
+        rc = _fflush_nolock(stream);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        return(rc);
+    return (rc);
 }
 
 
@@ -92,27 +91,26 @@ int __cdecl fflush (
 *
 *******************************************************************************/
 
-int __cdecl _fflush_nolock (
-        REG1 FILE *str
-        )
-{
+int __cdecl _fflush_nolock(
+    REG1 FILE* str
+) {
+    /* if stream is NULL, flush all streams
+     */
+    if (str == NULL) {
+        return (flsall(FFLUSHNULL));
+    }
 
-        /* if stream is NULL, flush all streams
-         */
-        if ( str == NULL )
-                return(flsall(FFLUSHNULL));
+    if (_flush(str) != 0) {
+        /* _flush failed, don't attempt to commit */
+        return (EOF);
+    }
 
+    /* lowio commit to ensure data is written to disk */
+    if (str->_flag & _IOCOMMIT) {
+        return (_commit(_fileno(str)) ? EOF : 0);
+    }
 
-        if (_flush(str) != 0) {
-                /* _flush failed, don't attempt to commit */
-                return(EOF);
-        }
-
-        /* lowio commit to ensure data is written to disk */
-        if (str->_flag & _IOCOMMIT) {
-                return (_commit(_fileno(str)) ? EOF : 0);
-        }
-        return 0;
+    return 0;
 }
 
 
@@ -136,38 +134,33 @@ int __cdecl _fflush_nolock (
 *
 *******************************************************************************/
 
-int __cdecl _flush (
-        FILE *str
-        )
-{
-        REG1 FILE *stream;
-        REG2 int rc = 0; /* assume good return */
-        REG3 int nchar;
+int __cdecl _flush(
+    FILE* str
+) {
+    REG1 FILE* stream;
+    REG2 int rc = 0; /* assume good return */
+    REG3 int nchar;
+    /* Init pointer to stream */
+    stream = str;
 
-        /* Init pointer to stream */
-        stream = str;
-
-
-        if ((stream->_flag & (_IOREAD | _IOWRT)) == _IOWRT && bigbuf(stream)
-                && (nchar = (int)(stream->_ptr - stream->_base)) > 0)
-        {
-                if ( _write(_fileno(stream), stream->_base, nchar) == nchar ) {
-                        /* if this is a read/write file, clear _IOWRT so that
-                         * next operation can be a read
-                         */
-                        if ( _IORW & stream->_flag )
-                                stream->_flag &= ~_IOWRT;
-                }
-                else {
-                        stream->_flag |= _IOERR;
-                        rc = EOF;
-                }
+    if ((stream->_flag & (_IOREAD | _IOWRT)) == _IOWRT && bigbuf(stream)
+            && (nchar = (int)(stream->_ptr - stream->_base)) > 0) {
+        if (_write(_fileno(stream), stream->_base, nchar) == nchar) {
+            /* if this is a read/write file, clear _IOWRT so that
+             * next operation can be a read
+             */
+            if (_IORW & stream->_flag) {
+                stream->_flag &= ~_IOWRT;
+            }
+        } else {
+            stream->_flag |= _IOERR;
+            rc = EOF;
         }
+    }
 
-        stream->_ptr = stream->_base;
-        stream->_cnt = 0;
-
-        return(rc);
+    stream->_ptr = stream->_base;
+    stream->_cnt = 0;
+    return (rc);
 }
 
 
@@ -187,11 +180,10 @@ int __cdecl _flush (
 *
 *******************************************************************************/
 
-int __cdecl _flushall (
-        void
-        )
-{
-        return(flsall(FLUSHALL));
+int __cdecl _flushall(
+    void
+) {
+    return (flsall(FLUSHALL));
 }
 
 
@@ -222,75 +214,69 @@ int __cdecl _flushall (
 *
 *******************************************************************************/
 
-static int __cdecl flsall (
-        int flushflag
-        )
-{
-        REG1 int i;
-        int count = 0;
-        int err = 0;
+static int __cdecl flsall(
+    int flushflag
+) {
+    REG1 int i;
+    int count = 0;
+    int err = 0;
+    _mlock(_IOB_SCAN_LOCK);
 
-        _mlock(_IOB_SCAN_LOCK);
-        __try {
+    __try {
+        for (i = 0 ; i < _nstream ; i++) {
+            if ((__piob[i] != NULL) && (inuse((FILE*)__piob[i]))) {
+                /*
+                 * lock the stream. this is not done until testing
+                 * the stream is in use to avoid unnecessarily creating
+                 * a lock for every stream. the price is having to
+                 * retest the stream after the lock has been asserted.
+                 */
+                _lock_str2(i, __piob[i]);
 
-        for ( i = 0 ; i < _nstream ; i++ ) {
-
-                if ( (__piob[i] != NULL) && (inuse((FILE *)__piob[i])) ) {
-
-                        /*
-                         * lock the stream. this is not done until testing
-                         * the stream is in use to avoid unnecessarily creating
-                         * a lock for every stream. the price is having to
-                         * retest the stream after the lock has been asserted.
-                         */
-                        _lock_str2(i, __piob[i]);
-
-                        __try {
-                                /*
-                                 * if the stream is STILL in use (it may have been
-                                 * closed before the lock was asserted), see about
-                                 * flushing it.
+                __try {
+                    /*
+                     * if the stream is STILL in use (it may have been
+                     * closed before the lock was asserted), see about
+                     * flushing it.
+                     */
+                    if (inuse((FILE*)__piob[i])) {
+                        if (flushflag == FLUSHALL) {
+                            /*
+                             * FLUSHALL functionality: fflush the read or
+                             * write stream and, if successful, update the
+                             * count of flushed streams
+                             */
+                            if (_fflush_nolock(__piob[i]) != EOF)
+                                /* update count of successfully flushed
+                                 * streams
                                  */
-                                if ( inuse((FILE *)__piob[i]) ) {
-
-                        if ( flushflag == FLUSHALL ) {
-                                /*
-                                 * FLUSHALL functionality: fflush the read or
-                                 * write stream and, if successful, update the
-                                 * count of flushed streams
-                                 */
-                                if ( _fflush_nolock(__piob[i]) != EOF )
-                                        /* update count of successfully flushed
-                                         * streams
-                                         */
-                                        count++;
+                            {
+                                count++;
+                            }
+                        } else if ((flushflag == FFLUSHNULL) &&
+                                   (((FILE*)__piob[i])->_flag & _IOWRT)) {
+                            /*
+                             * FFLUSHNULL functionality: fflush the write
+                             * stream and kept track of the error, if one
+                             * occurs
+                             */
+                            if (_fflush_nolock(__piob[i]) == EOF) {
+                                err = EOF;
+                            }
                         }
-                        else if ( (flushflag == FFLUSHNULL) &&
-                                  (((FILE *)__piob[i])->_flag & _IOWRT) ) {
-                                /*
-                                 * FFLUSHNULL functionality: fflush the write
-                                 * stream and kept track of the error, if one
-                                 * occurs
-                                 */
-                                if ( _fflush_nolock(__piob[i]) == EOF )
-                                        err = EOF;
-                        }
-
-                                }
-                        }
-                        __finally {
-                                _unlock_str2(i, __piob[i]);
-                        }
+                    }
+                } __finally {
+                    _unlock_str2(i, __piob[i]);
                 }
+            }
         }
+    } __finally {
+        _munlock(_IOB_SCAN_LOCK);
+    }
 
-        }
-        __finally {
-                _munlock(_IOB_SCAN_LOCK);
-        }
-
-        if ( flushflag == FLUSHALL )
-                return(count);
-        else
-                return(err);
+    if (flushflag == FLUSHALL) {
+        return (count);
+    } else {
+        return (err);
+    }
 }

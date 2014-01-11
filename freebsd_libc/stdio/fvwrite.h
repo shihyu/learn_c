@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -29,7 +29,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)fvwrite.h	8.1 (Berkeley) 6/4/93
+ *  @(#)fvwrite.h   8.1 (Berkeley) 6/4/93
  * $FreeBSD: src/lib/libc/stdio/fvwrite.h,v 1.4 2007/01/09 00:28:06 imp Exp $
  */
 
@@ -37,13 +37,13 @@
  * I/O descriptors for __sfvwrite().
  */
 struct __siov {
-	void	*iov_base;
-	size_t	iov_len;
+    void*    iov_base;
+    size_t  iov_len;
 };
 struct __suio {
-	struct	__siov *uio_iov;
-	int	uio_iovcnt;
-	int	uio_resid;
+    struct  __siov* uio_iov;
+    int uio_iovcnt;
+    int uio_resid;
 };
 
-extern int __sfvwrite(FILE *, struct __suio *);
+extern int __sfvwrite(FILE*, struct __suio*);

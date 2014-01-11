@@ -35,17 +35,13 @@
 *
 *******************************************************************************/
 
-void __cdecl __wrt2err (
-        char *msg
-        )
-{
-        unsigned long length;           /* length of string to write */
-        unsigned long numwritten;       /* number of bytes written */
-
-        length = *msg++;                /* 1st byte is length */
-
-        /* write the message to stderr */
-
-        WriteFile((HANDLE)_osfhnd(2), msg, length, &numwritten, NULL);
+void __cdecl __wrt2err(
+    char* msg
+) {
+    unsigned long length;           /* length of string to write */
+    unsigned long numwritten;       /* number of bytes written */
+    length = *msg++;                /* 1st byte is length */
+    /* write the message to stderr */
+    WriteFile((HANDLE)_osfhnd(2), msg, length, &numwritten, NULL);
 }
 

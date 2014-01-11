@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,18 +44,20 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/rewind.c,v 1.12 2007/01/09 00:28:07 imp E
 #include "local.h"
 
 void
-rewind(FILE *fp)
-{
-	int serrno = errno;
+rewind(FILE* fp) {
+    int serrno = errno;
 
-	/* make sure stdio is set up */
-	if (!__sdidinit)
-		__sinit();
+    /* make sure stdio is set up */
+    if (!__sdidinit) {
+        __sinit();
+    }
 
-	FLOCKFILE(fp);
-	if (_fseeko(fp, (off_t)0, SEEK_SET, 1) == 0) {
-		clearerr_unlocked(fp);
-		errno = serrno;
-	}
-	FUNLOCKFILE(fp);
+    FLOCKFILE(fp);
+
+    if (_fseeko(fp, (off_t)0, SEEK_SET, 1) == 0) {
+        clearerr_unlocked(fp);
+        errno = serrno;
+    }
+
+    FUNLOCKFILE(fp);
 }

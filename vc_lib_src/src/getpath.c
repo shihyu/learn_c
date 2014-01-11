@@ -66,110 +66,99 @@
 *******************************************************************************/
 
 #ifdef WPRFLAG
-wchar_t * __cdecl _wgetpath (
+wchar_t* __cdecl _wgetpath(
 #else  /* WPRFLAG */
-char * __cdecl _getpath (
+char* __cdecl _getpath(
 #endif  /* WPRFLAG */
-        register const _TSCHAR *src,
-        register _TSCHAR *dst,
-        size_t maxlen
-        )
-{
-        const _TSCHAR *save_src;
+    register const _TSCHAR* src,
+    register _TSCHAR* dst,
+    size_t maxlen
+) {
+    const _TSCHAR* save_src;
 
-        /*
-         * strip off leading semi colons
-         */
-        while ( *src == _T(';') )
-                src++;
+    /*
+     * strip off leading semi colons
+     */
+    while (*src == _T(';')) {
+        src++;
+    }
 
-        /*
-         * Save original src pointer
-         */
-        save_src = src;
+    /*
+     * Save original src pointer
+     */
+    save_src = src;
 
-        /*
-         * Decrement maxlen to allow for the terminating _T('\0')
-         */
-        if ( --maxlen == 0 )
-        {
-                errno = ERANGE;
-                goto appendnull;
-        }
+    /*
+     * Decrement maxlen to allow for the terminating _T('\0')
+     */
+    if (--maxlen == 0) {
+        errno = ERANGE;
+        goto appendnull;
+    }
 
-
-        /*
-         * Get the next path in src string
-         */
-        while (*src && (*src != _T(';'))) {
-
+    /*
+     * Get the next path in src string
+     */
+    while (*src && (*src != _T(';'))) {
 #if defined (_HPFS_)
 
-                /*
-                 * Check for quote char
-                 */
-                if (*src != _T('"')) {
+        /*
+         * Check for quote char
+         */
+        if (*src != _T('"')) {
+            *dst++ = *src++;
 
-                        *dst++ = *src++;
+            if (--maxlen == 0) {
+                save_src = src; /* ensure NULL return */
+                errno = ERANGE;
+                goto appendnull;
+            }
+        } else {
+            /*
+             * Found a quote.  Copy all chars until we hit the
+             * final quote or the end of the string.
+             */
+            src++;                  /* skip over opening quote */
 
-                        if ( --maxlen == 0 ) {
-                                save_src = src; /* ensure NULL return */
-                                errno = ERANGE;
-                                goto appendnull;
-                        }
-
-                }
-                else {
-
-                        /*
-                         * Found a quote.  Copy all chars until we hit the
-                         * final quote or the end of the string.
-                         */
-                        src++;                  /* skip over opening quote */
-
-                        while (*src && (*src != _T('"'))) {
-
-                                *dst++ = *src++;
-
-                                if ( --maxlen == 0 ) {
-                                        save_src = src; /* ensure NULL return */
-                                        errno = ERANGE;
-                                        goto appendnull;
-                                }
-                        }
-
-                        if (*src)
-                                src++;          /* skip over closing quote */
-
-                }
-
-#else  /* defined (_HPFS_) */
-
+            while (*src && (*src != _T('"'))) {
                 *dst++ = *src++;
 
-                if ( --maxlen == 0 ) {
-                        save_src = src; /* ensure NULL return */
-                        errno = ERANGE;
-                        goto appendnull;
+                if (--maxlen == 0) {
+                    save_src = src; /* ensure NULL return */
+                    errno = ERANGE;
+                    goto appendnull;
                 }
+            }
 
-#endif  /* defined (_HPFS_) */
-
+            if (*src) {
+                src++;    /* skip over closing quote */
+            }
         }
 
-        /*
-         * If we copied something and stopped because of a _T(';'),
-         * skip the _T(';') before returning
-         */
-        while ( *src == _T(';') )
-                src++;
+#else  /* defined (_HPFS_) */
+        *dst++ = *src++;
 
-        /*
-         * Store a terminating null
-         */
+        if (--maxlen == 0) {
+            save_src = src; /* ensure NULL return */
+            errno = ERANGE;
+            goto appendnull;
+        }
+
+#endif  /* defined (_HPFS_) */
+    }
+
+    /*
+     * If we copied something and stopped because of a _T(';'),
+     * skip the _T(';') before returning
+     */
+    while (*src == _T(';')) {
+        src++;
+    }
+
+    /*
+     * Store a terminating null
+     */
 appendnull:
-
-        *dst = _T('\0');
-
-        return((save_src != src) ? (_TSCHAR *)src : NULL);
+    *dst = _T('\0');
+    return ((save_src != src) ? (_TSCHAR*)src : NULL);
 }

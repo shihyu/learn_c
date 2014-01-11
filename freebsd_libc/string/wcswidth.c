@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  * (c) UNIX System Laboratories, Inc.
  * All or some portions of this file are derived from material licensed
  * to the University of California by American Telephone and Telegraph
@@ -41,17 +41,19 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcswidth.c,v 1.7 2007/01/09 00:28:12 imp
 #include <wchar.h>
 
 int
-wcswidth(const wchar_t *pwcs, size_t n)
-{
-	wchar_t wc;
-	int len, l;
+wcswidth(const wchar_t* pwcs, size_t n) {
+    wchar_t wc;
+    int len, l;
+    len = 0;
 
-	len = 0;
-	while (n-- > 0 && (wc = *pwcs++) != L'\0') {
-		if ((l = wcwidth(wc)) < 0)
-			return (-1);
-		len += l;
-	}
-	return (len);
+    while (n-- > 0 && (wc = *pwcs++) != L'\0') {
+        if ((l = wcwidth(wc)) < 0) {
+            return (-1);
+        }
+
+        len += l;
+    }
+
+    return (len);
 }
 

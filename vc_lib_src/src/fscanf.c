@@ -36,37 +36,33 @@
 *
 *******************************************************************************/
 
-int __cdecl vfscanf (
-        INPUTFN inputfn,
-        FILE *stream,
-        const char *format,
-        _locale_t plocinfo,
-        va_list arglist
-        )
+int __cdecl vfscanf(
+    INPUTFN inputfn,
+    FILE* stream,
+    const char* format,
+    _locale_t plocinfo,
+    va_list arglist
+)
 /*
  * 'F'ile (stream) 'SCAN', 'F'ormatted
  */
 {
-        int retval=0;
+    int retval = 0;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
-        _VALIDATE_RETURN((format != NULL), EINVAL, EOF);
-
-        _lock_str(stream);
-        __try {
+    __try {
         _VALIDATE_STREAM_ANSI_SETRET(stream, EINVAL, retval, EOF);
 
-                if(retval==0)
-                {
-                        retval = (inputfn(stream, format, plocinfo, arglist));
-                }
-
+        if (retval == 0) {
+            retval = (inputfn(stream, format, plocinfo, arglist));
         }
-        __finally {
-                _unlock_str(stream);
-        }
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        return(retval);
+    return (retval);
 }
 
 /***
@@ -89,27 +85,25 @@ int __cdecl vfscanf (
 *
 *******************************************************************************/
 
-int __cdecl fscanf (
-        FILE *stream,
-        const char *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vfscanf(_input_l, stream, format, NULL, arglist);
+int __cdecl fscanf(
+    FILE* stream,
+    const char* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vfscanf(_input_l, stream, format, NULL, arglist);
 }
 
-int __cdecl _fscanf_l (
-        FILE *stream,
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vfscanf(_input_l, stream, format, plocinfo, arglist);
+int __cdecl _fscanf_l(
+    FILE* stream,
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vfscanf(_input_l, stream, format, plocinfo, arglist);
 }
 
 /***
@@ -120,25 +114,23 @@ int __cdecl _fscanf_l (
 *
 *******************************************************************************/
 
-int __cdecl fscanf_s (
-        FILE *stream,
-        const char *format,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, format);
-        return vfscanf(_input_s_l, stream, format, NULL, arglist);
+int __cdecl fscanf_s(
+    FILE* stream,
+    const char* format,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, format);
+    return vfscanf(_input_s_l, stream, format, NULL, arglist);
 }
 
-int __cdecl _fscanf_s_l (
-        FILE *stream,
-        const char *format,
-        _locale_t plocinfo,
-        ...
-        )
-{
-        va_list arglist;
-        va_start(arglist, plocinfo);
-        return vfscanf(_input_s_l, stream, format, plocinfo, arglist);
+int __cdecl _fscanf_s_l(
+    FILE* stream,
+    const char* format,
+    _locale_t plocinfo,
+    ...
+) {
+    va_list arglist;
+    va_start(arglist, plocinfo);
+    return vfscanf(_input_s_l, stream, format, plocinfo, arglist);
 }

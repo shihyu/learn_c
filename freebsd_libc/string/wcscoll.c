@@ -33,7 +33,7 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcscoll.c,v 1.3 2004/04/07 09:47:56 tjr 
 #include <wchar.h>
 #include "collate.h"
 
-static char *__mbsdup(const wchar_t *);
+static char* __mbsdup(const wchar_t*);
 
 /*
  * Placeholder implementation of wcscoll(). Attempts to use the single-byte
@@ -41,58 +41,60 @@ static char *__mbsdup(const wchar_t *);
  * with extended character sets.
  */
 int
-wcscoll(const wchar_t *ws1, const wchar_t *ws2)
-{
-	char *mbs1, *mbs2;
-	int diff, sverrno;
+wcscoll(const wchar_t* ws1, const wchar_t* ws2) {
+    char* mbs1, *mbs2;
+    int diff, sverrno;
 
-	if (__collate_load_error || MB_CUR_MAX > 1)
-		/*
-		 * Locale has no special collating order, could not be
-		 * loaded, or has an extended character set; do a fast binary
-		 * comparison.
-		 */
-		return (wcscmp(ws1, ws2));
+    if (__collate_load_error || MB_CUR_MAX > 1)
+        /*
+         * Locale has no special collating order, could not be
+         * loaded, or has an extended character set; do a fast binary
+         * comparison.
+         */
+    {
+        return (wcscmp(ws1, ws2));
+    }
 
-	if ((mbs1 = __mbsdup(ws1)) == NULL || (mbs2 = __mbsdup(ws2)) == NULL) {
-		/*
-		 * Out of memory or illegal wide chars; fall back to wcscmp()
-		 * but leave errno indicating the error. Callers that don't
-		 * check for error will get a reasonable but often slightly
-		 * incorrect result.
-		 */
-		sverrno = errno;
-		free(mbs1);
-		errno = sverrno;
-		return (wcscmp(ws1, ws2));
-	}
+    if ((mbs1 = __mbsdup(ws1)) == NULL || (mbs2 = __mbsdup(ws2)) == NULL) {
+        /*
+         * Out of memory or illegal wide chars; fall back to wcscmp()
+         * but leave errno indicating the error. Callers that don't
+         * check for error will get a reasonable but often slightly
+         * incorrect result.
+         */
+        sverrno = errno;
+        free(mbs1);
+        errno = sverrno;
+        return (wcscmp(ws1, ws2));
+    }
 
-	diff = strcoll(mbs1, mbs2);
-	sverrno = errno;
-	free(mbs1);
-	free(mbs2);
-	errno = sverrno;
-
-	return (diff);
+    diff = strcoll(mbs1, mbs2);
+    sverrno = errno;
+    free(mbs1);
+    free(mbs2);
+    errno = sverrno;
+    return (diff);
 }
 
-static char *
-__mbsdup(const wchar_t *ws)
-{
-	static const mbstate_t initial;
-	mbstate_t st;
-	const wchar_t *wcp;
-	size_t len;
-	char *mbs;
+static char*
+__mbsdup(const wchar_t* ws) {
+    static const mbstate_t initial;
+    mbstate_t st;
+    const wchar_t* wcp;
+    size_t len;
+    char* mbs;
+    wcp = ws;
+    st = initial;
 
-	wcp = ws;
-	st = initial;
-	if ((len = wcsrtombs(NULL, &wcp, 0, &st)) == (size_t)-1)
-		return (NULL);
-	if ((mbs = malloc(len + 1)) == NULL)
-		return (NULL);
-	st = initial;
-	wcsrtombs(mbs, &ws, len + 1, &st);
+    if ((len = wcsrtombs(NULL, &wcp, 0, &st)) == (size_t) - 1) {
+        return (NULL);
+    }
 
-	return (mbs);
+    if ((mbs = malloc(len + 1)) == NULL) {
+        return (NULL);
+    }
+
+    st = initial;
+    wcsrtombs(mbs, &ws, len + 1, &st);
+    return (mbs);
 }

@@ -1,4 +1,4 @@
-/*	$NetBSD: tdelete.c,v 1.2 1999/09/16 11:45:37 lukem Exp $	*/
+/*  $NetBSD: tdelete.c,v 1.2 1999/09/16 11:45:37 lukem Exp $    */
 
 /*
  * Tree search generalized from Knuth (6.2.2) Algorithm T just like
@@ -31,41 +31,48 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/tdelete.c,v 1.6 2003/01/05 02:43:18 tjr 
  * vrootp: address of the root of the tree
  * compar: function to carry out node comparisons
  */
-void *
-tdelete(const void * __restrict vkey, void ** __restrict vrootp,
-    int (*compar)(const void *, const void *))
-{
-	node_t **rootp = (node_t **)vrootp;
-	node_t *p, *q, *r;
-	int cmp;
+void*
+tdelete(const void* __restrict vkey, void** __restrict vrootp,
+        int (*compar)(const void*, const void*)) {
+    node_t** rootp = (node_t**)vrootp;
+    node_t* p, *q, *r;
+    int cmp;
 
-	if (rootp == NULL || (p = *rootp) == NULL)
-		return NULL;
+    if (rootp == NULL || (p = *rootp) == NULL) {
+        return NULL;
+    }
 
-	while ((cmp = (*compar)(vkey, (*rootp)->key)) != 0) {
-		p = *rootp;
-		rootp = (cmp < 0) ?
-		    &(*rootp)->llink :		/* follow llink branch */
-		    &(*rootp)->rlink;		/* follow rlink branch */
-		if (*rootp == NULL)
-			return NULL;		/* key not found */
-	}
-	r = (*rootp)->rlink;			/* D1: */
-	if ((q = (*rootp)->llink) == NULL)	/* Left NULL? */
-		q = r;
-	else if (r != NULL) {			/* Right link is NULL? */
-		if (r->llink == NULL) {		/* D2: Find successor */
-			r->llink = q;
-			q = r;
-		} else {			/* D3: Find NULL link */
-			for (q = r->llink; q->llink != NULL; q = r->llink)
-				r = q;
-			r->llink = q->rlink;
-			q->llink = (*rootp)->llink;
-			q->rlink = (*rootp)->rlink;
-		}
-	}
-	free(*rootp);				/* D4: Free node */
-	*rootp = q;				/* link parent to new node */
-	return p;
+    while ((cmp = (*compar)(vkey, (*rootp)->key)) != 0) {
+        p = *rootp;
+        rootp = (cmp < 0) ?
+                &(*rootp)->llink :      /* follow llink branch */
+                &(*rootp)->rlink;       /* follow rlink branch */
+
+        if (*rootp == NULL) {
+            return NULL;    /* key not found */
+        }
+    }
+
+    r = (*rootp)->rlink;            /* D1: */
+
+    if ((q = (*rootp)->llink) == NULL) { /* Left NULL? */
+        q = r;
+    } else if (r != NULL) {         /* Right link is NULL? */
+        if (r->llink == NULL) {     /* D2: Find successor */
+            r->llink = q;
+            q = r;
+        } else {            /* D3: Find NULL link */
+            for (q = r->llink; q->llink != NULL; q = r->llink) {
+                r = q;
+            }
+
+            r->llink = q->rlink;
+            q->llink = (*rootp)->llink;
+            q->rlink = (*rootp)->rlink;
+        }
+    }
+
+    free(*rootp);               /* D4: Free node */
+    *rootp = q;             /* link parent to new node */
+    return p;
 }

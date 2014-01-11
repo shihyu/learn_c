@@ -48,14 +48,13 @@ extern UINT_PTR __security_cookie;
 *
 *******************************************************************************/
 
-void __declspec(naked) __fastcall __security_check_cookie(UINT_PTR cookie)
-{
+void __declspec(naked) __fastcall __security_check_cookie(UINT_PTR cookie) {
     /* x86 version written in asm to preserve all regs */
     __asm {
         cmp ecx, __security_cookie
         jne failure
         rep ret /* REP to avoid AMD branch prediction penalty */
-failure:
+        failure:
         jmp __report_gsfailure
     }
 }

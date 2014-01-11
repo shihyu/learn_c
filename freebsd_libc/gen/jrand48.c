@@ -17,8 +17,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/jrand48.c,v 1.2 2002/03/22 21:52:05 obrien 
 #include "rand48.h"
 
 long
-jrand48(unsigned short xseed[3])
-{
-	_dorand48(xseed);
-	return ((long) xseed[2] << 16) + (long) xseed[1];
+jrand48(unsigned short xseed[3]) {
+    _dorand48(xseed);
+    return ((long) xseed[2] << 16) + (long) xseed[1];
 }

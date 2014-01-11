@@ -32,18 +32,20 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wctomb.c,v 1.8 2004/07/29 06:18:40 tjr E
 #include "mblocal.h"
 
 int
-wctomb(char *s, wchar_t wchar)
-{
-	static const mbstate_t initial;
-	static mbstate_t mbs;
-	size_t rval;
+wctomb(char* s, wchar_t wchar) {
+    static const mbstate_t initial;
+    static mbstate_t mbs;
+    size_t rval;
 
-	if (s == NULL) {
-		/* No support for state dependent encodings. */
-		mbs = initial;
-		return (0);
-	}
-	if ((rval = __wcrtomb(s, wchar, &mbs)) == (size_t)-1)
-		return (-1);
-	return ((int)rval);
+    if (s == NULL) {
+        /* No support for state dependent encodings. */
+        mbs = initial;
+        return (0);
+    }
+
+    if ((rval = __wcrtomb(s, wchar, &mbs)) == (size_t) - 1) {
+        return (-1);
+    }
+
+    return ((int)rval);
 }

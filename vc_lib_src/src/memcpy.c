@@ -37,38 +37,29 @@
 *Exceptions:
 *******************************************************************************/
 
-void * __cdecl memcpy (
-        void * dst,
-        const void * src,
-        size_t count
-        )
-{
-        void * ret = dst;
-
+void* __cdecl memcpy(
+    void* dst,
+    const void* src,
+    size_t count
+) {
+    void* ret = dst;
 #if defined (_M_IA64)
-
-        {
-
-
+    {
         __declspec(dllimport)
-
-
-        void RtlCopyMemory( void *, const void *, size_t count );
-
-        RtlCopyMemory( dst, src, count );
-
-        }
-
+        void RtlCopyMemory(void*, const void*, size_t count);
+        RtlCopyMemory(dst, src, count);
+    }
 #else  /* defined (_M_IA64) */
-        /*
-         * copy from lower addresses to higher addresses
-         */
-        while (count--) {
-                *(char *)dst = *(char *)src;
-                dst = (char *)dst + 1;
-                src = (char *)src + 1;
-        }
-#endif  /* defined (_M_IA64) */
 
-        return(ret);
+    /*
+     * copy from lower addresses to higher addresses
+     */
+    while (count--) {
+        *(char*)dst = *(char*)src;
+        dst = (char*)dst + 1;
+        src = (char*)src + 1;
+    }
+
+#endif  /* defined (_M_IA64) */
+    return (ret);
 }

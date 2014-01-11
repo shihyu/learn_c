@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1987, 1993
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -13,7 +13,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -69,58 +69,61 @@ __FBSDID("$FreeBSD: src/lib/libc/resolv/herror.c,v 1.4 2007/06/03 17:20:27 ume E
 
 #include "port_after.h"
 
-const char *h_errlist[] = {
-	"Resolver Error 0 (no error)",
-	"Unknown host",				/*%< 1 HOST_NOT_FOUND */
-	"Host name lookup failure",		/*%< 2 TRY_AGAIN */
-	"Unknown server error",			/*%< 3 NO_RECOVERY */
-	"No address associated with name",	/*%< 4 NO_ADDRESS */
+const char* h_errlist[] = {
+    "Resolver Error 0 (no error)",
+    "Unknown host",             /*%< 1 HOST_NOT_FOUND */
+    "Host name lookup failure",     /*%< 2 TRY_AGAIN */
+    "Unknown server error",         /*%< 3 NO_RECOVERY */
+    "No address associated with name",  /*%< 4 NO_ADDRESS */
 };
 const int h_nerr = { sizeof h_errlist / sizeof h_errlist[0] };
 
-#undef	h_errno
-int	h_errno;
+#undef  h_errno
+int h_errno;
 
 /*%
  * herror --
- *	print the error indicated by the h_errno value.
+ *  print the error indicated by the h_errno value.
  */
 void
-herror(const char *s) {
-	struct iovec iov[4], *v = iov;
-	char *t;
+herror(const char* s) {
+    struct iovec iov[4], *v = iov;
+    char* t;
 
-	if (s != NULL && *s != '\0') {
-		DE_CONST(s, t);
-		v->iov_base = t;
-		v->iov_len = strlen(t);
-		v++;
-		DE_CONST(": ", t);
-		v->iov_base = t;
-		v->iov_len = 2;
-		v++;
-	}
-	DE_CONST(hstrerror(*__h_errno()), t);
-	v->iov_base = t;
-	v->iov_len = strlen(v->iov_base);
-	v++;
-	DE_CONST("\n", t);
-	v->iov_base = t;
-	v->iov_len = 1;
-	_writev(STDERR_FILENO, iov, (v - iov) + 1);
+    if (s != NULL && *s != '\0') {
+        DE_CONST(s, t);
+        v->iov_base = t;
+        v->iov_len = strlen(t);
+        v++;
+        DE_CONST(": ", t);
+        v->iov_base = t;
+        v->iov_len = 2;
+        v++;
+    }
+
+    DE_CONST(hstrerror(*__h_errno()), t);
+    v->iov_base = t;
+    v->iov_len = strlen(v->iov_base);
+    v++;
+    DE_CONST("\n", t);
+    v->iov_base = t;
+    v->iov_len = 1;
+    _writev(STDERR_FILENO, iov, (v - iov) + 1);
 }
 
 /*%
  * hstrerror --
- *	return the string associated with a given "host" errno value.
+ *  return the string associated with a given "host" errno value.
  */
-const char *
+const char*
 hstrerror(int err) {
-	if (err < 0)
-		return ("Resolver internal error");
-	else if (err < h_nerr)
-		return (h_errlist[err]);
-	return ("Unknown resolver error");
+    if (err < 0) {
+        return ("Resolver internal error");
+    } else if (err < h_nerr) {
+        return (h_errlist[err]);
+    }
+
+    return ("Unknown resolver error");
 }
 
 /*! \file */

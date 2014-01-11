@@ -39,51 +39,40 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _wcsicmp_l (
-        const wchar_t * dst,
-        const wchar_t * src,
-        _locale_t plocinfo
-        )
-{
-    wchar_t f,l;
+extern "C" int __cdecl _wcsicmp_l(
+    const wchar_t* dst,
+    const wchar_t* src,
+    _locale_t plocinfo
+) {
+    wchar_t f, l;
     _LocaleUpdate _loc_update(plocinfo);
-
     /* validation section */
     _VALIDATE_RETURN(dst != NULL, EINVAL, _NLSCMPERROR);
     _VALIDATE_RETURN(src != NULL, EINVAL, _NLSCMPERROR);
 
-    if ( _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE)
-    {
-        do
-        {
+    if (_loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
+        do {
             f = __ascii_towlower(*dst);
             l = __ascii_towlower(*src);
             dst++;
             src++;
-        }
-        while ( (f) && (f == l) );
+        } while ((f) && (f == l));
+    } else {
+        do {
+            f = _towlower_l((unsigned short) * (dst++), _loc_update.GetLocaleT());
+            l = _towlower_l((unsigned short) * (src++), _loc_update.GetLocaleT());
+        } while ((f) && (f == l));
     }
-    else
-    {
-        do
-        {
-            f = _towlower_l((unsigned short)*(dst++), _loc_update.GetLocaleT());
-            l = _towlower_l((unsigned short)*(src++), _loc_update.GetLocaleT());
-        }
-        while ( (f) && (f == l) );
-    }
+
     return (int)(f - l);
 }
 
-extern "C" int __cdecl _wcsicmp (
-        const wchar_t * dst,
-        const wchar_t * src
-        )
-{
-    if (__locale_changed == 0)
-    {
-        wchar_t f,l;
-
+extern "C" int __cdecl _wcsicmp(
+    const wchar_t* dst,
+    const wchar_t* src
+) {
+    if (__locale_changed == 0) {
+        wchar_t f, l;
         /* validation section */
         _VALIDATE_RETURN(dst != NULL, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(src != NULL, EINVAL, _NLSCMPERROR);
@@ -93,11 +82,10 @@ extern "C" int __cdecl _wcsicmp (
             l = __ascii_towlower(*src);
             dst++;
             src++;
-        } while ( (f) && (f == l) );
+        } while ((f) && (f == l));
+
         return (int)(f - l);
-    }
-    else
-    {
+    } else {
         return _wcsicmp_l(dst, src, NULL);
     }
 }

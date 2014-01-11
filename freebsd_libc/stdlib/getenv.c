@@ -45,47 +45,47 @@ static const char CorruptEnvValueMsg[] =
 /*
  * Standard environ.  environ variable is exposed to entire process.
  *
- *	origEnviron:	Upon cleanup on unloading of library or failure, this
- *			allows environ to return to as it was before.
- *	environSize:	Number of variables environ can hold.  Can only
- *			increase.
- *	intEnviron:	Internally-built environ.  Exposed via environ during
- *			(re)builds of the environment.
+ *  origEnviron:    Upon cleanup on unloading of library or failure, this
+ *          allows environ to return to as it was before.
+ *  environSize:    Number of variables environ can hold.  Can only
+ *          increase.
+ *  intEnviron: Internally-built environ.  Exposed via environ during
+ *          (re)builds of the environment.
  */
-extern char **environ;
-static char **origEnviron;
-static char **intEnviron = NULL;
+extern char** environ;
+static char** origEnviron;
+static char** intEnviron = NULL;
 static int environSize = 0;
 
 /*
  * Array of environment variables built from environ.  Each element records:
- *	name:		Pointer to name=value string
- *	name length:	Length of name not counting '=' character
- *	value:		Pointer to value within same string as name
- *	value size:	Size (not length) of space for value not counting the
- *			nul character
- *	active state:	true/false value to signify whether variable is active.
- *			Useful since multiple variables with the same name can
- *			co-exist.  At most, one variable can be active at any
- *			one time.
- *	putenv:		Created from putenv() call.  This memory must not be
- *			reused.
+ *  name:       Pointer to name=value string
+ *  name length:    Length of name not counting '=' character
+ *  value:      Pointer to value within same string as name
+ *  value size: Size (not length) of space for value not counting the
+ *          nul character
+ *  active state:   true/false value to signify whether variable is active.
+ *          Useful since multiple variables with the same name can
+ *          co-exist.  At most, one variable can be active at any
+ *          one time.
+ *  putenv:     Created from putenv() call.  This memory must not be
+ *          reused.
  */
 static struct envVars {
-	size_t nameLen;
-	size_t valueSize;
-	char *name;
-	char *value;
-	bool active;
-	bool putenv;
-} *envVars = NULL;
+    size_t nameLen;
+    size_t valueSize;
+    char* name;
+    char* value;
+    bool active;
+    bool putenv;
+}* envVars = NULL;
 
 /*
  * Environment array information.
  *
- *	envActive:	Number of active variables in array.
- *	envVarsSize:	Size of array.
- *	envVarsTotal:	Number of total variables in array (active or not).
+ *  envActive:  Number of active variables in array.
+ *  envVarsSize:    Size of array.
+ *  envVarsTotal:   Number of total variables in array (active or not).
  */
 static int envActive = 0;
 static int envVarsSize = 0;
@@ -93,7 +93,7 @@ static int envVarsTotal = 0;
 
 
 /* Deinitialization of new environment. */
-static void __attribute__ ((destructor)) __clean_env_destructor(void);
+static void __attribute__((destructor)) __clean_env_destructor(void);
 
 
 /*
@@ -101,15 +101,15 @@ static void __attribute__ ((destructor)) __clean_env_destructor(void);
  * Cheaper here than peforming a strchr() later.
  */
 static inline size_t
-__strleneq(const char *str)
-{
-	const char *s;
+__strleneq(const char* str) {
+    const char* s;
 
-	for (s = str; *s != '\0'; ++s)
-		if (*s == '=')
-			return (0);
+    for (s = str; *s != '\0'; ++s)
+        if (*s == '=') {
+            return (0);
+        }
 
-	return (s - str);
+    return (s - str);
 }
 
 
@@ -117,12 +117,12 @@ __strleneq(const char *str)
  * Comparison of an environment name=value to a name.
  */
 static inline bool
-strncmpeq(const char *nameValue, const char *name, size_t nameLen)
-{
-	if (strncmp(nameValue, name, nameLen) == 0 && nameValue[nameLen] == '=')
-		return (true);
+strncmpeq(const char* nameValue, const char* name, size_t nameLen) {
+    if (strncmp(nameValue, name, nameLen) == 0 && nameValue[nameLen] == '=') {
+        return (true);
+    }
 
-	return (false);
+    return (false);
 }
 
 
@@ -131,31 +131,30 @@ strncmpeq(const char *nameValue, const char *name, size_t nameLen)
  * else NULL.  If the onlyActive flag is set to true, only variables that are
  * active are returned else all are.
  */
-static inline char *
-__findenv(const char *name, size_t nameLen, int *envNdx, bool onlyActive)
-{
-	int ndx;
+static inline char*
+__findenv(const char* name, size_t nameLen, int* envNdx, bool onlyActive) {
+    int ndx;
 
-	/*
-	 * Find environment variable from end of array (more likely to be
-	 * active).  A variable created by putenv is always active or it is not
-	 * tracked in the array.
-	 */
-	for (ndx = *envNdx; ndx >= 0; ndx--)
-		if (envVars[ndx].putenv) {
-			if (strncmpeq(envVars[ndx].name, name, nameLen)) {
-				*envNdx = ndx;
-				return (envVars[ndx].name + nameLen +
-				    sizeof ("=") - 1);
-			}
-		} else if ((!onlyActive || envVars[ndx].active) &&
-		    (envVars[ndx].nameLen == nameLen &&
-		    strncmpeq(envVars[ndx].name, name, nameLen))) {
-			*envNdx = ndx;
-			return (envVars[ndx].value);
-		}
+    /*
+     * Find environment variable from end of array (more likely to be
+     * active).  A variable created by putenv is always active or it is not
+     * tracked in the array.
+     */
+    for (ndx = *envNdx; ndx >= 0; ndx--)
+        if (envVars[ndx].putenv) {
+            if (strncmpeq(envVars[ndx].name, name, nameLen)) {
+                *envNdx = ndx;
+                return (envVars[ndx].name + nameLen +
+                        sizeof("=") - 1);
+            }
+        } else if ((!onlyActive || envVars[ndx].active) &&
+                   (envVars[ndx].nameLen == nameLen &&
+                    strncmpeq(envVars[ndx].name, name, nameLen))) {
+            *envNdx = ndx;
+            return (envVars[ndx].value);
+        }
 
-	return (NULL);
+    return (NULL);
 }
 
 
@@ -163,21 +162,22 @@ __findenv(const char *name, size_t nameLen, int *envNdx, bool onlyActive)
  * Using environ, returns pointer to value associated with name, if any, else
  * NULL.  Used on the original environ passed into the program.
  */
-static char *
-__findenv_environ(const char *name, size_t nameLen)
-{
-	int envNdx;
+static char*
+__findenv_environ(const char* name, size_t nameLen) {
+    int envNdx;
 
-	/* Check for non-existant environment. */
-	if (environ == NULL)
-		return (NULL);
+    /* Check for non-existant environment. */
+    if (environ == NULL) {
+        return (NULL);
+    }
 
-	/* Find variable within environ. */
-	for (envNdx = 0; environ[envNdx] != NULL; envNdx++)
-		if (strncmpeq(environ[envNdx], name, nameLen))
-			return (&(environ[envNdx][nameLen + sizeof("=") - 1]));
+    /* Find variable within environ. */
+    for (envNdx = 0; environ[envNdx] != NULL; envNdx++)
+        if (strncmpeq(environ[envNdx], name, nameLen)) {
+            return (&(environ[envNdx][nameLen + sizeof("=") - 1]));
+        }
 
-	return (NULL);
+    return (NULL);
 }
 
 
@@ -185,15 +185,15 @@ __findenv_environ(const char *name, size_t nameLen)
  * Remove variable added by putenv() from variable tracking array.
  */
 static void
-__remove_putenv(int envNdx)
-{
-	envVarsTotal--;
-	if (envVarsTotal > envNdx)
-		memmove(&(envVars[envNdx]), &(envVars[envNdx + 1]),
-		    (envVarsTotal - envNdx) * sizeof (*envVars));
-	memset(&(envVars[envVarsTotal]), 0, sizeof (*envVars));
+__remove_putenv(int envNdx) {
+    envVarsTotal--;
 
-	return;
+    if (envVarsTotal > envNdx)
+        memmove(&(envVars[envNdx]), &(envVars[envNdx + 1]),
+                (envVarsTotal - envNdx) * sizeof(*envVars));
+
+    memset(&(envVars[envVarsTotal]), 0, sizeof(*envVars));
+    return;
 }
 
 
@@ -202,40 +202,46 @@ __remove_putenv(int envNdx)
  * both to NULL.  Eases debugging of memory leaks.
  */
 static void
-__clean_env(bool freeVars)
-{
-	int envNdx;
+__clean_env(bool freeVars) {
+    int envNdx;
 
-	/* Deallocate environment and environ if created by *env(). */
-	if (envVars != NULL) {
-		for (envNdx = envVarsTotal - 1; envNdx >= 0; envNdx--)
-			/* Free variables or deactivate them. */
-			if (envVars[envNdx].putenv) {
-				if (!freeVars)
-					__remove_putenv(envNdx);
-			} else {
-				if (freeVars)
-					free(envVars[envNdx].name);
-				else
-					envVars[envNdx].active = false;
-			}
-		if (freeVars) {
-			free(envVars);
-			envVars = NULL;
-		} else
-			envActive = 0;
+    /* Deallocate environment and environ if created by *env(). */
+    if (envVars != NULL) {
+        for (envNdx = envVarsTotal - 1; envNdx >= 0; envNdx--)
 
-		/* Restore original environ if it has not updated by program. */
-		if (origEnviron != NULL) {
-			if (environ == intEnviron)
-				environ = origEnviron;
-			free(intEnviron);
-			intEnviron = NULL;
-			environSize = 0;
-		}
-	}
+            /* Free variables or deactivate them. */
+            if (envVars[envNdx].putenv) {
+                if (!freeVars) {
+                    __remove_putenv(envNdx);
+                }
+            } else {
+                if (freeVars) {
+                    free(envVars[envNdx].name);
+                } else {
+                    envVars[envNdx].active = false;
+                }
+            }
 
-	return;
+        if (freeVars) {
+            free(envVars);
+            envVars = NULL;
+        } else {
+            envActive = 0;
+        }
+
+        /* Restore original environ if it has not updated by program. */
+        if (origEnviron != NULL) {
+            if (environ == intEnviron) {
+                environ = origEnviron;
+            }
+
+            free(intEnviron);
+            intEnviron = NULL;
+            environSize = 0;
+        }
+    }
+
+    return;
 }
 
 
@@ -244,35 +250,38 @@ __clean_env(bool freeVars)
  * calls that depend upon it.
  */
 static int
-__rebuild_environ(int newEnvironSize)
-{
-	char **tmpEnviron;
-	int envNdx;
-	int environNdx;
-	int tmpEnvironSize;
+__rebuild_environ(int newEnvironSize) {
+    char** tmpEnviron;
+    int envNdx;
+    int environNdx;
+    int tmpEnvironSize;
 
-	/* Resize environ. */
-	if (newEnvironSize > environSize) {
-		tmpEnvironSize = newEnvironSize * 2;
-		tmpEnviron = realloc(intEnviron, sizeof (*intEnviron) *
-		    (tmpEnvironSize + 1));
-		if (tmpEnviron == NULL)
-			return (-1);
-		environSize = tmpEnvironSize;
-		intEnviron = tmpEnviron;
-	}
-	envActive = newEnvironSize;
+    /* Resize environ. */
+    if (newEnvironSize > environSize) {
+        tmpEnvironSize = newEnvironSize * 2;
+        tmpEnviron = realloc(intEnviron, sizeof(*intEnviron) *
+                             (tmpEnvironSize + 1));
 
-	/* Assign active variables to environ. */
-	for (envNdx = envVarsTotal - 1, environNdx = 0; envNdx >= 0; envNdx--)
-		if (envVars[envNdx].active)
-			intEnviron[environNdx++] = envVars[envNdx].name;
-	intEnviron[environNdx] = NULL;
+        if (tmpEnviron == NULL) {
+            return (-1);
+        }
 
-	/* Always set environ which may have been replaced by program. */
-	environ = intEnviron;
+        environSize = tmpEnvironSize;
+        intEnviron = tmpEnviron;
+    }
 
-	return (0);
+    envActive = newEnvironSize;
+
+    /* Assign active variables to environ. */
+    for (envNdx = envVarsTotal - 1, environNdx = 0; envNdx >= 0; envNdx--)
+        if (envVars[envNdx].active) {
+            intEnviron[environNdx++] = envVars[envNdx].name;
+        }
+
+    intEnviron[environNdx] = NULL;
+    /* Always set environ which may have been replaced by program. */
+    environ = intEnviron;
+    return (0);
 }
 
 
@@ -280,25 +289,26 @@ __rebuild_environ(int newEnvironSize)
  * Enlarge new environment.
  */
 static inline bool
-__enlarge_env(void)
-{
-	int newEnvVarsSize;
-	struct envVars *tmpEnvVars;
+__enlarge_env(void) {
+    int newEnvVarsSize;
+    struct envVars* tmpEnvVars;
+    envVarsTotal++;
 
-	envVarsTotal++;
-	if (envVarsTotal > envVarsSize) {
-		newEnvVarsSize = envVarsTotal * 2;
-		tmpEnvVars = realloc(envVars, sizeof (*envVars) *
-		    newEnvVarsSize);
-		if (tmpEnvVars == NULL) {
-			envVarsTotal--;
-			return (false);
-		}
-		envVarsSize = newEnvVarsSize;
-		envVars = tmpEnvVars;
-	}
+    if (envVarsTotal > envVarsSize) {
+        newEnvVarsSize = envVarsTotal * 2;
+        tmpEnvVars = realloc(envVars, sizeof(*envVars) *
+                             newEnvVarsSize);
 
-	return (true);
+        if (tmpEnvVars == NULL) {
+            envVarsTotal--;
+            return (false);
+        }
+
+        envVarsSize = newEnvVarsSize;
+        envVars = tmpEnvVars;
+    }
+
+    return (true);
 }
 
 
@@ -306,76 +316,86 @@ __enlarge_env(void)
  * Using environ, build an environment for use by standard C library calls.
  */
 static int
-__build_env(void)
-{
-	char **env;
-	int activeNdx;
-	int envNdx;
-	int savedErrno;
-	size_t nameLen;
+__build_env(void) {
+    char** env;
+    int activeNdx;
+    int envNdx;
+    int savedErrno;
+    size_t nameLen;
 
-	/* Check for non-existant environment. */
-	if (environ == NULL || environ[0] == NULL)
-		return (0);
+    /* Check for non-existant environment. */
+    if (environ == NULL || environ[0] == NULL) {
+        return (0);
+    }
 
-	/* Count environment variables. */
-	for (env = environ, envVarsTotal = 0; *env != NULL; env++)
-		envVarsTotal++;
-	envVarsSize = envVarsTotal * 2;
+    /* Count environment variables. */
+    for (env = environ, envVarsTotal = 0; *env != NULL; env++) {
+        envVarsTotal++;
+    }
 
-	/* Create new environment. */
-	envVars = calloc(1, sizeof (*envVars) * envVarsSize);
-	if (envVars == NULL)
-		goto Failure;
+    envVarsSize = envVarsTotal * 2;
+    /* Create new environment. */
+    envVars = calloc(1, sizeof(*envVars) * envVarsSize);
 
-	/* Copy environ values and keep track of them. */
-	for (envNdx = envVarsTotal - 1; envNdx >= 0; envNdx--) {
-		envVars[envNdx].putenv = false;
-		envVars[envNdx].name =
-		    strdup(environ[envVarsTotal - envNdx - 1]);
-		if (envVars[envNdx].name == NULL)
-			goto Failure;
-		envVars[envNdx].value = strchr(envVars[envNdx].name, '=');
-		if (envVars[envNdx].value != NULL) {
-			envVars[envNdx].value++;
-			envVars[envNdx].valueSize =
-			    strlen(envVars[envNdx].value);
-		} else {
-			warnx(CorruptEnvValueMsg, envVars[envNdx].name);
-			errno = EFAULT;
-			goto Failure;
-		}
+    if (envVars == NULL) {
+        goto Failure;
+    }
 
-		/*
-		 * Find most current version of variable to make active.  This
-		 * will prevent multiple active variables from being created
-		 * during this initialization phase.
-		 */
-		nameLen = envVars[envNdx].value - envVars[envNdx].name - 1;
-		envVars[envNdx].nameLen = nameLen;
-		activeNdx = envVarsTotal - 1;
-		if (__findenv(envVars[envNdx].name, nameLen, &activeNdx,
-		    false) == NULL) {
-			warnx(CorruptEnvFindMsg, (int)nameLen,
-			    envVars[envNdx].name);
-			errno = EFAULT;
-			goto Failure;
-		}
-		envVars[activeNdx].active = true;
-	}
+    /* Copy environ values and keep track of them. */
+    for (envNdx = envVarsTotal - 1; envNdx >= 0; envNdx--) {
+        envVars[envNdx].putenv = false;
+        envVars[envNdx].name =
+            strdup(environ[envVarsTotal - envNdx - 1]);
 
-	/* Create a new environ. */
-	origEnviron = environ;
-	environ = NULL;
-	if (__rebuild_environ(envVarsTotal) == 0)
-		return (0);
+        if (envVars[envNdx].name == NULL) {
+            goto Failure;
+        }
+
+        envVars[envNdx].value = strchr(envVars[envNdx].name, '=');
+
+        if (envVars[envNdx].value != NULL) {
+            envVars[envNdx].value++;
+            envVars[envNdx].valueSize =
+                strlen(envVars[envNdx].value);
+        } else {
+            warnx(CorruptEnvValueMsg, envVars[envNdx].name);
+            errno = EFAULT;
+            goto Failure;
+        }
+
+        /*
+         * Find most current version of variable to make active.  This
+         * will prevent multiple active variables from being created
+         * during this initialization phase.
+         */
+        nameLen = envVars[envNdx].value - envVars[envNdx].name - 1;
+        envVars[envNdx].nameLen = nameLen;
+        activeNdx = envVarsTotal - 1;
+
+        if (__findenv(envVars[envNdx].name, nameLen, &activeNdx,
+                      false) == NULL) {
+            warnx(CorruptEnvFindMsg, (int)nameLen,
+                  envVars[envNdx].name);
+            errno = EFAULT;
+            goto Failure;
+        }
+
+        envVars[activeNdx].active = true;
+    }
+
+    /* Create a new environ. */
+    origEnviron = environ;
+    environ = NULL;
+
+    if (__rebuild_environ(envVarsTotal) == 0) {
+        return (0);
+    }
 
 Failure:
-	savedErrno = errno;
-	__clean_env(true);
-	errno = savedErrno;
-
-	return (-1);
+    savedErrno = errno;
+    __clean_env(true);
+    errno = savedErrno;
+    return (-1);
 }
 
 
@@ -383,40 +403,37 @@ Failure:
  * Destructor function with default argument to __clean_env().
  */
 static void
-__clean_env_destructor(void)
-{
-	__clean_env(true);
-
-	return;
+__clean_env_destructor(void) {
+    __clean_env(true);
+    return;
 }
 
 
 /*
  * Returns the value of a variable or NULL if none are found.
  */
-char *
-getenv(const char *name)
-{
-	int envNdx;
-	size_t nameLen;
+char*
+getenv(const char* name) {
+    int envNdx;
+    size_t nameLen;
 
-	/* Check for malformed name. */
-	if (name == NULL || (nameLen = __strleneq(name)) == 0) {
-		errno = EINVAL;
-		return (NULL);
-	}
+    /* Check for malformed name. */
+    if (name == NULL || (nameLen = __strleneq(name)) == 0) {
+        errno = EINVAL;
+        return (NULL);
+    }
 
-	/*
-	 * Find environment variable via environ if no changes have been made
-	 * via a *env() call or environ has been replaced by a running program,
-	 * otherwise, use the rebuilt environment.
-	 */
-	if (envVars == NULL || environ != intEnviron)
-		return (__findenv_environ(name, nameLen));
-	else {
-		envNdx = envVarsTotal - 1;
-		return (__findenv(name, nameLen, &envNdx, true));
-	}
+    /*
+     * Find environment variable via environ if no changes have been made
+     * via a *env() call or environ has been replaced by a running program,
+     * otherwise, use the rebuilt environment.
+     */
+    if (envVars == NULL || environ != intEnviron) {
+        return (__findenv_environ(name, nameLen));
+    } else {
+        envNdx = envVarsTotal - 1;
+        return (__findenv(name, nameLen, &envNdx, true));
+    }
 }
 
 
@@ -430,73 +447,81 @@ getenv(const char *name)
  * to calculate the length by means besides just strlen().
  */
 static int
-__setenv(const char *name, size_t nameLen, const char *value, int overwrite)
-{
-	bool reuse;
-	char *env;
-	int envNdx;
-	int newEnvActive;
-	size_t valueLen;
+__setenv(const char* name, size_t nameLen, const char* value, int overwrite) {
+    bool reuse;
+    char* env;
+    int envNdx;
+    int newEnvActive;
+    size_t valueLen;
+    /* Find existing environment variable large enough to use. */
+    envNdx = envVarsTotal - 1;
+    newEnvActive = envActive;
+    valueLen = strlen(value);
+    reuse = false;
 
-	/* Find existing environment variable large enough to use. */
-	envNdx = envVarsTotal - 1;
-	newEnvActive = envActive;
-	valueLen = strlen(value);
-	reuse = false;
-	if (__findenv(name, nameLen, &envNdx, false) != NULL) {
-		/* Deactivate entry if overwrite is allowed. */
-		if (envVars[envNdx].active) {
-			if (overwrite == 0)
-				return (0);
-			envVars[envNdx].active = false;
-			newEnvActive--;
-		}
+    if (__findenv(name, nameLen, &envNdx, false) != NULL) {
+        /* Deactivate entry if overwrite is allowed. */
+        if (envVars[envNdx].active) {
+            if (overwrite == 0) {
+                return (0);
+            }
 
-		/* putenv() created variable cannot be reused. */
-		if (envVars[envNdx].putenv)
-			__remove_putenv(envNdx);
+            envVars[envNdx].active = false;
+            newEnvActive--;
+        }
 
-		/* Entry is large enough to reuse. */
-		else if (envVars[envNdx].valueSize >= valueLen)
-			reuse = true;
-	}
+        /* putenv() created variable cannot be reused. */
+        if (envVars[envNdx].putenv) {
+            __remove_putenv(envNdx);
+        }
+        /* Entry is large enough to reuse. */
+        else if (envVars[envNdx].valueSize >= valueLen) {
+            reuse = true;
+        }
+    }
 
-	/* Create new variable if none was found of sufficient size. */
-	if (! reuse) {
-		/* Enlarge environment. */
-		envNdx = envVarsTotal;
-		if (!__enlarge_env())
-			return (-1);
+    /* Create new variable if none was found of sufficient size. */
+    if (! reuse) {
+        /* Enlarge environment. */
+        envNdx = envVarsTotal;
 
-		/* Create environment entry. */
-		envVars[envNdx].name = malloc(nameLen + sizeof ("=") +
-		    valueLen);
-		if (envVars[envNdx].name == NULL) {
-			envVarsTotal--;
-			return (-1);
-		}
-		envVars[envNdx].nameLen = nameLen;
-		envVars[envNdx].valueSize = valueLen;
+        if (!__enlarge_env()) {
+            return (-1);
+        }
 
-		/* Save name of name/value pair. */
-		env = stpcpy(envVars[envNdx].name, name);
-		if ((envVars[envNdx].name)[nameLen] != '=')
-			env = stpcpy(env, "=");
-	}
-	else
-		env = envVars[envNdx].value;
+        /* Create environment entry. */
+        envVars[envNdx].name = malloc(nameLen + sizeof("=") +
+                                      valueLen);
 
-	/* Save value of name/value pair. */
-	strcpy(env, value);
-	envVars[envNdx].value = env;
-	envVars[envNdx].active = true;
-	newEnvActive++;
+        if (envVars[envNdx].name == NULL) {
+            envVarsTotal--;
+            return (-1);
+        }
 
-	/* No need to rebuild environ if an active variable was reused. */
-	if (reuse && newEnvActive == envActive)
-		return (0);
-	else
-		return (__rebuild_environ(newEnvActive));
+        envVars[envNdx].nameLen = nameLen;
+        envVars[envNdx].valueSize = valueLen;
+        /* Save name of name/value pair. */
+        env = stpcpy(envVars[envNdx].name, name);
+
+        if ((envVars[envNdx].name)[nameLen] != '=') {
+            env = stpcpy(env, "=");
+        }
+    } else {
+        env = envVars[envNdx].value;
+    }
+
+    /* Save value of name/value pair. */
+    strcpy(env, value);
+    envVars[envNdx].value = env;
+    envVars[envNdx].active = true;
+    newEnvActive++;
+
+    /* No need to rebuild environ if an active variable was reused. */
+    if (reuse && newEnvActive == envActive) {
+        return (0);
+    } else {
+        return (__rebuild_environ(newEnvActive));
+    }
 }
 
 
@@ -506,38 +531,40 @@ __setenv(const char *name, size_t nameLen, const char *value, int overwrite)
  * from environ.
  */
 static int
-__merge_environ(void)
-{
-	char **env;
-	char *equals;
+__merge_environ(void) {
+    char** env;
+    char* equals;
 
-	/* environ has been replaced.  clean up everything. */
-	if (envVarsTotal > 0 && environ != intEnviron) {
-		/* Deactivate all environment variables. */
-		if (envActive > 0) {
-			origEnviron = NULL;
-			__clean_env(false);
-		}
+    /* environ has been replaced.  clean up everything. */
+    if (envVarsTotal > 0 && environ != intEnviron) {
+        /* Deactivate all environment variables. */
+        if (envActive > 0) {
+            origEnviron = NULL;
+            __clean_env(false);
+        }
 
-		/*
-		 * Insert new environ into existing, yet deactivated,
-		 * environment array.
-		 */
-		origEnviron = environ;
-		if (origEnviron != NULL)
-			for (env = origEnviron; *env != NULL; env++) {
-				if ((equals = strchr(*env, '=')) == NULL) {
-					warnx(CorruptEnvValueMsg, *env);
-					errno = EFAULT;
-					return (-1);
-				}
-				if (__setenv(*env, equals - *env, equals + 1,
-				    1) == -1)
-					return (-1);
-			}
-	}
+        /*
+         * Insert new environ into existing, yet deactivated,
+         * environment array.
+         */
+        origEnviron = environ;
 
-	return (0);
+        if (origEnviron != NULL)
+            for (env = origEnviron; *env != NULL; env++) {
+                if ((equals = strchr(*env, '=')) == NULL) {
+                    warnx(CorruptEnvValueMsg, *env);
+                    errno = EFAULT;
+                    return (-1);
+                }
+
+                if (__setenv(*env, equals - *env, equals + 1,
+                             1) == -1) {
+                    return (-1);
+                }
+            }
+    }
+
+    return (0);
 }
 
 
@@ -547,21 +574,21 @@ __merge_environ(void)
  * environment.
  */
 int
-setenv(const char *name, const char *value, int overwrite)
-{
-	size_t nameLen;
+setenv(const char* name, const char* value, int overwrite) {
+    size_t nameLen;
 
-	/* Check for malformed name. */
-	if (name == NULL || (nameLen = __strleneq(name)) == 0) {
-		errno = EINVAL;
-		return (-1);
-	}
+    /* Check for malformed name. */
+    if (name == NULL || (nameLen = __strleneq(name)) == 0) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	/* Initialize environment. */
-	if (__merge_environ() == -1 || (envVars == NULL && __build_env() == -1))
-		return (-1);
+    /* Initialize environment. */
+    if (__merge_environ() == -1 || (envVars == NULL && __build_env() == -1)) {
+        return (-1);
+    }
 
-	return (__setenv(name, nameLen, value, overwrite));
+    return (__setenv(name, nameLen, value, overwrite));
 }
 
 
@@ -571,53 +598,55 @@ setenv(const char *name, const char *value, int overwrite)
  * allowing it to be tracked.
  */
 int
-putenv(char *string)
-{
-	char *equals;
-	int envNdx;
-	int newEnvActive;
-	size_t nameLen;
+putenv(char* string) {
+    char* equals;
+    int envNdx;
+    int newEnvActive;
+    size_t nameLen;
 
-	/* Check for malformed argument. */
-	if (string == NULL || (equals = strchr(string, '=')) == NULL ||
-	    (nameLen = equals - string) == 0) {
-		errno = EINVAL;
-		return (-1);
-	}
+    /* Check for malformed argument. */
+    if (string == NULL || (equals = strchr(string, '=')) == NULL ||
+            (nameLen = equals - string) == 0) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	/* Initialize environment. */
-	if (__merge_environ() == -1 || (envVars == NULL && __build_env() == -1))
-		return (-1);
+    /* Initialize environment. */
+    if (__merge_environ() == -1 || (envVars == NULL && __build_env() == -1)) {
+        return (-1);
+    }
 
-	/* Deactivate previous environment variable. */
-	envNdx = envVarsTotal - 1;
-	newEnvActive = envActive;
-	if (__findenv(string, nameLen, &envNdx, true) != NULL) {
-		/* Reuse previous putenv slot. */
-		if (envVars[envNdx].putenv) {
-			envVars[envNdx].name = string;
-			return (__rebuild_environ(envActive));
-		} else {
-			newEnvActive--;
-			envVars[envNdx].active = false;
-		}
-	}
+    /* Deactivate previous environment variable. */
+    envNdx = envVarsTotal - 1;
+    newEnvActive = envActive;
 
-	/* Enlarge environment. */
-	envNdx = envVarsTotal;
-	if (!__enlarge_env())
-		return (-1);
+    if (__findenv(string, nameLen, &envNdx, true) != NULL) {
+        /* Reuse previous putenv slot. */
+        if (envVars[envNdx].putenv) {
+            envVars[envNdx].name = string;
+            return (__rebuild_environ(envActive));
+        } else {
+            newEnvActive--;
+            envVars[envNdx].active = false;
+        }
+    }
 
-	/* Create environment entry. */
-	envVars[envNdx].name = string;
-	envVars[envNdx].nameLen = -1;
-	envVars[envNdx].value = NULL;
-	envVars[envNdx].valueSize = -1;
-	envVars[envNdx].putenv = true;
-	envVars[envNdx].active = true;
-	newEnvActive++;
+    /* Enlarge environment. */
+    envNdx = envVarsTotal;
 
-	return (__rebuild_environ(newEnvActive));
+    if (!__enlarge_env()) {
+        return (-1);
+    }
+
+    /* Create environment entry. */
+    envVars[envNdx].name = string;
+    envVars[envNdx].nameLen = -1;
+    envVars[envNdx].value = NULL;
+    envVars[envNdx].valueSize = -1;
+    envVars[envNdx].putenv = true;
+    envVars[envNdx].active = true;
+    newEnvActive++;
+    return (__rebuild_environ(newEnvActive));
 }
 
 
@@ -626,29 +655,33 @@ putenv(char *string)
  * ever freed.
  */
 int
-unsetenv(const char *name)
-{
-	int envNdx;
-	size_t nameLen;
+unsetenv(const char* name) {
+    int envNdx;
+    size_t nameLen;
 
-	/* Check for malformed name. */
-	if (name == NULL || (nameLen = __strleneq(name)) == 0) {
-		errno = EINVAL;
-		return (-1);
-	}
+    /* Check for malformed name. */
+    if (name == NULL || (nameLen = __strleneq(name)) == 0) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	/* Initialize environment. */
-	if (__merge_environ() == -1 || (envVars == NULL && __build_env() == -1))
-		return (-1);
+    /* Initialize environment. */
+    if (__merge_environ() == -1 || (envVars == NULL && __build_env() == -1)) {
+        return (-1);
+    }
 
-	/* Deactivate specified variable. */
-	envNdx = envVarsTotal - 1;
-	if (__findenv(name, nameLen, &envNdx, true) != NULL) {
-		envVars[envNdx].active = false;
-		if (envVars[envNdx].putenv)
-			__remove_putenv(envNdx);
-		__rebuild_environ(envActive - 1);
-	}
+    /* Deactivate specified variable. */
+    envNdx = envVarsTotal - 1;
 
-	return (0);
+    if (__findenv(name, nameLen, &envNdx, true) != NULL) {
+        envVars[envNdx].active = false;
+
+        if (envVars[envNdx].putenv) {
+            __remove_putenv(envNdx);
+        }
+
+        __rebuild_environ(envActive - 1);
+    }
+
+    return (0);
 }

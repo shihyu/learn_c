@@ -29,9 +29,8 @@
 *
 *******************************************************************************/
 
-long __cdecl _tell (
-        int filedes
-        )
-{
-        return(_lseek(filedes,0L,1));
+long __cdecl _tell(
+    int filedes
+) {
+    return (_lseek(filedes, 0L, 1));
 }

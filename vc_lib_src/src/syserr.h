@@ -40,11 +40,10 @@
 #define _SYS_MSGMAX 38
 
 __inline
-const char *_get_sys_err_msg(int m)
-{
-_BEGIN_SECURE_CRT_DEPRECATION_DISABLE
+const char* _get_sys_err_msg(int m) {
+    _BEGIN_SECURE_CRT_DEPRECATION_DISABLE
     return _sys_err_msg(m);
-_END_SECURE_CRT_DEPRECATION_DISABLE
+    _END_SECURE_CRT_DEPRECATION_DISABLE
 }
 
 #endif  /* _INC_SYSERR */

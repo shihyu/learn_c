@@ -27,7 +27,7 @@
 
 #include <internal.h>
 
-_REDIRECT_TO_L_VERSION_3(errno_t, _mbscpy_s, unsigned char *, size_t, const unsigned char *)
+_REDIRECT_TO_L_VERSION_3(errno_t, _mbscpy_s, unsigned char*, size_t, const unsigned char*)
 
 #endif  /* _SYSCRT */
 

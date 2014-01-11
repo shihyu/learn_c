@@ -37,22 +37,20 @@ __FBSDID("$FreeBSD: src/lib/libc/sparc64/sys/__sparc_utrap_setup.c,v 1.7 2004/01
 #include "__sparc_utrap_private.h"
 
 static const struct sparc_utrap_args ua[] = {
-	{ UT_FP_DISABLED, __sparc_utrap_fp_disabled, NULL, NULL, NULL },
-	{ UT_FP_EXCEPTION_IEEE_754, __sparc_utrap_gen, NULL, NULL, NULL },
-	{ UT_FP_EXCEPTION_OTHER, __sparc_utrap_gen, NULL, NULL, NULL },
-	{ UT_ILLEGAL_INSTRUCTION, __sparc_utrap_gen, NULL, NULL, NULL },
-	{ UT_MEM_ADDRESS_NOT_ALIGNED, __sparc_utrap_gen, NULL, NULL, NULL },
+    { UT_FP_DISABLED, __sparc_utrap_fp_disabled, NULL, NULL, NULL },
+    { UT_FP_EXCEPTION_IEEE_754, __sparc_utrap_gen, NULL, NULL, NULL },
+    { UT_FP_EXCEPTION_OTHER, __sparc_utrap_gen, NULL, NULL, NULL },
+    { UT_ILLEGAL_INSTRUCTION, __sparc_utrap_gen, NULL, NULL, NULL },
+    { UT_MEM_ADDRESS_NOT_ALIGNED, __sparc_utrap_gen, NULL, NULL, NULL },
 };
 
 static const struct sparc_utrap_install_args uia[] = {
-	{ sizeof (ua) / sizeof (*ua), ua }
+    { sizeof(ua) / sizeof(*ua), ua }
 };
 
 void __sparc_utrap_setup(void) __attribute__((constructor));
 
 void
-__sparc_utrap_setup(void)
-{
-
-	sysarch(SPARC_UTRAP_INSTALL, &uia);
+__sparc_utrap_setup(void) {
+    sysarch(SPARC_UTRAP_INSTALL, &uia);
 }

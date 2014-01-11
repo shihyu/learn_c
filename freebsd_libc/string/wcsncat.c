@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wcsncat.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
+ *  citrus Id: wcsncat.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
 #include <sys/cdefs.h>
@@ -36,25 +36,29 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcsncat.c,v 1.7 2002/09/21 00:29:23 tjr 
 
 #include <wchar.h>
 
-wchar_t *
+wchar_t*
 wcsncat(s1, s2, n)
-	wchar_t * __restrict s1;
-	const wchar_t * __restrict s2;
-	size_t n;
+wchar_t* __restrict s1;
+const wchar_t* __restrict s2;
+size_t n;
 {
-	wchar_t *p;
-	wchar_t *q;
-	const wchar_t *r;
+    wchar_t* p;
+    wchar_t* q;
+    const wchar_t* r;
+    p = s1;
 
-	p = s1;
-	while (*p)
-		p++;
-	q = p;
-	r = s2;
-	while (*r && n) {
-		*q++ = *r++;
-		n--;
-	}
-	*q = '\0';
-	return s1;
+    while (*p) {
+        p++;
+    }
+
+    q = p;
+    r = s2;
+
+    while (*r && n) {
+        *q++ = *r++;
+        n--;
+    }
+
+    *q = '\0';
+    return s1;
 }

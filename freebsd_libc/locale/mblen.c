@@ -32,19 +32,22 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mblen.c,v 1.9 2004/07/29 06:18:40 tjr Ex
 #include "mblocal.h"
 
 int
-mblen(const char *s, size_t n)
-{
-	static const mbstate_t initial;
-	static mbstate_t mbs;
-	size_t rval;
+mblen(const char* s, size_t n) {
+    static const mbstate_t initial;
+    static mbstate_t mbs;
+    size_t rval;
 
-	if (s == NULL) {
-		/* No support for state dependent encodings. */
-		mbs = initial;
-		return (0);
-	}
-	rval = __mbrtowc(NULL, s, n, &mbs);
-	if (rval == (size_t)-1 || rval == (size_t)-2)
-		return (-1);
-	return ((int)rval);
+    if (s == NULL) {
+        /* No support for state dependent encodings. */
+        mbs = initial;
+        return (0);
+    }
+
+    rval = __mbrtowc(NULL, s, n, &mbs);
+
+    if (rval == (size_t) - 1 || rval == (size_t) - 2) {
+        return (-1);
+    }
+
+    return ((int)rval);
 }

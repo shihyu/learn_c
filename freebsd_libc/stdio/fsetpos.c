@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,8 +44,8 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fsetpos.c,v 1.9 2007/01/09 00:28:06 imp E
  */
 int
 fsetpos(iop, pos)
-	FILE *iop;
-	const fpos_t *pos;
+FILE* iop;
+const fpos_t* pos;
 {
-	return (fseeko(iop, (off_t)*pos, SEEK_SET));
+    return (fseeko(iop, (off_t) * pos, SEEK_SET));
 }

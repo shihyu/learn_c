@@ -32,59 +32,76 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/nextwctype.c,v 1.1 2004/07/08 06:43:37 t
 #include <wctype.h>
 
 wint_t
-nextwctype(wint_t wc, wctype_t wct)
-{
-	size_t lim;
-	_RuneRange *rr = &_CurrentRuneLocale->__runetype_ext;
-	_RuneEntry *base, *re;
-	int noinc;
+nextwctype(wint_t wc, wctype_t wct) {
+    size_t lim;
+    _RuneRange* rr = &_CurrentRuneLocale->__runetype_ext;
+    _RuneEntry* base, *re;
+    int noinc;
+    noinc = 0;
 
-	noinc = 0;
-	if (wc < _CACHED_RUNES) {
-		wc++;
-		while (wc < _CACHED_RUNES) {
-			if (_CurrentRuneLocale->__runetype[wc] & wct)
-				return (wc);
-			wc++;
-		}
-		wc--;
-	}
-	if (rr->__ranges != NULL && wc < rr->__ranges[0].__min) {
-		wc = rr->__ranges[0].__min;
-		noinc = 1;
-	}
+    if (wc < _CACHED_RUNES) {
+        wc++;
 
-	/* Binary search -- see bsearch.c for explanation. */
-	base = rr->__ranges;
-	for (lim = rr->__nranges; lim != 0; lim >>= 1) {
-		re = base + (lim >> 1);
-		if (re->__min <= wc && wc <= re->__max)
-			goto found;
-		else if (wc > re->__max) {
-			base = re + 1;
-			lim--;
-		}
-	}
-	return (-1);
+        while (wc < _CACHED_RUNES) {
+            if (_CurrentRuneLocale->__runetype[wc] & wct) {
+                return (wc);
+            }
+
+            wc++;
+        }
+
+        wc--;
+    }
+
+    if (rr->__ranges != NULL && wc < rr->__ranges[0].__min) {
+        wc = rr->__ranges[0].__min;
+        noinc = 1;
+    }
+
+    /* Binary search -- see bsearch.c for explanation. */
+    base = rr->__ranges;
+
+    for (lim = rr->__nranges; lim != 0; lim >>= 1) {
+        re = base + (lim >> 1);
+
+        if (re->__min <= wc && wc <= re->__max) {
+            goto found;
+        } else if (wc > re->__max) {
+            base = re + 1;
+            lim--;
+        }
+    }
+
+    return (-1);
 found:
-	if (!noinc)
-		wc++;
-	if (re->__min <= wc && wc <= re->__max) {
-		if (re->__types != NULL) {
-			for (; wc <= re->__max; wc++)
-				if (re->__types[wc - re->__min] & wct)
-					return (wc);
-		} else if (re->__map & wct)
-			return (wc);
-	}
-	while (++re < rr->__ranges + rr->__nranges) {
-		wc = re->__min;
-		if (re->__types != NULL) {
-			for (; wc <= re->__max; wc++)
-				if (re->__types[wc - re->__min] & wct)
-					return (wc);
-		} else if (re->__map & wct)
-			return (wc);
-	}
-	return (-1);
+
+    if (!noinc) {
+        wc++;
+    }
+
+    if (re->__min <= wc && wc <= re->__max) {
+        if (re->__types != NULL) {
+            for (; wc <= re->__max; wc++)
+                if (re->__types[wc - re->__min] & wct) {
+                    return (wc);
+                }
+        } else if (re->__map & wct) {
+            return (wc);
+        }
+    }
+
+    while (++re < rr->__ranges + rr->__nranges) {
+        wc = re->__min;
+
+        if (re->__types != NULL) {
+            for (; wc <= re->__max; wc++)
+                if (re->__types[wc - re->__min] & wct) {
+                    return (wc);
+                }
+        } else if (re->__map & wct) {
+            return (wc);
+        }
+    }
+
+    return (-1);
 }

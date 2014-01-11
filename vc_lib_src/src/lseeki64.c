@@ -23,11 +23,11 @@
  * integer.
  */
 typedef union doubleint {
-        __int64 bigint;
-        struct {
-            unsigned long lowerhalf;
-            long upperhalf;
-        } twoints;
+    __int64 bigint;
+    struct {
+        unsigned long lowerhalf;
+        long upperhalf;
+    } twoints;
 } DINT;
 
 
@@ -65,36 +65,33 @@ typedef union doubleint {
 *******************************************************************************/
 
 
-__int64 __cdecl _lseeki64 (
-        int fh,
-        __int64 pos,
-        int mthd
-        )
-{
-        __int64 r = -1i64;
+__int64 __cdecl _lseeki64(
+    int fh,
+    __int64 pos,
+    int mthd
+) {
+    __int64 r = -1i64;
+    /* validate fh */
+    _CHECK_FH_CLEAR_OSSERR_RETURN(fh, EBADF, -1i64);
+    _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1i64);
+    _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1i64);
+    _lock_fh(fh);                   /* lock file handle */
 
-        /* validate fh */
-        _CHECK_FH_CLEAR_OSSERR_RETURN( fh, EBADF, -1i64 );
-        _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1i64);
-        _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1i64);
-
-        _lock_fh(fh);                   /* lock file handle */
-        __try {
-                /* make sure the file is open (after locking) */
-                if ( _osfile(fh) & FOPEN )
-                        r = _lseeki64_nolock( fh, pos, mthd );  /* seek */
-                else {
-                        errno = EBADF;
-                        _doserrno = 0;  /* not OS error */
-                        r =  -1i64;
-                        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-                }
+    __try {
+        /* make sure the file is open (after locking) */
+        if (_osfile(fh) & FOPEN) {
+            r = _lseeki64_nolock(fh, pos, mthd);    /* seek */
+        } else {
+            errno = EBADF;
+            _doserrno = 0;  /* not OS error */
+            r =  -1i64;
+            _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
         }
-        __finally {
-                _unlock_fh(fh);         /* unlock file handle */
-        }
+    } __finally {
+        _unlock_fh(fh);         /* unlock file handle */
+    }
 
-        return( r );
+    return (r);
 }
 
 
@@ -112,43 +109,36 @@ __int64 __cdecl _lseeki64 (
 *
 *******************************************************************************/
 
-__int64 __cdecl _lseeki64_nolock (
-        int fh,
-        __int64 pos,
-        int mthd
-        )
-{
-        DINT newpos;                    /* new file position */
-        unsigned long err;          /* error code from API call */
-        HANDLE osHandle;        /* o.s. handle value */
-
-
-        newpos.bigint = pos;
-
-        /* tell OS to seek */
-
+__int64 __cdecl _lseeki64_nolock(
+    int fh,
+    __int64 pos,
+    int mthd
+) {
+    DINT newpos;                    /* new file position */
+    unsigned long err;          /* error code from API call */
+    HANDLE osHandle;        /* o.s. handle value */
+    newpos.bigint = pos;
+    /* tell OS to seek */
 #if SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END
-    #error Xenix and Win32 seek constants not compatible
+#error Xenix and Win32 seek constants not compatible
 #endif  /* SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END */
 
-        if ((osHandle = (HANDLE)_get_osfhandle(fh)) == (HANDLE)-1)
-        {
-            errno = EBADF;
-            _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-            return( -1i64 );
-        }
+    if ((osHandle = (HANDLE)_get_osfhandle(fh)) == (HANDLE) - 1) {
+        errno = EBADF;
+        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
+        return (-1i64);
+    }
 
-        if ( ((newpos.twoints.lowerhalf =
-               SetFilePointer( osHandle,
+    if (((newpos.twoints.lowerhalf =
+                SetFilePointer(osHandle,
                                newpos.twoints.lowerhalf,
                                &(newpos.twoints.upperhalf),
-                               mthd )) == -1L) &&
-             ((err = GetLastError()) != NO_ERROR) )
-        {
-                _dosmaperr( err );
-                return( -1i64 );
-        }
+                               mthd)) == -1L) &&
+            ((err = GetLastError()) != NO_ERROR)) {
+        _dosmaperr(err);
+        return (-1i64);
+    }
 
-        _osfile(fh) &= ~FEOFLAG;        /* clear the ctrl-z flag on the file */
-        return( newpos.bigint );        /* return */
+    _osfile(fh) &= ~FEOFLAG;        /* clear the ctrl-z flag on the file */
+    return (newpos.bigint);         /* return */
 }

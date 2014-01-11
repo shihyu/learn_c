@@ -42,11 +42,10 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _tolower (
-        int c
-        )
-{
-        return(mklower(c));
+extern "C" int __cdecl _tolower(
+    int c
+) {
+    return (mklower(c));
 }
 
 /***
@@ -63,28 +62,26 @@ extern "C" int __cdecl _tolower (
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _tolower_l (
-        int c,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _tolower_l(
+    int c,
+    _locale_t plocinfo
+) {
     int size;
     unsigned char inbuffer[3];
     unsigned char outbuffer[3];
     _LocaleUpdate _loc_update(plocinfo);
 
     /* if checking case of c does not require API call, do it */
-    if ( (unsigned)c < 256 )
-    {
-        if (_isupper_l(c, _loc_update.GetLocaleT()))
+    if ((unsigned)c < 256) {
+        if (_isupper_l(c, _loc_update.GetLocaleT())) {
             return _loc_update.GetLocaleT()->locinfo->pclmap[c];
-        else
+        } else {
             return c;
+        }
     }
 
     /* convert int c to multibyte string */
-    if (_loc_update.GetLocaleT()->locinfo->mb_cur_max > 1 && _isleadbyte_l(c >> 8 & 0xff, _loc_update.GetLocaleT()) )
-    {
+    if (_loc_update.GetLocaleT()->locinfo->mb_cur_max > 1 && _isleadbyte_l(c >> 8 & 0xff, _loc_update.GetLocaleT())) {
         inbuffer[0] = (c >> 8 & 0xff); /* put lead-byte at start of str */
         inbuffer[1] = (unsigned char)c;
         inbuffer[2] = 0;
@@ -98,25 +95,25 @@ extern "C" int __cdecl _tolower_l (
     }
 
     /* convert to lowercase */
-    if ( 0 == (size = __crtLCMapStringA(
-                    _loc_update.GetLocaleT(),
-                    _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE],
-                    LCMAP_LOWERCASE,
-                    (LPCSTR)inbuffer,
-                    size,
-                    (LPSTR)outbuffer,
-                    3,
-                    _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                    TRUE)) )
-    {
+    if (0 == (size = __crtLCMapStringA(
+                         _loc_update.GetLocaleT(),
+                         _loc_update.GetLocaleT()->locinfo->lc_handle[LC_CTYPE],
+                         LCMAP_LOWERCASE,
+                         (LPCSTR)inbuffer,
+                         size,
+                         (LPSTR)outbuffer,
+                         3,
+                         _loc_update.GetLocaleT()->locinfo->lc_codepage,
+                         TRUE))) {
         return c;
     }
 
     /* construct integer return value */
-    if (size == 1)
+    if (size == 1) {
         return ((int)outbuffer[0]);
-    else
+    } else {
         return ((int)outbuffer[1] | ((int)outbuffer[0] << 8));
+    }
 }
 
 /***
@@ -137,17 +134,12 @@ extern "C" int __cdecl _tolower_l (
 *******************************************************************************/
 
 
-extern "C" int __cdecl tolower (
-        int c
-        )
-{
-
-    if (__locale_changed == 0)
-    {
+extern "C" int __cdecl tolower(
+    int c
+) {
+    if (__locale_changed == 0) {
         return __ascii_towlower(c);
-    }
-    else
-    {
+    } else {
         return _tolower_l(c, NULL);
     }
 }

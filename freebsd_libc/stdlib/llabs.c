@@ -30,7 +30,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/llabs.c,v 1.1 2001/11/15 02:05:03 mike E
 #include <stdlib.h>
 
 long long
-llabs(long long j)
-{
-	return (j < 0 ? -j : j);
+llabs(long long j) {
+    return (j < 0 ? -j : j);
 }

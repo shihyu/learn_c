@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,13 +39,14 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/setdomainname.c,v 1.8 2007/01/09 00:27:55 i
 #include <unistd.h>
 
 int
-setdomainname(const char *name, int namelen)
-{
-	int mib[2];
+setdomainname(const char* name, int namelen) {
+    int mib[2];
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_NISDOMAINNAME;
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_NISDOMAINNAME;
-	if (sysctl(mib, 2, NULL, NULL, (void *)name, namelen) == -1)
-		return (-1);
-	return (0);
+    if (sysctl(mib, 2, NULL, NULL, (void*)name, namelen) == -1) {
+        return (-1);
+    }
+
+    return (0);
 }

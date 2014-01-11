@@ -31,29 +31,27 @@
 *
 *******************************************************************************/
 
-int __cdecl _isatty (
-        int fh
-        )
-{
+int __cdecl _isatty(
+    int fh
+) {
 #if defined (_DEBUG) && !defined (_SYSCRT)
-        /* make sure we ask debugger only once and cache the answer */
-        static int knownHandle = -1;
+    /* make sure we ask debugger only once and cache the answer */
+    static int knownHandle = -1;
 #endif  /* defined (_DEBUG) && !defined (_SYSCRT) */
-
-        /* see if file handle is valid, otherwise return FALSE */
-        _CHECK_FH_RETURN(fh, EBADF, 0);
-        _VALIDATE_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, 0);
-
+    /* see if file handle is valid, otherwise return FALSE */
+    _CHECK_FH_RETURN(fh, EBADF, 0);
+    _VALIDATE_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, 0);
 #if defined (_DEBUG) && !defined (_SYSCRT)
-        if (knownHandle == -1) {
-            knownHandle = DebuggerKnownHandle();
-        }
 
-        if (knownHandle) {
-            return TRUE;
-        }
+    if (knownHandle == -1) {
+        knownHandle = DebuggerKnownHandle();
+    }
+
+    if (knownHandle) {
+        return TRUE;
+    }
+
 #endif  /* defined (_DEBUG) && !defined (_SYSCRT) */
-
-        /* check file handle database to see if device bit set */
-        return (int)(_osfile(fh) & FDEV);
+    /* check file handle database to see if device bit set */
+    return (int)(_osfile(fh) & FDEV);
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Margo Seltzer.
@@ -43,13 +43,13 @@ __FBSDID("$FreeBSD: src/lib/libc/db/hash/hash_func.c,v 1.6 2007/01/09 00:27:50 i
 #include "page.h"
 #include "extern.h"
 
-static u_int32_t hash1(const void *, size_t) __unused;
-static u_int32_t hash2(const void *, size_t) __unused;
-static u_int32_t hash3(const void *, size_t) __unused;
-static u_int32_t hash4(const void *, size_t);
+static u_int32_t hash1(const void*, size_t) __unused;
+static u_int32_t hash2(const void*, size_t) __unused;
+static u_int32_t hash3(const void*, size_t) __unused;
+static u_int32_t hash4(const void*, size_t);
 
 /* Global default hash function */
-u_int32_t (*__default_hash)(const void *, size_t) = hash4;
+u_int32_t (*__default_hash)(const void*, size_t) = hash4;
 
 /*
  * HASH FUNCTIONS
@@ -60,47 +60,53 @@ u_int32_t (*__default_hash)(const void *, size_t) = hash4;
  * This came from ejb's hsearch.
  */
 
-#define PRIME1		37
-#define PRIME2		1048583
+#define PRIME1      37
+#define PRIME2      1048583
 
 static u_int32_t
 hash1(keyarg, len)
-	const void *keyarg;
-	size_t len;
+const void* keyarg;
+size_t len;
 {
-	const u_char *key;
-	u_int32_t h;
+    const u_char* key;
+    u_int32_t h;
 
-	/* Convert string to integer */
-	for (key = keyarg, h = 0; len--;)
-		h = h * PRIME1 ^ (*key++ - ' ');
-	h %= PRIME2;
-	return (h);
+    /* Convert string to integer */
+    for (key = keyarg, h = 0; len--;) {
+        h = h * PRIME1 ^ (*key++ - ' ');
+    }
+
+    h %= PRIME2;
+    return (h);
 }
 
 /*
  * Phong's linear congruential hash
  */
-#define dcharhash(h, c)	((h) = 0x63c63cd9*(h) + 0x9c39c33d + (c))
+#define dcharhash(h, c) ((h) = 0x63c63cd9*(h) + 0x9c39c33d + (c))
 
 static u_int32_t
 hash2(keyarg, len)
-	const void *keyarg;
-	size_t len;
+const void* keyarg;
+size_t len;
 {
-	const u_char *e, *key;
-	u_int32_t h;
-	u_char c;
+    const u_char* e, *key;
+    u_int32_t h;
+    u_char c;
+    key = keyarg;
+    e = key + len;
 
-	key = keyarg;
-	e = key + len;
-	for (h = 0; key != e;) {
-		c = *key++;
-		if (!c && key > e)
-			break;
-		dcharhash(h, c);
-	}
-	return (h);
+    for (h = 0; key != e;) {
+        c = *key++;
+
+        if (!c && key > e) {
+            break;
+        }
+
+        dcharhash(h, c);
+    }
+
+    return (h);
 }
 
 /*
@@ -114,97 +120,111 @@ hash2(keyarg, len)
  */
 static u_int32_t
 hash3(keyarg, len)
-	const void *keyarg;
-	size_t len;
+const void* keyarg;
+size_t len;
 {
-	const u_char *key;
-	size_t loop;
-	u_int32_t h;
-
+    const u_char* key;
+    size_t loop;
+    u_int32_t h;
 #define HASHC   h = *key++ + 65599 * h
+    h = 0;
+    key = keyarg;
 
-	h = 0;
-	key = keyarg;
-	if (len > 0) {
-		loop = (len + 8 - 1) >> 3;
+    if (len > 0) {
+        loop = (len + 8 - 1) >> 3;
 
-		switch (len & (8 - 1)) {
-		case 0:
-			do {
-				HASHC;
-				/* FALLTHROUGH */
-		case 7:
-				HASHC;
-				/* FALLTHROUGH */
-		case 6:
-				HASHC;
-				/* FALLTHROUGH */
-		case 5:
-				HASHC;
-				/* FALLTHROUGH */
-		case 4:
-				HASHC;
-				/* FALLTHROUGH */
-		case 3:
-				HASHC;
-				/* FALLTHROUGH */
-		case 2:
-				HASHC;
-				/* FALLTHROUGH */
-		case 1:
-				HASHC;
-			} while (--loop);
-		}
-	}
-	return (h);
+        switch (len & (8 - 1)) {
+        case 0:
+            do {
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 7:
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 6:
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 5:
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 4:
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 3:
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 2:
+                HASHC;
+
+            /* FALLTHROUGH */
+            case 1:
+                HASHC;
+            } while (--loop);
+        }
+    }
+
+    return (h);
 }
 
 /* Hash function from Chris Torek. */
 static u_int32_t
 hash4(keyarg, len)
-	const void *keyarg;
-	size_t len;
+const void* keyarg;
+size_t len;
 {
-	const u_char *key;
-	size_t loop;
-	u_int32_t h;
-
+    const u_char* key;
+    size_t loop;
+    u_int32_t h;
 #define HASH4a   h = (h << 5) - h + *key++;
 #define HASH4b   h = (h << 5) + h + *key++;
 #define HASH4 HASH4b
+    h = 0;
+    key = keyarg;
 
-	h = 0;
-	key = keyarg;
-	if (len > 0) {
-		loop = (len + 8 - 1) >> 3;
+    if (len > 0) {
+        loop = (len + 8 - 1) >> 3;
 
-		switch (len & (8 - 1)) {
-		case 0:
-			do {
-				HASH4;
-				/* FALLTHROUGH */
-		case 7:
-				HASH4;
-				/* FALLTHROUGH */
-		case 6:
-				HASH4;
-				/* FALLTHROUGH */
-		case 5:
-				HASH4;
-				/* FALLTHROUGH */
-		case 4:
-				HASH4;
-				/* FALLTHROUGH */
-		case 3:
-				HASH4;
-				/* FALLTHROUGH */
-		case 2:
-				HASH4;
-				/* FALLTHROUGH */
-		case 1:
-				HASH4;
-			} while (--loop);
-		}
-	}
-	return (h);
+        switch (len & (8 - 1)) {
+        case 0:
+            do {
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 7:
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 6:
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 5:
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 4:
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 3:
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 2:
+                HASH4;
+
+            /* FALLTHROUGH */
+            case 1:
+                HASH4;
+            } while (--loop);
+        }
+    }
+
+    return (h);
 }

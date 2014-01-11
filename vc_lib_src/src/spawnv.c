@@ -40,18 +40,16 @@
 *
 *******************************************************************************/
 
-intptr_t __cdecl _tspawnv (
-        int modeflag,
-        const _TSCHAR *pathname,
-        const _TSCHAR * const *argv
-        )
-{
-        /* validation section */
-        _VALIDATE_RETURN(pathname != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*pathname != _T('\0'), EINVAL, -1);
-        _VALIDATE_RETURN(argv != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(*argv != NULL, EINVAL, -1);
-        _VALIDATE_RETURN(**argv != _T('\0'), EINVAL, -1);
-
-        return(_tspawnve(modeflag,pathname,argv,NULL));
+intptr_t __cdecl _tspawnv(
+    int modeflag,
+    const _TSCHAR* pathname,
+    const _TSCHAR* const* argv
+) {
+    /* validation section */
+    _VALIDATE_RETURN(pathname != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*pathname != _T('\0'), EINVAL, -1);
+    _VALIDATE_RETURN(argv != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(*argv != NULL, EINVAL, -1);
+    _VALIDATE_RETURN(**argv != _T('\0'), EINVAL, -1);
+    return (_tspawnve(modeflag, pathname, argv, NULL));
 }

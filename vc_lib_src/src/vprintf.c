@@ -35,85 +35,74 @@
 *
 *******************************************************************************/
 
-int __cdecl vprintf_helper (
-        OUTPUTFN outfn,
-        const char *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
+int __cdecl vprintf_helper(
+    OUTPUTFN outfn,
+    const char* format,
+    _locale_t plocinfo,
+    va_list ap
+)
 /*
  * stdout 'V'ariable, 'PRINT', 'F'ormatted
  */
 {
-        REG1 FILE *stream = stdout;
-        REG2 int buffing;
-        REG3 int retval;
+    REG1 FILE* stream = stdout;
+    REG2 int buffing;
+    REG3 int retval;
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
-
-        _lock_str(stream);
-        __try {
-
+    __try {
         buffing = _stbuf(stream);
-        retval = outfn(stream, format, plocinfo, ap );
+        retval = outfn(stream, format, plocinfo, ap);
         _ftbuf(buffing, stream);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        }
-        __finally {
-            _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
-int __cdecl _vprintf_l (
-        const char *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-    return vprintf_helper(_output_l,format, plocinfo, ap);
+int __cdecl _vprintf_l(
+    const char* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    return vprintf_helper(_output_l, format, plocinfo, ap);
 }
 
-int __cdecl _vprintf_s_l (
-        const char *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-    return vprintf_helper(_output_s_l,format, plocinfo, ap);
+int __cdecl _vprintf_s_l(
+    const char* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    return vprintf_helper(_output_s_l, format, plocinfo, ap);
 }
 
-int __cdecl _vprintf_p_l (
-        const char *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-    return vprintf_helper(_output_p_l,format, plocinfo, ap);
+int __cdecl _vprintf_p_l(
+    const char* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    return vprintf_helper(_output_p_l, format, plocinfo, ap);
 }
 
-int __cdecl vprintf (
-        const char *format,
-        va_list ap
-        )
-{
-    return vprintf_helper(_output_l,format, NULL, ap);
+int __cdecl vprintf(
+    const char* format,
+    va_list ap
+) {
+    return vprintf_helper(_output_l, format, NULL, ap);
 }
 
-int __cdecl vprintf_s (
-        const char *format,
-        va_list ap
-        )
-{
-    return vprintf_helper(_output_s_l,format, NULL, ap);
+int __cdecl vprintf_s(
+    const char* format,
+    va_list ap
+) {
+    return vprintf_helper(_output_s_l, format, NULL, ap);
 }
 
-int __cdecl _vprintf_p (
-        const char *format,
-        va_list ap
-        )
-{
-    return vprintf_helper(_output_p_l,format, NULL, ap);
+int __cdecl _vprintf_p(
+    const char* format,
+    va_list ap
+) {
+    return vprintf_helper(_output_p_l, format, NULL, ap);
 }

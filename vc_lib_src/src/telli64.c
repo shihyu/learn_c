@@ -30,9 +30,8 @@
 *
 *******************************************************************************/
 
-__int64 __cdecl _telli64 (
-        int filedes
-        )
-{
-        return( _lseeki64( filedes, 0i64, SEEK_CUR ) );
+__int64 __cdecl _telli64(
+    int filedes
+) {
+    return (_lseeki64(filedes, 0i64, SEEK_CUR));
 }

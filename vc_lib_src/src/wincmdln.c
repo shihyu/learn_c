@@ -42,55 +42,62 @@ extern int __mbctype_initialized;
 *
 *******************************************************************************/
 
-_TUCHAR * __cdecl
+_TUCHAR* __cdecl
 #ifdef WPRFLAG
 _wwincmdln(
 #else  /* WPRFLAG */
 _wincmdln(
 #endif  /* WPRFLAG */
-        void
-        )
-{
-        _TUCHAR *lpszCommandLine;
-        BOOL inDoubleQuote=FALSE;
-
+    void
+) {
+    _TUCHAR* lpszCommandLine;
+    BOOL inDoubleQuote = FALSE;
 #ifdef _MBCS
-        /*
-         * If necessary, initialize the multibyte ctype table
-         */
-        if ( __mbctype_initialized == 0 )
-            __initmbctable();
-#endif  /* _MBCS */
 
-        /*
-         * Skip past program name (first token in command line).
-         * Check for and handle quoted program name.
-         */
+    /*
+     * If necessary, initialize the multibyte ctype table
+     */
+    if (__mbctype_initialized == 0) {
+        __initmbctable();
+    }
+
+#endif  /* _MBCS */
+    /*
+     * Skip past program name (first token in command line).
+     * Check for and handle quoted program name.
+     */
 #ifdef WPRFLAG
-        lpszCommandLine = _wcmdln == NULL ? L"" : (wchar_t *)_wcmdln;
+    lpszCommandLine = _wcmdln == NULL ? L"" : (wchar_t*)_wcmdln;
 #else  /* WPRFLAG */
-        lpszCommandLine = _acmdln == NULL ? "" : (unsigned char *)_acmdln;
+    lpszCommandLine = _acmdln == NULL ? "" : (unsigned char*)_acmdln;
 #endif  /* WPRFLAG */
 
-        while (*lpszCommandLine > SPACECHAR ||
-               (*lpszCommandLine&&inDoubleQuote)) {
-            /*
-             * Flip the inDoubleQuote if current character is DOUBLEQUOTE
-             */
-            if (*lpszCommandLine==DQUOTECHAR) inDoubleQuote=!inDoubleQuote;
-#ifdef _MBCS
-            if (_ismbblead(*lpszCommandLine))
-                if (lpszCommandLine)
-                    lpszCommandLine++;
-#endif  /* _MBCS */
-            ++lpszCommandLine;
+    while (*lpszCommandLine > SPACECHAR ||
+            (*lpszCommandLine && inDoubleQuote)) {
+        /*
+         * Flip the inDoubleQuote if current character is DOUBLEQUOTE
+         */
+        if (*lpszCommandLine == DQUOTECHAR) {
+            inDoubleQuote = !inDoubleQuote;
         }
 
-        /*
-         * Skip past any white space preceeding the second token.
-         */
-        while (*lpszCommandLine && (*lpszCommandLine <= SPACECHAR))
-            lpszCommandLine++;
+#ifdef _MBCS
 
-        return lpszCommandLine;
+        if (_ismbblead(*lpszCommandLine))
+            if (lpszCommandLine) {
+                lpszCommandLine++;
+            }
+
+#endif  /* _MBCS */
+        ++lpszCommandLine;
+    }
+
+    /*
+     * Skip past any white space preceeding the second token.
+     */
+    while (*lpszCommandLine && (*lpszCommandLine <= SPACECHAR)) {
+        lpszCommandLine++;
+    }
+
+    return lpszCommandLine;
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
@@ -38,29 +38,32 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/runetype.c,v 1.14 2007/01/09 00:28:00 im
 #include <runetype.h>
 
 unsigned long
-___runetype(__ct_rune_t c)
-{
-	size_t lim;
-	_RuneRange *rr = &_CurrentRuneLocale->__runetype_ext;
-	_RuneEntry *base, *re;
+___runetype(__ct_rune_t c) {
+    size_t lim;
+    _RuneRange* rr = &_CurrentRuneLocale->__runetype_ext;
+    _RuneEntry* base, *re;
 
-	if (c < 0 || c == EOF)
-		return(0L);
+    if (c < 0 || c == EOF) {
+        return (0L);
+    }
 
-	/* Binary search -- see bsearch.c for explanation. */
-	base = rr->__ranges;
-	for (lim = rr->__nranges; lim != 0; lim >>= 1) {
-		re = base + (lim >> 1);
-		if (re->__min <= c && c <= re->__max) {
-			if (re->__types)
-			    return(re->__types[c - re->__min]);
-			else
-			    return(re->__map);
-		} else if (c > re->__max) {
-			base = re + 1;
-			lim--;
-		}
-	}
+    /* Binary search -- see bsearch.c for explanation. */
+    base = rr->__ranges;
 
-	return(0L);
+    for (lim = rr->__nranges; lim != 0; lim >>= 1) {
+        re = base + (lim >> 1);
+
+        if (re->__min <= c && c <= re->__max) {
+            if (re->__types) {
+                return (re->__types[c - re->__min]);
+            } else {
+                return (re->__map);
+            }
+        } else if (c > re->__max) {
+            base = re + 1;
+            lim--;
+        }
+    }
+
+    return (0L);
 }

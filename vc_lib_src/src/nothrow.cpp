@@ -7,7 +7,7 @@
 #include <yvals.h>
 _STD_BEGIN
 
-const nothrow_t nothrow = nothrow_t();	// define nothrow
+const nothrow_t nothrow = nothrow_t();  // define nothrow
 _STD_END
 
 /*

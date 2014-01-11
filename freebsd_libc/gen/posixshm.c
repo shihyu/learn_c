@@ -41,32 +41,33 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/posixshm.c,v 1.4 2002/02/01 00:57:29 obrien
 #include "un-namespace.h"
 
 int
-shm_open(const char *path, int flags, mode_t mode)
-{
-	int fd;
-	struct stat stab;
+shm_open(const char* path, int flags, mode_t mode) {
+    int fd;
+    struct stat stab;
 
-	if ((flags & O_ACCMODE) == O_WRONLY)
-		return (EINVAL);
+    if ((flags & O_ACCMODE) == O_WRONLY) {
+        return (EINVAL);
+    }
 
-	fd = _open(path, flags, mode);
-	if (fd != -1) {
-		if (_fstat(fd, &stab) != 0 || !S_ISREG(stab.st_mode)) {
-			_close(fd);
-			errno = EINVAL;
-			return (-1);
-		}
+    fd = _open(path, flags, mode);
 
-		if (_fcntl(fd, F_SETFL, (int)FPOSIXSHM) != 0) {
-			_close(fd);
-			return (-1);
-		}
-	}
-	return (fd);
+    if (fd != -1) {
+        if (_fstat(fd, &stab) != 0 || !S_ISREG(stab.st_mode)) {
+            _close(fd);
+            errno = EINVAL;
+            return (-1);
+        }
+
+        if (_fcntl(fd, F_SETFL, (int)FPOSIXSHM) != 0) {
+            _close(fd);
+            return (-1);
+        }
+    }
+
+    return (fd);
 }
 
 int
-shm_unlink(const char *path)
-{
-	return (unlink(path));
+shm_unlink(const char* path) {
+    return (unlink(path));
 }

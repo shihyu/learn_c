@@ -50,18 +50,16 @@
 *******************************************************************************/
 
 long __cdecl _tstol(
-        const _TCHAR *nptr
-        )
-{
+    const _TCHAR* nptr
+) {
     return _tcstol(nptr, NULL, 10);
 }
 
 
 long __cdecl _tstol_l(
-        const _TCHAR *nptr,
-        _locale_t plocinfo
-        )
-{
+    const _TCHAR* nptr,
+    _locale_t plocinfo
+) {
     return _tcstol_l(nptr, NULL, 10, plocinfo);
 }
 
@@ -94,17 +92,15 @@ long __cdecl _tstol_l(
 *******************************************************************************/
 
 int __cdecl _tstoi(
-        const _TCHAR *nptr
-        )
-{
+    const _TCHAR* nptr
+) {
     return (int)_tstol(nptr);
 }
 
 int __cdecl _tstoi_l(
-        const _TCHAR *nptr,
-        _locale_t plocinfo
-        )
-{
+    const _TCHAR* nptr,
+    _locale_t plocinfo
+) {
     return (int)_tstol_l(nptr, plocinfo);
 }
 
@@ -138,17 +134,15 @@ int __cdecl _tstoi_l(
 *******************************************************************************/
 
 __int64 __cdecl _tstoi64(
-        const _TCHAR *nptr
-        )
-{
+    const _TCHAR* nptr
+) {
     return _tcstoi64(nptr, NULL, 10);
 }
 
 __int64 __cdecl _tstoi64_l(
-        const _TCHAR *nptr,
-        _locale_t plocinfo
-        )
-{
+    const _TCHAR* nptr,
+    _locale_t plocinfo
+) {
     return _tcstoi64_l(nptr, NULL, 10, plocinfo);
 }
 

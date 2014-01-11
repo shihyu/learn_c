@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,67 +42,72 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strsignal.c,v 1.8 2007/01/09 00:28:12 im
 #include <string.h>
 #include <signal.h>
 
-#define	UPREFIX		"Unknown signal"
+#define UPREFIX     "Unknown signal"
 
 /* XXX: negative 'num' ? (REGR) */
-char *
-strsignal(int num)
-{
-	static char ebuf[NL_TEXTMAX];
-	char tmp[20];
-	size_t n;
-	int signum;
-	char *t, *p;
-
+char*
+strsignal(int num) {
+    static char ebuf[NL_TEXTMAX];
+    char tmp[20];
+    size_t n;
+    int signum;
+    char* t, *p;
 #if defined(NLS)
-	int saved_errno = errno;
-	nl_catd catd;
-	catd = catopen("libc", NL_CAT_LOCALE);
+    int saved_errno = errno;
+    nl_catd catd;
+    catd = catopen("libc", NL_CAT_LOCALE);
 #endif
 
-	if (num > 0 && num < sys_nsig) {
-		n = strlcpy(ebuf,
+    if (num > 0 && num < sys_nsig) {
+        n = strlcpy(ebuf,
 #if defined(NLS)
-			catgets(catd, 2, num, sys_siglist[num]),
+                    catgets(catd, 2, num, sys_siglist[num]),
 #else
-			sys_siglist[num],
+                    sys_siglist[num],
 #endif
-			sizeof(ebuf));
-	} else {
-		n = strlcpy(ebuf,
+                    sizeof(ebuf));
+    } else {
+        n = strlcpy(ebuf,
 #if defined(NLS)
-			catgets(catd, 2, 0xffff, UPREFIX),
+                    catgets(catd, 2, 0xffff, UPREFIX),
 #else
-			UPREFIX,
+                    UPREFIX,
 #endif
-			sizeof(ebuf));
-	}
+                    sizeof(ebuf));
+    }
 
-	signum = num;
-	if (num < 0)
-		signum = -signum;
+    signum = num;
 
-	t = tmp;
-	do {
-		*t++ = "0123456789"[signum % 10];
-	} while (signum /= 10);
-	if (num < 0)
-		*t++ = '-';
+    if (num < 0) {
+        signum = -signum;
+    }
 
-	p = (ebuf + n);
-	*p++ = ':';
-	*p++ = ' ';
+    t = tmp;
 
-	for (;;) {
-		*p++ = *--t;
-		if (t <= tmp)
-			break;
-	}
-	*p = '\0';
+    do {
+        *t++ = "0123456789"[signum % 10];
+    } while (signum /= 10);
 
+    if (num < 0) {
+        *t++ = '-';
+    }
+
+    p = (ebuf + n);
+    *p++ = ':';
+    *p++ = ' ';
+
+    for (;;) {
+        *p++ = *--t;
+
+        if (t <= tmp) {
+            break;
+        }
+    }
+
+    *p = '\0';
 #if defined(NLS)
-	catclose(catd);
-	errno = saved_errno;
+    catclose(catd);
+    errno = saved_errno;
 #endif
-	return (ebuf);
+    return (ebuf);
 }

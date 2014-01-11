@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Copyright (c) 2000
- * 	Daniel Eischen.  All rights reserved.
+ *  Daniel Eischen.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@
  */
 
 #ifndef _TELLDIR_H_
-#define	_TELLDIR_H_
+#define _TELLDIR_H_
 
 #include <sys/queue.h>
 
@@ -44,10 +44,10 @@
  * associated with that return value.
  */
 struct ddloc {
-	LIST_ENTRY(ddloc) loc_lqe; /* entry in list */
-	long	loc_index;	/* key associated with structure */
-	long	loc_seek;	/* magic cookie returned by getdirentries */
-	long	loc_loc;	/* offset of entry in buffer */
+    LIST_ENTRY(ddloc) loc_lqe; /* entry in list */
+    long    loc_index;  /* key associated with structure */
+    long    loc_seek;   /* magic cookie returned by getdirentries */
+    long    loc_loc;    /* offset of entry in buffer */
 };
 
 /*
@@ -55,12 +55,12 @@ struct ddloc {
  * positions.
  */
 struct _telldir {
-	LIST_HEAD(, ddloc) td_locq; /* list of locations */
-	long	td_loccnt;	/* index of entry for sequential readdir's */
+    LIST_HEAD(, ddloc) td_locq; /* list of locations */
+    long    td_loccnt;  /* index of entry for sequential readdir's */
 };
 
-struct dirent	*_readdir_unlocked(DIR *);
-void 		_reclaim_telldir(DIR *);
-void 		_seekdir(DIR *, long);
+struct dirent*   _readdir_unlocked(DIR*);
+void        _reclaim_telldir(DIR*);
+void        _seekdir(DIR*, long);
 
 #endif

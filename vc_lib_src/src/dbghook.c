@@ -36,16 +36,15 @@ _CRT_ALLOC_HOOK _pfnAllocHook = _CrtDefaultAllocHook;
 *
 *******************************************************************************/
 int __cdecl _CrtDefaultAllocHook(
-        int nAllocType,
-        void * pvData,
-        size_t nSize,
-        int nBlockUse,
-        long lRequest,
-        const unsigned char * szFileName,
-        int nLine
-        )
-{
-        return 1; /* allow all allocs/reallocs/frees */
+    int nAllocType,
+    void* pvData,
+    size_t nSize,
+    int nBlockUse,
+    long lRequest,
+    const unsigned char* szFileName,
+    int nLine
+) {
+    return 1; /* allow all allocs/reallocs/frees */
 }
 
 #endif  /* _DEBUG */
@@ -58,8 +57,7 @@ int _debugger_hook_dummy;
 #endif  /* _M_IA64 */
 
 __declspec(noinline)
-void __cdecl _CRT_DEBUGGER_HOOK(int _Reserved)
-{
+void __cdecl _CRT_DEBUGGER_HOOK(int _Reserved) {
     /* assign 0 to _debugger_hook_dummy so that the function is not folded in retail */
     (_Reserved);
     _debugger_hook_dummy = 0;

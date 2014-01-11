@@ -37,42 +37,37 @@
 *
 *******************************************************************************/
 
-int __cdecl _fcloseall (
-        void
-        )
-{
-        REG2 int count = 0;
-        REG1 i;
+int __cdecl _fcloseall(
+    void
+) {
+    REG2 int count = 0;
+    REG1 i;
+    _mlock(_IOB_SCAN_LOCK);
 
-        _mlock(_IOB_SCAN_LOCK);
-        __try {
-
-        for ( i = 3 ; i < _nstream ; i++ ) {
-
-            if ( __piob[i] != NULL ) {
+    __try {
+        for (i = 3 ; i < _nstream ; i++) {
+            if (__piob[i] != NULL) {
                 /*
                  * if the stream is in use, close it
                  */
-                if ( inuse( (FILE *)__piob[i] ) && (fclose( __piob[i] ) !=
-                     EOF) )
-                        count++;
+                if (inuse((FILE*)__piob[i]) && (fclose(__piob[i]) !=
+                                                EOF)) {
+                    count++;
+                }
 
                 /*
                  * if stream is part of a _FILEX we allocated, free it.
                  */
-                if ( i >= _IOB_ENTRIES ) {
-
-                    DeleteCriticalSection( &(((_FILEX *)__piob[i])->lock) );
-                    _free_crt( __piob[i] );
+                if (i >= _IOB_ENTRIES) {
+                    DeleteCriticalSection(&(((_FILEX*)__piob[i])->lock));
+                    _free_crt(__piob[i]);
                     __piob[i] = NULL;
                 }
             }
         }
+    } __finally {
+        _munlock(_IOB_SCAN_LOCK);
+    }
 
-        }
-        __finally {
-            _munlock(_IOB_SCAN_LOCK);
-        }
-
-        return(count);
+    return (count);
 }

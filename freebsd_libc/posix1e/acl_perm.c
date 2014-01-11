@@ -40,21 +40,19 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_perm.c,v 1.6 2002/03/22 21:52:38 ob
  * permission set permset_d
  */
 int
-acl_add_perm(acl_permset_t permset_d, acl_perm_t perm)
-{
+acl_add_perm(acl_permset_t permset_d, acl_perm_t perm) {
+    if (permset_d) {
+        switch (perm) {
+        case ACL_READ:
+        case ACL_WRITE:
+        case ACL_EXECUTE:
+            *permset_d |= perm;
+            return (0);
+        }
+    }
 
-	if (permset_d) {
-		switch(perm) {
-		case ACL_READ:
-		case ACL_WRITE:
-		case ACL_EXECUTE:
-			*permset_d |= perm;
-			return (0);
-		}
-	}
-
-	errno = EINVAL;
-	return (-1);
+    errno = EINVAL;
+    return (-1);
 }
 
 /*
@@ -62,17 +60,14 @@ acl_add_perm(acl_permset_t permset_d, acl_perm_t perm)
  * set permset_d
  */
 int
-acl_clear_perms(acl_permset_t permset_d)
-{
+acl_clear_perms(acl_permset_t permset_d) {
+    if (permset_d == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (permset_d == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-
-	*permset_d = ACL_PERM_NONE;
-
-	return (0);
+    *permset_d = ACL_PERM_NONE;
+    return (0);
 }
 
 /*
@@ -80,19 +75,17 @@ acl_clear_perms(acl_permset_t permset_d)
  * permission set permset_d
  */
 int
-acl_delete_perm(acl_permset_t permset_d, acl_perm_t perm)
-{
+acl_delete_perm(acl_permset_t permset_d, acl_perm_t perm) {
+    if (permset_d) {
+        switch (perm) {
+        case ACL_READ:
+        case ACL_WRITE:
+        case ACL_EXECUTE:
+            *permset_d &= ~(perm & ACL_PERM_BITS);
+            return (0);
+        }
+    }
 
-	if (permset_d) {
-		switch(perm) {
-		case ACL_READ:
-		case ACL_WRITE:
-		case ACL_EXECUTE:
-			*permset_d &= ~(perm & ACL_PERM_BITS);
-			return (0);
-		}
-	}
-
-	errno = EINVAL;
-	return (-1);
+    errno = EINVAL;
+    return (-1);
 }

@@ -40,37 +40,38 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_init.c,v 1.10 2002/03/22 21:52:38 o
 #include <string.h>
 
 acl_t
-acl_init(int count)
-{
-	acl_t acl;
+acl_init(int count) {
+    acl_t acl;
 
-	if (count > ACL_MAX_ENTRIES) {
-		errno = ENOMEM;
-		return (NULL);
-	}
-	if (count < 0) {
-		errno = EINVAL;
-		return (NULL);
-	}
+    if (count > ACL_MAX_ENTRIES) {
+        errno = ENOMEM;
+        return (NULL);
+    }
 
-	acl = malloc(sizeof(struct acl_t_struct));
-	if (acl != NULL)
-		bzero(acl, sizeof(struct acl_t_struct));
+    if (count < 0) {
+        errno = EINVAL;
+        return (NULL);
+    }
 
-	return (acl);
+    acl = malloc(sizeof(struct acl_t_struct));
+
+    if (acl != NULL) {
+        bzero(acl, sizeof(struct acl_t_struct));
+    }
+
+    return (acl);
 }
 
 acl_t
-acl_dup(acl_t acl)
-{
-	acl_t	acl_new;
+acl_dup(acl_t acl) {
+    acl_t   acl_new;
+    acl_new = acl_init(ACL_MAX_ENTRIES);
 
-	acl_new = acl_init(ACL_MAX_ENTRIES);
-	if (acl_new != NULL) {
-		*acl_new = *acl;
-		acl->ats_cur_entry = 0;
-		acl_new->ats_cur_entry = 0;
-	}
+    if (acl_new != NULL) {
+        *acl_new = *acl;
+        acl->ats_cur_entry = 0;
+        acl_new->ats_cur_entry = 0;
+    }
 
-	return (acl_new);
+    return (acl_new);
 }

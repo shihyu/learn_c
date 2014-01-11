@@ -34,28 +34,29 @@ __FBSDID("$FreeBSD: src/lib/libc/net/gai_strerror.c,v 1.2 2006/05/21 11:22:31 um
 
 /* Entries EAI_ADDRFAMILY (1) and EAI_NODATA (7) are obsoleted, but left */
 /* for backward compatibility with userland code prior to 2553bis-02 */
-static const char *ai_errlist[] = {
-	"Success",					/* 0 */
-	"Address family for hostname not supported",	/* 1 */
-	"Temporary failure in name resolution",		/* EAI_AGAIN */
-	"Invalid value for ai_flags",			/* EAI_BADFLAGS */
-	"Non-recoverable failure in name resolution",	/* EAI_FAIL */
-	"ai_family not supported",			/* EAI_FAMILY */
-	"Memory allocation failure", 			/* EAI_MEMORY */
-	"No address associated with hostname",		/* 7 */
-	"hostname nor servname provided, or not known",	/* EAI_NONAME */
-	"servname not supported for ai_socktype",	/* EAI_SERVICE */
-	"ai_socktype not supported", 			/* EAI_SOCKTYPE */
-	"System error returned in errno", 		/* EAI_SYSTEM */
-	"Invalid value for hints",			/* EAI_BADHINTS */
-	"Resolved protocol is unknown",			/* EAI_PROTOCOL */
-	"Argument buffer overflow"			/* EAI_OVERFLOW */
+static const char* ai_errlist[] = {
+    "Success",                  /* 0 */
+    "Address family for hostname not supported",    /* 1 */
+    "Temporary failure in name resolution",     /* EAI_AGAIN */
+    "Invalid value for ai_flags",           /* EAI_BADFLAGS */
+    "Non-recoverable failure in name resolution",   /* EAI_FAIL */
+    "ai_family not supported",          /* EAI_FAMILY */
+    "Memory allocation failure",            /* EAI_MEMORY */
+    "No address associated with hostname",      /* 7 */
+    "hostname nor servname provided, or not known", /* EAI_NONAME */
+    "servname not supported for ai_socktype",   /* EAI_SERVICE */
+    "ai_socktype not supported",            /* EAI_SOCKTYPE */
+    "System error returned in errno",       /* EAI_SYSTEM */
+    "Invalid value for hints",          /* EAI_BADHINTS */
+    "Resolved protocol is unknown",         /* EAI_PROTOCOL */
+    "Argument buffer overflow"          /* EAI_OVERFLOW */
 };
 
-const char *
-gai_strerror(int ecode)
-{
-	if (ecode >= 0 && ecode < EAI_MAX)
-		return ai_errlist[ecode];
-	return "Unknown error";
+const char*
+gai_strerror(int ecode) {
+    if (ecode >= 0 && ecode < EAI_MAX) {
+        return ai_errlist[ecode];
+    }
+
+    return "Unknown error";
 }

@@ -4,12 +4,12 @@
 *       Copyright (c) Microsoft Corporation. All rights reserved.
 *
 *Purpose:
-*	The makefiles provided with the Microsoft Visual C++ (C/C++) Run-Time
-*	Library Sources generate commands with multiple commands per line,
-*	separated by ampersands (&).  This program will convert such a
-*	text file into a batch file which can be executed by the Windows 9x
-*	command interpreter (COMMAND.COM) which does not recognize multiple
-*	commands on a single line.
+*   The makefiles provided with the Microsoft Visual C++ (C/C++) Run-Time
+*   Library Sources generate commands with multiple commands per line,
+*   separated by ampersands (&).  This program will convert such a
+*   text file into a batch file which can be executed by the Windows 9x
+*   command interpreter (COMMAND.COM) which does not recognize multiple
+*   commands on a single line.
 *
 *******************************************************************************/
 
@@ -18,115 +18,109 @@
 #include <string.h>
 
 
-int main(int argc, char **argv);
+int main(int argc, char** argv);
 
 
-#define MAXLINE	4096
+#define MAXLINE 4096
 
 char InBuf [ MAXLINE ] ;
 
 
-int main(int argc, char **argv)
-{
-	/*
-	 * If any arguments are given, print a usage message and exit
-	 */
+int main(int argc, char** argv) {
+    /*
+     * If any arguments are given, print a usage message and exit
+     */
+    if (argc != 1 || argv [ 1 ]) {
+        fprintf(stderr , "Usage: nmk2bat < input > output\n"
+                "This program takes no arguments\n") ;
+        exit(1) ;
+    }
 
-	if ( argc != 1 || argv [ 1 ] )
-	{
-		fprintf ( stderr , "Usage: nmk2bat < input > output\n"
-			"This program takes no arguments\n" ) ;
-		exit ( 1 ) ;
-	}
+    /*
+     * Batch file should be terse
+     */
+    printf("@echo off\n") ;
 
-	/*
-	 * Batch file should be terse
-	 */
+    /*
+     * Process each input line
+     */
 
-	printf ( "@echo off\n" ) ;
+    while (fgets(InBuf , sizeof(InBuf) , stdin)) {
+        char* pStart ;
+        char* pFinish ;
+        char* pNextPart ;
+        pStart = InBuf ;
+        pFinish = pStart + strlen(pStart) ;
 
-	/*
-	 * Process each input line
-	 */
+        /*
+         * Remove the trailing newline character from the
+         * input buffer.  This simplifies the line processing.
+         */
 
-	while ( fgets ( InBuf , sizeof ( InBuf ) , stdin ) )
-	{
-		char * pStart ;
-		char * pFinish ;
-		char * pNextPart ;
+        if (pFinish > pStart && pFinish [ -1 ] == '\n') {
+            pFinish [ -1 ] = '\0' ;
+        }
 
-		pStart = InBuf ;
-	
-		pFinish = pStart + strlen ( pStart ) ;
+        /*
+         * Process each part of the line.  Parts are delimited
+         * by ampersand characters with optional whitespace.
+         */
 
-		/*
-		 * Remove the trailing newline character from the
-		 * input buffer.  This simplifies the line processing.
-		 */
+        do {
+            /*
+             * Skip initial whitespace
+             */
+            while (* pStart == ' ' || * pStart == '\t') {
+                ++ pStart ;
+            }
 
-		if ( pFinish > pStart && pFinish [ -1 ] == '\n' )
-			pFinish [ -1 ] = '\0' ;
+            /*
+             * Find the next command separator or
+             * the end of line, whichever comes first
+             */
+            pNextPart = strchr(pStart , '&') ;
 
-		/*
-		 * Process each part of the line.  Parts are delimited
-		 * by ampersand characters with optional whitespace.
-		 */
+            if (! pNextPart) {
+                pNextPart = pStart + strlen(pStart) ;
+            }
 
-		do
-		{
-			/*
-			 * Skip initial whitespace
-			 */
+            pFinish = pNextPart ;
 
-			while ( * pStart == ' ' || * pStart == '\t' )
-				++ pStart ;
+            /*
+             * Skip blank lines and blank parts of lines
+             */
 
-			/*
-			 * Find the next command separator or
-			 * the end of line, whichever comes first
-			 */
+            if (pStart == pNextPart) {
+                break ;
+            }
 
-			pNextPart = strchr ( pStart , '&' ) ;
+            /*
+             * Skip the trailing whitespace
+             */
 
-			if ( ! pNextPart )
-				pNextPart = pStart + strlen ( pStart ) ;
-		
-			pFinish = pNextPart ;
+            while (pFinish > pStart
+                    && (pFinish [ -1 ] == ' ' || pFinish [ -1 ] == '\t')) {
+                -- pFinish ;
+            }
 
-			/*
-			 * Skip blank lines and blank parts of lines
-			 */
+            /*
+             * Copy to stdout the characters between
+             * the skipped initial whitespace and
+             * the skipped trailing whitespace
+             */
 
-			if ( pStart == pNextPart )
-				break ;
-			/*
-			 * Skip the trailing whitespace
-			 */
+            while (pStart < pFinish) {
+                putchar(* pStart ++) ;
+            }
 
-			while ( pFinish > pStart
-			&& ( pFinish [ -1 ] == ' ' || pFinish [ -1 ] == '\t' ) )
-				-- pFinish ;
+            putchar('\n') ;
+            /*
+             * We are done with this line when pNextPart
+             * points to a null character (rather than a '&').
+             */
+            pStart = pNextPart ;
+        } while (* pStart ++) ;
+    }
 
-			/*
-			 * Copy to stdout the characters between
-			 * the skipped initial whitespace and
-			 * the skipped trailing whitespace
-			 */
-
-			while ( pStart < pFinish )
-				putchar ( * pStart ++ ) ;
-
-			putchar ( '\n' ) ;
-
-			/*
-			 * We are done with this line when pNextPart
-			 * points to a null character (rather than a '&').
-			 */
-
-			pStart = pNextPart ;
-
-		} while ( * pStart ++ ) ;
-	}
-
-	return 0 ;
+    return 0 ;
 }

@@ -32,8 +32,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/vwscanf.c,v 1.1 2002/09/23 12:40:06 tjr E
 #include <wchar.h>
 
 int
-vwscanf(const wchar_t * __restrict fmt, va_list ap)
-{
-
-	return (vfwscanf(stdin, fmt, ap));
+vwscanf(const wchar_t* __restrict fmt, va_list ap) {
+    return (vfwscanf(stdin, fmt, ap));
 }

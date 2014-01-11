@@ -36,19 +36,16 @@
 *******************************************************************************/
 
 extern "C" int __cdecl _ismbchira_l(
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
+    unsigned int c,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
-    return(_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP && c >= 0x829f && c <= 0x82f1);
+    return (_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP && c >= 0x829f && c <= 0x82f1);
 }
 
 extern "C" int __cdecl _ismbchira(
-        unsigned int c
-        )
-{
+    unsigned int c
+) {
     return _ismbchira_l(c, NULL);
 }
 
@@ -69,19 +66,16 @@ extern "C" int __cdecl _ismbchira(
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _ismbckata_l (
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _ismbckata_l(
+    unsigned int c,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
-    return(_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP && c >= 0x8340 && c <= 0x8396 && c != 0x837f);
+    return (_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP && c >= 0x8340 && c <= 0x8396 && c != 0x837f);
 }
 extern "C" int __cdecl _ismbckata(
-        unsigned int c
-        )
-{
+    unsigned int c
+) {
     return _ismbckata_l(c, NULL);
 }
 
@@ -105,19 +99,16 @@ extern "C" int __cdecl _ismbckata(
 *******************************************************************************/
 
 extern "C" int __cdecl _ismbcsymbol_l(
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
+    unsigned int c,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
-    return(_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP && c >= 0x8141 && c <= 0x81ac && c != 0x817f);
+    return (_loc_update.GetLocaleT()->mbcinfo->mbcodepage == _KANJI_CP && c >= 0x8141 && c <= 0x81ac && c != 0x817f);
 }
 
 extern "C" int (__cdecl _ismbcsymbol)(
-        unsigned int c
-        )
-{
+    unsigned int c
+) {
     return _ismbcsymbol_l(c, NULL);
 }
 

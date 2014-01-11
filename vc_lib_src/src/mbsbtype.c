@@ -52,44 +52,41 @@
 
 extern "C" int __cdecl _mbsbtype_l
 (
-        const unsigned char *string,
-        size_t len,
-        _locale_t plocinfo
-)
-{
-        int chartype;
-        _LocaleUpdate _loc_update(plocinfo);
+    const unsigned char* string,
+    size_t len,
+    _locale_t plocinfo
+) {
+    int chartype;
+    _LocaleUpdate _loc_update(plocinfo);
+    /* validation section */
+    _VALIDATE_RETURN(string != NULL, EINVAL, _MBC_ILLEGAL);
 
-        /* validation section */
-        _VALIDATE_RETURN(string != NULL, EINVAL, _MBC_ILLEGAL);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return _MBC_SINGLE;
+    }
 
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return _MBC_SINGLE;
+    chartype = _MBC_ILLEGAL;
 
-        chartype = _MBC_ILLEGAL;
+    do {
+        /* If the char at the position asked for is a '\0' we return
+        _MBC_ILLEGAL. But, If any char before the position asked for is
+        a '\0', then we call invalid_param */
+        if ((len == 0) && (*string == '\0')) {
+            return (_MBC_ILLEGAL);
+        }
 
-        do
-        {
-            /* If the char at the position asked for is a '\0' we return
-            _MBC_ILLEGAL. But, If any char before the position asked for is
-            a '\0', then we call invalid_param */
+        _VALIDATE_RETURN(*string != '\0', EINVAL, _MBC_ILLEGAL);
+        chartype = _mbbtype_l(*string++, chartype, _loc_update.GetLocaleT());
+    }  while (len--);
 
-            if ((len == 0) && (*string == '\0'))
-                return(_MBC_ILLEGAL);
-
-            _VALIDATE_RETURN(*string != '\0', EINVAL, _MBC_ILLEGAL);
-            chartype = _mbbtype_l(*string++, chartype, _loc_update.GetLocaleT());
-        }  while (len--);
-
-        return(chartype);
+    return (chartype);
 }
 
 int (__cdecl _mbsbtype)(
-        const unsigned char *string,
-        size_t len
-        )
-{
-        return _mbsbtype_l(string, len, NULL);
+    const unsigned char* string,
+    size_t len
+) {
+    return _mbsbtype_l(string, len, NULL);
 }
 
 #endif  /* _MBCS */

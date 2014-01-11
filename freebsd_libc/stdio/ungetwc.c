@@ -42,36 +42,36 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/ungetwc.c,v 1.10 2005/08/20 07:59:13 stef
  * Non-MT-safe version.
  */
 wint_t
-__ungetwc(wint_t wc, FILE *fp)
-{
-	char buf[MB_LEN_MAX];
-	size_t len;
+__ungetwc(wint_t wc, FILE* fp) {
+    char buf[MB_LEN_MAX];
+    size_t len;
 
-	if (wc == WEOF)
-		return (WEOF);
-	if ((len = __wcrtomb(buf, wc, &fp->_extra->mbstate)) == (size_t)-1) {
-		fp->_flags |= __SERR;
-		return (WEOF);
-	}
-	while (len-- != 0)
-		if (__ungetc((unsigned char)buf[len], fp) == EOF)
-			return (WEOF);
+    if (wc == WEOF) {
+        return (WEOF);
+    }
 
-	return (wc);
+    if ((len = __wcrtomb(buf, wc, &fp->_extra->mbstate)) == (size_t) - 1) {
+        fp->_flags |= __SERR;
+        return (WEOF);
+    }
+
+    while (len-- != 0)
+        if (__ungetc((unsigned char)buf[len], fp) == EOF) {
+            return (WEOF);
+        }
+
+    return (wc);
 }
 
 /*
  * MT-safe version.
  */
 wint_t
-ungetwc(wint_t wc, FILE *fp)
-{
-	wint_t r;
-
-	FLOCKFILE(fp);
-	ORIENT(fp, 1);
-	r = __ungetwc(wc, fp);
-	FUNLOCKFILE(fp);
-
-	return (r);
+ungetwc(wint_t wc, FILE* fp) {
+    wint_t r;
+    FLOCKFILE(fp);
+    ORIENT(fp, 1);
+    r = __ungetwc(wc, fp);
+    FUNLOCKFILE(fp);
+    return (r);
 }

@@ -36,14 +36,16 @@
 ******************************************************************************/
 
 BOOL WINAPI DllMain(
-        HANDLE  hDllHandle,
-        DWORD   dwReason,
-        LPVOID  lpreserved
-        )
-{
+    HANDLE  hDllHandle,
+    DWORD   dwReason,
+    LPVOID  lpreserved
+) {
 #if defined (CRTDLL)
-        if ( dwReason == DLL_PROCESS_ATTACH && ! _pRawDllMain )
-                DisableThreadLibraryCalls(hDllHandle);
+
+    if (dwReason == DLL_PROCESS_ATTACH && ! _pRawDllMain) {
+        DisableThreadLibraryCalls(hDllHandle);
+    }
+
 #endif  /* defined (CRTDLL) */
-        return TRUE ;
+    return TRUE ;
 }

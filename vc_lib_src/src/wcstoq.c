@@ -70,196 +70,195 @@ extern "C" int _wchartodigit(wchar_t ch);
 #define FL_OVERFLOW   4       /* overflow occured */
 #define FL_READDIGIT  8       /* we've read at least one correct digit */
 
-static unsigned __int64 __cdecl wcstoxq (
-        _locale_t plocinfo,
-        const wchar_t *nptr,
-        const wchar_t **endptr,
-        int ibase,
-        int flags
-        )
-{
-        const wchar_t *p;
-        wchar_t c;
-        unsigned __int64 number;
-        unsigned digval;
-        unsigned __int64 maxval;
+static unsigned __int64 __cdecl wcstoxq(
+    _locale_t plocinfo,
+    const wchar_t* nptr,
+    const wchar_t** endptr,
+    int ibase,
+    int flags
+) {
+    const wchar_t* p;
+    wchar_t c;
+    unsigned __int64 number;
+    unsigned digval;
+    unsigned __int64 maxval;
     _LocaleUpdate _loc_update(plocinfo);
 
-
     /* validation section */
-    if (endptr != NULL)
-    {
+    if (endptr != NULL) {
         /* store beginning of string in endptr */
         *endptr = nptr;
     }
+
     _VALIDATE_RETURN(nptr != NULL, EINVAL, 0L);
     _VALIDATE_RETURN(ibase == 0 || (2 <= ibase && ibase <= 36), EINVAL, 0L);
-
     p = nptr;                   /* p is our scanning pointer */
-        number = 0;                     /* start with zero */
+    number = 0;                     /* start with zero */
+    c = *p++;                       /* read wchar_t */
 
-        c = *p++;                       /* read wchar_t */
-
-    while ( _iswspace_l(c, _loc_update.GetLocaleT()) )
-                c = *p++;               /* skip whitespace */
-
-        if (c == '-') {
-                flags |= FL_NEG;        /* remember minus sign */
-                c = *p++;
-        }
-        else if (c == '+')
-                c = *p++;               /* skip sign */
-
-        if (ibase < 0 || ibase == 1 || ibase > 36) {
-                /* bad base! */
-                if (endptr)
-                        /* store beginning of string in endptr */
-                        *endptr = nptr;
-                return 0L;              /* return 0 */
-        }
-        else if (ibase == 0) {
-                /* determine base free-lance, based on first two chars of
-                   string */
-                if (_wchartodigit(c) != 0)
-                        ibase = 10;
-                else if (*p == 'x' || *p == 'X')
-                        ibase = 16;
-                else
-                        ibase = 8;
-        }
-
-        if (ibase == 16) {
-                /* we might have 0x in front of number; remove if there */
-        if (_wchartodigit(c) == 0 && (*p == L'x' || *p == L'X')) {
-                        ++p;
-                        c = *p++;       /* advance past prefix */
-                }
-        }
-
-        /* if our number exceeds this, we will overflow on multiply */
-        maxval = _UI64_MAX / ibase;
-
-
-        for (;;) {      /* exit in middle of loop */
-                /* convert c to value */
-                if ( (digval = _wchartodigit(c)) != -1 )
-                        ;
-                else if ( __ascii_iswalpha(c) )
-                        digval = __ascii_towupper(c) - L'A' + 10;
-                else
-                        break;
-                if (digval >= (unsigned)ibase)
-                        break;          /* exit loop if bad digit found */
-
-                /* record the fact we have read one digit */
-                flags |= FL_READDIGIT;
-
-                /* we now need to compute number = number * base + digval,
-                   but we need to know if overflow occured.  This requires
-                   a tricky pre-check. */
-
-                if (number < maxval || (number == maxval &&
-                (unsigned __int64)digval <= _UI64_MAX % ibase)) {
-                        /* we won't overflow, go ahead and multiply */
-                        number = number * ibase + digval;
-                }
-                else {
-                        /* we would have overflowed -- set the overflow flag */
-                        flags |= FL_OVERFLOW;
-                        if (endptr == NULL) {
-                                /* no need to keep on parsing if we
-                                   don't have to return the endptr. */
-                                break;
-                        }
-                }
-
-                c = *p++;               /* read next digit */
-        }
-
-        --p;                            /* point to place that stopped scan */
-
-        if (!(flags & FL_READDIGIT)) {
-                /* no number there; return 0 and point to beginning of
-                   string */
-                if (endptr)
-                        /* store beginning of string in endptr later on */
-                        p = nptr;
-                number = 0L;            /* return 0 */
-        }
-    else if ( (flags & FL_OVERFLOW) ||
-              ( !(flags & FL_UNSIGNED) &&
-                ( ( (flags & FL_NEG) && (number > -_I64_MIN) ) ||
-                  ( !(flags & FL_NEG) && (number > _I64_MAX) ) ) ) )
-    {
-        /* overflow or signed overflow occurred */
-        errno = ERANGE;
-        if ( flags & FL_UNSIGNED )
-            number = _UI64_MAX;
-        else if ( flags & FL_NEG )
-            number = (_I64_MIN);
-        else
-            number = _I64_MAX;
+    while (_iswspace_l(c, _loc_update.GetLocaleT())) {
+        c = *p++;    /* skip whitespace */
     }
 
-        if (endptr != NULL)
-                /* store pointer to wchar_t that stopped the scan */
-                *endptr = p;
+    if (c == '-') {
+        flags |= FL_NEG;        /* remember minus sign */
+        c = *p++;
+    } else if (c == '+') {
+        c = *p++;    /* skip sign */
+    }
 
-        if (flags & FL_NEG)
-                /* negate result if there was a neg sign */
-                number = (unsigned __int64)(-(__int64)number);
+    if (ibase < 0 || ibase == 1 || ibase > 36) {
+        /* bad base! */
+        if (endptr)
+            /* store beginning of string in endptr */
+        {
+            *endptr = nptr;
+        }
 
-        return number;                  /* done. */
+        return 0L;              /* return 0 */
+    } else if (ibase == 0) {
+        /* determine base free-lance, based on first two chars of
+           string */
+        if (_wchartodigit(c) != 0) {
+            ibase = 10;
+        } else if (*p == 'x' || *p == 'X') {
+            ibase = 16;
+        } else {
+            ibase = 8;
+        }
+    }
+
+    if (ibase == 16) {
+        /* we might have 0x in front of number; remove if there */
+        if (_wchartodigit(c) == 0 && (*p == L'x' || *p == L'X')) {
+            ++p;
+            c = *p++;       /* advance past prefix */
+        }
+    }
+
+    /* if our number exceeds this, we will overflow on multiply */
+    maxval = _UI64_MAX / ibase;
+
+    for (;;) {      /* exit in middle of loop */
+        /* convert c to value */
+        if ((digval = _wchartodigit(c)) != -1)
+            ;
+        else if (__ascii_iswalpha(c)) {
+            digval = __ascii_towupper(c) - L'A' + 10;
+        } else {
+            break;
+        }
+
+        if (digval >= (unsigned)ibase) {
+            break;    /* exit loop if bad digit found */
+        }
+
+        /* record the fact we have read one digit */
+        flags |= FL_READDIGIT;
+
+        /* we now need to compute number = number * base + digval,
+           but we need to know if overflow occured.  This requires
+           a tricky pre-check. */
+
+        if (number < maxval || (number == maxval &&
+                                (unsigned __int64)digval <= _UI64_MAX % ibase)) {
+            /* we won't overflow, go ahead and multiply */
+            number = number * ibase + digval;
+        } else {
+            /* we would have overflowed -- set the overflow flag */
+            flags |= FL_OVERFLOW;
+
+            if (endptr == NULL) {
+                /* no need to keep on parsing if we
+                   don't have to return the endptr. */
+                break;
+            }
+        }
+
+        c = *p++;               /* read next digit */
+    }
+
+    --p;                            /* point to place that stopped scan */
+
+    if (!(flags & FL_READDIGIT)) {
+        /* no number there; return 0 and point to beginning of
+           string */
+        if (endptr)
+            /* store beginning of string in endptr later on */
+        {
+            p = nptr;
+        }
+
+        number = 0L;            /* return 0 */
+    } else if ((flags & FL_OVERFLOW) ||
+               (!(flags & FL_UNSIGNED) &&
+                (((flags & FL_NEG) && (number > -_I64_MIN)) ||
+                 (!(flags & FL_NEG) && (number > _I64_MAX))))) {
+        /* overflow or signed overflow occurred */
+        errno = ERANGE;
+
+        if (flags & FL_UNSIGNED) {
+            number = _UI64_MAX;
+        } else if (flags & FL_NEG) {
+            number = (_I64_MIN);
+        } else {
+            number = _I64_MAX;
+        }
+    }
+
+    if (endptr != NULL)
+        /* store pointer to wchar_t that stopped the scan */
+    {
+        *endptr = p;
+    }
+
+    if (flags & FL_NEG)
+        /* negate result if there was a neg sign */
+    {
+        number = (unsigned __int64)(-(__int64)number);
+    }
+
+    return number;                  /* done. */
 }
 
 
 extern "C" __int64 _CRTIMP __cdecl _wcstoi64(
-    const wchar_t *nptr,
-    wchar_t **endptr,
+    const wchar_t* nptr,
+    wchar_t** endptr,
     int ibase
-    )
-{
-    if (__locale_changed == 0)
-    {
-        return (__int64) wcstoxq(&__initiallocalestructinfo, nptr, (const wchar_t **)endptr, ibase, 0);
-}
-    else
-    {
-        return (__int64) wcstoxq(NULL, nptr, (const wchar_t **)endptr, ibase, 0);
+) {
+    if (__locale_changed == 0) {
+        return (__int64) wcstoxq(&__initiallocalestructinfo, nptr, (const wchar_t**)endptr, ibase, 0);
+    } else {
+        return (__int64) wcstoxq(NULL, nptr, (const wchar_t**)endptr, ibase, 0);
     }
 }
 extern "C" __int64 _CRTIMP __cdecl _wcstoi64_l(
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase,
-        _locale_t plocinfo
-        )
-{
-    return (__int64) wcstoxq(plocinfo, nptr, (const wchar_t **)endptr, ibase, 0);
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase,
+    _locale_t plocinfo
+) {
+    return (__int64) wcstoxq(plocinfo, nptr, (const wchar_t**)endptr, ibase, 0);
 }
 
-extern "C" unsigned __int64 _CRTIMP __cdecl _wcstoui64 (
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase
-        )
-{
-    if (__locale_changed == 0)
-    {
-        return wcstoxq(&__initiallocalestructinfo, nptr, (const wchar_t **)endptr, ibase, FL_UNSIGNED);
-    }
-    else
-    {
-        return wcstoxq(NULL, nptr, (const wchar_t **)endptr, ibase, FL_UNSIGNED);
+extern "C" unsigned __int64 _CRTIMP __cdecl _wcstoui64(
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase
+) {
+    if (__locale_changed == 0) {
+        return wcstoxq(&__initiallocalestructinfo, nptr, (const wchar_t**)endptr, ibase, FL_UNSIGNED);
+    } else {
+        return wcstoxq(NULL, nptr, (const wchar_t**)endptr, ibase, FL_UNSIGNED);
     }
 }
 
-extern "C" unsigned __int64 _CRTIMP __cdecl _wcstoui64_l (
-        const wchar_t *nptr,
-        wchar_t **endptr,
-        int ibase,
-        _locale_t plocinfo
-        )
-{
-    return wcstoxq(plocinfo, nptr, (const wchar_t **)endptr, ibase, FL_UNSIGNED);
+extern "C" unsigned __int64 _CRTIMP __cdecl _wcstoui64_l(
+    const wchar_t* nptr,
+    wchar_t** endptr,
+    int ibase,
+    _locale_t plocinfo
+) {
+    return wcstoxq(plocinfo, nptr, (const wchar_t**)endptr, ibase, FL_UNSIGNED);
 }

@@ -45,45 +45,45 @@
 *******************************************************************************/
 
 
-extern "C" _CONST_RETURN unsigned char * __cdecl _mbschr_l(
-        const unsigned char *string,
-        unsigned int c,
-        _locale_t plocinfo
-        )
-{
-        unsigned short cc;
-        _LocaleUpdate _loc_update(plocinfo);
+extern "C" _CONST_RETURN unsigned char* __cdecl _mbschr_l(
+    const unsigned char* string,
+    unsigned int c,
+    _locale_t plocinfo
+) {
+    unsigned short cc;
+    _LocaleUpdate _loc_update(plocinfo);
+    /* validation section */
+    _VALIDATE_RETURN(string != NULL, EINVAL, NULL);
 
-        /* validation section */
-        _VALIDATE_RETURN(string != NULL, EINVAL, NULL);
+    if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0) {
+        return (_CONST_RETURN unsigned char*)strchr((const char*)string, (int)c);
+    }
 
-        if (_loc_update.GetLocaleT()->mbcinfo->ismbcodepage == 0)
-            return (_CONST_RETURN unsigned char *)strchr((const char *)string, (int)c);
-
-        for (; (cc = *string); string++)
-        {
-            if ( _ismbblead_l(cc, _loc_update.GetLocaleT()) )
-            {
-                if (*++string == '\0')
-                    return NULL;        /* error */
-                if ( c == (unsigned int)((cc << 8) | *string) ) /* DBCS match */
-                    return (unsigned char *)(string - 1);
+    for (; (cc = *string); string++) {
+        if (_ismbblead_l(cc, _loc_update.GetLocaleT())) {
+            if (*++string == '\0') {
+                return NULL;    /* error */
             }
-            else if (c == (unsigned int)cc)
-                break;  /* SBCS match */
+
+            if (c == (unsigned int)((cc << 8) | *string)) { /* DBCS match */
+                return (unsigned char*)(string - 1);
+            }
+        } else if (c == (unsigned int)cc) {
+            break;    /* SBCS match */
         }
+    }
 
-        if (c == (unsigned int)cc)      /* check for SBCS match--handles NUL char */
-            return (unsigned char *)(string);
+    if (c == (unsigned int)cc) {    /* check for SBCS match--handles NUL char */
+        return (unsigned char*)(string);
+    }
 
-        return NULL;
+    return NULL;
 }
 
-extern "C" _CONST_RETURN unsigned char * (__cdecl _mbschr)(
-        const unsigned char *string,
-        unsigned int c
-        )
-{
+extern "C" _CONST_RETURN unsigned char* (__cdecl _mbschr)(
+    const unsigned char* string,
+    unsigned int c
+) {
     return _mbschr_l(string, c, NULL);
 }
 

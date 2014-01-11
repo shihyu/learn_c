@@ -47,8 +47,8 @@
  */
 
 typedef struct {
-        FILE *stream;
-        intptr_t prochnd;
+    FILE* stream;
+    intptr_t prochnd;
 } IDpair;
 
 /* number of entries in idpairs table
@@ -62,15 +62,15 @@ extern unsigned __idtabsiz;
 /* pointer to first table entry
  */
 #ifndef _UNICODE
-IDpair *__idpairs = NULL;
+IDpair* __idpairs = NULL;
 #else  /* _UNICODE */
-extern IDpair *__idpairs;
+extern IDpair* __idpairs;
 #endif  /* _UNICODE */
 
 /* function to find specified table entries. also, creates and maintains
  * the table.
  */
-static IDpair * __cdecl idtab(FILE *);
+static IDpair* __cdecl idtab(FILE*);
 
 
 /***
@@ -101,199 +101,180 @@ static IDpair * __cdecl idtab(FILE *);
 *
 *******************************************************************************/
 
-FILE * __cdecl _tpopen (
-        const _TSCHAR *cmdstring,
-        const _TSCHAR *type
-        )
-{
+FILE* __cdecl _tpopen(
+    const _TSCHAR* cmdstring,
+    const _TSCHAR* type
+) {
+    int phdls[2];             /* I/O handles for pipe */
+    int ph_open[2];           /* flags, set if correspond phdls is open */
+    int i1;                   /* index into phdls[] */
+    int i2;                   /* index into phdls[] */
+    int tm = 0;               /* flag indicating text or binary mode */
+    int stdhdl;               /* either STDIN or STDOUT */
+    HANDLE newhnd;            /* ...in calls to DuplicateHandle API */
+    FILE* pstream = NULL;     /* stream to be associated with pipe */
+    HANDLE prochnd;           /* handle for current process */
+    _TSCHAR* cmdexe;          /* pathname for the command processor */
+    _TSCHAR* envbuf = NULL;   /* buffer for the env variable */
+    intptr_t childhnd;        /* handle for child process (cmd.exe) */
+    IDpair* locidpair;        /* pointer to IDpair table entry */
+    _TSCHAR* buf = NULL, *pfin, *env;
+    _TSCHAR* CommandLine;
+    size_t CommandLineSize = 0;
+    _TSCHAR _type[3] = {0, 0, 0};
+    /* Info for spawning the child. */
+    STARTUPINFO StartupInfo;  /* Info for spawning a child */
+    BOOL childstatus = 0;
+    PROCESS_INFORMATION ProcessInfo; /* child process information */
+    errno_t save_errno;
+    int fh_lock_held = 0;
+    int popen_lock_held = 0;
+    /* first check for errors in the arguments
+     */
+    _VALIDATE_RETURN((cmdstring != NULL), EINVAL, NULL);
+    _VALIDATE_RETURN((type != NULL), EINVAL, NULL);
 
-        int phdls[2];             /* I/O handles for pipe */
-        int ph_open[2];           /* flags, set if correspond phdls is open */
-        int i1;                   /* index into phdls[] */
-        int i2;                   /* index into phdls[] */
+    while (*type == _T(' ')) {
+        type++;
+    }
 
-        int tm = 0;               /* flag indicating text or binary mode */
+    _VALIDATE_RETURN(((*type == _T('w')) || (*type == _T('r'))), EINVAL, NULL);
+    _type[0] = *type;
+    ++type;
 
-        int stdhdl;               /* either STDIN or STDOUT */
-
-        HANDLE newhnd;            /* ...in calls to DuplicateHandle API */
-
-        FILE *pstream = NULL;     /* stream to be associated with pipe */
-
-        HANDLE prochnd;           /* handle for current process */
-
-        _TSCHAR *cmdexe;          /* pathname for the command processor */
-        _TSCHAR *envbuf = NULL;   /* buffer for the env variable */
-        intptr_t childhnd;        /* handle for child process (cmd.exe) */
-
-        IDpair *locidpair;        /* pointer to IDpair table entry */
-        _TSCHAR *buf = NULL, *pfin, *env;
-        _TSCHAR *CommandLine;
-        size_t CommandLineSize = 0;
-        _TSCHAR _type[3] = {0, 0, 0};
-
-        /* Info for spawning the child. */
-        STARTUPINFO StartupInfo;  /* Info for spawning a child */
-        BOOL childstatus = 0;
-        PROCESS_INFORMATION ProcessInfo; /* child process information */
-
-        errno_t save_errno;
-
-        int fh_lock_held = 0;
-        int popen_lock_held = 0;
-
-        /* first check for errors in the arguments
-         */
-        _VALIDATE_RETURN((cmdstring != NULL), EINVAL,NULL);
-        _VALIDATE_RETURN((type != NULL), EINVAL,NULL);
-
-        while (*type == _T(' '))
-        {
-            type++;
-        }
-        _VALIDATE_RETURN(((*type == _T('w')) || (*type == _T('r'))), EINVAL,NULL);
-        _type[0] = *type;
+    while (*type == _T(' ')) {
         ++type;
-        while (*type == _T(' '))
-        {
-            ++type;
-        }
-        _VALIDATE_RETURN(((*type == 0) || (*type == _T('t')) || (*type == _T('b'))), EINVAL, NULL);
-        _type[1] = *type;
+    }
 
-        /* do the _pipe(). note that neither of the resulting handles will
-         * be inheritable.
-         */
+    _VALIDATE_RETURN(((*type == 0) || (*type == _T('t')) || (*type == _T('b'))), EINVAL, NULL);
+    _type[1] = *type;
 
-        if ( _type[1] == _T('t') )
-                tm = _O_TEXT;
-        else if ( _type[1] == _T('b') )
-                tm = _O_BINARY;
+    /* do the _pipe(). note that neither of the resulting handles will
+     * be inheritable.
+     */
 
-        tm |= _O_NOINHERIT;
+    if (_type[1] == _T('t')) {
+        tm = _O_TEXT;
+    } else if (_type[1] == _T('b')) {
+        tm = _O_BINARY;
+    }
 
-        if ( _pipe( phdls, PSIZE, tm ) == -1 )
-                goto error1;
+    tm |= _O_NOINHERIT;
 
-        /* test _type[0] and set stdhdl, i1 and i2 accordingly.
-         */
-        if ( _type[0] == _T('w') ) {
-                stdhdl = STDIN;
-                i1 = 0;
-                i2 = 1;
-        }
-        else {
-                stdhdl = STDOUT;
-                i1 = 1;
-                i2 = 0;
-        }
+    if (_pipe(phdls, PSIZE, tm) == -1) {
+        goto error1;
+    }
 
-        /* ASSERT LOCK FOR IDPAIRS HERE!!!!
-         */
-        if ( !_mtinitlocknum( _POPEN_LOCK )) {
-            _close( phdls[0] );
-            _close( phdls[1] );
-            return NULL;
-        }
-        _mlock( _POPEN_LOCK );
-        __try
-        {
+    /* test _type[0] and set stdhdl, i1 and i2 accordingly.
+     */
+    if (_type[0] == _T('w')) {
+        stdhdl = STDIN;
+        i1 = 0;
+        i2 = 1;
+    } else {
+        stdhdl = STDOUT;
+        i1 = 1;
+        i2 = 0;
+    }
 
+    /* ASSERT LOCK FOR IDPAIRS HERE!!!!
+     */
+    if (!_mtinitlocknum(_POPEN_LOCK)) {
+        _close(phdls[0]);
+        _close(phdls[1]);
+        return NULL;
+    }
+
+    _mlock(_POPEN_LOCK);
+
+    __try {
         /* set flags to indicate pipe handles are open. note, these are only
          * used for error recovery.
          */
         ph_open[ 0 ] = ph_open[ 1 ] = 1;
-
-
         /* get the process handle, it will be needed in some API calls
          */
         prochnd = GetCurrentProcess();
 
-
-
-        if ( !DuplicateHandle( prochnd,
-                               (HANDLE)_osfhnd( phdls[i1] ),
-                               prochnd,
-                               &newhnd,
-                               0L,
-                               TRUE,                    /* inheritable */
-                               DUPLICATE_SAME_ACCESS )
-        ) {
-                goto error2;
+        if (!DuplicateHandle(prochnd,
+                             (HANDLE)_osfhnd(phdls[i1]),
+                             prochnd,
+                             &newhnd,
+                             0L,
+                             TRUE,                    /* inheritable */
+                             DUPLICATE_SAME_ACCESS)
+           ) {
+            goto error2;
         }
-        (void)_close( phdls[i1] );
+
+        (void)_close(phdls[i1]);
         ph_open[ i1 ] = 0;
 
         /* associate a stream with phdls[i2]. note that if there are no
          * errors, pstream is the return value to the caller.
          */
-        if ( (pstream = _tfdopen( phdls[i2], _type )) == NULL )
-                goto error2;
+        if ((pstream = _tfdopen(phdls[i2], _type)) == NULL) {
+            goto error2;
+        }
 
         /* next, set locidpair to a free entry in the idpairs table.
          */
-        if ( (locidpair = idtab( NULL )) == NULL )
-                goto error3;
-
+        if ((locidpair = idtab(NULL)) == NULL) {
+            goto error3;
+        }
 
         /* Find what to use. command.com or cmd.exe */
-        if ( (_ERRCHECK_EINVAL(_tdupenv_s_crt(&envbuf, NULL, _T("COMSPEC"))) != 0) || (envbuf == NULL) )
-        {
+        if ((_ERRCHECK_EINVAL(_tdupenv_s_crt(&envbuf, NULL, _T("COMSPEC"))) != 0) || (envbuf == NULL)) {
             unsigned int osver = 0;
             _get_osver(&osver);
-            cmdexe = ( osver & 0x8000 ) ? _T("command.com") : _T("cmd.exe");
-        }
-        else
-        {
+            cmdexe = (osver & 0x8000) ? _T("command.com") : _T("cmd.exe");
+        } else {
             cmdexe = envbuf;
         }
 
         /*
          * Initialise the variable for passing to CreateProcess
          */
-
         memset(&StartupInfo, 0, sizeof(StartupInfo));
         StartupInfo.cb = sizeof(StartupInfo);
-
         /* Used by os for duplicating the Handles. */
-
         StartupInfo.dwFlags = STARTF_USESTDHANDLES;
         StartupInfo.hStdInput = stdhdl == STDIN ? (HANDLE) newhnd
-                                                : (HANDLE) _osfhnd(0);
+                                : (HANDLE) _osfhnd(0);
         StartupInfo.hStdOutput = stdhdl == STDOUT ? (HANDLE) newhnd
-                                                  : (HANDLE) _osfhnd(1);
+                                 : (HANDLE) _osfhnd(1);
         StartupInfo.hStdError = (HANDLE) _osfhnd(2);
+        CommandLineSize = _tcslen(cmdexe) + _tcslen(_T(" /c ")) + (_tcslen(cmdstring)) + 1;
 
-
-        CommandLineSize = _tcslen(cmdexe) + _tcslen(_T(" /c ")) + (_tcslen(cmdstring)) +1;
-        if ((CommandLine = _calloc_crt( CommandLineSize, sizeof(_TSCHAR))) == NULL)
+        if ((CommandLine = _calloc_crt(CommandLineSize, sizeof(_TSCHAR))) == NULL) {
             goto error3;
+        }
+
         _ERRCHECK(_tcscpy_s(CommandLine, CommandLineSize, cmdexe));
         _ERRCHECK(_tcscat_s(CommandLine, CommandLineSize, _T(" /c ")));
         _ERRCHECK(_tcscat_s(CommandLine, CommandLineSize, cmdstring));
-
         /* Check if cmdexe can be accessed. If yes CreateProcess else try
          * searching path.
          */
         save_errno = errno;
+
         if (_taccess_s(cmdexe, 0) == 0) {
-            childstatus = CreateProcess( (LPTSTR) cmdexe,
-                                         (LPTSTR) CommandLine,
-                                         NULL,
-                                         NULL,
-                                         TRUE,
-                                         0,
-                                         NULL,
-                                         NULL,
-                                         &StartupInfo,
-                                         &ProcessInfo
-                                         );
-        }
-        else {
+            childstatus = CreateProcess((LPTSTR) cmdexe,
+                                        (LPTSTR) CommandLine,
+                                        NULL,
+                                        NULL,
+                                        TRUE,
+                                        0,
+                                        NULL,
+                                        NULL,
+                                        &StartupInfo,
+                                        &ProcessInfo
+                                       );
+        } else {
             TCHAR* envPath = NULL;
             size_t envPathSize = 0;
-            if ((buf = _calloc_crt(_MAX_PATH, sizeof(_TSCHAR))) == NULL)
-            {
+
+            if ((buf = _calloc_crt(_MAX_PATH, sizeof(_TSCHAR))) == NULL) {
                 _free_crt(buf);
                 _free_crt(CommandLine);
                 _free_crt(envbuf);
@@ -301,8 +282,8 @@ FILE * __cdecl _tpopen (
                 errno = save_errno;
                 goto error3;
             }
-            if (_ERRCHECK_EINVAL(_tdupenv_s_crt(&envPath, NULL, _T("PATH"))) != 0)
-            {
+
+            if (_ERRCHECK_EINVAL(_tdupenv_s_crt(&envPath, NULL, _T("PATH"))) != 0) {
                 _free_crt(envPath);
                 _free_crt(buf);
                 _free_crt(CommandLine);
@@ -311,112 +292,123 @@ FILE * __cdecl _tpopen (
                 errno = save_errno;
                 goto error3;
             }
+
             env = envPath;
-
 #ifdef WPRFLAG
-            while ( (env = _wgetpath(env, buf, _MAX_PATH -1)) && (*buf) ) {
-#else  /* WPRFLAG */
-            while ( (env = _getpath(env, buf, _MAX_PATH -1)) && (*buf) ) {
-#endif  /* WPRFLAG */
-                pfin = buf + _tcslen(buf) -1;
 
+            while ((env = _wgetpath(env, buf, _MAX_PATH - 1)) && (*buf)) {
+#else  /* WPRFLAG */
+
+            while ((env = _getpath(env, buf, _MAX_PATH - 1)) && (*buf)) {
+#endif  /* WPRFLAG */
+                pfin = buf + _tcslen(buf) - 1;
 #ifdef _MBCS
+
                 if (*pfin == SLASHCHAR) {
-                    if (pfin != _mbsrchr(buf, SLASHCHAR))
+                    if (pfin != _mbsrchr(buf, SLASHCHAR)) {
                         _ERRCHECK(strcat_s(buf, _MAX_PATH, SLASH));
-                }
-                else if (*pfin != XSLASHCHAR)
+                    }
+                } else if (*pfin != XSLASHCHAR) {
                     _ERRCHECK(strcat_s(buf, _MAX_PATH, SLASH));
+                }
 
 #else  /* _MBCS */
-                if (*pfin != SLASHCHAR && *pfin != XSLASHCHAR)
+
+                if (*pfin != SLASHCHAR && *pfin != XSLASHCHAR) {
                     _ERRCHECK(_tcscat_s(buf, _MAX_PATH, SLASH));
+                }
+
 #endif  /* _MBCS */
+
                 /* check that the final path will be of legal size. if so,
                  * build it. otherwise, return to the caller (return value
                  * and errno rename set from initial call to _spawnve()).
                  */
-                if ( (_tcslen(buf) + _tcslen(cmdexe)) < _MAX_PATH )
+                if ((_tcslen(buf) + _tcslen(cmdexe)) < _MAX_PATH) {
                     _ERRCHECK(_tcscat_s(buf, _MAX_PATH, cmdexe));
-                else
+                } else {
                     break;
+                }
 
                 /* Check if buf can be accessed. If yes CreateProcess else try
                  * again.
                  */
                 if (_taccess_s(buf, 0) == 0) {
-                    childstatus = CreateProcess( (LPTSTR) buf,
-                                                 CommandLine,
-                                                 NULL,
-                                                 NULL,
-                                                 TRUE,
-                                                 0,
-                                                 NULL,
-                                                 NULL,
-                                                 &StartupInfo,
-                                                 &ProcessInfo
-                                                 );
+                    childstatus = CreateProcess((LPTSTR) buf,
+                                                CommandLine,
+                                                NULL,
+                                                NULL,
+                                                TRUE,
+                                                0,
+                                                NULL,
+                                                NULL,
+                                                &StartupInfo,
+                                                &ProcessInfo
+                                               );
                     break;
                 }
             }
+
             _free_crt(envPath);
             _free_crt(buf);
         }
+
         _free_crt(CommandLine);
         _free_crt(envbuf);
         cmdexe = NULL;
         CloseHandle((HANDLE)newhnd);
         CloseHandle((HANDLE)ProcessInfo.hThread);
-                errno = save_errno;
+        errno = save_errno;
 
         /* check if the CreateProcess was sucessful.
          */
-        if ( childstatus)
+        if (childstatus) {
             childhnd = (intptr_t)ProcessInfo.hProcess;
-        else
+        } else {
             goto error4;
+        }
+
         locidpair->prochnd = childhnd;
         locidpair->stream = pstream;
-
         /* success, return the stream to the caller
          */
         goto done;
-
         /**
          * error handling code. all detected errors end up here, entering
          * via a goto one of the labels. note that the logic is currently
          * a straight fall-thru scheme (e.g., if entered at error4, the
          * code for error4, error3,...,error1 is all executed).
          **********************************************************************/
-
-error4:         /* make sure locidpair is reusable
+    error4:         /* make sure locidpair is reusable
                  */
-                locidpair->stream = NULL;
-
-error3:         /* close pstream (also, clear ph_open[i2] since the stream
+        locidpair->stream = NULL;
+    error3:         /* close pstream (also, clear ph_open[i2] since the stream
                  * close will also close the pipe handle)
                  */
-                (void)fclose( pstream );
-                ph_open[ i2 ] = 0;
-                pstream = NULL;
-
-error2:         /* close handles on pipe (if they are still open)
+        (void)fclose(pstream);
+        ph_open[ i2 ] = 0;
+        pstream = NULL;
+    error2:         /* close handles on pipe (if they are still open)
                  */
 
-                if ( ph_open[i1] )
-                        _close( phdls[i1] );
-                if ( ph_open[i2] )
-                        _close( phdls[i2] );
-done:
-
-        ;}
-        __finally {
-            _munlock(_POPEN_LOCK);
+        if (ph_open[i1]) {
+            _close(phdls[i1]);
         }
 
+        if (ph_open[i2]) {
+            _close(phdls[i2]);
+        }
+
+    done:
+        ;
+    }
+
+    __finally {
+        _munlock(_POPEN_LOCK);
+    }
 
 error1:
-        return pstream;
+    return pstream;
 }
 
 #ifndef _UNICODE
@@ -446,59 +438,58 @@ error1:
 *
 *******************************************************************************/
 
-int __cdecl _pclose (
-        FILE *pstream
-        )
-{
-        IDpair *locidpair;        /* pointer to entry in idpairs table */
-        int termstat;             /* termination status word */
-        int retval = -1;          /* return value (to caller) */
-        errno_t save_errno;
+int __cdecl _pclose(
+    FILE* pstream
+) {
+    IDpair* locidpair;        /* pointer to entry in idpairs table */
+    int termstat;             /* termination status word */
+    int retval = -1;          /* return value (to caller) */
+    errno_t save_errno;
+    _VALIDATE_RETURN((pstream != NULL), EINVAL, -1);
 
-        _VALIDATE_RETURN((pstream != NULL), EINVAL, -1);
+    if (!_mtinitlocknum(_POPEN_LOCK)) {
+        return -1;
+    }
 
-        if (!_mtinitlocknum(_POPEN_LOCK))
-            return -1;
-        _mlock(_POPEN_LOCK);
-        __try {
+    _mlock(_POPEN_LOCK);
 
-        if ((locidpair = idtab(pstream)) == NULL)
-        {
-                /* invalid pstream, exit with retval == -1
-                 */
-                errno = EBADF;
-                goto done;
+    __try {
+        if ((locidpair = idtab(pstream)) == NULL) {
+            /* invalid pstream, exit with retval == -1
+             */
+            errno = EBADF;
+            goto done;
         }
 
         /* close pstream
          */
         (void)fclose(pstream);
-
         /* wait on the child (copy of the command processor) and all of its
          * children.
          */
         save_errno = errno;
         errno = 0;
-        if ( (_cwait(&termstat, locidpair->prochnd, _WAIT_GRANDCHILD) != -1) ||
-             (errno == EINTR) )
-                retval = termstat;
-        errno = save_errno;
 
+        if ((_cwait(&termstat, locidpair->prochnd, _WAIT_GRANDCHILD) != -1) ||
+                (errno == EINTR)) {
+            retval = termstat;
+        }
+
+        errno = save_errno;
         /* Mark the IDpairtable entry as free (note: prochnd was closed by the
          * preceding call to _cwait).
          */
         locidpair->stream = NULL;
         locidpair->prochnd = 0;
-
         /* only return path!
          */
-        done:
+    done:
+        ;
+    } __finally {
+        _munlock(_POPEN_LOCK);
+    }
 
-        ; }
-        __finally {
-            _munlock(_POPEN_LOCK);
-        }
-        return(retval);
+    return (retval);
 }
 
 #endif  /* _UNICODE */
@@ -528,50 +519,49 @@ int __cdecl _pclose (
 *
 *******************************************************************************/
 
-static IDpair * __cdecl idtab (
-        FILE *pstream
-        )
-{
+static IDpair* __cdecl idtab(
+    FILE* pstream
+) {
+    IDpair* pairptr;        /* ptr to entry */
+    IDpair* newptr;         /* ptr to newly malloc'd memory */
 
-        IDpair * pairptr;       /* ptr to entry */
-        IDpair * newptr;        /* ptr to newly malloc'd memory */
+    /* search the table. if table is empty, appropriate action should
+     * fall out automatically.
+     */
+    for (pairptr = __idpairs ; pairptr < (__idpairs + __idtabsiz) ; pairptr++)
+        if (pairptr->stream == pstream) {
+            break;
+        }
 
+    /* if we found an entry, return it.
+     */
+    if (pairptr < (__idpairs + __idtabsiz)) {
+        return (pairptr);
+    }
 
-        /* search the table. if table is empty, appropriate action should
-         * fall out automatically.
+    /* did not find an entry in the table.  if pstream was NULL, then try
+     * creating/expanding the table. otherwise, return NULL. note that
+     * when the table is created or expanded, exactly one new entry is
+     * produced. this must not be changed unless code is added to mark
+     * the extra entries as being free (i.e., set their stream fields to
+     * to NULL).
+     */
+    if ((pstream != NULL) ||
+            ((__idtabsiz + 1) < __idtabsiz) ||
+            ((__idtabsiz + 1) >= (SIZE_MAX / sizeof(IDpair))) ||
+            ((newptr = (IDpair*)_recalloc_crt((void*)__idpairs, (__idtabsiz + 1), sizeof(IDpair))) == NULL))
+        /* either pstream was non-NULL or the attempt to create/expand
+         * the table failed. in either case, return a NULL to indicate
+         * failure.
          */
-        for ( pairptr = __idpairs ; pairptr < (__idpairs+__idtabsiz) ; pairptr++ )
-                if ( pairptr->stream == pstream )
-                        break;
+    {
+        return (NULL);
+    }
 
-        /* if we found an entry, return it.
-         */
-        if ( pairptr < (__idpairs + __idtabsiz) )
-                return(pairptr);
-
-        /* did not find an entry in the table.  if pstream was NULL, then try
-         * creating/expanding the table. otherwise, return NULL. note that
-         * when the table is created or expanded, exactly one new entry is
-         * produced. this must not be changed unless code is added to mark
-         * the extra entries as being free (i.e., set their stream fields to
-         * to NULL).
-         */
-        if ( (pstream != NULL) ||
-             ((__idtabsiz + 1) < __idtabsiz) ||
-             ((__idtabsiz + 1) >= (SIZE_MAX / sizeof(IDpair))) ||
-             ((newptr = (IDpair *)_recalloc_crt((void *)__idpairs, (__idtabsiz + 1),sizeof(IDpair))) == NULL))
-                /* either pstream was non-NULL or the attempt to create/expand
-                 * the table failed. in either case, return a NULL to indicate
-                 * failure.
-                 */
-                return( NULL );
-
-        __idpairs = newptr;             /* new table ptr */
-        pairptr = newptr + __idtabsiz;  /* first new entry */
-        __idtabsiz++;                   /* new table size */
-
-        return( pairptr );
-
+    __idpairs = newptr;             /* new table ptr */
+    pairptr = newptr + __idtabsiz;  /* first new entry */
+    __idtabsiz++;                   /* new table size */
+    return (pairptr);
 }
 
 

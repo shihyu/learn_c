@@ -23,9 +23,9 @@
  * Union to facilitate converting from FILETIME to unsigned __int64
  */
 typedef union {
-        unsigned __int64 ft_scalar;
-        FILETIME ft_struct;
-        } FT;
+    unsigned __int64 ft_scalar;
+    FILETIME ft_struct;
+} FT;
 
 
 /***
@@ -49,20 +49,17 @@ typedef union {
 *
 *******************************************************************************/
 
-__time64_t __cdecl _time64 (
-        __time64_t *timeptr
-        )
-{
-        __time64_t tim;
-        FT nt_time;
+__time64_t __cdecl _time64(
+    __time64_t* timeptr
+) {
+    __time64_t tim;
+    FT nt_time;
+    GetSystemTimeAsFileTime(&(nt_time.ft_struct));
+    tim = (__time64_t)((nt_time.ft_scalar - EPOCH_BIAS) / 10000000i64);
 
-        GetSystemTimeAsFileTime( &(nt_time.ft_struct) );
+    if (timeptr) {
+        *timeptr = tim;    /* store time if requested */
+    }
 
-        tim = (__time64_t)((nt_time.ft_scalar - EPOCH_BIAS) / 10000000i64);
-
-
-        if (timeptr)
-                *timeptr = tim;         /* store time if requested */
-
-        return tim;
+    return tim;
 }

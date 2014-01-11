@@ -45,67 +45,57 @@
 *******************************************************************************/
 
 size_t __cdecl _mbstrnlen_l(
-        const char *s,
-        size_t sizeInBytes,
-        _locale_t plocinfo
-        )
-{
+    const char* s,
+    size_t sizeInBytes,
+    _locale_t plocinfo
+) {
     size_t n, size;
-
-
     /* validation section */
-    _VALIDATE_RETURN(s != NULL, EINVAL, (size_t)-1);
-    _VALIDATE_RETURN(sizeInBytes <= INT_MAX, EINVAL, (size_t)-1);
-
-
+    _VALIDATE_RETURN(s != NULL, EINVAL, (size_t) - 1);
+    _VALIDATE_RETURN(sizeInBytes <= INT_MAX, EINVAL, (size_t) - 1);
     _LocaleUpdate _loc_update(plocinfo);
+    _ASSERTE(_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
 
-    _ASSERTE (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 || _loc_update.GetLocaleT()->locinfo->mb_cur_max == 2);
-
-    if ( _loc_update.GetLocaleT()->locinfo->mb_cur_max == 1 )
+    if (_loc_update.GetLocaleT()->locinfo->mb_cur_max == 1)
         /* handle single byte character sets */
+    {
         return (int)strnlen(s, sizeInBytes);
-
+    }
 
     /* verify all valid MB chars */
-    if ( MultiByteToWideChar( _loc_update.GetLocaleT()->locinfo->lc_codepage,
-                              MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-                              s,
-                              (int)sizeInBytes,
-                              NULL,
-                              0 ) == 0 )
-    {
+    if (MultiByteToWideChar(_loc_update.GetLocaleT()->locinfo->lc_codepage,
+                            MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
+                            s,
+                            (int)sizeInBytes,
+                            NULL,
+                            0) == 0) {
         /* bad MB char */
         errno = EILSEQ;
-        return (size_t)-1;
+        return (size_t) - 1;
     }
 
     /* count MB chars */
     /* Note that sizeInBytes here is the number of bytes, not mb characters! */
-    for (n = 0, size = 0; size < sizeInBytes && *s; n++, s++, size++)
-    {
-        if ( _isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT()) )
-        {
-                        size++;
-                        if (size >= sizeInBytes)
-                        {
-                                break;
-                        }
-            if (*++s == '\0')
-                        {
+    for (n = 0, size = 0; size < sizeInBytes && *s; n++, s++, size++) {
+        if (_isleadbyte_l((unsigned char)*s, _loc_update.GetLocaleT())) {
+            size++;
+
+            if (size >= sizeInBytes) {
                 break;
-                        }
+            }
+
+            if (*++s == '\0') {
+                break;
+            }
         }
     }
 
-
-        return (size >= sizeInBytes ? sizeInBytes : n);
+    return (size >= sizeInBytes ? sizeInBytes : n);
 }
 
 size_t __cdecl _mbstrnlen(
-        const char *s,
-        size_t maxsize
-        )
-{
+    const char* s,
+    size_t maxsize
+) {
     return _mbstrnlen_l(s, maxsize, NULL);
 }

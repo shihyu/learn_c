@@ -34,13 +34,11 @@
 *       None.
 *******************************************************************************/
 
-int __cdecl fsetpos (
-        FILE *stream,
-        const fpos_t *pos
-        )
-{
-        _VALIDATE_RETURN( (stream != NULL), EINVAL, -1);
-        _VALIDATE_RETURN( (pos != NULL), EINVAL, -1);
-
-        return( _fseeki64(stream, *pos, SEEK_SET) );
+int __cdecl fsetpos(
+    FILE* stream,
+    const fpos_t* pos
+) {
+    _VALIDATE_RETURN((stream != NULL), EINVAL, -1);
+    _VALIDATE_RETURN((pos != NULL), EINVAL, -1);
+    return (_fseeki64(stream, *pos, SEEK_SET));
 }

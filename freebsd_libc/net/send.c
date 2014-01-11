@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,9 +42,9 @@ __FBSDID("$FreeBSD: src/lib/libc/net/send.c,v 1.4 2007/01/09 00:28:02 imp Exp $"
 
 ssize_t
 send(s, msg, len, flags)
-	int s, flags;
-	size_t len;
-	const void *msg;
+int s, flags;
+size_t len;
+const void* msg;
 {
-	return (_sendto(s, msg, len, flags, NULL, 0));
+    return (_sendto(s, msg, len, flags, NULL, 0));
 }

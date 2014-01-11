@@ -46,36 +46,30 @@
 *
 *******************************************************************************/
 
-extern "C" char * __cdecl _strlwr_l (
-        char * string,
-        _locale_t plocinfo
-        )
-{
+extern "C" char* __cdecl _strlwr_l(
+    char* string,
+    _locale_t plocinfo
+) {
     _strlwr_s_l(string, (size_t)(-1), plocinfo);
     return string;
 }
 
-extern "C" char * __cdecl _strlwr (
-        char * string
-        )
-{
-    if (__locale_changed == 0)
-    {
-        char * cp;
-
+extern "C" char* __cdecl _strlwr(
+    char* string
+) {
+    if (__locale_changed == 0) {
+        char* cp;
         /* validation section */
         _VALIDATE_RETURN(string != NULL, EINVAL, NULL);
 
-        for (cp=string; *cp; ++cp)
-        {
-            if ('A' <= *cp && *cp <= 'Z')
+        for (cp = string; *cp; ++cp) {
+            if ('A' <= *cp && *cp <= 'Z') {
                 *cp += 'a' - 'A';
+            }
         }
 
-        return(string);
-    }
-    else
-    {
+        return (string);
+    } else {
         _strlwr_s_l(string, (size_t)(-1), NULL);
         return string;
     }
@@ -107,64 +101,61 @@ extern "C" char * __cdecl _strlwr (
 *
 *******************************************************************************/
 
-errno_t __cdecl _strlwr_s_l_stat (
-        char * string,
-        size_t sizeInBytes,
-        _locale_t plocinfo
-        )
-{
-
+errno_t __cdecl _strlwr_s_l_stat(
+    char* string,
+    size_t sizeInBytes,
+    _locale_t plocinfo
+) {
     int dstsize;                /* size of dst string buffer (include null)  */
-    unsigned char *dst;         /* destination string */
+    unsigned char* dst;         /* destination string */
     errno_t e = 0;
     size_t stringlen;
-
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(string != NULL, EINVAL);
     stringlen = strnlen(string, sizeInBytes);
-    if (stringlen >= sizeInBytes)
-    {
+
+    if (stringlen >= sizeInBytes) {
         _RESET_STRING(string, sizeInBytes);
         _RETURN_DEST_NOT_NULL_TERMINATED(string, sizeInBytes);
     }
+
     _FILL_STRING(string, sizeInBytes, stringlen + 1);
 
-    if ( plocinfo->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE ) {
-        char *cp;       /* traverses string for C locale conversion */
+    if (plocinfo->locinfo->lc_handle[LC_CTYPE] == _CLOCALEHANDLE) {
+        char* cp;       /* traverses string for C locale conversion */
 
-        for ( cp = string ; *cp ; ++cp )
-            if ( ('A' <= *cp) && (*cp <= 'Z') )
+        for (cp = string ; *cp ; ++cp)
+            if (('A' <= *cp) && (*cp <= 'Z')) {
                 *cp -= 'A' - 'a';
+            }
 
         return 0;
     }   /* C locale */
 
     /* Inquire size of dst string */
-    if ( 0 == (dstsize = __crtLCMapStringA(
-                    plocinfo,
-                    plocinfo->locinfo->lc_handle[LC_CTYPE],
-                    LCMAP_LOWERCASE,
-                    string,
-                    -1,
-                    NULL,
-                    0,
-                    plocinfo->locinfo->lc_codepage,
-                    TRUE )) )
-    {
+    if (0 == (dstsize = __crtLCMapStringA(
+                            plocinfo,
+                            plocinfo->locinfo->lc_handle[LC_CTYPE],
+                            LCMAP_LOWERCASE,
+                            string,
+                            -1,
+                            NULL,
+                            0,
+                            plocinfo->locinfo->lc_codepage,
+                            TRUE))) {
         errno = EILSEQ;
         return errno;
     }
 
-    if (sizeInBytes < (size_t)dstsize)
-    {
+    if (sizeInBytes < (size_t)dstsize) {
         _RESET_STRING(string, sizeInBytes);
         _RETURN_BUFFER_TOO_SMALL(string, sizeInBytes);
     }
 
     /* Allocate space for dst */
-    dst = (unsigned char *)_calloca(dstsize, sizeof(unsigned char));
-    if (dst == NULL)
-    {
+    dst = (unsigned char*)_calloca(dstsize, sizeof(unsigned char));
+
+    if (dst == NULL) {
         errno = ENOMEM;
         return errno;
     }
@@ -179,37 +170,29 @@ errno_t __cdecl _strlwr_s_l_stat (
                 (LPSTR)dst,
                 dstsize,
                 plocinfo->locinfo->lc_codepage,
-                TRUE ) != 0)
-    {
+                TRUE) != 0) {
         /* copy dst string to return string */
-        e = strcpy_s(string, sizeInBytes, (const char *)dst);
-    }
-    else
-    {
+        e = strcpy_s(string, sizeInBytes, (const char*)dst);
+    } else {
         e = errno = EILSEQ;
     }
 
     _freea(dst);
-
     return e;
 }
 
-extern "C" errno_t __cdecl _strlwr_s_l (
-        char * string,
-        size_t sizeInBytes,
-        _locale_t plocinfo
-        )
-{
-
+extern "C" errno_t __cdecl _strlwr_s_l(
+    char* string,
+    size_t sizeInBytes,
+    _locale_t plocinfo
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
     return _strlwr_s_l_stat(string, sizeInBytes, _loc_update.GetLocaleT());
 }
 
 extern "C" errno_t __cdecl _strlwr_s(
-        char * string,
-        size_t sizeInBytes
-        )
-{
+    char* string,
+    size_t sizeInBytes
+) {
     return _strlwr_s_l(string, sizeInBytes, NULL);
 }

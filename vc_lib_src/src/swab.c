@@ -35,23 +35,21 @@
 
 void __cdecl _swab
 (
-        char *src,
-        char *dest,
-        int nbytes
-)
-{
-        char b1='\0';
-        char b2='\0';
+    char* src,
+    char* dest,
+    int nbytes
+) {
+    char b1 = '\0';
+    char b2 = '\0';
+    _VALIDATE_RETURN_VOID(src != NULL, EINVAL);
+    _VALIDATE_RETURN_VOID(dest != NULL, EINVAL);
+    _VALIDATE_RETURN_VOID(nbytes >= 0, EINVAL);
 
-        _VALIDATE_RETURN_VOID(src!=NULL, EINVAL);
-        _VALIDATE_RETURN_VOID(dest!=NULL, EINVAL);
-        _VALIDATE_RETURN_VOID(nbytes>=0, EINVAL);
-
-        while (nbytes > 1) {
-                b1 = *src++;
-                b2 = *src++;
-                *dest++ = b2;
-                *dest++ = b1;
-                nbytes -= 2;
-        }
+    while (nbytes > 1) {
+        b1 = *src++;
+        b2 = *src++;
+        *dest++ = b2;
+        *dest++ = b1;
+        nbytes -= 2;
+    }
 }

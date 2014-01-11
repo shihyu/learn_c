@@ -31,46 +31,53 @@
 #include <uuid.h>
 
 /* A macro used to improve the readability of uuid_compare(). */
-#define DIFF_RETURN(a, b, field)	do {			\
-	if ((a)->field != (b)->field)				\
-		return (((a)->field < (b)->field) ? -1 : 1);	\
+#define DIFF_RETURN(a, b, field)    do {            \
+    if ((a)->field != (b)->field)               \
+        return (((a)->field < (b)->field) ? -1 : 1);    \
 } while (0)
 
 /*
  * uuid_compare() - compare two UUIDs.
  * See also:
- *	http://www.opengroup.org/onlinepubs/009629399/uuid_compare.htm
+ *  http://www.opengroup.org/onlinepubs/009629399/uuid_compare.htm
  *
  * NOTE: Either UUID can be NULL, meaning a nil UUID. nil UUIDs are smaller
- *	 than any non-nil UUID.
+ *   than any non-nil UUID.
  */
 int32_t
-uuid_compare(const uuid_t *a, const uuid_t *b, uint32_t *status)
-{
-	int	res;
+uuid_compare(const uuid_t* a, const uuid_t* b, uint32_t* status) {
+    int res;
 
-	if (status != NULL)
-		*status = uuid_s_ok;
+    if (status != NULL) {
+        *status = uuid_s_ok;
+    }
 
-	/* Deal with NULL or equal pointers. */
-	if (a == b)
-		return (0);
-	if (a == NULL)
-		return ((uuid_is_nil(b, NULL)) ? 0 : -1);
-	if (b == NULL)
-		return ((uuid_is_nil(a, NULL)) ? 0 : 1);
+    /* Deal with NULL or equal pointers. */
+    if (a == b) {
+        return (0);
+    }
 
-	/* We have to compare the hard way. */
-	DIFF_RETURN(a, b, time_low);
-	DIFF_RETURN(a, b, time_mid);
-	DIFF_RETURN(a, b, time_hi_and_version);
-	DIFF_RETURN(a, b, clock_seq_hi_and_reserved);
-	DIFF_RETURN(a, b, clock_seq_low);
+    if (a == NULL) {
+        return ((uuid_is_nil(b, NULL)) ? 0 : -1);
+    }
 
-	res = memcmp(a->node, b->node, sizeof(a->node));
-	if (res)
-		return ((res < 0) ? -1 : 1);
-	return (0);
+    if (b == NULL) {
+        return ((uuid_is_nil(a, NULL)) ? 0 : 1);
+    }
+
+    /* We have to compare the hard way. */
+    DIFF_RETURN(a, b, time_low);
+    DIFF_RETURN(a, b, time_mid);
+    DIFF_RETURN(a, b, time_hi_and_version);
+    DIFF_RETURN(a, b, clock_seq_hi_and_reserved);
+    DIFF_RETURN(a, b, clock_seq_low);
+    res = memcmp(a->node, b->node, sizeof(a->node));
+
+    if (res) {
+        return ((res < 0) ? -1 : 1);
+    }
+
+    return (0);
 }
 
 #undef DIFF_RETURN

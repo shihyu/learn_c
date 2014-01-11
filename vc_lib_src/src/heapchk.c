@@ -58,61 +58,56 @@
 *
 *******************************************************************************/
 
-int __cdecl _heapchk (void)
-{
-        int retcode = _HEAPOK;
-
+int __cdecl _heapchk(void) {
+    int retcode = _HEAPOK;
 #ifndef _WIN64
-        if ( __active_heap == __V6_HEAP )
-        {
-            _mlock( _HEAP_LOCK );
-            __try {
 
-            if ( __sbh_heap_check() < 0 )
+    if (__active_heap == __V6_HEAP) {
+        _mlock(_HEAP_LOCK);
+
+        __try {
+            if (__sbh_heap_check() < 0) {
                 retcode = _HEAPBADNODE;
-
             }
-            __finally {
-                _munlock( _HEAP_LOCK );
-            }
+        } __finally {
+            _munlock(_HEAP_LOCK);
         }
+    }
+
 #ifdef CRTDLL
-        else if ( __active_heap == __V5_HEAP )
-        {
-            _mlock( _HEAP_LOCK );
-            __try {
+    else if (__active_heap == __V5_HEAP) {
+        _mlock(_HEAP_LOCK);
 
-            if ( __old_sbh_heap_check() < 0 )
+        __try {
+            if (__old_sbh_heap_check() < 0) {
                 retcode = _HEAPBADNODE;
-
             }
-            __finally {
-                _munlock( _HEAP_LOCK );
-            }
+        } __finally {
+            _munlock(_HEAP_LOCK);
         }
+    }
+
 #endif  /* CRTDLL */
 #endif  /* _WIN64 */
 
-        if (!HeapValidate(_crtheap, 0, NULL))
-        {
-            if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
-            {
-                _doserrno = ERROR_CALL_NOT_IMPLEMENTED;
-                errno = ENOSYS;
-            }
-            else
-                retcode = _HEAPBADNODE;
+    if (!HeapValidate(_crtheap, 0, NULL)) {
+        if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
+            _doserrno = ERROR_CALL_NOT_IMPLEMENTED;
+            errno = ENOSYS;
+        } else {
+            retcode = _HEAPBADNODE;
         }
-        return retcode;
+    }
+
+    return retcode;
 }
 
 /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
-int __cdecl _heapset (
-        unsigned int _fill
-        )
-{
-        return _heapchk();
+int __cdecl _heapset(
+    unsigned int _fill
+) {
+    return _heapchk();
 }
 
 
@@ -176,17 +171,15 @@ static int __cdecl _heap_checkset(unsigned int _fill);
 *
 *******************************************************************************/
 
-int __cdecl _heapchk(void)
-{
-    return(_heap_checkset((unsigned int)_HEAP_NOFILL));
+int __cdecl _heapchk(void) {
+    return (_heap_checkset((unsigned int)_HEAP_NOFILL));
 }
 
 
-int __cdecl _heapset (
+int __cdecl _heapset(
     unsigned int _fill
-    )
-{
-    return(_heap_checkset(_fill));
+) {
+    return (_heap_checkset(_fill));
 }
 
 
@@ -206,19 +199,16 @@ int __cdecl _heapset (
 *
 *******************************************************************************/
 
-static int __cdecl _heap_checkset (
+static int __cdecl _heap_checkset(
     unsigned int _fill
-    )
-{
+) {
     REG1 _PBLKDESC pdesc;
     REG2 _PBLKDESC pnext;
-    int roverfound=0;
+    int roverfound = 0;
     int retval = _HEAPOK;
-
     /*
      * lock the heap
      */
-
     _mlock(_HEAP_LOCK);
 
     /*
@@ -235,8 +225,8 @@ static int __cdecl _heap_checkset (
      * Test for an empty heap
      */
 
-    if ( (_heap_desc.pfirstdesc == &_heap_desc.sentinel) &&
-         (_heap_desc.proverdesc == &_heap_desc.sentinel) ) {
+    if ((_heap_desc.pfirstdesc == &_heap_desc.sentinel) &&
+            (_heap_desc.proverdesc == &_heap_desc.sentinel)) {
         retval = _HEAPEMPTY;
         goto done;
     }
@@ -256,13 +246,11 @@ static int __cdecl _heap_checkset (
      */
 
     while (pdesc != &_heap_desc.sentinel) {
-
         /*
          * Make sure address for this entry is in range.
          */
-
-        if ( (_ADDRESS(pdesc) < _ADDRESS(_heap_desc.pfirstdesc)) ||
-             (_ADDRESS(pdesc) > _heap_desc.sentinel.pblock) ) {
+        if ((_ADDRESS(pdesc) < _ADDRESS(_heap_desc.pfirstdesc)) ||
+                (_ADDRESS(pdesc) > _heap_desc.sentinel.pblock)) {
             _PRINTERR(_BADRANGE);
             retval = _HEAPBADNODE;
             goto done;
@@ -275,7 +263,7 @@ static int __cdecl _heap_checkset (
          * in proper order.
          */
 
-        if ( _ADDRESS(pdesc) >= _ADDRESS(pnext) ) {
+        if (_ADDRESS(pdesc) >= _ADDRESS(pnext)) {
             _PRINTERR(_BADORDER);
             retval = _HEAPBADNODE;
             goto done;
@@ -286,7 +274,6 @@ static int __cdecl _heap_checkset (
          */
 
         if (_IS_INUSE(pdesc) || _IS_FREE(pdesc)) {
-
             if (!_CHECK_PDESC(pdesc)) {
                 retval = _HEAPBADPTR;
                 goto done;
@@ -297,21 +284,21 @@ static int __cdecl _heap_checkset (
          * Check for proverdesc
          */
 
-        if (pdesc == _heap_desc.proverdesc)
+        if (pdesc == _heap_desc.proverdesc) {
             roverfound++;
+        }
 
         /*
          * If it is free, fill it in if appropriate
          */
 
-        if ( _IS_FREE(pdesc) && (_fill != _HEAP_NOFILL) )
-            memset( (void *)((unsigned)_ADDRESS(pdesc)+_HDRSIZE),
-            _fill, _BLKSIZE(pdesc) );
+        if (_IS_FREE(pdesc) && (_fill != _HEAP_NOFILL))
+            memset((void*)((unsigned)_ADDRESS(pdesc) + _HDRSIZE),
+                   _fill, _BLKSIZE(pdesc));
 
         /*
          * Onto the next block
          */
-
         pdesc = pnext;
     }
 
@@ -319,8 +306,9 @@ static int __cdecl _heap_checkset (
      * Make sure we found 1 and only 1 rover
      */
 
-    if (_heap_desc.proverdesc == &_heap_desc.sentinel)
+    if (_heap_desc.proverdesc == &_heap_desc.sentinel) {
         roverfound++;
+    }
 
     if (roverfound != 1) {
         _PRINTERR(_BADROVER);
@@ -332,12 +320,9 @@ static int __cdecl _heap_checkset (
      * Walk the empty list.  We can't really compare values against
      * anything but we may loop forever or may cause a fault.
      */
-
     pdesc = _heap_desc.emptylist;
 
     while (pdesc != NULL) {
-
-
         pnext = pdesc->pnextdesc;
 
         /*
@@ -351,23 +336,17 @@ static int __cdecl _heap_checkset (
         }
 
         pdesc = pnext;
-
     }
-
 
     /*
      * Common return
      */
-
 done:
     /*
      * release the heap lock
      */
-
     _munlock(_HEAP_LOCK);
-
-    return(retval);
-
+    return (retval);
 }
 
 

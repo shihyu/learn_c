@@ -29,9 +29,8 @@
 *
 *******************************************************************************/
 
-int __CRTDECL _setargv (
-        void
-        )
-{
-        return __setargv();
+int __CRTDECL _setargv(
+    void
+) {
+    return __setargv();
 }

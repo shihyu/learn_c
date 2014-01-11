@@ -31,14 +31,12 @@
 *
 *******************************************************************************/
 
-void __cdecl _sleep(unsigned long dwDuration)
-{
-
+void __cdecl _sleep(unsigned long dwDuration) {
     if (dwDuration == 0) {
         dwDuration++;
     }
-    Sleep(dwDuration);
 
+    Sleep(dwDuration);
 }
 
 /***
@@ -57,7 +55,6 @@ void __cdecl _sleep(unsigned long dwDuration)
 *
 *******************************************************************************/
 
-void __cdecl _beep(unsigned dwFrequency, unsigned dwDuration)
-{
+void __cdecl _beep(unsigned dwFrequency, unsigned dwDuration) {
     Beep(dwFrequency, dwDuration);
 }

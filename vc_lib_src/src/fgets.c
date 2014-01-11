@@ -41,67 +41,60 @@
 *
 *******************************************************************************/
 
-_TSCHAR * __cdecl _fgetts (
-        _TSCHAR *string,
-        int count,
-        FILE *str
-        )
-{
-        REG1 FILE *stream;
-        REG2 _TSCHAR *pointer = string;
-        _TSCHAR *retval = string;
-        int ch;
+_TSCHAR* __cdecl _fgetts(
+    _TSCHAR* string,
+    int count,
+    FILE* str
+) {
+    REG1 FILE* stream;
+    REG2 _TSCHAR* pointer = string;
+    _TSCHAR* retval = string;
+    int ch;
+    _VALIDATE_RETURN((string != NULL) || (count == 0), EINVAL, NULL);
+    _VALIDATE_RETURN((count >= 0), EINVAL, NULL);
+    _VALIDATE_RETURN((str != NULL), EINVAL, NULL);
 
-        _VALIDATE_RETURN(( string != NULL ) || ( count == 0 ), EINVAL, NULL);
-        _VALIDATE_RETURN(( count >= 0 ), EINVAL, NULL);
-        _VALIDATE_RETURN(( str != NULL ), EINVAL, NULL);
+    if (count == 0) {
+        return NULL;
+    }
 
-                if (count == 0)
-                {
-                        return NULL;
-                }
+    /* The C Standard states the input buffer should remain
+    unchanged if EOF is encountered immediately. Hence we
+    do not blank out the input buffer here */
+    /* Init stream pointer */
+    stream = str;
+    _lock_str(stream);
 
-        /* The C Standard states the input buffer should remain
-        unchanged if EOF is encountered immediately. Hence we
-        do not blank out the input buffer here */
-
-        /* Init stream pointer */
-        stream = str;
-
-        _lock_str(stream);
-        __try {
-
+    __try {
 #ifndef _UNICODE
         _VALIDATE_STREAM_ANSI_SETRET(stream, EINVAL, retval, NULL);
 #endif  /* _UNICODE */
-        if(retval!=NULL)
-                {
-                        while (--count)
-                        {
-                                        if ((ch = _fgettc_nolock(stream)) == _TEOF)
-                                        {
-                                                        if (pointer == string) {
-                                                                        retval=NULL;
-                                                                        goto done;
-                                                        }
 
-                                                        break;
-                                        }
+        if (retval != NULL) {
+            while (--count) {
+                if ((ch = _fgettc_nolock(stream)) == _TEOF) {
+                    if (pointer == string) {
+                        retval = NULL;
+                        goto done;
+                    }
 
-                                        if ((*pointer++ = (_TSCHAR)ch) == _T('\n'))
-                                                        break;
-                        }
-                *pointer = _T('\0');
+                    break;
                 }
 
+                if ((*pointer++ = (_TSCHAR)ch) == _T('\n')) {
+                    break;
+                }
+            }
 
-/* Common return */
-done:
-
-        ; }
-        __finally {
-                _unlock_str(stream);
+            *pointer = _T('\0');
         }
 
-        return(retval);
+        /* Common return */
+    done:
+        ;
+    } __finally {
+        _unlock_str(stream);
+    }
+
+    return (retval);
 }

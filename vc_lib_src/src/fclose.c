@@ -38,30 +38,28 @@
 *******************************************************************************/
 
 
-int __cdecl fclose (
-        FILE *stream
-        )
-{
-        int result = EOF;
+int __cdecl fclose(
+    FILE* stream
+) {
+    int result = EOF;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
 
-        _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    /* If stream is a string, simply clear flag and return EOF */
+    if (stream->_flag & _IOSTRG) {
+        stream->_flag = 0;    /* IS THIS REALLY NEEDED ??? */
+    }
+    /* Stream is a real file. */
+    else {
+        _lock_str(stream);
 
-        /* If stream is a string, simply clear flag and return EOF */
-        if (stream->_flag & _IOSTRG)
-                stream->_flag = 0;  /* IS THIS REALLY NEEDED ??? */
-
-        /* Stream is a real file. */
-        else {
-                _lock_str(stream);
-                __try {
-                        result = _fclose_nolock(stream);
-                }
-                __finally {
-                        _unlock_str(stream);
-                }
+        __try {
+            result = _fclose_nolock(stream);
+        } __finally {
+            _unlock_str(stream);
         }
+    }
 
-        return(result);
+    return (result);
 }
 
 /***
@@ -80,49 +78,40 @@ int __cdecl fclose (
 *
 *******************************************************************************/
 
-int __cdecl _fclose_nolock (
-        FILE *str
-        )
-{
-        REG1 FILE *stream;
-        REG2 int result = EOF;
+int __cdecl _fclose_nolock(
+    FILE* str
+) {
+    REG1 FILE* stream;
+    REG2 int result = EOF;
+    _VALIDATE_RETURN((str != NULL), EINVAL, EOF);
+    /* Init near stream pointer */
+    stream = str;
 
-        _VALIDATE_RETURN((str != NULL), EINVAL, EOF);
+    if (inuse(stream)) {
+        /* Stream is in use:
+               (1) flush stream
+               (2) free the buffer
+               (3) close the file
+               (4) delete the file if temporary
+        */
+        result = _flush(stream);
+        _freebuf(stream);
 
-        /* Init near stream pointer */
-        stream = str;
-
-
-        if (inuse(stream)) {
-
-                /* Stream is in use:
-                       (1) flush stream
-                       (2) free the buffer
-                       (3) close the file
-                       (4) delete the file if temporary
-                */
-
-                result = _flush(stream);
-                _freebuf(stream);
-
-                if (_close(_fileno(stream)) < 0)
-                        result = EOF;
-
-                else if ( stream->_tmpfname != NULL ) {
-                        /*
-                         * temporary file (i.e., one created by tmpfile()
-                         * call). delete, if necessary (don't have to on
-                         * Windows NT because it was done by the system when
-                         * the handle was closed). also, free up the heap
-                         * block holding the pathname.
-                         */
-
-                        _free_crt(stream->_tmpfname);
-                stream->_tmpfname = NULL;
-                }
-
+        if (_close(_fileno(stream)) < 0) {
+            result = EOF;
+        } else if (stream->_tmpfname != NULL) {
+            /*
+             * temporary file (i.e., one created by tmpfile()
+             * call). delete, if necessary (don't have to on
+             * Windows NT because it was done by the system when
+             * the handle was closed). also, free up the heap
+             * block holding the pathname.
+             */
+            _free_crt(stream->_tmpfname);
+            stream->_tmpfname = NULL;
         }
+    }
 
-        stream->_flag = 0;
-        return(result);
+    stream->_flag = 0;
+    return (result);
 }

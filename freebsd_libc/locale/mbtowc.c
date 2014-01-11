@@ -32,19 +32,22 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mbtowc.c,v 1.11 2004/07/29 06:18:40 tjr 
 #include "mblocal.h"
 
 int
-mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n)
-{
-	static const mbstate_t initial;
-	static mbstate_t mbs;
-	size_t rval;
+mbtowc(wchar_t* __restrict pwc, const char* __restrict s, size_t n) {
+    static const mbstate_t initial;
+    static mbstate_t mbs;
+    size_t rval;
 
-	if (s == NULL) {
-		/* No support for state dependent encodings. */
-		mbs = initial;
-		return (0);
-	}
-	rval = __mbrtowc(pwc, s, n, &mbs);
-	if (rval == (size_t)-1 || rval == (size_t)-2)
-		return (-1);
-	return ((int)rval);
+    if (s == NULL) {
+        /* No support for state dependent encodings. */
+        mbs = initial;
+        return (0);
+    }
+
+    rval = __mbrtowc(pwc, s, n, &mbs);
+
+    if (rval == (size_t) - 1 || rval == (size_t) - 2) {
+        return (-1);
+    }
+
+    return ((int)rval);
 }

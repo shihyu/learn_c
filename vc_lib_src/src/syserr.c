@@ -18,8 +18,7 @@
 
 #ifdef _WIN32
 
-char *_sys_errlist[] =
-{
+char* _sys_errlist[] = {
     /*  0              */  "No error",
     /*  1 EPERM        */  "Operation not permitted",
     /*  2 ENOENT       */  "No such file or directory",
@@ -73,7 +72,7 @@ char *_sys_errlist[] =
 
 #endif  /* _WIN32 */
 
-int _sys_nerr = sizeof( _sys_errlist ) / sizeof( _sys_errlist[ 0 ] ) - 1;
+int _sys_nerr = sizeof(_sys_errlist) / sizeof(_sys_errlist[ 0 ]) - 1;
 
 /* The above array contains all the errors including unknown error # 37
    which is used if msg_num is unknown */
@@ -100,19 +99,17 @@ int _sys_nerr = sizeof( _sys_errlist ) / sizeof( _sys_errlist[ 0 ] ) - 1;
 *
 *******************************************************************************/
 
-int * __cdecl __sys_nerr
+int* __cdecl __sys_nerr
 (
     void
-)
-{
+) {
     return &(_sys_nerr);
 }
 
-char ** __cdecl __sys_errlist
+char** __cdecl __sys_errlist
 (
     void
-)
-{
+) {
     return (_sys_errlist);
 }
 

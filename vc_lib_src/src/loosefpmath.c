@@ -12,8 +12,7 @@
 
 int __set_loosefpmath(void);
 
-int __set_loosefpmath(void)
-{
+int __set_loosefpmath(void) {
     _ERRCHECK(_controlfp_s(NULL, _DN_FLUSH, _MCW_DN));
     return 0;
 }

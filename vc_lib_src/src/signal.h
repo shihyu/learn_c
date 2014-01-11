@@ -87,24 +87,23 @@ typedef int sig_atomic_t;
 
 /* pointer to exception information pointers structure */
 
-extern void * * __cdecl __pxcptinfoptrs(void);
+extern void** __cdecl __pxcptinfoptrs(void);
 #define _pxcptinfoptrs  (*__pxcptinfoptrs())
 
 
 /* Function prototypes */
 
 #ifndef _M_CEE_PURE
-_CRTIMP void (__cdecl * __cdecl signal(__in int _SigNum, __in_opt void (__cdecl * _Func)(int)))(int);
+_CRTIMP void (__cdecl* __cdecl signal(__in int _SigNum, __in_opt void (__cdecl* _Func)(int)))(int);
 #endif  /* _M_CEE_PURE */
 
 _CRTIMP int __cdecl raise(__in int _SigNum);
 
 #if defined (_M_CEE) && defined (__cplusplus)
-extern "C++"
-{
-_MRTIMP void (__clrcall * __cdecl signal(__in int _SigNum, __in_opt void (__clrcall * _Func)(int)))(int);
+extern "C++" {
+    _MRTIMP void (__clrcall * __cdecl signal(__in int _SigNum, __in_opt void (__clrcall * _Func)(int)))(int);
 #ifndef _M_CEE_PURE
-_MRTIMP void (__clrcall * __cdecl signal(__in int _SigNum, __in_opt int))(int);
+    _MRTIMP void (__clrcall * __cdecl signal(__in int _SigNum, __in_opt int))(int);
 #endif  /* _M_CEE_PURE */
 }
 #endif  /* defined (_M_CEE) && defined (__cplusplus) */

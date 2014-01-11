@@ -34,11 +34,11 @@
 extern int __mbctype_initialized;
 
 #ifdef WPRFLAG
-static void __cdecl wparse_cmdline(wchar_t *cmdstart, wchar_t **argv, wchar_t *args,
-        int *numargs, int *numchars);
+static void __cdecl wparse_cmdline(wchar_t* cmdstart, wchar_t** argv, wchar_t* args,
+                                   int* numargs, int* numchars);
 #else  /* WPRFLAG */
-static void __cdecl parse_cmdline(char *cmdstart, char **argv, char *args,
-        int *numargs, int *numchars);
+static void __cdecl parse_cmdline(char* cmdstart, char** argv, char* args,
+                                  int* numargs, int* numchars);
 #endif  /* WPRFLAG */
 
 /***
@@ -69,107 +69,100 @@ static void __cdecl parse_cmdline(char *cmdstart, char **argv, char *args,
 #ifdef WILDCARD
 
 #ifdef WPRFLAG
-int __cdecl __wsetargv (
+int __cdecl __wsetargv(
 #else  /* WPRFLAG */
-int __cdecl __setargv (
+int __cdecl __setargv(
 #endif  /* WPRFLAG */
 
 #else  /* WILDCARD */
 
 #ifdef WPRFLAG
-int __cdecl _wsetargv (
+int __cdecl _wsetargv(
 #else  /* WPRFLAG */
-int __cdecl _setargv (
+int __cdecl _setargv(
 #endif  /* WPRFLAG */
 
 #endif  /* WILDCARD */
     void
-    )
-{
-        _TSCHAR *p = NULL;
-        _TSCHAR *cmdstart;                  /* start of command line to parse */
-        int numargs, numchars;
-
-        static _TSCHAR _pgmname[ MAX_PATH + 1 ];
-
+) {
+    _TSCHAR* p = NULL;
+    _TSCHAR* cmdstart;                  /* start of command line to parse */
+    int numargs, numchars;
+    static _TSCHAR _pgmname[ MAX_PATH + 1 ];
 #if !defined (CRTDLL) && defined (_MBCS)
-        /* If necessary, initialize the multibyte ctype table. */
-        if ( __mbctype_initialized == 0 )
-            __initmbctable();
+
+    /* If necessary, initialize the multibyte ctype table. */
+    if (__mbctype_initialized == 0) {
+        __initmbctable();
+    }
+
 #endif  /* !defined (CRTDLL) && defined (_MBCS) */
-
-        /* Get the program name pointer from Win32 Base */
-
-        _pgmname[ MAX_PATH ] = '\0';
-        GetModuleFileName( NULL, _pgmname, MAX_PATH );
+    /* Get the program name pointer from Win32 Base */
+    _pgmname[ MAX_PATH ] = '\0';
+    GetModuleFileName(NULL, _pgmname, MAX_PATH);
 #ifdef WPRFLAG
-        _set_wpgmptr(_pgmname);
+    _set_wpgmptr(_pgmname);
 #else  /* WPRFLAG */
-        _set_pgmptr(_pgmname);
+    _set_pgmptr(_pgmname);
+#endif  /* WPRFLAG */
+    /* if there's no command line at all (won't happen from cmd.exe, but
+       possibly another program), then we use _pgmptr as the command line
+       to parse, so that argv[0] is initialized to the program name */
+#ifdef WPRFLAG
+    cmdstart = (_wcmdln == NULL || *_wcmdln == NULCHAR)
+               ? _pgmname : _wcmdln;
+#else  /* WPRFLAG */
+    cmdstart = (_acmdln == NULL || *_acmdln == NULCHAR)
+               ? _pgmname : _acmdln;
+#endif  /* WPRFLAG */
+    /* first find out how much space is needed to store args */
+#ifdef WPRFLAG
+    wparse_cmdline(cmdstart, NULL, NULL, &numargs, &numchars);
+#else  /* WPRFLAG */
+    parse_cmdline(cmdstart, NULL, NULL, &numargs, &numchars);
 #endif  /* WPRFLAG */
 
-        /* if there's no command line at all (won't happen from cmd.exe, but
-           possibly another program), then we use _pgmptr as the command line
-           to parse, so that argv[0] is initialized to the program name */
+    /* allocate space for argv[] vector and strings */
+    if (numargs >= (SIZE_MAX / sizeof(_TSCHAR*)) ||
+            numchars >= (SIZE_MAX / sizeof(_TSCHAR))) {
+        return -1;
+    }
 
+    if ((numargs * sizeof(_TSCHAR*) + numchars * sizeof(_TSCHAR)) < (numchars * sizeof(_TSCHAR))) {
+        return -1;
+    }
+
+    p = _malloc_crt(numargs * sizeof(_TSCHAR*) + numchars * sizeof(_TSCHAR));
+
+    if (p == NULL) {
+        return -1;
+    }
+
+    /* store args and argv ptrs in just allocated block */
 #ifdef WPRFLAG
-        cmdstart = (_wcmdln == NULL || *_wcmdln == NULCHAR)
-                   ? _pgmname : _wcmdln;
+    wparse_cmdline(cmdstart, (wchar_t**)p, (wchar_t*)(((char*)p) + numargs * sizeof(wchar_t*)), &numargs, &numchars);
 #else  /* WPRFLAG */
-        cmdstart = (_acmdln == NULL || *_acmdln == NULCHAR)
-                   ? _pgmname : _acmdln;
+    parse_cmdline(cmdstart, (char**)p, p + numargs * sizeof(char*), &numargs, &numchars);
 #endif  /* WPRFLAG */
-
-        /* first find out how much space is needed to store args */
+    /* set argv and argc */
+    __argc = numargs - 1;
 #ifdef WPRFLAG
-        wparse_cmdline(cmdstart, NULL, NULL, &numargs, &numchars);
+    __wargv = (wchar_t**)p;
 #else  /* WPRFLAG */
-        parse_cmdline(cmdstart, NULL, NULL, &numargs, &numchars);
+    __argv = (char**)p;
 #endif  /* WPRFLAG */
-
-        /* allocate space for argv[] vector and strings */
-        if (numargs >= (SIZE_MAX / sizeof(_TSCHAR *)) ||
-            numchars >= (SIZE_MAX / sizeof(_TSCHAR)))
-        {
-            return -1;
-        }
-        if ((numargs * sizeof(_TSCHAR *) + numchars * sizeof(_TSCHAR)) < (numchars * sizeof(_TSCHAR)))
-        {
-            return -1;
-        }
-        p = _malloc_crt(numargs * sizeof(_TSCHAR *) + numchars * sizeof(_TSCHAR));
-        if (p == NULL)
-            return -1;
-
-        /* store args and argv ptrs in just allocated block */
-
-#ifdef WPRFLAG
-        wparse_cmdline(cmdstart, (wchar_t **)p, (wchar_t *)(((char *)p) + numargs * sizeof(wchar_t *)), &numargs, &numchars);
-#else  /* WPRFLAG */
-        parse_cmdline(cmdstart, (char **)p, p + numargs * sizeof(char *), &numargs, &numchars);
-#endif  /* WPRFLAG */
-
-        /* set argv and argc */
-        __argc = numargs - 1;
-#ifdef WPRFLAG
-        __wargv = (wchar_t **)p;
-#else  /* WPRFLAG */
-        __argv = (char **)p;
-#endif  /* WPRFLAG */
-
 #ifdef WILDCARD
-
-        /* call _[w]cwild to expand wildcards in arg vector */
+    /* call _[w]cwild to expand wildcards in arg vector */
 #ifdef WPRFLAG
-        if (_wcwild())
+
+    if (_wcwild())
 #else  /* WPRFLAG */
-        if (_cwild())
+    if (_cwild())
 #endif  /* WPRFLAG */
-            return -1;                  /* out of space */
+        return -1;                  /* out of space */
 
 #endif  /* WILDCARD */
-
-        return 0;
+    return 0;
 }
 
 
@@ -205,105 +198,117 @@ int __cdecl _setargv (
 *******************************************************************************/
 
 #ifdef WPRFLAG
-static void __cdecl wparse_cmdline (
+static void __cdecl wparse_cmdline(
 #else  /* WPRFLAG */
-static void __cdecl parse_cmdline (
+static void __cdecl parse_cmdline(
 #endif  /* WPRFLAG */
-    _TSCHAR *cmdstart,
-    _TSCHAR **argv,
-    _TSCHAR *args,
-    int *numargs,
-    int *numchars
-    )
-{
-        _TSCHAR *p;
-        _TUCHAR c;
-        int inquote;                    /* 1 = inside quotes */
-        int copychar;                   /* 1 = copy char to *args */
-        unsigned numslash;              /* num of backslashes seen */
+    _TSCHAR* cmdstart,
+    _TSCHAR** argv,
+    _TSCHAR* args,
+    int* numargs,
+    int* numchars
+) {
+    _TSCHAR* p;
+    _TUCHAR c;
+    int inquote;                    /* 1 = inside quotes */
+    int copychar;                   /* 1 = copy char to *args */
+    unsigned numslash;              /* num of backslashes seen */
+    *numchars = 0;
+    *numargs = 1;                   /* the program name at least */
+    /* first scan the program name, copy it, and count the bytes */
+    p = cmdstart;
 
-        *numchars = 0;
-        *numargs = 1;                   /* the program name at least */
-
-        /* first scan the program name, copy it, and count the bytes */
-        p = cmdstart;
-        if (argv)
-            *argv++ = args;
+    if (argv) {
+        *argv++ = args;
+    }
 
 #ifdef WILDCARD
-        /* To handle later wild card expansion, we prefix each entry by
-        it's first character before quote handling.  This is done
-        so _[w]cwild() knows whether to expand an entry or not. */
-        if (args)
-            *args++ = *p;
-        ++*numchars;
 
+    /* To handle later wild card expansion, we prefix each entry by
+    it's first character before quote handling.  This is done
+    so _[w]cwild() knows whether to expand an entry or not. */
+    if (args) {
+        *args++ = *p;
+    }
+
+    ++*numchars;
 #endif  /* WILDCARD */
+    /* A quoted program name is handled here. The handling is much
+       simpler than for other arguments. Basically, whatever lies
+       between the leading double-quote and next one, or a terminal null
+       character is simply accepted. Fancier handling is not required
+       because the program name must be a legal NTFS/HPFS file name.
+       Note that the double-quote characters are not copied, nor do they
+       contribute to numchars. */
+    inquote = FALSE;
 
-        /* A quoted program name is handled here. The handling is much
-           simpler than for other arguments. Basically, whatever lies
-           between the leading double-quote and next one, or a terminal null
-           character is simply accepted. Fancier handling is not required
-           because the program name must be a legal NTFS/HPFS file name.
-           Note that the double-quote characters are not copied, nor do they
-           contribute to numchars. */
-        inquote = FALSE;
-        do {
-            if (*p == DQUOTECHAR )
-            {
-                inquote = !inquote;
-                c = (_TUCHAR) *p++;
-                continue;
-            }
-            ++*numchars;
-            if (args)
-                *args++ = *p;
-
-            c = (_TUCHAR) *p++;
-#ifdef _MBCS
-            if (_ismbblead(c)) {
-                ++*numchars;
-                if (args)
-                    *args++ = *p;   /* copy 2nd byte too */
-                p++;  /* skip over trail byte */
-            }
-#endif  /* _MBCS */
-
-        } while ( (c != NULCHAR && (inquote || (c !=SPACECHAR && c != TABCHAR))) );
-
-        if ( c == NULCHAR ) {
-            p--;
-        } else {
-            if (args)
-                *(args-1) = NULCHAR;
+    do {
+        if (*p == DQUOTECHAR) {
+            inquote = !inquote;
+            c = (_TUCHAR) * p++;
+            continue;
         }
 
-        inquote = 0;
+        ++*numchars;
 
-        /* loop on each argument */
-        for(;;) {
+        if (args) {
+            *args++ = *p;
+        }
 
-            if ( *p ) {
-                while (*p == SPACECHAR || *p == TABCHAR)
-                    ++p;
+        c = (_TUCHAR) * p++;
+#ifdef _MBCS
+
+        if (_ismbblead(c)) {
+            ++*numchars;
+
+            if (args) {
+                *args++ = *p;    /* copy 2nd byte too */
             }
 
-            if (*p == NULCHAR)
-                break;              /* end of args */
+            p++;  /* skip over trail byte */
+        }
 
-            /* scan an argument */
-            if (argv)
-                *argv++ = args;     /* store ptr to arg */
-            ++*numargs;
+#endif  /* _MBCS */
+    } while ((c != NULCHAR && (inquote || (c != SPACECHAR && c != TABCHAR))));
 
+    if (c == NULCHAR) {
+        p--;
+    } else {
+        if (args) {
+            *(args - 1) = NULCHAR;
+        }
+    }
+
+    inquote = 0;
+
+    /* loop on each argument */
+    for (;;) {
+        if (*p) {
+            while (*p == SPACECHAR || *p == TABCHAR) {
+                ++p;
+            }
+        }
+
+        if (*p == NULCHAR) {
+            break;    /* end of args */
+        }
+
+        /* scan an argument */
+        if (argv) {
+            *argv++ = args;    /* store ptr to arg */
+        }
+
+        ++*numargs;
 #ifdef WILDCARD
+
         /* To handle later wild card expansion, we prefix each entry by
         it's first character before quote handling.  This is done
         so _[w]cwild() knows whether to expand an entry or not. */
-        if (args)
+        if (args) {
             *args++ = *p;
-        ++*numchars;
+        }
 
+        ++*numchars;
 #endif  /* WILDCARD */
 
         /* loop through scanning one argument */
@@ -313,11 +318,13 @@ static void __cdecl parse_cmdline (
                2N+1 backslashes + " ==> N backslashes + literal "
                N backslashes ==> N backslashes */
             numslash = 0;
+
             while (*p == SLASHCHAR) {
                 /* count number of backslashes for use below */
                 ++p;
                 ++numslash;
             }
+
             if (*p == DQUOTECHAR) {
                 /* if 2N backslashes before, start/end quote, otherwise
                     copy literally */
@@ -329,28 +336,34 @@ static void __cdecl parse_cmdline (
                         inquote = !inquote;
                     }
                 }
+
                 numslash /= 2;          /* divide numslash by two */
             }
 
             /* copy slashes */
             while (numslash--) {
-                if (args)
+                if (args) {
                     *args++ = SLASHCHAR;
+                }
+
                 ++*numchars;
             }
 
             /* if at end of arg, break loop */
-            if (*p == NULCHAR || (!inquote && (*p == SPACECHAR || *p == TABCHAR)))
+            if (*p == NULCHAR || (!inquote && (*p == SPACECHAR || *p == TABCHAR))) {
                 break;
+            }
 
             /* copy character into argument */
 #ifdef _MBCS
+
             if (copychar) {
                 if (args) {
                     if (_ismbblead(*p)) {
                         *args++ = *p++;
                         ++*numchars;
                     }
+
                     *args++ = *p;
                 } else {
                     if (_ismbblead(*p)) {
@@ -358,30 +371,40 @@ static void __cdecl parse_cmdline (
                         ++*numchars;
                     }
                 }
+
                 ++*numchars;
             }
+
             ++p;
 #else  /* _MBCS */
+
             if (copychar) {
-                if (args)
+                if (args) {
                     *args++ = *p;
+                }
+
                 ++*numchars;
             }
+
             ++p;
 #endif  /* _MBCS */
-            }
-
-            /* null-terminate the argument */
-
-            if (args)
-                *args++ = NULCHAR;          /* terminate string */
-            ++*numchars;
         }
 
-        /* We put one last argument in -- a null ptr */
-        if (argv)
-            *argv++ = NULL;
-        ++*numargs;
+        /* null-terminate the argument */
+
+        if (args) {
+            *args++ = NULCHAR;    /* terminate string */
+        }
+
+        ++*numchars;
+    }
+
+    /* We put one last argument in -- a null ptr */
+    if (argv) {
+        *argv++ = NULL;
+    }
+
+    ++*numargs;
 }
 
 

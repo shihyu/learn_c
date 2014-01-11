@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,9 +40,8 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/rewinddir.c,v 1.6 2007/01/09 00:27:55 imp E
 
 void
 rewinddir(dirp)
-	DIR *dirp;
+DIR* dirp;
 {
-
-	_seekdir(dirp, dirp->dd_rewind);
-	dirp->dd_rewind = telldir(dirp);
+    _seekdir(dirp, dirp->dd_rewind);
+    dirp->dd_rewind = telldir(dirp);
 }

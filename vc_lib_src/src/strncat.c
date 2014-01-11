@@ -36,22 +36,23 @@
 *
 *******************************************************************************/
 
-char * __cdecl strncat (
-        char * front,
-        const char * back,
-        size_t count
-        )
-{
-        char *start = front;
+char* __cdecl strncat(
+    char* front,
+    const char* back,
+    size_t count
+) {
+    char* start = front;
 
-        while (*front++)
-                ;
-        front--;
+    while (*front++)
+        ;
 
-        while (count--)
-                if (!(*front++ = *back++))
-                        return(start);
+    front--;
 
-        *front = '\0';
-        return(start);
+    while (count--)
+        if (!(*front++ = *back++)) {
+            return (start);
+        }
+
+    *front = '\0';
+    return (start);
 }

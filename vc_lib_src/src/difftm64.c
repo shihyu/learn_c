@@ -30,17 +30,15 @@
 *
 *******************************************************************************/
 
-double __cdecl _difftime64 (
-        __time64_t b,
-        __time64_t a
-        )
-{
-        _VALIDATE_RETURN_NOEXC(
-            ( ( a >= 0 ) && ( b >= 0 ) ),
-            EINVAL,
-            0
-        )
-
-        return( (double)( b - a ) );
+double __cdecl _difftime64(
+    __time64_t b,
+    __time64_t a
+) {
+    _VALIDATE_RETURN_NOEXC(
+        ((a >= 0) && (b >= 0)),
+        EINVAL,
+        0
+    )
+    return ((double)(b - a));
 }
 

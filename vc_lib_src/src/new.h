@@ -53,24 +53,24 @@
 
 #ifdef _MSC_EXTENSIONS
 #ifdef _USE_OLD_STDCPP
-typedef void (__cdecl * new_handler) ();
+typedef void (__cdecl* new_handler)();
 _CRTIMP new_handler __cdecl set_new_handler(__in_opt new_handler _NewHandler);
 #else  /* _USE_OLD_STDCPP */
 
 namespace std {
 
 #ifdef _M_CEE_PURE
-typedef void (__clrcall * new_handler) ();
+    typedef void (__clrcall* new_handler)();
 #else  /* _M_CEE_PURE */
-typedef void (__cdecl * new_handler) ();
+    typedef void (__cdecl* new_handler)();
 #endif  /* _M_CEE_PURE */
 #ifdef _M_CEE
-typedef void (__clrcall * _new_handler_m) ();
+    typedef void (__clrcall* _new_handler_m)();
 #endif  /* _M_CEE */
-_CRTIMP2 new_handler __cdecl set_new_handler(__in_opt new_handler _NewHandler) throw();
+    _CRTIMP2 new_handler __cdecl set_new_handler(__in_opt new_handler _NewHandler) throw();
 #ifdef _M_CEE_MIXED
-extern "C++" _MRTIMP _new_handler_m __cdecl set_new_handler(__in_opt _new_handler_m _NewHandler) throw();
-extern "C++" _CRTIMP2 new_handler __cdecl set_new_handler(int) throw();
+    extern "C++" _MRTIMP _new_handler_m __cdecl set_new_handler(__in_opt _new_handler_m _NewHandler) throw();
+    extern "C++" _CRTIMP2 new_handler __cdecl set_new_handler(int) throw();
 #endif  /* _M_CEE_MIXED */
 
 };
@@ -86,26 +86,28 @@ using std::set_new_handler;
 #ifndef __NOTHROW_T_DEFINED
 #define __NOTHROW_T_DEFINED
 namespace std {
-        /* placement new tag type to suppress exceptions */
-        struct nothrow_t {};
+    /* placement new tag type to suppress exceptions */
+    struct nothrow_t {};
 
-        /* constant for placement new tag */
-        extern const nothrow_t nothrow;
+    /* constant for placement new tag */
+    extern const nothrow_t nothrow;
 };
 
-__bcount_opt(_Size) void *__CRTDECL operator new(size_t _Size, const std::nothrow_t&) throw();
-__bcount_opt(_Size) void *__CRTDECL operator new[](size_t _Size, const std::nothrow_t&) throw();
-void __CRTDECL operator delete(void *, const std::nothrow_t&) throw();
-void __CRTDECL operator delete[](void *, const std::nothrow_t&) throw();
+__bcount_opt(_Size) void* __CRTDECL operator new(size_t _Size, const std::nothrow_t&) throw();
+__bcount_opt(_Size) void* __CRTDECL operator new[](size_t _Size, const std::nothrow_t&) throw();
+void __CRTDECL operator delete(void*, const std::nothrow_t&) throw();
+void __CRTDECL operator delete[](void*, const std::nothrow_t&) throw();
 #endif  /* __NOTHROW_T_DEFINED */
 
 #ifndef __PLACEMENT_NEW_INLINE
 #define __PLACEMENT_NEW_INLINE
-inline void *__CRTDECL operator new(size_t, void *_Where)
-        {return (_Where); }
+inline void* __CRTDECL operator new(size_t, void* _Where) {
+    return (_Where);
+}
 #if _MSC_VER >= 1200
-inline void __CRTDECL operator delete(void *, void *)
-        {return; }
+inline void __CRTDECL operator delete(void*, void*) {
+    return;
+}
 #endif  /* _MSC_VER >= 1200 */
 #endif  /* __PLACEMENT_NEW_INLINE */
 
@@ -114,31 +116,31 @@ inline void __CRTDECL operator delete(void *, void *)
  * new mode flag -- when set, makes malloc() behave like new()
  */
 
-_CRTIMP int __cdecl _query_new_mode( void );
-_CRTIMP int __cdecl _set_new_mode( __in int _NewMode);
+_CRTIMP int __cdecl _query_new_mode(void);
+_CRTIMP int __cdecl _set_new_mode(__in int _NewMode);
 
 #ifndef _PNH_DEFINED
 #ifdef _M_CEE_PURE
-typedef int (__clrcall * _PNH)( size_t );
+typedef int (__clrcall* _PNH)(size_t);
 #else  /* _M_CEE_PURE */
-typedef int (__cdecl * _PNH)( size_t );
+typedef int (__cdecl* _PNH)(size_t);
 #endif  /* _M_CEE_PURE */
 #define _PNH_DEFINED
 #endif  /* _PNH_DEFINED */
 
-_CRTIMP _PNH __cdecl _query_new_handler( void );
-_CRTIMP _PNH __cdecl _set_new_handler( __in_opt _PNH _NewHandler);
+_CRTIMP _PNH __cdecl _query_new_handler(void);
+_CRTIMP _PNH __cdecl _set_new_handler(__in_opt _PNH _NewHandler);
 
 #if _MSC_VER >= 1400 && defined(_M_CEE)
 #ifndef __MPNH_DEFINED
-typedef int (__clrcall * __MPNH)( size_t );
+typedef int (__clrcall* __MPNH)(size_t);
 #define __MPNH_DEFINED
 #endif  /* __MPNH_DEFINED */
 
-_MRTIMP __MPNH __cdecl __query_new_handler_m( void );
+_MRTIMP __MPNH __cdecl __query_new_handler_m(void);
 #ifdef _M_CEE_MIXED
 /* _set_new_handler(int) is used to disambiguate NULL/0 */
-_CRTIMP _PNH __cdecl _set_new_handler( __in int _NewHandler);
+_CRTIMP _PNH __cdecl _set_new_handler(__in int _NewHandler);
 extern "C++" _MRTIMP __MPNH __cdecl _set_new_handler(__in_opt __MPNH _NewHandler);
 #endif  /* _M_CEE_MIXED */
 #endif  /* _MSC_VER >= 1400 && defined(_M_CEE) */

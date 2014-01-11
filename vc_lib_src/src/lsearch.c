@@ -61,48 +61,44 @@
 _CRTIMP
 #endif  /* !defined (_M_CEE) */
 #ifdef __USE_CONTEXT
-void *__fileDECL _lsearch_s (
-        REG2 const void *key,
-        REG1 void *base,
-        REG3 unsigned int *num,
-        size_t width,
-        int (__fileDECL *compare)(void *, const void *, const void *),
-        void *context
-        )
+void* __fileDECL _lsearch_s(
+    REG2 const void* key,
+    REG1 void* base,
+    REG3 unsigned int* num,
+    size_t width,
+    int (__fileDECL* compare)(void*, const void*, const void*),
+    void* context
+)
 #else  /* __USE_CONTEXT */
-void *__fileDECL _lsearch (
-        REG2 const void *key,
-        REG1 void *base,
-        REG3 unsigned int *num,
-        unsigned int width,
-        int (__fileDECL *compare)(const void *, const void *)
-        )
+void* __fileDECL _lsearch(
+    REG2 const void* key,
+    REG1 void* base,
+    REG3 unsigned int* num,
+    unsigned int width,
+    int (__fileDECL* compare)(const void*, const void*)
+)
 #endif  /* __USE_CONTEXT */
 {
-        unsigned int place = 0;
+    unsigned int place = 0;
+    /* validation section */
+    _VALIDATE_RETURN(key != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(num != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(base != NULL, EINVAL, NULL);
+    _VALIDATE_RETURN(width > 0, EINVAL, NULL);
+    _VALIDATE_RETURN(compare != NULL, EINVAL, NULL);
 
-        /* validation section */
-        _VALIDATE_RETURN(key != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(num != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(base != NULL, EINVAL, NULL);
-        _VALIDATE_RETURN(width > 0, EINVAL, NULL);
-        _VALIDATE_RETURN(compare != NULL, EINVAL, NULL);
-
-        while (place < *num)
-        {
-                if (__COMPARE(context, key, base) == 0)
-                {
-                        return base;
-                }
-                else
-                {
-                        base = (char*)base + width;
-                        place++;
-                }
+    while (place < *num) {
+        if (__COMPARE(context, key, base) == 0) {
+            return base;
+        } else {
+            base = (char*)base + width;
+            place++;
         }
-        memcpy(base, key, width);
-        (*num)++;
-        return base;
+    }
+
+    memcpy(base, key, width);
+    (*num)++;
+    return base;
 }
 
 #undef __fileDECL

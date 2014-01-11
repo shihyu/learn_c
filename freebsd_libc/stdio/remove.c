@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,13 +43,17 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/remove.c,v 1.9 2007/01/09 00:28:07 imp Ex
 
 int
 remove(file)
-	const char *file;
+const char* file;
 {
-	struct stat sb;
+    struct stat sb;
 
-	if (lstat(file, &sb) < 0)
-		return (-1);
-	if (S_ISDIR(sb.st_mode))
-		return (rmdir(file));
-	return (unlink(file));
+    if (lstat(file, &sb) < 0) {
+        return (-1);
+    }
+
+    if (S_ISDIR(sb.st_mode)) {
+        return (rmdir(file));
+    }
+
+    return (unlink(file));
 }

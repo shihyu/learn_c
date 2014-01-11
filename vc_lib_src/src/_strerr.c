@@ -54,52 +54,46 @@
 *******************************************************************************/
 
 #ifdef _UNICODE
-wchar_t * __cdecl __wcserror(
+wchar_t* __cdecl __wcserror(
 #else  /* _UNICODE */
-char * __cdecl _strerror (
+char* __cdecl _strerror(
 #endif  /* _UNICODE */
-    REG1 const _TCHAR *message
-    )
-{
-    const char *sysErrorMsg = NULL;
-
-    _TCHAR *bldmsg;
+    REG1 const _TCHAR* message
+) {
+    const char* sysErrorMsg = NULL;
+    _TCHAR* bldmsg;
     _ptiddata ptd = _getptd_noexit();
-    if (!ptd)
+
+    if (!ptd) {
         return NULL;
-
-
-
+    }
 
     /* Use per thread buffer area (malloc space, if necessary) */
     /* [NOTE: This buffer is shared between _strerror and streror.] */
 
-    if ( (ptd->_terrmsg == NULL) && ((ptd->_terrmsg =
-            _calloc_crt(_ERRMSGLEN_, sizeof(_TCHAR))) == NULL) )
-            return(NULL);
+    if ((ptd->_terrmsg == NULL) && ((ptd->_terrmsg =
+                                         _calloc_crt(_ERRMSGLEN_, sizeof(_TCHAR))) == NULL)) {
+        return (NULL);
+    }
+
     bldmsg = ptd->_terrmsg;
-
-
     /* Build the error message */
-
     bldmsg[0] = '\0';
 
     if (message && *message) {
         // should leave space for ": \n\0"
-        _ERRCHECK(_tcsncat_s( bldmsg, _ERRMSGLEN_, message, _ERRMSGLEN_-4 ));
-        _ERRCHECK(_tcscat_s( bldmsg, _ERRMSGLEN_, _T(": ")));
+        _ERRCHECK(_tcsncat_s(bldmsg, _ERRMSGLEN_, message, _ERRMSGLEN_ - 4));
+        _ERRCHECK(_tcscat_s(bldmsg, _ERRMSGLEN_, _T(": ")));
     }
 
     //  We should have extra space for "\n\0"
     sysErrorMsg = _get_sys_err_msg(errno);
-
 #ifdef _UNICODE
     _ERRCHECK(mbstowcs_s(NULL, bldmsg + wcslen(bldmsg), _ERRMSGLEN_ - wcslen(bldmsg), sysErrorMsg, _ERRMSGLEN_ - wcslen(bldmsg) - 2));
 #else  /* _UNICODE */
     _ERRCHECK(strncat_s(bldmsg, _ERRMSGLEN_, sysErrorMsg, _ERRMSGLEN_ - strlen(bldmsg) - 2));
 #endif  /* _UNICODE */
-
-    _ERRCHECK(_tcscat_s( bldmsg, _ERRMSGLEN_, _T("\n")));
+    _ERRCHECK(_tcscat_s(bldmsg, _ERRMSGLEN_, _T("\n")));
     return bldmsg;
 }
 
@@ -135,20 +129,17 @@ errno_t __cdecl _strerror_s(
 #endif  /* _UNICODE */
     TCHAR* buffer,
     size_t sizeInTChars,
-    REG1 const _TCHAR *message
-    )
-{
+    REG1 const _TCHAR* message
+) {
     errno_t e = 0;
-
     /* validation section */
     _VALIDATE_RETURN_ERRCODE(buffer != NULL, EINVAL);
     _VALIDATE_RETURN_ERRCODE(sizeInTChars > 0, EINVAL);
     buffer[0] = '\0';
 
     if (message &&
-        *message &&
-        _tcslen(message) < (sizeInTChars - 2 - _MIN_MSG_LENGTH))
-    {
+            *message &&
+            _tcslen(message) < (sizeInTChars - 2 - _MIN_MSG_LENGTH)) {
         _ERRCHECK(_tcscpy_s(buffer, sizeInTChars, message));
         _ERRCHECK(_tcscat_s(buffer, sizeInTChars, _T(": ")));
     }

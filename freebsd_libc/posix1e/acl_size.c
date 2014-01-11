@@ -35,9 +35,7 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_size.c,v 1.4 2002/03/22 21:52:38 ob
 #include <errno.h>
 
 ssize_t
-acl_size(acl_t acl)
-{
-
-	errno = ENOSYS;
-	return (-1);
+acl_size(acl_t acl) {
+    errno = ENOSYS;
+    return (-1);
 }

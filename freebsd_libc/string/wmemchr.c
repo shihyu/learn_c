@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemchr.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *  citrus Id: wmemchr.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -36,20 +36,22 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wmemchr.c,v 1.6 2002/09/21 00:29:23 tjr 
 
 #include <wchar.h>
 
-wchar_t	*
+wchar_t*
 wmemchr(s, c, n)
-	const wchar_t *s;
-	wchar_t c;
-	size_t n;
+const wchar_t* s;
+wchar_t c;
+size_t n;
 {
-	size_t i;
+    size_t i;
 
-	for (i = 0; i < n; i++) {
-		if (*s == c) {
-			/* LINTED const castaway */
-			return (wchar_t *)s;
-		}
-		s++;
-	}
-	return NULL;
+    for (i = 0; i < n; i++) {
+        if (*s == c) {
+            /* LINTED const castaway */
+            return (wchar_t*)s;
+        }
+
+        s++;
+    }
+
+    return NULL;
 }

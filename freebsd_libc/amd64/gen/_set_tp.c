@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	$FreeBSD: src/lib/libc/amd64/gen/_set_tp.c,v 1.1 2004/08/15 16:18:02 dfr Exp $
+ *  $FreeBSD: src/lib/libc/amd64/gen/_set_tp.c,v 1.1 2004/08/15 16:18:02 dfr Exp $
  */
 
 #include <string.h>
@@ -31,8 +31,6 @@
 #include <machine/sysarch.h>
 
 void
-_set_tp(void *tp)
-{
-
-	amd64_set_fsbase(tp);
+_set_tp(void* tp) {
+    amd64_set_fsbase(tp);
 }

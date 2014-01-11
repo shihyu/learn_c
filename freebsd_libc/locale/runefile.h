@@ -27,35 +27,35 @@
  */
 
 #ifndef _RUNEFILE_H_
-#define	_RUNEFILE_H_
+#define _RUNEFILE_H_
 
 #include <sys/types.h>
 
 #ifndef _CACHED_RUNES
-#define	_CACHED_RUNES	(1 << 8)
+#define _CACHED_RUNES   (1 << 8)
 #endif
 
 typedef struct {
-	int32_t		min;
-	int32_t		max;
-	int32_t		map;
+    int32_t     min;
+    int32_t     max;
+    int32_t     map;
 } _FileRuneEntry;
 
 typedef struct {
-	char		magic[8];
-	char		encoding[32];
+    char        magic[8];
+    char        encoding[32];
 
-	uint32_t	runetype[_CACHED_RUNES];
-	int32_t		maplower[_CACHED_RUNES];
-	int32_t		mapupper[_CACHED_RUNES];
+    uint32_t    runetype[_CACHED_RUNES];
+    int32_t     maplower[_CACHED_RUNES];
+    int32_t     mapupper[_CACHED_RUNES];
 
-	int32_t		runetype_ext_nranges;
-	int32_t		maplower_ext_nranges;
-	int32_t		mapupper_ext_nranges;
+    int32_t     runetype_ext_nranges;
+    int32_t     maplower_ext_nranges;
+    int32_t     mapupper_ext_nranges;
 
-	int32_t		variable_len;
+    int32_t     variable_len;
 } _FileRuneLocale;
 
-#define	_FILE_RUNE_MAGIC_1	"RuneMag1"
+#define _FILE_RUNE_MAGIC_1  "RuneMag1"
 
-#endif	/* !_RUNEFILE_H_ */
+#endif  /* !_RUNEFILE_H_ */

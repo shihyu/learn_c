@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -41,38 +41,35 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/sscanf.c,v 1.12 2007/01/09 00:28:07 imp E
 #include <stdarg.h>
 #include "local.h"
 
-static int eofread(void *, char *, int);
+static int eofread(void*, char*, int);
 
 /* ARGSUSED */
 static int
 eofread(cookie, buf, len)
-	void *cookie;
-	char *buf;
-	int len;
+void* cookie;
+char* buf;
+int len;
 {
-
-	return (0);
+    return (0);
 }
 
 int
-sscanf(const char * __restrict str, char const * __restrict fmt, ...)
-{
-	int ret;
-	va_list ap;
-	struct __sFILEX extra;
-	FILE f;
-
-	f._file = -1;
-	f._flags = __SRD;
-	f._bf._base = f._p = (unsigned char *)str;
-	f._bf._size = f._r = strlen(str);
-	f._read = eofread;
-	f._ub._base = NULL;
-	f._lb._base = NULL;
-	f._extra = &extra;
-	INITEXTRA(&f);
-	va_start(ap, fmt);
-	ret = __svfscanf(&f, fmt, ap);
-	va_end(ap);
-	return (ret);
+sscanf(const char* __restrict str, char const* __restrict fmt, ...) {
+    int ret;
+    va_list ap;
+    struct __sFILEX extra;
+    FILE f;
+    f._file = -1;
+    f._flags = __SRD;
+    f._bf._base = f._p = (unsigned char*)str;
+    f._bf._size = f._r = strlen(str);
+    f._read = eofread;
+    f._ub._base = NULL;
+    f._lb._base = NULL;
+    f._extra = &extra;
+    INITEXTRA(&f);
+    va_start(ap, fmt);
+    ret = __svfscanf(&f, fmt, ap);
+    va_end(ap);
+    return (ret);
 }

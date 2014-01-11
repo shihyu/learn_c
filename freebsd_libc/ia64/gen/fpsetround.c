@@ -30,14 +30,12 @@
 #include <ieeefp.h>
 
 fp_rnd_t
-fpsetround(fp_rnd_t rnd)
-{
-	uint64_t fpsr;
-	fp_rnd_t prev;
-
-	__asm __volatile("mov %0=ar.fpsr" : "=r"(fpsr));
-	prev = (fp_rnd_t)((fpsr >> 10) & 3);
-	fpsr = (fpsr & ~0xC00ULL) | ((unsigned int)rnd << 10);
-	__asm __volatile("mov ar.fpsr=%0" :: "r"(fpsr));
-	return (prev);
+fpsetround(fp_rnd_t rnd) {
+    uint64_t fpsr;
+    fp_rnd_t prev;
+    __asm __volatile("mov %0=ar.fpsr" : "=r"(fpsr));
+    prev = (fp_rnd_t)((fpsr >> 10) & 3);
+    fpsr = (fpsr & ~0xC00ULL) | ((unsigned int)rnd << 10);
+    __asm __volatile("mov ar.fpsr=%0" :: "r"(fpsr));
+    return (prev);
 }

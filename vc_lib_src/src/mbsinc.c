@@ -36,44 +36,38 @@
 *
 *******************************************************************************/
 
-unsigned char * __cdecl _mbsinc_l(
-        const unsigned char *current,
-        _locale_t plocinfo
-        )
-{
-        if ( (_ismbblead_l)(*(current++),plocinfo))
-        {
-            /* don't move forward two if we get leadbyte, EOS
-               also don't assert here as we are too low level
-            */
-            if(*current!='\0')
-            {
-                current++;
-            }
+unsigned char* __cdecl _mbsinc_l(
+    const unsigned char* current,
+    _locale_t plocinfo
+) {
+    if ((_ismbblead_l)(*(current++), plocinfo)) {
+        /* don't move forward two if we get leadbyte, EOS
+           also don't assert here as we are too low level
+        */
+        if (*current != '\0') {
+            current++;
         }
+    }
 
-        return (unsigned char *)current;
+    return (unsigned char*)current;
 }
 
-unsigned char * (__cdecl _mbsinc)(
-        const unsigned char *current
-        )
-{
-        /* validation section */
-        _VALIDATE_RETURN(current != NULL, EINVAL, NULL);
+unsigned char* (__cdecl _mbsinc)(
+    const unsigned char* current
+) {
+    /* validation section */
+    _VALIDATE_RETURN(current != NULL, EINVAL, NULL);
 
-        if ( _ismbblead(*(current++)))
-        {
-            /* don't move forward two if we get leadbyte, EOS
-               also don't assert here as we are too low level
-            */
-            if(*current!='\0')
-            {
-                current++;
-            }
+    if (_ismbblead(*(current++))) {
+        /* don't move forward two if we get leadbyte, EOS
+           also don't assert here as we are too low level
+        */
+        if (*current != '\0') {
+            current++;
         }
+    }
 
-        return (unsigned char *)current;
+    return (unsigned char*)current;
 }
 
 #endif  /* _MBCS */

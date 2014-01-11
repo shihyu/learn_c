@@ -71,70 +71,61 @@ versions of (v)swprintf */
 *
 *******************************************************************************/
 
-int __cdecl _vswprintf_l (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-        FILE str;
-        REG1 FILE *outfile = &str;
-        REG2 int retval;
+int __cdecl _vswprintf_l(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    FILE str;
+    REG1 FILE* outfile = &str;
+    REG2 int retval;
+    _ASSERTE(string != NULL);
+    _ASSERTE(format != NULL);
+    outfile->_flag = _IOWRT | _IOSTRG;
+    outfile->_ptr = outfile->_base = (char*) string;
 
-        _ASSERTE(string != NULL);
-        _ASSERTE(format != NULL);
+    if (count > (INT_MAX / sizeof(wchar_t))) {
+        /* old-style functions allow any large value to mean unbounded */
+        outfile->_cnt = INT_MAX;
+    } else {
+        outfile->_cnt = (int)(count * sizeof(wchar_t));
+    }
 
-        outfile->_flag = _IOWRT|_IOSTRG;
-        outfile->_ptr = outfile->_base = (char *) string;
-        if(count>(INT_MAX/sizeof(wchar_t)))
-        {
-            /* old-style functions allow any large value to mean unbounded */
-            outfile->_cnt = INT_MAX;
-        }
-        else
-        {
-            outfile->_cnt = (int)(count*sizeof(wchar_t));
-        }
-
-        retval = _woutput_l(outfile,format,plocinfo,ap );
-        _putc_nolock('\0',outfile);     /* no-lock version */
-        _putc_nolock('\0',outfile);     /* 2nd byte for wide char version */
-
-        return(retval);
+    retval = _woutput_l(outfile, format, plocinfo, ap);
+    _putc_nolock('\0', outfile);    /* no-lock version */
+    _putc_nolock('\0', outfile);    /* 2nd byte for wide char version */
+    return (retval);
 }
 
-int __cdecl vswprintf (
-        wchar_t *string,
-        size_t count,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl vswprintf(
+    wchar_t* string,
+    size_t count,
+    const wchar_t* format,
+    va_list ap
+) {
     return _vswprintf_l(string, count, format, NULL, ap);
 }
 
 #if defined (_NATIVE_WCHAR_T_DEFINED)
-int __cdecl _vswprintf_l (
-        unsigned short *string,
-        size_t count,
-        const unsigned short *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
-    return _vswprintf_l(reinterpret_cast<wchar_t *>(string), count, reinterpret_cast<const wchar_t *>(format), plocinfo,ap);
+int __cdecl _vswprintf_l(
+    unsigned short* string,
+    size_t count,
+    const unsigned short* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
+    return _vswprintf_l(reinterpret_cast<wchar_t*>(string), count, reinterpret_cast<const wchar_t*>(format), plocinfo, ap);
 }
 
-int __cdecl vswprintf (
-        unsigned short *string,
-        size_t count,
-        const unsigned short *format,
-        va_list ap
-        )
-{
-    return _vswprintf_l(reinterpret_cast<wchar_t *>(string), count, reinterpret_cast<const wchar_t *>(format), NULL, ap);
+int __cdecl vswprintf(
+    unsigned short* string,
+    size_t count,
+    const unsigned short* format,
+    va_list ap
+) {
+    return _vswprintf_l(reinterpret_cast<wchar_t*>(string), count, reinterpret_cast<const wchar_t*>(format), NULL, ap);
 }
 #endif  /* defined (_NATIVE_WCHAR_T_DEFINED) */
 

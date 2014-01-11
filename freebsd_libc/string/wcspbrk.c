@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wcspbrk.c,v 1.2 2000/12/21 05:07:25 itojun Exp
+ *  citrus Id: wcspbrk.c,v 1.2 2000/12/21 05:07:25 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -36,25 +36,29 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wcspbrk.c,v 1.6 2002/09/21 00:29:23 tjr 
 
 #include <wchar.h>
 
-wchar_t *
+wchar_t*
 wcspbrk(s, set)
-	const wchar_t *s;
-	const wchar_t *set;
+const wchar_t* s;
+const wchar_t* set;
 {
-	const wchar_t *p;
-	const wchar_t *q;
+    const wchar_t* p;
+    const wchar_t* q;
+    p = s;
 
-	p = s;
-	while (*p) {
-		q = set;
-		while (*q) {
-			if (*p == *q) {
-				/* LINTED interface specification */
-				return (wchar_t *)p;
-			}
-			q++;
-		}
-		p++;
-	}
-	return NULL;
+    while (*p) {
+        q = set;
+
+        while (*q) {
+            if (*p == *q) {
+                /* LINTED interface specification */
+                return (wchar_t*)p;
+            }
+
+            q++;
+        }
+
+        p++;
+    }
+
+    return NULL;
 }

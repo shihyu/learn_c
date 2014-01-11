@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -29,7 +29,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)floatio.h	8.1 (Berkeley) 6/4/93
+ *  @(#)floatio.h   8.1 (Berkeley) 6/4/93
  * $FreeBSD: src/lib/libc/stdio/floatio.h,v 1.6 2007/01/09 00:28:06 imp Exp $
  */
 
@@ -44,11 +44,11 @@
  * conversions are supported, ceil(log10(LDBL_MAX_EXP)).  But since it
  * is presently never greater than 5 in practice, we fudge it.
  */
-#define	MAXEXPDIG	6
+#define MAXEXPDIG   6
 #if LDBL_MAX_EXP > 999999
 #error "floating point buffers too small"
 #endif
 
-char *__hdtoa(double, const char *, int, int *, int *, char **);
-char *__hldtoa(long double, const char *, int, int *, int *, char **);
-char *__ldtoa(long double *, int, int, int *, int *, char **);
+char* __hdtoa(double, const char*, int, int*, int*, char**);
+char* __hldtoa(long double, const char*, int, int*, int*, char**);
+char* __ldtoa(long double*, int, int, int*, int*, char**);

@@ -77,14 +77,13 @@
 
 #include <tsplitpath_s.inl>
 
-void __cdecl _tsplitpath (
-        register const _TSCHAR *path,
-        _TSCHAR *drive,
-        _TSCHAR *dir,
-        _TSCHAR *fname,
-        _TSCHAR *ext
-        )
-{
+void __cdecl _tsplitpath(
+    register const _TSCHAR* path,
+    _TSCHAR* drive,
+    _TSCHAR* dir,
+    _TSCHAR* fname,
+    _TSCHAR* ext
+) {
     _tsplitpath_helper(
         path,
         drive, drive ? _MAX_DRIVE : 0,

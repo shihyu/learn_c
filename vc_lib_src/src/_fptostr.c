@@ -41,69 +41,68 @@
 *
 *******************************************************************************/
 
-errno_t __cdecl _fptostr (
-        char *buf,
-        size_t sizeInBytes,
-        REG4 int digits,
-        REG3 STRFLT pflt
-        )
-{
-        REG1 char *pbuf = buf;
-        REG2 char *mantissa = pflt->mantissa;
+errno_t __cdecl _fptostr(
+    char* buf,
+    size_t sizeInBytes,
+    REG4 int digits,
+    REG3 STRFLT pflt
+) {
+    REG1 char* pbuf = buf;
+    REG2 char* mantissa = pflt->mantissa;
+    /* validation section */
+    _VALIDATE_RETURN_ERRCODE(buf != NULL, EINVAL);
+    _VALIDATE_RETURN_ERRCODE(sizeInBytes > 0, EINVAL);
+    buf[0] = '\0';
+    /* the buffer will contains ndec decimal digits plus an optional
+     * overflow digit for the rounding
+     */
+    _VALIDATE_RETURN_ERRCODE(sizeInBytes > (size_t)((digits > 0 ? digits : 0) + 1), ERANGE);
+    _VALIDATE_RETURN_ERRCODE(pflt != NULL, EINVAL);
+    /* initialize the first digit in the buffer to '0' (NOTE - NOT '\0')
+     * and set the pointer to the second digit of the buffer.  The first
+     * digit is used to handle overflow on rounding (e.g. 9.9999...
+     * becomes 10.000...) which requires a carry into the first digit.
+     */
+    *pbuf++ = '0';
 
-        /* validation section */
-        _VALIDATE_RETURN_ERRCODE(buf != NULL, EINVAL);
-        _VALIDATE_RETURN_ERRCODE(sizeInBytes > 0, EINVAL);
-        buf[0] = '\0';
-        /* the buffer will contains ndec decimal digits plus an optional
-         * overflow digit for the rounding
-         */
-        _VALIDATE_RETURN_ERRCODE(sizeInBytes > (size_t)((digits > 0 ? digits : 0) + 1), ERANGE);
-        _VALIDATE_RETURN_ERRCODE(pflt != NULL, EINVAL);
+    /* Copy the digits of the value into the buffer (with 0 padding)
+     * and insert the terminating null character.
+     */
 
-        /* initialize the first digit in the buffer to '0' (NOTE - NOT '\0')
-         * and set the pointer to the second digit of the buffer.  The first
-         * digit is used to handle overflow on rounding (e.g. 9.9999...
-         * becomes 10.000...) which requires a carry into the first digit.
-         */
+    while (digits > 0) {
+        *pbuf++ = (*mantissa) ? *mantissa++ : (char)'0';
+        digits--;
+    }
 
-        *pbuf++ = '0';
+    *pbuf = '\0';
 
-        /* Copy the digits of the value into the buffer (with 0 padding)
-         * and insert the terminating null character.
-         */
+    /* do any rounding which may be needed.  Note - if digits < 0 don't
+     * do any rounding since in this case, the rounding occurs in  a digit
+     * which will not be output beause of the precision requested
+     */
 
-        while (digits > 0) {
-                *pbuf++ = (*mantissa) ? *mantissa++ : (char)'0';
-                digits--;
-        }
-        *pbuf = '\0';
+    if (digits >= 0 && *mantissa >= '5') {
+        pbuf--;
 
-        /* do any rounding which may be needed.  Note - if digits < 0 don't
-         * do any rounding since in this case, the rounding occurs in  a digit
-         * which will not be output beause of the precision requested
-         */
-
-        if (digits >= 0 && *mantissa >= '5') {
-                pbuf--;
-                while (*pbuf == '9')
-                        *pbuf-- = '0';
-                *pbuf += 1;
+        while (*pbuf == '9') {
+            *pbuf-- = '0';
         }
 
-        if (*buf == '1') {
-                /* the rounding caused overflow into the leading digit (e.g.
-                 * 9.999.. went to 10.000...), so increment the decpt position
-                 * by 1
-                 */
-                pflt->decpt++;
-        }
-        else {
-                /* move the entire string to the left one digit to remove the
-                 * unused overflow digit.
-                 */
-                memmove(buf, buf+1, strlen(buf+1)+1);
-        }
+        *pbuf += 1;
+    }
 
-        return 0;
+    if (*buf == '1') {
+        /* the rounding caused overflow into the leading digit (e.g.
+         * 9.999.. went to 10.000...), so increment the decpt position
+         * by 1
+         */
+        pflt->decpt++;
+    } else {
+        /* move the entire string to the left one digit to remove the
+         * unused overflow digit.
+         */
+        memmove(buf, buf + 1, strlen(buf + 1) + 1);
+    }
+
+    return 0;
 }

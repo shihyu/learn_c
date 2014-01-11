@@ -9,9 +9,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getprogname.c,v 1.4 2002/03/29 22:43:41 mar
 
 __weak_reference(_getprogname, getprogname);
 
-const char *
-_getprogname(void)
-{
-
-	return (__progname);
+const char*
+_getprogname(void) {
+    return (__progname);
 }

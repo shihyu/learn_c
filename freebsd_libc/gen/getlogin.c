@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,57 +46,57 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getlogin.c,v 1.10 2007/01/09 00:27:54 imp E
 
 #include "libc_private.h"
 
-#define	THREAD_LOCK()	if (__isthreaded) _pthread_mutex_lock(&logname_mutex)
-#define	THREAD_UNLOCK()	if (__isthreaded) _pthread_mutex_unlock(&logname_mutex)
+#define THREAD_LOCK()   if (__isthreaded) _pthread_mutex_lock(&logname_mutex)
+#define THREAD_UNLOCK() if (__isthreaded) _pthread_mutex_unlock(&logname_mutex)
 
-extern int		_getlogin(char *, int);
+extern int      _getlogin(char*, int);
 
-int			_logname_valid;		/* known to setlogin() */
-static pthread_mutex_t	logname_mutex = PTHREAD_MUTEX_INITIALIZER;
+int         _logname_valid;     /* known to setlogin() */
+static pthread_mutex_t  logname_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static char *
-getlogin_basic(int *status)
-{
-	static char logname[MAXLOGNAME];
+static char*
+getlogin_basic(int* status) {
+    static char logname[MAXLOGNAME];
 
-	if (_logname_valid == 0) {
-		if (_getlogin(logname, sizeof(logname)) < 0) {
-			*status = errno;
-			return (NULL);
-		}
-		_logname_valid = 1;
-	}
-	*status = 0;
-	return (*logname ? logname : NULL);
+    if (_logname_valid == 0) {
+        if (_getlogin(logname, sizeof(logname)) < 0) {
+            *status = errno;
+            return (NULL);
+        }
+
+        _logname_valid = 1;
+    }
+
+    *status = 0;
+    return (*logname ? logname : NULL);
 }
 
-char *
-getlogin(void)
-{
-	char	*result;
-	int	status;
-
-	THREAD_LOCK();
-	result = getlogin_basic(&status);
-	THREAD_UNLOCK();
-	return (result);
+char*
+getlogin(void) {
+    char*    result;
+    int status;
+    THREAD_LOCK();
+    result = getlogin_basic(&status);
+    THREAD_UNLOCK();
+    return (result);
 }
 
 int
-getlogin_r(char *logname, int namelen)
-{
-	char	*result;
-	int	len;
-	int	status;
-	
-	THREAD_LOCK();
-	result = getlogin_basic(&status);
-	if (status == 0) {
-		if ((len = strlen(result) + 1) > namelen)
-			status = ERANGE;
-		else
-			strncpy(logname, result, len);
-	}
-	THREAD_UNLOCK();
-	return (status);
+getlogin_r(char* logname, int namelen) {
+    char*    result;
+    int len;
+    int status;
+    THREAD_LOCK();
+    result = getlogin_basic(&status);
+
+    if (status == 0) {
+        if ((len = strlen(result) + 1) > namelen) {
+            status = ERANGE;
+        } else {
+            strncpy(logname, result, len);
+        }
+    }
+
+    THREAD_UNLOCK();
+    return (status);
 }

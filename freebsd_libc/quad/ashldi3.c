@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -45,20 +45,21 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/ashldi3.c,v 1.3 2007/01/09 00:28:02 imp Ex
  */
 quad_t
 __ashldi3(a, shift)
-	quad_t a;
-	qshift_t shift;
+quad_t a;
+qshift_t shift;
 {
-	union uu aa;
+    union uu aa;
+    aa.q = a;
 
-	aa.q = a;
-	if (shift >= LONG_BITS) {
-		aa.ul[H] = shift >= QUAD_BITS ? 0 :
-		    aa.ul[L] << (shift - LONG_BITS);
-		aa.ul[L] = 0;
-	} else if (shift > 0) {
-		aa.ul[H] = (aa.ul[H] << shift) |
-		    (aa.ul[L] >> (LONG_BITS - shift));
-		aa.ul[L] <<= shift;
-	}
-	return (aa.q);
+    if (shift >= LONG_BITS) {
+        aa.ul[H] = shift >= QUAD_BITS ? 0 :
+                   aa.ul[L] << (shift - LONG_BITS);
+        aa.ul[L] = 0;
+    } else if (shift > 0) {
+        aa.ul[H] = (aa.ul[H] << shift) |
+                   (aa.ul[L] >> (LONG_BITS - shift));
+        aa.ul[L] <<= shift;
+    }
+
+    return (aa.q);
 }

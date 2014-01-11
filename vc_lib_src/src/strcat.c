@@ -38,20 +38,19 @@
 *
 *******************************************************************************/
 
-char * __cdecl strcat (
-        char * dst,
-        const char * src
-        )
-{
-        char * cp = dst;
+char* __cdecl strcat(
+    char* dst,
+    const char* src
+) {
+    char* cp = dst;
 
-        while( *cp )
-                cp++;                   /* find end of dst */
+    while (*cp) {
+        cp++;    /* find end of dst */
+    }
 
-        while( *cp++ = *src++ ) ;       /* Copy src to end of dst */
+    while (*cp++ = *src++) ;        /* Copy src to end of dst */
 
-        return( dst );                  /* return dst */
-
+    return (dst);                   /* return dst */
 }
 
 
@@ -72,12 +71,11 @@ char * __cdecl strcat (
 *Exceptions:
 *******************************************************************************/
 
-char * __cdecl strcpy(char * dst, const char * src)
-{
-        char * cp = dst;
+char* __cdecl strcpy(char* dst, const char* src) {
+    char* cp = dst;
 
-        while( *cp++ = *src++ )
-                ;               /* Copy src over dst */
+    while (*cp++ = *src++)
+        ;               /* Copy src over dst */
 
-        return( dst );
+    return (dst);
 }

@@ -42,8 +42,7 @@
 *
 *******************************************************************************/
 
-int __cdecl _resetstkoflw(void)
-{
+int __cdecl _resetstkoflw(void) {
     LPBYTE pStack, pStackBase, pMaxGuard, pMinGuard;
 #if defined (_M_IA64)
     LPBYTE pBspBase;
@@ -56,11 +55,10 @@ int __cdecl _resetstkoflw(void)
     DWORD flNewProtect;
     DWORD flOldProtect;
     BOOL
-    (*SetThreadStackGuaranteePointer) (
-        ULONG *StackSizeInBytes
+    (*SetThreadStackGuaranteePointer)(
+        ULONG * StackSizeInBytes
     );
     unsigned int osplatform = 0;
-
     // Use _alloca() to get the current stack pointer
 #pragma warning(push)
 #pragma warning(disable:6255)
@@ -75,40 +73,35 @@ int __cdecl _resetstkoflw(void)
     }
 
     pStackBase = (LPBYTE)mbi.AllocationBase;
-
     GetSystemInfo(&si);
     PageSize = si.dwPageSize;
     RegionSize = 0;
-
     // Enable the new guard page.
     _ERRCHECK(_get_osplatform(&osplatform));
-    if (osplatform == VER_PLATFORM_WIN32_NT) {
 
+    if (osplatform == VER_PLATFORM_WIN32_NT) {
         //
         // Note: if the GuaranteedStackBytes TEB field is 0
         // (on older OS versions or if SetThreadStackGuarantee is
         // not being used) we will use the default value of
         // RegionSize (2 pages for ia64, 1 page for other platforms).
         //
-
         ULONG StackSizeInBytes;
         HMODULE ModuleHandle;
-
         //
         // Don't call SetThreadStackGuarantee directly as older kernel32.dll
         // versions do not have this export.
         //
-
-        ModuleHandle = GetModuleHandle ("kernel32.dll");
+        ModuleHandle = GetModuleHandle("kernel32.dll");
 
         if (ModuleHandle != NULL) {
-
-            SetThreadStackGuaranteePointer = (PVOID) GetProcAddress (ModuleHandle, "SetThreadStackGuarantee");
+            SetThreadStackGuaranteePointer = (PVOID) GetProcAddress(ModuleHandle, "SetThreadStackGuarantee");
 
             if (SetThreadStackGuaranteePointer != NULL) {
                 StackSizeInBytes = 0;       // Indicate just querying
-                if (SetThreadStackGuaranteePointer (&StackSizeInBytes) == TRUE &&
-                    StackSizeInBytes > 0) {
+
+                if (SetThreadStackGuaranteePointer(&StackSizeInBytes) == TRUE &&
+                        StackSizeInBytes > 0) {
                     RegionSize = StackSizeInBytes;
                 }
             }
@@ -118,8 +111,6 @@ int __cdecl _resetstkoflw(void)
     flNewProtect = (osplatform == VER_PLATFORM_WIN32_WINDOWS)
                    ? PAGE_NOACCESS
                    : PAGE_READWRITE | PAGE_GUARD;
-
-
     RegionSize = (RegionSize + PageSize - 1) & ~(PageSize - 1);
 
     //
@@ -134,32 +125,24 @@ int __cdecl _resetstkoflw(void)
     }
 
 #if defined (_M_IA64)
-
     //
     // Reset the backstore stack pages.
     //
-
     //
     // Calculate the top of the BSP stack, by getting the size of the normal
     // stack and adding it to the StackBase.
     //
-
     pBspBase = (LPBYTE)(((ULONG_PTR)(((PNT_TIB)NtCurrentTeb())->StackBase) - (ULONG_PTR) mbi.AllocationBase) +
-        (ULONG_PTR)(((PNT_TIB)NtCurrentTeb())->StackBase));
-
+                        (ULONG_PTR)(((PNT_TIB)NtCurrentTeb())->StackBase));
     //
     // Get the current BSP and round up since the BSP grows up.
     //
-
-    pMinGuard = (LPBYTE) ((__getReg(__REG_IA64_RsBSP) + PageSize) & ~(ULONG_PTR)(PageSize - 1));
-
+    pMinGuard = (LPBYTE)((__getReg(__REG_IA64_RsBSP) + PageSize) & ~(ULONG_PTR)(PageSize - 1));
     //
     // The highest BSP address is the top of the BSP stack less one page for
     // the guard.
     //
-
     pMaxGuard = pBspBase - PageSize;
-
     BspRegionSize = RegionSize;
 
     if (BspRegionSize < MIN_BSP_REQ_WINNT * PageSize) {
@@ -167,17 +150,15 @@ int __cdecl _resetstkoflw(void)
     }
 
     if (((ULONG_PTR)pMaxGuard < BspRegionSize) ||
-        (pMaxGuard - BspRegionSize) < pMinGuard) {
-
+            (pMaxGuard - BspRegionSize) < pMinGuard) {
         //
         // The current BSP is already in the highest guard region.
         //
-
         return 0;
     }
 
-    if (VirtualAlloc (pMinGuard, BspRegionSize, MEM_COMMIT, PAGE_READWRITE) == NULL ||
-        VirtualProtect (pMinGuard, BspRegionSize, flNewProtect, &flOldProtect) == 0) {
+    if (VirtualAlloc(pMinGuard, BspRegionSize, MEM_COMMIT, PAGE_READWRITE) == NULL ||
+            VirtualProtect(pMinGuard, BspRegionSize, flNewProtect, &flOldProtect) == 0) {
         return 0;
     }
 
@@ -191,20 +172,17 @@ int __cdecl _resetstkoflw(void)
     // Find the page(s) just below where the stack pointer currently points.
     // This is the highest potential guard page.
     //
-
-    pMaxGuard = (LPBYTE) (((DWORD_PTR)pStack & ~(DWORD_PTR)(PageSize - 1))
-                       - RegionSize);
-
+    pMaxGuard = (LPBYTE)(((DWORD_PTR)pStack & ~(DWORD_PTR)(PageSize - 1))
+                         - RegionSize);
     //
     // If the potential guard page is too close to the start of the stack
     // region, abandon the reset effort for lack of space.  Win9x has a
     // larger reserved stack requirement.
     //
-
     pMinGuard = pStackBase + (
-                              (osplatform == VER_PLATFORM_WIN32_WINDOWS)
-                              ? MIN_STACK_REQ_WIN9X
-                              : PageSize);
+                    (osplatform == VER_PLATFORM_WIN32_WINDOWS)
+                    ? MIN_STACK_REQ_WIN9X
+                    : PageSize);
 
     if (pMaxGuard < pMinGuard) {
         return 0;
@@ -212,8 +190,8 @@ int __cdecl _resetstkoflw(void)
 
     // Set the new guard page just below the current stack page.
 
-    if (VirtualAlloc (pMaxGuard, RegionSize, MEM_COMMIT, PAGE_READWRITE) == NULL ||
-        VirtualProtect (pMaxGuard, RegionSize, flNewProtect, &flOldProtect) == 0) {
+    if (VirtualAlloc(pMaxGuard, RegionSize, MEM_COMMIT, PAGE_READWRITE) == NULL ||
+            VirtualProtect(pMaxGuard, RegionSize, flNewProtect, &flOldProtect) == 0) {
         return 0;
     }
 

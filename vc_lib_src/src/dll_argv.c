@@ -58,13 +58,13 @@
 extern int _dowildcard; /* should be in <internal.h> */
 
 #ifdef WPRFLAG
-int __CRTDECL __wsetargv ( void )
+int __CRTDECL __wsetargv(void)
 #else  /* WPRFLAG */
-int __CRTDECL __setargv ( void )
+int __CRTDECL __setargv(void)
 #endif  /* WPRFLAG */
 {
-        _dowildcard = 1;
-        return 0;
+    _dowildcard = 1;
+    return 0;
 }
 
 #endif  /* defined (CRTDLL) || defined (MRTDLL) */

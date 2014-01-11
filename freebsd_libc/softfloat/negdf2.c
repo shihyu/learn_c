@@ -14,9 +14,7 @@ __FBSDID("$FreeBSD: src/lib/libc/softfloat/negdf2.c,v 1.1 2004/05/14 12:13:04 co
 float64 __negdf2(float64);
 
 float64
-__negdf2(float64 a)
-{
-
-	/* libgcc1.c says -a */
-	return a ^ FLOAT64_MANGLE(0x8000000000000000ULL);
+__negdf2(float64 a) {
+    /* libgcc1.c says -a */
+    return a ^ FLOAT64_MANGLE(0x8000000000000000ULL);
 }

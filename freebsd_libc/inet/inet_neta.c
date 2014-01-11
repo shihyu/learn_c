@@ -43,49 +43,56 @@ __FBSDID("$FreeBSD: src/lib/libc/inet/inet_neta.c,v 1.3 2007/06/03 17:20:26 ume 
 /*%
  * char *
  * inet_neta(src, dst, size)
- *	format an in_addr_t network number into presentation format.
+ *  format an in_addr_t network number into presentation format.
  * return:
- *	pointer to dst, or NULL if an error occurred (check errno).
+ *  pointer to dst, or NULL if an error occurred (check errno).
  * note:
- *	format of ``src'' is as for inet_network().
+ *  format of ``src'' is as for inet_network().
  * author:
- *	Paul Vixie (ISC), July 1996
+ *  Paul Vixie (ISC), July 1996
  */
-char *
+char*
 inet_neta(src, dst, size)
-	in_addr_t src;
-	char *dst;
-	size_t size;
+in_addr_t src;
+char* dst;
+size_t size;
 {
-	char *odst = dst;
-	char *tp;
+    char* odst = dst;
+    char* tp;
 
-	while (src & 0xffffffff) {
-		u_char b = (src & 0xff000000) >> 24;
+    while (src & 0xffffffff) {
+        u_char b = (src & 0xff000000) >> 24;
+        src <<= 8;
 
-		src <<= 8;
-		if (b) {
-			if (size < sizeof "255.")
-				goto emsgsize;
-			tp = dst;
-			dst += SPRINTF((dst, "%u", b));
-			if (src != 0L) {
-				*dst++ = '.';
-				*dst = '\0';
-			}
-			size -= (size_t)(dst - tp);
-		}
-	}
-	if (dst == odst) {
-		if (size < sizeof "0.0.0.0")
-			goto emsgsize;
-		strcpy(dst, "0.0.0.0");
-	}
-	return (odst);
+        if (b) {
+            if (size < sizeof "255.") {
+                goto emsgsize;
+            }
 
- emsgsize:
-	errno = EMSGSIZE;
-	return (NULL);
+            tp = dst;
+            dst += SPRINTF((dst, "%u", b));
+
+            if (src != 0L) {
+                *dst++ = '.';
+                *dst = '\0';
+            }
+
+            size -= (size_t)(dst - tp);
+        }
+    }
+
+    if (dst == odst) {
+        if (size < sizeof "0.0.0.0") {
+            goto emsgsize;
+        }
+
+        strcpy(dst, "0.0.0.0");
+    }
+
+    return (odst);
+emsgsize:
+    errno = EMSGSIZE;
+    return (NULL);
 }
 
 /*

@@ -36,43 +36,35 @@
 *
 *******************************************************************************/
 
-int __cdecl memcmp (
-        const void * buf1,
-        const void * buf2,
-        size_t count
-        )
-{
-        if (!count)
-                return(0);
-
-#if defined (_M_AMD64)
-
-    {
-
-
-        __declspec(dllimport)
-
-
-        size_t RtlCompareMemory( const void * src1, const void * src2, size_t length );
-
-        size_t length;
-
-        if ( ( length = RtlCompareMemory( buf1, buf2, count ) ) == count ) {
-            return(0);
-        }
-
-        buf1 = (char *)buf1 + length;
-        buf2 = (char *)buf2 + length;
+int __cdecl memcmp(
+    const void* buf1,
+    const void* buf2,
+    size_t count
+) {
+    if (!count) {
+        return (0);
     }
 
-#else  /* defined (_M_AMD64) */
+#if defined (_M_AMD64)
+    {
+        __declspec(dllimport)
+        size_t RtlCompareMemory(const void* src1, const void* src2, size_t length);
+        size_t length;
 
-        while ( --count && *(char *)buf1 == *(char *)buf2 ) {
-                buf1 = (char *)buf1 + 1;
-                buf2 = (char *)buf2 + 1;
+        if ((length = RtlCompareMemory(buf1, buf2, count)) == count) {
+            return (0);
         }
 
-#endif  /* defined (_M_AMD64) */
+        buf1 = (char*)buf1 + length;
+        buf2 = (char*)buf2 + length;
+    }
+#else  /* defined (_M_AMD64) */
 
-        return( *((unsigned char *)buf1) - *((unsigned char *)buf2) );
+    while (--count && *(char*)buf1 == *(char*)buf2) {
+        buf1 = (char*)buf1 + 1;
+        buf2 = (char*)buf2 + 1;
+    }
+
+#endif  /* defined (_M_AMD64) */
+    return (*((unsigned char*)buf1) - * ((unsigned char*)buf2));
 }

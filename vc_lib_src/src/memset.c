@@ -34,34 +34,25 @@
 *
 *******************************************************************************/
 
-void * __cdecl memset (
-        void *dst,
-        int val,
-        size_t count
-        )
-{
-        void *start = dst;
-
+void* __cdecl memset(
+    void* dst,
+    int val,
+    size_t count
+) {
+    void* start = dst;
 #if defined (_M_IA64) || defined (_M_AMD64)
-
-        {
-
-
+    {
         __declspec(dllimport)
-
-
-        void RtlFillMemory( void *, size_t count, char );
-
-        RtlFillMemory( dst, count, (char)val );
-
-        }
-
+        void RtlFillMemory(void*, size_t count, char);
+        RtlFillMemory(dst, count, (char)val);
+    }
 #else  /* defined (_M_IA64) || defined (_M_AMD64) */
-        while (count--) {
-                *(char *)dst = (char)val;
-                dst = (char *)dst + 1;
-        }
-#endif  /* defined (_M_IA64) || defined (_M_AMD64) */
 
-        return(start);
+    while (count--) {
+        *(char*)dst = (char)val;
+        dst = (char*)dst + 1;
+    }
+
+#endif  /* defined (_M_IA64) || defined (_M_AMD64) */
+    return (start);
 }

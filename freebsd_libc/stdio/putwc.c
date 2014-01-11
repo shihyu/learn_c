@@ -41,8 +41,6 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/putwc.c,v 1.3 2004/05/25 10:42:52 tjr Exp
  * macro, may evaluate `fp' more than once.
  */
 wint_t
-putwc(wchar_t wc, FILE *fp)
-{
-
-	return (fputwc(wc, fp));
+putwc(wchar_t wc, FILE* fp) {
+    return (fputwc(wc, fp));
 }

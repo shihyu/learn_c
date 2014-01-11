@@ -44,25 +44,21 @@
 *
 *******************************************************************************/
 
-wint_t __cdecl ungetwc (
-        REG2 wint_t ch,
-        REG1 FILE *stream
-        )
-{
-        wint_t retval;
+wint_t __cdecl ungetwc(
+    REG2 wint_t ch,
+    REG1 FILE* stream
+) {
+    wint_t retval;
+    _VALIDATE_RETURN((stream != NULL), EINVAL, EOF);
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (stream != NULL), EINVAL, EOF);
+    __try {
+        retval = _ungetwc_nolock(ch, stream);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        _lock_str(stream);
-
-        __try {
-                retval = _ungetwc_nolock (ch, stream);
-        }
-        __finally {
-                _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
 

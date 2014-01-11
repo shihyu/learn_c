@@ -42,18 +42,18 @@
 *
 *******************************************************************************/
 
-static int __cdecl wcsncnt (
-        const wchar_t *string,
-        int cnt
-        )
-{
-        int n = cnt;
-        wchar_t *cp = (wchar_t *)string;
+static int __cdecl wcsncnt(
+    const wchar_t* string,
+    int cnt
+) {
+    int n = cnt;
+    wchar_t* cp = (wchar_t*)string;
 
-        while (n-- && *cp)
-            cp++;
+    while (n-- && *cp) {
+        cp++;
+    }
 
-        return cnt - n - 1;
+    return cnt - n - 1;
 }
 
 /***
@@ -83,16 +83,15 @@ static int __cdecl wcsncnt (
 *******************************************************************************/
 
 static int __cdecl __crtCompareStringW_stat(
-        _locale_t plocinfo,
-        LCID     Locale,
-        DWORD    dwCmpFlags,
-        LPCWSTR  lpString1,
-        int      cchCount1,
-        LPCWSTR  lpString2,
-        int      cchCount2,
-        int      code_page
-        )
-{
+    _locale_t plocinfo,
+    LCID     Locale,
+    DWORD    dwCmpFlags,
+    LPCWSTR  lpString1,
+    int      cchCount1,
+    LPCWSTR  lpString2,
+    int      cchCount2,
+    int      code_page
+) {
     static int f_use = 0;
 
     /*
@@ -100,13 +99,12 @@ static int __cdecl __crtCompareStringW_stat(
      * Must actually call the function to ensure it's not a stub.
      */
 
-    if (0 == f_use)
-    {
-        if (0 != CompareStringW(0, 0, L"\0", 1, L"\0", 1))
+    if (0 == f_use) {
+        if (0 != CompareStringW(0, 0, L"\0", 1, L"\0", 1)) {
             f_use = USE_W;
-
-        else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
+        } else if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) {
             f_use = USE_A;
+        }
     }
 
     /*
@@ -114,10 +112,13 @@ static int __cdecl __crtCompareStringW_stat(
      * before cchCountn wide characters.
      */
 
-    if (cchCount1 > 0)
-        cchCount1= wcsncnt(lpString1, cchCount1);
-    if (cchCount2 > 0)
-        cchCount2= wcsncnt(lpString2, cchCount2);
+    if (cchCount1 > 0) {
+        cchCount1 = wcsncnt(lpString1, cchCount1);
+    }
+
+    if (cchCount2 > 0) {
+        cchCount2 = wcsncnt(lpString2, cchCount2);
+    }
 
     if (!cchCount1 || !cchCount2)
         return (cchCount1 - cchCount2 == 0) ? 2 :
@@ -125,24 +126,22 @@ static int __cdecl __crtCompareStringW_stat(
 
     /* Use "W" version */
 
-    if (USE_W == f_use)
-    {
-        return CompareStringW( Locale,
-                               dwCmpFlags,
-                               lpString1,
-                               cchCount1,
-                               lpString2,
-                               cchCount2 );
+    if (USE_W == f_use) {
+        return CompareStringW(Locale,
+                              dwCmpFlags,
+                              lpString1,
+                              cchCount1,
+                              lpString2,
+                              cchCount2);
     }
 
     /* Use "A" version */
 
-    if (USE_A == f_use || f_use == 0)
-    {
+    if (USE_A == f_use || f_use == 0) {
         int buff_size1;
         int buff_size2;
-        unsigned char *buffer1;
-        unsigned char *buffer2;
+        unsigned char* buffer1;
+        unsigned char* buffer2;
         int retcode = 0;
         int AnsiCP;
 
@@ -150,19 +149,22 @@ static int __cdecl __crtCompareStringW_stat(
          * Use __lc_codepage for conversion if code_page not specified
          */
 
-        if (0 == Locale)
+        if (0 == Locale) {
             Locale = plocinfo->locinfo->lc_handle[LC_CTYPE];
-        if (0 == code_page)
+        }
+
+        if (0 == code_page) {
             code_page = plocinfo->locinfo->lc_codepage;
+        }
 
         /*
          * Always use Ansi codepage with Ansi WinAPI because they use
          * Ansi codepage
          */
-        if ( code_page != (AnsiCP = __ansicp(Locale)))
-        {
-            if (AnsiCP != -1)
+        if (code_page != (AnsiCP = __ansicp(Locale))) {
+            if (AnsiCP != -1) {
                 code_page = AnsiCP;
+            }
         }
 
         /*
@@ -170,98 +172,99 @@ static int __cdecl __crtCompareStringW_stat(
          */
 
         /* find out how big a buffer we need (includes NULL if any) */
-        if ( 0 == (buff_size1 = WideCharToMultiByte( code_page,
-                                                     0,
-                                                     lpString1,
-                                                     cchCount1,
-                                                     NULL,
-                                                     0,
-                                                     NULL,
-                                                     NULL )) )
+        if (0 == (buff_size1 = WideCharToMultiByte(code_page,
+                               0,
+                               lpString1,
+                               cchCount1,
+                               NULL,
+                               0,
+                               NULL,
+                               NULL))) {
             return 0;
+        }
 
         /* allocate enough space for chars */
-        buffer1 = (unsigned char *)_calloca( buff_size1, sizeof(char) );
-        if ( buffer1 == NULL ) {
+        buffer1 = (unsigned char*)_calloca(buff_size1, sizeof(char));
+
+        if (buffer1 == NULL) {
             return 0;
         }
 
         /* do the conversion */
-        if ( 0 == WideCharToMultiByte( code_page,
-                                       0,
-                                       lpString1,
-                                       cchCount1,
-                                       (char *)buffer1,
-                                       buff_size1,
-                                       NULL,
-                                       NULL ) )
+        if (0 == WideCharToMultiByte(code_page,
+                                     0,
+                                     lpString1,
+                                     cchCount1,
+                                     (char*)buffer1,
+                                     buff_size1,
+                                     NULL,
+                                     NULL)) {
             goto error_cleanup;
+        }
 
         /* find out how big a buffer we need (includes NULL if any) */
-        if ( 0 == (buff_size2 = WideCharToMultiByte( code_page,
-                                                     0,
-                                                     lpString2,
-                                                     cchCount2,
-                                                     NULL,
-                                                     0,
-                                                     NULL,
-                                                     NULL )) )
+        if (0 == (buff_size2 = WideCharToMultiByte(code_page,
+                               0,
+                               lpString2,
+                               cchCount2,
+                               NULL,
+                               0,
+                               NULL,
+                               NULL))) {
             goto error_cleanup;
+        }
 
         /* allocate enough space for chars */
-        buffer2 = (unsigned char *)_calloca( buff_size2, sizeof(char) );
-        if ( buffer2 == NULL ) {
+        buffer2 = (unsigned char*)_calloca(buff_size2, sizeof(char));
+
+        if (buffer2 == NULL) {
             goto error_cleanup;
         }
 
         /* do the conversion */
-        if ( 0 != WideCharToMultiByte( code_page,
-                                       0,
-                                       lpString2,
-                                       cchCount2,
-                                       (char *)buffer2,
-                                       buff_size2,
-                                       NULL,
-                                       NULL ) )
-            retcode = CompareStringA( Locale,
-                                      dwCmpFlags,
-                                      (const char *)buffer1,
-                                      buff_size1,
-                                      (char *)buffer2,
-                                      buff_size2 );
+        if (0 != WideCharToMultiByte(code_page,
+                                     0,
+                                     lpString2,
+                                     cchCount2,
+                                     (char*)buffer2,
+                                     buff_size2,
+                                     NULL,
+                                     NULL))
+            retcode = CompareStringA(Locale,
+                                     dwCmpFlags,
+                                     (const char*)buffer1,
+                                     buff_size1,
+                                     (char*)buffer2,
+                                     buff_size2);
 
         _freea(buffer2);
-
-error_cleanup:
+    error_cleanup:
         _freea(buffer1);
-
         return retcode;
-    }
-    else   /* f_use is neither USE_A nor USE_W */
+    } else { /* f_use is neither USE_A nor USE_W */
         return 0;
+    }
 }
 
 extern "C" int __cdecl __crtCompareStringW(
-        _locale_t plocinfo,
-        LCID     Locale,
-        DWORD    dwCmpFlags,
-        LPCWSTR  lpString1,
-        int      cchCount1,
-        LPCWSTR  lpString2,
-        int      cchCount2,
-        int      code_page
-        )
-{
+    _locale_t plocinfo,
+    LCID     Locale,
+    DWORD    dwCmpFlags,
+    LPCWSTR  lpString1,
+    int      cchCount1,
+    LPCWSTR  lpString2,
+    int      cchCount2,
+    int      code_page
+) {
     _LocaleUpdate _loc_update(plocinfo);
-
     return __crtCompareStringW_stat(
-            _loc_update.GetLocaleT(),
-            Locale,
-            dwCmpFlags,
-            lpString1,
-            cchCount1,
-            lpString2,
-            cchCount2,
-            code_page
-            );
+               _loc_update.GetLocaleT(),
+               Locale,
+               dwCmpFlags,
+               lpString1,
+               cchCount1,
+               lpString2,
+               cchCount2,
+               code_page
+           );
 }

@@ -42,81 +42,69 @@
 *
 *******************************************************************************/
 
-extern "C" int __cdecl _memicmp_l (
-        const void * first,
-        const void * last,
-        size_t count,
-        _locale_t plocinfo
-        )
-{
+extern "C" int __cdecl _memicmp_l(
+    const void* first,
+    const void* last,
+    size_t count,
+    _locale_t plocinfo
+) {
     int f = 0, l = 0;
-    const char *dst = (const char *)first, *src = (const char *)last;
+    const char* dst = (const char*)first, *src = (const char*)last;
     _LocaleUpdate _loc_update(plocinfo);
-
     /* validation section */
     _VALIDATE_RETURN(first != NULL || count == 0, EINVAL, _NLSCMPERROR);
     _VALIDATE_RETURN(last != NULL || count == 0, EINVAL, _NLSCMPERROR);
 
-    if ( __LC_HANDLE(_loc_update.GetLocaleT()->locinfo)[LC_CTYPE] == _CLOCALEHANDLE )
-    {
+    if (__LC_HANDLE(_loc_update.GetLocaleT()->locinfo)[LC_CTYPE] == _CLOCALEHANDLE) {
         return __ascii_memicmp(first, last, count);
-    }
-    else
-    {
-        while (count-- && f==l)
-        {
-            f = _tolower_l( (unsigned char)(*(dst++)), _loc_update.GetLocaleT() );
-            l = _tolower_l( (unsigned char)(*(src++)), _loc_update.GetLocaleT() );
+    } else {
+        while (count-- && f == l) {
+            f = _tolower_l((unsigned char)(*(dst++)), _loc_update.GetLocaleT());
+            l = _tolower_l((unsigned char)(*(src++)), _loc_update.GetLocaleT());
         }
     }
-    return ( f - l );
+
+    return (f - l);
 }
 
 
 #ifndef _M_IX86
 
-extern "C" int __cdecl __ascii_memicmp (
-        const void * first,
-        const void * last,
-        size_t count
-        )
-{
+extern "C" int __cdecl __ascii_memicmp(
+    const void* first,
+    const void* last,
+    size_t count
+) {
     int f = 0;
     int l = 0;
 
-    while ( count-- )
-    {
-        if ( (*(unsigned char *)first == *(unsigned char *)last) ||
-             ((f = __ascii_tolower( *(unsigned char *)first )) ==
-              (l = __ascii_tolower( *(unsigned char *)last ))) )
-        {
-                first = (char *)first + 1;
-                last = (char *)last + 1;
-        }
-        else
+    while (count--) {
+        if ((*(unsigned char*)first == *(unsigned char*)last) ||
+                ((f = __ascii_tolower(*(unsigned char*)first)) ==
+                 (l = __ascii_tolower(*(unsigned char*)last)))) {
+            first = (char*)first + 1;
+            last = (char*)last + 1;
+        } else {
             break;
+        }
     }
-    return ( f - l );
+
+    return (f - l);
 }
 
 #endif  /* _M_IX86 */
 
-extern "C" int __cdecl _memicmp (
-        const void * first,
-        const void * last,
-        size_t count
-        )
-{
-    if (__locale_changed == 0)
-    {
+extern "C" int __cdecl _memicmp(
+    const void* first,
+    const void* last,
+    size_t count
+) {
+    if (__locale_changed == 0) {
         /* validation section */
         _VALIDATE_RETURN(first != NULL || count == 0, EINVAL, _NLSCMPERROR);
         _VALIDATE_RETURN(last != NULL || count == 0, EINVAL, _NLSCMPERROR);
-
         return __ascii_memicmp(first, last, count);
-    }
-    else
-    {
+    } else {
         return _memicmp_l(first, last, count, NULL);
     }
 }

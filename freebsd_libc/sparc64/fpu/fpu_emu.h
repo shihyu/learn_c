@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -30,8 +30,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)fpu_emu.h	8.1 (Berkeley) 6/11/93
- *	$NetBSD: fpu_emu.h,v 1.4 2000/08/03 18:32:07 eeh Exp $
+ *  @(#)fpu_emu.h   8.1 (Berkeley) 6/11/93
+ *  $NetBSD: fpu_emu.h,v 1.4 2000/08/03 18:32:07 eeh Exp $
  * $FreeBSD: src/lib/libc/sparc64/fpu/fpu_emu.h,v 1.6 2007/01/09 00:28:05 imp Exp $
  */
 
@@ -41,10 +41,10 @@
  *
  * Floating point numbers are carried around internally in an `expanded'
  * or `unpacked' form consisting of:
- *	- sign
- *	- unbiased exponent
- *	- mantissa (`1.' + 112-bit fraction + guard + round)
- *	- sticky bit
+ *  - sign
+ *  - unbiased exponent
+ *  - mantissa (`1.' + 112-bit fraction + guard + round)
+ *  - sticky bit
  * Any implied `1' bit is inserted, giving a 113-bit mantissa that is
  * always nonzero.  Additional low-order `guard' and `round' bits are
  * scrunched in, making the entire mantissa 115 bits long.  This is divided
@@ -77,20 +77,20 @@
 #include "fpu_reg.h"
 
 struct fpn {
-	int	fp_class;		/* see below */
-	int	fp_sign;		/* 0 => positive, 1 => negative */
-	int	fp_exp;			/* exponent (unbiased) */
-	int	fp_sticky;		/* nonzero bits lost at right end */
-	u_int	fp_mant[4];		/* 115-bit mantissa */
+    int fp_class;       /* see below */
+    int fp_sign;        /* 0 => positive, 1 => negative */
+    int fp_exp;         /* exponent (unbiased) */
+    int fp_sticky;      /* nonzero bits lost at right end */
+    u_int   fp_mant[4];     /* 115-bit mantissa */
 };
 
-#define	FP_NMANT	115		/* total bits in mantissa (incl g,r) */
-#define	FP_NG		2		/* number of low-order guard bits */
-#define	FP_LG		((FP_NMANT - 1) & 31)	/* log2(1.0) for fp_mant[0] */
-#define	FP_LG2		((FP_NMANT - 1) & 63)	/* log2(1.0) for fp_mant[0] and fp_mant[1] */
-#define	FP_QUIETBIT	(1 << (FP_LG - 1))	/* Quiet bit in NaNs (0.5) */
-#define	FP_1		(1 << FP_LG)		/* 1.0 in fp_mant[0] */
-#define	FP_2		(1 << (FP_LG + 1))	/* 2.0 in fp_mant[0] */
+#define FP_NMANT    115     /* total bits in mantissa (incl g,r) */
+#define FP_NG       2       /* number of low-order guard bits */
+#define FP_LG       ((FP_NMANT - 1) & 31)   /* log2(1.0) for fp_mant[0] */
+#define FP_LG2      ((FP_NMANT - 1) & 63)   /* log2(1.0) for fp_mant[0] and fp_mant[1] */
+#define FP_QUIETBIT (1 << (FP_LG - 1))  /* Quiet bit in NaNs (0.5) */
+#define FP_1        (1 << FP_LG)        /* 1.0 in fp_mant[0] */
+#define FP_2        (1 << (FP_LG + 1))  /* 2.0 in fp_mant[0] */
 
 /*
  * Number classes.  Since zero, Inf, and NaN cannot be represented using
@@ -98,60 +98,60 @@ struct fpn {
  * In addition, to make computation easier and to follow Appendix N of
  * the SPARC Version 8 standard, we give each kind of NaN a separate class.
  */
-#define	FPC_SNAN	-2		/* signalling NaN (sign irrelevant) */
-#define	FPC_QNAN	-1		/* quiet NaN (sign irrelevant) */
-#define	FPC_ZERO	0		/* zero (sign matters) */
-#define	FPC_NUM		1		/* number (sign matters) */
-#define	FPC_INF		2		/* infinity (sign matters) */
+#define FPC_SNAN    -2      /* signalling NaN (sign irrelevant) */
+#define FPC_QNAN    -1      /* quiet NaN (sign irrelevant) */
+#define FPC_ZERO    0       /* zero (sign matters) */
+#define FPC_NUM     1       /* number (sign matters) */
+#define FPC_INF     2       /* infinity (sign matters) */
 
-#define	ISNAN(fp)	((fp)->fp_class < 0)
-#define	ISZERO(fp)	((fp)->fp_class == 0)
-#define	ISINF(fp)	((fp)->fp_class == FPC_INF)
+#define ISNAN(fp)   ((fp)->fp_class < 0)
+#define ISZERO(fp)  ((fp)->fp_class == 0)
+#define ISINF(fp)   ((fp)->fp_class == FPC_INF)
 
 /*
  * ORDER(x,y) `sorts' a pair of `fpn *'s so that the right operand (y) points
  * to the `more significant' operand for our purposes.  Appendix N says that
  * the result of a computation involving two numbers are:
  *
- *	If both are SNaN: operand 2, converted to Quiet
- *	If only one is SNaN: the SNaN operand, converted to Quiet
- *	If both are QNaN: operand 2
- *	If only one is QNaN: the QNaN operand
+ *  If both are SNaN: operand 2, converted to Quiet
+ *  If only one is SNaN: the SNaN operand, converted to Quiet
+ *  If both are QNaN: operand 2
+ *  If only one is QNaN: the QNaN operand
  *
  * In addition, in operations with an Inf operand, the result is usually
  * Inf.  The class numbers are carefully arranged so that if
- *	(unsigned)class(op1) > (unsigned)class(op2)
+ *  (unsigned)class(op1) > (unsigned)class(op2)
  * then op1 is the one we want; otherwise op2 is the one we want.
  */
-#define	ORDER(x, y) { \
-	if ((u_int)(x)->fp_class > (u_int)(y)->fp_class) \
-		SWAP(x, y); \
+#define ORDER(x, y) { \
+    if ((u_int)(x)->fp_class > (u_int)(y)->fp_class) \
+        SWAP(x, y); \
 }
-#define	SWAP(x, y) { \
-	register struct fpn *swap; \
-	swap = (x), (x) = (y), (y) = swap; \
+#define SWAP(x, y) { \
+    register struct fpn *swap; \
+    swap = (x), (x) = (y), (y) = swap; \
 }
 
 /*
  * Floating point operand types. FTYPE_LNG is syntethic (it does not occur in
  * instructions).
  */
-#define	FTYPE_INT	INSFP_i
-#define	FTYPE_SNG	INSFP_s
-#define	FTYPE_DBL	INSFP_d
-#define	FTYPE_EXT	INSFP_q
-#define	FTYPE_LNG	-1
+#define FTYPE_INT   INSFP_i
+#define FTYPE_SNG   INSFP_s
+#define FTYPE_DBL   INSFP_d
+#define FTYPE_EXT   INSFP_q
+#define FTYPE_LNG   -1
 
 /*
  * Emulator state.
  */
 struct fpemu {
-	u_long	fe_fsr;			/* fsr copy (modified during op) */
-	int	fe_cx;			/* exceptions */
-	int     pad;                    /* align access to following fields */
-	struct	fpn fe_f1;		/* operand 1 */
-	struct	fpn fe_f2;		/* operand 2, if required */
-	struct	fpn fe_f3;		/* available storage for result */
+    u_long  fe_fsr;         /* fsr copy (modified during op) */
+    int fe_cx;          /* exceptions */
+    int     pad;                    /* align access to following fields */
+    struct  fpn fe_f1;      /* operand 1 */
+    struct  fpn fe_f2;      /* operand 2, if required */
+    struct  fpn fe_f3;      /* available storage for result */
 };
 
 /*
@@ -159,17 +159,17 @@ struct fpemu {
  * Each of these may modify its inputs (f1,f2) and/or the temporary.
  * Each returns a pointer to the result and/or sets exceptions.
  */
-#define	__fpu_sub(fe) ((fe)->fe_f2.fp_sign ^= 1, __fpu_add(fe))
+#define __fpu_sub(fe) ((fe)->fe_f2.fp_sign ^= 1, __fpu_add(fe))
 
 #ifdef FPU_DEBUG
-#define	FPE_INSN	0x1
-#define	FPE_REG		0x2
+#define FPE_INSN    0x1
+#define FPE_REG     0x2
 extern int __fpe_debug;
-void	__fpu_dumpfpn(struct fpn *);
-#define	DPRINTF(x, y)	if (__fpe_debug & (x)) printf y
-#define DUMPFPN(x, f)	if (__fpe_debug & (x)) __fpu_dumpfpn((f))
+void    __fpu_dumpfpn(struct fpn*);
+#define DPRINTF(x, y)   if (__fpe_debug & (x)) printf y
+#define DUMPFPN(x, f)   if (__fpe_debug & (x)) __fpu_dumpfpn((f))
 #else
-#define	DPRINTF(x, y)
+#define DPRINTF(x, y)
 #define DUMPFPN(x, f)
 #endif
 

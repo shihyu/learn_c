@@ -1,4 +1,4 @@
-/*	$NetBSD: xdr_reference.c,v 1.13 2000/01/22 22:19:18 mycroft Exp	$ */
+/*  $NetBSD: xdr_reference.c,v 1.13 2000/01/22 22:19:18 mycroft Exp $ */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -29,9 +29,9 @@
  * Mountain View, California  94043
  */
 
-#if defined(LIBC_SCCS) && !defined(lint) 
-static char *sccsid2 = "@(#)xdr_reference.c 1.11 87/08/11 SMI";
-static char *sccsid = "@(#)xdr_reference.c	2.1 88/07/29 4.0 RPCSRC";
+#if defined(LIBC_SCCS) && !defined(lint)
+static char* sccsid2 = "@(#)xdr_reference.c 1.11 87/08/11 SMI";
+static char* sccsid = "@(#)xdr_reference.c	2.1 88/07/29 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/xdr/xdr_reference.c,v 1.12 2004/10/16 06:32:43 obrien Exp $");
@@ -66,39 +66,42 @@ __FBSDID("$FreeBSD: src/lib/libc/xdr/xdr_reference.c,v 1.12 2004/10/16 06:32:43 
  */
 bool_t
 xdr_reference(xdrs, pp, size, proc)
-	XDR *xdrs;
-	caddr_t *pp;		/* the pointer to work on */
-	u_int size;		/* size of the object pointed to */
-	xdrproc_t proc;		/* xdr routine to handle the object */
+XDR* xdrs;
+caddr_t* pp;        /* the pointer to work on */
+u_int size;     /* size of the object pointed to */
+xdrproc_t proc;     /* xdr routine to handle the object */
 {
-	caddr_t loc = *pp;
-	bool_t stat;
+    caddr_t loc = *pp;
+    bool_t stat;
 
-	if (loc == NULL)
-		switch (xdrs->x_op) {
-		case XDR_FREE:
-			return (TRUE);
+    if (loc == NULL)
+        switch (xdrs->x_op) {
+        case XDR_FREE:
+            return (TRUE);
 
-		case XDR_DECODE:
-			*pp = loc = (caddr_t) mem_alloc(size);
-			if (loc == NULL) {
-				warnx("xdr_reference: out of memory");
-				return (FALSE);
-			}
-			memset(loc, 0, size);
-			break;
+        case XDR_DECODE:
+            *pp = loc = (caddr_t) mem_alloc(size);
 
-		case XDR_ENCODE:
-			break;
-		}
+            if (loc == NULL) {
+                warnx("xdr_reference: out of memory");
+                return (FALSE);
+            }
 
-	stat = (*proc)(xdrs, loc);
+            memset(loc, 0, size);
+            break;
 
-	if (xdrs->x_op == XDR_FREE) {
-		mem_free(loc, size);
-		*pp = NULL;
-	}
-	return (stat);
+        case XDR_ENCODE:
+            break;
+        }
+
+    stat = (*proc)(xdrs, loc);
+
+    if (xdrs->x_op == XDR_FREE) {
+        mem_free(loc, size);
+        *pp = NULL;
+    }
+
+    return (stat);
 }
 
 
@@ -122,22 +125,23 @@ xdr_reference(xdrs, pp, size, proc)
  *
  */
 bool_t
-xdr_pointer(xdrs,objpp,obj_size,xdr_obj)
-	XDR *xdrs;
-	char **objpp;
-	u_int obj_size;
-	xdrproc_t xdr_obj;
+xdr_pointer(xdrs, objpp, obj_size, xdr_obj)
+XDR* xdrs;
+char** objpp;
+u_int obj_size;
+xdrproc_t xdr_obj;
 {
+    bool_t more_data;
+    more_data = (*objpp != NULL);
 
-	bool_t more_data;
+    if (! xdr_bool(xdrs, &more_data)) {
+        return (FALSE);
+    }
 
-	more_data = (*objpp != NULL);
-	if (! xdr_bool(xdrs,&more_data)) {
-		return (FALSE);
-	}
-	if (! more_data) {
-		*objpp = NULL;
-		return (TRUE);
-	}
-	return (xdr_reference(xdrs,objpp,obj_size,xdr_obj));
+    if (! more_data) {
+        *objpp = NULL;
+        return (TRUE);
+    }
+
+    return (xdr_reference(xdrs, objpp, obj_size, xdr_obj));
 }

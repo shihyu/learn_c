@@ -50,64 +50,62 @@
 
 
 
-typedef BOOL (APIENTRY *PGENRANDOM)( PVOID, ULONG );
+typedef BOOL (APIENTRY* PGENRANDOM)(PVOID, ULONG);
 
 static PGENRANDOM g_pfnRtlGenRandom;
 
-void __cdecl _initp_misc_rand_s(void* enull)
-{
+void __cdecl _initp_misc_rand_s(void* enull) {
     g_pfnRtlGenRandom = (PGENRANDOM) enull;
 }
 
 errno_t __cdecl rand_s
 (
-    unsigned int *_RandomValue
-)
-{
+    unsigned int* _RandomValue
+) {
     PGENRANDOM pfnRtlGenRandom = _decode_pointer(g_pfnRtlGenRandom);
-    _VALIDATE_RETURN_ERRCODE( _RandomValue != NULL, EINVAL );
+    _VALIDATE_RETURN_ERRCODE(_RandomValue != NULL, EINVAL);
     *_RandomValue = 0; // Review : better value to initialize it to?
 
-    if ( pfnRtlGenRandom == NULL )
-    {
+    if (pfnRtlGenRandom == NULL) {
         PGENRANDOM encoded;
         void* enull;
-
         // Advapi32.dll is unloaded when the App exits.
-        HMODULE hAdvApi32=LoadLibrary("ADVAPI32.DLL");
-                if (!hAdvApi32)
-                {
-            _VALIDATE_RETURN_ERRCODE(("rand_s is not available on this platform", 0), EINVAL);
-                }
+        HMODULE hAdvApi32 = LoadLibrary("ADVAPI32.DLL");
 
-        pfnRtlGenRandom = ( PGENRANDOM ) GetProcAddress( hAdvApi32, _TO_STR( RtlGenRandom ) );
-        if ( pfnRtlGenRandom == NULL )
-        {
+        if (!hAdvApi32) {
+            _VALIDATE_RETURN_ERRCODE(("rand_s is not available on this platform", 0), EINVAL);
+        }
+
+        pfnRtlGenRandom = (PGENRANDOM) GetProcAddress(hAdvApi32, _TO_STR(RtlGenRandom));
+
+        if (pfnRtlGenRandom == NULL) {
             _VALIDATE_RETURN_ERRCODE(("rand_s is not available on this platform", 0), _get_errno_from_oserr(GetLastError()));
         }
+
         encoded = (PGENRANDOM) _encode_pointer(pfnRtlGenRandom);
         enull = _encoded_null();
 #ifdef _M_IX86
-        if ( (void*)(LONG_PTR)InterlockedExchange(
-                ( LONG* )&g_pfnRtlGenRandom,
-                ( LONG )( LONG_PTR )encoded)
-            != enull )
+
+        if ((void*)(LONG_PTR)InterlockedExchange(
+                    (LONG*)&g_pfnRtlGenRandom,
+                    (LONG)(LONG_PTR)encoded)
+                != enull)
 #else  /* _M_IX86 */
-        if ( InterlockedExchangePointer(
-                ( void** )&g_pfnRtlGenRandom,
-                ( void* )encoded)
-            != enull )
+        if (InterlockedExchangePointer(
+                    (void**)&g_pfnRtlGenRandom,
+                    (void*)encoded)
+                != enull)
 #endif  /* _M_IX86 */
         {
             /* A different thread has already loaded advapi32.dll. */
-            FreeLibrary( hAdvApi32 );
+            FreeLibrary(hAdvApi32);
         }
     }
 
-    if ( !(*pfnRtlGenRandom)( _RandomValue, ( ULONG )sizeof( unsigned int ) ) )
-    {
+    if (!(*pfnRtlGenRandom)(_RandomValue, (ULONG)sizeof(unsigned int))) {
         errno = ENOMEM;
         return errno;
     }
+
     return 0;
 }

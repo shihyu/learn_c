@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,45 +43,52 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/getgrouplist.c,v 1.15 2007/01/09 00:27:53 i
 #include <unistd.h>
 
 int
-getgrouplist(const char *uname, gid_t agroup, gid_t *groups, int *grpcnt)
-{
-	const struct group *grp;
-	int i, maxgroups, ngroups, ret;
+getgrouplist(const char* uname, gid_t agroup, gid_t* groups, int* grpcnt) {
+    const struct group* grp;
+    int i, maxgroups, ngroups, ret;
+    ret = 0;
+    ngroups = 0;
+    maxgroups = *grpcnt;
+    /*
+     * When installing primary group, duplicate it;
+     * the first element of groups is the effective gid
+     * and will be overwritten when a setgid file is executed.
+     */
+    groups[ngroups++] = agroup;
 
-	ret = 0;
-	ngroups = 0;
-	maxgroups = *grpcnt;
-	/*
-	 * When installing primary group, duplicate it;
-	 * the first element of groups is the effective gid
-	 * and will be overwritten when a setgid file is executed.
-	 */
-	groups[ngroups++] = agroup;
-	if (maxgroups > 1)
-		groups[ngroups++] = agroup;
-	/*
-	 * Scan the group file to find additional groups.
-	 */
-	setgrent();
-	while ((grp = getgrent()) != NULL) {
-		for (i = 0; i < ngroups; i++) {
-			if (grp->gr_gid == groups[i])
-				goto skip;
-		}
-		for (i = 0; grp->gr_mem[i]; i++) {
-			if (!strcmp(grp->gr_mem[i], uname)) {
-				if (ngroups >= maxgroups) {
-					ret = -1;
-					break;
-				}
-				groups[ngroups++] = grp->gr_gid;
-				break;
-			}
-		}
-skip:
-		;
-	}
-	endgrent();
-	*grpcnt = ngroups;
-	return (ret);
+    if (maxgroups > 1) {
+        groups[ngroups++] = agroup;
+    }
+
+    /*
+     * Scan the group file to find additional groups.
+     */
+    setgrent();
+
+    while ((grp = getgrent()) != NULL) {
+        for (i = 0; i < ngroups; i++) {
+            if (grp->gr_gid == groups[i]) {
+                goto skip;
+            }
+        }
+
+        for (i = 0; grp->gr_mem[i]; i++) {
+            if (!strcmp(grp->gr_mem[i], uname)) {
+                if (ngroups >= maxgroups) {
+                    ret = -1;
+                    break;
+                }
+
+                groups[ngroups++] = grp->gr_gid;
+                break;
+            }
+        }
+
+    skip:
+        ;
+    }
+
+    endgrent();
+    *grpcnt = ngroups;
+    return (ret);
 }

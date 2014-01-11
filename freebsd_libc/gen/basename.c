@@ -39,46 +39,53 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/basename.c,v 1.7 2002/12/30 01:41:14 marcel
 #include <string.h>
 #include <sys/param.h>
 
-char *
+char*
 basename(path)
-	const char *path;
+const char* path;
 {
-	static char *bname = NULL;
-	const char *endp, *startp;
+    static char* bname = NULL;
+    const char* endp, *startp;
 
- 	if (bname == NULL) {
-		bname = (char *)malloc(MAXPATHLEN);
-		if (bname == NULL)
-			return(NULL);
-	}
+    if (bname == NULL) {
+        bname = (char*)malloc(MAXPATHLEN);
 
-	/* Empty or NULL string gets treated as "." */
-	if (path == NULL || *path == '\0') {
-		(void)strcpy(bname, ".");
-		return(bname);
-	}
+        if (bname == NULL) {
+            return (NULL);
+        }
+    }
 
-	/* Strip trailing slashes */
-	endp = path + strlen(path) - 1;
-	while (endp > path && *endp == '/')
-		endp--;
+    /* Empty or NULL string gets treated as "." */
+    if (path == NULL || *path == '\0') {
+        (void)strcpy(bname, ".");
+        return (bname);
+    }
 
-	/* All slashes becomes "/" */
-	if (endp == path && *endp == '/') {
-		(void)strcpy(bname, "/");
-		return(bname);
-	}
+    /* Strip trailing slashes */
+    endp = path + strlen(path) - 1;
 
-	/* Find the start of the base */
-	startp = endp;
-	while (startp > path && *(startp - 1) != '/')
-		startp--;
+    while (endp > path && *endp == '/') {
+        endp--;
+    }
 
-	if (endp - startp + 2 > MAXPATHLEN) {
-		errno = ENAMETOOLONG;
-		return(NULL);
-	}
-	(void)strncpy(bname, startp, endp - startp + 1);
-	bname[endp - startp + 1] = '\0';
-	return(bname);
+    /* All slashes becomes "/" */
+    if (endp == path && *endp == '/') {
+        (void)strcpy(bname, "/");
+        return (bname);
+    }
+
+    /* Find the start of the base */
+    startp = endp;
+
+    while (startp > path && *(startp - 1) != '/') {
+        startp--;
+    }
+
+    if (endp - startp + 2 > MAXPATHLEN) {
+        errno = ENAMETOOLONG;
+        return (NULL);
+    }
+
+    (void)strncpy(bname, startp, endp - startp + 1);
+    bname[endp - startp + 1] = '\0';
+    return (bname);
 }

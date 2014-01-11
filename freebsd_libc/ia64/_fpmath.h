@@ -30,27 +30,27 @@
 #include <sys/endian.h>
 
 union IEEEl2bits {
-	long double	e;
-	struct {
+    long double e;
+    struct {
 #if _BYTE_ORDER == _LITTLE_ENDIAN
-		unsigned int	manl	:32;
-		unsigned int	manh	:32;
-		unsigned int	exp	:15;
-		unsigned int	sign	:1;
-		unsigned long	junk	:48;
+        unsigned int    manl    : 32;
+        unsigned int    manh    : 32;
+        unsigned int    exp : 15;
+        unsigned int    sign    : 1;
+        unsigned long   junk    : 48;
 #else /* _BIG_ENDIAN */
-		unsigned long	junk	:48;
-		unsigned int	sign	:1;
-		unsigned int	exp	:15;
-		unsigned int	manh	:32;
-		unsigned int	manl	:32;
+        unsigned long   junk    : 48;
+        unsigned int    sign    : 1;
+        unsigned int    exp : 15;
+        unsigned int    manh    : 32;
+        unsigned int    manl    : 32;
 #endif
-	} bits;
+    } bits;
 };
 
 #if _BYTE_ORDER == _LITTLE_ENDIAN
-#define	LDBL_NBIT	0x80000000
-#define	mask_nbit_l(u)	((u).bits.manh &= ~LDBL_NBIT)
+#define LDBL_NBIT   0x80000000
+#define mask_nbit_l(u)  ((u).bits.manh &= ~LDBL_NBIT)
 #else /* _BIG_ENDIAN */
 /*
  * XXX This doesn't look right.  Very few machines have a different
@@ -58,14 +58,14 @@ union IEEEl2bits {
  *     we assume that none do.  If you have an environment for testing
  *     this, please let me know. --das
  */
-#define	LDBL_NBIT	0x80
-#define	mask_nbit_l(u)	((u).bits.manh &= ~LDBL_NBIT)
+#define LDBL_NBIT   0x80
+#define mask_nbit_l(u)  ((u).bits.manh &= ~LDBL_NBIT)
 #endif
 
-#define	LDBL_MANH_SIZE	32
-#define	LDBL_MANL_SIZE	32
+#define LDBL_MANH_SIZE  32
+#define LDBL_MANL_SIZE  32
 
-#define	LDBL_TO_ARRAY32(u, a) do {			\
-	(a)[0] = (uint32_t)(u).bits.manl;		\
-	(a)[1] = (uint32_t)(u).bits.manh;		\
+#define LDBL_TO_ARRAY32(u, a) do {          \
+    (a)[0] = (uint32_t)(u).bits.manl;       \
+    (a)[1] = (uint32_t)(u).bits.manh;       \
 } while(0)

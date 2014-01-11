@@ -68,7 +68,7 @@ typedef _W64 unsigned int   uintptr_t;
 #ifdef _M_CEE_PURE
 typedef System::ArgIterator va_list;
 #else  /* _M_CEE_PURE */
-typedef char *  va_list;
+typedef char*   va_list;
 #endif  /* _M_CEE_PURE */
 #define _VA_LIST_DEFINED
 #endif  /* _VA_LIST_DEFINED */
@@ -97,7 +97,7 @@ typedef char *  va_list;
 #if defined (_M_CEE)
 
 extern void __cdecl __va_start(va_list*, ...);
-extern void * __cdecl __va_arg(va_list*, ...);
+extern void* __cdecl __va_arg(va_list*, ...);
 extern void __cdecl __va_end(va_list*);
 
 #define _crt_va_start(ap,v)  ( __va_start(&ap, _ADDRESSOF(v), _SLOTSIZEOF(v), \
@@ -132,7 +132,7 @@ extern void __cdecl __va_start(va_list*, ...);
 #elif defined (_M_AMD64)
 
 
-extern void __cdecl __va_start(va_list *, ...);
+extern void __cdecl __va_start(va_list*, ...);
 
 #define _crt_va_start(ap, x) ( __va_start(&ap, x) )
 #define _crt_va_arg(ap, t)   \

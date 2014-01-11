@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1983, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,100 +42,106 @@ __FBSDID("$FreeBSD: src/lib/libc/net/getproto.c,v 1.7 2007/01/09 00:28:02 imp Ex
 #include "nss_tls.h"
 
 static const ns_src defaultsrc[] = {
-	{ NSSRC_FILES, NS_SUCCESS },
-	{ NULL, 0 }
+    { NSSRC_FILES, NS_SUCCESS },
+    { NULL, 0 }
 };
 
 #ifdef NS_CACHING
-extern int __proto_id_func(char *, size_t *, va_list, void *);
-extern int __proto_marshal_func(char *, size_t *, void *, va_list, void *);
-extern int __proto_unmarshal_func(char *, size_t, void *, va_list, void *);
+extern int __proto_id_func(char*, size_t*, va_list, void*);
+extern int __proto_marshal_func(char*, size_t*, void*, va_list, void*);
+extern int __proto_unmarshal_func(char*, size_t, void*, va_list, void*);
 #endif
 
 static int
-files_getprotobynumber(void *retval, void *mdata, va_list ap)
-{
-	struct protoent pe;
-	struct protoent_data *ped;
-	int error;
+files_getprotobynumber(void* retval, void* mdata, va_list ap) {
+    struct protoent pe;
+    struct protoent_data* ped;
+    int error;
+    int number;
+    struct protoent* pptr;
+    char* buffer;
+    size_t buflen;
+    int* errnop;
+    number = va_arg(ap, int);
+    pptr = va_arg(ap, struct protoent*);
+    buffer = va_arg(ap, char*);
+    buflen = va_arg(ap, size_t);
+    errnop = va_arg(ap, int*);
 
-	int number;
-	struct protoent	*pptr;
-	char *buffer;
-	size_t buflen;
-	int *errnop;
+    if ((ped = __protoent_data_init()) == NULL) {
+        *errnop = -1;
+        return (NS_NOTFOUND);
+    }
 
-	number = va_arg(ap, int);
-	pptr = va_arg(ap, struct protoent *);
-	buffer = va_arg(ap, char *);
-	buflen = va_arg(ap, size_t);
-	errnop = va_arg(ap, int *);
+    __setprotoent_p(ped->stayopen, ped);
 
-	if ((ped = __protoent_data_init()) == NULL) {
-		*errnop = -1;
-		return (NS_NOTFOUND);
-	}
+    while ((error = __getprotoent_p(&pe, ped)) == 0)
+        if (pe.p_proto == number) {
+            break;
+        }
 
-	__setprotoent_p(ped->stayopen, ped);
-	while ((error = __getprotoent_p(&pe, ped)) == 0)
-		if (pe.p_proto == number)
-			break;
-	if (!ped->stayopen)
-		__endprotoent_p(ped);
-	if (error != 0) {
-		*errnop = -1;
-		return (NS_NOTFOUND);
-	}
-	if (__copy_protoent(&pe, pptr, buffer, buflen) != 0) {
-		*errnop = -1;
-		return (NS_NOTFOUND);
-	}
+    if (!ped->stayopen) {
+        __endprotoent_p(ped);
+    }
 
-	*((struct protoent **)retval) = pptr;
-	return (NS_SUCCESS);
+    if (error != 0) {
+        *errnop = -1;
+        return (NS_NOTFOUND);
+    }
+
+    if (__copy_protoent(&pe, pptr, buffer, buflen) != 0) {
+        *errnop = -1;
+        return (NS_NOTFOUND);
+    }
+
+    *((struct protoent**)retval) = pptr;
+    return (NS_SUCCESS);
 }
 
 int
-getprotobynumber_r(int proto, struct protoent *pptr, char *buffer,
-    size_t buflen, struct protoent **result)
-{
+getprotobynumber_r(int proto, struct protoent* pptr, char* buffer,
+                   size_t buflen, struct protoent** result) {
 #ifdef NS_CACHING
-	static const nss_cache_info cache_info =
-    		NS_COMMON_CACHE_INFO_INITIALIZER(
-		protocols, (void *)nss_lt_id,
-		__proto_id_func, __proto_marshal_func, __proto_unmarshal_func);
+    static const nss_cache_info cache_info =
+        NS_COMMON_CACHE_INFO_INITIALIZER(
+            protocols, (void*)nss_lt_id,
+            __proto_id_func, __proto_marshal_func, __proto_unmarshal_func);
 #endif
-
-	static const ns_dtab dtab[] = {
-		{ NSSRC_FILES, files_getprotobynumber, NULL },
+    static const ns_dtab dtab[] = {
+        { NSSRC_FILES, files_getprotobynumber, NULL },
 #ifdef NS_CACHING
-		NS_CACHE_CB(&cache_info)
+        NS_CACHE_CB(&cache_info)
 #endif
-		{ NULL, NULL, NULL }
-	};
-	int	rv, ret_errno;
+        {
+            NULL, NULL, NULL
+        }
+    };
+    int rv, ret_errno;
+    ret_errno = 0;
+    *result = NULL;
+    rv = nsdispatch(result, dtab, NSDB_PROTOCOLS, "getprotobynumber_r",
+                    defaultsrc, proto, pptr, buffer, buflen, &ret_errno);
 
-	ret_errno = 0;
-	*result = NULL;
-	rv = nsdispatch(result, dtab, NSDB_PROTOCOLS, "getprotobynumber_r",
-		defaultsrc, proto, pptr, buffer, buflen, &ret_errno);
-
-	if (rv == NS_SUCCESS)
-		return (0);
-	else
-		return (ret_errno);
+    if (rv == NS_SUCCESS) {
+        return (0);
+    } else {
+        return (ret_errno);
+    }
 }
 
-struct protoent *
-getprotobynumber(int proto)
-{
-	struct protodata *pd;
-	struct protoent *rval;
+struct protoent*
+getprotobynumber(int proto) {
+    struct protodata* pd;
+    struct protoent* rval;
 
-	if ((pd = __protodata_init()) == NULL)
-		return (NULL);
-	if (getprotobynumber_r(proto, &pd->proto, pd->data, sizeof(pd->data),
-	    &rval) != 0)
-		return (NULL);
-	return (rval);
+    if ((pd = __protodata_init()) == NULL) {
+        return (NULL);
+    }
+
+    if (getprotobynumber_r(proto, &pd->proto, pd->data, sizeof(pd->data),
+                           &rval) != 0) {
+        return (NULL);
+    }
+
+    return (rval);
 }

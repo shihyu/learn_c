@@ -29,8 +29,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)SYS.h	5.5 (Berkeley) 5/7/91
- *	from: FreeBSD: src/lib/libc/i386/SYS.h,v 1.20 2001/01/29
+ *  @(#)SYS.h   5.5 (Berkeley) 5/7/91
+ *  from: FreeBSD: src/lib/libc/i386/SYS.h,v 1.20 2001/01/29
  * $FreeBSD: src/lib/libc/sparc64/SYS.h,v 1.6 2007/07/04 23:18:38 peter Exp $
  */
 
@@ -39,47 +39,47 @@
 #include <machine/asm.h>
 #include <machine/utrap.h>
 
-#define	ERROR() \
-	mov	%o7, %g1 ; \
-	call	HIDENAME(cerror) ; \
-	 mov	%g1, %o7
+#define ERROR() \
+    mov %o7, %g1 ; \
+    call    HIDENAME(cerror) ; \
+     mov    %g1, %o7
 
-#define	_SYSENTRY(x) \
+#define _SYSENTRY(x) \
 ENTRY(__CONCAT(__sys_,x)) ; \
-	.weak	CNAME(x) ; \
-	.type	CNAME(x),@function ; \
-	.set	CNAME(x),CNAME(__CONCAT(__sys_,x)) ; \
-	.weak	CNAME(__CONCAT(_,x)) ; \
-	.type	CNAME(__CONCAT(_,x)), @function ; \
-	.set	CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x))
+    .weak   CNAME(x) ; \
+    .type   CNAME(x),@function ; \
+    .set    CNAME(x),CNAME(__CONCAT(__sys_,x)) ; \
+    .weak   CNAME(__CONCAT(_,x)) ; \
+    .type   CNAME(__CONCAT(_,x)), @function ; \
+    .set    CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x))
 
-#define	_SYSEND(x) \
-	.size	CNAME(__CONCAT(__sys_,x)), . - CNAME(__CONCAT(__sys_,x)) ; \
-	.size	CNAME(__CONCAT(_,x)), . - CNAME(__CONCAT(__sys_,x)) ; \
-	.size	CNAME(__CONCAT(,x)), . - CNAME(__CONCAT(__sys_,x))
+#define _SYSEND(x) \
+    .size   CNAME(__CONCAT(__sys_,x)), . - CNAME(__CONCAT(__sys_,x)) ; \
+    .size   CNAME(__CONCAT(_,x)), . - CNAME(__CONCAT(__sys_,x)) ; \
+    .size   CNAME(__CONCAT(,x)), . - CNAME(__CONCAT(__sys_,x))
 
-#define	_SYSCALL(x) \
-	mov	__CONCAT(SYS_,x), %g1 ; \
-	ta	%xcc, ST_SYSCALL ; \
-	bcc,a,pt %xcc, 1f ; \
-	 nop ; \
-	ERROR() ; \
+#define _SYSCALL(x) \
+    mov __CONCAT(SYS_,x), %g1 ; \
+    ta  %xcc, ST_SYSCALL ; \
+    bcc,a,pt %xcc, 1f ; \
+     nop ; \
+    ERROR() ; \
 1:
 
-#define	RSYSCALL(x) \
+#define RSYSCALL(x) \
 _SYSENTRY(x) ; \
-	_SYSCALL(x) ; \
-	retl ; \
-	 nop ; \
-	_SYSEND(x)
+    _SYSCALL(x) ; \
+    retl ; \
+     nop ; \
+    _SYSEND(x)
 
-#define	PSEUDO(x) \
+#define PSEUDO(x) \
 ENTRY(__CONCAT(__sys_,x)) ; \
-	.weak	CNAME(__CONCAT(_,x)) ; \
-	.type	CNAME(__CONCAT(_,x)),@function ; \
-	.set	CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)) ; \
-	_SYSCALL(x) ; \
-	retl ; \
-	 nop ; \
-	.size	CNAME(__CONCAT(__sys_,x)), . - CNAME(__CONCAT(__sys_,x)) ; \
-	.size	CNAME(__CONCAT(_,x)), . - CNAME(__CONCAT(__sys_,x))
+    .weak   CNAME(__CONCAT(_,x)) ; \
+    .type   CNAME(__CONCAT(_,x)),@function ; \
+    .set    CNAME(__CONCAT(_,x)),CNAME(__CONCAT(__sys_,x)) ; \
+    _SYSCALL(x) ; \
+    retl ; \
+     nop ; \
+    .size   CNAME(__CONCAT(__sys_,x)), . - CNAME(__CONCAT(__sys_,x)) ; \
+    .size   CNAME(__CONCAT(_,x)), . - CNAME(__CONCAT(__sys_,x))

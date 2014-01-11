@@ -50,108 +50,104 @@ static int __cdecl _locking_nolock(int, int, long);
 *
 *******************************************************************************/
 
-int __cdecl _locking (
-        int fh,
-        int lmode,
-        long nbytes
-        )
-{
-        int retval;
+int __cdecl _locking(
+    int fh,
+    int lmode,
+    long nbytes
+) {
+    int retval;
+    /* validate file handle */
+    _CHECK_FH_CLEAR_OSSERR_RETURN(fh, EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
+    _lock_fh(fh);                   /* acquire file handle lock */
 
-        /* validate file handle */
-        _CHECK_FH_CLEAR_OSSERR_RETURN( fh, EBADF, -1 );
-        _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
-
-
-        _lock_fh(fh);                   /* acquire file handle lock */
-
-        __try {
-                if ( _osfile(fh) & FOPEN )
-                        retval = _locking_nolock(fh, lmode, nbytes);
-                else {
-                        errno = EBADF;
-                        _doserrno = 0;  /* not an o.s. error */
-                        retval = -1;
-                        _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread",0));
-                }
+    __try {
+        if (_osfile(fh) & FOPEN) {
+            retval = _locking_nolock(fh, lmode, nbytes);
+        } else {
+            errno = EBADF;
+            _doserrno = 0;  /* not an o.s. error */
+            retval = -1;
+            _ASSERTE(("Invalid file descriptor. File possibly closed by a different thread", 0));
         }
-        __finally {
-                _unlock_fh(fh);
-        }
+    } __finally {
+        _unlock_fh(fh);
+    }
 
-        return retval;
+    return retval;
 }
 
-static int __cdecl _locking_nolock (
-        int fh,
-        int lmode,
-        long nbytes
-        )
-{
-        ULONG dosretval;                /* o.s. return code */
-        LONG lockoffset;
-        int retry;                      /* retry count */
+static int __cdecl _locking_nolock(
+    int fh,
+    int lmode,
+    long nbytes
+) {
+    ULONG dosretval;                /* o.s. return code */
+    LONG lockoffset;
+    int retry;                      /* retry count */
+    /* obtain current position in file by calling _lseek */
+    /* Use _lseek_nolock as we already own lock */
+    lockoffset = _lseek_nolock(fh, 0L, 1);
 
+    if (lockoffset == -1) {
+        return -1;
+    }
 
-        /* obtain current position in file by calling _lseek */
-        /* Use _lseek_nolock as we already own lock */
-        lockoffset = _lseek_nolock(fh, 0L, 1);
-        if (lockoffset == -1)
-                return -1;
+    /* set retry count based on mode */
+    if (lmode == _LK_LOCK || lmode == _LK_RLCK) {
+        retry = 9;    /* retry 9 times */
+    } else {
+        retry = 0;    /* don't retry */
+    }
 
-        /* set retry count based on mode */
-        if (lmode == _LK_LOCK || lmode == _LK_RLCK)
-                retry = 9;              /* retry 9 times */
-        else
-                retry = 0;              /* don't retry */
+    /* ask o.s. to lock the file until success or retry count finished */
+    /* note that the only error possible is a locking violation, since */
+    /* an invalid handle would have already failed above */
+    for (;;) {
+        dosretval = 0;
 
-        /* ask o.s. to lock the file until success or retry count finished */
-        /* note that the only error possible is a locking violation, since */
-        /* an invalid handle would have already failed above */
-        for (;;) {
-
-                dosretval = 0;
-                if (lmode == _LK_UNLCK) {
-                    if ( !(UnlockFile((HANDLE)_get_osfhandle(fh),
-                                      lockoffset,
-                                      0L,
-                                      nbytes,
-                                      0L))
-                       )
-                        dosretval = GetLastError();
-
-                } else {
-                    if ( !(LockFile((HANDLE)_get_osfhandle(fh),
-                                    lockoffset,
-                                    0L,
-                                    nbytes,
-                                    0L))
-                       )
-                        dosretval = GetLastError();
-                }
-
-                if (retry <= 0 || dosretval == 0)
-                        break;  /* exit loop on success or retry exhausted */
-
-                Sleep(1000L);
-
-                --retry;
+        if (lmode == _LK_UNLCK) {
+            if (!(UnlockFile((HANDLE)_get_osfhandle(fh),
+                             lockoffset,
+                             0L,
+                             nbytes,
+                             0L))
+               ) {
+                dosretval = GetLastError();
+            }
+        } else {
+            if (!(LockFile((HANDLE)_get_osfhandle(fh),
+                           lockoffset,
+                           0L,
+                           nbytes,
+                           0L))
+               ) {
+                dosretval = GetLastError();
+            }
         }
 
-        if (dosretval != 0) {
-                /* o.s. error occurred -- file was already locked; if a
-                   blocking call, then return EDEADLOCK, otherwise map
-                   error normally */
-                if (lmode == _LK_LOCK || lmode == _LK_RLCK) {
-                        errno = EDEADLOCK;
-                        _doserrno = dosretval;
-                }
-                else {
-                        _dosmaperr(dosretval);
-                }
-                return -1;
+        if (retry <= 0 || dosretval == 0) {
+            break;    /* exit loop on success or retry exhausted */
         }
-        else
-                return 0;
+
+        Sleep(1000L);
+        --retry;
+    }
+
+    if (dosretval != 0) {
+        /* o.s. error occurred -- file was already locked; if a
+           blocking call, then return EDEADLOCK, otherwise map
+           error normally */
+        if (lmode == _LK_LOCK || lmode == _LK_RLCK) {
+            errno = EDEADLOCK;
+            _doserrno = dosretval;
+        } else {
+            _dosmaperr(dosretval);
+        }
+
+        return -1;
+    } else {
+        return 0;
+    }
 }

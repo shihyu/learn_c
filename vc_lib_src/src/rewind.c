@@ -32,46 +32,37 @@
 *
 *******************************************************************************/
 
-void __cdecl rewind (
-        FILE *str
-        )
-{
-        REG1 FILE *stream;
-        REG2 int fd;
+void __cdecl rewind(
+    FILE* str
+) {
+    REG1 FILE* stream;
+    REG2 int fd;
+    _VALIDATE_RETURN_VOID((str != NULL), EINVAL);
+    /* Init stream pointer */
+    stream = str;
+    fd = _fileno(stream);
+    /* Lock the file */
+    _lock_str(stream);
 
-        _VALIDATE_RETURN_VOID( (str != NULL), EINVAL);
-
-        /* Init stream pointer */
-        stream = str;
-
-        fd = _fileno(stream);
-
-        /* Lock the file */
-        _lock_str(stream);
-        __try {
-
+    __try {
         /* Flush the stream */
         _flush(stream);
-
         /* Clear errors */
-        stream->_flag &= ~(_IOERR|_IOEOF);
+        stream->_flag &= ~(_IOERR | _IOEOF);
         _osfile_safe(fd) &= ~(FEOFLAG);
 
         /* Set flags */
         /* [note: _flush set _cnt=0 and _ptr=_base] */
-        if (stream->_flag & _IORW)
-            stream->_flag &= ~(_IOREAD|_IOWRT);
+        if (stream->_flag & _IORW) {
+            stream->_flag &= ~(_IOREAD | _IOWRT);
+        }
 
         /* Position to beginning of file */
-        if(_lseek(fd,0L,0)==-1)
-                {
-                        stream->_flag |= _IOERR;
-                }
-
+        if (_lseek(fd, 0L, 0) == -1) {
+            stream->_flag |= _IOERR;
         }
-        __finally {
-            /* unlock stream */
-            _unlock_str(stream);
-        }
-
+    } __finally {
+        /* unlock stream */
+        _unlock_str(stream);
+    }
 }

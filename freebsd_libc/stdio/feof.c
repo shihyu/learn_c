@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -44,12 +44,10 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/feof.c,v 1.10 2007/01/09 00:28:06 imp Exp
 #undef feof
 
 int
-feof(FILE *fp)
-{
-	int	ret;
-
-	FLOCKFILE(fp);
-	ret= __sfeof(fp);
-	FUNLOCKFILE(fp);
-	return (ret);
+feof(FILE* fp) {
+    int ret;
+    FLOCKFILE(fp);
+    ret = __sfeof(fp);
+    FUNLOCKFILE(fp);
+    return (ret);
 }

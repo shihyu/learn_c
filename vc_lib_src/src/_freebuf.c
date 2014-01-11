@@ -41,18 +41,15 @@
 *
 *******************************************************************************/
 
-void __cdecl _freebuf (
-        REG1 FILE *stream
-        )
-{
-        _ASSERTE(stream != NULL);
+void __cdecl _freebuf(
+    REG1 FILE* stream
+) {
+    _ASSERTE(stream != NULL);
 
-        if (inuse(stream) && mbuf(stream))
-        {
-                _free_crt(stream->_base);
-
-                stream->_flag &= ~(_IOMYBUF | _IOSETVBUF);
-                stream->_base = stream->_ptr = NULL;
-                stream->_cnt = 0;
-        }
+    if (inuse(stream) && mbuf(stream)) {
+        _free_crt(stream->_base);
+        stream->_flag &= ~(_IOMYBUF | _IOSETVBUF);
+        stream->_base = stream->_ptr = NULL;
+        stream->_cnt = 0;
+    }
 }

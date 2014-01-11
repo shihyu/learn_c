@@ -47,143 +47,139 @@
 *******************************************************************************/
 
 int __cdecl _alloc_osfhnd(
-        void
-        )
-{
-        int fh = -1;    /* file handle */
-        int i;
-        ioinfo *pio;
-        int failed=FALSE;
+    void
+) {
+    int fh = -1;    /* file handle */
+    int i;
+    ioinfo* pio;
+    int failed = FALSE;
 
-        if (!_mtinitlocknum(_OSFHND_LOCK))
-            return -1;
+    if (!_mtinitlocknum(_OSFHND_LOCK)) {
+        return -1;
+    }
 
-        _mlock(_OSFHND_LOCK);   /* lock the __pioinfo[] array */
-        __TRY
+    _mlock(_OSFHND_LOCK);   /* lock the __pioinfo[] array */
+    __TRY
 
+    /*
+     * Search the arrays of ioinfo structs, in order, looking for the
+     * first free entry. The compound index of this free entry is the
+     * return value. Here, the compound index of the ioinfo struct
+     * *(__pioinfo[i] + j) is k = i * IOINFO_ARRAY_ELTS + j, and k = 0,
+     * 1, 2,... is the order of the search.
+     */
+    for (i = 0 ; i < IOINFO_ARRAYS ; i++) {
+        /*
+         * If __pioinfo[i] is non-empty array, search it looking for
+         * the first free entry. Otherwise, allocate a new array and use
+         * its first entry.
+         */
+        if (__pioinfo[i] != NULL) {
             /*
-             * Search the arrays of ioinfo structs, in order, looking for the
-             * first free entry. The compound index of this free entry is the
-             * return value. Here, the compound index of the ioinfo struct
-             * *(__pioinfo[i] + j) is k = i * IOINFO_ARRAY_ELTS + j, and k = 0,
-             * 1, 2,... is the order of the search.
+             * Search for an available entry.
              */
-            for ( i = 0 ; i < IOINFO_ARRAYS ; i++ ) {
-                /*
-                 * If __pioinfo[i] is non-empty array, search it looking for
-                 * the first free entry. Otherwise, allocate a new array and use
-                 * its first entry.
-                 */
-                if ( __pioinfo[i] != NULL ) {
+            for (pio = __pioinfo[i] ;
+                    pio < __pioinfo[i] + IOINFO_ARRAY_ELTS ;
+                    pio++) {
+                if ((pio->osfile & FOPEN) == 0) {
                     /*
-                     * Search for an available entry.
+                     * Make sure the lock is initialized.
                      */
-                    for ( pio = __pioinfo[i] ;
-                          pio < __pioinfo[i] + IOINFO_ARRAY_ELTS ;
-                          pio++ )
-                    {
-                        if ( (pio->osfile & FOPEN) == 0 ) {
-                            /*
-                             * Make sure the lock is initialized.
-                             */
-                            if ( pio->lockinitflag == 0 ) {
-                                _mlock( _LOCKTAB_LOCK );
-                                __TRY
-                                    if ( pio->lockinitflag == 0 ) {
-                                        if ( !__crtInitCritSecAndSpinCount( &(pio->lock), _CRT_SPINCOUNT ))
-                                        {
-                                            /*
-                                             * Lock initialization failed.  Release
-                                             * held locks and return failure.
-                                            */
-                                            failed=TRUE;
-                                        }
-                                        else
-                                        {
-                                            pio->lockinitflag++;
-                                        }
-                                    }
-                                __FINALLY
-                                    _munlock( _LOCKTAB_LOCK );
-                                __END_TRY_FINALLY
-                            }
+                    if (pio->lockinitflag == 0) {
+                        _mlock(_LOCKTAB_LOCK);
+                        __TRY
 
-                            if(!failed)
-                            {
-                                EnterCriticalSection( &(pio->lock) );
-
+                        if (pio->lockinitflag == 0) {
+                            if (!__crtInitCritSecAndSpinCount(&(pio->lock), _CRT_SPINCOUNT)) {
                                 /*
-                                * Check for the case where another thread has
-                                * managed to grab the handle out from under us.
+                                 * Lock initialization failed.  Release
+                                 * held locks and return failure.
                                 */
-                                if ( (pio->osfile & FOPEN) != 0 ) {
-                                        LeaveCriticalSection( &(pio->lock) );
-                                        continue;
-                                }
+                                failed = TRUE;
+                            } else {
+                                pio->lockinitflag++;
                             }
-                            if(!failed)
-                            {
-                                pio->osfile = FOPEN;
-                                pio->osfhnd = (intptr_t)INVALID_HANDLE_VALUE;
-                                fh = i * IOINFO_ARRAY_ELTS + (int)(pio - __pioinfo[i]);
-                                break;
-                            }
+                        }
+
+                        __FINALLY
+                        _munlock(_LOCKTAB_LOCK);
+                        __END_TRY_FINALLY
+                    }
+
+                    if (!failed) {
+                        EnterCriticalSection(&(pio->lock));
+
+                        /*
+                        * Check for the case where another thread has
+                        * managed to grab the handle out from under us.
+                        */
+                        if ((pio->osfile & FOPEN) != 0) {
+                            LeaveCriticalSection(&(pio->lock));
+                            continue;
                         }
                     }
 
-                    /*
-                     * Check if a free entry has been found.
-                     */
-                    if ( fh != -1 )
+                    if (!failed) {
+                        pio->osfile = FOPEN;
+                        pio->osfhnd = (intptr_t)INVALID_HANDLE_VALUE;
+                        fh = i * IOINFO_ARRAY_ELTS + (int)(pio - __pioinfo[i]);
                         break;
-                }
-                else {
-                    /*
-                     * Allocate and initialize another array of ioinfo structs.
-                     */
-                    if ( (pio = _calloc_crt( IOINFO_ARRAY_ELTS, sizeof(ioinfo) ))
-                        != NULL )
-                    {
-
-                        /*
-                         * Update __pioinfo[] and _nhandle
-                         */
-                        __pioinfo[i] = pio;
-                        _nhandle += IOINFO_ARRAY_ELTS;
-
-                        for ( ; pio < __pioinfo[i] + IOINFO_ARRAY_ELTS ; pio++ ) {
-                            pio->osfile = 0;
-                            pio->osfhnd = (intptr_t)INVALID_HANDLE_VALUE;
-                            pio->pipech = 10;
-                            pio->lockinitflag = 0;
-                        }
-
-                        /*
-                         * The first element of the newly allocated array of ioinfo
-                         * structs, *(__pioinfo[i]), is our first free entry.
-                         */
-                        fh = i * IOINFO_ARRAY_ELTS;
-                        _osfile(fh) = FOPEN;
-                        if ( !__lock_fhandle( fh ) ) {
-                            /*
-                             * The lock initialization failed, return the failure
-                             */
-                            fh = -1;
-                        }
                     }
-
-                    break;
                 }
             }
-        __FINALLY
-            _munlock(_OSFHND_LOCK); /* unlock the __pioinfo[] table */
-        __END_TRY_FINALLY
 
-        /*
-         * return the index of the previously free table entry, if one was
-         * found. return -1 otherwise.
-         */
-        return( fh );
+            /*
+             * Check if a free entry has been found.
+             */
+            if (fh != -1) {
+                break;
+            }
+        } else {
+            /*
+             * Allocate and initialize another array of ioinfo structs.
+             */
+            if ((pio = _calloc_crt(IOINFO_ARRAY_ELTS, sizeof(ioinfo)))
+                    != NULL) {
+                /*
+                 * Update __pioinfo[] and _nhandle
+                 */
+                __pioinfo[i] = pio;
+                _nhandle += IOINFO_ARRAY_ELTS;
+
+                for (; pio < __pioinfo[i] + IOINFO_ARRAY_ELTS ; pio++) {
+                    pio->osfile = 0;
+                    pio->osfhnd = (intptr_t)INVALID_HANDLE_VALUE;
+                    pio->pipech = 10;
+                    pio->lockinitflag = 0;
+                }
+
+                /*
+                 * The first element of the newly allocated array of ioinfo
+                 * structs, *(__pioinfo[i]), is our first free entry.
+                 */
+                fh = i * IOINFO_ARRAY_ELTS;
+                _osfile(fh) = FOPEN;
+
+                if (!__lock_fhandle(fh)) {
+                    /*
+                     * The lock initialization failed, return the failure
+                     */
+                    fh = -1;
+                }
+            }
+
+            break;
+        }
+    }
+
+    __FINALLY
+    _munlock(_OSFHND_LOCK); /* unlock the __pioinfo[] table */
+    __END_TRY_FINALLY
+    /*
+     * return the index of the previously free table entry, if one was
+     * found. return -1 otherwise.
+     */
+    return (fh);
 }
 
 
@@ -206,35 +202,36 @@ int __cdecl _alloc_osfhnd(
 *
 *******************************************************************************/
 
-int __cdecl _set_osfhnd (
-        int fh,
-        intptr_t value
-        )
-{
-        if ( fh >= 0 && ((unsigned)fh < (unsigned)_nhandle) &&
-             (_osfhnd(fh) == (intptr_t)INVALID_HANDLE_VALUE)
-           ) {
-            if ( __app_type == _CONSOLE_APP ) {
-                switch (fh) {
-                case 0:
-                    SetStdHandle( STD_INPUT_HANDLE, (HANDLE)value );
-                    break;
-                case 1:
-                    SetStdHandle( STD_OUTPUT_HANDLE, (HANDLE)value );
-                    break;
-                case 2:
-                    SetStdHandle( STD_ERROR_HANDLE, (HANDLE)value );
-                    break;
-                }
-            }
+int __cdecl _set_osfhnd(
+    int fh,
+    intptr_t value
+) {
+    if (fh >= 0 && ((unsigned)fh < (unsigned)_nhandle) &&
+            (_osfhnd(fh) == (intptr_t)INVALID_HANDLE_VALUE)
+       ) {
+        if (__app_type == _CONSOLE_APP) {
+            switch (fh) {
+            case 0:
+                SetStdHandle(STD_INPUT_HANDLE, (HANDLE)value);
+                break;
 
-            _osfhnd(fh) = value;
-            return(0);
-        } else {
-            errno = EBADF;      /* bad handle */
-            _doserrno = 0L;     /* not an OS error */
-            return -1;
+            case 1:
+                SetStdHandle(STD_OUTPUT_HANDLE, (HANDLE)value);
+                break;
+
+            case 2:
+                SetStdHandle(STD_ERROR_HANDLE, (HANDLE)value);
+                break;
+            }
         }
+
+        _osfhnd(fh) = value;
+        return (0);
+    } else {
+        errno = EBADF;      /* bad handle */
+        _doserrno = 0L;     /* not an OS error */
+        return -1;
+    }
 }
 
 
@@ -257,35 +254,35 @@ int __cdecl _set_osfhnd (
 *
 *******************************************************************************/
 
-int __cdecl _free_osfhnd (
-        int fh      /* user's file handle */
-        )
-{
-        if ( (fh >= 0 && (unsigned)fh < (unsigned)_nhandle) &&
-             (_osfile(fh) & FOPEN) &&
-             (_osfhnd(fh) != (intptr_t)INVALID_HANDLE_VALUE) )
-        {
-            if ( __app_type == _CONSOLE_APP ) {
-                switch (fh) {
-                case 0:
-                    SetStdHandle( STD_INPUT_HANDLE, NULL );
-                    break;
-                case 1:
-                    SetStdHandle( STD_OUTPUT_HANDLE, NULL );
-                    break;
-                case 2:
-                    SetStdHandle( STD_ERROR_HANDLE, NULL );
-                    break;
-                }
-            }
+int __cdecl _free_osfhnd(
+    int fh      /* user's file handle */
+) {
+    if ((fh >= 0 && (unsigned)fh < (unsigned)_nhandle) &&
+            (_osfile(fh) & FOPEN) &&
+            (_osfhnd(fh) != (intptr_t)INVALID_HANDLE_VALUE)) {
+        if (__app_type == _CONSOLE_APP) {
+            switch (fh) {
+            case 0:
+                SetStdHandle(STD_INPUT_HANDLE, NULL);
+                break;
 
-            _osfhnd(fh) = (intptr_t)INVALID_HANDLE_VALUE;
-            return(0);
-        } else {
-            errno = EBADF;      /* bad handle */
-            _doserrno = 0L;     /* not an OS error */
-            return -1;
+            case 1:
+                SetStdHandle(STD_OUTPUT_HANDLE, NULL);
+                break;
+
+            case 2:
+                SetStdHandle(STD_ERROR_HANDLE, NULL);
+                break;
+            }
         }
+
+        _osfhnd(fh) = (intptr_t)INVALID_HANDLE_VALUE;
+        return (0);
+    } else {
+        errno = EBADF;      /* bad handle */
+        _doserrno = 0L;     /* not an OS error */
+        return -1;
+    }
 }
 
 
@@ -306,15 +303,13 @@ int __cdecl _free_osfhnd (
 *
 *******************************************************************************/
 
-intptr_t __cdecl _get_osfhandle (
-        int fh      /* user's file handle */
-        )
-{
-        _CHECK_FH_CLEAR_OSSERR_RETURN( fh, EBADF, -1 );
-        _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
-        _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
-
-        return( _osfhnd(fh) );
+intptr_t __cdecl _get_osfhandle(
+    int fh      /* user's file handle */
+) {
+    _CHECK_FH_CLEAR_OSSERR_RETURN(fh, EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((fh >= 0 && (unsigned)fh < (unsigned)_nhandle), EBADF, -1);
+    _VALIDATE_CLEAR_OSSERR_RETURN((_osfile(fh) & FOPEN), EBADF, -1);
+    return (_osfhnd(fh));
 }
 
 /***
@@ -337,76 +332,71 @@ intptr_t __cdecl _get_osfhandle (
 *******************************************************************************/
 
 int __cdecl _open_osfhandle(
-        intptr_t osfhandle,
-        int flags
-        )
-{
-        int fh;
-        char fileflags;         /* _osfile flags */
-        DWORD isdev;            /* device indicator in low byte */
-        int success = FALSE;
+    intptr_t osfhandle,
+    int flags
+) {
+    int fh;
+    char fileflags;         /* _osfile flags */
+    DWORD isdev;            /* device indicator in low byte */
+    int success = FALSE;
+    /* copy relevant flags from second parameter */
+    fileflags = 0;
 
-        /* copy relevant flags from second parameter */
+    if (flags & _O_APPEND) {
+        fileflags |= FAPPEND;
+    }
 
-        fileflags = 0;
+    if (flags & _O_TEXT) {
+        fileflags |= FTEXT;
+    }
 
-        if ( flags & _O_APPEND )
-            fileflags |= FAPPEND;
+    if (flags & _O_NOINHERIT) {
+        fileflags |= FNOINHERIT;
+    }
 
-        if ( flags & _O_TEXT )
-            fileflags |= FTEXT;
+    /* find out what type of file (file/device/pipe) */
+    isdev = GetFileType((HANDLE)osfhandle);
 
-        if ( flags & _O_NOINHERIT )
-            fileflags |= FNOINHERIT;
+    if (isdev == FILE_TYPE_UNKNOWN) {
+        /* OS error */
+        _dosmaperr(GetLastError());     /* map error */
+        return -1;
+    }
 
-        /* find out what type of file (file/device/pipe) */
+    /* is isdev value to set flags */
+    if (isdev == FILE_TYPE_CHAR) {
+        fileflags |= FDEV;
+    } else if (isdev == FILE_TYPE_PIPE) {
+        fileflags |= FPIPE;
+    }
 
-        isdev = GetFileType((HANDLE)osfhandle);
-        if (isdev == FILE_TYPE_UNKNOWN) {
-            /* OS error */
-            _dosmaperr( GetLastError() );   /* map error */
-            return -1;
-        }
+    /* attempt to allocate a C Runtime file handle */
 
-        /* is isdev value to set flags */
-        if (isdev == FILE_TYPE_CHAR)
-            fileflags |= FDEV;
-        else if (isdev == FILE_TYPE_PIPE)
-            fileflags |= FPIPE;
+    if ((fh = _alloc_osfhnd()) == -1) {
+        errno = EMFILE;         /* too many open files */
+        _doserrno = 0L;         /* not an OS error */
+        return -1;              /* return error to caller */
+    }
 
+    __TRY
+    /*
+     * the file is open. now, set the info in _osfhnd array
+     */
+    _set_osfhnd(fh, osfhandle);
+    fileflags |= FOPEN;     /* mark as open */
+    _osfile(fh) = fileflags;    /* set osfile entry */
+    _textmode(fh) = 0;
+    _tm_unicode(fh) = 0;
+    success = TRUE;
+    __FINALLY
 
-        /* attempt to allocate a C Runtime file handle */
+    if (!success) {
+        _osfile(fh) &= ~FOPEN;
+    }
 
-        if ( (fh = _alloc_osfhnd()) == -1 ) {
-            errno = EMFILE;         /* too many open files */
-            _doserrno = 0L;         /* not an OS error */
-            return -1;              /* return error to caller */
-        }
-        __TRY
-
-            /*
-             * the file is open. now, set the info in _osfhnd array
-             */
-
-            _set_osfhnd(fh, osfhandle);
-
-            fileflags |= FOPEN;     /* mark as open */
-
-            _osfile(fh) = fileflags;    /* set osfile entry */
-            _textmode(fh) = 0;
-            _tm_unicode(fh) = 0;
-
-            success = TRUE;
-
-        __FINALLY
-            if (!success)
-            {
-                _osfile(fh) &= ~FOPEN;
-            }
-            _unlock_fh(fh);         /* unlock handle */
-        __END_TRY_FINALLY
-
-            return success ? fh : -1;   /* return handle */
+    _unlock_fh(fh);         /* unlock handle */
+    __END_TRY_FINALLY
+    return success ? fh : -1;   /* return handle */
 }
 
 
@@ -431,40 +421,40 @@ int __cdecl _open_osfhandle(
 *
 *******************************************************************************/
 
-int __cdecl __lock_fhandle (
-        int fh
-        )
-{
-        ioinfo *pio = _pioinfo(fh);
-        int retval=TRUE;
+int __cdecl __lock_fhandle(
+    int fh
+) {
+    ioinfo* pio = _pioinfo(fh);
+    int retval = TRUE;
 
-        /*
-         * Make sure the lock has been initialized.
-         */
-        if ( pio->lockinitflag == 0 ) {
+    /*
+     * Make sure the lock has been initialized.
+     */
+    if (pio->lockinitflag == 0) {
+        _mlock(_LOCKTAB_LOCK);
+        __TRY
 
-            _mlock( _LOCKTAB_LOCK );
-            __TRY
-                if ( pio->lockinitflag == 0 ) {
-                    if ( !__crtInitCritSecAndSpinCount( &(pio->lock), _CRT_SPINCOUNT )) {
-                        /*
-                         * Failed to initialize the lock, so return failure code.
-                         */
-                        retval=FALSE;
-                    }
-                    pio->lockinitflag++;
-                }
-            __FINALLY
-                _munlock( _LOCKTAB_LOCK);
-            __END_TRY_FINALLY
+        if (pio->lockinitflag == 0) {
+            if (!__crtInitCritSecAndSpinCount(&(pio->lock), _CRT_SPINCOUNT)) {
+                /*
+                 * Failed to initialize the lock, so return failure code.
+                 */
+                retval = FALSE;
+            }
+
+            pio->lockinitflag++;
         }
 
-        if(retval)
-        {
-            EnterCriticalSection( &(_pioinfo(fh)->lock) );
-        }
+        __FINALLY
+        _munlock(_LOCKTAB_LOCK);
+        __END_TRY_FINALLY
+    }
 
-        return retval;
+    if (retval) {
+        EnterCriticalSection(&(_pioinfo(fh)->lock));
+    }
+
+    return retval;
 }
 
 
@@ -483,10 +473,9 @@ int __cdecl __lock_fhandle (
 *
 *******************************************************************************/
 
-void __cdecl _unlock_fhandle (
-        int fh
-        )
-{
-        LeaveCriticalSection( &(_pioinfo(fh)->lock) );
+void __cdecl _unlock_fhandle(
+    int fh
+) {
+    LeaveCriticalSection(&(_pioinfo(fh)->lock));
 }
 

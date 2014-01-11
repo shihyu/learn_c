@@ -16,7 +16,6 @@
  * is where you would put the extra code if it were.)
  */
 void
-_Exit(int code)
-{
-	_exit(code);
+_Exit(int code) {
+    _exit(code);
 }

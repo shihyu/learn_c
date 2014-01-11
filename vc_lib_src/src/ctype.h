@@ -35,7 +35,7 @@ extern "C" {
 extern const unsigned short __newctype[];
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP const unsigned short ** __cdecl __p__pctype(void);
+_CRTIMP const unsigned short** __cdecl __p__pctype(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 
@@ -47,9 +47,9 @@ _CRTIMP const unsigned short ** __cdecl __p__pctype(void);
 #endif  /* defined (_CRT_DISABLE_PERFCRIT_LOCKS) && !defined (_DLL) */
 #endif  /* __PCTYPE_FUNC */
 
-_CRTIMP const unsigned short * __cdecl __pctype_func(void);
+_CRTIMP const unsigned short* __cdecl __pctype_func(void);
 #if !defined (_M_CEE_PURE)
-_CRTIMP extern const unsigned short *_pctype;
+_CRTIMP extern const unsigned short* _pctype;
 #else  /* !defined (_M_CEE_PURE) */
 #define _pctype (__pctype_func())
 #endif  /* !defined (_M_CEE_PURE) */
@@ -66,13 +66,13 @@ _CRTIMP extern const unsigned short _wctype[];
 extern const unsigned short __newctype[];
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP const wctype_t ** __cdecl __p__pwctype(void);
+_CRTIMP const wctype_t** __cdecl __p__pwctype(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #endif  /* _INTERNAL_IFSTRIP_ */
 
-_CRTIMP const wctype_t * __cdecl __pwctype_func(void);
+_CRTIMP const wctype_t* __cdecl __pwctype_func(void);
 #if !defined (_M_CEE_PURE)
-_CRTIMP extern const wctype_t *_pwctype;
+_CRTIMP extern const wctype_t* _pwctype;
 #else  /* !defined (_M_CEE_PURE) */
 #define _pwctype (__pwctype_func())
 #endif  /* !defined (_M_CEE_PURE) */
@@ -105,7 +105,7 @@ pthreadmbcinfo __cdecl __updatetmbcinfo(void);
 #define _LOWER          0x2     /* lower case letter */
 #define _DIGIT          0x4     /* digit[0-9] */
 #define _SPACE          0x8     /* tab, carriage return, newline, */
-                                /* vertical tab or form feed */
+/* vertical tab or form feed */
 #define _PUNCT          0x10    /* punctuation character */
 #define _CONTROL        0x20    /* control character */
 #define _BLANK          0x40    /* space char */
@@ -217,7 +217,7 @@ _CRT_OBSOLETE(iswctype) _CRTIMP int __cdecl is_wctype(__in wint_t _C, __in wctyp
 #ifndef _INTERNAL_IFSTRIP_
 #if defined (_DLL) && defined (_M_IX86)
 /* Retained for compatibility with VC++ 5.0 and earlier versions */
-_CRTIMP int * __cdecl __p___mb_cur_max(void);
+_CRTIMP int* __cdecl __p___mb_cur_max(void);
 #endif  /* defined (_DLL) && defined (_M_IX86) */
 #define __MB_CUR_MAX(ptloci) (ptloci)->mb_cur_max
 #endif  /* _INTERNAL_IFSTRIP_ */

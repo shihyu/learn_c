@@ -40,96 +40,85 @@
 *
 *******************************************************************************/
 
-int __cdecl vfwprintf_helper (
-        WOUTPUTFN woutfn,
-        FILE *str,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
+int __cdecl vfwprintf_helper(
+    WOUTPUTFN woutfn,
+    FILE* str,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+)
 /*
  * 'V'ariable argument 'F'ile (stream) 'W'char_t 'PRINT', 'F'ormatted
  */
 {
-        REG1 FILE *stream;
-        REG2 int buffing;
-        REG3 int retval;
+    REG1 FILE* stream;
+    REG2 int buffing;
+    REG3 int retval;
+    _VALIDATE_RETURN((str != NULL), EINVAL, -1);
+    _VALIDATE_RETURN((format != NULL), EINVAL, -1);
+    /* Init stream pointer */
+    stream = str;
+    _lock_str(stream);
 
-        _VALIDATE_RETURN( (str != NULL), EINVAL, -1);
-        _VALIDATE_RETURN( (format != NULL), EINVAL, -1);
-
-        /* Init stream pointer */
-        stream = str;
-
-        _lock_str(stream);
-        __try {
-
+    __try {
         buffing = _stbuf(stream);
-        retval = woutfn(stream,format,plocinfo,ap );
+        retval = woutfn(stream, format, plocinfo, ap);
         _ftbuf(buffing, stream);
+    } __finally {
+        _unlock_str(stream);
+    }
 
-        }
-        __finally {
-            _unlock_str(stream);
-        }
-
-        return(retval);
+    return (retval);
 }
 
-int __cdecl _vfwprintf_l (
-        FILE *str,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vfwprintf_l(
+    FILE* str,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     return vfwprintf_helper(_woutput_l, str, format, plocinfo, ap);
 }
 
-int __cdecl _vfwprintf_s_l (
-        FILE *str,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vfwprintf_s_l(
+    FILE* str,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     return vfwprintf_helper(_woutput_s_l, str, format, plocinfo, ap);
 }
 
-int __cdecl _vfwprintf_p_l (
-        FILE *str,
-        const wchar_t *format,
-        _locale_t plocinfo,
-        va_list ap
-        )
-{
+int __cdecl _vfwprintf_p_l(
+    FILE* str,
+    const wchar_t* format,
+    _locale_t plocinfo,
+    va_list ap
+) {
     return vfwprintf_helper(_woutput_p_l, str, format, plocinfo, ap);
 }
 
-int __cdecl vfwprintf (
-        FILE *str,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl vfwprintf(
+    FILE* str,
+    const wchar_t* format,
+    va_list ap
+) {
     return vfwprintf_helper(_woutput_l, str, format, NULL, ap);
 }
 
-int __cdecl vfwprintf_s (
-        FILE *str,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl vfwprintf_s(
+    FILE* str,
+    const wchar_t* format,
+    va_list ap
+) {
     return vfwprintf_helper(_woutput_s_l, str, format, NULL, ap);
 }
 
-int __cdecl _vfwprintf_p (
-        FILE *str,
-        const wchar_t *format,
-        va_list ap
-        )
-{
+int __cdecl _vfwprintf_p(
+    FILE* str,
+    const wchar_t* format,
+    va_list ap
+) {
     return vfwprintf_helper(_woutput_p_l, str, format, NULL, ap);
 }
 

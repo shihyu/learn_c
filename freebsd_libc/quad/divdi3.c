@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -45,19 +45,23 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/divdi3.c,v 1.3 2007/01/09 00:28:03 imp Exp
  */
 quad_t
 __divdi3(a, b)
-	quad_t a, b;
+quad_t a, b;
 {
-	u_quad_t ua, ub, uq;
-	int neg;
+    u_quad_t ua, ub, uq;
+    int neg;
 
-	if (a < 0)
-		ua = -(u_quad_t)a, neg = 1;
-	else
-		ua = a, neg = 0;
-	if (b < 0)
-		ub = -(u_quad_t)b, neg ^= 1;
-	else
-		ub = b;
-	uq = __qdivrem(ua, ub, (u_quad_t *)0);
-	return (neg ? -uq : uq);
+    if (a < 0) {
+        ua = -(u_quad_t)a, neg = 1;
+    } else {
+        ua = a, neg = 0;
+    }
+
+    if (b < 0) {
+        ub = -(u_quad_t)b, neg ^= 1;
+    } else {
+        ub = b;
+    }
+
+    uq = __qdivrem(ua, ub, (u_quad_t*)0);
+    return (neg ? -uq : uq);
 }

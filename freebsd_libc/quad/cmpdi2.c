@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -46,12 +46,11 @@ __FBSDID("$FreeBSD: src/lib/libc/quad/cmpdi2.c,v 1.3 2007/01/09 00:28:03 imp Exp
  */
 int
 __cmpdi2(a, b)
-	quad_t a, b;
+quad_t a, b;
 {
-	union uu aa, bb;
-
-	aa.q = a;
-	bb.q = b;
-	return (aa.sl[H] < bb.sl[H] ? 0 : aa.sl[H] > bb.sl[H] ? 2 :
-	    aa.ul[L] < bb.ul[L] ? 0 : aa.ul[L] > bb.ul[L] ? 2 : 1);
+    union uu aa, bb;
+    aa.q = a;
+    bb.q = b;
+    return (aa.sl[H] < bb.sl[H] ? 0 : aa.sl[H] > bb.sl[H] ? 2 :
+            aa.ul[L] < bb.ul[L] ? 0 : aa.ul[L] > bb.ul[L] ? 2 : 1);
 }

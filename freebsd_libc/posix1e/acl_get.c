@@ -51,103 +51,108 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_get.c,v 1.12 2002/12/29 20:47:05 rw
 #include <string.h>
 
 acl_t
-acl_get_file(const char *path_p, acl_type_t type)
-{
-	acl_t	aclp;
-	int	error;
+acl_get_file(const char* path_p, acl_type_t type) {
+    acl_t   aclp;
+    int error;
+    aclp = acl_init(ACL_MAX_ENTRIES);
 
-	aclp = acl_init(ACL_MAX_ENTRIES);
-	if (aclp == NULL)
-		return (NULL);
+    if (aclp == NULL) {
+        return (NULL);
+    }
 
-	error = __acl_get_file(path_p, type, &aclp->ats_acl);
-	if (error) {
-		acl_free(aclp);
-		return (NULL);
-	}
+    error = __acl_get_file(path_p, type, &aclp->ats_acl);
 
-	return (aclp);
+    if (error) {
+        acl_free(aclp);
+        return (NULL);
+    }
+
+    return (aclp);
 }
 
 acl_t
-acl_get_link_np(const char *path_p, acl_type_t type)
-{
-	acl_t	aclp;
-	int	error;
+acl_get_link_np(const char* path_p, acl_type_t type) {
+    acl_t   aclp;
+    int error;
+    aclp = acl_init(ACL_MAX_ENTRIES);
 
-	aclp = acl_init(ACL_MAX_ENTRIES);
-	if (aclp == NULL)
-		return (NULL);
+    if (aclp == NULL) {
+        return (NULL);
+    }
 
-	error = __acl_get_link(path_p, type, &aclp->ats_acl);
-	if (error) {
-		acl_free(aclp);
-		return (NULL);
-	}
+    error = __acl_get_link(path_p, type, &aclp->ats_acl);
 
-	return (aclp);
+    if (error) {
+        acl_free(aclp);
+        return (NULL);
+    }
+
+    return (aclp);
 }
 
 acl_t
-acl_get_fd(int fd)
-{
-	acl_t	aclp;
-	int	error;
+acl_get_fd(int fd) {
+    acl_t   aclp;
+    int error;
+    aclp = acl_init(ACL_MAX_ENTRIES);
 
-	aclp = acl_init(ACL_MAX_ENTRIES);
-	if (aclp == NULL)
-		return (NULL);
+    if (aclp == NULL) {
+        return (NULL);
+    }
 
-	error = ___acl_get_fd(fd, ACL_TYPE_ACCESS, &aclp->ats_acl);
-	if (error) {
-		acl_free(aclp);
-		return (NULL);
-	}
+    error = ___acl_get_fd(fd, ACL_TYPE_ACCESS, &aclp->ats_acl);
 
-	return (aclp);
+    if (error) {
+        acl_free(aclp);
+        return (NULL);
+    }
+
+    return (aclp);
 }
 
 acl_t
-acl_get_fd_np(int fd, acl_type_t type)
-{
-	acl_t	aclp;
-	int	error;
+acl_get_fd_np(int fd, acl_type_t type) {
+    acl_t   aclp;
+    int error;
+    aclp = acl_init(ACL_MAX_ENTRIES);
 
-	aclp = acl_init(ACL_MAX_ENTRIES);
-	if (aclp == NULL)
-		return (NULL);
+    if (aclp == NULL) {
+        return (NULL);
+    }
 
-	error = ___acl_get_fd(fd, type, &aclp->ats_acl);
-	if (error) {
-		acl_free(aclp);
-		return (NULL);
-	}
+    error = ___acl_get_fd(fd, type, &aclp->ats_acl);
 
-	return (aclp);
+    if (error) {
+        acl_free(aclp);
+        return (NULL);
+    }
+
+    return (aclp);
 }
 
 int
-acl_get_perm_np(acl_permset_t permset_d, acl_perm_t perm)
-{
+acl_get_perm_np(acl_permset_t permset_d, acl_perm_t perm) {
+    if (permset_d == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (permset_d == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
+    switch (perm) {
+    case ACL_READ:
+    case ACL_WRITE:
+    case ACL_EXECUTE:
+        if (*permset_d & perm) {
+            return (1);
+        }
 
-	switch(perm) {
-	case ACL_READ:
-	case ACL_WRITE:
-	case ACL_EXECUTE:
-		if (*permset_d & perm)
-			return (1);
-		break;
-	default:
-		errno = EINVAL;
-		return (-1);
-	}
+        break;
 
-	return (0);
+    default:
+        errno = EINVAL;
+        return (-1);
+    }
+
+    return (0);
 }
 
 /*
@@ -155,45 +160,44 @@ acl_get_perm_np(acl_permset_t permset_d, acl_perm_t perm)
  * the permission set in the ACL entry entry_d.
  */
 int
-acl_get_permset(acl_entry_t entry_d, acl_permset_t *permset_p)
-{
+acl_get_permset(acl_entry_t entry_d, acl_permset_t* permset_p) {
+    if (entry_d == NULL || permset_p == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (entry_d == NULL || permset_p == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-
-	*permset_p = &entry_d->ae_perm;
-
-	return (0);
+    *permset_p = &entry_d->ae_perm;
+    return (0);
 }
 
 /*
  * acl_get_qualifier() (23.4.18): retrieve the qualifier of the tag
  * for the ACL entry entry_d.
  */
-void *
-acl_get_qualifier(acl_entry_t entry_d)
-{
-	uid_t *retval;
+void*
+acl_get_qualifier(acl_entry_t entry_d) {
+    uid_t* retval;
 
-	if (entry_d == NULL) {
-		errno = EINVAL;
-		return (NULL);
-	}
+    if (entry_d == NULL) {
+        errno = EINVAL;
+        return (NULL);
+    }
 
-	switch(entry_d->ae_tag) {
-	case ACL_USER:
-	case ACL_GROUP:
-		retval = malloc(sizeof(uid_t));
-		if (retval == NULL)
-			return (NULL);
-		*retval = entry_d->ae_id;
-		return (retval);
-	}
+    switch (entry_d->ae_tag) {
+    case ACL_USER:
+    case ACL_GROUP:
+        retval = malloc(sizeof(uid_t));
 
-	errno = EINVAL;
-	return (NULL);
+        if (retval == NULL) {
+            return (NULL);
+        }
+
+        *retval = entry_d->ae_id;
+        return (retval);
+    }
+
+    errno = EINVAL;
+    return (NULL);
 }
 
 /*
@@ -201,15 +205,12 @@ acl_get_qualifier(acl_entry_t entry_d)
  * entry entry_p.
  */
 int
-acl_get_tag_type(acl_entry_t entry_d, acl_tag_t *tag_type_p)
-{
+acl_get_tag_type(acl_entry_t entry_d, acl_tag_t* tag_type_p) {
+    if (entry_d == NULL || tag_type_p == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	if (entry_d == NULL || tag_type_p == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-
-	*tag_type_p = entry_d->ae_tag;
-
-	return (0);
+    *tag_type_p = entry_d->ae_tag;
+    return (0);
 }

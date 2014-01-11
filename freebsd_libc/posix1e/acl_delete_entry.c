@@ -39,41 +39,41 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_delete_entry.c,v 1.7 2004/01/06 20:
  * from acl.
  */
 int
-acl_delete_entry(acl_t acl, acl_entry_t entry_d)
-{
-	struct acl *acl_int;
-	int i;
+acl_delete_entry(acl_t acl, acl_entry_t entry_d) {
+    struct acl* acl_int;
+    int i;
 
-	if (acl == NULL || entry_d == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
+    if (acl == NULL || entry_d == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
 
-	acl_int = &acl->ats_acl;
+    acl_int = &acl->ats_acl;
 
-	if ((acl->ats_acl.acl_cnt < 1) ||
-	    (acl->ats_acl.acl_cnt > ACL_MAX_ENTRIES)) {
-		errno = EINVAL;
-		return (-1);
-	}
-	for (i = 0; i < acl->ats_acl.acl_cnt; i++) {
-		/* if this is our entry... */
-		if ((acl->ats_acl.acl_entry[i].ae_tag == entry_d->ae_tag) &&
-		    (acl->ats_acl.acl_entry[i].ae_id == entry_d->ae_id)) {
-			/* ...shift the remaining entries... */
-			for (; i < acl->ats_acl.acl_cnt - 1; ++i)
-				acl->ats_acl.acl_entry[i] =
-				    acl->ats_acl.acl_entry[i+1];
-			/* ...drop the count and zero the unused entry... */
-			acl->ats_acl.acl_cnt--;
-			bzero(&acl->ats_acl.acl_entry[i],
-			    sizeof(struct acl_entry));
-			acl->ats_cur_entry = 0;
-			return (0);
-		}
-	}
+    if ((acl->ats_acl.acl_cnt < 1) ||
+            (acl->ats_acl.acl_cnt > ACL_MAX_ENTRIES)) {
+        errno = EINVAL;
+        return (-1);
+    }
 
+    for (i = 0; i < acl->ats_acl.acl_cnt; i++) {
+        /* if this is our entry... */
+        if ((acl->ats_acl.acl_entry[i].ae_tag == entry_d->ae_tag) &&
+                (acl->ats_acl.acl_entry[i].ae_id == entry_d->ae_id)) {
+            /* ...shift the remaining entries... */
+            for (; i < acl->ats_acl.acl_cnt - 1; ++i)
+                acl->ats_acl.acl_entry[i] =
+                    acl->ats_acl.acl_entry[i + 1];
 
-	errno = EINVAL;
-	return (-1);
+            /* ...drop the count and zero the unused entry... */
+            acl->ats_acl.acl_cnt--;
+            bzero(&acl->ats_acl.acl_entry[i],
+                  sizeof(struct acl_entry));
+            acl->ats_cur_entry = 0;
+            return (0);
+        }
+    }
+
+    errno = EINVAL;
+    return (-1);
 }

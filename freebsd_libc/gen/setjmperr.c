@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1980, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,8 +46,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/setjmperr.c,v 1.6 2007/01/09 00:27:55 imp E
 #include "un-namespace.h"
 
 void
-longjmperror()
-{
-#define	ERRMSG	"longjmp botch.\n"
-	(void)_write(STDERR_FILENO, ERRMSG, sizeof(ERRMSG) - 1);
+longjmperror() {
+#define ERRMSG  "longjmp botch.\n"
+    (void)_write(STDERR_FILENO, ERRMSG, sizeof(ERRMSG) - 1);
 }

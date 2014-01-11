@@ -36,23 +36,22 @@
 *
 *******************************************************************************/
 
-unsigned char * __cdecl _mbsninc_l(
-        const unsigned char *string,
-        size_t ccnt,
-        _locale_t plocinfo
-        )
-{
-        if (string == NULL)
-                return(NULL);
+unsigned char* __cdecl _mbsninc_l(
+    const unsigned char* string,
+    size_t ccnt,
+    _locale_t plocinfo
+) {
+    if (string == NULL) {
+        return (NULL);
+    }
 
-        return((char *)string + (unsigned int)_mbsnbcnt_l(string, ccnt, plocinfo));
+    return ((char*)string + (unsigned int)_mbsnbcnt_l(string, ccnt, plocinfo));
 }
 
-unsigned char * (__cdecl _mbsninc)(
-        const unsigned char *string,
-        size_t ccnt
-        )
-{
+unsigned char* (__cdecl _mbsninc)(
+    const unsigned char* string,
+    size_t ccnt
+) {
     return _mbsninc_l(string, ccnt, NULL);
 }
 

@@ -31,11 +31,12 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wcrtomb.c,v 1.8 2004/05/12 14:09:04 tjr 
 #include "mblocal.h"
 
 size_t
-wcrtomb(char * __restrict s, wchar_t wc, mbstate_t * __restrict ps)
-{
-	static mbstate_t mbs;
+wcrtomb(char* __restrict s, wchar_t wc, mbstate_t* __restrict ps) {
+    static mbstate_t mbs;
 
-	if (ps == NULL)
-		ps = &mbs;
-	return (__wcrtomb(s, wc, ps));
+    if (ps == NULL) {
+        ps = &mbs;
+    }
+
+    return (__wcrtomb(s, wc, ps));
 }

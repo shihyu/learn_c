@@ -1,4 +1,4 @@
-/*	$NetBSD: svc_run.c,v 1.17 2000/07/06 03:10:35 christos Exp $	*/
+/*  $NetBSD: svc_run.c,v 1.17 2000/07/06 03:10:35 christos Exp $    */
 
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
@@ -30,8 +30,8 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char *sccsid2 = "from: @(#)svc_run.c 1.1 87/10/13 Copyr 1984 Sun Micro";
-static char *sccsid = "from: @(#)svc_run.c	2.1 88/07/29 4.0 RPCSRC";
+static char* sccsid2 = "from: @(#)svc_run.c 1.1 87/10/13 Copyr 1984 Sun Micro";
+static char* sccsid = "from: @(#)svc_run.c	2.1 88/07/29 4.0 RPCSRC";
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/rpc/svc_run.c,v 1.20 2006/02/27 22:10:59 deischen Exp $");
@@ -55,34 +55,37 @@ __FBSDID("$FreeBSD: src/lib/libc/rpc/svc_run.c,v 1.20 2006/02/27 22:10:59 deisch
 #include "mt_misc.h"
 
 void
-svc_run()
-{
-	fd_set readfds, cleanfds;
-	struct timeval timeout;
+svc_run() {
+    fd_set readfds, cleanfds;
+    struct timeval timeout;
+    timeout.tv_sec = 30;
+    timeout.tv_usec = 0;
 
-	timeout.tv_sec = 30;
-	timeout.tv_usec = 0;
+    for (;;) {
+        rwlock_rdlock(&svc_fd_lock);
+        readfds = svc_fdset;
+        cleanfds = svc_fdset;
+        rwlock_unlock(&svc_fd_lock);
 
-	for (;;) {
-		rwlock_rdlock(&svc_fd_lock);
-		readfds = svc_fdset;
-		cleanfds = svc_fdset;
-		rwlock_unlock(&svc_fd_lock);
-		switch (_select(svc_maxfd+1, &readfds, NULL, NULL, &timeout)) {
-		case -1:
-			FD_ZERO(&readfds);
-			if (errno == EINTR) {
-				continue;
-			}
-			_warn("svc_run: - select failed");
-			return;
-		case 0:
-			__svc_clean_idle(&cleanfds, 30, FALSE);
-			continue;
-		default:
-			svc_getreqset(&readfds);
-		}
-	}
+        switch (_select(svc_maxfd + 1, &readfds, NULL, NULL, &timeout)) {
+        case -1:
+            FD_ZERO(&readfds);
+
+            if (errno == EINTR) {
+                continue;
+            }
+
+            _warn("svc_run: - select failed");
+            return;
+
+        case 0:
+            __svc_clean_idle(&cleanfds, 30, FALSE);
+            continue;
+
+        default:
+            svc_getreqset(&readfds);
+        }
+    }
 }
 
 /*
@@ -90,9 +93,8 @@ svc_run()
  *      more work to do.
  */
 void
-svc_exit()
-{
-	rwlock_wrlock(&svc_fd_lock);
-	FD_ZERO(&svc_fdset);
-	rwlock_unlock(&svc_fd_lock);
+svc_exit() {
+    rwlock_wrlock(&svc_fd_lock);
+    FD_ZERO(&svc_fdset);
+    rwlock_unlock(&svc_fd_lock);
 }

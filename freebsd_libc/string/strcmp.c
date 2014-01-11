@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
@@ -43,10 +43,12 @@ __FBSDID("$FreeBSD: src/lib/libc/string/strcmp.c,v 1.6 2007/01/09 00:28:12 imp E
  */
 int
 strcmp(s1, s2)
-	const char *s1, *s2;
+const char* s1, *s2;
 {
-	while (*s1 == *s2++)
-		if (*s1++ == 0)
-			return (0);
-	return (*(const unsigned char *)s1 - *(const unsigned char *)(s2 - 1));
+    while (*s1 == *s2++)
+        if (*s1++ == 0) {
+            return (0);
+        }
+
+    return (*(const unsigned char*)s1 - * (const unsigned char*)(s2 - 1));
 }

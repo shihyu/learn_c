@@ -44,7 +44,7 @@ typedef struct {
     WORD        Reserved1;
     DWORD       EditList;                   // VA
     PUINT_PTR   SecurityCookie;
-    PVOID       *SEHandlerTable;
+    PVOID*       SEHandlerTable;
     DWORD       SEHandlerCount;
 } IMAGE_LOAD_CONFIG_DIRECTORY32_2;
 
@@ -69,5 +69,5 @@ IMAGE_LOAD_CONFIG_DIRECTORY32_2   _load_config_used = {
     0,
     &__security_cookie,
     __safe_se_handler_table,
-    (DWORD)(DWORD_PTR) &__safe_se_handler_count
+    (DWORD)(DWORD_PTR)& __safe_se_handler_count
 };

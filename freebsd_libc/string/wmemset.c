@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemset.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *  citrus Id: wmemset.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
 #include <sys/cdefs.h>
@@ -36,19 +36,20 @@ __FBSDID("$FreeBSD: src/lib/libc/string/wmemset.c,v 1.6 2002/09/21 00:29:23 tjr 
 
 #include <wchar.h>
 
-wchar_t	*
+wchar_t*
 wmemset(s, c, n)
-	wchar_t *s;
-	wchar_t c;
-	size_t n;
+wchar_t* s;
+wchar_t c;
+size_t n;
 {
-	size_t i;
-	wchar_t *p;
+    size_t i;
+    wchar_t* p;
+    p = (wchar_t*)s;
 
-	p = (wchar_t *)s;
-	for (i = 0; i < n; i++) {
-		*p = c;
-		p++;
-	}
-	return s;
+    for (i = 0; i < n; i++) {
+        *p = c;
+        p++;
+    }
+
+    return s;
 }
