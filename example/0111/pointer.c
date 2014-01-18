@@ -2,10 +2,10 @@
 
 int main(int argc, char *argv[])
 {
-    char *a = 1000;
-    int *b = 1000;
-    unsigned short *c = 1000;
-    float *d = 1000;
+    char *a = (char*)1000;
+    int *b = (int*)1000;
+    unsigned short *c = (unsigned short*)1000;
+    float *d = (float*)1000;
 
     printf("%ld\n",sizeof(unsigned short));
 
@@ -14,17 +14,16 @@ int main(int argc, char *argv[])
     printf("%ld\n",sizeof(c));
     printf("%ld\n",sizeof(d));
 
-    printf("%d\n",a);
-    printf("%d\n",a+1);
+    printf("%ld\n",(unsigned long)a);
+    printf("%ld\n",(unsigned long)a+1);
 
-    printf("%d\n",b);
-    printf("%d\n",b+1);
+    printf("%ld\n",(unsigned long)b);
+    printf("%ld\n",(unsigned long)b+1);
 
-    printf("%d\n",c);
-    printf("%d\n",c+1);
+    printf("%ld\n",(unsigned long)c);
+    printf("%ld\n",(unsigned long)c+1);
 
-    printf("%d\n",d);
-    printf("%d\n",d+1);
-
+    printf("%ld\n",(unsigned long)d);
+    printf("%ld\n",(unsigned long)d+1);
     return 0;
 }
