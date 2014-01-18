@@ -8,6 +8,7 @@ int main(int argc, char* argv[]) {
     printf("%p\n", p);
     *p = 100;
     *(p + 1) = 200;
+    printf("%p\n", p + 1);
     *(p + 2) = 300;
     *(p + 3) = 400;
     *(p + 4) = 500;
@@ -18,6 +19,7 @@ int main(int argc, char* argv[]) {
     }
 
     free(p);
+    printf("%p\n",p);
     p = NULL;
     return 0;
 }
