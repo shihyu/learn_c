@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
         g_value = 200;
         register_sleep(10, print_hello);
     } else {
+        sleep(1);
         /* in parent process */
         printf("parent pid = %d, pparent pid = %d\n", getpid(), getppid());
         printf("%p\n", &g_value);
