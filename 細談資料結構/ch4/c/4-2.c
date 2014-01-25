@@ -24,7 +24,7 @@ int Pop(STACK*, int*);
 int IsEmpty(STACK*);
 void PrintStack(STACK*);
 
-void main(void) {
+int main(void) {
     STACK S;
     int choose, LoopFlag = 1;
     int data;
@@ -64,6 +64,8 @@ void main(void) {
             printf("選項錯誤");
         }
     }
+
+    return 0;
 }
 
 void PrintStack(STACK* s) {

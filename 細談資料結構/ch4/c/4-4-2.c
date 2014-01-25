@@ -37,7 +37,7 @@ void Pop(int*);
 int  post_evaluate(char*);
 int  evaluate(char , int , int);
 
-void main(void) {
+int main(void) {
     int i;
     char infix[MAX_ITEM];
     char postfix[MAX_ITEM];
@@ -53,6 +53,7 @@ void main(void) {
     }
 
     printf("\n上式之結果= %d \n", post_evaluate(postfix));
+    return 0;
 }
 
 void in_to_post(char* infix, char* postfix) {
@@ -70,7 +71,7 @@ void in_to_post(char* infix, char* postfix) {
             Push(token);
         } else if (token == ')')
             while (S.top >= 0) {
-                Pop(&(int)element);
+                Pop(&element);
 
                 if (element == '(') {
                     break;
@@ -83,7 +84,7 @@ void in_to_post(char* infix, char* postfix) {
                 element = S.item[S.top];
 
                 if (priority(token) <= priority(element)) {
-                    Pop(&(int)element);
+                    Pop(&element);
                     postfix[j++] = element;
                 } else {
                     break;
@@ -95,7 +96,7 @@ void in_to_post(char* infix, char* postfix) {
     }
 
     while (S.top >= 0) {
-        Pop(& element);
+        Pop(&element);
         postfix[j++] = element;
     }
 
@@ -129,7 +130,7 @@ int priority(int c) {
 
 int post_evaluate(char* postfix) {
     char token;
-    int evaluate(), op1, op2, result, i = 0;
+    int op1, op2, result, i = 0;
 
     while ((token = postfix[i]) != '\0') {
         i = i + 1;
