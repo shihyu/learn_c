@@ -15,15 +15,15 @@ int main(int argc, char *argv[])
     printf("%ld\n",sizeof(d));
 
     printf("%ld\n",(unsigned long)a);
-    printf("%ld\n",(unsigned long)a+1);
+    printf("%ld\n",(unsigned long)(a+1));
 
     printf("%ld\n",(unsigned long)b);
-    printf("%ld\n",(unsigned long)b+1);
+    printf("%ld\n",(unsigned long)(b+1));
 
     printf("%ld\n",(unsigned long)c);
-    printf("%ld\n",(unsigned long)c+1);
+    printf("%ld\n",(unsigned long)(c+1));
 
     printf("%ld\n",(unsigned long)d);
-    printf("%ld\n",(unsigned long)d+1);
+    printf("%ld\n",(unsigned long)(d+1));
     return 0;
 }

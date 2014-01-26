@@ -3,6 +3,8 @@
 
 
 int main(int argc, char* argv[]) {
+    int a[100];
+    int *t = a;
     int* p = (int*)malloc(20); // int a[5];
     int i;
     printf("%p\n", p);
