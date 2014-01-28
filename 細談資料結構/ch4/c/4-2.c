@@ -25,6 +25,8 @@ int IsEmpty(STACK*);
 void PrintStack(STACK*);
 
 int main(void) {
+	::printf ("This is line %d of file %s (function %s)\n", __LINE__, __FILE__, __func__);
+
     STACK S;
     int choose, LoopFlag = 1;
     int data;
@@ -69,6 +71,8 @@ int main(void) {
 }
 
 void PrintStack(STACK* s) {
+	::printf ("This is line %d of file %s (function %s)\n", __LINE__, __FILE__, __func__);
+
     int i;
 
     if (IsEmpty(s)) {
@@ -83,6 +87,8 @@ void PrintStack(STACK* s) {
 }
 
 int Push(STACK* S, int X) {
+	::printf ("This is line %d of file %s (function %s)\n", __LINE__, __FILE__, __func__);
+
     if (IsFull(S)) {
         return (0);
     }
@@ -93,6 +99,8 @@ int Push(STACK* S, int X) {
 }
 
 int IsFull(STACK* S) {
+	::printf ("This is line %d of file %s (function %s)\n", __LINE__, __FILE__, __func__);
+
     if (S->top == (MAX_ITEM - 1)) {
         return (1);
     } else {
@@ -101,6 +109,8 @@ int IsFull(STACK* S) {
 }
 
 int Pop(STACK* S, int* X) {
+	::printf ("This is line %d of file %s (function %s)\n", __LINE__, __FILE__, __func__);
+
     if (IsEmpty(S)) {
         return (0);
     }
@@ -111,6 +121,8 @@ int Pop(STACK* S, int* X) {
 }
 
 int IsEmpty(STACK* S) {
+	::printf ("This is line %d of file %s (function %s)\n", __LINE__, __FILE__, __func__);
+
     if (S->top == -1) {
         return (1);
     } else {
