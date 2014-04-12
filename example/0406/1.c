@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define LEN 6 
 
@@ -11,18 +12,29 @@
 int main(int argc, char *argv[])
 {
     int data[LEN];
-    int i;
+    int i ,j, r;
 
     srand(time(NULL)); // 設定不同的亂數種子
 
     // int r = rand();  例如透過rand函數亂數產生數值給r變數
 
     for (i = 0; i < LEN; ++i) {
-        // for 裡面利用rand() 產生6個數字1~49範圍的數字,存到data 陣列
+        r = rand() % 50 + 1;
+
+        for (j = 0; j < i; j++) {
+            if (r == data[j]) {
+                i--;
+                break;
+            }
+        }
+
+        if (r != data[j] ) {
+            data[i] = r;
+        }
     }
 
-    // 印出data 6個數字
     for (i = 0; i < LEN; ++i) {
+        printf("data[%d]=%d\n", i, data[i]);
 
     }
 
