@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define RANGE 10
 
@@ -33,11 +34,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    show(matrix_a);
-    printf("\n");
-    show(matrix_b);
+    for (i = 0; i < 3; ++i) {
+        for (j = 0; j < 3; ++j) {
+            matrix_c[i][j] = 0;
+        }
+    }
 
+    for (i = 0; i < 3; ++i) {
+        for (j = 0; j < 3; ++j) {
+            matrix_c[i][j] += matrix_a[i][j] * matrix_b[i][j];
+        }
+    }
 
+    show(matrix_c);
 
     return 0;
 }

@@ -10,6 +10,7 @@ int g_value = 100;
 int main(int argc, char* argv[]) {
     pid_t pid;
     int status;
+    int value = 20;
     pid = fork();
 
     if (pid < 0) {
@@ -18,16 +19,22 @@ int main(int argc, char* argv[]) {
     } else if (pid == 0) {
         /* in child process */
         printf("child pid = %d, pparent pid = %d\n", getpid(), getppid());
-        printf("%p\n", &g_value);
-        printf("%d\n", g_value);
+        printf("g_value address=%p\n", &g_value);
+        printf("value address=%p\n", &value);
+        printf("g_value=%d\n", g_value);
+        printf("value=%d\n", value);
         g_value = 200;
+        value = 50;
+        printf("value=%d\n", value);
         register_sleep(10, print_hello);
     } else {
         sleep(1);
         /* in parent process */
         printf("parent pid = %d, pparent pid = %d\n", getpid(), getppid());
-        printf("%p\n", &g_value);
-        printf("%d\n", g_value);
+        printf("g_value address=%p\n", &g_value);
+        printf("value address=%p\n", &value);
+        printf("g_value=%d\n", g_value);
+        printf("value=%d\n", value);
         // wait(NULL);
         waitpid(pid, &status, 0);
     }
