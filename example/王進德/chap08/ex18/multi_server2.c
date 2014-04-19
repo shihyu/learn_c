@@ -25,13 +25,13 @@ static void sigchld_handler() {
     signal(SIGCHLD, sigchld_handler);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     int       z, len_inet;
     struct sockaddr_in    adr_srvr, adr_clnt;
     int       sockfd, connfd;
     pid_t     PID;
     time_t    clock;
-    struct tm* tm;
+    struct tm *tm;
     int       len_time, i;
     char      buf[256];
     signal(SIGCHLD, sigchld_handler);
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    z = bind(sockfd, (struct sockaddr*)&adr_srvr, sizeof(adr_srvr));
+    z = bind(sockfd, (struct sockaddr *)&adr_srvr, sizeof(adr_srvr));
 
     if (z == -1) {
         perror("bind error");
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 
     while (1) {
         len_inet = sizeof(adr_clnt);
-        connfd = accept(sockfd, (struct sockaddr*)&adr_clnt, &len_inet);
+        connfd = accept(sockfd, (struct sockaddr *)&adr_clnt, &len_inet);
 
         if (connfd == -1) {
             perror("connect error");

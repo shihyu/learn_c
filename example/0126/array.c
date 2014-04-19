@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int value;
     unsigned char  image1[10];
 
@@ -9,10 +8,10 @@ int main(int argc, char *argv[])
 
     unsigned char  image2[value];
 
-    printf("%ld\n",sizeof(image2));
+    printf("%ld\n", sizeof(image2));
 
-    
-    
-    
+
+
+
     return 0;
 }

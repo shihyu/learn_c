@@ -6,8 +6,8 @@ int test1();
 float test2();
 double test3();
 char test4();
-char* test5();
-int* test6();
+char *test5();
+int *test6();
 
 
 int g;
@@ -16,7 +16,7 @@ int sum(int a, int b) {
     return a + b;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     printf("%d\n", sum(10, 50));
     test();
     printf("%d\n", g);
@@ -45,10 +45,10 @@ char test4() {
     return 0;
 }
 
-char* test5() {
+char *test5() {
     return 0;
 }
 
-int* test6() {
+int *test6() {
     return 0;
 }

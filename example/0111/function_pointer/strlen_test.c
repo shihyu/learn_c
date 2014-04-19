@@ -2,18 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 
-int main ()
-{
+int main() {
     int i, yyy;
-    char xxx[4] = {'A','C','B','\0'};
+    char xxx[4] = {'A', 'C', 'B', '\0'};
 
     yyy = strlen(xxx);
-    printf("%d\n",yyy);
+    printf("%d\n", yyy);
 
-    for (i = 0; i < yyy; ++i)
-    {
-        printf("%c\n",xxx[i]);
+    for (i = 0; i < yyy; ++i) {
+        printf("%c\n", xxx[i]);
         /* code */
     }
+
     return 0;
 }

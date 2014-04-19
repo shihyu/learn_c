@@ -33,21 +33,21 @@ int main(void) {
     key = getchar();
 
     switch (key) {
-    case '+':
-        oper = add;
-        break;
+        case '+':
+            oper = add;
+            break;
 
-    case '-':
-        oper = sub;
-        break;
+        case '-':
+            oper = sub;
+            break;
 
-    case '*':
-        oper = mul;
-        break;
+        case '*':
+            oper = mul;
+            break;
 
-    case '/':
-        oper = div;
-        break;
+        case '/':
+            oper = div;
+            break;
     }
 
     for (i = 0; i < N; i++) {

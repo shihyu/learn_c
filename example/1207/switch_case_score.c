@@ -13,23 +13,23 @@ int main(void) {
 
     if ((Score >= 0) && (Score <= 100)) {
         switch (Score / 10) {
-        case 10:
-            printf("完美分數\n");
+            case 10:
+                printf("完美分數\n");
 
-        case 9:
-            printf("分數等級為優等\n");
+            case 9:
+                printf("分數等級為優等\n");
 
-        case 8:
-            printf("分數等級為甲等\n");
+            case 8:
+                printf("分數等級為甲等\n");
 
-        case 7:
-            printf("分數等級為乙等\n");
+            case 7:
+                printf("分數等級為乙等\n");
 
-        case 6:
-            printf("分數等級為丙等\n");
+            case 6:
+                printf("分數等級為丙等\n");
 
-        default:
-            printf("分數等級為丁等\n");
+            default:
+                printf("分數等級為丁等\n");
         }
     }
 

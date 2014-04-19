@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     mode_t  mode = 0666;
 
     if (argc != 2) {

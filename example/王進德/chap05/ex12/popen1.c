@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-    FILE*  fp;
+    FILE  *fp;
     char  buf[501];
     int   ch;
     memset(buf, '\0', sizeof(buf));

@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     int   z, len_inet;
     struct sockaddr_in    adr_srvr;
     int   sockfd;
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    z = connect(sockfd, (struct sockaddr*)&adr_srvr, sizeof(adr_srvr));
+    z = connect(sockfd, (struct sockaddr *)&adr_srvr, sizeof(adr_srvr));
 
     if (z == -1) {
         perror("connect error");

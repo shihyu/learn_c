@@ -8,11 +8,11 @@
 
 int port = 8000;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     struct sockaddr_in    pin;
     int   mysock;
     char  buf[8192];
-    char*  str = "A001 電視機 20000.00 ";
+    char  *str = "A001 電視機 20000.00 ";
 
     if (argc < 2) {
         printf("使用方法: client 字串\n");
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    if (connect(mysock, (void*)&pin, sizeof(pin)) == -1) {
+    if (connect(mysock, (void *)&pin, sizeof(pin)) == -1) {
         perror("call to connect");
         exit(1);
     }

@@ -32,7 +32,7 @@ int main(void) {
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
     sin.sin_port = htons(port);
 
-    if (bind(mysock, (struct sockaddr*)&sin, sizeof(sin)) == -1) {
+    if (bind(mysock, (struct sockaddr *)&sin, sizeof(sin)) == -1) {
         perror("call to bind");
         exit(1);
     }
@@ -45,7 +45,7 @@ int main(void) {
     printf("Accepting connections ...\n");
 
     while (1) {
-        tempsock = accept(mysock, (struct sockaddr*)&pin, &addrsize);
+        tempsock = accept(mysock, (struct sockaddr *)&pin, &addrsize);
 
         if (tempsock == -1) {
             perror("call to accept");

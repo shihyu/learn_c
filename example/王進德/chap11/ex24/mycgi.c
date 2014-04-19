@@ -7,16 +7,16 @@ typedef struct name_value_set {
     char value[250];  // 表單欄位值最長為250個字元
 } nv_set;
 
-void makespace(char* s);
-char* split(char* s, char stop);
-char* convert(char* s);
+void makespace(char *s);
+char *split(char *s, char stop);
+char *convert(char *s);
 int hexa(char c);
 
 /* 將表單資料解碼,結果存入nv陣列中 */
-int get_input(nv_set* nv) {
-    char*  method;
-    char*  my_data = 0;
-    char*  tmp_ptr, *tmp;
+int get_input(nv_set *nv) {
+    char  *method;
+    char  *my_data = 0;
+    char  *tmp_ptr, *tmp;
     int   data_len;
     int   i;
     /* 表單以GET方法傳送資料 */
@@ -26,7 +26,7 @@ int get_input(nv_set* nv) {
         tmp_ptr = getenv("QUERY_STRING");
         data_len = strlen(tmp_ptr);
         /* 將表單編碼資料存入my_data中 */
-        my_data = (char*)malloc(sizeof(char) * (data_len + 1));
+        my_data = (char *)malloc(sizeof(char) * (data_len + 1));
         strcpy(my_data, getenv("QUERY_STRING"));
         my_data[data_len] = '\0';
     }
@@ -35,7 +35,7 @@ int get_input(nv_set* nv) {
     if (strcmp(method, "POST") == 0) {
         data_len = atoi(getenv("CONTENT_LENGTH"));
         /* 將表單編碼資料存入my_data中 */
-        my_data = (char*)malloc(sizeof(char) * (data_len + 1));
+        my_data = (char *)malloc(sizeof(char) * (data_len + 1));
         fread(my_data, 1, data_len, stdin);
     }
 
@@ -57,7 +57,7 @@ int get_input(nv_set* nv) {
 }
 
 /* 將+號還原成空白 */
-void makespace(char* s) {
+void makespace(char *s) {
     int   i, len;
     len = strlen(s);
 
@@ -69,13 +69,13 @@ void makespace(char* s) {
 }
 
 /* 分離資料對 */
-char* split(char* s, char stop) {
-    char*  data;
-    char*  tmp;
+char *split(char *s, char stop) {
+    char  *data;
+    char  *tmp;
     int   i, len, j;
     len = strlen(s);
     tmp = s;
-    data = (char*)malloc(sizeof(char) * (len + 1));
+    data = (char *)malloc(sizeof(char) * (len + 1));
 
     for (i = 0; i < len; i++) {
         if (s[i] != stop) {
@@ -97,11 +97,11 @@ char* split(char* s, char stop) {
 }
 
 /* 將十六進位碼還原成字元 */
-char* convert(char* s) {
+char *convert(char *s) {
     int   x, y, len;
-    char*  data;
+    char  *data;
     len = strlen(s);
-    data = (char*)malloc(sizeof(char) * (len + 1));
+    data = (char *)malloc(sizeof(char) * (len + 1));
     y = 0;
 
     for (x = 0; x < len; x++) {
@@ -123,53 +123,53 @@ char* convert(char* s) {
 /* 將字元轉為十六進位碼 */
 int hexa(char c) {
     switch (c) {
-    case '0':
-        return 0;
+        case '0':
+            return 0;
 
-    case '1':
-        return 1;
+        case '1':
+            return 1;
 
-    case '2':
-        return 2;
+        case '2':
+            return 2;
 
-    case '3':
-        return 3;
+        case '3':
+            return 3;
 
-    case '4':
-        return 4;
+        case '4':
+            return 4;
 
-    case '5':
-        return 5;
+        case '5':
+            return 5;
 
-    case '6':
-        return 6;
+        case '6':
+            return 6;
 
-    case '7':
-        return 7;
+        case '7':
+            return 7;
 
-    case '8':
-        return 8;
+        case '8':
+            return 8;
 
-    case '9':
-        return 9;
+        case '9':
+            return 9;
 
-    case 'A':
-        return 10;
+        case 'A':
+            return 10;
 
-    case 'B':
-        return 11;
+        case 'B':
+            return 11;
 
-    case 'C':
-        return 12;
+        case 'C':
+            return 12;
 
-    case 'D':
-        return 13;
+        case 'D':
+            return 13;
 
-    case 'E':
-        return 14;
+        case 'E':
+            return 14;
 
-    case 'F':
-        return 15;
+        case 'F':
+            return 15;
     }
 
     return 0;

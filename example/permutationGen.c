@@ -29,7 +29,7 @@ void permutation(char a[], int k, int n) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     char a[3] = {'a', 'b', 'c'};
     permutation(a, 0, 3);
     return 0;

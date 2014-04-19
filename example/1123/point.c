@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int a = 100;
     int b = 200;
-    int* ptr;  // 宣個 ptr 為 int* 型態指標
+    int *ptr;  // 宣個 ptr 為 int* 型態指標
     printf("a=%d, address=%p\n", a, &a);
     printf("b=%d, address=%p\n", b, &b);
     ptr = &a; // ptr 指標指向a變數位址

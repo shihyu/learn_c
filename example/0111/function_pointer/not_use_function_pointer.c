@@ -33,24 +33,25 @@ int main(void) {
 
     for (i = 0; i < N; i++) {
         switch (key) {
-        case 'a':
-            c[i] = add(a[i], b[i]);
-            break;
+            case 'a':
+                c[i] = add(a[i], b[i]);
+                break;
 
-        case 's':
-            c[i] = sub(a[i], b[i]);
-            break;
+            case 's':
+                c[i] = sub(a[i], b[i]);
+                break;
 
-        case 'm':
-            c[i] = mul(a[i], b[i]);
-            break;
+            case 'm':
+                c[i] = mul(a[i], b[i]);
+                break;
 
-        case 'd':
-            c[i] = div(a[i], b[i]);
-            break;
-        default:
-            printf("key error");
-            break;
+            case 'd':
+                c[i] = div(a[i], b[i]);
+                break;
+
+            default:
+                printf("key error");
+                break;
         }
 
         printf("%d ", c[i]);

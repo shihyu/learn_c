@@ -30,7 +30,7 @@ int main() {
     }
 
     z = bind(sockfd,
-             (struct sockaddr*)&adr_inet,
+             (struct sockaddr *)&adr_inet,
              sizeof(adr_inet));
 
     if (z == -1) {
@@ -43,7 +43,7 @@ int main() {
                      buf,
                      sizeof(buf),
                      0,
-                     (struct sockaddr*)&adr_clnt,
+                     (struct sockaddr *)&adr_clnt,
                      &len);
 
         if (z < 0) {

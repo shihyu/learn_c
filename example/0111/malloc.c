@@ -2,10 +2,10 @@
 #include <stdlib.h>
 
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int a[100];
     int *t = a;
-    int* p = (int*)malloc(20); // int a[5];
+    int *p = (int *)malloc(20); // int a[5];
     int i;
     printf("%p\n", p);
     *p = 100;
@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     }
 
     free(p);
-    printf("%p\n",p);
+    printf("%p\n", p);
     p = NULL;
     return 0;
 }
