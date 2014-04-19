@@ -10,10 +10,11 @@ long long my_atoi(char* s) {
     long long sum = 0;
 
     len = strlen(s) - 1;
-    printf("len=%d\n",len);
+
+    // printf("len=%d\n",len);
 
     for (i = 0; i < len; ++i) {
-        sum += (s[i] - '0') * (long long)pow(10.0, (double)(len - i - 1));
+        sum += (s[i] - '0') * (long long)                                pow(10.0, (double)(len - i - 1));
     }
 
     return sum;
@@ -21,10 +22,13 @@ long long my_atoi(char* s) {
 
 int main() {
     long long value;
-    char buffer[256];
+    char buffer[25];
 
     printf("Enter a number: ");
-    fgets(buffer, 256, stdin);
+    fgets(buffer, 256, stdin);  // 鍵盤輸入數值存入buffer 
+
+    // getchar();
+
     value = my_atoi(buffer);
 
     printf("\nThe value entered is %lld.\n", value);

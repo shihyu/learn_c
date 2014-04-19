@@ -33,10 +33,15 @@ int main(void) {
     ListNode* p;
     FILE* fin;
 
+#if 0
+    fin = fopen("List.in", "r");
+
+#else
     if ((fin = fopen("List.in", "r")) == NULL) {
         printf("File can not be opened, program terminate.");
         exit(1);
     }
+#endif
 
     listA = (ListNode*)malloc(sizeof(ListNode));
     listA->next = NULL;

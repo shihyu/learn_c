@@ -39,6 +39,10 @@ int main(void) {
 void Quick_Sort(int a[], int l, int r) {
     int partition_point;
 
+    printf("l=%d\n",l);
+    printf("r=%d\n",r);
+    getchar();
+
     if (l < r) {
         partition_point = Partition(a, l, r);   /*分割*/
         Quick_Sort(a, l, partition_point - 1);  /*收拾左半部*/
