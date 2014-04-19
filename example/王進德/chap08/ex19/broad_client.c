@@ -35,7 +35,7 @@ int main() {
         exit(1);
     }
 
-    z = bind(sockfd, (struct sockaddr*)&sv_addr, sizeof(sv_addr));
+    z = bind(sockfd, (struct sockaddr *)&sv_addr, sizeof(sv_addr));
 
     if (z == -1) {
         perror("bind error");
@@ -46,7 +46,7 @@ int main() {
         int i;
         socklen_t j;
         i = recvfrom(sockfd, buf, sizeof(buf), 0,
-                     (struct sockaddr*)&sv_addr, &j);
+                     (struct sockaddr *)&sv_addr, &j);
 
         if (i < 0) {
             perror("recvfrom error");

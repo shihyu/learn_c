@@ -10,7 +10,7 @@
 #include <netdb.h>
 #include <time.h>
 
-void test(int count, char* buf) {
+void test(int count, char *buf) {
     int i;
     srand((int)time(0));
     i = (rand() % 6) + 1;
@@ -47,7 +47,7 @@ int main() {
         exit(1);
     }
 
-    z = bind(sockfd, (struct sockaddr*)&sv_addr, sizeof(sv_addr));
+    z = bind(sockfd, (struct sockaddr *)&sv_addr, sizeof(sv_addr));
 
     if (z == -1) {
         perror("bind error");
@@ -60,7 +60,7 @@ int main() {
         test(i, buf);
         printf("%s\n", buf);
         z = sendto(sockfd, buf, strlen(buf) + 1, 0,
-                   (struct sockaddr*)&bc_addr, sizeof(bc_addr));
+                   (struct sockaddr *)&bc_addr, sizeof(bc_addr));
 
         if (z < 0) {
             perror("sendto error");
@@ -69,7 +69,7 @@ int main() {
 
     sprintf(buf, "STOP");
     z = sendto(sockfd, buf, strlen(buf) + 1, 0,
-               (struct sockaddr*)&bc_addr, sizeof(bc_addr));
+               (struct sockaddr *)&bc_addr, sizeof(bc_addr));
 
     if (z < 0) {
         perror("sendto error");

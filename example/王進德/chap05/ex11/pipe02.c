@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <limits.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int fd[2];
     int fdin;
     char buf[PIPE_BUF];

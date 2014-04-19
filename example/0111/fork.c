@@ -7,7 +7,7 @@ void print_hello(int time);
 void register_sleep(int time, void (*ptr_fun)(int time));
 int g_value = 100;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     pid_t pid;
     int status;
     int value = 20;

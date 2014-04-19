@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void swap(int* p1, int* p2) {
+void swap(int *p1, int *p2) {
     printf("swap[+] a=%d, b=%d p1=%p p2=%p\n", *p1, *p2, p1, p2);
     int temp = *p1;
     *p1 = *p2;
@@ -8,7 +8,7 @@ void swap(int* p1, int* p2) {
     printf("swap[-] a=%d, b=%d p1=%p p2=%p\n", *p1, *p2, p1, p2);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int a, b;
     a = 50;
     b = 100;

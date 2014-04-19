@@ -9,7 +9,7 @@
 struct sigaction act;
 
 /* signal handler definition goes here */
-void sig_handler(int signo, siginfo_t* si, void* ucontext) {
+void sig_handler(int signo, siginfo_t *si, void *ucontext) {
     printf("Got alarm signal %d\n", signo);
     /* do the required stuff here */
 }

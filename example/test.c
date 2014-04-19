@@ -2,7 +2,7 @@
 
 #define PI 3.14
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     enum _Month {
         January = 1,
         February,
@@ -25,11 +25,11 @@ int main(int argc, char* argv[]) {
 
 
     printf("%d月\n", January);
-    printf("%d月\n", December); 
-    printf("%d月\n", Month); 
+    printf("%d月\n", December);
+    printf("%d月\n", Month);
 
 
-    printf("PI=%f\n",PI);
+    printf("PI=%f\n", PI);
 
     return 0;
 }

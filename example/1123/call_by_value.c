@@ -2,7 +2,7 @@
 
 void swap(int a, int b);
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int a, b;
     a = 50;
     b = 100;

@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int i, j;
 
     for (i = 0; i < 10; ++i) {
@@ -13,9 +12,9 @@ int main(int argc, char *argv[])
             }
         }
 
-        printf("i=%d\n",i);
+        printf("i=%d\n", i);
 
     }
-    
+
     return 0;
 }

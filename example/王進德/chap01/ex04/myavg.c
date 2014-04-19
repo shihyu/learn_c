@@ -1,6 +1,6 @@
 /* myavg.c */
 
-double myavg(int* p) {
+double myavg(int *p) {
     int i;
     double sum;
     sum = 0.0;

@@ -1,13 +1,11 @@
 #include <stdio.h>
 
-struct Stack
-{
+struct Stack {
     int item[9];
     int top;
 };
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
     struct Stack S;
     struct Stack *p = &S;
@@ -25,14 +23,14 @@ int main(int argc, char *argv[])
 
 
 
-    printf("%d\n",p->top);
+    printf("%d\n", p->top);
 
-    printf("%d\n",p->item[0]);
-    printf("%d\n",p->item[1]);
-    printf("%d\n",p->item[2]);
-    printf("%d\n",p->item[3]);
-    printf("%d\n",p->item[7]);
-    printf("%d\n",p->item[8]);
+    printf("%d\n", p->item[0]);
+    printf("%d\n", p->item[1]);
+    printf("%d\n", p->item[2]);
+    printf("%d\n", p->item[3]);
+    printf("%d\n", p->item[7]);
+    printf("%d\n", p->item[8]);
 
 
     return 0;

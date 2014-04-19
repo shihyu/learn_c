@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 char my_score_level(int score) {
-    
+
     if (score > 100 || score < 0) {
         printf("input format error!!\n");
         return 'N';
@@ -21,7 +21,7 @@ char my_score_level(int score) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int c;
     int score;
     scanf("%d", &score);
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     c = my_score_level(score);
 
-    printf("%d<-->",c);
-    printf("%c",c);
+    printf("%d<-->", c);
+    printf("%c", c);
     return 0;
 }

@@ -16,7 +16,7 @@ int main() {
     int   z;
     char  buf[80], str1[80];
     struct sockaddr_in    adr_srvr;
-    FILE*  fp;
+    FILE  *fp;
     printf("開啟檔案...\n");
     fp = fopen("product.txt", "r");
 
@@ -47,7 +47,7 @@ int main() {
                    buf,
                    sizeof(buf),
                    0,
-                   (struct sockaddr*)&adr_srvr,
+                   (struct sockaddr *)&adr_srvr,
                    sizeof(adr_srvr));
 
         if (z < 0) {
@@ -62,7 +62,7 @@ int main() {
                buf,
                sizeof(buf),
                0,
-               (struct sockaddr*)&adr_srvr,
+               (struct sockaddr *)&adr_srvr,
                sizeof(adr_srvr));
 
     if (z < 0) {

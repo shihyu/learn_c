@@ -28,15 +28,15 @@ int main() {
     pid = fork();
 
     switch (pid) {
-    case -1:
-        perror("fork error");
-        exit(1);
+        case -1:
+            perror("fork error");
+            exit(1);
 
-    case 0:
-        /* child */
-        sleep(5);
-        kill(getppid(), SIGALRM);
-        exit(0);
+        case 0:
+            /* child */
+            sleep(5);
+            kill(getppid(), SIGALRM);
+            exit(0);
     }
 
     /* parent process */

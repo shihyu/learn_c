@@ -5,24 +5,23 @@
 #include <string.h>
 #include <math.h>
 
-void my_char_stats(char* buffer, int char_stats[]) {
+void my_char_stats(char *buffer, int char_stats[]) {
     int i, len;
 
     len = strlen(buffer) - 1;
-    printf("len=%d\n",len);
+    printf("len=%d\n", len);
 
     for (i = 0; i < len; ++i) {
-        printf("%c ",buffer[i]);
-        printf("%d ",buffer[i]);
+        printf("%c ", buffer[i]);
+        printf("%d ", buffer[i]);
         char_stats[ buffer[i] - 'a' ]++;
 
     }
 
     printf("\n\n\n\n");
 
-    for (i = 0; i < 26; ++i)
-    {
-        printf("%d ",char_stats[i]);
+    for (i = 0; i < 26; ++i) {
+        printf("%d ", char_stats[i]);
     }
 }
 
@@ -32,9 +31,9 @@ int main() {
     int char_stats[26];
 
     printf("Enter a string: ");
-    fgets(buffer, 256, stdin);  // 鍵盤輸入數值存入buffer 
+    fgets(buffer, 256, stdin);  // 鍵盤輸入數值存入buffer
     // getchar();
-    
+
     for (i = 0; i < 26; ++i) {
         char_stats[i] = 0;
     }

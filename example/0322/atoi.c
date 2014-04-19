@@ -5,7 +5,7 @@
 #include <string.h>
 #include <math.h>
 
-long long my_atoi(char* s) {
+long long my_atoi(char *s) {
     int i, len;
     long long sum = 0;
 
@@ -25,7 +25,7 @@ int main() {
     char buffer[25];
 
     printf("Enter a number: ");
-    fgets(buffer, 256, stdin);  // 鍵盤輸入數值存入buffer 
+    fgets(buffer, 256, stdin);  // 鍵盤輸入數值存入buffer
 
     // getchar();
 

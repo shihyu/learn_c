@@ -1,13 +1,13 @@
 #include <stdio.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     char a[2][10] = {"Hello", "world"};  // 20 byte
     char(*b)[10] = a;  // b 是個指標, 64bit 是8byte
-    char* c[2] = {"Hello", "world"}; // 16 byte
+    char *c[2] = {"Hello", "world"}; // 16 byte
     char d[100] = "egergergergewrgewrgjeiorgjoierjgoiergjoiejgoierjgoijeorgjowjerg";
     <<< <<< < HEAD
-    char* e = "c";
-    char* f = "hello";
+    char *e = "c";
+    char *f = "hello";
     char g[100000] = "abcdefghij";
     int i;
     == == == =

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     char c = 0xFF;
     unsigned uc = 0xFF;
     float f = -13.625; // 1 1000 0010 10110100000000000000000
@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     printf("%hhX, %d\n", c, c);
     printf("%hhX, %u\n", uc, uc);
     // c15a0000 = 1 1000 0010 10110100000000000000000
-    printf("%f, %08lX", f, *(unsigned long*)&f);
+    printf("%f, %08lX", f, *(unsigned long *)&f);
     return 0;
 }
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int score;
     scanf("%d", &score);
     // 整數判斷非0之外都是true

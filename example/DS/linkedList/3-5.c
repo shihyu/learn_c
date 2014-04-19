@@ -17,33 +17,35 @@
 
 typedef struct tagListNode {
     int data;
-    struct tagListNode* next;
+    struct tagListNode *next;
 } ListNode;
-ListNode* listA;
+ListNode *listA;
 
-int InsertAfter(ListNode*, int);
-int DeleteNode(ListNode*, ListNode*);
-int InsertTail(ListNode*, int);
-ListNode* GetPreNode(ListNode*, ListNode*);
-void FreeAllNode(ListNode*);
-void PrintList(ListNode*);
+int InsertAfter(ListNode *, int);
+int DeleteNode(ListNode *, ListNode *);
+int InsertTail(ListNode *, int);
+ListNode *GetPreNode(ListNode *, ListNode *);
+void FreeAllNode(ListNode *);
+void PrintList(ListNode *);
 
 int main(void) {
     int choose, i, insertdata, num;
-    ListNode* p;
-    FILE* fin;
+    ListNode *p;
+    FILE *fin;
 
 #if 0
     fin = fopen("List.in", "r");
 
 #else
+
     if ((fin = fopen("List.in", "r")) == NULL) {
         printf("File can not be opened, program terminate.");
         exit(1);
     }
+
 #endif
 
-    listA = (ListNode*)malloc(sizeof(ListNode));
+    listA = (ListNode *)malloc(sizeof(ListNode));
     listA->next = NULL;
     fscanf(fin, "%d", &insertdata);
 
@@ -61,57 +63,57 @@ int main(void) {
         scanf("%d", &choose);
 
         switch (choose) {
-        case 0:
-            FreeAllNode(listA);     /*釋放所有節點*/
-            exit(0);            /*結束程式*/
+            case 0:
+                FreeAllNode(listA);     /*釋放所有節點*/
+                exit(0);            /*結束程式*/
 
-        case 1:
-            printf("請輸入欲附加之資料(Input new data )=>");
-            scanf("%d", &insertdata);
-            InsertTail(listA, insertdata);
-            break;
+            case 1:
+                printf("請輸入欲附加之資料(Input new data )=>");
+                scanf("%d", &insertdata);
+                InsertTail(listA, insertdata);
+                break;
 
-        case 2:
-            printf("請輸入欲插入之資料(Input new data)=>");
-            scanf("%d", &insertdata);
-            printf("請輸入欲插入之位置(New Position)=>");
-            scanf("%d", &num);
+            case 2:
+                printf("請輸入欲插入之資料(Input new data)=>");
+                scanf("%d", &insertdata);
+                printf("請輸入欲插入之位置(New Position)=>");
+                scanf("%d", &num);
 
-            for (i = 1, p = listA; i != num && p != NULL; p = p->next, i++);
+                for (i = 1, p = listA; i != num && p != NULL; p = p->next, i++);
 
-            if (p == NULL) {
-                printf("插入失敗 ( Insert Failed )");
-            } else if (InsertAfter(p, insertdata) == 0) {
-                printf("插入失敗 ( Insert Failed )");
-            }
+                if (p == NULL) {
+                    printf("插入失敗 ( Insert Failed )");
+                } else if (InsertAfter(p, insertdata) == 0) {
+                    printf("插入失敗 ( Insert Failed )");
+                }
 
-            break;
+                break;
 
-        case 3:
-            printf("請輸入欲刪除之資料 ( data to be deleted )=>");
-            scanf("%d", &num);
+            case 3:
+                printf("請輸入欲刪除之資料 ( data to be deleted )=>");
+                scanf("%d", &num);
 
-            for (i = 0, p = listA; p != NULL && p->data != num; p = p->next, i++);
+                for (i = 0, p = listA; p != NULL && p->data != num; p = p->next, i++);
 
-            if (p == NULL) {
-                printf("此資料不在串列中( the data is not in list )");
-            } else if (DeleteNode(listA, p) == 0) {
-                printf("刪除失敗( Delete Failed)");
-            }
+                if (p == NULL) {
+                    printf("此資料不在串列中( the data is not in list )");
+                } else if (DeleteNode(listA, p) == 0) {
+                    printf("刪除失敗( Delete Failed)");
+                }
 
-            break;
+                break;
 
-        default:
-            printf("選項錯誤 ( Wrong option ) !!");
+            default:
+                printf("選項錯誤 ( Wrong option ) !!");
         }
     }
 
     return 0;
 }
 
-int InsertAfter(ListNode* p, int value) {
-    ListNode* newnode;
-    newnode = (ListNode*)malloc(sizeof(ListNode));
+int InsertAfter(ListNode *p, int value) {
+    ListNode *newnode;
+    newnode = (ListNode *)malloc(sizeof(ListNode));
 
     if (newnode == NULL) {
         return (0);
@@ -123,8 +125,8 @@ int InsertAfter(ListNode* p, int value) {
     return (1);
 }
 
-int DeleteNode(ListNode* head, ListNode* node) {
-    ListNode* GetPreNode(), *prenode;
+int DeleteNode(ListNode *head, ListNode *node) {
+    ListNode *GetPreNode(), *prenode;
 
     if (head == node) {
         return 0;
@@ -141,8 +143,8 @@ int DeleteNode(ListNode* head, ListNode* node) {
     return (1);
 }
 
-ListNode* GetPreNode(ListNode* head, ListNode* node) {
-    ListNode* p, *q;
+ListNode *GetPreNode(ListNode *head, ListNode *node) {
+    ListNode *p, *q;
     p = head;
     q = head->next;
 
@@ -158,10 +160,10 @@ ListNode* GetPreNode(ListNode* head, ListNode* node) {
     }
 }
 
-int InsertTail(ListNode* head, int value) {
-    ListNode* new_node, *p = head;
+int InsertTail(ListNode *head, int value) {
+    ListNode *new_node, *p = head;
 
-    if ((new_node = (ListNode*)malloc(sizeof(ListNode))) == NULL) {
+    if ((new_node = (ListNode *)malloc(sizeof(ListNode))) == NULL) {
         return (0);
     }
 
@@ -176,14 +178,14 @@ int InsertTail(ListNode* head, int value) {
     return (1);
 }
 
-void PrintList(ListNode* p) {
+void PrintList(ListNode *p) {
     for (p = p->next; p != NULL; p = p->next) {
         printf("%d ", p->data);
     }
 }
 
-void FreeAllNode(ListNode* head) {
-    ListNode* next_node;
+void FreeAllNode(ListNode *head) {
+    ListNode *next_node;
 
     while (head != NULL) {
         next_node = head->next;
