@@ -15,17 +15,17 @@ void show(int row, int col, int ar[row][col]) {
 
         printf("\n");
     }
+
     printf("\n");
 }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const* argv[]) {
     int matrix_a[M][N];
     int matrix_b[M][N];
     int tmp;
 
     srand(time(NULL));
-    
+
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < N; ++j) {
             matrix_a[i][j] = rand() % RANGE;
