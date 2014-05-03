@@ -28,7 +28,7 @@ int main(int argc, char const* argv[]) {
 
     for (i = 0; i < M; i++) {
         for (j = 0; j < N; j++) {
-            *(matrix_a + N * i + j) = rand() % RANGE;
+            *(matrix_a + N * i + j) = rand() % RANGE;  // base address + offset [0][0] ~ [4][2]   相當於 int arr[5][3]  , arr is base addrss 
         }
     }
 
