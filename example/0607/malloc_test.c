@@ -1,16 +1,47 @@
 #include <stdio.h>
+#if 1
+int main(int argc, char *argv[])
+{
+    int *p = malloc(10 * sizeof(int));
+    int *tmp = p;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        *(p++) = 1000;
+    }
+
+    p = tmp;
+
+
+    for (int i = 0; i < 10; ++i)
+    {
+        printf("%d\n", *(i + p));
+    }
+
+
+    return 0;
+}
+#else
+
+void assign_value(int *p) {
+    printf("%p\n",p);
+    printf("%p\n",&p);
+    for (int i = 0; i < 10; ++i)
+    {
+        // p[i] = i;
+        *(p++) = 1000;
+    }
+}
+
 
 int main(int argc, char *argv[])
 {
     int *p = malloc(10 * sizeof(int));
 
-    for (int i = 0; i < 10; ++i)
-    {
-        // p[i] = i;
-        *(p+i) = i;
-    }
+    printf("%p\n",p);
+    printf("%p\n",&p);
 
-    // int *tmp = p;
+    assign_value(p);
 
     for (int i = 0; i < 10; ++i)
     {
@@ -21,13 +52,8 @@ int main(int argc, char *argv[])
 
     // p = tmp;
 
-    printf("\n");
-
-    for (int i = 0; i < 10; ++i)
-    {
-        printf("%d\n", p[i]);
-    }
-
         
     return 0;
 }
+
+#endif
