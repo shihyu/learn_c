@@ -11,8 +11,10 @@ int main() {
     printf("0x%08X\n", *(unsigned int*)&_i);
 
     printf("f=%f\n",f);
+    // printf("f=%d\n",f);
     printf("i =%f\n",i);
-    printf("_i=%f\n",i);
+    printf("_i=%f\n",_i);
+
 
     return 0;
 }

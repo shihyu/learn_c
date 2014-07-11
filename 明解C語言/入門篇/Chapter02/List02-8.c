@@ -28,6 +28,10 @@ int main(void) {
     printf("d3 =%f\n", d3);
     printf("d4 =%f\n", d4);
 
+    printf("%ld\n",sizeof(2));
+    printf("%ld\n",sizeof(2.0));
+    printf("%ld\n",sizeof(2.0f));
+
     return (0);
 }
 

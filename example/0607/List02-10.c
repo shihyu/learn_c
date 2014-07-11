@@ -5,13 +5,13 @@
 #include  <stdio.h>
 
 int main(void) {
-    int  na, nb;
+    float na, nb;
 
     puts("請輸入兩個整數:");
     printf("整數A：");
-    scanf("%d", &na);
+    scanf("%f", &na);
     printf("整數B：");
-    scanf("%d", &nb);
+    scanf("%f", &nb);
 
     printf("其平均值是%f。\n", (na + nb) / 2);  // 不轉型會出錯 , 計算出來是整數, %f格式使用IEEE754 去解析會有問題
 
@@ -19,6 +19,7 @@ int main(void) {
     printf("其平均值是%f。\n", (double)(na + nb) / 2);    /* cast */
     printf("其平均值是%f。\n", ((double)na + (double)nb) / 2);    /* cast */
     printf("其平均值是%f。\n", (((double)na + nb) / 2));    /* cast */
+    printf("其平均值是%f。\n", ((na + (double)nb) / 2));    /* cast */
     printf("其平均值是%f。\n", ((na + nb) / 2.0));    /* cast */
 
     return (0);
