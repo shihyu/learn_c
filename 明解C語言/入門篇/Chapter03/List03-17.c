@@ -16,6 +16,8 @@ int main(void) {
         puts("此數除以3的餘數為1。");
     } else if (num % 3 == 2) {
         puts("此數除以3的餘數為2。");
+    } else {
+        puts("format error");
     }
 
     return (0);

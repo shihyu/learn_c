@@ -23,7 +23,7 @@ int main(void) {
         puts("D");
         break;
 
-    case 6  :
+    //case 6  :
     case 7  :
         puts("E");
         break;
