@@ -89,6 +89,14 @@ int main(void) {
         }
     }
 
+    // dump temp
+    for (i = biHeight - 1; i > 0; i--) {
+        for (j = biWidth - 1; j > 0; j--) {
+            printf("%3d ",*(temp + i * biWidth + j));
+        }
+        printf("\n");
+    }
+
     //將資訊反轉180度
     for (i = 0; i < biHeight; i++) {
         for (j = 0; j < biWidth; j++) {
