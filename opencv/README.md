@@ -16,6 +16,13 @@ mkdir debug ; cd debug
 cmake -D CMAKE_INSTALL_PREFIX=/usr/local/opencv  -g ..
 make -j8 ; sudo make install
 ```
+### add library path
+```
+sudo vim /etc/ld.so.conf.d/opencv.conf
+/usr/local/opencv/lib
+sudo ldconfig
+ldconfig -p | ag 'opencv'
+```
 
 ### bashrc configure
 ```
