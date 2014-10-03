@@ -15,6 +15,7 @@ int main(void) {
 
     printf("兩者之差為%d。\n", (n1 > n2) ? n1 - n2 : n2 - n1);
 
+
     return (0);
 }
 

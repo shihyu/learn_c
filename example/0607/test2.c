@@ -47,7 +47,5 @@ int main(int argc, char *argv[])
     test(e, &e);
     printf("main fun %d\n",e);
 
-
-
     return 0;
 }

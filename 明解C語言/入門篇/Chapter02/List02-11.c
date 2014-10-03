@@ -21,7 +21,7 @@ int main(void) {
     ave = (double)sum / 3;           /* cast */
 
     printf("其和為%5d。\n",       sum);      /* 99999 */
-    printf("其平均值為%5.1f。\n", ave);      /* 999.9 */
+    printf("其平均值為%5.2f\n", ave);      /* 999.9 */
 
     return (0);
 }

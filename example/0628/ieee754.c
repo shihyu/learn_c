@@ -11,10 +11,16 @@ int main() {
     printf("0x%08X\n\n", *(unsigned int*)&_i);
 
     printf("f=%f\n",f);
+    // printf("f=%d\n",f);
     printf("i =%f\n",i);
+<<<<<<< HEAD
+    printf("_i=%f\n",_i);
+
+=======
     printf("_i=%f\n\n",_i);
 
     printf("%d\n",*(int*)&f);
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 
     return 0;
 }

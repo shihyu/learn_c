@@ -278,7 +278,11 @@ am__uninstall_files_from_dir = { \
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 pkglibexecdir = ${libexecdir}/${PACKAGE}
+<<<<<<< HEAD
+ACLOCAL = ${SHELL} /home/shihyu/data/learn_c/gzip-1.6/build-aux/missing aclocal-1.99a
+=======
 ACLOCAL = ${SHELL} /home/shihyu/data/gzip-1.6/build-aux/missing aclocal-1.99a
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 ALLOCA = 
 ALLOCA_H = alloca.h
 AMTAR = $${TAR-tar}
@@ -290,20 +294,34 @@ ASCPPFLAGS = -DNO_UNDERLINE
 ASCPPPOST = sed '/^ *\#/d; s,//.*,,; s/% /%/g; s/\. /./g'
 ASFLAGS_config = 
 ASM_SYMBOL_PREFIX = ""
+<<<<<<< HEAD
+AUTOCONF = ${SHELL} /home/shihyu/data/learn_c/gzip-1.6/build-aux/missing autoconf
+AUTOHEADER = ${SHELL} /home/shihyu/data/learn_c/gzip-1.6/build-aux/missing autoheader
+AUTOMAKE = ${SHELL} /home/shihyu/data/learn_c/gzip-1.6/build-aux/missing automake-1.99a
+=======
 AUTOCONF = ${SHELL} /home/shihyu/data/gzip-1.6/build-aux/missing autoconf
 AUTOHEADER = ${SHELL} /home/shihyu/data/gzip-1.6/build-aux/missing autoheader
 AUTOMAKE = ${SHELL} /home/shihyu/data/gzip-1.6/build-aux/missing automake-1.99a
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 AWK = gawk
 BITSIZEOF_PTRDIFF_T = 
 BITSIZEOF_SIG_ATOMIC_T = 
 BITSIZEOF_SIZE_T = 
 BITSIZEOF_WCHAR_T = 
 BITSIZEOF_WINT_T = 
+<<<<<<< HEAD
+CC = gcc -std=gnu99
+CCDEPMODE = depmode=gcc3
+CFLAGS = -g -O2
+CONFIG_INCLUDE = lib/config.h
+CPP = gcc -std=gnu99 -E
+=======
 CC = gcc -std=gnu11
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CONFIG_INCLUDE = lib/config.h
 CPP = gcc -std=gnu11 -E
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
@@ -982,7 +1000,11 @@ LIBPTH =
 LIBPTH_PREFIX = 
 LIBS = 
 LIBTHREAD = 
+<<<<<<< HEAD
+LIB_CLOCK_GETTIME = -lrt
+=======
 LIB_CLOCK_GETTIME = 
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 LN_S = ln -s
 LOCALCHARSET_TESTS_ENVIRONMENT = CHARSETALIASDIR="$(abs_top_builddir)/lib"
 LOCALE_FR_UTF8 = none
@@ -993,7 +1015,11 @@ LTLIBMULTITHREAD = -lpthread
 LTLIBOBJS = 
 LTLIBPTH = 
 LTLIBTHREAD = 
+<<<<<<< HEAD
+MAKEINFO = ${SHELL} /home/shihyu/data/learn_c/gzip-1.6/build-aux/missing makeinfo
+=======
 MAKEINFO = ${SHELL} /home/shihyu/data/gzip-1.6/build-aux/missing makeinfo
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 MKDIR_P = /bin/mkdir -p
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = 
@@ -1258,10 +1284,17 @@ WERROR_CFLAGS =
 WINDOWS_64_BIT_OFF_T = 0
 WINDOWS_64_BIT_ST_SIZE = 0
 WINT_T_SUFFIX = 
+<<<<<<< HEAD
+abs_builddir = /home/shihyu/data/learn_c/gzip-1.6/doc
+abs_srcdir = /home/shihyu/data/learn_c/gzip-1.6/doc
+abs_top_builddir = /home/shihyu/data/learn_c/gzip-1.6
+abs_top_srcdir = /home/shihyu/data/learn_c/gzip-1.6
+=======
 abs_builddir = /home/shihyu/data/gzip-1.6/doc
 abs_srcdir = /home/shihyu/data/gzip-1.6/doc
 abs_top_builddir = /home/shihyu/data/gzip-1.6
 abs_top_srcdir = /home/shihyu/data/gzip-1.6
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 ac_ct_CC = gcc
 am__include = include
 am__quote = 
@@ -1292,7 +1325,11 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
+<<<<<<< HEAD
+install_sh = ${SHELL} /home/shihyu/data/learn_c/gzip-1.6/build-aux/install-sh
+=======
 install_sh = ${SHELL} /home/shihyu/data/gzip-1.6/build-aux/install-sh
+>>>>>>> 0b572d343eb8c9f00561e71d1113889649dfc9e4
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 lispdir = ${datarootdir}/emacs/site-lisp
