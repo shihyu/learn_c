@@ -6,7 +6,9 @@ int main(int argc, char** argv) {
     const int K = 10;
     int i, j, k, accuracy;
     float response;
+    // Step 0: 建立 100 組 (x,y) 資料的陣列 與 存放標準答案的陣列 
     int train_sample_count = 100;
+
     CvRNG rng_state = cvRNG(-1);
     CvMat* trainData = cvCreateMat(train_sample_count, 2, CV_32FC1);
     CvMat* trainClasses = cvCreateMat(train_sample_count, 1, CV_32FC1);
@@ -30,6 +32,7 @@ int main(int argc, char** argv) {
     cvGetRows(trainClasses, &trainClasses2, train_sample_count / 2, train_sample_count);
     cvSet(&trainClasses2, cvScalar(2));
 
+    // 如何把 training set 丟給 KNN 物件學習?
     // learn classifier
     CvKNearest knn(trainData, trainClasses, 0, false, K);
     CvMat* nearests = cvCreateMat(1, K, CV_32FC1);
