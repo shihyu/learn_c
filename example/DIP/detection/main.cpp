@@ -22,9 +22,11 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
     BwImage BlockA(Image);
 
     k = 0;
+
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             k = j + 1;
+
             if (k < Image->width && BlockA[i][j] != BlockA[i][k]) {
                 feature_veotors[0][i] += 1;
             }
@@ -37,16 +39,19 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
 
     for (i = 0; i < 2; ++i) {
         for (j = 0; j < 32; ++j) {
-            printf("%3d",feature_veotors[i][j]);
+            printf("%3d", feature_veotors[i][j]);
         }
+
         printf("\n");
     }
 
 #if 1
+
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             printf("%3d ", BlockA[i][j]);
         }
+
         printf("\n");
     }
 
@@ -59,20 +64,19 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
 
 void features_train() {
     char FileName[50];
-    int i,j;
+    int i, j;
 
     for (i = 0; i < FILDERNUM; ++i) {
         for (j = 0; j < FILENO; ++j) {
             int feature_veotors[2][32] = {0};
-            sprintf(FileName, "number1_bmp/%d/%d.bmp",i,j);
+            sprintf(FileName, "number1_bmp/%d/%d.bmp", i, j);
             // printf("%s\n",FileName);
             cal_feature(FileName, feature_veotors);
         }
     }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
     features_train();
     return 0;
 }
