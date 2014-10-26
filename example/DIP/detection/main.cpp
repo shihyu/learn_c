@@ -52,6 +52,7 @@ void features_train() {
     cvShowImage("Show Image", Image);
     waitKey();
 #endif
+    cvReleaseImage(&Image);
 }
 
 int main(int argc, char *argv[])
