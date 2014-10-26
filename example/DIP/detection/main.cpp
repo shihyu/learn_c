@@ -37,6 +37,18 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
         }
     }
 
+
+#if 1
+    for (i = 0; i < Image->height; ++i) {
+        for (j = 0; j < Image->width; ++j) {
+            printf("%3d ", BlockA[i][j]);
+        }
+
+        printf("\n");
+    }
+
+    printf("\n");
+
     for (i = 0; i < 2; ++i) {
         for (j = 0; j < 32; ++j) {
             printf("%3d", feature_veotors[i][j]);
@@ -45,15 +57,7 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
         printf("\n");
     }
 
-#if 1
-
-    for (i = 0; i < Image->height; ++i) {
-        for (j = 0; j < Image->width; ++j) {
-            printf("%3d ", BlockA[i][j]);
-        }
-
-        printf("\n");
-    }
+    printf("\n");
 
     cvShowImage("Show Image", Image);
     waitKey();
