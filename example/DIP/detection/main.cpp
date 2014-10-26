@@ -6,7 +6,7 @@ using namespace cv;
 #define FILDERNUM 10
 #define FILENO 10
 
-void* cal_feature(const char* FileName, int feature_veotors[][32]) {
+void cal_feature(const char* FileName, int feature_veotors[][32]) {
     int i, j, k;
     IplImage* Image = NULL;
 
