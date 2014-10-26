@@ -2,7 +2,7 @@
 #include "opencv.h"
 // g++ -ggdb `pkg-config --cflags opencv` main.cpp -o main `pkg-config --libs opencv`
 
-using namespace cv;
+//using namespace cv;
 #define FILDERNUM 10
 #define FILENO 10
 
@@ -56,7 +56,7 @@ void cal_feature(const char* FileName, int feature_veotors[][32]) {
     printf("\n");
 
     cvShowImage("Show Image", Image);
-    waitKey();
+    cv::waitKey();
 #endif
 
     cvReleaseImage(&Image);
@@ -81,8 +81,8 @@ void features_train() {
     for (i = 0; i < FILDERNUM; ++i) {
         for (j = 0; j < FILENO; ++j) {
             int feature_veotors[2][32] = {0};
+
             sprintf(FileName, "number1_bmp/%d/%d.bmp", i, j);
-            
             cal_feature(FileName,  feature_veotors);
             stats_features_veotors(i,  feature_veotors, feature_veotors_table);
         }
