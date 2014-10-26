@@ -13,8 +13,25 @@ int main(void)
                                {50,60}};
 
     int *pa = &a;
+
+    // int *parray = &one_dim_array[0];
     int *parray = one_dim_array;
+
+    printf("%p\n", &one_dim_array[0]);
+    printf("%p\n", one_dim_array);
+
+    printf("%ld\n",sizeof(one_dim_array));
+    printf("%ld\n",sizeof(&one_dim_array[0]));
+
+
+
+
+
     int (*pparray)[2] = two_dim_array;
+
+
+
+    int *pparray1[2] = two_dim_array;
 
     printf("%d\n",*pa);
 
