@@ -82,6 +82,7 @@ void features_train() {
         for (j = 0; j < FILENO; ++j) {
             int feature_veotors[2][32] = {0};
             sprintf(FileName, "number1_bmp/%d/%d.bmp", i, j);
+            
             cal_feature(FileName,  feature_veotors);
             stats_features_veotors(i,  feature_veotors, feature_veotors_table);
         }
@@ -91,6 +92,7 @@ void features_train() {
 
     for (i = 0; i < 10; ++i) {
         for (j = 0; j < 64; ++j) {
+            feature_veotors_table[i][j] /= 10.0;
             printf("%f ", feature_veotors_table[i][j]);
         }
 
