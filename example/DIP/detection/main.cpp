@@ -10,7 +10,6 @@ using namespace cv;
 
 void* cal_feature(const char* FileName, int feature_veotors[][32]) {
     int i, j, k;
-    // const char* FileName = "f0002_01_30_001.bmp";
     IplImage* Image = NULL;
 
     Image = cvLoadImage(FileName, CV_LOAD_IMAGE_GRAYSCALE);
