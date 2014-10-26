@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include "opencv.h"
-
 // g++ -ggdb `pkg-config --cflags opencv` main.cpp -o main `pkg-config --libs opencv`
 
 using namespace cv;
 #define FILDERNUM 10
 #define FILENO 10
-
 
 void* cal_feature(const char* FileName, int feature_veotors[][32]) {
     int i, j, k;
@@ -37,7 +35,6 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
         }
     }
 
-
 #if 1
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
@@ -62,6 +59,7 @@ void* cal_feature(const char* FileName, int feature_veotors[][32]) {
     cvShowImage("Show Image", Image);
     waitKey();
 #endif
+
     cvReleaseImage(&Image);
 
 }
