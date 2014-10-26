@@ -91,11 +91,15 @@ void features_train() {
     printf("\n");
 
     for (i = 0; i < 10; ++i) {
+        FILE *pFile;
+        sprintf(FileName, "%d.txt", i);
+        pFile = fopen (FileName, "w");
         for (j = 0; j < 64; ++j) {
             feature_veotors_table[i][j] /= 10.0;
+            fprintf(pFile, "%f\n", feature_veotors_table[i][j]);
             printf("%f ", feature_veotors_table[i][j]);
         }
-
+        fclose (pFile);
         printf("\n\n");
     }
 }
