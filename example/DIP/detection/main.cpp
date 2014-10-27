@@ -6,7 +6,7 @@
 #define FILDERNUM 10
 #define FILENO 10
 
-void cal_feature(const char* FileName, int feature_veotors[][32]) {
+void cal_feature(const char* FileName, int feature_veotors[64]) {
     int i, j, k;
     IplImage* Image = NULL;
 
@@ -25,11 +25,11 @@ void cal_feature(const char* FileName, int feature_veotors[][32]) {
             k = j + 1;
 
             if (k < Image->width && BlockA[i][j] != BlockA[i][k]) {
-                feature_veotors[0][i] += 1;
+                feature_veotors[i] += 1;
             }
 
             if (k < Image->width && BlockA[j][i] != BlockA[k][i]) {
-                feature_veotors[1][i] += 1;
+                feature_veotors[i + 32] += 1;
             }
         }
     }
@@ -45,12 +45,8 @@ void cal_feature(const char* FileName, int feature_veotors[][32]) {
 
     printf("\n");
 
-    for (i = 0; i < 2; ++i) {
-        for (j = 0; j < 32; ++j) {
-            printf("%3d", feature_veotors[i][j]);
-        }
-
-        printf("\n");
+    for (i = 0; i < 64; ++i) {
+        printf("%3d", feature_veotors[i]);
     }
 
     printf("\n");
@@ -63,13 +59,11 @@ void cal_feature(const char* FileName, int feature_veotors[][32]) {
 
 }
 
-void stats_features_veotors(int fildernum, int feature_veotors[][32], float feature_veotors_table[][64]) {
-    int i, j;
+void stats_features_veotors(int fildernum, int feature_veotors[64], float feature_veotors_table[][64]) {
+    int i;
 
-    for (i = 0; i < 2; ++i) {
-        for (j = 0; j < 32; ++j) {
-            feature_veotors_table[fildernum][i * 32 + j] += feature_veotors[i][j]; 
-        }
+    for (i = 0; i < 64; ++i) {
+            feature_veotors_table[fildernum][i] += feature_veotors[i]; 
     }
 }
 
@@ -80,7 +74,7 @@ void features_train() {
 
     for (i = 0; i < FILDERNUM; ++i) {
         for (j = 0; j < FILENO; ++j) {
-            int feature_veotors[2][32] = {0};
+            int feature_veotors[64] = {0};
 
             sprintf(FileName, "number1_bmp/%d/%d.bmp", i, j);
             cal_feature(FileName,  feature_veotors);
