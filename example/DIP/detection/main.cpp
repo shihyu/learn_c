@@ -72,6 +72,7 @@ void stats_features_veotors(int fildernum, int feature_veotors[64], float featur
 
 void features_train()
 {
+    FILE* pFile;
     char FileName[50];
     float feature_veotors_table[10][64] = {0};
     int i, j;
@@ -89,8 +90,6 @@ void features_train()
     printf("\n");
 
     for (i = 0; i < 10; ++i) {
-        FILE* pFile;
-
         sprintf(FileName, "%d.txt", i);
         pFile = fopen(FileName, "w");
 
