@@ -6,7 +6,8 @@
 #define FILDERNUM 10
 #define FILENO 10
 
-void cal_feature(const char* FileName, int feature_veotors[64]) {
+void cal_feature(const char* FileName, int feature_veotors[64])
+{
     int i, j, k;
     IplImage* Image = NULL;
 
@@ -20,6 +21,7 @@ void cal_feature(const char* FileName, int feature_veotors[64]) {
     BwImage BlockA(Image);
 
     k = 0;
+
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             k = j + 1;
@@ -35,6 +37,7 @@ void cal_feature(const char* FileName, int feature_veotors[64]) {
     }
 
 #if 1
+
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             printf("%3d ", BlockA[i][j]);
@@ -59,15 +62,17 @@ void cal_feature(const char* FileName, int feature_veotors[64]) {
 
 }
 
-void stats_features_veotors(int fildernum, int feature_veotors[64], float feature_veotors_table[][64]) {
+void stats_features_veotors(int fildernum, int feature_veotors[64], float feature_veotors_table[][64])
+{
     int i;
 
     for (i = 0; i < 64; ++i) {
-            feature_veotors_table[fildernum][i] += feature_veotors[i]; 
+        feature_veotors_table[fildernum][i] += feature_veotors[i];
     }
 }
 
-void features_train() {
+void features_train()
+{
     char FileName[50];
     float feature_veotors_table[10][64] = {0};
     int i, j;
@@ -85,7 +90,7 @@ void features_train() {
     printf("\n");
 
     for (i = 0; i < 10; ++i) {
-        FILE *pFile;
+        FILE* pFile;
 
         sprintf(FileName, "%d.txt", i);
         pFile = fopen(FileName, "w");
@@ -96,13 +101,14 @@ void features_train() {
             printf("%f ", feature_veotors_table[i][j]);
         }
 
-        fclose (pFile);
+        fclose(pFile);
         printf("\n\n");
     }
 }
 
-int main(int argc, char* argv[]) {
-    FILE *pFile;
+int main(int argc, char* argv[])
+{
+    FILE* pFile;
     int i, j;
     float value;
     char FileName[50];
@@ -116,19 +122,19 @@ int main(int argc, char* argv[]) {
         sprintf(FileName, "%d.txt", i);
         pFile = fopen(FileName, "r");
 
-       if (!pFile) {
-           printf("open file fail...\n");
-           exit(1);
-       }
+        if (!pFile) {
+            printf("open file fail...\n");
+            exit(1);
+        }
 
-       for (j = 0; j < 64; ++j) {
-           fscanf(pFile, "%f\n", &value);
-           feature_veotors_table[i][j] = value;
-           printf("%f ",feature_veotors_table[i][j]);
-       }
+        for (j = 0; j < 64; ++j) {
+            fscanf(pFile, "%f\n", &value);
+            feature_veotors_table[i][j] = value;
+            printf("%f ", feature_veotors_table[i][j]);
+        }
 
-       printf("\n\n");
-       fclose(pFile);
+        printf("\n\n");
+        fclose(pFile);
     }
 
     return 0;
