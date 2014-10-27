@@ -21,7 +21,6 @@ void cal_feature(const char* FileName, int feature_veotors[64])
     BwImage BlockA(Image);
 
     k = 0;
-
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             k = j + 1;
@@ -110,9 +109,8 @@ int main(int argc, char* argv[])
 {
     FILE* pFile;
     int i, j;
-    float value;
     char FileName[50];
-    float feature_veotors_table[10][64] = {0};
+    float feature_veotors_table[10][64] = {0} , value;
 
     features_train();
 
