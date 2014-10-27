@@ -93,7 +93,7 @@ void features_train() {
     for (i = 0; i < 10; ++i) {
         FILE *pFile;
         sprintf(FileName, "%d.txt", i);
-        pFile = fopen (FileName, "w");
+        pFile = fopen(FileName, "w");
         for (j = 0; j < 64; ++j) {
             feature_veotors_table[i][j] /= 10.0;
             fprintf(pFile, "%f\n", feature_veotors_table[i][j]);
@@ -105,6 +105,34 @@ void features_train() {
 }
 
 int main(int argc, char* argv[]) {
+    FILE *pFile;
+    int i, j;
+    float value;
+    char FileName[50];
+
     features_train();
+
+    printf("\n\n\n\n");
+
+    for (i = 0; i < 10; ++i) {
+        sprintf(FileName, "%d.txt", i);
+        pFile = fopen(FileName, "r");
+
+       if (!pFile) {
+           printf("open file fail...\n");
+           exit(1);
+       }
+
+       for (j = 0; j < 64; ++j) {
+           fscanf(pFile, "%f\n", &value);
+           printf("%f ",value);
+       }
+
+       printf("\n\n");
+       fclose(pFile);
+    }
+
+
+
     return 0;
 }
