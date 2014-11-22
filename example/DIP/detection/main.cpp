@@ -104,8 +104,7 @@ void features_train()
     }
 }
 
-int main(int argc, char* argv[])
-{
+void features_train_begin() {
     FILE* pFile;
     int i, j;
     char FileName[50];
@@ -133,6 +132,12 @@ int main(int argc, char* argv[])
         printf("\n\n");
         fclose(pFile);
     }
+}
+
+
+int main(int argc, char* argv[])
+{
+    features_train_begin();
 
     return 0;
 }
