@@ -118,7 +118,6 @@ void features_train_begin() {
 
 #if DEBUG
     printf("\n\n\n\n");
-#endif
 
     for (i = 0; i < 10; ++i) {
         sprintf(FileName, "%d.txt", i);
@@ -132,16 +131,41 @@ void features_train_begin() {
         for (j = 0; j < 64; ++j) {
             fscanf(pFile, "%f\n", &value);
             feature_veotors_table[i][j] = value;
-#if DEBUG
             printf("%f ", feature_veotors_table[i][j]);
-#endif
         }
 
-#if DEBUG
         printf("\n\n");
-#endif
         fclose(pFile);
     }
+#endif
+}
+
+void similar_compare(int feature_veotors[64]) {
+    float similar_vectors[10] = {0};
+    float value;
+    int i, j;
+    char FileName[50];
+    FILE *pFile;
+
+    for (i = 0; i < 10; ++i) {
+        sprintf(FileName, "%d.txt", i);
+        pFile = fopen(FileName, "r");
+
+        if (!pFile) {
+            printf("open file fail...\n");
+            exit(1);
+        }
+
+        for (j = 0; j < 64; ++j) {
+            fscanf(pFile, "%f\n", &value);
+            similar_vectors[i] += (feature_veotors[j] - value) * (feature_veotors[j] - value);
+        }
+
+        similar_vectors[i] = sqrt(similar_vectors[i] / (float)64);
+        printf("%f\n", similar_vectors[i]);
+        fclose(pFile);
+    }
+
 }
 
 
@@ -150,13 +174,13 @@ int main(int argc, char *argv[]) {
     int i;
     int feature_veotors[64] = {0};
 
-
     if (argc >= 2) {
         cal_feature(argv[1],  feature_veotors);
         for (i = 0; i < 64; ++i) {
             printf("%d ", feature_veotors[i]);
         }
         printf("\n");
+        similar_compare(feature_veotors);
     } else {
         features_train_begin();
     }
