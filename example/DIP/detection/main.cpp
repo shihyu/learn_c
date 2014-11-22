@@ -147,10 +147,18 @@ void features_train_begin() {
 
 int main(int argc, char *argv[]) {
     char FileName[50];
+    int i;
     int feature_veotors[64] = {0};
 
     features_train_begin();
-    cal_feature(argv[1],  feature_veotors);
+
+    if (argc >= 2) {
+        cal_feature(argv[1],  feature_veotors);
+        for (i = 0; i < 64; ++i) {
+            printf("%d ", feature_veotors[i]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }
