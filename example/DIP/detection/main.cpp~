@@ -5,12 +5,11 @@
 //using namespace cv;
 #define FILDERNUM 10
 #define FILENO 10
-#define DEBUG 0
 
-void cal_feature(const char *FileName, int feature_veotors[64]) {
+void cal_feature(const char* FileName, int feature_veotors[64])
+{
     int i, j, k;
-    IplImage *Image = NULL;
-
+    IplImage* Image = NULL;
     Image = cvLoadImage(FileName, CV_LOAD_IMAGE_GRAYSCALE);
 
     if (Image == NULL) {
@@ -36,7 +35,8 @@ void cal_feature(const char *FileName, int feature_veotors[64]) {
         }
     }
 
-#if DEBUG
+#if 1
+
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             printf("%3d ", BlockA[i][j]);
@@ -52,16 +52,16 @@ void cal_feature(const char *FileName, int feature_veotors[64]) {
     }
 
     printf("\n");
-
     cvShowImage("Show Image", Image);
     cv::waitKey();
 #endif
-
     cvReleaseImage(&Image);
-
 }
 
-void stats_features_veotors(int fildernum, int feature_veotors[64], float feature_veotors_table[][64]) {
+void stats_features_veotors(int fildernum,
+                            int feature_veotors[64],
+                            float feature_veotors_table[][64])
+{
     int i;
 
     for (i = 0; i < 64; ++i) {
@@ -69,25 +69,24 @@ void stats_features_veotors(int fildernum, int feature_veotors[64], float featur
     }
 }
 
-void features_train() {
-    FILE *pFile;
+void features_train()
+{
+    FILE* pFile;
     char FileName[50];
-    float feature_veotors_table[10][64] = {0};
+    float feature_veotors_table[10][64] = { 0 };
     int i, j;
 
     for (i = 0; i < FILDERNUM; ++i) {
         for (j = 0; j < FILENO; ++j) {
-            int feature_veotors[64] = {0};
-
+            int feature_veotors[64] = { 0 };
             sprintf(FileName, "number1_bmp/%d/%d.bmp", i, j);
-            cal_feature(FileName,  feature_veotors);
-            stats_features_veotors(i,  feature_veotors, feature_veotors_table);
+            cal_feature(FileName, feature_veotors);
+            stats_features_veotors(i, feature_veotors,
+                                   feature_veotors_table);
         }
     }
 
-#if DEBUG
     printf("\n");
-#endif
 
     for (i = 0; i < 10; ++i) {
         sprintf(FileName, "%d.txt", i);
@@ -96,29 +95,22 @@ void features_train() {
         for (j = 0; j < 64; ++j) {
             feature_veotors_table[i][j] /= 10.0;
             fprintf(pFile, "%f\n", feature_veotors_table[i][j]);
-#if DEBUG
             printf("%f ", feature_veotors_table[i][j]);
-#endif
         }
 
         fclose(pFile);
-#if DEBUG
         printf("\n\n");
-#endif
     }
 }
 
-void features_train_begin() {
-    FILE *pFile;
+int main(int argc, char* argv[])
+{
+    FILE* pFile;
     int i, j;
     char FileName[50];
-    float feature_veotors_table[10][64] = {0} , value;
-
+    float feature_veotors_table[10][64] = { 0 }, value;
     features_train();
-
-#if DEBUG
     printf("\n\n\n\n");
-#endif
 
     for (i = 0; i < 10; ++i) {
         sprintf(FileName, "%d.txt", i);
@@ -132,33 +124,11 @@ void features_train_begin() {
         for (j = 0; j < 64; ++j) {
             fscanf(pFile, "%f\n", &value);
             feature_veotors_table[i][j] = value;
-#if DEBUG
             printf("%f ", feature_veotors_table[i][j]);
-#endif
         }
 
-#if DEBUG
         printf("\n\n");
-#endif
         fclose(pFile);
-    }
-}
-
-
-int main(int argc, char *argv[]) {
-    char FileName[50];
-    int i;
-    int feature_veotors[64] = {0};
-
-
-    if (argc >= 2) {
-        cal_feature(argv[1],  feature_veotors);
-        for (i = 0; i < 64; ++i) {
-            printf("%d ", feature_veotors[i]);
-        }
-        printf("\n");
-    } else {
-        features_train_begin();
     }
 
     return 0;
