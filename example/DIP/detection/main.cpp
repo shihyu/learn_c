@@ -6,10 +6,9 @@
 #define FILDERNUM 10
 #define FILENO 10
 
-void cal_feature(const char* FileName, int feature_veotors[64])
-{
+void cal_feature(const char *FileName, int feature_veotors[64]) {
     int i, j, k;
-    IplImage* Image = NULL;
+    IplImage *Image = NULL;
 
     Image = cvLoadImage(FileName, CV_LOAD_IMAGE_GRAYSCALE);
 
@@ -21,6 +20,7 @@ void cal_feature(const char* FileName, int feature_veotors[64])
     BwImage BlockA(Image);
 
     k = 0;
+
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             k = j + 1;
@@ -61,8 +61,7 @@ void cal_feature(const char* FileName, int feature_veotors[64])
 
 }
 
-void stats_features_veotors(int fildernum, int feature_veotors[64], float feature_veotors_table[][64])
-{
+void stats_features_veotors(int fildernum, int feature_veotors[64], float feature_veotors_table[][64]) {
     int i;
 
     for (i = 0; i < 64; ++i) {
@@ -70,9 +69,8 @@ void stats_features_veotors(int fildernum, int feature_veotors[64], float featur
     }
 }
 
-void features_train()
-{
-    FILE* pFile;
+void features_train() {
+    FILE *pFile;
     char FileName[50];
     float feature_veotors_table[10][64] = {0};
     int i, j;
@@ -105,7 +103,7 @@ void features_train()
 }
 
 void features_train_begin() {
-    FILE* pFile;
+    FILE *pFile;
     int i, j;
     char FileName[50];
     float feature_veotors_table[10][64] = {0} , value;
@@ -135,8 +133,7 @@ void features_train_begin() {
 }
 
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
     features_train_begin();
 
     return 0;
