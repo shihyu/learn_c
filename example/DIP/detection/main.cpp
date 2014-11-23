@@ -142,8 +142,8 @@ void features_train_begin() {
 
 void similar_compare(int feature_veotors[64]) {
     float similar_vectors[10] = {0};
-    float value;
-    int i, j;
+    float value, min_value;
+    int i, j, result;
     char FileName[50];
     FILE *pFile;
 
@@ -165,6 +165,18 @@ void similar_compare(int feature_veotors[64]) {
         printf("%f\n", similar_vectors[i]);
         fclose(pFile);
     }
+
+    min_value = similar_vectors[0]; 
+
+    result = 0;
+    for (i = 1; i < 10; ++i) {
+        if (similar_vectors[i] < min_value) {
+            min_value = similar_vectors[i];
+            result = i;
+        } 
+    }
+
+    printf("\ndigital=%d\n", result);
 
 }
 
