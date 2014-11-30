@@ -1,4 +1,4 @@
-/*gcc -g glibc_using_gdb.c -o glibc_using_gdb */
+/* gcc -g glibc_using_gdb.c -o glibc_using_gdb */
 
 #include <stdio.h>                                                        
  
