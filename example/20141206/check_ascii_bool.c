@@ -4,7 +4,7 @@
 
 int main(void)
 {
-#if 0
+#if 1
     int check_ascii_bool = 1;
     int num, i;
     char input_string[20];
@@ -15,6 +15,10 @@ int main(void)
 
     for (i = 0; input_string[i] != '\0'; i++) {
         check_ascii = input_string[i];
+        
+        if (i == 0 && check_ascii == '-') {
+            continue;
+        }
 
         if ((check_ascii < '0') || (check_ascii > '9')) {
             check_ascii_bool = 0;
