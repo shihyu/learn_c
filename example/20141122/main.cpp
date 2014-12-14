@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
     } else {
         printf("argv[0]=%s\n",argv[0]);
-        printf("example ./main file path");
+        printf("example ./main file path\n");
     }
 
     return 0;
