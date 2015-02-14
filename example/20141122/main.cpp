@@ -39,6 +39,14 @@ void tarin_feature_begin() {
         }
     }
 
+
+    for (i = 0; i < 10; ++i) {
+        for (j = 0; j < 64; ++j) {
+            printf("%f ",feature_vectors_table[i][j]);
+        }
+
+    }
+
     for (i = 0; i < 10; ++i) {
         sprintf(FilePathName, "%d.txt", i);
         pFile = fopen(FilePathName, "w");

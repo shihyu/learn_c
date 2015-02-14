@@ -2,6 +2,10 @@
 #define _OPENCV_H_
 
 #include <opencv2/opencv.hpp>
+#include "opencv2/imgproc/imgproc_c.h"
+#include "opencv2/videoio/videoio_c.h"
+#include "opencv2/highgui/highgui_c.h"
+
 #ifdef _WIN32
 #ifdef _DEBUG
 //Debug   mode
