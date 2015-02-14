@@ -1,42 +1,12 @@
 #include <stdio.h>
 #include "opencv.h"
+#include "main.h"
 // g++ -ggdb `pkg-config --cflags opencv` main.cpp -o main `pkg-config --libs opencv`
 
-void tarin_feature_begin();
-
-/* mode is 0 : train
- * mode is 1 : similar compare
- *
- * */
-void cal_image_feature(int feature_vector[64], char *FilePathName);
-void stats_feature();
-
-
 int main(int argc, char *argv[]) {
-    IplImage *Image = NULL;
-    int i, j;
-
-    // printf("argc=%d\n",argc);
 
     if (argc > 1) {
         printf("start similar compare\n");
-#if 0
-        printf("argv[0]=%s\n", argv[0]);
-        printf("argv[1]=%s\n\n", argv[1]);
-
-        Image = cvLoadImage(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
-        BwImage BlockA(Image);
-
-        for (i = 0; i < Image->height; ++i) {
-            for (j = 0; j < Image->width; ++j) {
-                printf("%4d", BlockA[i][j]);
-            }
-
-            printf("\n");
-        }
-
-#endif
-
     } else {
         printf("start train\n");
         tarin_feature_begin();
@@ -45,25 +15,50 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+void stats_features_vectors(int fildernum, int feature_vectors[64], float feature_vectors_table[][64]) {
+    int i;
+
+    for (i = 0; i < 64; ++i) {
+        feature_vectors_table[fildernum][i] += feature_vectors[i];
+    }
+}
 
 void tarin_feature_begin() {
-    int feature_vector[64] = {0};
+    int   feature_vectors[64] = {0};
+    float feature_vectors_table[10][64] = {0};
     char FilePathName[50];
     int i, j;
+    FILE *pFile;
 
     for (i = 0; i < 10; ++i) {
         for (j = 0; j < 10; ++j) {
             sprintf(FilePathName, "number1_bmp/%d/%d.bmp", i, j);
-            cal_image_feature(feature_vector, FilePathName);
+            // printf("%s\n",FilePathName);
+            cal_image_feature(feature_vectors, FilePathName);
+            stats_features_vectors(i,  feature_vectors, feature_vectors_table);
         }
+    }
+
+    for (i = 0; i < 10; ++i) {
+        sprintf(FilePathName, "%d.txt", i);
+        pFile = fopen(FilePathName, "w");
+
+        for (j = 0; j < 64; ++j) {
+            feature_vectors_table[i][j] /= 10.0;
+            fprintf(pFile, "%f\n", feature_vectors_table[i][j]);
+        }
+
+        fclose(pFile);
     }
 }
 
-void cal_image_feature(int feature_vector[64], char *FilePathName) {
+void cal_image_feature(int feature_vector[], char FilePathName[]) {
     IplImage *Image = NULL;
     int i, j;
 
-    Image = cvLoadImage(FilePathName, CV_LOAD_IMAGE_GRAYSCALE);
+    printf("\n%p[+]\n", Image);
+    Image = cvLoadImage(FilePathName, 0);
+    printf("%p[-]\n", Image);
 
     if (Image == NULL) {
         fprintf(stderr, "Can not load image %s\n", FilePathName);
@@ -72,12 +67,14 @@ void cal_image_feature(int feature_vector[64], char *FilePathName) {
 
     BwImage BlockA(Image);
 
-    for (i = 0; i < Image->height; ++i) {                                                                                                      
+    for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             printf("%3d ", BlockA[i][j]);
         }
+
         printf("\n");
     }
+
     printf("\n");
 }
 
