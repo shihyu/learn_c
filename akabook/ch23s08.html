@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>8. 函數類型和函數指針類型</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch23.html" title="第 23 章 指針" /><link rel="prev" href="ch23s07.html" title="7. 指向數組的指針與多維數組" /><link rel="next" href="ch23s09.html" title="9. 不完全類型和複雜聲明" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">8. 函數類型和函數指針類型</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch23s07.html">上一頁</a> </td><th width="60%" align="center">第 23 章 指針</th><td width="20%" align="right"> <a accesskey="n" href="ch23s09.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2813491"></a>8. 函數類型和函數指針類型</h2></div></div></div><p>在C語言中，函數也是一種類型，可以定義指向函數的指針。我們知道，指針變數的內存單元存放一個地址值，而函數指針存放的就是函數的入口地址（位於<code class="literal">.text</code>段）。下面看一個簡單的例子：</p><div class="example"><a id="id2813509"></a><p class="title"><b>例 23.3. 函數指針</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+void say_hello(const char *str)
+{
+	printf("Hello %s\n", str);
+}
+
+int main(void)
+{
+	void (*f)(const char *) = say_hello;
+	f("Guys");
+	return 0;
+}</pre></div></div><br class="example-break" /><p>分析一下變數<code class="literal">f</code>的類型聲明<code class="literal">void (*f)(const char *)</code>，<code class="literal">f</code>首先跟<code class="literal">*</code>號結合在一起，因此是一個指針。<code class="literal">(*f)</code>外面是一個函數原型的格式，參數是<code class="literal">const char *</code>，返回值是<code class="literal">void</code>，所以<code class="literal">f</code>是指向這種函數的指針。而<code class="literal">say_hello</code>的參數是<code class="literal">const char *</code>，返回值是<code class="literal">void</code>，正好是這種函數，因此<code class="literal">f</code>可以指向<code class="literal">say_hello</code>。注意，<code class="literal">say_hello</code>是一種函數類型，而函數類型和數組類型類似，做右值使用時自動轉換成函數指針類型，所以可以直接賦給<code class="literal">f</code>，當然也可以寫成<code class="literal">void (*f)(const char *) = &amp;say_hello;</code>，把函數<code class="literal">say_hello</code>先取地址再賦給<code class="literal">f</code>，就不需要自動類型轉換了。</p><p>可以直接通過函數指針調用函數，如上面的<code class="literal">f("Guys")</code>，也可以先用<code class="literal">*f</code>取出它所指的函數類型，再調用函數，即<code class="literal">(*f)("Guys")</code>。可以這麼理解：函數調用運算符<code class="literal">()</code>要求操作數是函數指針，所以<code class="literal">f("Guys")</code>是最直接的寫法，而<code class="literal">say_hello("Guys")</code>或<code class="literal">(*f)("Guys")</code>則是把函數類型自動轉換成函數指針然後做函數調用。</p><p>下面再舉幾個例子區分函數類型和函數指針類型。首先定義函數類型F：</p><pre class="programlisting">typedef int F(void);</pre><p>這種類型的函數不帶參數，返回值是<code class="literal">int</code>。那麼可以這樣聲明<code class="literal">f</code>和<code class="literal">g</code>：</p><pre class="programlisting">F f, g;</pre><p>相當於聲明：</p><pre class="programlisting">int f(void);
+int g(void);</pre><p>下面這個函數聲明是錯誤的：</p><pre class="programlisting">F h(void);</pre><p>因為函數可以返回<code class="literal">void</code>類型、標量類型、結構體、聯合體，但不能返回函數類型，也不能返回數組類型。而下面這個函數聲明是正確的：</p><pre class="programlisting">F *e(void);</pre><p>函數<code class="literal">e</code>返回一個<code class="literal">F *</code>類型的函數指針。如果給<code class="literal">e</code>多套幾層括號仍然表示同樣的意思：</p><pre class="programlisting">F *((e))(void);</pre><p>但如果把<code class="literal">*</code>號也套在括號裡就不一樣了：</p><pre class="programlisting">int (*fp)(void);</pre><p>這樣聲明了一個函數指針，而不是聲明一個函數。<code class="literal">fp</code>也可以這樣聲明：</p><pre class="programlisting">F *fp;</pre><p>通過函數指針調用函數和直接調用函數相比有什麼好處呢？我們研究一個例子。回顧<a class="xref" href="ch07s03.html#struct.datatag">第 3 節 “數據類型標誌”</a>的習題1，由於結構體中多了一個類型欄位，需要重新實現<code class="literal">real_part</code>、<code class="literal">img_part</code>、<code class="literal">magnitude</code>、<code class="literal">angle</code>這些函數，你當時是怎麼實現的？大概是這樣吧：</p><pre class="programlisting">double real_part(struct complex_struct z)
+{
+	if (z.t == RECTANGULAR)
+		return z.a;
+	else
+		return z.a * cos(z.b);
+}</pre><p>現在類型欄位有兩種取值，<code class="literal">RECTANGULAR</code>和<code class="literal">POLAR</code>，每個函數都要<code class="literal">if ... else ...</code>，如果類型欄位有三種取值呢？每個函數都要<code class="literal">if ... else if ... else</code>，或者<code class="literal">switch ... case ...</code>。這樣維護代碼是不夠理想的，現在我用函數指針給出一種實現：</p><pre class="programlisting">double rect_real_part(struct complex_struct z)
+{
+	return z.a;
+}
+
+double rect_img_part(struct complex_struct z)
+{
+	return z.b;
+}
+
+double rect_magnitude(struct complex_struct z)
+{
+	return sqrt(z.a * z.a + z.b * z.b);
+}
+
+double rect_angle(struct complex_struct z)
+{
+	double PI = acos(-1.0);
+
+	if (z.a &gt; 0)
+		return atan(z.b / z.a);
+	else
+		return atan(z.b / z.a) + PI;
+}
+
+double pol_real_part(struct complex_struct z)
+{
+	return z.a * cos(z.b);
+}
+
+double pol_img_part(struct complex_struct z)
+{
+	return z.a * sin(z.b);
+}
+
+double pol_magnitude(struct complex_struct z)
+{
+	return z.a;
+}
+
+double pol_angle(struct complex_struct z)
+{
+	return z.b;
+}
+
+double (*real_part_tbl[])(struct complex_struct) = { rect_real_part, pol_real_part };
+double (*img_part_tbl[])(struct complex_struct) = { rect_img_part, pol_img_part };
+double (*magnitude_tbl[])(struct complex_struct) = { rect_magnitude, pol_magnitude };
+double (*angle_tbl[])(struct complex_struct) = { rect_angle, pol_angle };
+
+#define real_part(z) real_part_tbl[z.t](z)
+#define img_part(z) img_part_tbl[z.t](z)
+#define magnitude(z) magnitude_tbl[z.t](z)
+#define angle(z) angle_tbl[z.t](z)</pre><p>當調用<code class="literal">real_part(z)</code>時，用類型欄位<code class="literal">z.t</code>做索引，從指針數組<code class="literal">real_part_tbl</code>中取出相應的函數指針來調用，也可以達到<code class="literal">if ... else ...</code>的效果，但相比之下這種實現更好，每個函數都只做一件事情，而不必用<code class="literal">if ... else ...</code>兼顧好幾件事情，比如<code class="literal">rect_real_part</code>和<code class="literal">pol_real_part</code>各做各的，互相獨立，而不必把它們的代碼都耦合到一個函數中。“<span class="quote">低耦合，高內聚</span>”（Low Coupling, High Cohesion）<a id="id2813970" class="indexterm"></a>是程序設計的一條基本原則，這樣可以更好地復用現有代碼，使代碼更容易維護。如果類型欄位<code class="literal">z.t</code>又多了一種取值，只需要添加一組新的函數，修改函數指針數組，原有的函數仍然可以不加改動地復用。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch23s07.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch23.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch23s09.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">7. 指向數組的指針與多維數組 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 9. 不完全類型和複雜聲明</td></tr></table></div></body></html>

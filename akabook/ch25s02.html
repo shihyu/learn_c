@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 標準I/O庫函數</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch25.html" title="第 25 章 C標準庫" /><link rel="prev" href="ch25s01.html" title="1. 字元串操作函數" /><link rel="next" href="ch25s03.html" title="3. 數值字元串轉換函數" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 標準I/O庫函數</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch25s01.html">上一頁</a> </td><th width="60%" align="center">第 25 章 C標準庫</th><td width="20%" align="right"> <a accesskey="n" href="ch25s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2829667"></a>2. 標準I/O庫函數</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2829671"></a>2.1. 檔案的基本概念</h3></div></div></div><p>我們已經多次用到了檔案，例如源檔案、目標檔案、執行檔、庫檔案等，現在學習如何用C標準庫對檔案進行讀寫操作，對檔案的讀寫也屬於I/O操作的一種，本節介紹的大部分函數在標頭檔<code class="literal">stdio.h</code>中聲明，稱為標準I/O庫函數。</p><p>檔案可分為文本檔案（Text File）<a id="id2829693" class="indexterm"></a>和二進制檔案（Binary File）<a id="id2829701" class="indexterm"></a>兩種，源檔案是文本檔案，而目標檔案、執行檔和庫檔案是二進制檔案。文本檔案是用來保存字元的，檔案中的位元組都是字元的某種編碼（例如ASCII或UTF-8），用<code class="literal">cat</code>命令可以查看其中的字元，用<code class="literal">vi</code>可以編輯其中的字元，而二進制檔案不是用來保存字元的，檔案中的位元組表示其它含義，例如執行檔中有些位元組表示指令，有些位元組表示各Section和Segment在檔案中的位置，有些位元組表示各Segment的加載地址。</p><p>在<a class="xref" href="ch18s05.html#asm.relocatable">第 5.1 節 “目標檔案”</a>中我們用<code class="literal">hexdump</code>命令查看過一個二進制檔案。我們再做一個小實驗，用<code class="literal">vi</code>編輯一個檔案<code class="literal">textfile</code>，在其中輸入<code class="literal">5678</code>然後保存退出，用<code class="literal">ls -l</code>命令可以看到它的長度是5：</p><pre class="screen">$ ls -l textfile 
+-rw-r--r-- 1 akaedu akaedu 5 2009-03-20 10:58 textfile</pre><p><code class="literal">5678</code>四個字元各占一個位元組，<code class="literal">vi</code>會自動在檔案末尾加一個換行符，所以檔案長度是5。用<code class="literal">od</code>命令查看該檔案的內容：</p><pre class="screen">$ od -tx1 -tc -Ax textfile 
+000000 35 36 37 38 0a
+         5   6   7   8  \n
+000005</pre><p><code class="literal">-tx1</code>選項表示將檔案中的位元組以十六進制的形式列出來，每組一個位元組，<code class="literal">-tc</code>選項表示將檔案中的ASCII碼以字元形式列出來。和<code class="literal">hexdump</code>類似，輸出結果最左邊的一列是檔案中的地址，預設以八進制顯示，<code class="literal">-Ax</code>選項要求以十六進制顯示檔案中的地址。這樣我們看到，這個檔案中保存了5個字元，以ASCII碼保存。ASCII碼的範圍是0~127，所以ASCII碼文本檔案中每個位元組只用到低7位，最高位都是0。以後我們會經常用到<code class="literal">od</code>命令。</p><p>文本檔案是一個模糊的概念。有些時候說文本檔案是指用<code class="literal">vi</code>可以編輯出來的檔案，例如<code class="literal">/etc</code>目錄下的各種配置檔案，這些檔案中只包含ASCII碼中的可見字元，而不包含像<code class="literal">'\0'</code>這種不可見字元，也不包含最高位是1的非ASCII碼位元組。從廣義上來說，只要是專門保存字元的檔案都算文本檔案，包含不可見字元的也算，採用其它字元編碼（例如UTF-8編碼）的也算。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2829869"></a>2.2. fopen/fclose</h3></div></div></div><p>在操作檔案之前要用<code class="literal">fopen</code>打開檔案，操作完畢要用<code class="literal">fclose</code>關閉檔案。打開檔案就是在操作系統中分配一些資源用於保存該檔案的狀態信息，並得到該檔案的標識，以後用戶程序就可以用這個標識對檔案做各種操作，關閉檔案則釋放檔案在操作系統中占用的資源，使檔案的標識失效，用戶程序就無法再操作這個檔案了。 </p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+FILE *fopen(const char *path, const char *mode);
+返回值：成功返回檔案指針，出錯返回NULL並設置errno</pre><p><code class="literal">path</code>是檔案的路徑名，<code class="literal">mode</code>表示打開方式。如果檔案打開成功，就返回一個<code class="literal">FILE *</code>檔案指針來標識這個檔案。以後調用其它函數對檔案做讀寫操作都要提供這個指針，以指明對哪個檔案進行操作。<code class="literal">FILE</code>是C標準庫中定義的結構體類型，其中包含該檔案在內核中標識（在<a class="xref" href="ch28s02.html#io.twoioflavors">第 2 節 “C標準I/O庫函數與Unbuffered I/O函數”</a>將會講到這個標識叫做檔案描述符）、I/O緩衝區和當前讀寫位置等信息，但調用者不必知道<code class="literal">FILE</code>結構體都有哪些成員，我們很快就會看到，調用者只是把檔案指針在庫函數介面之間傳來傳去，而檔案指針所指的<code class="literal">FILE</code>結構體的成員在庫函數內部維護，調用者不應該直接訪問這些成員，這種編程思想在面向對象方法論中稱為封裝（Encapsulation）<a id="id2829962" class="indexterm"></a>。像<code class="literal">FILE *</code>這樣的指針稱為不透明指針（Opaque Pointer）<a id="id2829976" class="indexterm"></a>或者叫句柄（Handle）<a id="id2829986" class="indexterm"></a>，<code class="literal">FILE *</code>指針就像一個把手（Handle），抓住這個把手就可以打開門或抽屜，但用戶只能抓這個把手，而不能直接抓門或抽屜。</p><p>下面說說參數<code class="literal">path</code>和<code class="literal">mode</code>，<code class="literal">path</code>可以是相對路徑也可以是絶對路徑，<code class="literal">mode</code>表示打開方式是讀還是寫。比如<code class="literal">fp = fopen("/tmp/file2", "w");</code>表示打開絶對路徑<code class="literal">/tmp/file2</code>，只做寫操作，<code class="literal">path</code>也可以是相對路徑，比如<code class="literal">fp = fopen("file.a", "r");</code>表示在當前工作目錄下打開檔案<code class="literal">file.a</code>，只做讀操作，再比如<code class="literal">fp = fopen("../a.out", "r");</code>只讀打開當前工作目錄上一層目錄下的<code class="literal">a.out</code>，<code class="literal">fp = fopen("Desktop/file3", "w");</code>只寫打開當前工作目錄下子目錄<code class="literal">Desktop</code>下的<code class="literal">file3</code>。相對路徑是相對於當前工作目錄（Current Working Directory）<a id="id2830098" class="indexterm"></a>的路徑，每個進程都有自己的當前工作目錄，Shell進程的當前工作目錄可以用<code class="literal">pwd</code>命令查看：</p><pre class="screen">$ pwd
+/home/akaedu</pre><p>通常Linux發行版都把Shell配置成在提示符前面顯示當前工作目錄，例如<code class="literal">~$</code>表示當前工作目錄是主目錄，<code class="literal">/etc$</code>表示當前工作目錄是<code class="literal">/etc</code>。用<code class="literal">cd</code>命令可以改變Shell進程的當前工作目錄。在Shell下敲命令啟動新的進程，則該進程的當前工作目錄繼承自Shell進程的當前工作目錄，該進程也可以調用<code class="literal">chdir(2)</code>函數改變自己的當前工作目錄。</p><p><code class="literal">mode</code>參數是一個字元串，由<code class="literal">rwatb+</code>六個字元組合而成，<code class="literal">r</code>表示讀，<code class="literal">w</code>表示寫，<code class="literal">a</code>表示追加（Append）<a id="id2830188" class="indexterm"></a>，在檔案末尾追加數據使檔案的尺寸增大。<code class="literal">t</code>表示文本檔案，<code class="literal">b</code>表示二進制檔案，有些操作系統的文本檔案和二進制檔案格式不同，而在UNIX系統中，無論文本檔案還是二進制檔案都是由一串位元組組成，<code class="literal">t</code>和<code class="literal">b</code>沒有區分，用哪個都一樣，也可以省略不寫。如果省略<code class="literal">t</code>和<code class="literal">b</code>，<code class="literal">rwa+</code>四個字元有以下6種合法的組合： </p><div class="variablelist"><dl><dt><span class="term"><code class="literal">"r"</code></span></dt><dd><p>只讀，檔案必須已存在</p></dd><dt><span class="term">"w"</span></dt><dd><p>只寫，如果檔案不存在則創建，如果檔案已存在則把檔案長度截斷（Truncate）<a id="id2830268" class="indexterm"></a>為0位元組再重新寫，也就是替換掉原來的檔案內容</p></dd><dt><span class="term">"a"</span></dt><dd><p>只能在檔案末尾追加數據，如果檔案不存在則創建</p></dd><dt><span class="term">"r+"</span></dt><dd><p>允許讀和寫，檔案必須已存在</p></dd><dt><span class="term">"w+"</span></dt><dd><p>允許讀和寫，如果檔案不存在則創建，如果檔案已存在則把檔案長度截斷為0位元組再重新寫</p></dd><dt><span class="term">"a+"</span></dt><dd><p>允許讀和追加數據，如果檔案不存在則創建</p></dd></dl></div><p>在打開一個檔案時如果出錯，<code class="literal">fopen</code>將返回<code class="literal">NULL</code>並設置<code class="literal">errno</code>，<code class="literal">errno</code>稍後介紹。在程序中應該做出錯處理，通常這樣寫：</p><pre class="programlisting">if ( (fp = fopen("/tmp/file1", "r")) == NULL) {
+	printf("error open file /tmp/file1!\n");
+	exit(1);
+}</pre><p>比如<code class="literal">/tmp/file1</code>這個檔案不存在，而<code class="literal">r</code>打開方式又不會創建這個檔案，<code class="literal">fopen</code>就會出錯返回。</p><p>再說說<code class="literal">fclose</code>函數。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int fclose(FILE *fp);
+返回值：成功返回0，出錯返回EOF並設置errno</pre><p>把檔案指針傳給<code class="literal">fclose</code>可以關閉它所標識的檔案，關閉之後該檔案指針就無效了，不能再使用了。如果<code class="literal">fclose</code>調用出錯（比如傳給它一個無效的檔案指針）則返回<code class="literal">EOF</code>並設置<code class="literal">errno</code>，<code class="literal">errno</code>稍後介紹，<code class="literal">EOF</code>在<code class="literal">stdio.h</code>中定義：</p><pre class="programlisting">/* End of file character.
+   Some things throughout the library rely on this being -1.  */
+#ifndef EOF
+# define EOF (-1)
+#endif</pre><p>它的值是-1。<code class="literal">fopen</code>調用應該和<code class="literal">fclose</code>調用配對，打開檔案操作完之後一定要記得關閉。如果不調用<code class="literal">fclose</code>，在進程退出時系統會自動關閉檔案，但是不能因此就忽略<code class="literal">fclose</code>調用，如果寫一個長年累月運行的程序（比如網絡伺服器程序），打開的檔案都不關閉，堆積得越來越多，就會占用越來越多的系統資源。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2830485"></a>2.3. stdin/stdout/stderr</h3></div></div></div><p>我們經常用<code class="literal">printf</code>打印到屏幕，也用過<code class="literal">scanf</code>讀鍵盤輸入，這些也屬於I/O操作，但不是對檔案做I/O操作而是對終端設備做I/O操作。所謂終端（Terminal）<a id="id2830507" class="indexterm"></a>是指人機交互的設備，也就是可以接受用戶輸入並輸出信息給用戶的設備。在計算機剛誕生的年代，終端是電傳打字機和打印機，現在的終端通常是鍵盤和顯示器。終端設備和檔案一樣也需要先打開後操作，終端設備也有對應的路徑名，<code class="literal">/dev/tty</code>就表示和當前進程相關聯的終端設備（在<a class="xref" href="ch34s01.html#jobs.intro">第 1.1 節 “終端的基本概念”</a>會講到這叫進程的控制終端）。也就是說，<code class="literal">/dev/tty</code>不是一個普通的檔案，它不表示磁碟上的一組數據，而是表示一個設備。用<code class="literal">ls</code>命令查看這個檔案：</p><pre class="screen">$ ls -l /dev/tty
+crw-rw-rw- 1 root dialout 5, 0 2009-03-20 19:31 /dev/tty</pre><p>開頭的<code class="literal">c</code>表示檔案類型是字元設備。中間的<code class="literal">5, 0</code>是它的設備號，主設備號5，次設備號0，主設備號標識內核中的一個設備驅動程式，次設備號標識該設備驅動程式管理的一個設備。內核通過設備號找到相應的驅動程式，完成對該設備的操作。我們知道常規檔案的這一列應該顯示檔案尺寸，而設備檔案的這一列顯示設備號，這表明設備檔案是沒有檔案尺寸這個屬性的，因為設備檔案在磁碟上不保存數據，對設備檔案做讀寫操作並不是讀寫磁碟上的數據，而是在讀寫設備。UNIX的傳統是Everything is a file，鍵盤、顯示器、串口、磁碟等設備在<code class="literal">/dev</code>目錄下都有一個特殊的設備檔案與之對應，這些設備檔案也可以像普通檔案一樣打開、讀、寫和關閉，使用的函數介面是相同的。本書中不嚴格區分“<span class="quote">檔案</span>”和“<span class="quote">設備</span>”這兩個概念，遇到“<span class="quote">檔案</span>”這個詞，讀者可以根據上下文理解它是指普通檔案還是設備，如果需要強調是保存在磁碟上的普通檔案，本書會用“<span class="quote">常規檔案</span>”（Regular File）<a id="id2830622" class="indexterm"></a>這個詞。</p><p>那為什麼<code class="literal">printf</code>和<code class="literal">scanf</code>不用打開就能對終端設備進行操作呢？因為在程序啟動時（在<code class="literal">main</code>函數還沒開始執行之前）會自動把終端設備打開三次，分別賦給三個<code class="literal">FILE *</code>指針<code class="literal">stdin</code>、<code class="literal">stdout</code>和<code class="literal">stderr</code>，這三個檔案指針是<code class="literal">libc</code>中定義的全局變數，在<code class="literal">stdio.h</code>中聲明，<code class="literal">printf</code>向<code class="literal">stdout</code>寫，而<code class="literal">scanf</code>從<code class="literal">stdin</code>讀，後面我們會看到，用戶程序也可以直接使用這三個檔案指針。這三個檔案指針的打開方式都是可讀可寫的，但通常<code class="literal">stdin</code>只用於讀操作，稱為標準輸入（Standard Input）<a id="id2830724" class="indexterm"></a>，<code class="literal">stdout</code>只用於寫操作，稱為標準輸出（Standard Output）<a id="id2830738" class="indexterm"></a>，<code class="literal">stderr</code>也只用於寫操作，稱為標准錯誤輸出（Standard Error）<a id="id2830752" class="indexterm"></a>，通常程序的運行結果打印到標準輸出，而錯誤提示（例如<code class="literal">gcc</code>報的警告和錯誤）打印到標准錯誤輸出，所以<code class="literal">fopen</code>的錯誤處理寫成這樣更符合慣例：</p><pre class="programlisting">if ( (fp = fopen("/tmp/file1", "r")) == NULL) {
+	fputs("Error open file /tmp/file1\n", stderr);
+	exit(1);
+}</pre><p><code class="literal">fputs</code>函數將在稍後詳細介紹。不管是打印到標準輸出還是打印到標准錯誤輸出效果是一樣的，都是打印到終端設備（也就是屏幕）了，那為什麼還要分成標準輸出和標准錯誤輸出呢？以後我們會講到重定向操作，可以把標準輸出重定向到一個常規檔案，而標准錯誤輸出仍然對應終端設備，這樣就可以把正常的運行結果和錯誤提示分開，而不是混在一起打印到屏幕了。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2830807"></a>2.4. errno與perror函數</h3></div></div></div><p>很多系統函數在錯誤返回時將錯誤原因記錄在<code class="literal">libc</code>定義的全局變數<code class="literal">errno</code>中，每種錯誤原因對應一個錯誤碼，請查閲<code class="literal">errno(3)</code>的Man Page瞭解各種錯誤碼，<code class="literal">errno</code>在標頭檔<code class="literal">errno.h</code>中聲明，是一個整型變數，所有錯誤碼都是正整數。</p><p>如果在程序中打印錯誤信息時直接打印<code class="literal">errno</code>變數，打印出來的只是一個整數值，仍然看不出是什麼錯誤。比較好的辦法是用<code class="literal">perror</code>或<code class="literal">strerror</code>函數將<code class="literal">errno</code>解釋成字元串再打印。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+void perror(const char *s);</pre><p><code class="literal">perror</code>函數將錯誤信息打印到標准錯誤輸出，首先打印參數<code class="literal">s</code>所指的字元串，然後打印:號，然後根據當前<code class="literal">errno</code>的值打印錯誤原因。例如：</p><div class="example"><a id="id2830911"></a><p class="title"><b>例 25.4. perror</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	FILE *fp = fopen("abcde", "r");
+	if (fp == NULL) {
+		perror("Open file abcde");
+		exit(1);
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><p>如果檔案<code class="literal">abcde</code>不存在，<code class="literal">fopen</code>返回-1並設置<code class="literal">errno</code>為<code class="literal">ENOENT</code>，緊接着<code class="literal">perror</code>函數讀取<code class="literal">errno</code>的值，將<code class="literal">ENOENT</code>解釋成字元串<code class="literal">No such file or directory</code>並打印，最後打印的結果是<code class="literal">Open file abcde: No such file or directory</code>。雖然<code class="literal">perror</code>可以打印出錯誤原因，傳給<code class="literal">perror</code>的字元串參數仍然應該提供一些額外的信息，以便在看到錯誤信息時能夠很快定位是程序中哪裡出了錯，如果在程序中有很多個<code class="literal">fopen</code>調用，每個<code class="literal">fopen</code>打開不同的檔案，那麼在每個<code class="literal">fopen</code>的錯誤處理中打印檔案名就很有幫助。</p><p>如果把上面的程序改成這樣：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+
+int main(void)
+{
+	FILE *fp = fopen("abcde", "r");
+	if (fp == NULL) {
+		perror("Open file abcde");
+		printf("errno: %d\n", errno);
+		exit(1);
+	}
+	return 0;
+}</pre><p>則<code class="literal">printf</code>打印的錯誤號並不是<code class="literal">fopen</code>產生的錯誤號，而是<code class="literal">perror</code>產生的錯誤號。<code class="literal">errno</code>是一個全局變數，很多系統函數都會改變它，<code class="literal">fopen</code>函數Man Page中的<span class="emphasis"><em>ERRORS</em></span>部分描述了它可能產生的錯誤碼，<code class="literal">perror</code>函數的Man Page中沒有<code class="literal">ERRORS</code>部分，說明它本身不產生錯誤碼，但它調用的其它函數也有可能改變<code class="literal">errno</code>變數。大多數系統函數都有一個Side Effect，就是有可能改變<code class="literal">errno</code>變數（當然也有少數例外，比如<code class="literal">strcpy</code>），所以一個系統函數錯誤返回後應該馬上檢查<code class="literal">errno</code>，在檢查<code class="literal">errno</code>之前不能再調用其它系統函數。</p><p><code class="literal">strerror</code>函數可以根據錯誤號返回錯誤原因字元串。</p><pre class="programlisting">#include &lt;string.h&gt;
+
+char *strerror(int errnum);
+返回值：錯誤碼errnum所對應的字元串</pre><p>這個函數返回指向靜態內存的指針。以後學綫程庫時我們會看到，有些函數的錯誤碼並不保存在<code class="literal">errno</code>中，而是通過返回值返回，就不能調用<code class="literal">perror</code>打印錯誤原因了，這時<code class="literal">strerror</code>就派上了用場：</p><pre class="programlisting">fputs(strerror(n), stderr);</pre><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2831166"></a>習題</h4></div></div></div><p>1、在系統標頭檔中找到各種錯誤碼的宏定義。</p><p>2、做幾個小練習，看看<code class="literal">fopen</code>出錯有哪些常見的原因。</p><p>打開一個沒有訪問權限的檔案。</p><pre class="programlisting">fp = fopen("/etc/shadow", "r");
+if (fp == NULL) {
+	perror("Open /etc/shadow");
+	exit(1);
+}</pre><p><code class="literal">fopen</code>也可以打開一個目錄，傳給<code class="literal">fopen</code>的第一個參數目錄名末尾可以加<code class="literal">/</code>也可以不加<code class="literal">/</code>，但只允許以只讀方式打開。試試如果以可寫的方式打開一個存在的目錄會怎麼樣呢？</p><pre class="programlisting">fp = fopen("/home/akaedu/", "r+");
+if (fp == NULL) {
+	perror("Open /home/akaedu");
+	exit(1);
+}</pre><p>請讀者自己設計幾個實驗，看看你還能測試出哪些錯誤原因？</p></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2831236"></a>2.5. 以位元組為單位的I/O函數</h3></div></div></div><p><code class="literal">fgetc</code>函數從指定的檔案中讀一個位元組，<code class="literal">getchar</code>從標準輸入讀一個位元組，調用<code class="literal">getchar()</code>相當於調用<code class="literal">fgetc(stdin)</code>。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int fgetc(FILE *stream);
+int getchar(void);
+返回值：成功返回讀到的位元組，出錯或者讀到檔案末尾時返回EOF</pre><p>注意在Man Page的函數原型中<code class="literal">FILE *</code>指針參數有時會起名叫<code class="literal">stream</code>，這是因為標準I/O庫操作的檔案有時也叫做流（Stream）<a id="id2831293" class="indexterm"></a>，檔案由一串位元組組成，每次可以讀或寫其中任意數量的位元組，以後介紹TCP協議時會對流這個概念做更詳細的解釋。</p><p>對於fgetc函數的使用有以下幾點說明：</p><div class="itemizedlist"><ul type="disc"><li><p>要用<code class="literal">fgetc</code>函數讀一個檔案，該檔案的打開方式必須是可讀的。</p></li><li><p>系統對於每個打開的檔案都記錄著當前讀寫位置在檔案中的地址（或者說距離檔案開頭的位元組數），也叫偏移量（Offset）<a id="id2831331" class="indexterm"></a>。當檔案打開時，讀寫位置是0，每調用一次<code class="literal">fgetc</code>，讀寫位置向後移動一個位元組，因此可以連續多次調用<code class="literal">fgetc</code>函數依次讀取多個位元組。</p></li><li><p><code class="literal">fgetc</code>成功時返回讀到一個位元組，本來應該是<code class="literal">unsigned char</code>型的，但由於函數原型中返回值是<code class="literal">int</code>型，所以這個位元組要轉換成<code class="literal">int</code>型再返回，那為什麼要規定返回值是<code class="literal">int</code>型呢？因為出錯或讀到檔案末尾時<code class="literal">fgetc</code>將返回<code class="literal">EOF</code>，即-1，保存在<code class="literal">int</code>型的返回值中是0xffffffff，如果讀到位元組0xff，由<code class="literal">unsigned char</code>型轉換為<code class="literal">int</code>型是0x000000ff，只有規定返回值是<code class="literal">int</code>型才能把這兩種情況區分開，如果規定返回值是<code class="literal">unsigned char</code>型，那麼當返回值是0xff時無法區分到底是<code class="literal">EOF</code>還是位元組0xff。如果需要保存<code class="literal">fgetc</code>的返回值，一定要保存在<code class="literal">int</code>型變數中，如果寫成<code class="literal">unsigned char c = fgetc(fp);</code>，那麼根據<code class="literal">c</code>的值又無法區分<code class="literal">EOF</code>和0xff位元組了。注意，<code class="literal">fgetc</code>讀到檔案末尾時返回<code class="literal">EOF</code>，只是用這個返回值表示已讀到檔案末尾，並不是說每個檔案末尾都有一個位元組是<code class="literal">EOF</code>（根據上面的分析，EOF並不是一個位元組）。</p></li></ul></div><p><code class="literal">fputc</code>函數向指定的檔案寫一個位元組，<code class="literal">putchar</code>向標準輸出寫一個位元組，調用<code class="literal">putchar(c)</code>相當於調用<code class="literal">fputc(c, stdout)</code>。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int fputc(int c, FILE *stream);
+int putchar(int c);
+返回值：成功返回寫入的位元組，出錯返回EOF</pre><p>對於<code class="literal">fputc</code>函數的使用也要說明幾點： </p><div class="itemizedlist"><ul type="disc"><li><p>要用<code class="literal">fputc</code>函數寫一個檔案，該檔案的打開方式必須是可寫的（包括追加）。</p></li><li><p>每調用一次<code class="literal">fputc</code>，讀寫位置向後移動一個位元組，因此可以連續多次調用<code class="literal">fputc</code>函數依次寫入多個位元組。但如果檔案是以追加方式打開的，每次調用<code class="literal">fputc</code>時總是將讀寫位置移到檔案末尾然後把要寫入的位元組追加到後面。</p></li></ul></div><p>下面的例子演示了這四個函數的用法，從鍵盤讀入一串字元寫到一個檔案中，再從這個檔案中讀出這些字元打印到屏幕上。</p><div class="example"><a id="id2831583"></a><p class="title"><b>例 25.5. 用fputc/fget讀寫檔案和終端</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	FILE *fp;
+	int ch;
+
+	if ( (fp = fopen("file2", "w+")) == NULL) {
+		perror("Open file file2\n");
+		exit(1);
+	}
+	while ( (ch = getchar()) != EOF)
+		fputc(ch, fp);
+	rewind(fp);
+	while ( (ch = fgetc(fp)) != EOF)
+		putchar(ch);
+	fclose(fp);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>從終端設備讀有點特殊。當調用<code class="literal">getchar()</code>或<code class="literal">fgetc(stdin)</code>時，如果用戶沒有輸入字元，<code class="literal">getchar</code>函數就阻塞等待，所謂阻塞是指這個函數調用不返回，也就不能執行後面的代碼，這個進程阻塞了，操作系統可以調度別的進程執行。從終端設備讀還有一個特點，用戶輸入一般字元並不會使<code class="literal">getchar</code>函數返回，仍然阻塞着，只有當用戶輸入回車或者到達檔案末尾時<code class="literal">getchar</code>才返回<sup>[<a id="id2831641" href="#ftn.id2831641" class="footnote">34</a>]</sup>。這個程序的執行過程分析如下：</p><pre class="screen">$ ./a.out
+hello（輸入hello並回車，這時第一次調用getchar返回，讀取字元h存到檔案中，然後連續調用getchar五次，讀取ello和換行符存到檔案中，第七次調用getchar又阻塞了）
+hey（輸入hey並回車，第七次調用getchar返回，讀取字元h存到檔案中，然後連續調用getchar三次，讀取ey和換行符存到檔案中，第11次調用getchar又阻塞了）
+（這時輸入Ctrl-D，第11次調用getchar返回EOF，跳出循環，進入下一個循環，回到檔案開頭，把檔案內容一個位元組一個位元組讀出來打印，直到檔案結束）
+hello
+hey</pre><p>從終端設備輸入時有兩種方法表示檔案結束，一種方法是在一行的開頭輸入Ctrl-D（如果不在一行的開頭則需要連續輸入兩次Ctrl-D），另一種方法是利用Shell的Heredoc<a id="id2831678" class="indexterm"></a>語法：</p><pre class="screen">$ ./a.out &lt;&lt;END
+&gt; hello
+&gt; hey
+&gt; END
+hello
+hey</pre><p><code class="literal">&lt;&lt;END</code>表示從下一行開始是標準輸入，直到某一行開頭出現<code class="literal">END</code>時結束。<code class="literal">&lt;&lt;</code>後面的結束符可以任意指定，不一定得是<code class="literal">END</code>，只要和輸入的內容能區分開就行。</p><p>在上面的程序中，第一個<code class="literal">while</code>循環結束時<code class="literal">fp</code>所指檔案的讀寫位置在檔案末尾，然後調用<code class="literal">rewind</code>函數把讀寫位置移到檔案開頭，再進入第二個<code class="literal">while</code>循環從頭讀取檔案內容。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2831750"></a>習題</h4></div></div></div><p>1、編寫一個簡單的檔案複製程序。</p><pre class="screen">$ ./mycp dir1/fileA dir2/fileB</pre><p>運行這個程序可以把<code class="literal">dir1/fileA</code>檔案拷貝到<code class="literal">dir2/fileB</code>檔案。注意各種出錯處理。</p><p>2、雖然我說<code class="literal">getchar</code>要讀到換行符才返回，但上面的程序並沒有提供證據支持我的說法，如果看成每敲一個鍵<code class="literal">getchar</code>就返回一次，也能解釋程序的運行結果。請寫一個小程序證明<code class="literal">getchar</code>確實是讀到換行符才返回的。</p></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2831814"></a>2.6. 操作讀寫位置的函數</h3></div></div></div><p>我們在上一節的例子中看到<code class="literal">rewind</code>函數把讀寫位置移到檔案開頭，本節介紹另外兩個操作讀寫位置的函數，<code class="literal">fseek</code>可以任意移動讀寫位置，<code class="literal">ftell</code>可以返回當前的讀寫位置。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int fseek(FILE *stream, long offset, int whence);
+返回值：成功返回0，出錯返回-1並設置errno
+
+long ftell(FILE *stream);
+返回值：成功返回當前讀寫位置，出錯返回-1並設置errno
+
+void rewind(FILE *stream);</pre><p><code class="literal">fseek</code>的<code class="literal">whence</code>和<code class="literal">offset</code>參數共同決定了讀寫位置移動到何處，<code class="literal">whence</code>參數的含義如下：</p><div class="variablelist"><dl><dt><span class="term"><code class="literal">SEEK_SET</code></span></dt><dd><p>從檔案開頭移動<code class="literal">offset</code>個位元組</p></dd><dt><span class="term"><code class="literal">SEEK_CUR</code></span></dt><dd><p>從當前位置移動<code class="literal">offset</code>個位元組</p></dd><dt><span class="term"><code class="literal">SEEK_END</code></span></dt><dd><p>從檔案末尾移動<code class="literal">offset</code>個位元組</p></dd></dl></div><p><code class="literal">offset</code>可正可負，負值表示向前（向檔案開頭的方向）移動，正值表示向後（向檔案末尾的方向）移動，如果向前移動的位元組數超過了檔案開頭則出錯返回，如果向後移動的位元組數超過了檔案末尾，再次寫入時將增大檔案尺寸，從原來的檔案末尾到<code class="literal">fseek</code>移動之後的讀寫位置之間的位元組都是0。</p><p>先前我們創建過一個檔案<code class="literal">textfile</code>，其中有五個位元組，<code class="literal">5678</code>加一個換行符，現在我們拿這個檔案做實驗。</p><div class="example"><a id="id2831985"></a><p class="title"><b>例 25.6. fseek</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	FILE* fp;
+	if ( (fp = fopen("textfile","r+")) == NULL) {
+		perror("Open file textfile");
+		exit(1);
+	}
+	if (fseek(fp, 10, SEEK_SET) != 0) {
+		perror("Seek file textfile");
+		exit(1);
+	}
+	fputc('K', fp);
+	fclose(fp);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>運行這個程序，然後查看檔案<code class="literal">textfile</code>的內容：</p><pre class="screen">$ ./a.out 
+$ od -tx1 -tc -Ax textfile 
+000000 35 36 37 38 0a 00 00 00 00 00 4b
+         5   6   7   8  \n  \0  \0  \0  \0  \0   K
+00000b</pre><p><code class="literal">fseek(fp, 10, SEEK_SET)</code>將讀寫位置移到第10個位元組處（其實是第11個位元組，從0開始數），然後在該位置寫入一個字元K，這樣<code class="literal">textfile</code>檔案就變長了，從第5到第9個位元組自動被填充為0。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2832034"></a>2.7. 以字元串為單位的I/O函數</h3></div></div></div><p><code class="literal">fgets</code>從指定的檔案中讀一行字元到調用者提供的緩衝區中，<code class="literal">gets</code>從標準輸入讀一行字元到調用者提供的緩衝區中。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+char *fgets(char *s, int size, FILE *stream);
+char *gets(char *s);
+返回值：成功時s指向哪返回的指針就指向哪，出錯或者讀到檔案末尾時返回NULL</pre><p><code class="literal">gets</code>函數無需解釋，Man Page的<span class="emphasis"><em>BUGS</em></span>部分已經說得很清楚了：Never use gets()。<code class="literal">gets</code>函數的存在只是為了兼容以前的程序，我們寫的代碼都不應該調用這個函數。<code class="literal">gets</code>函數的介面設計得很有問題，就像<code class="literal">strcpy</code>一樣，用戶提供一個緩衝區，卻不能指定緩衝區的大小，很可能導致緩衝區溢出錯誤，這個函數比<code class="literal">strcpy</code>更加危險，<code class="literal">strcpy</code>的輸入和輸出都來自程序內部，只要程序員小心一點就可以避免出問題，而<code class="literal">gets</code>讀取的輸入直接來自程序外部，用戶可能通過標準輸入提供任意長的字元串，程序員無法避免<code class="literal">gets</code>函數導致的緩衝區溢出錯誤，所以唯一的辦法就是不要用它。</p><p>現在說說<code class="literal">fgets</code>函數，參數<code class="literal">s</code>是緩衝區的首地址，<code class="literal">size</code>是緩衝區的長度，該函數從<code class="literal">stream</code>所指的檔案中讀取以<code class="literal">'\n'</code>結尾的一行（包括<code class="literal">'\n'</code>在內）存到緩衝區<code class="literal">s</code>中，並且在該行末尾添加一個<code class="literal">'\0'</code>組成完整的字元串。</p><p>如果檔案中的一行太長，<code class="literal">fgets</code>從檔案中讀了<code class="literal">size-1</code>個字元還沒有讀到<code class="literal">'\n'</code>，就把已經讀到的<code class="literal">size-1</code>個字元和一個<code class="literal">'\0'</code>字元存入緩衝區，檔案中剩下的半行可以在下次調用<code class="literal">fgets</code>時繼續讀。</p><p>如果一次<code class="literal">fgets</code>調用在讀入若干個字元後到達檔案末尾，則將已讀到的字元串加上<code class="literal">'\0'</code>存入緩衝區並返回，如果再次調用<code class="literal">fgets</code>則返回<code class="literal">NULL</code>，可以據此判斷是否讀到檔案末尾。</p><p>注意，對於<code class="literal">fgets</code>來說，<code class="literal">'\n'</code>是一個特別的字元，而<code class="literal">'\0'</code>並無任何特別之處，如果讀到<code class="literal">'\0'</code>就當作普通字元讀入。如果檔案中存在<code class="literal">'\0'</code>字元（或者說0x00位元組），調用<code class="literal">fgets</code>之後就無法判斷緩衝區中的<code class="literal">'\0'</code>究竟是從檔案讀上來的字元還是由<code class="literal">fgets</code>自動添加的結束符，所以<code class="literal">fgets</code>只適合讀文本檔案而不適合讀二進制檔案，並且文本檔案中的所有字元都應該是可見字元，不能有<code class="literal">'\0'</code>。</p><p><code class="literal">fputs</code>向指定的檔案寫入一個字元串，<code class="literal">puts</code>向標準輸出寫入一個字元串。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int fputs(const char *s, FILE *stream);
+int puts(const char *s);
+返回值：成功返回一個非負整數，出錯返回EOF</pre><p>緩衝區<code class="literal">s</code>中保存的是以<code class="literal">'\0'</code>結尾的字元串，<code class="literal">fputs</code>將該字元串寫入檔案<code class="literal">stream</code>，但並不寫入結尾的<code class="literal">'\0'</code>。與<code class="literal">fgets</code>不同的是，<code class="literal">fputs</code>並不關心的字元串中的<code class="literal">'\n'</code>字元，字元串中可以有<code class="literal">'\n'</code>也可以沒有<code class="literal">'\n'</code>。<code class="literal">puts</code>將字元串<code class="literal">s</code>寫到標準輸出（不包括結尾的<code class="literal">'\0'</code>），然後自動寫一個<code class="literal">'\n'</code>到標準輸出。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2832450"></a>習題</h4></div></div></div><p>1、用<code class="literal">fgets</code>/<code class="literal">fputs</code>寫一個拷貝檔案的程序，根據本節對<code class="literal">fgets</code>函數的分析，應該只能拷貝文本檔案，試試用它拷貝二進制檔案會出什麼問題。</p></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2832480"></a>2.8. 以記錄為單位的I/O函數</h3></div></div></div><pre class="programlisting">#include &lt;stdio.h&gt;
+
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+返回值：讀或寫的記錄數，成功時返回的記錄數等於nmemb，出錯或讀到檔案末尾時返回的記錄數小於nmemb，也可能返回0</pre><p><code class="literal">fread</code>和<code class="literal">fwrite</code>用於讀寫記錄，這裡的記錄是指一串固定長度的位元組，比如一個<code class="literal">int</code>、一個結構體或者一個定長數組。參數<code class="literal">size</code>指出一條記錄的長度，而<code class="literal">nmemb</code>指出要讀或寫多少條記錄，這些記錄在<code class="literal">ptr</code>所指的內存空間中連續存放，共占<code class="literal">size * nmemb</code>個位元組，<code class="literal">fread</code>從檔案<code class="literal">stream</code>中讀出<code class="literal">size * nmemb</code>個位元組保存到<code class="literal">ptr</code>中，而<code class="literal">fwrite</code>把<code class="literal">ptr</code>中的<code class="literal">size * nmemb</code>個位元組寫到檔案<code class="literal">stream</code>中。</p><p><code class="literal">nmemb</code>是請求讀或寫的記錄數，<code class="literal">fread</code>和<code class="literal">fwrite</code>返回的記錄數有可能小於<code class="literal">nmemb</code>指定的記錄數。例如當前讀寫位置距檔案末尾只有一條記錄的長度，調用<code class="literal">fread</code>時指定<code class="literal">nmemb</code>為2，則返回值為1。如果當前讀寫位置已經在檔案末尾了，或者讀檔案時出錯了，則<code class="literal">fread</code>返回0。如果寫檔案時出錯了，則<code class="literal">fwrite</code>的返回值小於<code class="literal">nmemb</code>指定的值。下面的例子由兩個程序組成，一個程序把結構體保存到檔案中，另一個程序和從檔案中讀出結構體。</p><div class="example"><a id="id2832653"></a><p class="title"><b>例 25.7. fread/fwrite</b></p><div class="example-contents"><pre class="programlisting">/* writerec.c */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct record {
+	char name[10];
+	int age;
+};
+
+int main(void)
+{
+	struct record array[2] = {{"Ken", 24}, {"Knuth", 28}};
+	FILE *fp = fopen("recfile", "w");
+	if (fp == NULL) {
+		perror("Open file recfile");
+		exit(1);
+	}
+	fwrite(array, sizeof(struct record), 2, fp);
+	fclose(fp);
+	return 0;
+}</pre><pre class="programlisting">/* readrec.c */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct record {
+	char name[10];
+	int age;
+};
+
+int main(void)
+{
+	struct record array[2];
+	FILE *fp = fopen("recfile", "r");
+	if (fp == NULL) {
+		perror("Open file recfile");
+		exit(1);
+	}
+	fread(array, sizeof(struct record), 2, fp);
+	printf("Name1: %s\tAge1: %d\n", array[0].name, array[0].age);
+	printf("Name2: %s\tAge2: %d\n", array[1].name, array[1].age);
+	fclose(fp);
+	return 0;
+}</pre></div></div><br class="example-break" /><pre class="screen">$ gcc writerec.c -o writerec
+$ gcc readrec.c -o readrec
+$ ./writerec
+$ od -tx1 -tc -Ax recfile 
+000000 4b 65 6e 00 00 00 00 00 00 00 00 00 18 00 00 00
+         K   e   n  \0  \0  \0  \0  \0  \0  \0  \0  \0 030  \0  \0  \0
+000010 4b 6e 75 74 68 00 00 00 00 00 00 00 1c 00 00 00
+         K   n   u   t   h  \0  \0  \0  \0  \0  \0  \0 034  \0  \0  \0
+000020
+$ ./readrec 
+Name1: Ken	Age1: 24
+Name2: Knuth	Age2: 28</pre><p>我們把一個<code class="literal">struct record</code>結構體看作一條記錄，由於結構體中有填充位元組，每條記錄占16位元組，把兩條記錄寫到檔案中共占32位元組。該程序生成的<code class="literal">recfile</code>檔案是二進制檔案而非文本檔案，因為其中不僅保存着字元型數據，還保存着整型數據24和28（在<code class="literal">od</code>命令的輸出中以八進制顯示為030和034）。注意，直接在檔案中讀寫結構體的程序是不可移植的，如果在一種平台上編譯運行<code class="literal">writebin.c</code>程序，把生成的<code class="literal">recfile</code>檔案拷到另一種平台並在該平台上編譯運行<code class="literal">readbin.c</code>程序，則不能保證正確讀出檔案的內容，因為不同平台的大小端可能不同（因而對整型數據的存儲方式不同），結構體的填充方式也可能不同（因而同一個結構體所占的位元組數可能不同，<code class="literal">age</code>成員在<code class="literal">name</code>成員之後的什麼位置也可能不同）。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2832755"></a>2.9. 格式化I/O函數</h3></div></div></div><p>現在該正式講一下<code class="literal">printf</code>和<code class="literal">scanf</code>函數了，這兩個函數都有很多種形式。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int printf(const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
+int sprintf(char *str, const char *format, ...);
+int snprintf(char *str, size_t size, const char *format, ...);
+
+#include &lt;stdarg.h&gt;
+
+int vprintf(const char *format, va_list ap);
+int vfprintf(FILE *stream, const char *format, va_list ap);
+int vsprintf(char *str, const char *format, va_list ap);
+int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+
+返回值：成功返回格式化輸出的位元組數（不包括字元串的結尾'\0'），出錯返回一個負值</pre><p><code class="literal">printf</code>格式化打印到標準輸出，而<code class="literal">fprintf</code>打印到指定的檔案<code class="literal">stream</code>中。<code class="literal">sprintf</code>並不打印到檔案，而是打印到用戶提供的緩衝區<code class="literal">str</code>中並在末尾加<code class="literal">'\0'</code>，由於格式化後的字元串長度很難預計，所以很可能造成緩衝區溢出，用<code class="literal">snprintf</code>更好一些，參數<code class="literal">size</code>指定了緩衝區長度，如果格式化後的字元串長度超過緩衝區長度，<code class="literal">snprintf</code>就把字元串截斷到<code class="literal">size-1</code>位元組，再加上一個<code class="literal">'\0'</code>寫入緩衝區，也就是說<code class="literal">snprintf</code>保證字元串以<code class="literal">'\0'</code>結尾。<code class="literal">snprintf</code>的返回值是格式化後的字元串長度（不包括結尾的<code class="literal">'\0'</code>），如果字元串被截斷，返回的是截斷之前的長度，把它和實際緩衝區中的字元串長度相比較就可以知道是否發生了截斷。</p><p>上面列出的後四個函數在前四個函數名的前面多了個<code class="literal">v</code>，表示可變參數不是以<code class="literal">...</code>的形式傳進來，而是以<code class="literal">va_list</code>類型傳進來。下面我們用<code class="literal">vsnprintf</code>包裝出一個類似<code class="literal">printf</code>的帶格式化字元串和可變參數的函數。</p><div class="example"><a id="id2832931"></a><p class="title"><b>例 25.8. 實現格式化打印錯誤的err_sys函數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;string.h&gt;
+
+#define MAXLINE 80
+
+void err_sys(const char *fmt, ...)
+{
+	int err = errno;
+	char buf[MAXLINE+1];
+	va_list ap;
+
+	va_start(ap, fmt);
+
+	vsnprintf(buf, MAXLINE, fmt, ap);
+	snprintf(buf+strlen(buf), MAXLINE-strlen(buf), ": %s", strerror(err));
+	strcat(buf, "\n");
+	fputs(buf, stderr);
+
+	va_end(ap);
+	exit(1);
+}
+
+int main(int argc, char *argv[])
+{
+	FILE *fp;
+	if (argc != 2) {
+		fputs("Usage: ./a.out pathname\n", stderr);
+		exit(1);
+	}
+	fp = fopen(argv[1], "r");
+
+	if (fp == NULL)
+		err_sys("Line %d - Open file %s", __LINE__, argv[1]);
+	printf("Open %s OK\n", argv[1]);
+	fclose(fp);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>有了<code class="literal">err_sys</code>函數，不僅簡化了<code class="literal">main</code>函數的代碼，而且可以把<code class="literal">fopen</code>的錯誤提示打印得非常清楚，有原始碼行號，有打開檔案的路徑名，一看就知道哪裡出錯了。</p><p>現在總結一下<code class="literal">printf</code>格式化字元串中的轉換說明的有哪些寫法。在這裡只列舉幾種常用的格式，其它格式請參考Man Page。每個轉換說明以<code class="literal">%</code>號開頭，以轉換字元結尾，我們以前用過的轉換說明僅包含<code class="literal">%</code>號和轉換字元，例如<code class="literal">%d</code>、<code class="literal">%s</code>，其實在這兩個字元中間還可以插入一些可選項。</p><div class="table"><a id="id2833014"></a><p class="title"><b>表 25.1. printf轉換說明的可選項</b></p><div class="table-contents"><table summary="printf轉換說明的可選項" border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>選項</th><th>描述</th><th>舉例</th></tr></thead><tbody><tr><td>#</td><td>八進制前面加0（轉換字元為<code class="literal">o</code>），十六進制前面加0x（轉換字元為<code class="literal">x</code>）或0X（轉換字元為<code class="literal">X</code>）。</td><td><code class="literal">printf("%#x", 0xff)</code>打印<code class="literal">0xff</code>，<code class="literal">printf("%x", 0xff)</code>打印<code class="literal">ff</code>。</td></tr><tr><td>-</td><td>格式化後的內容居左，右邊可以留空格。</td><td>見下面的例子</td></tr><tr><td>寬度</td><td>用一個整數指定格式化後的最小長度，如果格式化後的內容沒有這麼長，可以在左邊留空格，如果前面指定了<code class="literal">-</code>號就在右邊留空格。寬度有一種特別的形式，不指定整數值而是寫成一個<code class="literal">*</code>號，表示取一個<code class="literal">int</code>型參數作為寬度。</td><td><code class="literal">printf("-%10s-", "hello")</code>打印<code class="literal">-␣␣␣␣␣hello-</code>，<code class="literal">printf("-%-*s-", 10, "hello")</code>打印<code class="literal">-hello␣␣␣␣␣-</code>。</td></tr><tr><td>.</td><td>用於分隔上一條提到的最小長度和下一條要講的精度。</td><td>見下面的例子</td></tr><tr><td>精度</td><td>用一個整數表示精度，對於字元串來說指定了格式化後保留的最大長度，對於浮點數來說指定了格式化後小數點右邊的位數，對於整數來說指定了格式化後的最小位數。精度也可以不指定整數值而是寫成一個<code class="literal">*</code>號，表示取下一個<code class="literal">int</code>型參數作為精度。</td><td><code class="literal">printf("%.4s", "hello")</code>打印<code class="literal">hell</code>，<code class="literal">printf("-%6.4d-", 100)</code>打印<code class="literal">-␣␣0100-</code>，<code class="literal">printf("-%*.*f-", 8, 4, 3.14)</code>打印<code class="literal">-␣␣3.1400-</code>。</td></tr><tr><td>字長</td><td>對於整型參數，<code class="literal">hh</code>、<code class="literal">h</code>、<code class="literal">l</code>、<code class="literal">ll</code>分別表示是<code class="literal">char</code>、<code class="literal">short</code>、<code class="literal">long</code>、<code class="literal">long long</code>型的字長，至於是有符號數還是無符號數則取決於轉換字元；對於浮點型參數，<code class="literal">L</code>表示<code class="literal">long double</code>型的字長。</td><td><code class="literal">printf("%hhd", 255)</code>打印<code class="literal">-1</code>。</td></tr></tbody></table></div></div><br class="table-break" /><p>常用的轉換字元有：</p><div class="table"><a id="id2833311"></a><p class="title"><b>表 25.2. printf的轉換字元</b></p><div class="table-contents"><table summary="printf的轉換字元" border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>轉換字元</th><th>描述</th><th>舉例</th></tr></thead><tbody><tr><td>d i</td><td>取<code class="literal">int</code>型參數格式化成有符號十進製表示，如果格式化後的位數小於指定的精度，就在左邊補0。</td><td><code class="literal">printf("%.4d", 100)</code>打印<code class="literal">0100</code>。</td></tr><tr><td>o u x X</td><td>取<code class="literal">unsigned int</code>型參數格式化成無符號八進制（o）、十進制（u）、十六進制（x或X）表示，x表示十六進制數字用小寫abcdef，X表示十六進制數字用大寫ABCDEF，如果格式化後的位數小於指定的精度，就在左邊補0。</td><td><code class="literal">printf("%#X", 0xdeadbeef)</code>打印<code class="literal">0XDEADBEEF</code>，<code class="literal">printf("%hhu", -1)</code>打印<code class="literal">255</code>。</td></tr><tr><td>c</td><td>取<code class="literal">int</code>型參數轉換成<code class="literal">unsigned char</code>型，格式化成對應的ASCII碼字元。</td><td><code class="literal">printf("%c", 256+'A')</code>打印<code class="literal">A</code>。</td></tr><tr><td>s</td><td>取<code class="literal">const char *</code>型參數所指向的字元串格式化輸出，遇到<code class="literal">'\0'</code>結束，或者達到指定的最大長度（精度）結束。</td><td><code class="literal">printf("%.4s", "hello")</code>打印<code class="literal">hell</code>。</td></tr><tr><td>p</td><td>取<code class="literal">void *</code>型參數格式化成十六進製表示。相當於<code class="literal">%#x</code>。</td><td><code class="literal">printf("%p", main)</code>打印<code class="literal">main</code>函數的首地址<code class="literal">0x80483c4</code>。</td></tr><tr><td>f</td><td>取<code class="literal">double</code>型參數格式化成<code class="literal">[-]ddd.ddd</code>這樣的格式，小數點後的預設精度是6位。</td><td><code class="literal">printf("%f", 3.14)</code>打印<code class="literal">3.140000</code>，<code class="literal">printf("%f", 0.00000314)</code>打印<code class="literal">0.000003</code>。</td></tr><tr><td>e E</td><td>取<code class="literal">double</code>型參數格式化成<code class="literal">[-]d.ddde±dd</code>（轉換字元是e）或<code class="literal">[-]d.dddE±dd</code>（轉換字元是E）這樣的格式，小數點後的預設精度是6位，指數至少是兩位。</td><td><code class="literal">printf("%e", 3.14)</code>打印<code class="literal">3.140000e+00</code>。</td></tr><tr><td>g G</td><td>取<code class="literal">double</code>型參數格式化，精度是指有效數字而非小數點後的數字，預設精度是6。如果指數小於-4或大於等於精度就按<code class="literal">%e</code>（轉換字元是g）或<code class="literal">%E</code>（轉換字元是G）格式化，否則按<code class="literal">%f</code>格式化。小數部分的末尾0去掉，如果沒有小數部分，小數點也去掉。</td><td><code class="literal">printf("%g", 3.00)</code>打印<code class="literal">3</code>，<code class="literal">printf("%g", 0.00001234567)</code>打印<code class="literal">1.23457e-05</code>。</td></tr><tr><td>%</td><td>格式化成一個<code class="literal">%</code>。</td><td><code class="literal">printf("%%")</code>打印一個<code class="literal">%</code>。</td></tr></tbody></table></div></div><br class="table-break" /><p>我們在<a class="xref" href="ch24s06.html#interface.va">第 6 節 “可變參數”</a>講過可變參數的原理，<code class="literal">printf</code>並不知道實際參數的類型，只能按轉換說明指出的參數類型從棧幀上取參數，所以如果實際參數和轉換說明的類型不符，結果可能會有些意外，上面也舉過幾個這樣的例子。另外，如果<code class="literal">s</code>指向一個字元串，用<code class="literal">printf(s)</code>打印這個字元串可能得到錯誤的結果，因為字元串中可能包含<code class="literal">%</code>號而被<code class="literal">printf</code>當成轉換說明，<code class="literal">printf</code>並不知道後面沒有傳其它參數，照樣會從棧幀上取參數。所以比較保險的辦法是<code class="literal">printf("%s", s)</code>。</p><p>下面看<code class="literal">scanf</code>函數的各種形式。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int scanf(const char *format, ...);
+int fscanf(FILE *stream, const char *format, ...);
+int sscanf(const char *str, const char *format, ...);
+
+#include &lt;stdarg.h&gt;
+
+int vscanf(const char *format, va_list ap);
+int vsscanf(const char *str, const char *format, va_list ap);
+int vfscanf(FILE *stream, const char *format, va_list ap);
+返回值：返回成功匹配和賦值的參數個數，成功匹配的參數可能少於所提供的賦值參數，返回0表示一個都不匹配，出錯或者讀到檔案或字元串末尾時返回EOF並設置errno</pre><p><code class="literal">scanf</code>從標準輸入讀字元，按格式化字元串<code class="literal">format</code>中的轉換說明解釋這些字元，轉換後賦給後面的參數，後面的參數都是傳出參數，因此必須傳地址而不能傳值。<code class="literal">fscanf</code>從指定的檔案<code class="literal">stream</code>中讀字元，而<code class="literal">sscanf</code>從指定的字元串<code class="literal">str</code>中讀字元。後面三個以<code class="literal">v</code>開頭的函數的可變參數不是以<code class="literal">...</code>的形式傳進來，而是以<code class="literal">va_list</code>類型傳進來。</p><p>現在總結一下<code class="literal">scanf</code>的格式化字元串和轉換說明，這裡也只列舉幾種常用的格式，其它格式請參考Man Page。<code class="literal">scanf</code>用輸入的字元去匹配格式化字元串中的字元和轉換說明，如果成功匹配一個轉換說明，就給一個參數賦值，如果讀到檔案或字元串末尾就停止，或者如果遇到和格式化字元串不匹配的地方（比如轉換說明是<code class="literal">%d</code>卻讀到字元<code class="literal">A</code>）就停止。如果遇到不匹配的地方而停止，<code class="literal">scanf</code>的返回值可能小於賦值參數的個數，檔案的讀寫位置指向輸入中不匹配的地方，下次調用庫函數讀檔案時可以從這個位置繼續。</p><p>格式化字元串中包括：</p><div class="itemizedlist"><ul type="disc"><li><p>空格或Tab，在處理過程中被忽略。</p></li><li><p>普通字元（不包括<code class="literal">%</code>），和輸入字元中的非空白字元相匹配。輸入字元中的空白字元是指空格、Tab、<code class="literal">\r</code>、<code class="literal">\n</code>、<code class="literal">\v</code>、<code class="literal">\f</code>。</p></li><li><p>轉換說明，以<code class="literal">%</code>開頭，以轉換字元結尾，中間也有若干個可選項。</p></li></ul></div><p>轉換說明中的可選項有：</p><div class="itemizedlist"><ul type="disc"><li><p><code class="literal">*</code>號，表示這個轉換說明只是用來匹配一段輸入字元，但匹配結果並不賦給後面的參數。</p></li><li><p>用一個整數指定的寬度N。表示這個轉換說明最多匹配N個輸入字元，或者匹配到輸入字元中的下一個空白字元結束。</p></li><li><p>對於整型參數可以指定字長，有<code class="literal">hh</code>、<code class="literal">h</code>、<code class="literal">l</code>、<code class="literal">ll</code>（也可以寫成一個<code class="literal">L</code>），含義和<code class="literal">printf</code>相同。但<code class="literal">l</code>和<code class="literal">L</code>還有一層含義，當轉換字元是<code class="literal">e</code>、<code class="literal">f</code>、<code class="literal">g</code>時，表示賦值參數的類型是<code class="literal">float *</code>而非<code class="literal">double *</code>，這一點跟<code class="literal">printf</code>不同（結合以前講的類型轉換規則思考一下為什麼不同），這時前面加上<code class="literal">l</code>或<code class="literal">L</code>分別表示<code class="literal">double *</code>或<code class="literal">long double *</code>型。</p></li></ul></div><p>常用的轉換字元有：</p><div class="table"><a id="id2834066"></a><p class="title"><b>表 25.3. scanf的轉換字元</b></p><div class="table-contents"><table summary="scanf的轉換字元" border="1"><colgroup><col /><col /></colgroup><thead><tr><th>轉換字元</th><th>描述</th></tr></thead><tbody><tr><td>d</td><td>匹配十進制整數（開頭可以有負號），賦值參數的類型是<code class="literal">int *</code>。</td></tr><tr><td>i</td><td>匹配整數（開頭可以有負號），賦值參數的類型是<code class="literal">int *</code>，如果輸入字元以0x或0X開頭則匹配十六進制整數，如果輸入字元以0開頭則匹配八進制整數。</td></tr><tr><td>o u x</td><td>匹配八進制、十進制、十六進制整數（開頭可以有負號），賦值參數的類型是<code class="literal">unsigned int *</code>。</td></tr><tr><td>c</td><td>匹配一串字元，字元的個數由寬度指定，預設寬度是1，賦值參數的類型是<code class="literal">char *</code>，末尾不會添加<code class="literal">'\0'</code>。如果輸入字元的開頭有空白字元，這些空白字元並不被忽略，而是保存到參數中，要想跳過開頭的空白字元，可以在格式化字元串中用一個空格去匹配。</td></tr><tr><td>s</td><td>匹配一串非空白字元，從輸入字元中的第一個非空白字元開始匹配到下一個空白字元之前，或者匹配到指定的寬度，賦值參數的類型是<code class="literal">char *</code>，末尾自動添加<code class="literal">'\0'</code>。</td></tr><tr><td>e f g</td><td>匹配符點數（開頭可以有負號），賦值參數的類型是<code class="literal">float *</code>，也可以指定<code class="literal">double *</code>或<code class="literal">long double *</code>的字長。</td></tr><tr><td>%</td><td>轉換說明<code class="literal">%%</code>匹配一個字元<code class="literal">%</code>，不做賦值。</td></tr></tbody></table></div></div><br class="table-break" /><p>下面幾個例子出自<a class="xref" href="bi01.html#bibli.kr" title="The C Programming Language">[<abbr class="abbrev">K&amp;R</abbr>]</a>。第一個例子，讀取用戶輸入的浮點數累加起來。</p><div class="example"><a id="id2834234"></a><p class="title"><b>例 25.9. 用scanf實現簡單的計算器</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)  /* rudimentary calculator */
+{
+	double sum, v;
+
+	sum = 0;
+	while (scanf("%lf", &amp;v) == 1)
+		printf("\t%.2f\n", sum += v);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>如果我們要讀取<code class="literal">25 Dec 1988</code>這樣的日期格式，可以這樣寫：</p><pre class="programlisting">char *str = "25 Dec 1988";
+int day, year;
+char monthname[20];
+
+sscanf(str, "%d %s %d", &amp;day, monthname, &amp;year);</pre><p>如果<code class="literal">str</code>中的空白字元再多一些，比如<code class="literal">"  25	Dec   1998"</code>，仍然可以正確讀取。如果格式化字元串中的空格和Tab再多一些，比如<code class="literal">"%d   %s	%d  "</code>，也可以正確讀取。<code class="literal">scanf</code>函數是很強大的，但是要用對了不容易，需要多練習，通過練習體會空白字元的作用。</p><p>如果要讀取<code class="literal">12/25/1998</code>這樣的日期格式，就需要在格式化字元串中用<code class="literal">/</code>匹配輸入字元中的<code class="literal">/</code>：</p><pre class="programlisting">int day, month, year;
+
+scanf("%d/%d/%d", &amp;month, &amp;day, &amp;year);</pre><p><code class="literal">scanf</code>把換行符也看作空白字元，僅僅當作欄位之間的分隔符，如果輸入中的欄位個數不確定，最好是先用<code class="literal">fgets</code>按行讀取，然後再交給<code class="literal">sscanf</code>處理。如果我們的程序需要同時識別以上兩種日期格式，可以這樣寫：</p><pre class="programlisting">while (fgets(line, sizeof(line), stdin) &gt; 0) {
+	if (sscanf(line, "%d %s %d", &amp;day, monthname, &amp;year) == 3)
+		printf("valid: %s\n", line); /* 25 Dec 1988 form */
+	else if (sscanf(line, "%d/%d/%d", &amp;month, &amp;day, &amp;year) == 3)
+		printf("valid: %s\n", line); /* mm/dd/yy form */
+	else
+		printf("invalid: %s\n", line); /* invalid form */
+}</pre></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2834346"></a>2.10. C標準庫的I/O緩衝區</h3></div></div></div><p>用戶程序調用C標準I/O庫函數讀寫檔案或設備，而這些庫函數要通過系統調用把讀寫請求傳給內核（以後我們會看到與I/O相關的系統調用），最終由內核驅動磁碟或設備完成I/O操作。C標準庫為每個打開的檔案分配一個I/O緩衝區以加速讀寫操作，通過檔案的<code class="literal">FILE</code>結構體可以找到這個緩衝區，用戶調用讀寫函數大多數時候都在I/O緩衝區中讀寫，只有少數時候需要把讀寫請求傳給內核。以<code class="literal">fgetc</code>/<code class="literal">fputc</code>為例，當用戶程序第一次調用<code class="literal">fgetc</code>讀一個位元組時，<code class="literal">fgetc</code>函數可能通過系統調用進入內核讀1K位元組到I/O緩衝區中，然後返回I/O緩衝區中的第一個位元組給用戶，把讀寫位置指向I/O緩衝區中的第二個字元，以後用戶再調<code class="literal">fgetc</code>，就直接從I/O緩衝區中讀取，而不需要進內核了，當用戶把這1K位元組都讀完之後，再次調用<code class="literal">fgetc</code>時，<code class="literal">fgetc</code>函數會再次進入內核讀1K位元組到I/O緩衝區中。在這個場景中用戶程序、C標準庫和內核之間的關係就像在<a class="xref" href="ch17s05.html#arch.memh">第 5 節 “Memory Hierarchy”</a>中CPU、Cache和內存之間的關係一樣，C標準庫之所以會從內核預讀一些數據放在I/O緩衝區中，是希望用戶程序隨後要用到這些數據，C標準庫的I/O緩衝區也在用戶空間，直接從用戶空間讀取數據比進內核讀數據要快得多。另一方面，用戶程序調用<code class="literal">fputc</code>通常只是寫到I/O緩衝區中，這樣<code class="literal">fputc</code>函數可以很快地返回，如果I/O緩衝區寫滿了，<code class="literal">fputc</code>就通過系統調用把I/O緩衝區中的數據傳給內核，內核最終把數據寫回磁碟。有時候用戶程序希望把I/O緩衝區中的數據立刻傳給內核，讓內核寫回設備，這稱為Flush<a id="id2834469" class="indexterm"></a>操作，對應的庫函數是<code class="literal">fflush</code>，<code class="literal">fclose</code>函數在關閉檔案之前也會做Flush操作。</p><p>下圖以<code class="literal">fgets</code>/<code class="literal">fputs</code>示意了I/O緩衝區的作用，使用<code class="literal">fgets</code>/<code class="literal">fputs</code>函數時在用戶程序中也需要分配緩衝區（圖中的<code class="literal">buf1</code>和<code class="literal">buf2</code>），注意區分用戶程序的緩衝區和C標準庫的I/O緩衝區。</p><div class="figure"><a id="id2834531"></a><p class="title"><b>圖 25.1. C標準庫的I/O緩衝區</b></p><div class="figure-contents"><div><img src="images/stdlib.buffer.png" alt="C標準庫的I/O緩衝區" /></div></div></div><br class="figure-break" /><p>C標準庫的I/O緩衝區有三種類型：全緩衝、行緩衝和無緩衝。當用戶程序調用庫函數做寫操作時，不同類型的緩衝區具有不同的特性。</p><div class="variablelist"><dl><dt><span class="term">全緩衝</span></dt><dd><p>如果緩衝區寫滿了就寫回內核。常規檔案通常是全緩衝的。</p></dd><dt><span class="term">行緩衝</span></dt><dd><p>如果用戶程序寫的數據中有換行符就把這一行寫回內核，或者如果緩衝區寫滿了就寫回內核。標準輸入和標準輸出對應終端設備時通常是行緩衝的。</p></dd><dt><span class="term">無緩衝</span></dt><dd><p>用戶程序每次調庫函數做寫操作都要通過系統調用寫回內核。標准錯誤輸出通常是無緩衝的，這樣用戶程序產生的錯誤信息可以儘快輸出到設備。</p></dd></dl></div><p>下面通過一個簡單的例子證明標準輸出對應終端設備時是行緩衝的。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main()
+{
+	printf("hello world");
+	while(1);
+	return 0;
+}</pre><p>運行這個程序，會發現<code class="literal">hello world</code>並沒有打印到屏幕上。用Ctrl-C終止它，去掉程序中的<code class="literal">while(1);</code>語句再試一次：</p><pre class="screen">$ ./a.out
+hello world$</pre><p><code class="literal">hello world</code>被打印到屏幕上，後面直接跟Shell提示符，中間沒有換行。</p><p>我們知道<code class="literal">main</code>函數被啟動代碼這樣調用：<code class="literal">exit(main(argc, argv));</code>。<code class="literal">main</code>函數<code class="literal">return</code>時啟動代碼會調用<code class="literal">exit</code>，<code class="literal">exit</code>函數首先關閉所有尚未關閉的<code class="literal">FILE *</code>指針（關閉之前要做Flush操作），然後通過<code class="literal">_exit</code>系統調用進入內核退出當前進程<sup>[<a id="id2834688" href="#ftn.id2834688" class="footnote">35</a>]</sup>。</p><p>在上面的例子中，由於標準輸出是行緩衝的，<code class="literal">printf("hello world");</code>打印的字元串中沒有換行符，所以只把字元串寫到標準輸出的I/O緩衝區中而沒有寫回內核（寫到終端設備），如果敲Ctrl-C，進程是異常終止的，並沒有調用<code class="literal">exit</code>，也就沒有機會Flush I/O緩衝區，因此字元串最終沒有打印到屏幕上。如果把打印語句改成<code class="literal">printf("hello world\n");</code>，有換行符，就會立刻寫到終端設備，或者如果把<code class="literal">while(1);</code>去掉也可以寫到終端設備，因為程序退出時會調用<code class="literal">exit</code>Flush所有I/O緩衝區。在本書的其它例子中，<code class="literal">printf</code>打印的字元串末尾都有換行符，以保證字元串在<code class="literal">printf</code>調用結束時就寫到終端設備。</p><p>我們再做個實驗，在程序中直接調用<code class="literal">_exit</code>退出。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+int main()
+{
+	printf("hello world");
+	_exit(0);
+}</pre><p>結果也不會把字元串打印到屏幕上，如果把<code class="literal">_exit</code>調用改成<code class="literal">exit</code>就可以打印到屏幕上。</p><p>除了寫滿緩衝區、寫入換行符之外，行緩衝還有一種情況會自動做Flush操作。如果：</p><div class="itemizedlist"><ul type="disc"><li><p>用戶程序調用庫函數從無緩衝的檔案中讀取</p></li><li><p>或者從行緩衝的檔案中讀取，並且這次讀操作會引發系統調用從內核讀取數據</p></li></ul></div><p>那麼在讀取之前會自動Flush所有行緩衝。例如：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+int main()
+{
+	char buf[20];
+	printf("Please input a line: ");
+	fgets(buf, 20, stdin);
+	return 0;
+}</pre><p>雖然調用<code class="literal">printf</code>並不會把字元串寫到設備，但緊接着調用<code class="literal">fgets</code>讀一個行緩衝的檔案（標準輸入），在讀取之前會自動Flush所有行緩衝，包括標準輸出。</p><p>如果用戶程序不想完全依賴于自動的Flush操作，可以調<code class="literal">fflush</code>函數手動做Flush操作。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int fflush(FILE *stream);
+返回值：成功返回0，出錯返回EOF並設置errno</pre><p>對前面的例子再稍加改動：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main()
+{
+	printf("hello world");
+	fflush(stdout);
+	while(1);
+}</pre><p>雖然字元串中沒有換行，但用戶程序調用<code class="literal">fflush</code>強制寫回內核，因此也能在屏幕上打印出字元串。<code class="literal">fflush</code>函數用於確保數據寫回了內核，以免進程異常終止時丟失數據。作為一個特例，調用<code class="literal">fflush(NULL)</code>可以對所有打開檔案的I/O緩衝區做Flush操作。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2834904"></a>2.11. 本節綜合練習</h3></div></div></div><p>1、編程讀寫一個檔案<code class="literal">test.txt</code>，每隔1秒向檔案中寫入一行記錄，類似於這樣：</p><pre class="programlisting">1 2009-7-30 15:16:42
+2 2009-7-30 15:16:43</pre><p>該程序應該無限循環，直到按Ctrl-C終止。下次再啟動程序時在<code class="literal">test.txt</code>檔案末尾追加記錄，並且序號能夠接續上次的序號，比如：</p><pre class="programlisting">1 2009-7-30 15:16:42
+2 2009-7-30 15:16:43
+3 2009-7-30 15:19:02
+4 2009-7-30 15:19:03
+5 2009-7-30 15:19:04</pre><p>這類似於很多系統服務維護的日誌檔案，例如在我的機器上系統服務進程<code class="literal">acpid</code>維護一個日誌檔案<code class="literal">/var/log/acpid</code>，就像這樣：</p><pre class="programlisting">$ cat /var/log/acpid
+[Sun Oct 26 08:44:46 2008] logfile reopened
+[Sun Oct 26 10:11:53 2008] exiting
+[Sun Oct 26 18:54:39 2008] starting up
+...</pre><p>每次系統啟動時<code class="literal">acpid</code>進程就以追加方式打開這個檔案，當有事件發生時就追加一條記錄，包括事件發生的時刻以及事件描述信息。</p><p>獲取當前的系統時間需要調用<code class="literal">time(2)</code>函數，返回的結果是一個<code class="literal">time_t</code>類型，其實就是一個大整數，其值表示從UTC（Coordinated Universal Time）<a id="id2834997" class="indexterm"></a>時間1970年1月1日00:00:00（稱為UNIX系統的Epoch<a id="id2835006" class="indexterm"></a>時間）到當前時刻的秒數。然後調用<code class="literal">localtime(3)</code>將<code class="literal">time_t</code>所表示的UTC時間轉換為本地時間（我們是+8區，比UTC多8個小時）並轉成<code class="literal">struct tm</code>類型，該類型的各數據成員分別表示年月日時分秒，具體用法請查閲Man Page。調用<code class="literal">sleep(3)</code>函數可以指定程序睡眠多少秒。</p><p>2、INI檔案是一種很常見的配置檔案，很多Windows程序都採用這種格式的配置檔案，在Linux系統中Qt程序通常也採用這種格式的配置檔案。比如：</p><pre class="programlisting">;Configuration of http
+[http]
+domain=www.mysite.com
+port=8080
+cgihome=/cgi-bin
+
+;Configuration of db
+[database]
+server = mysql
+user = myname
+password = toopendatabase</pre><p>一個配置檔案由若干個Section組成，由[]括號括起來的是Section名。每個Section下面有若干個<code class="literal">key = value</code>形式的鍵值對（Key-value Pair）<a id="id2835069" class="indexterm"></a>，等號兩邊可以有零個或多個空白字元（空格或Tab），每個鍵值對占一行。以;號開頭的行是註釋。每個Section結束時有一個或多個空行，空行是僅包含零個或多個空白字元（空格或Tab）的行。INI檔案的最後一行後面可能有換行符也可能沒有。</p><p>現在XML興起了，INI檔案顯得有點土。現在要求編程把INI檔案轉換成XML檔案。上面的例子經轉換後應該變成這樣：</p><pre class="programlisting">&lt;!-- Configuration of http --&gt;
+&lt;http&gt;
+        &lt;domain&gt;www.mysite.com&lt;/domain&gt;
+        &lt;port&gt;8080&lt;/port&gt;
+        &lt;cgihome&gt;/cgi-bin&lt;/cgihome&gt;
+&lt;/http&gt;
+
+&lt;!-- Configuration of db --&gt;
+&lt;database&gt;
+        &lt;server&gt;mysql&lt;/server&gt;
+        &lt;user&gt;myname&lt;/user&gt;
+        &lt;password&gt;toopendatabase&lt;/password&gt;
+&lt;/database&gt;</pre><p>3、實現類似<code class="literal">gcc</code>的<code class="literal">-M</code>選項的功能，給定一個<code class="literal">.c</code>檔案，列出它直接和間接包含的所有標頭檔，例如有一個<code class="literal">main.c</code>檔案：</p><pre class="programlisting">#include &lt;errno.h&gt;
+#include "stack.h"
+
+int main()
+{
+	return 0;
+}</pre><p>你的程序讀取這個檔案，打印出其中包含的所有標頭檔的絶對路徑：</p><pre class="screen">$ ./a.out main.c
+/usr/include/errno.h
+/usr/include/features.h
+/usr/include/bits/errno.h
+/usr/include/linux/errno.h
+...
+/home/akaedu/stack.h: cannot find</pre><p>如果有的標頭檔找不到，就像上面例子那樣打印<code class="literal">/home/akaedu/stack.h: cannot find</code>。首先複習一下<a class="xref" href="ch20s02.html#link.header">第 2.2 節 “標頭檔”</a>講過的標頭檔查找順序，本題目不必考慮<code class="literal">-I</code>選項指定的目錄，只在<code class="literal">.c</code>檔案所在的目錄以及系統目錄<code class="literal">/usr/include</code>中查找。</p></div><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2831641" href="#id2831641" class="para">34</a>] </sup>這些特性取決於終端的工作模式，終端可以配置成一次一行的模式，也可以配置成一次一個字元的模式，預設是一次一行的模式（本書的實驗都是在這種模式下做的），關於終端的配置可參考<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>。</p></div><div class="footnote"><p><sup>[<a id="ftn.id2834688" href="#id2834688" class="para">35</a>] </sup>其實在調<code class="literal">_exit</code>進內核之前還要調用戶程序中通過<code class="literal">atexit(3)</code>註冊的退出處理函數，本書不做詳細介紹，讀者可參考<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch25s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch25.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch25s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 字元串操作函數 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 數值字元串轉換函數</td></tr></table></div></body></html>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. ext2檔案系統</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch29.html" title="第 29 章 檔案系統" /><link rel="prev" href="ch29s01.html" title="1. 引言" /><link rel="next" href="ch29s03.html" title="3. VFS" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. ext2檔案系統</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch29s01.html">上一頁</a> </td><th width="60%" align="center">第 29 章 檔案系統</th><td width="20%" align="right"> <a accesskey="n" href="ch29s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2857318"></a>2. ext2檔案系統</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2857323"></a>2.1. 總體存儲佈局</h3></div></div></div><p>我們知道，一個磁碟可以劃分成多個分區，每個分區必須先用格式化工具（例如某種<code class="literal">mkfs</code>命令）格式化成某種格式的檔案系統，然後才能存儲檔案，格式化的過程會在磁碟上寫一些管理存儲佈局的信息。下圖是一個磁碟分區格式化成ext2檔案系統後的存儲佈局。</p><div class="figure"><a id="id2857342"></a><p class="title"><b>圖 29.2. ext2檔案系統的總體存儲佈局</b></p><div class="figure-contents"><div><img src="images/fs.ext2layout.png" alt="ext2檔案系統的總體存儲佈局" /></div></div></div><br class="figure-break" /><p>檔案系統中存儲的最小單位是塊（Block）<a id="id2857359" class="indexterm"></a>，一個塊究竟多大是在格式化時確定的，例如<code class="literal">mke2fs</code>的<code class="literal">-b</code>選項可以設定塊大小為1024、2048或4096位元組。而上圖中啟動塊（Boot Block）<a id="id2857380" class="indexterm"></a>的大小是確定的，就是1KB，啟動塊是由PC標準規定的，用來存儲磁碟分區信息和啟動信息，任何檔案系統都不能使用啟動塊。啟動塊之後才是ext2檔案系統的開始，ext2檔案系統將整個分區劃成若干個同樣大小的塊組（Block Group）<a id="id2857392" class="indexterm"></a>，每個塊組都由以下部分組成。</p><div class="variablelist"><dl><dt><span class="term">超級塊（Super Block）<a id="id2857407" class="indexterm"></a></span></dt><dd><p>描述整個分區的檔案系統信息，例如塊大小、檔案系統版本號、上次<code class="literal">mount</code>的時間等等。超級塊在每個塊組的開頭都有一份拷貝。</p></dd><dt><span class="term">塊組描述符表（GDT，Group Descriptor Table）<a id="id2857435" class="indexterm"></a></span></dt><dd><p>由很多塊組描述符組成，整個分區分成多少個塊組就對應有多少個塊組描述符。每個塊組描述符（Group Descriptor）<a id="id2857448" class="indexterm"></a>存儲一個塊組的描述信息，例如在這個塊組中從哪裡開始是inode表，從哪裡開始是數據塊，空閒的inode和數據塊還有多少個等等。和超級塊類似，塊組描述符表在每個塊組的開頭也都有一份拷貝，這些信息是非常重要的，一旦超級塊意外損壞就會丟失整個分區的數據，一旦塊組描述符意外損壞就會丟失整個塊組的數據，因此它們都有多份拷貝。通常內核只用到第0個塊組中的拷貝，當執行<code class="literal">e2fsck</code>檢查檔案系統一致性時，第0個塊組中的超級塊和塊組描述符表就會拷貝到其它塊組，這樣當第0個塊組的開頭意外損壞時就可以用其它拷貝來恢復，從而減少損失。</p></dd><dt><span class="term">塊點陣圖（Block Bitmap）<a id="id2857487" class="indexterm"></a></span></dt><dd><p>一個塊組中的塊是這樣利用的：數據塊存儲所有檔案的數據，比如某個分區的塊大小是1024位元組，某個檔案是2049位元組，那麼就需要三個數據塊來存，即使第三個塊只存了一個位元組也需要占用一個整塊；超級塊、塊組描述符表、塊點陣圖、inode點陣圖、inode表這幾部分存儲該塊組的描述信息。那麼如何知道哪些塊已經用來存儲檔案數據或其它描述信息，哪些塊仍然空閒可用呢？塊點陣圖就是用來描述整個塊組中哪些塊已用哪些塊空閒的，它本身占一個塊，其中的每個bit代表本塊組中的一個塊，這個bit為1表示該塊已用，這個bit為0表示該塊空閒可用。</p><p>為什麼用<code class="literal">df</code>命令統計整個磁碟的已用空間非常快呢？因為只需要查看每個塊組的塊點陣圖即可，而不需要搜遍整個分區。相反，用<code class="literal">du</code>命令查看一個較大目錄的已用空間就非常慢，因為不可避免地要搜遍整個目錄的所有檔案。</p><p>與此相聯繫的另一個問題是：在格式化一個分區時究竟會划出多少個塊組呢？主要的限制在於塊點陣圖本身必須只占一個塊。用<code class="literal">mke2fs</code>格式化時預設塊大小是1024位元組，可以用<code class="literal">-b</code>參數指定塊大小，現在設塊大小指定為b位元組，那麼一個塊可以有8b個bit，這樣大小的一個塊點陣圖就可以表示8b個塊的占用情況，因此一個塊組最多可以有8b個塊，如果整個分區有s個塊，那麼就可以有s/(8b)個塊組。格式化時可以用<code class="literal">-g</code>參數指定一個塊組有多少個塊，但是通常不需要手動指定，<code class="literal">mke2fs</code>工具會計算出最優的數值。</p></dd><dt><span class="term">inode點陣圖（inode Bitmap）<a id="id2857581" class="indexterm"></a></span></dt><dd><p>和塊點陣圖類似，本身占一個塊，其中每個bit表示一個inode是否空閒可用。</p></dd><dt><span class="term">inode表（inode Table）<a id="id2857600" class="indexterm"></a></span></dt><dd><p>我們知道，一個檔案除了數據需要存儲之外，一些描述信息也需要存儲，例如檔案類型（常規、目錄、符號連結等），權限，檔案大小，創建/修改/訪問時間等，也就是<code class="literal">ls -l</code>命令看到的那些信息，這些信息存在inode<a id="id2857620" class="indexterm"></a>中而不是數據塊中。每個檔案都有一個inode，一個塊組中的所有inode組成了inode表。</p><p>inode表占多少個塊在格式化時就要決定並寫入塊組描述符中，<code class="literal">mke2fs</code>格式化工具的預設策略是一個塊組有多少個8KB就分配多少個inode。由於數據塊占了整個塊組的絶大部分，也可以近似認為數據塊有多少個8KB就分配多少個inode，換句話說，如果平均每個檔案的大小是8KB，當分區存滿的時候inode表會得到比較充分的利用，數據塊也不浪費。如果這個分區存的都是很大的檔案（比如電影），則數據塊用完的時候inode會有一些浪費，如果這個分區存的都是很小的檔案（比如原始碼），則有可能數據塊還沒用完inode就已經用完了，數據塊可能有很大的浪費。如果用戶在格式化時能夠對這個分區以後要存儲的檔案大小做一個預測，也可以用<code class="literal">mke2fs</code>的<code class="literal">-i</code>參數手動指定每多少個位元組分配一個inode。</p></dd><dt><span class="term">數據塊（Data Block）<a id="id2857679" class="indexterm"></a></span></dt><dd><p>根據不同的檔案類型有以下幾種情況</p><div class="itemizedlist"><ul type="disc"><li><p>對於常規檔案，檔案的數據存儲在數據塊中。</p></li><li><p>對於目錄，該目錄下的所有檔案名和目錄名存儲在數據塊中，注意檔案名保存在它所在目錄的數據塊中，除檔案名之外，<code class="literal">ls -l</code>命令看到的其它信息都保存在該檔案的inode中。注意這個概念：目錄也是一種檔案，是一種特殊類型的檔案。</p></li><li><p>對於符號連結，如果目標路徑名較短則直接保存在inode中以便更快地查找，如果目標路徑名較長則分配一個數據塊來保存。</p></li><li><p>設備檔案、FIFO和socket等特殊檔案沒有數據塊，設備檔案的主設備號和次設備號保存在inode中。</p></li></ul></div></dd></dl></div><p>現在做幾個小實驗來理解這些概念。例如在<code class="literal">home</code>目錄下<code class="literal">ls -l</code>：</p><pre class="screen">$ ls -l
+total 32
+drwxr-xr-x 114 akaedu akaedu 12288 2008-10-25 11:33 akaedu
+drwxr-xr-x 114 ftp    ftp     4096 2008-10-25 10:30 ftp
+drwx------   2 root   root   16384 2008-07-04 05:58 lost+found</pre><p>為什麼各目錄的大小都是4096的整數倍？因為這個分區的塊大小是4096，目錄的大小總是數據塊的整數倍。為什麼有的目錄大有的目錄小？因為目錄的數據塊保存着它下邊所有檔案和目錄的名字，如果一個目錄中的檔案很多，一個塊裝不下這麼多檔案名，就可能分配更多的數據塊給這個目錄。再比如：</p><pre class="screen">$ ls -l /dev
+...
+prw-r-----  1 syslog adm            0 2008-10-25 11:39 xconsole
+crw-rw-rw-  1 root   root      1,   5 2008-10-24 16:44 zero</pre><p><code class="literal">xconsole</code>檔案的類型是<code class="literal">p</code>（表示pipe），是一個FIFO檔案，後面會講到它其實是一塊內核緩衝區的標識，不在磁碟上保存數據，因此沒有數據塊，檔案大小是0。<code class="literal">zero</code>檔案的類型是<code class="literal">c</code>，表示字元設備檔案，它代表內核中的一個設備驅動程式，也沒有數據塊，原本應該寫檔案大小的地方寫了<code class="literal">1, 5</code>這兩個數字，表示主設備號和次設備號，訪問該檔案時，內核根據設備號找到相應的驅動程式。再比如：</p><pre class="screen">$ touch hello
+$ ln -s ./hello halo
+$ ls -l
+total 0
+lrwxrwxrwx 1 akaedu akaedu 7 2008-10-25 15:04 halo -&gt; ./hello
+-rw-r--r-- 1 akaedu akaedu 0 2008-10-25 15:04 hello</pre><p>檔案<code class="literal">hello</code>是剛創建的，位元組數為0，符號連結檔案<code class="literal">halo</code>指向<code class="literal">hello</code>，位元組數卻是7，為什麼呢？其實7就是“<span class="quote">./hello</span>”這7個字元，符號連結檔案就保存着這樣一個路徑名。再試試硬連結：</p><pre class="screen">$ ln ./hello hello2
+$ ls -l
+total 0
+lrwxrwxrwx 1 akaedu akaedu 7 2008-10-25 15:08 halo -&gt; ./hello
+-rw-r--r-- 2 akaedu akaedu 0 2008-10-25 15:04 hello
+-rw-r--r-- 2 akaedu akaedu 0 2008-10-25 15:04 hello2</pre><p><code class="literal">hello2</code>和<code class="literal">hello</code>除了檔案名不一樣之外，別的屬性都一模一樣，並且<code class="literal">hello</code>的屬性發生了變化，第二欄的數字原本是1，現在變成2了。從根本上說，<code class="literal">hello</code>和<code class="literal">hello2</code>是同一個檔案在檔案系統中的兩個名字，<code class="literal">ls -l</code>第二欄的數字是硬連結數，表示一個檔案在檔案系統中有幾個名字（這些名字可以保存在不同目錄的數據塊中，或者說可以位於不同的路徑下），硬連結數也保存在inode中。既然是同一個檔案，inode當然只有一個，所以用<code class="literal">ls -l</code>看它們的屬性是一模一樣的，因為都是從這個inode裡讀出來的。再研究一下目錄的硬連結數：</p><pre class="screen">$ mkdir a
+$ mkdir a/b
+$ ls -ld a
+drwxr-xr-x 3 akaedu akaedu 4096 2008-10-25 16:15 a
+$ ls -la a
+total 20
+drwxr-xr-x   3 akaedu akaedu  4096 2008-10-25 16:15 .
+drwxr-xr-x 115 akaedu akaedu 12288 2008-10-25 16:14 ..
+drwxr-xr-x   2 akaedu akaedu  4096 2008-10-25 16:15 b
+$ ls -la a/b
+total 8
+drwxr-xr-x 2 akaedu akaedu 4096 2008-10-25 16:15 .
+drwxr-xr-x 3 akaedu akaedu 4096 2008-10-25 16:15 ..</pre><p>首先創建目錄<code class="literal">a</code>，然後在它下面創建子目錄<code class="literal">a/b</code>。目錄<code class="literal">a</code>的硬連結數是3，這3個名字分別是當前目錄下的<code class="literal">a</code>，<code class="literal">a</code>目錄下的<code class="literal">.</code>和<code class="literal">b</code>目錄下的<code class="literal">..</code>。目錄<code class="literal">b</code>的硬連結數是2，這兩個名字分別是<code class="literal">a</code>目錄下的<code class="literal">b</code>和<code class="literal">b</code>目錄下的<code class="literal">.</code>。注意，<span class="emphasis"><em>目錄的硬連結只能這種方式創建，用<code class="literal">ln</code>命令可以創建目錄的符號連結，但不能創建目錄的硬連結</em></span>。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2858019"></a>2.2. 實例剖析</h3></div></div></div><p>如果要格式化一個分區來研究檔案系統格式則必須有一個空閒的磁碟分區，為了方便實驗，我們把一個檔案當作分區來格式化，然後分析這個檔案中的數據來印證上面所講的要點。首先創建一個1MB的檔案並清零：</p><pre class="screen">$ dd if=/dev/zero of=fs count=256 bs=4K</pre><p>我們知道<code class="literal">cp</code>命令可以把一個檔案拷貝成另一個檔案，而<code class="literal">dd</code>命令可以把一個檔案的一部分拷貝成另一個檔案。這個命令的作用是把<code class="literal">/dev/zero</code>檔案開頭的1M（256×4K）位元組拷貝成檔案名為<code class="literal">fs</code>的檔案。剛纔我們看到<code class="literal">/dev/zero</code>是一個特殊的設備檔案，它沒有磁碟數據塊，對它進行讀操作傳給設備號為<code class="literal">1, 5</code>的驅動程式。<code class="literal">/dev/zero</code>這個檔案可以看作是無窮大的，不管從哪裡開始讀，讀出來的都是位元組0x00。因此這個命令拷貝了1M個0x00到<code class="literal">fs</code>檔案。<code class="literal">if</code>和<code class="literal">of</code>參數表示輸入檔案和輸出檔案，<code class="literal">count</code>和<code class="literal">bs</code>參數表示拷貝多少次，每次拷多少位元組。</p><p>做好之後對檔案<code class="literal">fs</code>進行格式化，也就是<span class="emphasis"><em>把這個檔案的數據塊合起來看成一個1MB的磁碟分區，在這個分區上再劃分出塊組</em></span>。</p><pre class="screen">$ mke2fs fs
+mke2fs 1.40.2 (12-Jul-2007)
+fs is not a block special device.
+Proceed anyway? (y,n) （輸入y回車）
+Filesystem label=
+OS type: Linux
+Block size=1024 (log=0)
+Fragment size=1024 (log=0)
+128 inodes, 1024 blocks
+51 blocks (4.98%) reserved for the super user
+First data block=1
+Maximum filesystem blocks=1048576
+1 block group
+8192 blocks per group, 8192 fragments per group
+128 inodes per group
+
+Writing inode tables: done                            
+Writing superblocks and filesystem accounting information: done
+
+This filesystem will be automatically checked every 27 mounts or
+180 days, whichever comes first.  Use tune2fs -c or -i to override.</pre><p>格式化一個真正的分區應該指定塊設備檔案名，例如<code class="literal">/dev/sda1</code>，而這個<code class="literal">fs</code>是常規檔案而不是塊設備檔案，<code class="literal">mke2fs</code>認為用戶有可能是誤操作了，所以給出提示，要求確認是否真的要格式化，輸入<code class="literal">y</code>回車完成格式化。</p><p>現在<code class="literal">fs</code>的大小仍然是1MB，但不再是全0了，其中已經有了塊組和描述信息。用<code class="literal">dumpe2fs</code>工具可以查看這個分區的超級塊和塊組描述符表中的信息：</p><pre class="screen">$ dumpe2fs fs
+dumpe2fs 1.40.2 (12-Jul-2007)
+Filesystem volume name:   &lt;none&gt;
+Last mounted on:          &lt;not available&gt;
+Filesystem UUID:          8e1f3b7a-4d1f-41dc-8928-526e43b2fd74
+Filesystem magic number:  0xEF53
+Filesystem revision #:    1 (dynamic)
+Filesystem features:      resize_inode dir_index filetype sparse_super
+Filesystem flags:         signed directory hash 
+Default mount options:    (none)
+Filesystem state:         clean
+Errors behavior:          Continue
+Filesystem OS type:       Linux
+Inode count:              128
+Block count:              1024
+Reserved block count:     51
+Free blocks:              986
+Free inodes:              117
+First block:              1
+Block size:               1024
+Fragment size:            1024
+Reserved GDT blocks:      3
+Blocks per group:         8192
+Fragments per group:      8192
+Inodes per group:         128
+Inode blocks per group:   16
+Filesystem created:       Sun Dec 16 14:56:59 2007
+Last mount time:          n/a
+Last write time:          Sun Dec 16 14:56:59 2007
+Mount count:              0
+Maximum mount count:      30
+Last checked:             Sun Dec 16 14:56:59 2007
+Check interval:           15552000 (6 months)
+Next check after:         Fri Jun 13 14:56:59 2008
+Reserved blocks uid:      0 (user root)
+Reserved blocks gid:      0 (group root)
+First inode:              11
+Inode size:               128
+Default directory hash:   tea
+Directory Hash Seed:      6d0e58bd-b9db-41ae-92b3-4563a02a5981
+
+
+Group 0: (Blocks 1-1023)
+  Primary superblock at 1, Group descriptors at 2-2
+  Reserved GDT blocks at 3-5
+  Block bitmap at 6 (+5), Inode bitmap at 7 (+6)
+  Inode table at 8-23 (+7)
+  986 free blocks, 117 free inodes, 2 directories
+  Free blocks: 38-1023
+  Free inodes: 12-128
+
+128 inodes per group, 8 inodes per block, so: 16 blocks for inode table</pre><p>根據上面講過的知識簡單計算一下，塊大小是1024位元組，1MB的分區共有1024個塊，第0個塊是啟動塊，啟動塊之後才算ext2檔案系統的開始，因此Group 0佔據第1個到第1023個塊，共1023個塊。塊點陣圖占一個塊，共有1024×8=8192個bit，足夠表示這1023個塊了，因此只要一個塊組就夠了。預設是每8KB分配一個inode，因此1MB的分區對應128個inode，這些數據都和<code class="literal">dumpe2fs</code>的輸出吻合。</p><p>用常規檔案製作而成的檔案系統也可以像磁碟分區一樣<code class="literal">mount</code>到某個目錄，例如：</p><pre class="screen">$ sudo mount -o loop fs /mnt
+$ cd /mnt/
+$ ls -la
+total 17
+drwxr-xr-x  3 akaedu akaedu  1024 2008-10-25 12:20 .
+drwxr-xr-x 21 root    root     4096 2008-08-18 08:54 ..
+drwx------  2 root    root    12288 2008-10-25 12:20 lost+found</pre><p><code class="literal">-o loop</code>選項告訴<code class="literal">mount</code>這是一個常規檔案而不是一個塊設備檔案。<code class="literal">mount</code>會把它的數據塊中的數據當作分區格式來解釋。檔案系統格式化之後在根目錄下自動生成三個子目錄：<code class="literal">.</code>，<code class="literal">..</code>和<code class="literal">lost+found</code>。其它子目錄下的<code class="literal">.</code>表示當前目錄，<code class="literal">..</code>表示上一級目錄，而根目錄的<code class="literal">.</code>和<code class="literal">..</code>都表示根目錄本身。<code class="literal">lost+found</code>目錄由<code class="literal">e2fsck</code>工具使用，如果在檢查磁碟時發現錯誤，就把有錯誤的塊掛在這個目錄下，因為這些塊不知道是誰的，找不到主，就放在這裡“<span class="quote">失物招領</span>”了。</p><p>現在可以在<code class="literal">/mnt</code>目錄下添加刪除檔案，這些操作會自動保存到檔案<code class="literal">fs</code>中。然後把這個分區<code class="literal">umount</code>下來，以確保所有的改動都保存到檔案中了。</p><pre class="screen">$ sudo umount /mnt</pre><p>注意，下面的實驗步驟是對新創建的檔案系統做的，如果你在檔案系統中添加刪除過檔案，跟着做下面的步驟時結果可能和我寫的不太一樣，不過也不影響理解。</p><p>現在我們用二進制查看工具查看這個檔案系統的所有位元組，並且同<code class="literal">dumpe2fs</code>工具的輸出信息相比較，就可以很好地理解檔案系統的存儲佈局了。</p><pre class="screen">$ od -tx1 -Ax fs
+000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+*
+000400 80 00 00 00 00 04 00 00 33 00 00 00 da 03 00 00
+000410 75 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+...</pre><p>其中以*開頭的行表示這一段數據全是零因此省略了。下面詳細分析<code class="literal">od</code>輸出的信息。</p><p>從000000開始的1KB是啟動塊，由於這不是一個真正的磁碟分區，啟動塊的內容全部為零。從000400到0007ff的1KB是超級塊，對照着<code class="literal">dumpe2fs</code>的輸出信息，詳細分析如下：</p><div class="figure"><a id="id2858465"></a><p class="title"><b>圖 29.3. 超級塊</b></p><div class="figure-contents"><div><img src="images/fs.sb.png" alt="超級塊" /></div></div></div><br class="figure-break" /><p>超級塊中從0004d0到末尾的204個位元組是填充位元組，保留未用，上圖未畫出。注意，ext2檔案系統中各欄位都是按小端存儲的，如果把位元組在檔案中的位置看作地址，那麼靠近檔案開頭的是低地址，存低位元組。各欄位的位置、長度和含義詳見<a class="xref" href="bi01.html#bibli.ulk" title="Understanding the Linux Kernel">[<abbr class="abbrev">ULK</abbr>]</a>。</p><p>從000800開始是塊組描述符表，這個檔案系統較小，只有一個塊組描述符，對照着<code class="literal">dumpe2fs</code>的輸出信息分析如下：</p><pre class="screen">...
+Group 0: (Blocks 1-1023)
+  Primary superblock at 1, Group descriptors at 2-2
+  Reserved GDT blocks at 3-5
+  Block bitmap at 6 (+5), Inode bitmap at 7 (+6)
+  Inode table at 8-23 (+7)
+  986 free blocks, 117 free inodes, 2 directories
+  Free blocks: 38-1023
+  Free inodes: 12-128
+...</pre><div class="figure"><a id="id2858517"></a><p class="title"><b>圖 29.4. 塊組描述符</b></p><div class="figure-contents"><div><img src="images/fs.gd.png" alt="塊組描述符" /></div></div></div><br class="figure-break" /><p>整個檔案系統是1MB，每個塊是1KB，應該有1024個塊，除去啟動塊還有1023個塊，分別編號為1-1023，它們全都屬於Group 0。其中，Block 1是超級塊，接下來的塊組描述符指出，塊點陣圖是Block 6，因此中間的Block 2-5是塊組描述符表，其中Block 3-5保留未用。塊組描述符還指出，inode點陣圖是Block 7，inode表是從Block 8開始的，那麼inode表到哪個塊結束呢？由於超級塊中指出每個塊組有128個inode，每個inode的大小是128位元組，因此共占16個塊，inode表的範圍是Block 8-23。</p><p>從Block 24開始就是數據塊了。塊組描述符中指出，空閒的數據塊有986個，由於檔案系統是新創建的，空閒塊是連續的Block 38-1023，用掉了前面的Block 24-37。從塊點陣圖中可以看出，前37位（前4個位元組加最後一個位元組的低5位）都是1，就表示Block 1-37已用:</p><pre class="screen">001800 ff ff ff ff 1f 00 00 00 00 00 00 00 00 00 00 00
+001810 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+*
+001870 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80
+001880 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+*</pre><p>在塊點陣圖中，Block 38-1023對應的位都是0（一直到001870那一行最後一個位元組的低7位），接下來的位已經超出了檔案系統的空間，不管是0還是1都沒有意義。可見，塊點陣圖每個位元組中的位應該按從低位到高位的順序來看。以後隨着檔案系統的使用和添加刪除檔案，塊點陣圖中的1就變得不連續了。</p><p>塊組描述符指出，空閒的inode有117個，由於檔案系統是新創建的，空閒的inode也是連續的，inode編號從1到128，空閒的inode編號從12到128。從inode點陣圖可以看出，前11位都是1，表示前11個inode已用：</p><pre class="screen">001c00 ff 07 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+001c10 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+*</pre><p>以後隨着檔案系統的使用和添加刪除檔案，inode點陣圖中的1就變得不連續了。</p><p>001c00這一行的128位就表示了所有inode，因此下面的行不管是0還是1都沒有意義。已用的11個inode中，前10個inode是被ext2檔案系統保留的，其中第2個inode是根目錄，第11個inode是<code class="literal">lost+found</code>目錄，塊組描述符也指出該組有兩個目錄，就是根目錄和<code class="literal">lost+found</code>。</p><p>探索檔案系統還有一個很有用的工具<code class="literal">debugfs</code>，它提供一個命令行界面，可以對檔案系統做各種操作，例如查看信息、恢復數據、修正檔案系統中的錯誤。下面用<code class="literal">debugfs</code>打開<code class="literal">fs</code>檔案，然後在提示符下輸入<code class="literal">help</code>看看它都能做哪些事情：</p><pre class="screen">$ debugfs fs
+debugfs 1.40.2 (12-Jul-2007)
+debugfs:  help</pre><p>在<code class="literal">debugfs</code>的提示符下輸入<code class="literal">stat /</code>命令，這時在新的一屏中顯示根目錄的inode信息：</p><pre class="screen">Inode: 2   Type: directory    Mode:  0755   Flags: 0x0   Generation: 0
+User:  1000   Group:  1000   Size: 1024
+File ACL: 0    Directory ACL: 0
+Links: 3   Blockcount: 2
+Fragment:  Address: 0    Number: 0    Size: 0
+ctime: 0x4764cc3b -- Sun Dec 16 14:56:59 2007
+atime: 0x4764cc3b -- Sun Dec 16 14:56:59 2007
+mtime: 0x4764cc3b -- Sun Dec 16 14:56:59 2007
+BLOCKS:
+(0):24
+TOTAL: 1</pre><p>按q退出這一屏，然後用<code class="literal">quit</code>命令退出<code class="literal">debugfs</code>：</p><pre class="screen">debugfs:  quit</pre><p>把以上信息和<code class="literal">od</code>命令的輸出對照起來分析：</p><div class="figure"><a id="id2858859"></a><p class="title"><b>圖 29.5. 根目錄的inode</b></p><div class="figure-contents"><div><img src="images/fs.rootinode.png" alt="根目錄的inode" /></div></div></div><br class="figure-break" /><p>上圖中的<code class="literal">st_mode</code>以八進製表示，包含了檔案類型和檔案權限，最高位的4表示檔案類型為目錄（各種檔案類型的編碼詳見stat(2)），低位的755表示權限。Size是1024，說明根目錄現在只有一個數據塊。Links為3表示根目錄有三個硬連結，分別是根目錄下的<code class="literal">.</code>和<code class="literal">..</code>，以及<code class="literal">lost+found</code>子目錄下的<code class="literal">..</code>。注意，雖然我們通常用<code class="literal">/</code>表示根目錄，但是並沒有名為<code class="literal">/</code>的硬連結，事實上，<code class="literal">/</code>是路徑分隔符，不能在檔案名中出現。這裡的<code class="literal">Blockcount</code>是以512位元組為一個塊來數的，並非格式化檔案系統時所指定的塊大小，磁碟的最小讀寫單位稱為扇區（Sector）<a id="id2858941" class="indexterm"></a>，通常是512位元組，所以<code class="literal">Blockcount</code>是磁碟的物理塊數量，而非分區的邏輯塊數量。根目錄數據塊的位置由上圖中的<code class="literal">Blocks[0]</code>指出，也就是第24個塊，它在檔案系統中的位置是24×0x400=0x6000，從<code class="literal">od</code>命令的輸出中找到006000地址，它的格式是這樣：</p><div class="figure"><a id="id2858972"></a><p class="title"><b>圖 29.6. 根目錄的數據塊</b></p><div class="figure-contents"><div><img src="images/fs.datablock.png" alt="根目錄的數據塊" /></div></div></div><br class="figure-break" /><p>目錄的數據塊由許多不定長的記錄組成，每條記錄描述該目錄下的一個檔案，在上圖中用框表示。第一條記錄描述inode號為2的檔案，也就是根目錄本身，該記錄的總長度為12位元組，其中檔案名的長度為1位元組，檔案類型為2（見下表，注意此處的檔案類型編碼和<code class="literal">st_mode</code>不一致），檔案名是<code class="literal">.</code>。</p><div class="table"><a id="id2859019"></a><p class="title"><b>表 29.1. 目錄中的檔案類型編碼</b></p><div class="table-contents"><table summary="目錄中的檔案類型編碼" border="1"><colgroup><col /><col /></colgroup><thead><tr><th>編碼</th><th>檔案類型</th></tr></thead><tbody><tr><td>0</td><td>Unknown</td></tr><tr><td>1</td><td>Regular file</td></tr><tr><td>2</td><td>Directory</td></tr><tr><td>3</td><td>Character device</td></tr><tr><td>4</td><td>Block device</td></tr><tr><td>5</td><td>Named pipe</td></tr><tr><td>6</td><td>Socket</td></tr><tr><td>7</td><td>Symbolic link</td></tr></tbody></table></div></div><br class="table-break" /><p>第二條記錄也是描述inode號為2的檔案（根目錄），該記錄總長度為12位元組，其中檔案名的長度為2位元組，檔案類型為2，檔案名字元串是<code class="literal">..</code>。第三條記錄一直延續到該數據塊的末尾，描述inode號為11的檔案（<code class="literal">lost+found</code>目錄），該記錄的總長度為1000位元組（和前面兩條記錄加起來是1024位元組），檔案類型為2，檔案名字元串是<code class="literal">lost+found</code>，後面全是0位元組。如果要在根目錄下創建新的檔案，可以把第三條記錄截短，在原來的0位元組處創建新的記錄。如果該目錄下的檔案名太多，一個數據塊不夠用，則會分配新的數據塊，塊編號會填充到inode的<code class="literal">Blocks[1]</code>欄位。</p><p><code class="literal">debugfs</code>也提供了<code class="literal">cd</code>、<code class="literal">ls</code>等命令，不需要<code class="literal">mount</code>就可以查看這個檔案系統中的目錄，例如用<code class="literal">ls</code>查看根目錄：</p><pre class="screen"> 2  (12) .    2  (12) ..    11  (1000) lost+found</pre><p>列出了inode號、記錄長度和檔案名，這些信息都是從根目錄的數據塊中讀出來的。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2859176"></a>習題</h4></div></div></div><p>1、請讀者仿照對根目錄的分析，自己分析<code class="literal">lost+found</code>目錄的inode和數據塊的格式。</p><p>2、<code class="literal">mount</code>這個檔案系統，在裡面添加刪除檔案，然後<code class="literal">umount</code>下來，再次分析它的格式，和原來的結果比較一下看哪些位元組發生了變化。</p></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2859212"></a>2.3. 數據塊定址</h3></div></div></div><p>如果一個檔案有多個數據塊，這些數據塊很可能不是連續存放的，應該如何定址到每個塊呢？根據上面的分析，根目錄的數據塊是通過其inode中的索引項<code class="literal">Blocks[0]</code>找到的，事實上，這樣的索引項一共有15個，從<code class="literal">Blocks[0]</code>到<code class="literal">Blocks[14]</code>，每個索引項占4位元組。前12個索引項都表示塊編號，例如上面的例子中<code class="literal">Blocks[0]</code>欄位保存着24，就表示第24個塊是該檔案的數據塊，如果塊大小是1KB，這樣可以表示從0位元組到12KB的檔案。如果剩下的三個索引項<code class="literal">Blocks[12]</code>到<code class="literal">Blocks[14]</code>也是這麼用的，就只能表示最大15KB的檔案了，這是遠遠不夠的，事實上，剩下的三個索引項都是間接索引。</p><p>索引項<code class="literal">Blocks[12]</code>所指向的塊並非數據塊，而是稱為間接定址塊（Indirect Block）<a id="id2859276" class="indexterm"></a>，其中存放的都是類似<code class="literal">Blocks[0]</code>這種索引項，再由索引項指向數據塊。設塊大小是b，那麼一個間接定址塊中可以存放b/4個索引項，指向b/4個數據塊。所以如果把<code class="literal">Blocks[0]</code>到<code class="literal">Blocks[12]</code>都用上，最多可以表示b/4+12個數據塊，對於塊大小是1K的情況，最大可表示268K的檔案。如下圖所示，注意檔案的數據塊編號是從0開始的，<code class="literal">Blocks[0]</code>指向第0個數據塊，<code class="literal">Blocks[11]</code>指向第11個數據塊，<code class="literal">Blocks[12]</code>所指向的間接定址塊的第一個索引項指向第12個數據塊，依此類推。</p><div class="figure"><a id="id2859328"></a><p class="title"><b>圖 29.7. 數據塊的定址</b></p><div class="figure-contents"><div><img src="images/fs.datablockaddr.png" alt="數據塊的定址" /></div></div></div><br class="figure-break" /><p>從上圖可以看出，索引項<code class="literal">Blocks[13]</code>指向兩級的間接定址塊，最多可表示(b/4)<sup>2</sup>+b/4+12個數據塊，對於1K的塊大小最大可表示64.26MB的檔案。索引項<code class="literal">Blocks[14]</code>指向三級的間接定址塊，最多可表示(b/4)<sup>3</sup>+(b/4)<sup>2</sup>+b/4+12個數據塊，對於1K的塊大小最大可表示16.06GB的檔案。</p><p>可見，這種定址方式對於訪問不超過12個數據塊的小檔案是非常快的，訪問檔案中的任意數據只需要兩次讀盤操作，一次讀inode（也就是讀索引項）一次讀數據塊。而訪問大檔案中的數據則需要最多五次讀盤操作：inode、一級間接定址塊、二級間接定址塊、三級間接定址塊、數據塊。實際上，磁碟中的inode和數據塊往往已經被內核緩存了，讀大檔案的效率也不會太低。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2859394"></a>2.4. 檔案和目錄操作的系統函數</h3></div></div></div><p>本節簡要介紹一下檔案和目錄操作常用的系統函數，常用的檔案操作命令如<code class="literal">ls</code>、<code class="literal">cp</code>、<code class="literal">mv</code>等也是基于這些函數實現的。本節的側重點在於講解這些函數的工作原理，而不是如何使用它們，理解了實現原理之後再看這些函數的用法就很簡單了，請讀者自己查閲Man Page瞭解其用法。</p><p><code class="literal">stat(2)</code>函數讀取檔案的inode，然後把inode中的各種檔案屬性填入一個<code class="literal">struct stat</code>結構體傳出給調用者。<code class="literal">stat(1)</code>命令是基于<code class="literal">stat</code>函數實現的。<code class="literal">stat</code>需要根據傳入的檔案路徑找到inode，假設一個路徑是<code class="literal">/opt/file</code>，則查找的順序是：</p><div class="orderedlist"><ol type="1"><li><p>讀出inode表中第2項，也就是根目錄的inode，從中找出根目錄數據塊的位置</p></li><li><p>從根目錄的數據塊中找出檔案名為<code class="literal">opt</code>的記錄，從記錄中讀出它的inode號</p></li><li><p>讀出<code class="literal">opt</code>目錄的inode，從中找出它的數據塊的位置</p></li><li><p>從<code class="literal">opt</code>目錄的數據塊中找出檔案名為<code class="literal">file</code>的記錄，從記錄中讀出它的inode號</p></li><li><p>讀出<code class="literal">file</code>檔案的inode</p></li></ol></div><p>還有另外兩個類似<code class="literal">stat</code>的函數：<code class="literal">fstat(2)</code>函數傳入一個已打開的檔案描述符，傳出inode信息，<code class="literal">lstat(2)</code>函數也是傳入路徑傳出inode信息，但是和<code class="literal">stat</code>函數有一點不同，當檔案是一個符號連結時，<code class="literal">stat(2)</code>函數傳出的是它所指向的目標檔案的inode，而<code class="literal">lstat</code>函數傳出的就是符號連結檔案本身的inode。</p><p><code class="literal">access(2)</code>函數檢查執行當前進程的用戶是否有權限訪問某個檔案，傳入檔案路徑和要執行的訪問操作（讀/寫/執行），<code class="literal">access</code>函數取出檔案inode中的<code class="literal">st_mode</code>欄位，比較一下訪問權限，然後返回0表示允許訪問，返回-1表示錯誤或不允許訪問。</p><p><code class="literal">chmod(2)</code>和<code class="literal">fchmod(2)</code>函數改變檔案的訪問權限，也就是修改inode中的<code class="literal">st_mode</code>欄位。這兩個函數的區別類似於<code class="literal">stat</code>/<code class="literal">fstat</code>。<code class="literal">chmod(1)</code>命令是基于<code class="literal">chmod</code>函數實現的。</p><p><code class="literal">chown(2)</code>/<code class="literal">fchown(2)</code>/<code class="literal">lchown(2)</code>改變檔案的所有者和組，也就是修改inode中的<code class="literal">User</code>和<code class="literal">Group</code>欄位，只有超級用戶才能正確調用這幾個函數，這幾個函數之間的區別類似於<code class="literal">stat</code>/<code class="literal">fstat</code>/<code class="literal">lstat</code>。<code class="literal">chown(1)</code>命令是基于<code class="literal">chown</code>函數實現的。</p><p><code class="literal">utime(2)</code>函數改變檔案的訪問時間和修改時間，也就是修改inode中的<code class="literal">atime</code>和<code class="literal">mtime</code>欄位。<code class="literal">touch(1)</code>命令是基于<code class="literal">utime</code>函數實現的。</p><p><code class="literal">truncate(2)</code>和<code class="literal">ftruncate(2)</code>函數把檔案截斷到某個長度，如果新的長度比原來的長度短，則後面的數據被截掉了，如果新的長度比原來的長度長，則後面多出來的部分用0填充，這需要修改inode中的<code class="literal">Blocks</code>索引項以及塊點陣圖中相應的bit。這兩個函數的區別類似於<code class="literal">stat</code>/<code class="literal">fstat</code>。</p><p><code class="literal">link(2)</code>函數創建硬連結，其原理是在目錄的數據塊中添加一條新記錄，其中的inode號欄位和原檔案相同。<code class="literal">symlink(2)</code>函數創建一個符號連結，這需要創建一個新的inode，其中<code class="literal">st_mode</code>欄位的檔案類型是符號連結，原檔案的路徑保存在inode中或者分配一個數據塊來保存。<code class="literal">ln(1)</code>命令是基于<code class="literal">link</code>和<code class="literal">symlink</code>函數實現的。</p><p><code class="literal">unlink(2)</code>函數刪除一個連結。如果是符號連結則釋放這個符號連結的inode和數據塊，清除inode點陣圖和塊點陣圖中相應的位。如果是硬連結則從目錄的數據塊中清除一條檔案名記錄，如果當前檔案的硬連結數已經是1了還要刪除它，就同時釋放它的inode和數據塊，清除inode點陣圖和塊點陣圖中相應的位，這樣就真的刪除檔案了。<code class="literal">unlink(1)</code>命令和<code class="literal">rm(1)</code>命令是基于<code class="literal">unlink</code>函數實現的。</p><p><code class="literal">rename(2)</code>函數改變檔案名，需要修改目錄數據塊中的檔案名記錄，如果原檔案名和新檔案名不在一個目錄下則需要從原目錄數據塊中清除一條記錄然後添加到新目錄的數據塊中。<code class="literal">mv(1)</code>命令是基于<code class="literal">rename</code>函數實現的，因此在同一分區的不同目錄中移動檔案並不需要複製和刪除檔案的inode和數據塊，只需要一個改名操作，即使要移動整個目錄，這個目錄下有很多子目錄和檔案也要隨着一起移動，移動操作也只是對頂級目錄的改名操作，很快就能完成。但是，如果在不同的分區之間移動檔案就必須複製和刪除inode和數據塊，如果要移動整個目錄，所有子目錄和檔案都要複製刪除，這就很慢了。</p><p><code class="literal">readlink(2)</code>函數讀取一個符號連結所指向的目標路徑，其原理是從符號連結的inode或數據塊中讀出保存的數據，這就是目標路徑。</p><p><code class="literal">mkdir(2)</code>函數創建新的目錄，要做的操作是在它的父目錄數據塊中添加一條記錄，然後分配新的inode和數據塊，inode的<code class="literal">st_mode</code>欄位的檔案類型是目錄，在數據塊中填兩個記錄，分別是<code class="literal">.</code>和<code class="literal">..</code>，由於<code class="literal">..</code>表示父目錄，因此父目錄的硬連結數要加1。<code class="literal">mkdir(1)</code>命令是基于<code class="literal">mkdir</code>函數實現的。</p><p><code class="literal">rmdir(2)</code>函數刪除一個目錄，這個目錄必須是空的（只包含<code class="literal">.</code>和<code class="literal">..</code>）才能刪除，要做的操作是釋放它的inode和數據塊，清除inode點陣圖和塊點陣圖中相應的位，清除父目錄數據塊中的記錄，父目錄的硬連結數要減1。<code class="literal">rmdir(1)</code>命令是基于<code class="literal">rmdir</code>函數實現的。</p><p><code class="literal">opendir(3)</code>/<code class="literal">readdir(3)</code>/<code class="literal">closedir(3)</code>用於遍歷目錄數據塊中的記錄。<code class="literal">opendir</code>打開一個目錄，返回一個<code class="literal">DIR *</code>指針代表這個目錄，它是一個類似<code class="literal">FILE *</code>指針的句柄，<code class="literal">closedir</code>用於關閉這個句柄，把<code class="literal">DIR *</code>指針傳給<code class="literal">readdir</code>讀取目錄數據塊中的記錄，每次返回一個指向<code class="literal">struct dirent</code>的指針，反覆讀就可以遍歷所有記錄，所有記錄遍歷完之後<code class="literal">readdir</code>返回<code class="literal">NULL</code>。結構體<code class="literal">struct dirent</code>的定義如下：</p><pre class="programlisting">struct dirent {
+	ino_t          d_ino;       /* inode number */
+	off_t          d_off;       /* offset to the next dirent */
+	unsigned short d_reclen;    /* length of this record */
+	unsigned char  d_type;      /* type of file */
+	char           d_name[256]; /* filename */
+};</pre><p>這些欄位和<a class="xref" href="ch29s02.html#fs.datablock">圖 29.6 “根目錄的數據塊”</a>基本一致。這裡的檔案名<code class="literal">d_name</code>被庫函數處理過，已經在結尾加了'\0'，而<a class="xref" href="ch29s02.html#fs.datablock">圖 29.6 “根目錄的數據塊”</a>中的檔案名欄位不保證是以'\0'結尾的，需要根據前面的檔案名長度欄位確定檔案名到哪裡結束。</p><p>下面這個例子出自<a class="xref" href="bi01.html#bibli.kr" title="The C Programming Language">[<abbr class="abbrev">K&amp;R</abbr>]</a>，作用是遞歸地打印出一個目錄下的所有子目錄和檔案，類似<code class="literal">ls -R</code>。</p><div class="example"><a id="id2860134"></a><p class="title"><b>例 29.1. 遞歸列出目錄中的檔案列表</b></p><div class="example-contents"><pre class="programlisting">#include &lt;sys/types.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;dirent.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+#define MAX_PATH 1024
+
+/* dirwalk:  apply fcn to all files in dir */
+void dirwalk(char *dir, void (*fcn)(char *))
+{
+	char name[MAX_PATH];
+	struct dirent *dp;
+	DIR *dfd;
+
+	if ((dfd = opendir(dir)) == NULL) {
+		fprintf(stderr, "dirwalk: can't open %s\n", dir);
+		return;
+	}
+	while ((dp = readdir(dfd)) != NULL) {
+		if (strcmp(dp-&gt;d_name, ".") == 0
+		    || strcmp(dp-&gt;d_name, "..") == 0)
+			continue;    /* skip self and parent */
+		if (strlen(dir)+strlen(dp-&gt;d_name)+2 &gt; sizeof(name))
+			fprintf(stderr, "dirwalk: name %s %s too long\n",
+				dir, dp-&gt;d_name);
+		else {
+			sprintf(name, "%s/%s", dir, dp-&gt;d_name);
+			(*fcn)(name);
+		}
+	}
+	closedir(dfd);
+}
+
+/* fsize:  print the size and name of file "name" */
+void fsize(char *name)
+{
+	struct stat stbuf;
+
+	if (stat(name, &amp;stbuf) == -1) {
+		fprintf(stderr, "fsize: can't access %s\n", name);
+		return;
+	}
+	if ((stbuf.st_mode &amp; S_IFMT) == S_IFDIR)
+		dirwalk(name, fsize);
+	printf("%8ld %s\n", stbuf.st_size, name);
+}
+
+int main(int argc, char **argv)
+{
+	if (argc == 1)  /* default: current directory */
+		fsize(".");
+	else
+		while (--argc &gt; 0)
+			fsize(*++argv);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>然而這個程序還是不如<code class="literal">ls -R</code>健壯，它有可能死循環，思考一下什麼情況會導致死循環。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch29s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch29.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch29s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 引言 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. VFS</td></tr></table></div></body></html>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 綫程控制</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch35.html" title="第 35 章 綫程" /><link rel="prev" href="ch35s01.html" title="1. 綫程的概念" /><link rel="next" href="ch35s03.html" title="3. 綫程間同步" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 綫程控制</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch35s01.html">上一頁</a> </td><th width="60%" align="center">第 35 章 綫程</th><td width="20%" align="right"> <a accesskey="n" href="ch35s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2895627"></a>2. 綫程控制</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2895632"></a>2.1. 創建綫程</h3></div></div></div><pre class="programlisting">#include &lt;pthread.h&gt;
+
+int pthread_create(pthread_t *restrict thread,
+	const pthread_attr_t *restrict attr,
+	void *(*start_routine)(void*), void *restrict arg);</pre><p>返回值：成功返回0，失敗返回錯誤號。以前學過的系統函數都是成功返回0，失敗返回-1，而錯誤號保存在全局變數<code class="literal">errno</code>中，而pthread庫的函數都是通過返回值返回錯誤號，雖然每個綫程也都有一個<code class="literal">errno</code>，但這是為了兼容其它函數介面而提供的，pthread庫本身並不使用它，通過返回值返回錯誤碼更加清晰。</p><p>在一個綫程中調用pthread_create()創建新的綫程後，當前線程從pthread_create()返回繼續往下執行，而新的綫程所執行的代碼由我們傳給<code class="literal">pthread_create</code>的函數指針<code class="literal">start_routine</code>決定。<code class="literal">start_routine</code>函數接收一個參數，是通過<code class="literal">pthread_create</code>的<code class="literal">arg</code>參數傳遞給它的，該參數的類型為<code class="literal">void *</code>，這個指針按什麼類型解釋由調用者自己定義。<code class="literal">start_routine</code>的返回值類型也是<code class="literal">void *</code>，這個指針的含義同樣由調用者自己定義。<code class="literal">start_routine</code>返回時，這個綫程就退出了，其它綫程可以調用<code class="literal">pthread_join</code>得到<code class="literal">start_routine</code>的返回值，類似於父進程調用<code class="literal">wait(2)</code>得到子進程的退出狀態，稍後詳細介紹<code class="literal">pthread_join</code>。</p><p><code class="literal">pthread_create</code>成功返回後，新創建的綫程的id被填寫到<code class="literal">thread</code>參數所指向的內存單元。我們知道進程id的類型是<code class="literal">pid_t</code>，每個進程的id在整個系統中是唯一的，調用<code class="literal">getpid(2)</code>可以獲得當前進程的id，是一個正整數值。綫程id的類型是<code class="literal">thread_t</code>，它只在當前進程中保證是唯一的，在不同的系統中<code class="literal">thread_t</code>這個類型有不同的實現，它可能是一個整數值，也可能是一個結構體，也可能是一個地址，所以不能簡單地當成整數用<code class="literal">printf</code>打印，調用<code class="literal">pthread_self(3)</code>可以獲得當前線程的id。</p><p><code class="literal">attr</code>參數表示綫程屬性，本章不深入討論綫程屬性，所有代碼例子都傳<code class="literal">NULL</code>給<code class="literal">attr</code>參數，表示綫程屬性取預設值，感興趣的讀者可以參考<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>。首先看一個簡單的例子：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;unistd.h&gt;
+
+pthread_t ntid;
+
+void printids(const char *s)
+{
+	pid_t      pid;
+	pthread_t  tid;
+
+	pid = getpid();
+	tid = pthread_self();
+	printf("%s pid %u tid %u (0x%x)\n", s, (unsigned int)pid,
+	       (unsigned int)tid, (unsigned int)tid);
+}
+
+void *thr_fn(void *arg)
+{
+	printids(arg);
+	return NULL;
+}
+
+int main(void)
+{
+	int err;
+
+	err = pthread_create(&amp;ntid, NULL, thr_fn, "new thread: ");
+	if (err != 0) {
+		fprintf(stderr, "can't create thread: %s\n", strerror(err));
+		exit(1);
+	}
+	printids("main thread:");
+	sleep(1);
+
+	return 0;
+}</pre><p>編譯運行結果如下：</p><pre class="screen">$ gcc main.c -lpthread
+$ ./a.out
+main thread: pid 7398 tid 3084450496 (0xb7d8fac0)
+new thread:  pid 7398 tid 3084446608 (0xb7d8eb90)</pre><p>可知在Linux上，<code class="literal">thread_t</code>類型是一個地址值，屬於同一進程的多個綫程調用<code class="literal">getpid(2)</code>可以得到相同的進程號，而調用<code class="literal">pthread_self(3)</code>得到的綫程號各不相同。</p><p>由於<code class="literal">pthread_create</code>的錯誤碼不保存在<code class="literal">errno</code>中，因此不能直接用<code class="literal">perror(3)</code>打印錯誤信息，可以先用<code class="literal">strerror(3)</code>把錯誤碼轉換成錯誤信息再打印。</p><p>如果任意一個綫程調用了<code class="literal">exit</code>或<code class="literal">_exit</code>，則整個進程的所有線程都終止，由於從<code class="literal">main</code>函數<code class="literal">return</code>也相當於調用<code class="literal">exit</code>，為了防止新創建的綫程還沒有得到執行就終止，我們在<code class="literal">main</code>函數<code class="literal">return</code>之前延時1秒，這只是一種權宜之計，即使主綫程等待1秒，內核也不一定會調度新創建的綫程執行，下一節我們會看到更好的辦法。</p><p>思考題：主綫程在一個全局變數<code class="literal">ntid</code>中保存了新創建的綫程的id，如果新創建的綫程不調用<code class="literal">pthread_self</code>而是直接打印這個<code class="literal">ntid</code>，能不能達到同樣的效果？</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2896029"></a>2.2. 終止綫程</h3></div></div></div><p>如果需要只終止某個綫程而不終止整個進程，可以有三種方法：</p><div class="itemizedlist"><ul type="disc"><li><p>從綫程函數<code class="literal">return</code>。這種方法對主綫程不適用，從<code class="literal">main</code>函數<code class="literal">return</code>相當於調用<code class="literal">exit</code>。</p></li><li><p>一個綫程可以調用<code class="literal">pthread_cancel</code>終止同一進程中的另一個綫程。</p></li><li><p>綫程可以調用<code class="literal">pthread_exit</code>終止自己。</p></li></ul></div><p>用<code class="literal">pthread_cancel</code>終止一個綫程分同步和非同步兩種情況，比較複雜，本章不打算詳細介紹，讀者可以參考<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>。下面介紹<code class="literal">pthread_exit</code>的和<code class="literal">pthread_join</code>的用法。</p><pre class="programlisting">#include &lt;pthread.h&gt;
+
+void pthread_exit(void *value_ptr);</pre><p><code class="literal">value_ptr</code>是<code class="literal">void *</code>類型，和綫程函數返回值的用法一樣，其它綫程可以調用<code class="literal">pthread_join</code>獲得這個指針。</p><p>需要注意，<code class="literal">pthread_exit</code>或者<code class="literal">return</code>返回的指針所指向的內存單元必須是全局的或者是用<code class="literal">malloc</code>分配的，不能在綫程函數的棧上分配，因為當其它綫程得到這個返回指針時綫程函數已經退出了。</p><pre class="programlisting">#include &lt;pthread.h&gt;
+
+int pthread_join(pthread_t thread, void **value_ptr);</pre><p>返回值：成功返回0，失敗返回錯誤號</p><p>調用該函數的綫程將掛起等待，直到id為<code class="literal">thread</code>的綫程終止。<code class="literal">thread</code>綫程以不同的方法終止，通過<code class="literal">pthread_join</code>得到的終止狀態是不同的，總結如下：</p><div class="itemizedlist"><ul type="disc"><li><p>如果<code class="literal">thread</code>綫程通過<code class="literal">return</code>返回，<code class="literal">value_ptr</code>所指向的單元裡存放的是<code class="literal">thread</code>綫程函數的返回值。</p></li><li><p>如果<code class="literal">thread</code>綫程被別的綫程調用<code class="literal">pthread_cancel</code>異常終止掉，<code class="literal">value_ptr</code>所指向的單元裡存放的是常數<code class="literal">PTHREAD_CANCELED</code>。</p></li><li><p>如果<code class="literal">thread</code>綫程是自己調用<code class="literal">pthread_exit</code>終止的，<code class="literal">value_ptr</code>所指向的單元存放的是傳給<code class="literal">pthread_exit</code>的參數。</p></li></ul></div><p>如果對<code class="literal">thread</code>綫程的終止狀態不感興趣，可以傳<code class="literal">NULL</code>給<code class="literal">value_ptr</code>參數。</p><p>看下面的例子（省略了出錯處理）：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;unistd.h&gt;
+
+void *thr_fn1(void *arg)
+{
+	printf("thread 1 returning\n");
+	return (void *)1;
+}
+
+void *thr_fn2(void *arg)
+{
+	printf("thread 2 exiting\n");
+	pthread_exit((void *)2);
+}
+
+void *thr_fn3(void *arg)
+{
+	while(1) {
+		printf("thread 3 writing\n");
+		sleep(1);
+	}
+}
+
+int main(void)
+{
+	pthread_t   tid;
+	void        *tret;
+
+	pthread_create(&amp;tid, NULL, thr_fn1, NULL);
+	pthread_join(tid, &amp;tret);
+	printf("thread 1 exit code %d\n", (int)tret);
+
+	pthread_create(&amp;tid, NULL, thr_fn2, NULL);
+	pthread_join(tid, &amp;tret);
+	printf("thread 2 exit code %d\n", (int)tret);
+
+	pthread_create(&amp;tid, NULL, thr_fn3, NULL);
+	sleep(3);
+	pthread_cancel(tid);
+	pthread_join(tid, &amp;tret);
+	printf("thread 3 exit code %d\n", (int)tret);
+
+	return 0;
+}</pre><p>運行結果是：</p><pre class="screen">$ ./a.out 
+thread 1 returning
+thread 1 exit code 1
+thread 2 exiting
+thread 2 exit code 2
+thread 3 writing
+thread 3 writing
+thread 3 writing
+thread 3 exit code -1</pre><p>可見在Linux的pthread庫中常數<code class="literal">PTHREAD_CANCELED</code>的值是-1。可以在標頭檔<code class="literal">pthread.h</code>中找到它的定義：</p><pre class="programlisting">#define PTHREAD_CANCELED ((void *) -1)</pre><p>一般情況下，綫程終止後，其終止狀態一直保留到其它綫程調用<code class="literal">pthread_join</code>獲取它的狀態為止。但是綫程也可以被置為detach狀態，這樣的綫程一旦終止就立刻回收它占用的所有資源，而不保留終止狀態。不能對一個已經處于detach狀態的綫程調用<code class="literal">pthread_join</code>，這樣的調用將返回<code class="literal">EINVAL</code>。對一個尚未detach的綫程調用<code class="literal">pthread_join</code>或<code class="literal">pthread_detach</code>都可以把該綫程置為detach狀態，也就是說，不能對同一綫程調用兩次<code class="literal">pthread_join</code>，或者如果已經對一個綫程調用了<code class="literal">pthread_detach</code>就不能再調用<code class="literal">pthread_join</code>了。</p><pre class="programlisting">#include &lt;pthread.h&gt;
+
+int pthread_detach(pthread_t tid);</pre><p>返回值：成功返回0，失敗返回錯誤號。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch35s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch35.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch35s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 綫程的概念 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 綫程間同步</td></tr></table></div></body></html>

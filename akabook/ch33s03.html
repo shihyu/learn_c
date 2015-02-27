@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3. 阻塞信號</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch33.html" title="第 33 章 信號" /><link rel="prev" href="ch33s02.html" title="2. 產生信號" /><link rel="next" href="ch33s04.html" title="4. 捕捉信號" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3. 阻塞信號</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch33s02.html">上一頁</a> </td><th width="60%" align="center">第 33 章 信號</th><td width="20%" align="right"> <a accesskey="n" href="ch33s04.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2884689"></a>3. 阻塞信號</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2884694"></a>3.1. 信號在內核中的表示</h3></div></div></div><p>以上我們討論了信號<span class="emphasis"><em>產生</em></span>（Generation）的各種原因，而實際執行信號的處理動作稱為信號<span class="emphasis"><em>遞達</em></span>（Delivery），信號從產生到遞達之間的狀態，稱為信號<span class="emphasis"><em>未決</em></span>（Pending）。進程可以選擇阻塞（Block）某個信號。被阻塞的信號產生時將保持在未決狀態，直到進程解除對此信號的阻塞，才執行遞達的動作。注意，阻塞和忽略是不同的，只要信號被阻塞就不會遞達，而忽略是在遞達之後可選的一種處理動作。信號在內核中的表示可以看作是這樣的：</p><div class="figure"><a id="id2884728"></a><p class="title"><b>圖 33.1. 信號在內核中的表示示意圖</b></p><div class="figure-contents"><div><img src="images/signal.internal.png" alt="信號在內核中的表示示意圖" /></div></div></div><br class="figure-break" /><p>每個信號都有兩個標誌位分別表示阻塞和未決，還有一個函數指針表示處理動作。信號產生時，內核在進程控制塊中設置該信號的未決標誌，直到信號遞達才清除該標誌。在上圖的例子中，</p><div class="orderedlist"><ol type="1"><li><p><code class="literal">SIGHUP</code>信號未阻塞也未產生過，當它遞達時執行預設處理動作。</p></li><li><p><code class="literal">SIGINT</code>信號產生過，但正在被阻塞，所以暫時不能遞達。雖然它的處理動作是忽略，但在沒有解除阻塞之前不能忽略這個信號，因為進程仍有機會改變處理動作之後再解除阻塞。</p></li><li><p><code class="literal">SIGQUIT</code>信號未產生過，一旦產生<code class="literal">SIGQUIT</code>信號將被阻塞，它的處理動作是用戶自定義函數<code class="literal">sighandler</code>。</p></li></ol></div><p>如果在進程解除對某信號的阻塞之前這種信號產生過多次，將如何處理？POSIX.1允許系統遞送該信號一次或多次。Linux是這樣實現的：常規信號在遞達之前產生多次只計一次，而實時信號在遞達之前產生多次可以依次放在一個隊列裡。本章不討論實時信號。從上圖來看，每個信號只有一個bit的未決標誌，非0即1，不記錄該信號產生了多少次，阻塞標誌也是這樣表示的。因此，未決和阻塞標誌可以用相同的數據類型<code class="literal">sigset_t</code>來存儲，<code class="literal">sigset_t</code>稱為信號集，這個類型可以表示每個信號的“<span class="quote">有效</span>”或“<span class="quote">無效</span>”狀態，在阻塞信號集中“<span class="quote">有效</span>”和“<span class="quote">無效</span>”的含義是該信號是否被阻塞，而在未決信號集中“<span class="quote">有效</span>”和“<span class="quote">無效</span>”的含義是該信號是否處于未決狀態。下一節將詳細介紹信號集的各種操作。阻塞信號集也叫做當前進程的信號屏蔽字（Signal Mask）<a id="id2884862" class="indexterm"></a>，這裡的“<span class="quote">屏蔽</span>”應該理解為阻塞而不是忽略。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2884876"></a>3.2. 信號集操作函數</h3></div></div></div><p><code class="literal">sigset_t</code>類型對於每種信號用一個bit表示“<span class="quote">有效</span>”或“<span class="quote">無效</span>”狀態，至于這個類型內部如何存儲這些bit則依賴于系統實現，從使用者的角度是不必關心的，使用者只能調用以下函數來操作<code class="literal">sigset_t</code>變數，而不應該對它的內部數據做任何解釋，比如用<code class="literal">printf</code>直接打印<code class="literal">sigset_t</code>變數是沒有意義的。</p><pre class="programlisting">#include &lt;signal.h&gt;
+
+int sigemptyset(sigset_t *set);
+int sigfillset(sigset_t *set);
+int sigaddset(sigset_t *set, int signo);
+int sigdelset(sigset_t *set, int signo);
+int sigismember(const sigset_t *set, int signo);</pre><p>函數<code class="literal">sigemptyset</code>初始化<code class="literal">set</code>所指向的信號集，使其中所有信號的對應bit清零，表示該信號集不包含任何有效信號。函數<code class="literal">sigfillset</code>初始化<code class="literal">set</code>所指向的信號集，使其中所有信號的對應bit置位，表示該信號集的有效信號包括系統支持的所有信號。注意，在使用<code class="literal">sigset_t</code>類型的變數之前，一定要調用<code class="literal">sigemptyset</code>或<code class="literal">sigfillset</code>做初始化，使信號集處于確定的狀態。初始化<code class="literal">sigset_t</code>變數之後就可以在調用<code class="literal">sigaddset</code>和<code class="literal">sigdelset</code>在該信號集中添加或刪除某種有效信號。這四個函數都是成功返回0，出錯返回-1。<code class="literal">sigismember</code>是一個布爾函數，用於判斷一個信號集的有效信號中是否包含某種信號，若包含則返回1，不包含則返回0，出錯返回-1。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2885022"></a>3.3. sigprocmask</h3></div></div></div><p>調用函數<code class="literal">sigprocmask</code>可以讀取或更改進程的信號屏蔽字。</p><pre class="programlisting">#include &lt;signal.h&gt;
+
+int sigprocmask(int how, const sigset_t *set, sigset_t *oset);</pre><p>返回值：若成功則為0，若出錯則為-1</p><p>如果<code class="literal">oset</code>是非空指針，則讀取進程的當前信號屏蔽字通過<code class="literal">oset</code>參數傳出。如果<code class="literal">set</code>是非空指針，則更改進程的信號屏蔽字，參數<code class="literal">how</code>指示如何更改。如果<code class="literal">oset</code>和<code class="literal">set</code>都是非空指針，則先將原來的信號屏蔽字備份到<code class="literal">oset</code>裡，然後根據<code class="literal">set</code>和<code class="literal">how</code>參數更改信號屏蔽字。假設當前的信號屏蔽字為<code class="literal">mask</code>，下表說明了<code class="literal">how</code>參數的可選值。</p><div class="table"><a id="id2885118"></a><p class="title"><b>表 33.1. how參數的含義</b></p><div class="table-contents"><table summary="how參數的含義" border="1"><colgroup><col /><col /></colgroup><tbody><tr><td><code class="literal">SIG_BLOCK</code></td><td><code class="literal">set</code>包含了我們希望添加到當前信號屏蔽字的信號，相當於mask=mask|set</td></tr><tr><td><code class="literal">SIG_UNBLOCK</code></td><td><code class="literal">set</code>包含了我們希望從當前信號屏蔽字中解除阻塞的信號，相當於mask=mask&amp;~set</td></tr><tr><td><code class="literal">SIG_SETMASK</code></td><td>設置當前信號屏蔽字為<code class="literal">set</code>所指向的值，相當於mask=set</td></tr></tbody></table></div></div><br class="table-break" /><p>如果調用<code class="literal">sigprocmask</code>解除了對當前若干個未決信號的阻塞，則在<code class="literal">sigprocmask</code>返回前，至少將其中一個信號遞達。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2885205"></a>3.4. sigpending</h3></div></div></div><pre class="programlisting">#include &lt;signal.h&gt;
+
+int sigpending(sigset_t *set);</pre><p><code class="literal">sigpending</code>讀取當前進程的未決信號集，通過<code class="literal">set</code>參數傳出。調用成功則返回0，出錯則返回-1。</p><p>下面用剛學的幾個函數做個實驗。程序如下：</p><pre class="programlisting">#include &lt;signal.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+void printsigset(const sigset_t *set)
+{
+	int i;
+	for (i = 1; i &lt; 32; i++)
+		if (sigismember(set, i) == 1)
+			putchar('1');
+		else
+			putchar('0');
+	puts("");
+}
+
+int main(void)
+{
+	sigset_t s, p;
+	sigemptyset(&amp;s);
+	sigaddset(&amp;s, SIGINT);
+	sigprocmask(SIG_BLOCK, &amp;s, NULL);
+	while (1) {
+		sigpending(&amp;p);
+		printsigset(&amp;p);
+		sleep(1);
+	}
+	return 0;
+}</pre><p>程序運行時，每秒鐘把各信號的未決狀態打印一遍，由於我們阻塞了<code class="literal">SIGINT</code>信號，按Ctrl-C將會使<code class="literal">SIGINT</code>信號處于未決狀態，按Ctrl-\仍然可以終止程序，因為<code class="literal">SIGQUIT</code>信號沒有阻塞。</p><pre class="screen">$ ./a.out 
+0000000000000000000000000000000
+0000000000000000000000000000000（這時按Ctrl-C）
+0100000000000000000000000000000
+0100000000000000000000000000000（這時按Ctrl-\）
+Quit (core dumped)</pre></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch33s02.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch33.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch33s04.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">2. 產生信號 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 4. 捕捉信號</td></tr></table></div></body></html>

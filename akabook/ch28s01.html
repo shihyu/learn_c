@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1. 彙編程序的Hello world</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch28.html" title="第 28 章 檔案與I/O" /><link rel="prev" href="ch28.html" title="第 28 章 檔案與I/O" /><link rel="next" href="ch28s02.html" title="2. C標準I/O庫函數與Unbuffered I/O函數" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1. 彙編程序的Hello world</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch28.html">上一頁</a> </td><th width="60%" align="center">第 28 章 檔案與I/O</th><td width="20%" align="right"> <a accesskey="n" href="ch28s02.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2850246"></a>1. 彙編程序的Hello world</h2></div></div></div><p>之前我們學習了如何用C標準I/O庫讀寫檔案，本章詳細講解這些I/O操作是怎麼實現的。所有I/O操作最終都是在內核中做的，以前我們用的C標準I/O庫函數最終也是通過系統調用把I/O操作從用戶空間傳給內核，然後讓內核去做I/O操作，本章和下一章會介紹內核中I/O子系統的工作原理。首先看一個打印Hello world的彙編程序，瞭解I/O操作是怎樣通過系統調用傳給內核的。</p><div class="example"><a id="id2850272"></a><p class="title"><b>例 28.1. 彙編程序的Hello world</b></p><div class="example-contents"><pre class="programlisting">.data					# section declaration
+
+msg:
+	.ascii	"Hello, world!\n"	# our dear string
+	len = . - msg			# length of our dear string
+
+.text					# section declaration
+
+			# we must export the entry point to the ELF linker or
+    .global _start	# loader. They conventionally recognize _start as their
+			# entry point. Use ld -e foo to override the default.
+
+_start:
+
+# write our string to stdout
+
+	movl	$len,%edx	# third argument: message length
+	movl	$msg,%ecx	# second argument: pointer to message to write
+	movl	$1,%ebx		# first argument: file handle (stdout)
+	movl	$4,%eax		# system call number (sys_write)
+	int	$0x80		# call kernel
+
+# and exit
+
+	movl	$0,%ebx		# first argument: exit code
+	movl	$1,%eax		# system call number (sys_exit)
+	int	$0x80		# call kernel</pre></div></div><br class="example-break" /><p>像以前一樣，彙編、連結、運行：</p><pre class="screen">$ as -o hello.o hello.s
+$ ld -o hello hello.o
+$ ./hello
+Hello, world!</pre><p>這段彙編相當於以下C代碼：</p><pre class="programlisting">#include &lt;unistd.h&gt;
+
+char msg[14] = "Hello, world!\n";
+#define len 14
+
+int main(void)
+{
+	write(1, msg, len);
+	_exit(0);
+}</pre><p><code class="literal">.data</code>段有一個標號<code class="literal">msg</code>，代表字元串<code class="literal">"Hello, world!\n"</code>的首地址，相當於C程序的一個全局變數。注意在C語言中字元串的末尾隱含有一個<code class="literal">'\0'</code>，而彙編指示<code class="literal">.ascii</code>定義的字元串末尾沒有隱含的<code class="literal">'\0'</code>。彙編程序中的<code class="literal">len</code>代表一個常量，它的值由當前地址減去符號<code class="literal">msg</code>所代表的地址得到，換句話說就是字元串<code class="literal">"Hello, world!\n"</code>的長度。現在解釋一下這行代碼中的“<span class="quote">.</span>”，彙編器總是從前到後把彙編代碼轉換成目標檔案，在這個過程中維護一個地址計數器，當處理到每個段的開頭時把地址計數器置成0，然後每處理一條彙編指示或指令就把地址計數器增加相應的位元組數，在彙編程序中用“<span class="quote">.</span>”可以取出當前地址計數器的值，該值是一個常量。</p><p>在<code class="literal">_start</code>中調了兩個系統調用，第一個是<code class="literal">write</code>系統調用，第二個是以前講過的<code class="literal">_exit</code>系統調用。在調<code class="literal">write</code>系統調用時，<code class="literal">eax</code>寄存器保存着<code class="literal">write</code>的系統調用號4，<code class="literal">ebx</code>、<code class="literal">ecx</code>、<code class="literal">edx</code>寄存器分別保存着<code class="literal">write</code>系統調用需要的三個參數。<code class="literal">ebx</code>保存着檔案描述符，進程中每個打開的檔案都用一個編號來標識，稱為檔案描述符，檔案描述符1表示標準輸出，對應于C標準I/O庫的<code class="literal">stdout</code>。<code class="literal">ecx</code>保存着輸出緩衝區的首地址。<code class="literal">edx</code>保存着輸出的位元組數。<code class="literal">write</code>系統調用把從<code class="literal">msg</code>開始的<code class="literal">len</code>個位元組寫到標準輸出。</p><p>C代碼中的<code class="literal">write</code>函數是系統調用的包裝函數，其內部實現就是把傳進來的三個參數分別賦給<code class="literal">ebx</code>、<code class="literal">ecx</code>、<code class="literal">edx</code>寄存器，然後執行<code class="literal">movl $4,%eax</code>和<code class="literal">int $0x80</code>兩條指令。這個函數不可能完全用C代碼來寫，因為任何C代碼都不會編譯生成<code class="literal">int</code>指令，所以這個函數有可能是完全用彙編寫的，也可能是用C內聯彙編寫的，甚至可能是一個宏定義（省了參數入棧出棧的步驟）。<code class="literal">_exit</code>函數也是如此，我們講過這些系統調用的包裝函數位于Man Page的第2個Section。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch28.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch28s02.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">第 28 章 檔案與I/O </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 2. C標準I/O庫函數與Unbuffered I/O函數</td></tr></table></div></body></html>

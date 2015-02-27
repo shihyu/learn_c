@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3. 在Linux C編程中使用Unicode和UTF-8</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="apa.html" title="附錄 A. 字元編碼" /><link rel="prev" href="apas02.html" title="2. Unicode和UTF-8" /><link rel="next" href="apb.html" title="附錄 B. GNU Free Documentation License Version 1.3, 3 November 2008" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3. 在Linux C編程中使用Unicode和UTF-8</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="apas02.html">上一頁</a> </td><th width="60%" align="center">附錄 A. 字元編碼</th><td width="20%" align="right"> <a accesskey="n" href="apb.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2906750"></a>3. 在Linux C編程中使用Unicode和UTF-8</h2></div></div></div><p>目前各種Linux發行版都支持UTF-8編碼，當前系統的語言和字元編碼設置保存在一些環境變數中，可以通過<code class="literal">locale</code>命令查看：</p><pre class="screen">$ locale
+LANG=en_US.UTF-8
+LC_CTYPE="en_US.UTF-8"
+LC_NUMERIC="en_US.UTF-8"
+LC_TIME="en_US.UTF-8"
+LC_COLLATE="en_US.UTF-8"
+LC_MONETARY="en_US.UTF-8"
+LC_MESSAGES="en_US.UTF-8"
+LC_PAPER="en_US.UTF-8"
+LC_NAME="en_US.UTF-8"
+LC_ADDRESS="en_US.UTF-8"
+LC_TELEPHONE="en_US.UTF-8"
+LC_MEASUREMENT="en_US.UTF-8"
+LC_IDENTIFICATION="en_US.UTF-8"
+LC_ALL=</pre><p>常用漢字也都位於BMP中，所以一個漢字的存儲通常占3個位元組。例如編輯一個C程序：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	printf("你好\n");
+	return 0;
+}</pre><p>源檔案是以UTF-8編碼存儲的：</p><pre class="screen">$ od -tc nihao.c 
+0000000   #   i   n   c   l   u   d   e       &lt;   s   t   d   i   o   .
+0000020   h   &gt;  \n  \n   i   n   t       m   a   i   n   (   v   o   i
+0000040   d   )  \n   {  \n  \t   p   r   i   n   t   f   (   " 344 275
+0000060 240 345 245 275   \   n   "   )   ;  \n  \t   r   e   t   u   r
+0000100   n       0   ;  \n   }  \n
+0000107</pre><p>其中八進制的<code class="literal">344 375 240</code>（十六進制<code class="literal">e4 bd a0</code>）就是“<span class="quote">你</span>”的UTF-8編碼，八進制的<code class="literal">345 245 275</code>（十六進制<code class="literal">e5 a5 bd</code>）就是“<span class="quote">好</span>”。把它編譯成目標檔案，<code class="literal">"你好\n"</code>這個字元串就成了這樣一串位元組：<code class="literal">e4 bd a0 e5 a5 bd 0a 00</code>，漢字在其中仍然是UTF-8編碼的，一個漢字占3個位元組，這種字元在C語言中稱為多位元組字元（Multibyte Character）<a id="id2906864" class="indexterm"></a>。運行這個程序相當於把這一串位元組<code class="literal">write</code>到當前終端的設備檔案。如果當前終端的驅動程式能夠識別UTF-8編碼就能打印出漢字，如果當前終端的驅動程式不能識別UTF-8編碼（比如一般的字元終端）就打印不出漢字。也就是說，像這種程序，識別漢字的工作既不是由C編譯器做的也不是由<code class="literal">libc</code>做的，C編譯器原封不動地把源檔案中的UTF-8編碼複製到目標檔案中，<code class="literal">libc</code>只是當作以0結尾的字元串原封不動地<code class="literal">write</code>給內核，識別漢字的工作是由終端的驅動程式做的。</p><p>但是僅有這種程度的漢字支持是不夠的，有時候我們需要在C程序中操作字元串裡的字元，比如求字元串<code class="literal">"你好\n"</code>中有幾個漢字或字元，用<code class="literal">strlen</code>就不靈了，因為<code class="literal">strlen</code>只看結尾的0位元組而不管字元串裡存的是什麼，求出來的是位元組數7。為了在程序中操作Unicode字元，C語言定義了寬字元（Wide Character）<a id="id2906938" class="indexterm"></a>類型<code class="literal">wchar_t</code>和一些庫函數。在字元常量或字元串字面值前面加一個L就表示寬字元常量或寬字元串，例如定義<code class="literal">wchar_t c = L'你';</code>，變數<code class="literal">c</code>的值就是漢字“<span class="quote">你</span>”的31位UCS編碼，而<code class="literal">L"你好\n"</code>就相當於<code class="literal">{L'你', L'好', L'\n', 0}</code>，<code class="literal">wcslen</code>函數就可以取寬字元串中的字元個數。看下面的程序：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;locale.h&gt;
+
+int main(void)
+{
+	if (!setlocale(LC_CTYPE, "")) {
+		fprintf(stderr, "Can't set the specified locale! "
+			"Check LANG, LC_CTYPE, LC_ALL.\n");
+		return 1;
+	}
+	printf("%ls", L"你好\n");
+	return 0;
+}</pre><p>寬字元串<code class="literal">L"你好\n"</code>在原始碼中當然還是存成UTF-8編碼的，但編譯器會把它變成4個UCS編碼<code class="literal">0x00004f60 0x0000597d 0x0000000a 0x00000000</code>保存在目標檔案中，按小端存儲就是<code class="literal">60 4f 00 00 7d 59 00 00 0a 00 00 00 00 00 00 00</code>，用<code class="literal">od</code>命令查看目標檔案應該能找到這些位元組。</p><pre class="screen">$ gcc hihao.c
+$ od -tx1 a.out</pre><p><code class="literal">printf</code>的<code class="literal">%ls</code>轉換說明表示把後面的參數按寬字元串解釋，不是見到0位元組就結束，而是見到UCS編碼為0的字元才結束，但是要<code class="literal">write</code>到終端仍然需要以多位元組編碼輸出，這樣終端驅動程式才能識別，所以<code class="literal">printf</code>在內部把寬字元串轉換成多位元組字元串再<code class="literal">write</code>出去。事實上，C標準並沒有規定多位元組字元必須以UTF-8編碼，也可以使用其它的多位元組編碼，在運行時根據環境變數確定當前系統的編碼，所以在程序開頭需要調用<code class="literal">setlocale</code>獲取當前系統的編碼設置，如果當前系統是UTF-8的，<code class="literal">printf</code>就把UCS編碼轉換成UTF-8編碼的多位元組字元串再<code class="literal">write</code>出去。一般來說，程序在做內部計算時通常以寬字元編碼，如果要存檔或者輸出給別的程序，或者通過網絡發給別的程序，則採用多位元組編碼。</p><p>關於Unicode和UTF-8本節只介紹了最基本的概念，部分內容出自<a class="xref" href="bi01.html#bibli.unicodefaq" title="UTF-8 and Unicode FAQ, http://www.cl.cam.ac.uk/~mgk25/unicode.html">[<abbr class="abbrev">Unicode FAQ</abbr>]</a>，讀者可進一步參考這篇文章。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="apas02.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="apa.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="apb.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">2. Unicode和UTF-8 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 附錄 B. GNU Free Documentation License Version 1.3, 3 November 2008</td></tr></table></div></body></html>

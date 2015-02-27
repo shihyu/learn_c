@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1. return語句</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch05.html" title="第 5 章 深入理解函數" /><link rel="prev" href="ch05.html" title="第 5 章 深入理解函數" /><link rel="next" href="ch05s02.html" title="2. 增量式開發" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1. return語句</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch05.html">上一頁</a> </td><th width="60%" align="center">第 5 章 深入理解函數</th><td width="20%" align="right"> <a accesskey="n" href="ch05s02.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2721598"></a>1. return語句</h2></div></div></div><p>之前我們一直在<code class="literal">main</code>函數中使用<code class="literal">return</code>語句，現在是時候全面深入地學習一下了。在有返回值的函數中，<code class="literal">return</code>語句的作用是提供整個函數的返回值，並結束當前函數返回到調用它的地方。在沒有返回值的函數中也可以使用<code class="literal">return</code>語句，例如當檢查到一個錯誤時提前結束當前函數的執行並返回：</p><pre class="programlisting">#include &lt;math.h&gt;
+
+void print_logarithm(double x)
+{
+	if (x &lt;= 0.0) {
+		printf("Positive numbers only, please.\n");
+		return;
+	}
+	printf("The log of x is %f", log(x));
+}</pre><p>這個函數首先檢查參數<code class="literal">x</code>是否大於0，如果<code class="literal">x</code>不大於0就打印錯誤提示，然後提前結束函數的執行返回到調用者，只有當<code class="literal">x</code>大於0時才能求對數，在打印了對數結果之後到達函數體的末尾，自然地結束執行並返回。注意，使用數學函數<code class="literal">log</code>需要包含標頭檔<code class="literal">math.h</code>，由於<code class="literal">x</code>是浮點數，應該與同類型的數做比較，所以寫成0.0。</p><p>在<a class="xref" href="ch04s02.html#cond.ifelse">第 2 節 “if/else語句”</a>中我們定義了一個檢查奇偶性的函數，如果是奇數就打印<code class="literal">x is odd.</code>，如果是偶數就打印<code class="literal">x is even.</code>。事實上這個函數並不十分好用，我們定義一個檢查奇偶性的函數往往不是為了打印兩個字元串就完了，而是為了根據奇偶性的不同分別執行不同的後續動作。我們可以把它改成一個返回布爾值的函數：</p><pre class="programlisting">int is_even(int x)
+{
+	if (x % 2 == 0)
+		return 1;
+	else
+		return 0;
+}</pre><p>有些人喜歡寫成<code class="literal">return(1);</code>這種形式也可以，表達式外面套括號表示改變運算符優先順序，在這裡不起任何作用。我們可以這樣調用這個函數：</p><pre class="programlisting">int i = 19;
+if (is_even(i)) {
+	/* do something */
+} else {
+	/* do some other thing */
+}</pre><p>返回布爾值的函數是一類非常有用的函數，在程序中通常充當控製表達式，函數名通常帶有<code class="literal">is</code>或<code class="literal">if</code>等表示判斷的詞，這類函數也叫做謂詞（Predicate）<a id="id2721727" class="indexterm"></a>。<code class="literal">is_even</code>這個函數寫得有點囉嗦，<code class="literal">x % 2</code>這個表達式本來就有0值或非0值，直接把這個值當作布爾值返回就可以了：</p><pre class="programlisting">int is_even(int x)
+{
+	return !(x % 2);
+}</pre><p>函數的返回值應該這樣理解：<span class="emphasis"><em>函數返回一個值相當於定義一個和返回值類型相同的臨時變數並用<code class="literal">return</code>後面的表達式來初始化</em></span>。例如上面的函數調用相當於這樣的過程：</p><pre class="programlisting">int 臨時變數 = !(x % 2);
+函數退出，局部變數x的存儲空間釋放;
+if (臨時變數) { /* 臨時變數用完就釋放 */
+	/* do something */
+} else {
+	/* do some other thing */
+}</pre><p>當<code class="literal">if</code>語句對函數的返回值做判斷時，函數已經退出，局部變數<code class="literal">x</code>已經釋放，所以不可能在這時候才計算表達式<code class="literal">!(x % 2)</code>的值，表達式的值必然是事先計算好了存在一個臨時變數裡的，然後函數退出，局部變數釋放，<code class="literal">if</code>語句對這個臨時變數的值做判斷。注意，雖然函數的返回值可以看作是一個臨時變數，但我們只是讀一下它的值，讀完值就釋放它，而不能往它裡面存新的值，換句話說，<span class="emphasis"><em>函數的返回值不是左值，或者說函數調用表達式不能做左值</em></span>，因此下面的賦值語句是非法的：</p><pre class="programlisting">is_even(20) = 1;</pre><p>在<a class="xref" href="ch03s03.html#func.paraarg">第 3 節 “形參和實參”</a>中講過，C語言的傳參規則是Call by Value，按值傳遞，現在我們知道返回值也是按值傳遞的，即便返回語句寫成<code class="literal">return x;</code>，返回的也是變數<code class="literal">x</code>的值，而非變數<code class="literal">x</code>本身，因為變數<code class="literal">x</code>馬上就要被釋放了。</p><p>在寫帶有<code class="literal">return</code>語句的函數時要小心檢查所有的代碼路徑（Code Path）<a id="id2721866" class="indexterm"></a>。有些代碼路徑在任何條件下都執行不到，這稱為Dead Code<a id="id2721874" class="indexterm"></a>，例如把&amp;&amp;和||運算符記混了（據我瞭解初學者犯這個低級錯誤的不在少數），寫出如下代碼：</p><pre class="programlisting">void foo(int x, int y)
+{
+	if (x &gt;= 0 || y &gt;= 0) {
+		printf("both x and y are positive.\n");
+		return;
+	} else if (x &lt; 0 || y &lt; 0) {
+		printf("both x and y are negetive.\n");
+		return;
+	}
+	printf("x has a different sign from y.\n");
+}</pre><p>最後一行<code class="literal">printf</code>永遠都沒機會被執行到，是一行Dead Code。有Dead Code就一定有Bug，你寫的每一行代碼都是想讓程序在某種情況下去執行的，你不可能故意寫出一行永遠不會被執行的代碼，如果程序在任何情況下都不會去執行它，說明跟你預想的不一樣，要麼是你對所有可能的情況分析得不正確，也就是邏輯錯誤，要麼就是像上例這樣的筆誤，語義錯誤。還有一些時候，對程序中所有可能的情況分析得不夠全面將導致漏掉一些代碼路徑，例如：</p><pre class="programlisting">int absolute_value(int x)
+{
+	if (x &lt; 0) {
+		return -x;
+	} else if (x &gt; 0) {
+		return x;
+	}
+}</pre><p>這個函數被定義為返回<code class="literal">int</code>，就應該在任何情況下都返回<code class="literal">int</code>，但是上面這個程序在<code class="literal">x==0</code>時安靜地退出函數，什麼也不返回，C語言對於這種情況會返回什麼結果是未定義的，通常返回不確定的值，等學到<a class="xref" href="ch19s01.html#asmc.funccall">第 1 節 “函數調用”</a>你就知道為什麼了。另外注意這個例子中把-號當負號用而不是當減號用，事實上+號也可以這麼用。正負號是單目運算符，而加減號是雙目運算符，正負號的優先順序和邏輯非運算符相同，比加減的優先順序要高。</p><p>以上兩段代碼都不會產生編譯錯誤，編譯器只做語法檢查和最簡單的語義檢查，而不檢查程序的邏輯<sup>[<a id="id2721968" href="#ftn.id2721968" class="footnote">7</a>]</sup>。雖然到現在為止你見到了各種各樣的編譯器錯誤提示，也許你已經十分討厭編譯器報錯了，但很快你就會認識到，如果程序中有錯誤編譯器還不報錯，那一定比報錯更糟糕。比如上面的絶對值函數，在你測試的時候運行得很好，也許是你沒有測到<code class="literal">x==0</code>的情況，也許剛好在你的環境中<code class="literal">x==0</code>時返回的不確定值就是0，然後你放心地把它整合到一個數萬行的程序之中。然後你把這個程序交給用戶，起初的幾天裡相安無事，之後每過幾個星期就有用戶報告說程序出錯，但每次出錯的現象都不一樣，而且這個錯誤很難復現，你想讓它出現時它就不出現，在你毫無防備時它又突然冒出來了。然後你花了大量的時間在數萬行的程序中排查哪裡錯了，幾天之後終於幸運地找到了這個函數的Bug，這時候你就會想，如果當初編譯器能報個錯多好啊！所以，如果編譯器報錯了，不要責怪編譯器太過于挑剔，它幫你節省了大量的調試時間。另外，在<code class="literal">math.h</code>中有一個<code class="literal">fabs</code>函數就是求絶對值的，我們通常不必自己寫絶對值函數。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2721483"></a>習題</h3></div></div></div><p>1、編寫一個布爾函數<code class="literal">int is_leap_year(int year)</code>，判斷參數<code class="literal">year</code>是不是閏年。如果某年份能被4整除，但不能被100整除，那麼這一年就是閏年，此外，能被400整除的年份也是閏年。</p><p>2、編寫一個函數<code class="literal">double myround(double x)</code>，輸入一個小數，將它四捨五入。例如<code class="literal">myround(-3.51)</code>的值是-4.0，<code class="literal">myround(4.49)</code>的值是4.0。可以調用<code class="literal">math.h</code>中的庫函數<code class="literal">ceil</code>和<code class="literal">floor</code>實現這個函數。</p></div><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2721968" href="#id2721968" class="para">7</a>] </sup>有的代碼路徑沒有返回值的問題編譯器是可以檢查出來的，如果編譯時加<code class="literal">-Wall</code>選項會報警告。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch05.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch05.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch05s02.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">第 5 章 深入理解函數 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 2. 增量式開發</td></tr></table></div></body></html>

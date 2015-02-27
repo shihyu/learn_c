@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>6. 可變參數</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch24.html" title="第 24 章 函數介面" /><link rel="prev" href="ch24s05.html" title="5. 回調函數" /><link rel="next" href="ch25.html" title="第 25 章 C標準庫" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6. 可變參數</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch24s05.html">上一頁</a> </td><th width="60%" align="center">第 24 章 函數介面</th><td width="20%" align="right"> <a accesskey="n" href="ch25.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2822466"></a>6. 可變參數</h2></div></div></div><p>到目前為止我們只見過一個帶有可變參數的函數<code class="literal">printf</code>：</p><pre class="programlisting">int printf(const char *format, ...);</pre><p>以後還會見到更多這樣的函數。現在我們實現一個簡單的<code class="literal">myprintf</code>函數：</p><div class="example"><a id="id2822499"></a><p class="title"><b>例 24.9. 用可變參數實現簡單的printf函數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+
+void myprintf(const char *format, ...)
+{
+     va_list ap;
+     char c;
+
+     va_start(ap, format);
+     while (c = *format++) {
+	  switch(c) {
+	  case 'c': {
+	       /* char is promoted to int when passed through '...' */
+	       char ch = va_arg(ap, int);
+	       putchar(ch);
+	       break;
+	  }
+	  case 's': {
+	       char *p = va_arg(ap, char *);
+	       fputs(p, stdout);
+	       break;
+	  }
+	  default:
+	       putchar(c);
+	  }
+     }
+     va_end(ap);
+}
+
+int main(void)
+{
+     myprintf("c\ts\n", '1', "hello");
+     return 0;
+}</pre></div></div><br class="example-break" /><p>要處理可變參數，需要用C到標準庫的<code class="literal">va_list</code>類型和<code class="literal">va_start</code>、<code class="literal">va_arg</code>、<code class="literal">va_end</code>宏，這些定義在<code class="literal">stdarg.h</code>標頭檔中。這些宏是如何取出可變參數的呢？我們首先對照反彙編分析在調用<code class="literal">myprintf</code>函數時這些參數的內存佈局。</p><pre class="screen">     myprintf("c\ts\n", '1', "hello");
+ 80484c5:	c7 44 24 08 b0 85 04 	movl   $0x80485b0,0x8(%esp)
+ 80484cc:	08 
+ 80484cd:	c7 44 24 04 31 00 00 	movl   $0x31,0x4(%esp)
+ 80484d4:	00 
+ 80484d5:	c7 04 24 b6 85 04 08 	movl   $0x80485b6,(%esp)
+ 80484dc:	e8 43 ff ff ff       	call   8048424 &lt;myprintf&gt;</pre><div class="figure"><a id="id2822565"></a><p class="title"><b>圖 24.6. <code class="literal">myprintf</code>函數的參數佈局</b></p><div class="figure-contents"><div><img src="images/interface.vaarg.png" alt="myprintf函數的參數佈局" /></div></div></div><br class="figure-break" /><p>這些參數是從右向左依次壓棧的，所以第一個參數靠近棧頂，第三個參數靠近棧底。這些參數在內存中是連續存放的，每個參數都對齊到4位元組邊界。第一個和第三個參數都是指針類型，各占4個位元組，雖然第二個參數隻占一個位元組，但為了使第三個參數對齊到4位元組邊界，所以第二個參數也占4個位元組。現在給出一個<code class="literal">stdarg.h</code>的簡單實現，這個實現出自<a class="xref" href="bi01.html#bibli.standardclib" title="The Standard C Library">[<abbr class="abbrev">Standard C Library</abbr>]</a>：</p><div class="example"><a id="id2822618"></a><p class="title"><b>例 24.10. stdarg.h的一種實現</b></p><div class="example-contents"><pre class="programlisting">/* stdarg.h standard header */
+#ifndef _STDARG
+#define _STDARG
+
+/* type definitions */
+typedef char *va_list;
+/* macros */
+#define va_arg(ap, T) \
+	(* (T *)(((ap) += _Bnd(T, 3U)) - _Bnd(T, 3U)))
+#define va_end(ap) (void)0
+#define va_start(ap, A) \
+	(void)((ap) = (char *)&amp;(A) + _Bnd(A, 3U))
+#define _Bnd(X, bnd) (sizeof (X) + (bnd) &amp; ~(bnd))
+#endif</pre></div></div><br class="example-break" /><p>這個標頭檔中的內部宏定義<code class="literal">_Bnd(X, bnd)</code>將類型或變數<code class="literal">X</code>的長度對齊到<code class="literal">bnd+1</code>位元組的整數倍，例如<code class="literal">_Bnd(char, 3U)</code>的值是4，<code class="literal">_Bnd(int, 3U)</code>也是4。</p><p>在<code class="literal">myprintf</code>中定義的<code class="literal">va_list ap;</code>其實是一個指針，<code class="literal">va_start(ap, format)</code>使<code class="literal">ap</code>指向<code class="literal">format</code>參數的下一個參數，也就是指向上圖中<code class="literal">esp+4</code>的位置。然後<code class="literal">va_arg(ap, int)</code>把第二個參數的值按<code class="literal">int</code>型取出來，同時使<code class="literal">ap</code>指向第三個參數，也就是指向上圖中<code class="literal">esp+8</code>的位置。然後<code class="literal">va_arg(ap, char *)</code>把第三個參數的值按<code class="literal">char *</code>型取出來，同時使<code class="literal">ap</code>指向更高的地址。<code class="literal">va_end(ap)</code>在我們的簡單實現中不起任何作用，在有些實現中可能會把<code class="literal">ap</code>改寫成無效值，C標準要求在函數返回前調用<code class="literal">va_end</code>。</p><p>如果把<code class="literal">myprintf</code>中的<code class="literal">char ch = va_arg(ap, int);</code>改成<code class="literal">char ch = va_arg(ap, char);</code>，用我們這個<code class="literal">stdarg.h</code>的簡單實現是沒有問題的。但如果改用<code class="literal">libc</code>提供的<code class="literal">stdarg.h</code>，在編譯時會報錯：</p><pre class="screen">$ gcc main.c
+main.c: In function ‘myprintf’:
+main.c:33: warning: ‘char’ is promoted to ‘int’ when passed through ‘...’
+main.c:33: note: (so you should pass ‘int’ not ‘char’ to ‘va_arg’)
+main.c:33: note: if this code is reached, the program will abort
+$ ./a.out
+Illegal instruction</pre><p>因此要求<code class="literal">char</code>型的可變參數必須按<code class="literal">int</code>型來取，這是為了與C標準一致，我們在<a class="xref" href="ch15s03.html#type.intpromo">第 3.1 節 “Integer Promotion”</a>講過Default Argument Promotion規則，傳遞<code class="literal">char</code>型的可變參數時要提升為<code class="literal">int</code>型。</p><p>從<code class="literal">myprintf</code>的例子可以理解<code class="literal">printf</code>的實現原理，<code class="literal">printf</code>函數根據第一個參數（格式化字元串）來確定後面有幾個參數，分別是什麼類型。保證參數的類型、個數與格式化字元串的描述相匹配是調用者的責任，實現者只管按格式化字元串的描述從棧上取數據，如果調用者傳遞的參數類型或個數不正確，實現者是沒有辦法避免錯誤的。</p><p>還有一種方法可以確定可變參數的個數，就是在參數列表的末尾傳一個Sentinel，例如<code class="literal">NULL</code>。<code class="literal">execl(3)</code>就採用這種方法確定參數的個數。下面實現一個<code class="literal">printlist</code>函數，可以打印若干個傳入的字元串。</p><div class="example"><a id="id2818908"></a><p class="title"><b>例 24.11. 根據Sentinel判斷可變參數的個數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+
+void printlist(int begin, ...)
+{
+     va_list ap;
+     char *p;
+
+     va_start(ap, begin);
+     p = va_arg(ap, char *);
+
+     while (p != NULL) {
+	  fputs(p, stdout);
+	  putchar('\n');
+	  p = va_arg(ap, char*);
+     }
+     va_end(ap);
+}
+
+int main(void)
+{
+     printlist(0, "hello", "world", "foo", "bar", NULL);
+     return 0;
+}</pre></div></div><br class="example-break" /><p><code class="literal">printlist</code>的第一個參數<code class="literal">begin</code>的值並沒有用到，但是C語言規定至少要定義一個有名字的參數，因為<code class="literal">va_start</code>宏要用到參數列表中最後一個有名字的參數，從它的地址開始找可變參數的位置。實現者應該在文檔中說明參數列表必須以<code class="literal">NULL</code>結尾，如果調用者不遵守這個約定，實現者是沒有辦法避免錯誤的。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2818955"></a>習題</h3></div></div></div><p>1、實現一個功能更完整的<code class="literal">printf</code>，能夠識別<code class="literal">%</code>，能夠處理<code class="literal">%d</code>、<code class="literal">%f</code>對應的整數參數。在實現中不許調用<code class="literal">printf(3)</code>這個Man Page中描述的任何函數。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch24s05.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch24.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch25.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">5. 回調函數 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 第 25 章 C標準庫</td></tr></table></div></body></html>

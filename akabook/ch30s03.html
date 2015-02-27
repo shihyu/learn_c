@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3. 進程控制</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch30.html" title="第 30 章 進程" /><link rel="prev" href="ch30s02.html" title="2. 環境變數" /><link rel="next" href="ch30s04.html" title="4. 進程間通信" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3. 進程控制</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch30s02.html">上一頁</a> </td><th width="60%" align="center">第 30 章 進程</th><td width="20%" align="right"> <a accesskey="n" href="ch30s04.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2866208"></a>3. 進程控制</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2866212"></a>3.1. fork函數</h3></div></div></div><pre class="programlisting">#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+
+pid_t fork(void);</pre><p><code class="literal">fork</code>調用失敗則返回-1，調用成功的返回值見下面的解釋。我們通過一個例子來理解<code class="literal">fork</code>是怎樣創建新進程的。</p><div class="example"><a id="id2866242"></a><p class="title"><b>例 30.3. fork</b></p><div class="example-contents"><pre class="programlisting">#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	pid_t pid;
+	char *message;
+	int n;
+	pid = fork();
+	if (pid &lt; 0) {
+		perror("fork failed");
+		exit(1);
+	}
+	if (pid == 0) {
+		message = "This is the child\n";
+		n = 6;
+	} else {
+		message = "This is the parent\n";
+		n = 3;
+	}
+	for(; n &gt; 0; n--) {
+		printf(message);
+		sleep(1);
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><pre class="screen">$ ./a.out 
+This is the child
+This is the parent
+This is the child
+This is the parent
+This is the child
+This is the parent
+This is the child
+$ This is the child
+This is the child</pre><p>這個程序的運行過程如下圖所示。</p><div class="figure"><a id="id2866272"></a><p class="title"><b>圖 30.4. fork</b></p><div class="figure-contents"><div><img src="images/process.fork.png" alt="fork" /></div></div></div><br class="figure-break" /><div class="orderedlist"><ol type="1"><li><p>父進程初始化。</p></li><li><p>父進程調用<code class="literal">fork</code>，這是一個系統調用，因此進入內核。</p></li><li><p>內核根據父進程複製出一個子進程，父進程和子進程的PCB信息相同，用戶態代碼和數據也相同。因此，<span class="emphasis"><em>子進程現在的狀態看起來和父進程一樣，做完了初始化，剛調用了<code class="literal">fork</code>進入內核，還沒有從內核返回</em></span>。</p></li><li><p>現在有兩個一模一樣的進程看起來都調用了<code class="literal">fork</code>進入內核等待從內核返回（實際上<code class="literal">fork</code>只調用了一次），此外系統中還有很多別的進程也等待從內核返回。是父進程先返回還是子進程先返回，還是這兩個進程都等待，先去調度執行別的進程，這都不一定，取決於內核的調度算法。</p></li><li><p>如果某個時刻父進程被調度執行了，從內核返回後就從<code class="literal">fork</code>函數返回，保存在變數<code class="literal">pid</code>中的返回值是子進程的id，是一個大於0的整數，因此執下面的<code class="literal">else</code>分支，然後執行<code class="literal">for</code>循環，打印<code class="literal">"This is the parent\n"</code>三次之後終止。</p></li><li><p>如果某個時刻子進程被調度執行了，從內核返回後就從<code class="literal">fork</code>函數返回，保存在變數<code class="literal">pid</code>中的返回值是0，因此執行下面的<code class="literal">if (pid == 0)</code>分支，然後執行<code class="literal">for</code>循環，打印<code class="literal">"This is the child\n"</code>六次之後終止。<code class="literal">fork</code>調用把父進程的數據複製一份給子進程，但此後二者互不影響，在這個例子中，<code class="literal">fork</code>調用之後父進程和子進程的變數<code class="literal">message</code>和<code class="literal">n</code>被賦予不同的值，互不影響。</p></li><li><p>父進程每打印一條消息就睡眠1秒，這時內核調度別的進程執行，在1秒這麼長的間隙裡（對於計算機來說1秒很長了）子進程很有可能被調度到。同樣地，子進程每打印一條消息就睡眠1秒，在這1秒期間父進程也很有可能被調度到。所以程序運行的結果基本上是父子進程交替打印，但這也不是一定的，取決於系統中其它進程的運行情況和內核的調度算法，如果係統中其它進程非常繁忙則有可能觀察到不同的結果。另外，讀者也可以把<code class="literal">sleep(1);</code>去掉看程序的運行結果如何。</p></li><li><p>這個程序是在Shell下運行的，因此Shell進程是父進程的父進程。父進程運行時Shell進程處于等待狀態（<a class="xref" href="ch30s03.html#process.wait">第 3.3 節 “wait和waitpid函數”</a>會講到這種等待是怎麼實現的），當父進程終止時Shell進程認為命令執行結束了，於是打印Shell提示符，而事實上子進程這時還沒結束，所以子進程的消息打印到了Shell提示符後面。最後光標停在<code class="literal">This is the child</code>的下一行，這時用戶仍然可以敲命令，即使命令不是緊跟在提示符後面，Shell也能正確讀取。</p></li></ol></div><p>
+</p><p><code class="literal">fork</code>函數的特點概括起來就是“<span class="quote">調用一次，返回兩次</span>”，在父進程中調用一次，在父進程和子進程中各返回一次。從上圖可以看出，一開始是一個控制流程，調用<code class="literal">fork</code>之後發生了分叉，變成兩個控制流程，這也就是“<span class="quote">fork</span>”（分叉）這個名字的由來了。子進程中<code class="literal">fork</code>的返回值是0，而父進程中<code class="literal">fork</code>的返回值則是子進程的id（從根本上說<code class="literal">fork</code>是從內核返回的，內核自有辦法讓父進程和子進程返回不同的值），這樣當<code class="literal">fork</code>函數返回後，程序員可以根據返回值的不同讓父進程和子進程執行不同的代碼。</p><p><code class="literal">fork</code>的返回值這樣規定是有道理的。<code class="literal">fork</code>在子進程中返回0，子進程仍可以調用<code class="literal">getpid</code>函數得到自己的進程id，也可以調用<code class="literal">getppid</code>函數得到父進程的id。在父進程中用<code class="literal">getpid</code>可以得到自己的進程id，然而要想得到子進程的id，只有將<code class="literal">fork</code>的返回值記錄下來，別無它法。</p><p><code class="literal">fork</code>的另一個特性是所有由父進程打開的描述符都被覆制到子進程中。父、子進程中相同編號的檔案描述符在內核中指向同一個<code class="literal">file</code>結構體，也就是說，<code class="literal">file</code>結構體的引用計數要增加。</p><p>用<code class="literal">gdb</code>調試多進程的程序會遇到困難，<code class="literal">gdb</code>只能跟蹤一個進程（預設是跟蹤父進程），而不能同時跟蹤多個進程，但可以設置<code class="literal">gdb</code>在<code class="literal">fork</code>之後跟蹤父進程還是子進程。以上面的程序為例：</p><pre class="screen">$ gcc main.c -g
+$ gdb a.out
+GNU gdb 6.8-debian
+Copyright (C) 2008 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i486-linux-gnu"...
+(gdb) l
+2	#include &lt;unistd.h&gt;
+3	#include &lt;stdio.h&gt;
+4	#include &lt;stdlib.h&gt;
+5	
+6	int main(void)
+7	{
+8		pid_t pid;
+9		char *message;
+10		int n;
+11		pid = fork();
+(gdb) 
+12		if(pid&lt;0) {
+13			perror("fork failed");
+14			exit(1);
+15		}
+16		if(pid==0) {
+17			message = "This is the child\n";
+18			n = 6;
+19		} else {
+20			message = "This is the parent\n";
+21			n = 3;
+(gdb) b 17
+Breakpoint 1 at 0x8048481: file main.c, line 17.
+(gdb) set follow-fork-mode child
+(gdb) r
+Starting program: /home/akaedu/a.out 
+This is the parent
+[Switching to process 30725]
+
+Breakpoint 1, main () at main.c:17
+17			message = "This is the child\n";
+(gdb) This is the parent
+This is the parent</pre><p><code class="literal">set follow-fork-mode child</code>命令設置<code class="literal">gdb</code>在<code class="literal">fork</code>之後跟蹤子進程（<code class="literal">set follow-fork-mode parent</code>則是跟蹤父進程），然後用<code class="literal">run</code>命令，看到的現象是父進程一直在運行，在<code class="literal">(gdb)</code>提示符下打印消息，而子進程被先前設的斷點打斷了。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2866732"></a>3.2. exec函數</h3></div></div></div><p>用<code class="literal">fork</code>創建子進程後執行的是和父進程相同的程序（但有可能執行不同的代碼分支），子進程往往要調用一種<code class="literal">exec</code>函數以執行另一個程序。當進程調用一種<code class="literal">exec</code>函數時，該進程的用戶空間代碼和數據完全被新程序替換，從新程序的啟動常式開始執行。調用<code class="literal">exec</code>並不創建新進程，所以調用<code class="literal">exec</code>前後該進程的id並未改變。</p><p>其實有六種以<code class="literal">exec</code>開頭的函數，統稱<code class="literal">exec</code>函數：</p><pre class="programlisting">#include &lt;unistd.h&gt;
+
+int execl(const char *path, const char *arg, ...);
+int execlp(const char *file, const char *arg, ...);
+int execle(const char *path, const char *arg, ..., char *const envp[]);
+int execv(const char *path, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+int execve(const char *path, char *const argv[], char *const envp[]);</pre><p>這些函數如果調用成功則加載新的程序從啟動代碼開始執行，不再返回，如果調用出錯則返回-1，所以<code class="literal">exec</code>函數只有出錯的返回值而沒有成功的返回值。</p><p>這些函數原型看起來很容易混，但只要掌握了規律就很好記。不帶字母p（表示path）的<code class="literal">exec</code>函數第一個參數必須是程序的相對路徑或絶對路徑，例如<code class="literal">"/bin/ls"</code>或<code class="literal">"./a.out"</code>，而不能是<code class="literal">"ls"</code>或<code class="literal">"a.out"</code>。對於帶字母p的函數：</p><div class="itemizedlist"><ul type="disc"><li><p>如果參數中包含/，則將其視為路徑名。</p></li><li><p>否則視為不帶路徑的程序名，在<code class="literal">PATH</code>環境變數的目錄列表中搜索這個程序。</p></li></ul></div><p>帶有字母l（表示list）的<code class="literal">exec</code>函數要求將新程序的每個命令行參數都當作一個參數傳給它，命令行參數的個數是可變的，因此函數原型中有<code class="literal">...</code>，<code class="literal">...</code>中的最後一個可變參數應該是<code class="literal">NULL</code>，起sentinel的作用。對於帶有字母v（表示vector）的函數，則應該先構造一個指向各參數的指針數組，然後將該數組的首地址當作參數傳給它，數組中的最後一個指針也應該是<code class="literal">NULL</code>，就像<code class="literal">main</code>函數的<code class="literal">argv</code>參數或者環境變數表一樣。</p><p>對於以e（表示environment）結尾的<code class="literal">exec</code>函數，可以把一份新的環境變數表傳給它，其他<code class="literal">exec</code>函數仍使用當前的環境變數表執行新程序。</p><p><code class="literal">exec</code>調用舉例如下：</p><pre class="programlisting">char *const ps_argv[] ={"ps", "-o", "pid,ppid,pgrp,session,tpgid,comm", NULL};
+char *const ps_envp[] ={"PATH=/bin:/usr/bin", "TERM=console", NULL};
+execl("/bin/ps", "ps", "-o", "pid,ppid,pgrp,session,tpgid,comm", NULL);
+execv("/bin/ps", ps_argv);
+execle("/bin/ps", "ps", "-o", "pid,ppid,pgrp,session,tpgid,comm", NULL, ps_envp);
+execve("/bin/ps", ps_argv, ps_envp);
+execlp("ps", "ps", "-o", "pid,ppid,pgrp,session,tpgid,comm", NULL);
+execvp("ps", ps_argv);</pre><p>事實上，只有<code class="literal">execve</code>是真正的系統調用，其它五個函數最終都調用<code class="literal">execve</code>，所以<code class="literal">execve</code>在man手冊第2節，其它函數在man手冊第3節。這些函數之間的關係如下圖所示。</p><div class="figure"><a id="id2866985"></a><p class="title"><b>圖 30.5. exec函數族</b></p><div class="figure-contents"><div><img src="images/process.exec.png" alt="exec函數族" /></div></div></div><br class="figure-break" /><p>一個完整的例子：</p><pre class="programlisting">#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	execlp("ps", "ps", "-o", "pid,ppid,pgrp,session,tpgid,comm", NULL);
+	perror("exec ps");
+	exit(1);
+}</pre><p>執行此程序則得到：</p><pre class="screen">$ ./a.out 
+  PID  PPID  PGRP  SESS TPGID COMMAND
+ 6614  6608  6614  6614  7199 bash
+ 7199  6614  7199  6614  7199 ps</pre><p>由於<code class="literal">exec</code>函數只有錯誤返回值，只要返回了一定是出錯了，所以不需要判斷它的返回值，直接在後面調用<code class="literal">perror</code>即可。注意在調用<code class="literal">execlp</code>時傳了兩個<code class="literal">"ps"</code>參數，第一個<code class="literal">"ps"</code>是程序名，<code class="literal">execlp</code>函數要在<code class="literal">PATH</code>環境變數中找到這個程序並執行它，而第二個<code class="literal">"ps"</code>是第一個命令行參數，<code class="literal">execlp</code>函數並不關心它的值，只是簡單地把它傳給<code class="literal">ps</code>程序，<code class="literal">ps</code>程序可以通過<code class="literal">main</code>函數的<code class="literal">argv[0]</code>取到這個參數。</p><p>調用<code class="literal">exec</code>後，原來打開的檔案描述符仍然是打開的<sup>[<a id="id2867112" href="#ftn.id2867112" class="footnote">37</a>]</sup>。利用這一點可以實現I/O重定向。先看一個簡單的例子，把標準輸入轉成大寫然後打印到標準輸出：</p><div class="example"><a id="id2867135"></a><p class="title"><b>例 30.4. upper</b></p><div class="example-contents"><pre class="programlisting">/* upper.c */
+#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	int ch;
+	while((ch = getchar()) != EOF) {
+		putchar(toupper(ch));
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><p>運行結果如下：</p><pre class="screen">$ ./upper
+hello THERE
+HELLO THERE
+（按Ctrl-D表示EOF）
+$</pre><p>使用Shell重定向：</p><pre class="screen">$ cat file.txt
+this is the file, file.txt, it is all lower case.
+$ ./upper &lt; file.txt
+THIS IS THE FILE, FILE.TXT, IT IS ALL LOWER CASE.</pre><p>如果希望把待轉換的檔案名放在命令行參數中，而不是借助于輸入重定向，我們可以利用<code class="literal">upper</code>程序的現有功能，再寫一個包裝程序<code class="literal">wrapper</code>。</p><div class="example"><a id="id2867183"></a><p class="title"><b>例 30.5. wrapper</b></p><div class="example-contents"><pre class="programlisting">/* wrapper.c */
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+
+int main(int argc, char *argv[])
+{
+	int fd;
+	if (argc != 2) {
+		fputs("usage: wrapper file\n", stderr);
+		exit(1);
+	}
+	fd = open(argv[1], O_RDONLY);
+	if(fd&lt;0) {
+		perror("open");
+		exit(1);
+	}
+	dup2(fd, STDIN_FILENO);
+	close(fd);
+	execl("./upper", "upper", NULL);
+	perror("exec ./upper");
+	exit(1);
+}</pre></div></div><br class="example-break" /><p><code class="literal">wrapper</code>程序將命令行參數當作檔案名打開，將標準輸入重定向到這個檔案，然後調用<code class="literal">exec</code>執行<code class="literal">upper</code>程序，這時原來打開的檔案描述符仍然是打開的，<code class="literal">upper</code>程序只負責從標準輸入讀入字元轉成大寫，並不關心標準輸入對應的是檔案還是終端。運行結果如下：</p><pre class="screen">$ ./wrapper file.txt
+THIS IS THE FILE, FILE.TXT, IT IS ALL LOWER CASE.</pre></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2867242"></a>3.3. wait和waitpid函數</h3></div></div></div><p>一個進程在終止時會關閉所有檔案描述符，釋放在用戶空間分配的內存，但它的PCB還保留着，內核在其中保存了一些信息：如果是正常終止則保存着退出狀態，如果是異常終止則保存着導致該進程終止的信號是哪個。這個進程的父進程可以調用<code class="literal">wait</code>或<code class="literal">waitpid</code>獲取這些信息，然後徹底清除掉這個進程。我們知道一個進程的退出狀態可以在Shell中用特殊變數<code class="literal">$?</code>查看，因為Shell是它的父進程，當它終止時Shell調用<code class="literal">wait</code>或<code class="literal">waitpid</code>得到它的退出狀態同時徹底清除掉這個進程。</p><p>如果一個進程已經終止，但是它的父進程尚未調用<code class="literal">wait</code>或<code class="literal">waitpid</code>對它進行清理，這時的進程狀態稱為殭屍（Zombie）<a id="id2867311" class="indexterm"></a>進程。任何進程在剛終止時都是殭屍進程，正常情況下，殭屍進程都立刻被父進程清理了，為了觀察到殭屍進程，我們自己寫一個不正常的程序，父進程<code class="literal">fork</code>出子進程，子進程終止，而父進程既不終止也不調用<code class="literal">wait</code>清理子進程：</p><pre class="programlisting">#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	pid_t pid=fork();
+	if(pid&lt;0) {
+		perror("fork");
+		exit(1);
+	}
+	if(pid&gt;0) { /* parent */
+		while(1);
+	}
+	/* child */
+	return 0;	  
+}</pre><p>在後台運行這個程序，然後用<code class="literal">ps</code>命令查看：</p><pre class="screen">$ ./a.out &amp;
+[1] 6130
+$ ps u
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+akaedu    6016  0.0  0.3   5724  3140 pts/0    Ss   08:41   0:00 bash
+akaedu    6130 97.2  0.0   1536   284 pts/0    R    08:44  14:33 ./a.out
+akaedu    6131  0.0  0.0      0     0 pts/0    Z    08:44   0:00 [a.out] &lt;defunct&gt;
+akaedu    6163  0.0  0.0   2620  1000 pts/0    R+   08:59   0:00 ps u</pre><p>在<code class="literal">./a.out</code>命令後面加個<code class="literal">&amp;</code>表示後台運行，Shell不等待這個進程終止就立刻打印提示符並等待用戶輸命令。現在Shell是位於前台的，用戶在終端的輸入會被Shell讀取，後台進程是讀不到終端輸入的。第二條命令<code class="literal">ps u</code>是在前台運行的，在此期間Shell進程和<code class="literal">./a.out</code>進程都在後台運行，等到<code class="literal">ps u</code>命令結束時Shell進程又重新回到前台。在<a class="xref" href="ch33.html#signal">第 33 章 <i>信號</i></a>和<a class="xref" href="ch34.html#jobs">第 34 章 <i>終端、作業控制與守護進程</i></a>將會進一步解釋前台（Foreground）<a id="id2867418" class="indexterm"></a>和後台（Backgroud）<a id="id2867425" class="indexterm"></a>的概念。</p><p>父進程的pid是6130，子進程是殭屍進程，pid是6131，<code class="literal">ps</code>命令顯示殭屍進程的狀態為<code class="literal">Z</code>，在命令行一欄還顯示<code class="literal">&lt;defunct&gt;</code>。</p><p>如果一個父進程終止，而它的子進程還存在（這些子進程或者仍在運行，或者已經是殭屍進程了），則這些子進程的父進程改為<code class="literal">init</code>進程。<code class="literal">init</code>是系統中的一個特殊進程，通常程序檔案是<code class="literal">/sbin/init</code>，進程id是1，在系統啟動時負責啟動各種系統服務，之後就負責清理子進程，只要有子進程終止，<code class="literal">init</code>就會調用<code class="literal">wait</code>函數清理它。</p><p>殭屍進程是不能用<code class="literal">kill</code>命令清除掉的，因為<code class="literal">kill</code>命令只是用來終止進程的，而殭屍進程已經終止了。思考一下，用什麼辦法可以清除掉殭屍進程？</p><p><code class="literal">wait</code>和<code class="literal">waitpid</code>函數的原型是：</p><pre class="programlisting">#include &lt;sys/types.h&gt;
+#include &lt;sys/wait.h&gt;
+
+pid_t wait(int *status);
+pid_t waitpid(pid_t pid, int *status, int options);</pre><p>若調用成功則返回清理掉的子進程id，若調用出錯則返回-1。父進程調用<code class="literal">wait</code>或<code class="literal">waitpid</code>時可能會：</p><div class="itemizedlist"><ul type="disc"><li><p>阻塞（如果它的所有子進程都還在運行）。</p></li><li><p>帶子進程的終止信息立即返回（如果一個子進程已終止，正等待父進程讀取其終止信息）。</p></li><li><p>出錯立即返回（如果它沒有任何子進程）。</p></li></ul></div><p>這兩個函數的區別是：</p><div class="itemizedlist"><ul type="disc"><li><p>如果父進程的所有子進程都還在運行，調用<code class="literal">wait</code>將使父進程阻塞，而調用<code class="literal">waitpid</code>時如果在<code class="literal">options</code>參數中指定<code class="literal">WNOHANG</code>可以使父進程不阻塞而立即返回0。</p></li><li><p><code class="literal">wait</code>等待第一個終止的子進程，而<code class="literal">waitpid</code>可以通過<code class="literal">pid</code>參數指定等待哪一個子進程。</p></li></ul></div><p>可見，調用<code class="literal">wait</code>和<code class="literal">waitpid</code>不僅可以獲得子進程的終止信息，還可以使父進程阻塞等待子進程終止，起到進程間同步的作用。如果參數<code class="literal">status</code>不是空指針，則子進程的終止信息通過這個參數傳出，如果只是為了同步而不關心子進程的終止信息，可以將<code class="literal">status</code>參數指定為<code class="literal">NULL</code>。</p><div class="example"><a id="process.waitpid"></a><p class="title"><b>例 30.6. waitpid</b></p><div class="example-contents"><pre class="programlisting">#include &lt;sys/types.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	pid_t pid;
+	pid = fork();
+	if (pid &lt; 0) {
+		perror("fork failed");
+		exit(1);
+	}
+	if (pid == 0) {
+		int i;
+		for (i = 3; i &gt; 0; i--) {
+			printf("This is the child\n");
+			sleep(1);
+		}
+		exit(3);
+	} else {
+		int stat_val;
+		waitpid(pid, &amp;stat_val, 0);
+		if (WIFEXITED(stat_val))
+			printf("Child exited with code %d\n", WEXITSTATUS(stat_val));
+		else if (WIFSIGNALED(stat_val))
+			printf("Child terminated abnormally, signal %d\n", WTERMSIG(stat_val));
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><p>子進程的終止信息在一個<code class="literal">int</code>中包含了多個欄位，用宏定義可以取出其中的每個欄位：如果子進程是正常終止的，<code class="literal">WIFEXITED</code>取出的欄位值非零，<code class="literal">WEXITSTATUS</code>取出的欄位值就是子進程的退出狀態；如果子進程是收到信號而異常終止的，<code class="literal">WIFSIGNALED</code>取出的欄位值非零，<code class="literal">WTERMSIG</code>取出的欄位值就是信號的編號。作為練習，請讀者從標頭檔裡查一下這些宏做了什麼運算，是如何取出欄位值的。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2867747"></a>習題</h4></div></div></div><p>1、請讀者修改<a class="xref" href="ch30s03.html#process.waitpid" title="例 30.6. waitpid">例 30.6 “waitpid”</a>的代碼和實驗條件，使它產生“<span class="quote">Child terminated abnormally</span>”的輸出。</p></div></div><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2867112" href="#id2867112" class="para">37</a>] </sup>事實上，在每個檔案描述符中有一個close-on-exec標誌，如果該標誌為1，則調用<code class="literal">exec</code>時關閉這個檔案描述符。該標誌預設為0，可以用<code class="literal">fcntl</code>函數將它置1，本書不討論該標誌為1的情況。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch30s02.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch30.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch30s04.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">2. 環境變數 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 4. 進程間通信</td></tr></table></div></body></html>

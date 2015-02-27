@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>5. ELF檔案</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch18.html" title="第 18 章 x86彙編程序基礎" /><link rel="prev" href="ch18s04.html" title="4. 定址方式" /><link rel="next" href="ch19.html" title="第 19 章 彙編與C之間的關係" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5. ELF檔案</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch18s04.html">上一頁</a> </td><th width="60%" align="center">第 18 章 x86彙編程序基礎</th><td width="20%" align="right"> <a accesskey="n" href="ch19.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2770642"></a>5. ELF檔案</h2></div></div></div><p>ELF檔案格式是一個開放標準，各種UNIX系統的執行檔都採用ELF格式，它有三種不同的類型：</p><div class="itemizedlist"><ul type="disc"><li><p>可重定位的目標檔案（Relocatable，或者Object File）<a id="id2770661" class="indexterm"></a><a id="id2770669" class="indexterm"></a></p></li><li><p>執行檔（Executable）<a id="id2770682" class="indexterm"></a></p></li><li><p>共享庫（Shared Object，或者Shared Library）<a id="id2770693" class="indexterm"></a></p></li></ul></div><p>共享庫留到<a class="xref" href="ch20s04.html#link.shared">第 4 節 “共享庫”</a>再詳細介紹，本節我們以<a class="xref" href="ch18s03.html#asm.max">例 18.2 “求一組數的最大值的彙編程序”</a>為例討論目標檔案和執行檔的格式。現在詳細解釋一下這個程序的彙編、連結、運行過程：</p><div class="orderedlist"><ol type="1"><li><p>寫一個彙編程序保存成文本檔案<code class="literal">max.s</code>。</p></li><li><p>彙編器讀取這個文本檔案轉換成目標檔案<code class="literal">max.o</code>，目標檔案由若干個Section組成，我們在彙編程序中聲明的<code class="literal">.section</code>會成為目標檔案中的Section，此外彙編器還會自動添加一些Section（比如符號表）。</p></li><li><p>然後連結器把目標檔案中的Section合併成幾個Segment<a id="id2770764" class="indexterm"></a><sup>[<a id="id2770769" href="#ftn.id2770769" class="footnote">28</a>]</sup>，生成執行檔<code class="literal">max</code>。</p></li><li><p>最後加載器（Loader）<a id="id2770791" class="indexterm"></a>根據執行檔中的Segment信息加載運行這個程序。</p></li></ol></div><p>ELF格式提供了兩種不同的視角，連結器把ELF檔案看成是Section的集合，而加載器把ELF檔案看成是Segment的集合。如下圖所示。</p><div class="figure"><a id="id2770810"></a><p class="title"><b>圖 18.1. ELF檔案</b></p><div class="figure-contents"><div><img src="images/asm.elfoverview.png" alt="ELF檔案" /></div></div></div><br class="figure-break" /><p>左邊是從連結器的視角來看ELF檔案，開頭的ELF Header描述了體繫結構和操作系統等基本信息，並指出Section Header Table和Program Header Table在檔案中的什麼位置，Program Header Table在連結過程中用不到，所以是可有可無的，Section Header Table中保存了所有Section的描述信息，通過Section Header Table可以找到每個Section在檔案中的位置。右邊是從加載器的視角來看ELF檔案，開頭是ELF Header，Program Header Table中保存了所有Segment的描述信息，Section Header Table在加載過程中用不到，所以是可有可無的。從上圖可以看出，一個Segment由一個或多個Section組成，這些Section加載到內存時具有相同的訪問權限。有些Section只對連結器有意義，在運行時用不到，也不需要加載到內存，那麼就不屬於任何Segment。注意Section Header Table和Program Header Table並不是一定要位於檔案的開頭和結尾，其位置由ELF Header指出，上圖這麼畫只是為了清晰。</p><p>目標檔案需要連結器做進一步處理，所以一定有Section Header Table；執行檔需要加載運行，所以一定有Program Header Table；而共享庫既要加載運行，又要在加載時做動態連結，所以既有Section Header Table又有Program Header Table。</p><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2770854"></a>5.1. 目標檔案</h3></div></div></div><p>下面用<code class="literal">readelf</code>工具讀出目標檔案<code class="literal">max.o</code>的ELF Header和Section Header Table，然後我們逐段分析。</p><pre class="screen">$ readelf -a max.o 
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              REL (Relocatable file)
+  Machine:                           Intel 80386
+  Version:                           0x1
+  Entry point address:               0x0
+  Start of program headers:          0 (bytes into file)
+  Start of section headers:          200 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               52 (bytes)
+  Size of program headers:           0 (bytes)
+  Number of program headers:         0
+  Size of section headers:           40 (bytes)
+  Number of section headers:         8
+  Section header string table index: 5
+...</pre><p>ELF Header中描述了操作系統是UNIX，體繫結構是80386。Section Header Table中有8個Section Header，從檔案地址200（0xc8）開始，每個Section Header占40位元組，共320位元組，到檔案地址0x207結束。這個目標檔案沒有Program Header。檔案地址是這樣定義的：檔案開頭第一個位元組的地址是0，然後每個位元組占一個地址。</p><pre class="screen">...
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .text             PROGBITS        00000000 000034 00002a 00  AX  0   0  4
+  [ 2] .rel.text         REL             00000000 0002b0 000010 08      6   1  4
+  [ 3] .data             PROGBITS        00000000 000060 000038 00  WA  0   0  4
+  [ 4] .bss              NOBITS          00000000 000098 000000 00  WA  0   0  4
+  [ 5] .shstrtab         STRTAB          00000000 000098 000030 00      0   0  1
+  [ 6] .symtab           SYMTAB          00000000 000208 000080 10      7   7  4
+  [ 7] .strtab           STRTAB          00000000 000288 000028 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings)
+  I (info), L (link order), G (group), x (unknown)
+  O (extra OS processing required) o (OS specific), p (processor specific)
+
+There are no section groups in this file.
+
+There are no program headers in this file.
+...</pre><p>從Section Header中讀出各Section的描述信息，其中<code class="literal">.text</code>和<code class="literal">.data</code>是我們在彙編程序中聲明的Section，而其它Section是彙編器自動添加的。<code class="literal">Addr</code>是這些段加載到內存中的地址（我們講過程序中的地址都是虛擬地址），加載地址要在連結時填寫，現在空缺，所以是全0。<code class="literal">Off</code>和<code class="literal">Size</code>兩列指出了各Section的檔案地址，比如<code class="literal">.data</code>段從檔案地址0x60開始，一共0x38個位元組，回去翻一下程序，<code class="literal">.data</code>段定義了14個4位元組的整數，一共是56個位元組，也就是0x38。根據以上信息可以描繪出整個目標檔案的佈局。</p><div class="table"><a id="id2771004"></a><p class="title"><b>表 18.1. 目標檔案的佈局</b></p><div class="table-contents"><table summary="目標檔案的佈局" border="1"><colgroup><col /><col /></colgroup><thead><tr><th>起始檔案地址</th><th>Section或Header</th></tr></thead><tbody><tr><td>0</td><td>ELF Header</td></tr><tr><td>0x34</td><td><code class="literal">.text</code></td></tr><tr><td>0x60</td><td><code class="literal">.data</code></td></tr><tr><td>0x98</td><td><code class="literal">.bss</code>（此段為空）</td></tr><tr><td>0x98</td><td><code class="literal">.shstrtab</code></td></tr><tr><td>0xc8</td><td>Section Header Table</td></tr><tr><td>0x208</td><td><code class="literal">.symtab</code></td></tr><tr><td>0x288</td><td><code class="literal">.strtab</code></td></tr><tr><td>0x2b0</td><td><code class="literal">.rel.text</code></td></tr></tbody></table></div></div><br class="table-break" /><p>這個檔案不大，我們直接用<code class="literal">hexdump</code>工具把目標檔案的位元組全部打印出來看。</p><pre class="screen">$ hexdump -C max.o 
+00000000  7f 45 4c 46 01 01 01 00  00 00 00 00 00 00 00 00  |.ELF............|
+00000010  01 00 03 00 01 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000020  c8 00 00 00 00 00 00 00  34 00 00 00 00 00 28 00  |........4.....(.|
+00000030  08 00 05 00 bf 00 00 00  00 8b 04 bd 00 00 00 00  |................|
+00000040  89 c3 83 f8 00 74 10 47  8b 04 bd 00 00 00 00 39  |.....t.G.......9|
+00000050  d8 7e ef 89 c3 eb eb b8  01 00 00 00 cd 80 00 00  |.~..............|
+00000060  03 00 00 00 43 00 00 00  22 00 00 00 de 00 00 00  |....C...".......|
+00000070  2d 00 00 00 4b 00 00 00  36 00 00 00 22 00 00 00  |-...K...6..."...|
+00000080  2c 00 00 00 21 00 00 00  16 00 00 00 0b 00 00 00  |,...!...........|
+00000090  42 00 00 00 00 00 00 00  00 2e 73 79 6d 74 61 62  |B.........symtab|
+000000a0  00 2e 73 74 72 74 61 62  00 2e 73 68 73 74 72 74  |..strtab..shstrt|
+000000b0  61 62 00 2e 72 65 6c 2e  74 65 78 74 00 2e 64 61  |ab..rel.text..da|
+000000c0  74 61 00 2e 62 73 73 00  00 00 00 00 00 00 00 00  |ta..bss.........|
+000000d0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+000000f0  1f 00 00 00 01 00 00 00  06 00 00 00 00 00 00 00  |................|
+00000100  34 00 00 00 2a 00 00 00  00 00 00 00 00 00 00 00  |4...*...........|
+00000110  04 00 00 00 00 00 00 00  1b 00 00 00 09 00 00 00  |................|
+00000120  00 00 00 00 00 00 00 00  b0 02 00 00 10 00 00 00  |................|
+00000130  06 00 00 00 01 00 00 00  04 00 00 00 08 00 00 00  |................|
+00000140  25 00 00 00 01 00 00 00  03 00 00 00 00 00 00 00  |%...............|
+00000150  60 00 00 00 38 00 00 00  00 00 00 00 00 00 00 00  |`...8...........|
+00000160  04 00 00 00 00 00 00 00  2b 00 00 00 08 00 00 00  |........+.......|
+00000170  03 00 00 00 00 00 00 00  98 00 00 00 00 00 00 00  |................|
+00000180  00 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00  |................|
+00000190  11 00 00 00 03 00 00 00  00 00 00 00 00 00 00 00  |................|
+000001a0  98 00 00 00 30 00 00 00  00 00 00 00 00 00 00 00  |....0...........|
+000001b0  01 00 00 00 00 00 00 00  01 00 00 00 02 00 00 00  |................|
+000001c0  00 00 00 00 00 00 00 00  08 02 00 00 80 00 00 00  |................|
+000001d0  07 00 00 00 07 00 00 00  04 00 00 00 10 00 00 00  |................|
+000001e0  09 00 00 00 03 00 00 00  00 00 00 00 00 00 00 00  |................|
+000001f0  88 02 00 00 28 00 00 00  00 00 00 00 00 00 00 00  |....(...........|
+00000200  01 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000210  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000220  00 00 00 00 03 00 01 00  00 00 00 00 00 00 00 00  |................|
+00000230  00 00 00 00 03 00 03 00  00 00 00 00 00 00 00 00  |................|
+00000240  00 00 00 00 03 00 04 00  01 00 00 00 00 00 00 00  |................|
+00000250  00 00 00 00 00 00 03 00  0c 00 00 00 0e 00 00 00  |................|
+00000260  00 00 00 00 00 00 01 00  17 00 00 00 23 00 00 00  |............#...|
+00000270  00 00 00 00 00 00 01 00  21 00 00 00 00 00 00 00  |........!.......|
+00000280  00 00 00 00 10 00 01 00  00 64 61 74 61 5f 69 74  |.........data_it|
+00000290  65 6d 73 00 73 74 61 72  74 5f 6c 6f 6f 70 00 6c  |ems.start_loop.l|
+000002a0  6f 6f 70 5f 65 78 69 74  00 5f 73 74 61 72 74 00  |oop_exit._start.|
+000002b0  08 00 00 00 01 02 00 00  17 00 00 00 01 02 00 00  |................|
+000002c0</pre><p>左邊一列是檔案地址，中間是每個位元組的十六進製表示，右邊是把這些位元組解釋成ASCII碼所對應的字元。中間有一個*號表示省略的部分全是0。<code class="literal">.data</code>段對應的是這一塊：</p><pre class="screen">...
+00000060  03 00 00 00 43 00 00 00  22 00 00 00 de 00 00 00  |....C...".......|
+00000070  2d 00 00 00 4b 00 00 00  36 00 00 00 22 00 00 00  |-...K...6..."...|
+00000080  2c 00 00 00 21 00 00 00  16 00 00 00 0b 00 00 00  |,...!...........|
+00000090  42 00 00 00 00 00 00 00
+...</pre><p><code class="literal">.data</code>段將被原封不動地加載到內存中，下一小節會看到<code class="literal">.data</code>段被加載到內存地址0x080490a0~0x080490d7。</p><p><code class="literal">.shstrtab</code>和<code class="literal">.strtab</code>這兩個Section中存放的都是ASCII碼：</p><pre class="screen">...
+                                   00 2e 73 79 6d 74 61 62  |B.........symtab|
+000000a0  00 2e 73 74 72 74 61 62  00 2e 73 68 73 74 72 74  |..strtab..shstrt|
+000000b0  61 62 00 2e 72 65 6c 2e  74 65 78 74 00 2e 64 61  |ab..rel.text..da|
+000000c0  74 61 00 2e 62 73 73 00                           |ta..bss.........|
+...
+                                   00 64 61 74 61 5f 69 74  |.........data_it|
+00000290  65 6d 73 00 73 74 61 72  74 5f 6c 6f 6f 70 00 6c  |ems.start_loop.l|
+000002a0  6f 6f 70 5f 65 78 69 74  00 5f 73 74 61 72 74 00  |oop_exit._start.|
+...</pre><p>可見<code class="literal">.shstrtab</code>段保存着各Section的名字，<code class="literal">.strtab</code>段保存着程序中用到的符號的名字。每個名字都是以<code class="literal">'\0'</code>結尾的字元串。</p><p>我們知道，C語言的全局變數如果在代碼中沒有初始化，就會在程序加載時用0初始化。這種數據屬於<code class="literal">.bss</code>段，在加載時它和<code class="literal">.data</code>段一樣都是可讀可寫的數據，但是在ELF檔案中<code class="literal">.data</code>段需要占用一部分空間保存初始值，而<code class="literal">.bss</code>段則不需要。也就是說，<code class="literal">.bss</code>段在檔案中只占一個Section Header而沒有對應的Section，程序加載時<code class="literal">.bss</code>段占多大內存空間在Section Header中描述。在我們這個例子中沒有用到<code class="literal">.bss</code>段，在<a class="xref" href="ch19s03.html#asmc.layout">第 3 節 “變數的存儲佈局”</a>會看到這樣的例子。</p><p>我們繼續分析<code class="literal">readelf</code>輸出的最後一部分，是從<code class="literal">.rel.text</code>和<code class="literal">.symtab</code>這兩個Section中讀出的信息。</p><pre class="screen">...
+Relocation section '.rel.text' at offset 0x2b0 contains 2 entries:
+ Offset     Info    Type            Sym.Value  Sym. Name
+00000008  00000201 R_386_32          00000000   .data
+00000017  00000201 R_386_32          00000000   .data
+
+There are no unwind sections in this file.
+
+Symbol table '.symtab' contains 8 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00000000     0 SECTION LOCAL  DEFAULT    3 
+     3: 00000000     0 SECTION LOCAL  DEFAULT    4 
+     4: 00000000     0 NOTYPE  LOCAL  DEFAULT    3 data_items
+     5: 0000000e     0 NOTYPE  LOCAL  DEFAULT    1 start_loop
+     6: 00000023     0 NOTYPE  LOCAL  DEFAULT    1 loop_exit
+     7: 00000000     0 NOTYPE  GLOBAL DEFAULT    1 _start
+
+No version information found in this file.</pre><p><code class="literal">.rel.text</code>告訴連結器指令中的哪些地方需要做重定位，在下一小節詳細討論。</p><p><code class="literal">.symtab</code>是符號表。<code class="literal">Ndx</code>列是每個符號所在的Section編號，例如符號<code class="literal">data_items</code>在第3個Section裡（也就是<code class="literal">.data</code>段），各Section的編號見Section Header Table。<code class="literal">Value</code>列是每個符號所代表的地址，在目標檔案中，符號地址都是相對於該符號所在Section的相對地址，比如<code class="literal">data_items</code>位於<code class="literal">.data</code>段的開頭，所以地址是0，<code class="literal">_start</code>位於<code class="literal">.text</code>段的開頭，所以地址也是0，但是<code class="literal">start_loop</code>和<code class="literal">loop_exit</code>相對於<code class="literal">.text</code>段的地址就不是0了。從<code class="literal">Bind</code>這一列可以看出<code class="literal">_start</code>這個符號是<code class="literal">GLOBAL</code>的，而其它符號是<code class="literal">LOCAL</code>的，<code class="literal">GLOBAL</code>符號是在彙編程序中用<code class="literal">.globl</code>指示聲明過的符號。</p><p>現在剩下<code class="literal">.text</code>段沒有分析，<code class="literal">objdump</code>工具可以把程序中的機器指令反彙編（Disassemble）<a id="id2771571" class="indexterm"></a>，那麼反彙編的結果是否跟原來寫的彙編代碼一模一樣呢？我們對比分析一下。</p><pre class="screen">$ objdump -d max.o
+
+max.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 &lt;_start&gt;:
+   0:	bf 00 00 00 00       	mov    $0x0,%edi
+   5:	8b 04 bd 00 00 00 00 	mov    0x0(,%edi,4),%eax
+   c:	89 c3                	mov    %eax,%ebx
+
+0000000e &lt;start_loop&gt;:
+   e:	83 f8 00             	cmp    $0x0,%eax
+  11:	74 10                	je     23 &lt;loop_exit&gt;
+  13:	47                   	inc    %edi
+  14:	8b 04 bd 00 00 00 00 	mov    0x0(,%edi,4),%eax
+  1b:	39 d8                	cmp    %ebx,%eax
+  1d:	7e ef                	jle    e &lt;start_loop&gt;
+  1f:	89 c3                	mov    %eax,%ebx
+  21:	eb eb                	jmp    e &lt;start_loop&gt;
+
+00000023 &lt;loop_exit&gt;:
+  23:	b8 01 00 00 00       	mov    $0x1,%eax
+  28:	cd 80                	int    $0x80</pre><p>左邊是機器指令的位元組，右邊是反彙編結果。顯然，所有的符號都被替換成地址了，比如<code class="literal">je     23</code>，注意沒有加<code class="literal">$</code>的數表示內存地址，而不表示立即數。這條指令後面的<code class="literal">&lt;loop_exit&gt;</code>並不是指令的一部分，而是反彙編器從<code class="literal">.symtab</code>和<code class="literal">.strtab</code>中查到的符號名稱，寫在後面是為了有更好的可讀性。目前所有指令中用到的符號地址都是相對地址，下一步連結器要修改這些指令，把其中的地址都改成加載時的內存地址，這些指令才能正確執行。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2771639"></a>5.2. 執行檔</h3></div></div></div><p>現在我們按上一節的步驟分析執行檔<code class="literal">max</code>，看看連結器都做了什麼改動。</p><pre class="screen">$ readelf -a max
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Intel 80386
+  Version:                           0x1
+  Entry point address:               0x8048074
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          256 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         2
+  Size of section headers:           40 (bytes)
+  Number of section headers:         6
+  Section header string table index: 3
+
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .text             PROGBITS        08048074 000074 00002a 00  AX  0   0  4
+  [ 2] .data             PROGBITS        080490a0 0000a0 000038 00  WA  0   0  4
+  [ 3] .shstrtab         STRTAB          00000000 0000d8 000027 00      0   0  1
+  [ 4] .symtab           SYMTAB          00000000 0001f0 0000a0 10      5   6  4
+  [ 5] .strtab           STRTAB          00000000 000290 000040 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings)
+  I (info), L (link order), G (group), x (unknown)
+  O (extra OS processing required) o (OS specific), p (processor specific)
+
+There are no section groups in this file.
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x000000 0x08048000 0x08048000 0x0009e 0x0009e R E 0x1000
+  LOAD           0x0000a0 0x080490a0 0x080490a0 0x00038 0x00038 RW  0x1000
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text 
+   01     .data 
+
+There is no dynamic section in this file.
+
+There are no relocations in this file.
+
+There are no unwind sections in this file.
+
+Symbol table '.symtab' contains 10 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 08048074     0 SECTION LOCAL  DEFAULT    1 
+     2: 080490a0     0 SECTION LOCAL  DEFAULT    2 
+     3: 080490a0     0 NOTYPE  LOCAL  DEFAULT    2 data_items
+     4: 08048082     0 NOTYPE  LOCAL  DEFAULT    1 start_loop
+     5: 08048097     0 NOTYPE  LOCAL  DEFAULT    1 loop_exit
+     6: 08048074     0 NOTYPE  GLOBAL DEFAULT    1 _start
+     7: 080490d8     0 NOTYPE  GLOBAL DEFAULT  ABS __bss_start
+     8: 080490d8     0 NOTYPE  GLOBAL DEFAULT  ABS _edata
+     9: 080490d8     0 NOTYPE  GLOBAL DEFAULT  ABS _end
+
+No version information found in this file.</pre><p>在ELF Header中，<code class="literal">Type</code>改成了<code class="literal">EXEC</code>，由目標檔案變成執行檔了，<code class="literal">Entry point address</code>改成了0x8048074（這是<code class="literal">_start</code>符號的地址），還可以看出，多了兩個Program Header，少了兩個Section Header。</p><p>在Section Header Table中，<code class="literal">.text</code>和<code class="literal">.data</code>段的加載地址分別改成了0x08048074和0x080490a0。<code class="literal">.bss</code>段沒有用到，所以被刪掉了。<code class="literal">.rel.text</code>段就是用於連結過程的，做完連結就沒用了，所以也刪掉了。</p><p>多出來的Program Header Table描述了兩個Segment的信息。<code class="literal">.text</code>段和前面的ELF Header、Program Header Table一起組成一個Segment（<code class="literal">FileSiz</code>指出總長度是0x9e），<code class="literal">.data</code>段組成另一個Segment（總長度是0x38）。<code class="literal">VirtAddr</code>列指出第一個Segment加載到虛擬地址0x08048000（注意在x86平台上後面的<code class="literal">PhysAddr</code>列是沒有意義的，並不代表實際的物理地址），第二個Segment加載到地址0x080490a0。<code class="literal">Flg</code>列指出第一個Segment的訪問權限是可讀可執行，第二個Segment的訪問權限是可讀可寫。最後一列<code class="literal">Align</code>的值0x1000（4K）是x86平台的內存頁面大小。在加載時檔案也要按內存頁面大小分成若干頁，檔案中的一頁對應內存中的一頁，對應關係如下圖所示。</p><div class="figure"><a id="id2771830"></a><p class="title"><b>圖 18.2. 檔案和加載地址的對應關係</b></p><div class="figure-contents"><div><img src="images/asm.load.png" alt="檔案和加載地址的對應關係" /></div></div></div><br class="figure-break" /><p>這個執行檔很小，總共也不超過一頁大小，但是兩個Segment必須加載到內存中兩個不同的頁面，因為MMU的權限保護機制是以頁為單位的，一個頁面只能設置一種權限。此外還規定每個Segment在檔案頁面內偏移多少加載到內存頁面仍然要偏移多少，比如第二個Segment在檔案中的偏移是0xa0，在內存頁面0x08049000中的偏移仍然是0xa0，所以從0x080490a0開始，這樣規定是為了簡化連結器和加載器的實現。從上圖也可以看出<code class="literal">.text</code>段的加載地址應該是<code class="literal">0x08048074</code>，<code class="literal">_start</code>符號位於<code class="literal">.text</code>段的開頭，所以<code class="literal">_start</code>符號的地址也是0x08048074，從符號表中可以驗證這一點。</p><p>原來目標檔案符號表中的<code class="literal">Value</code>都是相對地址，現在都改成絶對地址了。此外還多了三個符號<code class="literal">__bss_start</code>、<code class="literal">_edata</code>和<code class="literal">_end</code>，這些符號在連結腳本中定義，被連結器添加到執行檔中，連結腳本在<a class="xref" href="ch20s01.html#link.basic">第 1 節 “多目標檔案的連結”</a>介紹。</p><p>再看一下反彙編的結果：</p><pre class="screen">$ objdump -d max
+
+max:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+08048074 &lt;_start&gt;:
+ 8048074:	bf 00 00 00 00       	mov    $0x0,%edi
+ 8048079:	8b 04 bd a0 90 04 08 	mov    0x80490a0(,%edi,4),%eax
+ 8048080:	89 c3                	mov    %eax,%ebx
+
+08048082 &lt;start_loop&gt;:
+ 8048082:	83 f8 00             	cmp    $0x0,%eax
+ 8048085:	74 10                	je     8048097 &lt;loop_exit&gt;
+ 8048087:	47                   	inc    %edi
+ 8048088:	8b 04 bd a0 90 04 08 	mov    0x80490a0(,%edi,4),%eax
+ 804808f:	39 d8                	cmp    %ebx,%eax
+ 8048091:	7e ef                	jle    8048082 &lt;start_loop&gt;
+ 8048093:	89 c3                	mov    %eax,%ebx
+ 8048095:	eb eb                	jmp    8048082 &lt;start_loop&gt;
+
+08048097 &lt;loop_exit&gt;:
+ 8048097:	b8 01 00 00 00       	mov    $0x1,%eax
+ 804809c:	cd 80                	int    $0x80</pre><p>指令中的相對地址都改成絶對地址了。我們仔細檢查一下改了哪些地方。首先看跳轉指令，原來目標檔案的指令是這樣：</p><pre class="screen">...
+  11:	74 10                	je     23 &lt;loop_exit&gt;
+...
+  1d:	7e ef                	jle    e &lt;start_loop&gt;
+...
+  21:	eb eb                	jmp    e &lt;start_loop&gt;
+...</pre><p>現在改成了這樣：</p><pre class="screen">...
+ 8048085:	74 10                	je     8048097 &lt;loop_exit&gt;
+...
+ 8048091:	7e ef                	jle    8048082 &lt;start_loop&gt;
+...
+ 8048095:	eb eb                	jmp    8048082 &lt;start_loop&gt;
+...</pre><p>改了嗎？其實只是反彙編的結果不同了，指令的機器碼根本沒變。為什麼不用改指令就能跳轉到新的地址呢？因為跳轉指令中指定的是相對於當前指令向前或向後跳多少位元組，而不是指定一個完整的內存地址，內存地址有32位，這些跳轉指令只有16位，顯然也不可能指定一個完整的內存地址，這稱為相對跳轉。這種相對跳轉指令只有16位，只能在當前指令前後的一個小範圍內跳轉，不可能跳得太遠，也有的跳轉指令指定一個完整的內存地址，可以跳到任何地方，這稱絶對跳轉，在<a class="xref" href="ch20s04.html#link.dlprocess">第 4.2 節 “動態連結的過程”</a>我們會看到這樣的例子。</p><p>再看內存訪問指令，原來目標檔案的指令是這樣：</p><pre class="screen">...
+   5:	8b 04 bd 00 00 00 00 	mov    0x0(,%edi,4),%eax
+...
+  14:	8b 04 bd 00 00 00 00 	mov    0x0(,%edi,4),%eax
+...</pre><p>現在改成了這樣：</p><pre class="screen">...
+ 8048079:	8b 04 bd a0 90 04 08 	mov    0x80490a0(,%edi,4),%eax
+...
+ 8048088:	8b 04 bd a0 90 04 08 	mov    0x80490a0(,%edi,4),%eax
+...</pre><p>指令中的地址原本是0x00000000，現在改成了0x080409a0（注意是小端位元組序）。那麼連結器怎麼知道要改這兩處呢？是根據目標檔案中的<code class="literal">.rel.text</code>段提供的重定位信息來改的：</p><pre class="screen">...
+Relocation section '.rel.text' at offset 0x2b0 contains 2 entries:
+ Offset     Info    Type            Sym.Value  Sym. Name
+00000008  00000201 R_386_32          00000000   .data
+00000017  00000201 R_386_32          00000000   .data
+...</pre><p>第一列<code class="literal">Offset</code>的值就是<code class="literal">.text</code>段需要改的地方，在<code class="literal">.text</code>段中的相對地址是8和0x17，正是這兩條指令中00 00 00 00的位置。</p></div><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2770769" href="#id2770769" class="para">28</a>] </sup>Segment也可以翻譯成“<span class="quote">段</span>”，為了避免混淆，在本書中只把Section稱為段，而Segment直接用英文。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch18s04.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch18.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch19.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">4. 定址方式 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 第 19 章 彙編與C之間的關係</td></tr></table></div></body></html>

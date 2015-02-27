@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1. 鏈表</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch26.html" title="第 26 章 鏈表、二叉樹和哈希表" /><link rel="prev" href="ch26.html" title="第 26 章 鏈表、二叉樹和哈希表" /><link rel="next" href="ch26s02.html" title="2. 二叉樹" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1. 鏈表</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch26.html">上一頁</a> </td><th width="60%" align="center">第 26 章 鏈表、二叉樹和哈希表</th><td width="20%" align="right"> <a accesskey="n" href="ch26s02.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2844772"></a>1. 鏈表</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2844144"></a>1.1. 單鏈表</h3></div></div></div><p><a class="xref" href="ch23s09.html#pointer.linkedlist">圖 23.6 “鏈表”</a>所示的鏈表即單鏈表（Single Linked List）<a id="id2844161" class="indexterm"></a>，本節我們學習如何創建和操作這種鏈表。每個鏈表有一個頭指針，通過頭指針可以找到第一個節點，每個節點都可以通過指針域找到它的後繼，最後一個節點的指針域為<code class="literal">NULL</code>，表示沒有後繼。數組在內存中是連續存放的，而鏈表在內存中的佈局是不規則的，我們知道訪問某個數組元素<code class="literal">b[n]</code>時可以通過<code class="literal">基地址+n×每個元素的位元組數</code>得到它地址，或者說數組支持隨機訪問，而鏈表是不支持隨機訪問的，只能通過前一個元素的指針域得知後一個元素的地址，因此只能從頭指針開始順序訪問各節點。以下代碼實現了單鏈表的基本操作。</p><div class="example"><a id="id2844807"></a><p class="title"><b>例 26.1. 單鏈表</b></p><div class="example-contents"><pre class="programlisting">/* linkedlist.h */
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
+
+typedef struct node *link;
+struct node {
+	unsigned char item;
+	link next;
+};
+
+link make_node(unsigned char item);
+void free_node(link p);
+link search(unsigned char key);
+void insert(link p);
+void delete(link p);
+void traverse(void (*visit)(link));
+void destroy(void);
+void push(link p);
+link pop(void);
+
+#endif</pre><pre class="programlisting">/* linkedlist.c */
+#include &lt;stdlib.h&gt;
+#include "linkedlist.h"
+
+static link head = NULL;
+
+link make_node(unsigned char item)
+{
+	link p = malloc(sizeof *p);
+	p-&gt;item = item;
+	p-&gt;next = NULL;
+	return p;
+}
+
+void free_node(link p)
+{
+	free(p);
+}
+
+link search(unsigned char key)
+{
+	link p;
+	for (p = head; p; p = p-&gt;next)
+		if (p-&gt;item == key)
+			return p;
+	return NULL;
+}
+
+void insert(link p)
+{
+	p-&gt;next = head;
+	head = p;
+}
+
+void delete(link p)
+{
+	link pre;
+	if (p == head) {
+		head = p-&gt;next;
+		return;
+	}
+	for (pre = head; pre; pre = pre-&gt;next)
+		if (pre-&gt;next == p) {
+			pre-&gt;next = p-&gt;next;
+			return;
+		}
+}
+
+void traverse(void (*visit)(link))
+{
+	link p;
+	for (p = head; p; p = p-&gt;next)
+		visit(p);
+}
+
+void destroy(void)
+{
+	link q, p = head;
+	head = NULL;
+	while (p) {
+		q = p;
+		p = p-&gt;next;
+		free_node(q);
+	}
+}
+
+void push(link p)
+{
+	insert(p);
+}
+
+link pop(void)
+{
+	if (head == NULL)
+		return NULL;
+	else {
+		link p = head;
+		head = head-&gt;next;
+		return p;
+	}
+}</pre><pre class="programlisting">/* main.c */
+#include &lt;stdio.h&gt;
+#include "linkedlist.h"
+
+void print_item(link p)
+{
+	printf("%d\n", p-&gt;item); 
+}
+
+int main(void)
+{
+	link p = make_node(10);
+	insert(p);
+	p = make_node(5);
+	insert(p);
+	p = make_node(90);
+	insert(p);
+	p = search(5);
+	delete(p);
+	free_node(p);
+	traverse(print_item);
+	destroy();
+
+	p = make_node(100);
+	push(p);
+	p = make_node(200);
+	push(p);
+	p = make_node(250);
+	push(p);
+	while (p = pop()) {
+		print_item(p);
+		free_node(p);
+	}
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>在初始化時把頭指針<code class="literal">head</code>初始化為<code class="literal">NULL</code>，表示空鏈表。然後<code class="literal">main</code>函數調用<code class="literal">make_node</code>創建幾個節點，分別調用<code class="literal">insert</code>插入到鏈表中。</p><pre class="programlisting">void insert(link p)
+{
+	p-&gt;next = head;
+	head = p;
+}</pre><div class="figure"><a id="id2844893"></a><p class="title"><b>圖 26.1. 鏈表的插入操作</b></p><div class="figure-contents"><div><img src="images/linkedlist.insert.png" alt="鏈表的插入操作" /></div></div></div><br class="figure-break" /><p>正如上圖所示，<code class="literal">insert</code>函數雖然簡單，其中也隱含了一種特殊情況（Special Case）<a id="id2844915" class="indexterm"></a>的處理，當<code class="literal">head</code>為<code class="literal">NULL</code>時，執行<code class="literal">insert</code>操作插入第一個節點之後，<code class="literal">head</code>指向第一個節點，而第一個節點的<code class="literal">next</code>指針域成為<code class="literal">NULL</code>，這很合理，因為它也是最後一個節點。所以空鏈表雖然是一種特殊情況，卻不需要特殊的代碼來處理，和一般情況用同樣的代碼處理即可，這樣寫出來的代碼更簡潔，但是在讀代碼時要想到可能存在的特殊情況。當然，<code class="literal">insert</code>函數傳進來的參數<code class="literal">p</code>也可能有特殊情況，傳進來的<code class="literal">p</code>可能是<code class="literal">NULL</code>，甚至是野指針，本章的函數代碼都假定調用者的傳進來的參數是合法的，不對參數做特別檢查。事實上，對指針參數做檢查是不現實的，如果傳進來的是<code class="literal">NULL</code>還可以檢查一下，如果傳進來的是野指針，根本無法檢查它指向的內存單元是不是合法的，C標準庫的函數通常也不做這種檢查，例如<code class="literal">strcpy(p, NULL)</code>就會引起段錯誤。</p><p>接下來<code class="literal">main</code>函數調用<code class="literal">search</code>在鏈表中查找某個節點，如果找到就返回指向該節點的指針，找不到就返回<code class="literal">NULL</code>。</p><pre class="programlisting">link search(unsigned char key)
+{
+	link p;
+	for (p = head; p; p = p-&gt;next)
+		if (p-&gt;item == key)
+			return p;
+	return NULL;
+}</pre><p><code class="literal">search</code>函數其實也隱含了對於空鏈表這種特殊情況的處理，如果是空鏈表則循環體一次都不執行，直接返回<code class="literal">NULL</code>。</p><p>然後<code class="literal">main</code>函數調用<code class="literal">delete</code>從鏈表中摘除用<code class="literal">search</code>找到的節點，最後調用<code class="literal">free_node</code>釋放它的存儲空間。</p><pre class="programlisting">void delete(link p)
+{
+	link pre;
+	if (p == head) {
+		head = p-&gt;next;
+		return;
+	}
+	for (pre = head; pre; pre = pre-&gt;next)
+		if (pre-&gt;next == p) {
+			pre-&gt;next = p-&gt;next;
+			return;
+		}
+}</pre><div class="figure"><a id="id2845087"></a><p class="title"><b>圖 26.2. 鏈表的刪除操作</b></p><div class="figure-contents"><div><img src="images/linkedlist.delete.png" alt="鏈表的刪除操作" /></div></div></div><br class="figure-break" /><p>從上圖可以看出，要摘除一個節點需要首先找到它的前趨然後才能做摘除操作，而在單鏈表中通過某個節點只能找到它的後繼而不能找到它的前趨，所以刪除操作要麻煩一些，需要從第一個節點開始依次查找要摘除的節點的前趨。<code class="literal">delete</code>操作也要處理一種特殊情況，如果要摘除的節點是鏈表的第一個節點，它是沒有前趨的，這種情況要用特殊的代碼處理，而不能和一般情況用同樣的代碼處理。這樣很不爽，能不能把這種特殊情況轉化為一般情況呢？可以把<code class="literal">delete</code>函數改成這樣：</p><pre class="programlisting">void delete(link p)
+{
+	link *pnext;
+	for (pnext = &amp;head; *pnext; pnext = &amp;(*pnext)-&gt;next)
+		if (*pnext == p) {
+			*pnext = p-&gt;next;
+			return;
+		}
+}</pre><div class="figure"><a id="id2845143"></a><p class="title"><b>圖 26.3. 消除特殊情況的鏈表刪除操作</b></p><div class="figure-contents"><div><img src="images/linkedlist.pdelete.png" alt="消除特殊情況的鏈表刪除操作" /></div></div></div><br class="figure-break" /><p>定義一個指向指針的指針<code class="literal">pnext</code>，在<code class="literal">for</code>循環中<code class="literal">pnext</code>遍歷的是指向鏈表中各節點的指針域，這樣就把<code class="literal">head</code>指針和各節點的<code class="literal">next</code>指針統一起來了，可以在一個循環中處理。</p><p>然後<code class="literal">main</code>函數調用<code class="literal">traverse</code>函數遍歷整個鏈表，調用<code class="literal">destroy</code>函數銷毀整個鏈表。請讀者自己閲讀這兩個函數的代碼。</p><p>如果限定每次只在鏈表的頭部插入和刪除元素，就形成一個LIFO的訪問序列，所以在鏈表頭部插入和刪除元素的操作實現了堆棧的<code class="literal">push</code>和<code class="literal">pop</code>操作，<code class="literal">main</code>函數的最後幾步把鏈表當成堆棧來操作，從打印的結果可以看到出棧的順序和入棧是相反的。想一想，用鏈表實現的堆棧和<a class="xref" href="ch12s02.html#stackqueue.stack">第 2 節 “堆棧”</a>中用數組實現的堆棧相比有什麼優點和缺點？</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2845251"></a>習題</h4></div></div></div><p>1、修改<code class="literal">insert</code>函數實現插入排序的功能，鏈表中的數據按從小到大排列，每次插入數據都要在鏈表中找到合適的位置再插入。在<a class="xref" href="ch11s06.html#sortsearch.binary">第 6 節 “折半查找”</a>中我們看到，如果數組中的元素是有序排列的，可以用折半查找算法更快地找到某個元素，想一想如果鏈表中的節點是有序排列的，是否適用折半查找算法？為什麼？</p><p>2、基于單鏈表實現隊列的<code class="literal">enqueue</code>和<code class="literal">dequeue</code>操作。在鏈表的末尾再維護一個指針<code class="literal">tail</code>，在<code class="literal">tail</code>處<code class="literal">enqueue</code>，在<code class="literal">head</code>處<code class="literal">dequeue</code>。想一想能不能反過來，在<code class="literal">head</code>處<code class="literal">enqueue</code>而在<code class="literal">tail</code>處<code class="literal">dequeue</code>？</p><p>3、實現函數<code class="literal">void reverse(void);</code>將單鏈表反轉。如下圖所示。</p><div class="figure"><a id="id2845362"></a><p class="title"><b>圖 26.4. 單鏈表的反轉</b></p><div class="figure-contents"><div><img src="images/linkedlist.reverse.png" alt="單鏈表的反轉" /></div></div></div><br class="figure-break" /></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2845376"></a>1.2. 雙向鏈表</h3></div></div></div><p>鏈表的<code class="literal">delete</code>操作需要首先找到要摘除的節點的前趨，而在單鏈表中找某個節點的前趨需要從表頭開始依次查找，對於n個節點的鏈表，刪除操作的時間複雜度為O(n)。可以想像得到，如果每個節點再維護一個指向前趨的指針，刪除操作就像插入操作一樣容易了，時間複雜度為O(1)，這稱為雙向鏈表（Doubly Linked List）。要實現雙向鏈表只需在上一節代碼的基礎上改動兩個地方。</p><p>在<code class="literal">linkedlist.h</code>中修改鏈表節點的結構體定義：</p><pre class="programlisting">struct node {
+	unsigned char item;
+	link prev, next;
+};</pre><p>在<code class="literal">linkedlist.c</code>中修改<code class="literal">insert</code>和<code class="literal">delete</code>函數：</p><pre class="programlisting">void insert(link p)
+{
+	p-&gt;next = head;
+	if (head)
+		head-&gt;prev = p;
+	head = p;
+	p-&gt;prev = NULL;
+}
+
+void delete(link p)
+{
+	if (p-&gt;prev)
+		p-&gt;prev-&gt;next = p-&gt;next;
+	else
+		head = p-&gt;next;
+	if (p-&gt;next)
+		p-&gt;next-&gt;prev = p-&gt;prev;
+}</pre><div class="figure"><a id="id2845444"></a><p class="title"><b>圖 26.5. 雙向鏈表</b></p><div class="figure-contents"><div><img src="images/linkedlist.doubly.png" alt="雙向鏈表" /></div></div></div><br class="figure-break" /><p>由於引入了<code class="literal">prev</code>指針，<code class="literal">insert</code>和<code class="literal">delete</code>函數中都有一些特殊情況需要用特殊的代碼處理，不能和一般情況用同樣的代碼處理，這非常不爽，如果在表頭和表尾各添加一個Sentinel節點（這兩個節點只用於界定表頭和表尾，不保存數據），就可以把這些特殊情況都轉化為一般情況了。</p><div class="example"><a id="id2845498"></a><p class="title"><b>例 26.2. 帶Sentinel的雙向鏈表</b></p><div class="example-contents"><pre class="programlisting">/* doublylinkedlist.h */
+#ifndef DOUBLYLINKEDLIST_H
+#define DOUBLYLINKEDLIST_H
+
+typedef struct node *link;
+struct node {
+	unsigned char item;
+	link prev, next;
+};
+
+link make_node(unsigned char item);
+void free_node(link p);
+link search(unsigned char key);
+void insert(link p);
+void delete(link p);
+void traverse(void (*visit)(link));
+void destroy(void);
+void enqueue(link p);
+link dequeue(void);
+
+#endif</pre><pre class="programlisting">/* doublylinkedlist.c */
+#include &lt;stdlib.h&gt;
+#include "doublylinkedlist.h"
+
+struct node tailsentinel;
+struct node headsentinel = {0, NULL, &amp;tailsentinel};
+struct node tailsentinel = {0, &amp;headsentinel, NULL};
+
+static link head = &amp;headsentinel;
+static link tail = &amp;tailsentinel;
+
+link make_node(unsigned char item)
+{
+	link p = malloc(sizeof *p);
+	p-&gt;item = item;
+	p-&gt;prev = p-&gt;next = NULL;
+	return p;
+}
+
+void free_node(link p)
+{
+	free(p);
+}
+
+link search(unsigned char key)
+{
+	link p;
+	for (p = head-&gt;next; p != tail; p = p-&gt;next)
+		if (p-&gt;item == key)
+			return p;
+	return NULL;
+}
+
+void insert(link p)
+{
+	p-&gt;next = head-&gt;next;
+	head-&gt;next-&gt;prev = p;
+	head-&gt;next = p;
+	p-&gt;prev = head;
+}
+
+void delete(link p)
+{
+	p-&gt;prev-&gt;next = p-&gt;next;
+	p-&gt;next-&gt;prev = p-&gt;prev;
+}
+
+void traverse(void (*visit)(link))
+{
+	link p;
+	for (p = head-&gt;next; p != tail; p = p-&gt;next)
+		visit(p);
+}
+
+void destroy(void)
+{
+	link q, p = head-&gt;next;
+	head-&gt;next = tail;
+	tail-&gt;prev = head;
+	while (p != tail) {
+		q = p;
+		p = p-&gt;next;
+		free_node(q);
+	}
+}
+
+void enqueue(link p)
+{
+	insert(p);
+}
+
+link dequeue(void)
+{
+	if (tail-&gt;prev == head)
+		return NULL;
+	else {
+		link p = tail-&gt;prev;
+		delete(p);
+		return p;
+	}
+}</pre><pre class="programlisting">/* main.c */
+#include &lt;stdio.h&gt;
+#include "doublylinkedlist.h"
+
+void print_item(link p)
+{
+	printf("%d\n", p-&gt;item); 
+}
+
+int main(void)
+{
+	link p = make_node(10);
+	insert(p);
+	p = make_node(5);
+	insert(p);
+	p = make_node(90);
+	insert(p);
+	p = search(5);
+	delete(p);
+	free_node(p);
+	traverse(print_item);
+	destroy();
+
+	p = make_node(100);
+	enqueue(p);
+	p = make_node(200);
+	enqueue(p);
+	p = make_node(250);
+	enqueue(p);
+	while (p = dequeue()) {
+		print_item(p);
+		free_node(p);
+	}
+
+	return 0;
+}</pre></div></div><br class="example-break" /><div class="figure"><a id="id2845549"></a><p class="title"><b>圖 26.6. 帶Sentinel的雙向鏈表</b></p><div class="figure-contents"><div><img src="images/linkedlist.sentinel.png" alt="帶Sentinel的雙向鏈表" /></div></div></div><br class="figure-break" /><p>這個例子也實現了隊列的<code class="literal">enqueue</code>和<code class="literal">dequeue</code>操作，現在每個節點有了<code class="literal">prev</code>指針，可以反過來在<code class="literal">head</code>處<code class="literal">enqueue</code>而在<code class="literal">tail</code>處<code class="literal">dequeue</code>了。</p><p>現在結合<a class="xref" href="ch12s05.html#stackqueue.circular">第 5 節 “環形隊列”</a>想一想，其實用鏈表實現環形隊列是最自然的，以前基于數組實現環形隊列，我們還需要“<span class="quote">假想</span>”它是首尾相接的，而如果基于鏈表實現環形隊列，我們本來就可以用指針串成首尾相接的。把上面的程序改成環形鏈表（Circular Linked List）<a id="id2845629" class="indexterm"></a>也非常簡單，只需要把<code class="literal">doublylinkedlist.c</code>中的</p><pre class="programlisting">struct node tailsentinel;
+struct node headsentinel = {0, NULL, &amp;tailsentinel};
+struct node tailsentinel = {0, &amp;headsentinel, NULL};
+
+static link head = &amp;headsentinel;
+static link tail = &amp;tailsentinel;</pre><p>改成：</p><pre class="programlisting">struct node sentinel = {0, &amp;sentinel, &amp;sentinel};
+static link head = &amp;sentinel;</pre><p>再把<code class="literal">doublylinkedlist.c</code>中所有的<code class="literal">tail</code>替換成<code class="literal">head</code>即可，相當於把<code class="literal">head</code>和<code class="literal">tail</code>合二為一了。</p><div class="figure"><a id="id2845693"></a><p class="title"><b>圖 26.7. 環形鏈表</b></p><div class="figure-contents"><div><img src="images/linkedlist.circular.png" alt="環形鏈表" /></div></div></div><br class="figure-break" /></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2845707"></a>1.3. 靜態鏈表</h3></div></div></div><p>回想一下我們在<a class="xref" href="ch12s04.html#stackqueue.bfs">例 12.4 “用廣度優先搜索解迷宮問題”</a>中使用的資料結構，我把圖重新畫在下面。</p><div class="figure"><a id="id2845725"></a><p class="title"><b>圖 26.8. 廣度優先搜索的隊列資料結構</b></p><div class="figure-contents"><div><img src="images/stackqueue.bfsqueue.png" alt="廣度優先搜索的隊列資料結構" /></div></div></div><br class="figure-break" /><p>這是一個靜態分配的數組，每個數組元素都有<code class="literal">row</code>、<code class="literal">col</code>和<code class="literal">predecessor</code>三個成員，<code class="literal">predecessor</code>成員保存一個數組下標，指向數組中的另一個元素，這其實也是鏈表的一種形式，稱為靜態鏈表，例如上圖中的第6、4、2、1、0個元素串成一條鏈表。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2845773"></a>1.4. 本節綜合練習</h3></div></div></div><p>1、Josephus是公元1世紀的著名歷史學家，相傳在一次戰役中他和另外幾個人被圍困在山洞裡，他們寧死不屈，決定站成一圈，每次數到三個人就殺一個，直到全部死光為止。Josephus和他的一個朋友不想死，於是串通好了站在適當的位置上，最後只剩下他們倆的時候這個遊戲就停止了。如果一開始的人數為<code class="literal">N</code>，每次數到<code class="literal">M</code>個人就殺一個，那麼要想不死應該站在什麼位置呢？這個問題比較複雜，<a class="xref" href="bi01.html#bibli.concrete" title="Concrete Mathematics">[<abbr class="abbrev">具體數學</abbr>]</a>的1.3節研究了Josephus問題的解，有興趣的讀者可以參考。現在我們做個比較簡單的練習，用鏈表模擬Josephus他們玩的這個遊戲，<code class="literal">N</code>和<code class="literal">M</code>作為命令行參數傳入，每個人的編號依次是1~N，打印每次被殺者的編號，打印最後一個倖存者的編號。</p><p>2、在<a class="xref" href="ch25s02.html#stdlib.ioproblem">第 2.11 節 “本節綜合練習”</a>的習題1中規定了一種日誌檔案的格式，每行是一條記錄，由行號、日期、時間三個欄位組成，由於記錄是按時間先後順序寫入的，可以看作所有記錄是按日期排序的，對於日期相同的記錄再按時間排序。現在要求從這樣的一個日誌檔案中讀出所有記錄組成一個鏈表，在鏈表中首先按時間排序，對於時間相同的記錄再按日期排序，最後寫回檔案中。比如原檔案的內容是：</p><pre class="programlisting">1 2009-7-30 15:16:42
+2 2009-7-30 15:16:43
+3 2009-7-31 15:16:41
+4 2009-7-31 15:16:42
+5 2009-7-31 15:16:43
+6 2009-7-31 15:16:44</pre><p>重新排序輸出的檔案內容是：</p><pre class="programlisting">1 2009-7-31 15:16:41
+2 2009-7-30 15:16:42
+3 2009-7-31 15:16:42
+4 2009-7-30 15:16:43
+5 2009-7-31 15:16:43
+6 2009-7-31 15:16:44</pre></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch26.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch26.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch26s02.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">第 26 章 鏈表、二叉樹和哈希表 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 2. 二叉樹</td></tr></table></div></body></html>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 共享庫</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch20.html" title="第 20 章 連結詳解" /><link rel="prev" href="ch20s03.html" title="3. 靜態庫" /><link rel="next" href="ch20s05.html" title="5. 虛擬內存管理" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 共享庫</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch20s03.html">上一頁</a> </td><th width="60%" align="center">第 20 章 連結詳解</th><td width="20%" align="right"> <a accesskey="n" href="ch20s05.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2789683"></a>4. 共享庫</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2789691"></a>4.1. 編譯、連結、運行</h3></div></div></div><p>組成共享庫的目標檔案和一般的目標檔案有所不同，在編譯時要加<code class="literal">-fPIC</code>選項，例如：</p><pre class="screen">$ gcc -c -fPIC stack/stack.c stack/push.c stack/pop.c stack/is_empty.c</pre><p><code class="literal">-f</code>後面跟一些編譯選項，<code class="literal">PIC</code>是其中一種，表示生成位置無關代碼（Position Independent Code）<a id="id2789725" class="indexterm"></a>。那麼用<code class="literal">-fPIC</code>生成的目標檔案和一般的目標檔案有什麼不同呢？下面分析這個問題。</p><p>我們知道一般的目標檔案稱為Relocatable，在連結時可以把目標檔案中各段的地址做重定位，重定位時需要修改指令。我們先不加<code class="literal">-fPIC</code>選項編譯生成目標檔案：</p><pre class="screen">$ gcc -c -g stack/stack.c stack/push.c stack/pop.c stack/is_empty.c</pre><p>由於接下來要用<code class="literal">objdump -dS</code>把反彙編指令和原始碼穿插起來分析，所以用<code class="literal">-g</code>選項加調試信息。注意，加調試信息必須在編譯每個目標檔案時用<code class="literal">-g</code>選項，而不能只在最後編譯生成執行檔時用<code class="literal">-g</code>選項。反彙編查看<code class="literal">push.o</code>：</p><pre class="screen">$ objdump -dS push.o 
+
+push.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 &lt;push&gt;:
+/* push.c */
+extern char stack[512];
+extern int top;
+
+void push(char c)
+{
+   0:	55                   	push   %ebp
+   1:	89 e5                	mov    %esp,%ebp
+   3:	83 ec 04             	sub    $0x4,%esp
+   6:	8b 45 08             	mov    0x8(%ebp),%eax
+   9:	88 45 fc             	mov    %al,-0x4(%ebp)
+	stack[++top] = c;
+   c:	a1 00 00 00 00       	mov    0x0,%eax
+  11:	83 c0 01             	add    $0x1,%eax
+  14:	a3 00 00 00 00       	mov    %eax,0x0
+  19:	8b 15 00 00 00 00    	mov    0x0,%edx
+  1f:	0f b6 45 fc          	movzbl -0x4(%ebp),%eax
+  23:	88 82 00 00 00 00    	mov    %al,0x0(%edx)
+}
+  29:	c9                   	leave  
+  2a:	c3                   	ret</pre><p>指令中凡是用到<code class="literal">stack</code>和<code class="literal">top</code>的地址都用0x0表示，準備在重定位時修改。再看<code class="literal">readelf</code>輸出的<code class="literal">.rel.text</code>段的信息：</p><pre class="screen">Relocation section '.rel.text' at offset 0x848 contains 4 entries:
+ Offset     Info    Type            Sym.Value  Sym. Name
+0000000d  00001001 R_386_32          00000000   top
+00000015  00001001 R_386_32          00000000   top
+0000001b  00001001 R_386_32          00000000   top
+00000025  00001101 R_386_32          00000000   stack</pre><p>標出了指令中有四處需要在重定位時修改。下面編譯連結成執行檔之後再做反彙編分析：</p><pre class="screen">$ gcc -g main.c stack.o push.o pop.o is_empty.o -Istack -o main
+$ objdump -dS main
+...
+080483c0 &lt;push&gt;:
+/* push.c */
+extern char stack[512];
+extern int top;
+
+void push(char c)
+{
+ 80483c0:       55                      push   %ebp
+ 80483c1:       89 e5                   mov    %esp,%ebp
+ 80483c3:       83 ec 04                sub    $0x4,%esp
+ 80483c6:       8b 45 08                mov    0x8(%ebp),%eax
+ 80483c9:       88 45 fc                mov    %al,-0x4(%ebp)
+        stack[++top] = c;
+ 80483cc:       a1 10 a0 04 08          mov    0x804a010,%eax
+ 80483d1:       83 c0 01                add    $0x1,%eax
+ 80483d4:       a3 10 a0 04 08          mov    %eax,0x804a010
+ 80483d9:       8b 15 10 a0 04 08       mov    0x804a010,%edx
+ 80483df:       0f b6 45 fc             movzbl -0x4(%ebp),%eax
+ 80483e3:       88 82 40 a0 04 08       mov    %al,0x804a040(%edx)
+}
+ 80483e9:       c9                      leave  
+ 80483ea:       c3                      ret    
+ 80483eb:       90                      nop    
+...</pre><p>原來指令中的0x0被修改成了0x804a010和0x804a040，這樣做了重定位之後，各段的加載地址就定死了，因為在指令中使用了絶對地址。</p><p>現在看用<code class="literal">-fPIC</code>編譯生成的目標檔案有什麼不同：</p><pre class="screen">$ gcc -c -g -fPIC stack/stack.c stack/push.c stack/pop.c stack/is_empty.c
+$ objdump -dS push.o
+
+push.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 &lt;push&gt;:
+/* push.c */
+extern char stack[512];
+extern int top;
+
+void push(char c)
+{
+   0:	55                   	push   %ebp
+   1:	89 e5                	mov    %esp,%ebp
+   3:	53                   	push   %ebx
+   4:	83 ec 04             	sub    $0x4,%esp
+   7:	e8 fc ff ff ff       	call   8 &lt;push+0x8&gt;
+   c:	81 c3 02 00 00 00    	add    $0x2,%ebx
+  12:	8b 45 08             	mov    0x8(%ebp),%eax
+  15:	88 45 f8             	mov    %al,-0x8(%ebp)
+	stack[++top] = c;
+  18:	8b 83 00 00 00 00    	mov    0x0(%ebx),%eax
+  1e:	8b 00                	mov    (%eax),%eax
+  20:	8d 50 01             	lea    0x1(%eax),%edx
+  23:	8b 83 00 00 00 00    	mov    0x0(%ebx),%eax
+  29:	89 10                	mov    %edx,(%eax)
+  2b:	8b 83 00 00 00 00    	mov    0x0(%ebx),%eax
+  31:	8b 08                	mov    (%eax),%ecx
+  33:	8b 93 00 00 00 00    	mov    0x0(%ebx),%edx
+  39:	0f b6 45 f8          	movzbl -0x8(%ebp),%eax
+  3d:	88 04 0a             	mov    %al,(%edx,%ecx,1)
+}
+  40:	83 c4 04             	add    $0x4,%esp
+  43:	5b                   	pop    %ebx
+  44:	5d                   	pop    %ebp
+  45:	c3                   	ret    
+
+Disassembly of section .text.__i686.get_pc_thunk.bx:
+
+00000000 &lt;__i686.get_pc_thunk.bx&gt;:
+   0:	8b 1c 24             	mov    (%esp),%ebx
+   3:	c3                   	ret</pre><p>指令中用到的<code class="literal">stack</code>和<code class="literal">top</code>的地址不再以0x0表示，而是以<code class="literal">0x0(%ebx)</code>表示，但其中還是留有0x0準備做進一步修改。再看<code class="literal">readelf</code>輸出的<code class="literal">.rel.text</code>段：</p><pre class="screen">Relocation section '.rel.text' at offset 0x94c contains 6 entries:
+ Offset     Info    Type            Sym.Value  Sym. Name
+00000008  00001202 R_386_PC32        00000000   __i686.get_pc_thunk.bx
+0000000e  0000130a R_386_GOTPC       00000000   _GLOBAL_OFFSET_TABLE_
+0000001a  00001403 R_386_GOT32       00000000   top
+00000025  00001403 R_386_GOT32       00000000   top
+0000002d  00001403 R_386_GOT32       00000000   top
+00000035  00001503 R_386_GOT32       00000000   stack</pre><p><code class="literal">top</code>和<code class="literal">stack</code>對應的記錄類型不再是<code class="literal">R_386_32</code>了，而是<code class="literal">R_386_GOT32</code>，有什麼區別呢？我們先編譯生成共享庫再做反彙編分析：</p><pre class="screen">$ gcc -shared -o libstack.so stack.o push.o pop.o is_empty.o
+$ objdump -dS libstack.so
+...
+0000047c &lt;push&gt;:
+/* push.c */
+extern char stack[512];
+extern int top;
+
+void push(char c)
+{
+ 47c:	55                   	push   %ebp
+ 47d:	89 e5                	mov    %esp,%ebp
+ 47f:	53                   	push   %ebx
+ 480:	83 ec 04             	sub    $0x4,%esp
+ 483:	e8 ef ff ff ff       	call   477 &lt;__i686.get_pc_thunk.bx&gt;
+ 488:	81 c3 6c 1b 00 00    	add    $0x1b6c,%ebx
+ 48e:	8b 45 08             	mov    0x8(%ebp),%eax
+ 491:	88 45 f8             	mov    %al,-0x8(%ebp)
+	stack[++top] = c;
+ 494:	8b 83 f4 ff ff ff    	mov    -0xc(%ebx),%eax
+ 49a:	8b 00                	mov    (%eax),%eax
+ 49c:	8d 50 01             	lea    0x1(%eax),%edx
+ 49f:	8b 83 f4 ff ff ff    	mov    -0xc(%ebx),%eax
+ 4a5:	89 10                	mov    %edx,(%eax)
+ 4a7:	8b 83 f4 ff ff ff    	mov    -0xc(%ebx),%eax
+ 4ad:	8b 08                	mov    (%eax),%ecx
+ 4af:	8b 93 f8 ff ff ff    	mov    -0x8(%ebx),%edx
+ 4b5:	0f b6 45 f8          	movzbl -0x8(%ebp),%eax
+ 4b9:	88 04 0a             	mov    %al,(%edx,%ecx,1)
+}
+ 4bc:	83 c4 04             	add    $0x4,%esp
+ 4bf:	5b                   	pop    %ebx
+ 4c0:	5d                   	pop    %ebp
+ 4c1:	c3                   	ret    
+ 4c2:	90                   	nop    
+ 4c3:	90                   	nop    
+...</pre><p>和先前的結果不同，指令中的<code class="literal">0x0(%ebx)</code>被修改成<code class="literal">-0xc(%ebx)</code>和<code class="literal">-0x8(%ebx)</code>，而不是修改成絶對地址。所以共享庫各段的加載地址並沒有定死，可以加載到任意位置，因為指令中沒有使用絶對地址，因此稱為位置無關代碼。另外，注意這幾條指令：</p><pre class="screen"> 494:	8b 83 f4 ff ff ff    	mov    -0xc(%ebx),%eax
+ 49a:	8b 00                	mov    (%eax),%eax
+ 49c:	8d 50 01             	lea    0x1(%eax),%edx</pre><p>和先前的指令對比一下：</p><pre class="screen"> 80483cc:       a1 10 a0 04 08          mov    0x804a010,%eax
+ 80483d1:       83 c0 01                add    $0x1,%eax</pre><p>可以發現，<code class="literal">-0xc(%ebx)</code>這個地址並不是變數<code class="literal">top</code>的地址，這個地址的內存單元中又保存了另外一個地址，這另外一個地址才是變數<code class="literal">top</code>的地址，所以<code class="literal">mov    -0xc(%ebx),%eax</code>是把變數<code class="literal">top</code>的地址傳給<code class="literal">eax</code>，而<code class="literal">mov    (%eax),%eax</code>才是從<code class="literal">top</code>的地址中取出<code class="literal">top</code>的值傳給<code class="literal">eax</code>。<code class="literal">lea    0x1(%eax),%edx</code>是把<code class="literal">top</code>的值加1存到<code class="literal">edx</code>中，如下圖所示：</p><div class="figure"><a id="id2790289"></a><p class="title"><b>圖 20.3. 間接定址</b></p><div class="figure-contents"><div><img src="images/link.indirect.png" alt="間接定址" /></div></div></div><br class="figure-break" /><p><code class="literal">top</code>和<code class="literal">stack</code>的絶對地址保存在一個地址表中，而指令通過地址表做間接定址，因此避免了將絶對地址寫死在指令中，這也是一種避免硬編碼的策略。</p><p>現在把<code class="literal">main.c</code>和共享庫編譯連結在一起，然後運行：</p><pre class="screen">$ gcc main.c -g -L. -lstack -Istack -o main
+$ ./main 
+./main: error while loading shared libraries: libstack.so: cannot open shared object file: No such file or directory</pre><p>結果出乎意料，編譯的時候沒問題，由於指定了<code class="literal">-L.</code>選項，編譯器可以在當前目錄下找到<code class="literal">libstack.so</code>，而運行時卻說找不到<code class="literal">libstack.so</code>。那麼運行時在哪些路徑下找共享庫呢？我們先用<code class="literal">ldd</code>命令查看執行檔依賴于哪些共享庫：</p><pre class="screen">$ ldd main
+	linux-gate.so.1 =&gt;  (0xb7f5c000)
+	libstack.so =&gt; not found
+	libc.so.6 =&gt; /lib/tls/i686/cmov/libc.so.6 (0xb7dcf000)
+	/lib/ld-linux.so.2 (0xb7f42000)</pre><p><code class="literal">ldd</code>模擬運行一遍<code class="literal">main</code>，在運行過程中做動態連結，從而得知這個執行檔依賴于哪些共享庫，每個共享庫都在什麼路徑下，加載到進程地址空間的什麼地址。<code class="literal">/lib/ld-linux.so.2</code>是動態連結器，它的路徑是在編譯連結時指定的，我們在<a class="xref" href="ch19s02.html#asmc.main">第 2 節 “<code class="literal">main</code>函數和啟動常式”</a>講過<code class="literal">gcc</code>在做連結時用<code class="literal">-dynamic-linker</code>指定動態連結器的路徑，它也像其它共享庫一樣加載到進程的地址空間中。<code class="literal">libc.so.6</code>的路徑<code class="literal">/lib/tls/i686/cmov/libc.so.6</code>是由動態連結器<code class="literal">ld-linux.so.2</code>在做動態連結時搜索到的，而<code class="literal">libstack.so</code>的路徑沒有找到。<code class="literal">linux-gate.so.1</code>這個共享庫其實並不存在於檔案系統中，它是由內核虛擬出來的共享庫，所以它沒有對應的路徑，它負責處理系統調用。總之，共享庫的搜索路徑由動態連結器決定，從<code class="literal">ld.so(8)</code>的Man Page可以查到共享庫路徑的搜索順序：</p><div class="orderedlist"><ol type="1"><li><p>首先在環境變數<code class="literal">LD_LIBRARY_PATH</code>所記錄的路徑中查找。</p></li><li><p>然後從緩存檔案<code class="literal">/etc/ld.so.cache</code>中查找。這個緩存檔案由<code class="literal">ldconfig</code>命令讀取配置檔案<code class="literal">/etc/ld.so.conf</code>之後生成，稍後詳細解釋。</p></li><li><p>如果上述步驟都找不到，則到預設的系統路徑中查找，先是/usr/lib然後是/lib。</p></li></ol></div><p>先試試第一種方法，在運行<code class="literal">main</code>時通過環境變數<code class="literal">LD_LIBRARY_PATH</code>把當前目錄添加到共享庫的搜索路徑：</p><pre class="screen">$ LD_LIBRARY_PATH=. ./main</pre><p>這種方法只適合在開發中臨時用一下，通常<code class="literal">LD_LIBRARY_PATH</code>是不推薦使用的，儘量不要設置這個環境變數，理由可以參考Why LD_LIBRARY_PATH is bad（<a class="ulink" href="http://www.visi.com/~barr/ldpath.html" target="_top">http://www.visi.com/~barr/ldpath.html</a>）。</p><p>再試試第二種方法，這是最常用的方法。把<code class="literal">libstack.so</code>所在目錄的絶對路徑（比如/home/akaedu/somedir）添加到<code class="literal">/etc/ld.so.conf</code>中（該檔案中每個路徑占一行），然後運行<code class="literal">ldconfig</code>：</p><pre class="screen">$ sudo ldconfig -v
+...
+/home/akaedu/somedir:
+        libstack.so -&gt; libstack.so
+/lib:
+        libe2p.so.2 -&gt; libe2p.so.2.3
+        libncursesw.so.5 -&gt; libncursesw.so.5.6
+...
+/usr/lib:
+        libkdeinit_klauncher.so -&gt; libkdeinit_klauncher.so
+        libv4l2.so.0 -&gt; libv4l2.so.0
+...
+/usr/lib64:
+/lib/tls: (hwcap: 0x8000000000000000)
+/usr/lib/sse2: (hwcap: 0x0000000004000000)
+...
+/usr/lib/tls: (hwcap: 0x8000000000000000)
+...
+/usr/lib/i686: (hwcap: 0x0008000000000000)
+/usr/lib/i586: (hwcap: 0x0004000000000000)
+...
+/usr/lib/i486: (hwcap: 0x0002000000000000)
+...
+/lib/tls/i686: (hwcap: 0x8008000000000000)
+/usr/lib/i686/cmov: (hwcap: 0x0008000000008000)
+...
+/lib/tls/i686/cmov: (hwcap: 0x8008000000008000)</pre><p><code class="literal">ldconfig</code>命令除了處理<code class="literal">/etc/ld.so.conf</code>中配置的目錄之外，還處理一些預設目錄，如<code class="literal">/lib</code>、<code class="literal">/usr/lib</code>等，處理之後生成<code class="literal">/etc/ld.so.cache</code>緩存檔案，動態連結器就從這個緩存中搜索共享庫。hwcap是x86平台的Linux特有的一種機制，系統檢測到當前平台是i686而不是<code class="literal">i586</code>或<code class="literal">i486</code>，所以在運行程序時使用i686的庫，這樣可以更好地發揮平台的性能，也可以利用一些新的指令，所以上面<code class="literal">ldd</code>命令的輸出結果顯示動態連結器搜索到的<code class="literal">libc</code>是<code class="literal">/lib/tls/i686/cmov/libc.so.6</code>，而不是<code class="literal">/lib/libc.so.6</code>。現在再用<code class="literal">ldd</code>命令查看，<code class="literal">libstack.so</code>就能找到了：</p><pre class="screen">$ ldd main
+	linux-gate.so.1 =&gt;  (0xb809c000)
+	libstack.so =&gt; /home/akaedu/somedir/libstack.so (0xb806a000)
+	libc.so.6 =&gt; /lib/tls/i686/cmov/libc.so.6 (0xb7f0c000)
+	/lib/ld-linux.so.2 (0xb8082000)</pre><p>第三種方法就是把<code class="literal">libstack.so</code>拷到<code class="literal">/usr/lib</code>或<code class="literal">/lib</code>目錄，這樣可以確保動態連結器能找到這個共享庫。</p><p>其實還有第四種方法，在編譯執行檔<code class="literal">main</code>的時候就把<code class="literal">libstack.so</code>的路徑寫死在執行檔中：</p><pre class="screen">$ gcc main.c -g -L. -lstack -Istack -o main -Wl,-rpath,/home/akaedu/somedir</pre><p><code class="literal">-Wl,-rpath,/home/akaedu/somedir</code>表示<code class="literal">-rpath /home/akaedu/somedir</code>是由<code class="literal">gcc</code>傳遞給連結器的選項。可以看到<code class="literal">readelf</code>的結果多了一條<code class="literal">rpath</code>記錄：</p><pre class="screen">$ readelf -a main
+...
+Dynamic section at offset 0xf10 contains 23 entries:
+  Tag        Type                         Name/Value
+ 0x00000001 (NEEDED)                     Shared library: [libstack.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so.6]
+ 0x0000000f (RPATH)                      Library rpath: [/home/akaedu/somedir]
+...</pre><p>還可以看出，執行檔運行時需要哪些共享庫也都記錄在<code class="literal">.dynamic</code>段中。當然<code class="literal">rpath</code>這種辦法也是不推薦的，把共享庫的路徑定死了，失去了靈活性。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2790795"></a>4.2. 動態連結的過程</h3></div></div></div><p>本節研究一下在<code class="literal">main.c</code>中調用共享庫的函數<code class="literal">push</code>是如何實現的。首先反彙編看一下<code class="literal">main</code>的指令：</p><pre class="screen">$ objdump -dS main
+...
+Disassembly of section .plt:
+
+080483a8 &lt;__gmon_start__@plt-0x10&gt;:
+ 80483a8:	ff 35 f8 9f 04 08    	pushl  0x8049ff8
+ 80483ae:	ff 25 fc 9f 04 08    	jmp    *0x8049ffc
+ 80483b4:	00 00                	add    %al,(%eax)
+...
+080483d8 &lt;push@plt&gt;:
+ 80483d8:	ff 25 08 a0 04 08    	jmp    *0x804a008
+ 80483de:	68 10 00 00 00       	push   $0x10
+ 80483e3:	e9 c0 ff ff ff       	jmp    80483a8 &lt;_init+0x30&gt;
+
+Disassembly of section .text:
+...
+080484a4 &lt;main&gt;:
+/* main.c */
+#include &lt;stdio.h&gt;
+#include "stack.h"
+
+int main(void)
+{
+ 80484a4:	8d 4c 24 04          	lea    0x4(%esp),%ecx
+ 80484a8:	83 e4 f0             	and    $0xfffffff0,%esp
+ 80484ab:	ff 71 fc             	pushl  -0x4(%ecx)
+ 80484ae:	55                   	push   %ebp
+ 80484af:	89 e5                	mov    %esp,%ebp
+ 80484b1:	51                   	push   %ecx
+ 80484b2:	83 ec 04             	sub    $0x4,%esp
+	push('a');
+ 80484b5:	c7 04 24 61 00 00 00 	movl   $0x61,(%esp)
+ 80484bc:	e8 17 ff ff ff       	call   80483d8 &lt;push@plt&gt;
+...</pre><p>和<a class="xref" href="ch20s03.html#link.staticlib">第 3 節 “靜態庫”</a>連結靜態庫不同，<code class="literal">push</code>函數沒有連結到執行檔中。而且<code class="literal">call   80483d8 &lt;push@plt&gt;</code>這條指令調用的也不是<code class="literal">push</code>函數的地址。共享庫是位置無關代碼，在運行時可以加載到任意地址，其加載地址只有在動態連結時才能確定，所以在<code class="literal">main</code>函數中不可能直接通過絶對地址調用<code class="literal">push</code>函數，也是通過間接定址來找<code class="literal">push</code>函數的。對照着上面的指令，我們用<code class="literal">gdb</code>跟蹤一下：</p><pre class="screen">$ gdb main
+...
+(gdb) start
+Breakpoint 1 at 0x80484b5: file main.c, line 7.
+Starting program: /home/akaedu/somedir/main 
+main () at main.c:7
+7		push('a');
+(gdb) si
+0x080484bc	7		push('a');
+(gdb) si
+0x080483d8 in push@plt ()
+Current language:  auto; currently asm</pre><p>跳轉到<code class="literal">.plt</code>段中，現在將要執行一條<code class="literal">jmp    *0x804a008</code>指令，我們看看0x804a008這個地址裡存的是什麼：</p><pre class="screen">(gdb) x 0x804a008
+0x804a008 &lt;_GLOBAL_OFFSET_TABLE_+20&gt;:	0x080483de</pre><p>原來就是下一條指令<code class="literal">push   $0x10</code>的地址。繼續跟蹤下去：</p><pre class="screen">(gdb) si
+0x080483de in push@plt ()
+(gdb) si
+0x080483e3 in push@plt ()
+(gdb) si
+0x080483a8 in ?? ()
+(gdb) si
+0x080483ae in ?? ()
+(gdb) si
+0xb806a080 in ?? () from /lib/ld-linux.so.2</pre><p>最終進入了動態連結器<code class="literal">/lib/ld-linux.so.2</code>，在其中完成動態連結的過程並調用<code class="literal">push</code>函數，我們不深入這些細節了，直接用<code class="literal">finish</code>命令返回到<code class="literal">main</code>函數：</p><pre class="screen">(gdb) finish
+Run till exit from #0  0xb806a080 in ?? () from /lib/ld-linux.so.2
+main () at main.c:8
+8		return 0;
+Current language:  auto; currently c</pre><p>這時再看看0x804a008這個地址裡存的是什麼：</p><pre class="screen">(gdb) x 0x804a008
+0x804a008 &lt;_GLOBAL_OFFSET_TABLE_+20&gt;:	0xb803f47c
+(gdb) x 0xb803f47c
+0xb803f47c &lt;push&gt;:	0x53e58955</pre><p>動態連結器已經把<code class="literal">push</code>函數的地址存在這裡了，所以下次再調用<code class="literal">push</code>函數就可以直接從<code class="literal">jmp    *0x804a008</code>指令跳到它的地址，而不必再進入<code class="literal">/lib/ld-linux.so.2</code>做動態連結了。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2791032"></a>4.3. 共享庫的命名慣例</h3></div></div></div><p>你可能已經注意到了，系統的共享庫通常帶有符號連結，例如：</p><pre class="screen">$ ls -l  /lib
+...
+-rwxr-xr-x  1 root root 1315024 2009-01-09 22:10 libc-2.8.90.so
+lrwxrwxrwx  1 root root      14 2008-07-04 05:58 libcap.so.1 -&gt; libcap.so.1.10
+-rw-r--r--  1 root root   10316 2007-08-01 03:20 libcap.so.1.10
+lrwxrwxrwx  1 root root      14 2008-11-01 08:55 libcap.so.2 -&gt; libcap.so.2.10
+-rw-r--r--  1 root root   13792 2008-06-12 21:39 libcap.so.2.10
+...
+lrwxrwxrwx  1 root root      14 2009-01-13 09:28 libc.so.6 -&gt; libc-2.8.90.so
+...
+$ ls -l /usr/lib/libc.so
+-rw-r--r-- 1 root root 238 2009-01-09 21:59 /usr/lib/libc.so</pre><p>按照共享庫的命名慣例，每個共享庫有三個檔案名：real name、soname和linker name。真正的庫檔案（而不是符號連結）的名字是real name，包含完整的共享庫版本號。例如上面的<code class="literal">libcap.so.1.10</code>、<code class="literal">libc-2.8.90.so</code>等。</p><p>soname是一個符號連結的名字，只包含共享庫的主版本號，主版本號一致即可保證庫函數的介面一致，因此應用程序的<code class="literal">.dynamic</code>段只記錄共享庫的soname，只要soname一致，這個共享庫就可以用。例如上面的<code class="literal">libcap.so.1</code>和<code class="literal">libcap.so.2</code>是兩個主版本號不同的<code class="literal">libcap</code>，有些應用程序依賴于<code class="literal">libcap.so.1</code>，有些應用程序依賴于<code class="literal">libcap.so.2</code>，但對於依賴<code class="literal">libcap.so.1</code>的應用程序來說，真正的庫檔案不管是<code class="literal">libcap.so.1.10</code>還是<code class="literal">libcap.so.1.11</code>都可以用，所以使用共享庫可以很方便地升級庫檔案而不需要重新編譯應用程序，這是靜態庫所沒有的優點。注意<code class="literal">libc</code>的版本編號有一點特殊，<code class="literal">libc-2.8.90.so</code>的主版本號是6而不是2或2.8。</p><p>linker name僅在編譯連結時使用，<code class="literal">gcc</code>的<code class="literal">-L</code>選項應該指定linker name所在的目錄。有的linker name是庫檔案的一個符號連結，有的linker name是一段連結腳本。例如上面的<code class="literal">libc.so</code>就是一個linker name，它是一段連結腳本：</p><pre class="screen">$ cat /usr/lib/libc.so
+/* GNU ld script
+   Use the shared library, but some functions are only in
+   the static library, so try that secondarily.  */
+OUTPUT_FORMAT(elf32-i386)
+GROUP ( /lib/libc.so.6 /usr/lib/libc_nonshared.a  AS_NEEDED ( /lib/ld-linux.so.2 ) )</pre><p>下面重新編譯我們的<code class="literal">libstack</code>，指定它的soname：</p><pre class="screen">$ gcc -shared -Wl,-soname,libstack.so.1 -o libstack.so.1.0 stack.o push.o pop.o is_empty.o</pre><p>這樣編譯生成的庫檔案是<code class="literal">libstack.so.1.0</code>，是real name，但這個庫檔案中記錄了它的soname是<code class="literal">libstack.so.1</code>：</p><pre class="screen">$ readelf -a libstack.so.1.0
+...
+Dynamic section at offset 0xf10 contains 22 entries:
+  Tag        Type                         Name/Value
+ 0x00000001 (NEEDED)                     Shared library: [libc.so.6]
+ 0x0000000e (SONAME)                     Library soname: [libstack.so.1]
+...</pre><p>如果把<code class="literal">libstack.so.1.0</code>所在的目錄加入<code class="literal">/etc/ld.so.conf</code>中，然後運行<code class="literal">ldconfig</code>命令，<code class="literal">ldconfig</code>會自動創建一個soname的符號連結：</p><pre class="screen">$ sudo ldconfig
+$ ls -l libstack*
+lrwxrwxrwx 1 root    root       15 2009-01-21 17:52 libstack.so.1 -&gt; libstack.so.1.0
+-rwxr-xr-x 1 akaedu  akaedu  10142 2009-01-21 17:49 libstack.so.1.0</pre><p>但這樣編譯連結<code class="literal">main.c</code>卻會報錯：</p><pre class="screen">$ gcc main.c -L. -lstack -Istack -o main
+/usr/bin/ld: cannot find -lstack
+collect2: ld returned 1 exit status</pre><p>注意，要做這個實驗，你得把先前編譯的<code class="literal">libstack</code>共享庫、靜態庫都刪掉，如果先前拷到<code class="literal">/lib</code>或者<code class="literal">/usr/lib</code>下了也刪掉，只留下<code class="literal">libstack.so.1.0</code>和<code class="literal">libstack.so.1</code>，這樣你會發現編譯器不認這兩個名字，因為編譯器只認linker name。可以先創建一個linker name的符號連結，然後再編譯就沒問題了：</p><pre class="screen">$ ln -s libstack.so.1.0 libstack.so
+$ gcc main.c -L. -lstack -Istack -o main</pre></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch20s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch20.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch20s05.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 靜態庫 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 5. 虛擬內存管理</td></tr></table></div></body></html>

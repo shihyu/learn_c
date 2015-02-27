@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>5. C內聯彙編</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch19.html" title="第 19 章 彙編與C之間的關係" /><link rel="prev" href="ch19s04.html" title="4. 結構體和聯合體" /><link rel="next" href="ch19s06.html" title="6. volatile限定符" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5. C內聯彙編</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch19s04.html">上一頁</a> </td><th width="60%" align="center">第 19 章 彙編與C之間的關係</th><td width="20%" align="right"> <a accesskey="n" href="ch19s06.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2779851"></a>5. C內聯彙編</h2></div></div></div><p>用C寫程序比直接用彙編寫程序更簡潔，可讀性更好，但效率可能不如彙編程序，因為C程序畢竟要經由編譯器生成彙編代碼，儘管現代編譯器的優化已經做得很好了，但還是不如手寫的彙編代碼。另外，有些平台相關的指令必須手寫，在C語言中沒有等價的語法，因為C語言的語法和概念是對各種平台的抽象，而各種平台特有的一些東西就不會在C語言中出現了，例如x86是連接埠I/O，而C語言就沒有這個概念，所以<code class="literal">in/out</code>指令必須用彙編來寫。</p><p>C語言簡潔易讀，容易組織規模較大的代碼，而彙編效率高，而且寫一些特殊指令必須用彙編，為了把這兩方面的好處都占全了，<code class="literal">gcc</code>提供了一種擴展語法可以在C代碼中使用內聯彙編（Inline Assembly）<a id="id2779900" class="indexterm"></a>。最簡單的格式是<code class="literal">__asm__("assembly code");</code>，例如<code class="literal">__asm__("nop");</code> ，<code class="literal">nop</code> 這條指令什麼都不做，只是讓CPU空轉一個指令執行周期。如果需要執行多條彙編指令，則應該用<code class="literal">\n\t</code>將各條指令分隔開，例如：</p><pre class="programlisting">__asm__("movl $1, %eax\n\t"
+	"movl $4, %ebx\n\t"
+	"int $0x80");</pre><p>通常 C 代碼中的內聯彙編需要和C的變數建立關聯，需要用到完整的內聯彙編格式：</p><pre class="programlisting">__asm__(assembler template 
+	: output operands                  /* optional */
+	: input operands                   /* optional */
+	: list of clobbered registers      /* optional */
+	);</pre><p>這種格式由四部分組成，第一部分是彙編指令，和上面的例子一樣，第二部分和第三部分是約束條件，第二部分指示彙編指令的運算結果要輸出到哪些C操作數中，C操作數應該是左值表達式，第三部分指示彙編指令需要從哪些C操作數獲得輸入，第四部分是在彙編指令中被修改過的寄存器列表，指示編譯器哪些寄存器的值在執行這條<code class="literal">__asm__</code>語句時會改變。後三個部分都是可選的，如果有就填寫，沒有就空着只寫個<code class="literal">:</code>號。例如：</p><div class="example"><a id="id2779984"></a><p class="title"><b>例 19.6. 內聯彙編</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main() 
+{
+        int a = 10, b;
+
+	__asm__("movl %1, %%eax\n\t"
+		"movl %%eax, %0\n\t"
+		:"=r"(b)        /* output */
+		:"r"(a)         /* input */
+		:"%eax"         /* clobbered register */
+		);
+	printf("Result: %d, %d\n", a, b);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>這個程序將變數<code class="literal">a</code>的值賦給<code class="literal">b</code>。<code class="literal">"r"(a)</code>指示編譯器分配一個寄存器保存變數<code class="literal">a</code>的值，作為彙編指令的輸入，也就是指令中的<code class="literal">%1</code>（按照約束條件的順序，<code class="literal">b</code>對應<code class="literal">%0</code>，<code class="literal">a</code>對應<code class="literal">1%</code>），至于<code class="literal">%1</code>究竟代表哪個寄存器則由編譯器自己決定。彙編指令首先把<code class="literal">%1</code>所代表的寄存器的值傳給<code class="literal">eax</code>（為了和<code class="literal">%1</code>這種占位符區分，<code class="literal">eax</code>前面要求加兩個<code class="literal">%</code>號），然後把<code class="literal">eax</code>的值再傳給<code class="literal">%0</code>所代表的寄存器。<code class="literal">"=r"(b)</code>就表示把<code class="literal">%0</code>所代表的寄存器的值輸出給變數<code class="literal">b</code>。在執行這兩條指令的過程中，寄存器<code class="literal">eax</code>的值被改變了，所以把<code class="literal">"%eax"</code>寫在第四部分，告訴編譯器在執行這條<code class="literal">__asm__</code>語句時<code class="literal">eax</code>要被改寫，所以在此期間不要用<code class="literal">eax</code>保存其它值。</p><p>我們看一下這個程序的反彙編結果：</p><pre class="screen">        __asm__("movl %1, %%eax\n\t"
+ 80483dc:       8b 55 f8                mov    -0x8(%ebp),%edx
+ 80483df:       89 d0                   mov    %edx,%eax
+ 80483e1:       89 c2                   mov    %eax,%edx
+ 80483e3:       89 55 f4                mov    %edx,-0xc(%ebp)
+                "movl %%eax, %0\n\t"
+                :"=r"(b)        /* output */
+                :"r"(a)         /* input */
+                :"%eax"         /* clobbered register */
+                );</pre><p>可見<code class="literal">%0</code>和<code class="literal">%1</code>都代表<code class="literal">edx</code>寄存器，首先把變數<code class="literal">a</code>（位於<code class="literal">ebp-8</code>的位置）的值傳給<code class="literal">edx</code>然後執行內聯彙編的兩條指令，然後把<code class="literal">edx</code>的值傳給<code class="literal">b</code>（位於<code class="literal">ebp-12</code>的位置）。</p><p>關於內聯彙編就介紹這麼多，本書不做深入討論。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch19s04.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch19.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch19s06.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">4. 結構體和聯合體 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 6. volatile限定符</td></tr></table></div></body></html>

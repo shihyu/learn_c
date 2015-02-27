@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 全局變數、局部變數和作用域</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch03.html" title="第 3 章 簡單函數" /><link rel="prev" href="ch03s03.html" title="3. 形參和實參" /><link rel="next" href="ch04.html" title="第 4 章 分支語句" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 全局變數、局部變數和作用域</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s03.html">上一頁</a> </td><th width="60%" align="center">第 3 章 簡單函數</th><td width="20%" align="right"> <a accesskey="n" href="ch04.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2714471"></a>4. 全局變數、局部變數和作用域</h2></div></div></div><p>我們把函數中定義的變數稱為局部變數（Local Variable）<a id="id2714481" class="indexterm"></a>，由於形參相當於函數中定義的變數，所以形參也是一種局部變數。在這裡“<span class="quote">局部</span>”有兩層含義：</p><p>1、一個函數中定義的變數不能被另一個函數使用。例如<code class="literal">print_time</code>中的<code class="literal">hour</code>和<code class="literal">minute</code>在<code class="literal">main</code>函數中沒有定義，不能使用，同樣<code class="literal">main</code>函數中的局部變數也不能被<code class="literal">print_time</code>函數使用。如果這樣定義：</p><pre class="programlisting">void print_time(int hour, int minute)
+{
+	printf("%d:%d\n", hour, minute);
+}
+
+int main(void)
+{
+	int hour = 23, minute = 59;
+	print_time(hour, minute);
+	return 0;
+}</pre><p><code class="literal">main</code>函數中定義了局部變數<code class="literal">hour</code>，<code class="literal">print_time</code>函數中也有參數<code class="literal">hour</code>，雖然它們名稱相同，但仍然是兩個不同的變數，代表不同的存儲單元。<code class="literal">main</code>函數的局部變數<code class="literal">minute</code>和<code class="literal">print_time</code>函數的參數<code class="literal">minute</code>也是如此。</p><p>2、每次調用函數時局部變數都表示不同的存儲空間。局部變數在每次函數調用時分配存儲空間，在每次函數返回時釋放存儲空間，例如調用<code class="literal">print_time(23, 59)</code>時分配<code class="literal">hour</code>和<code class="literal">minute</code>兩個變數的存儲空間，在裡面分別存上23和59，函數返回時釋放它們的存儲空間，下次再調用<code class="literal">print_time(12, 20)</code>時又分配<code class="literal">hour</code>和<code class="literal">minute</code>的存儲空間，在裡面分別存上12和20。</p><p>與局部變數的概念相對的是全局變數（Global Variable）<a id="id2714634" class="indexterm"></a>，全局變數定義在所有的函數體之外，它們在程序開始運行時分配存儲空間，在程序結束時釋放存儲空間，在任何函數中都可以訪問全局變數，例如：</p><div class="example"><a id="id2714644"></a><p class="title"><b>例 3.5. 全局變數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int hour = 23, minute = 59;
+
+void print_time(void)
+{
+	printf("%d:%d in print_time\n", hour, minute);
+}
+
+int main(void)
+{
+	print_time();
+	printf("%d:%d in main\n", hour, minute);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>正因為全局變數在任何函數中都可以訪問，所以在程序運行過程中全局變數被讀寫的順序從原始碼中是看不出來的，原始碼的書寫順序並不能反映函數的調用順序。程序出現了Bug往往就是因為在某個不起眼的地方對全局變數的讀寫順序不正確，如果代碼規模很大，這種錯誤是很難找到的。而對局部變數的訪問不僅侷限在一個函數內部，而且侷限在一次函數調用之中，從函數的原始碼很容易看出訪問的先後順序是怎樣的，所以比較容易找到Bug。因此，<span class="emphasis"><em>雖然全局變數用起來很方便，但一定要慎用，能用函數傳參代替的就不要用全局變數</em></span>。</p><p>如果全局變數和局部變數重名了會怎麼樣呢？如果上面的例子改為：</p><div class="example"><a id="id2714690"></a><p class="title"><b>例 3.6. 作用域</b></p><div class="example-contents"><div><img src="images/func.scope.png" /></div></div></div><br class="example-break" /><p>則第一次調用<code class="literal">print_time</code>打印的是全局變數的值，第二次直接調用<code class="literal">printf</code>打印的則是<code class="literal">main</code>函數局部變數的值。在C語言中每個標識符都有特定的作用域，全局變數是定義在所有函數體之外的標識符，它的作用域從定義的位置開始直到源檔案結束，而<code class="literal">main</code>函數局部變數的作用域僅限于<code class="literal">main</code>函數之中。如上圖所示，設想整個源檔案是一張大紙，也就是全局變數的作用域，而<code class="literal">main</code>函數是蓋在這張大紙上的一張小紙，也就是<code class="literal">main</code>函數局部變數的作用域。在小紙上用到標識符<code class="literal">hour</code>和<code class="literal">minute</code>時應該參考小紙上的定義，因為大紙（全局變數的作用域）被蓋住了，如果在小紙上用到某個標識符卻沒有找到它的定義，那麼再去翻看下面的大紙上有沒有定義，例如上圖中的變數<code class="literal">x</code>。</p><p>到目前為止我們在初始化一個變數時都是用常量做Initializer，其實也可以用表達式做Initializer，但要注意一點：<span class="emphasis"><em>局部變數可以用類型相符的任意表達式來初始化，而全局變數只能用常量表達式（Constant Expression）<a id="id2714780" class="indexterm"></a>初始化</em></span>。例如，全局變數<code class="literal">pi</code>這樣初始化是合法的：</p><pre class="programlisting">double pi = 3.14 + 0.0016;</pre><p>但這樣初始化是不合法的：</p><pre class="programlisting">double pi = acos(-1.0);</pre><p>然而局部變數這樣初始化卻是可以的。程序開始運行時要用適當的值來初始化全局變數，所以初始值必須保存在編譯生成的執行檔中，因此初始值在<span class="emphasis"><em>編譯時</em></span>就要計算出來，然而上面第二種Initializer的值必須在程序<span class="emphasis"><em>運行時</em></span>調用<code class="literal">acos</code>函數才能得到，所以不能用來初始化全局變數。請注意區分編譯時和運行時這兩個概念。為了簡化編譯器的實現，C語言從語法上規定全局變數只能用常量表達式來初始化，因此下面這種全局變數初始化是不合法的：</p><pre class="programlisting">int minute = 360;
+int hour = minute / 60;</pre><p>雖然在編譯時計算出<code class="literal">hour</code>的初始值是可能的，但是<code class="literal">minute / 60</code>不是常量表達式，不符合語法規定，所以編譯器不必想辦法去算這個初始值。</p><p>如果全局變數在定義時不初始化則初始值是0，如果局部變數在定義時不初始化則初始值是不確定的。所以，<span class="emphasis"><em>局部變數在使用之前一定要先賦值</em></span>，如果基于一個不確定的值做後續計算肯定會引入Bug。</p><p>如何證明“<span class="quote">局部變數的存儲空間在每次函數調用時分配，在函數返回時釋放</span>”？當我們想要確認某些語法規則時，可以查教材，也可以查C99，但最快捷的辦法就是編個小程序驗證一下：</p><div class="example"><a id="id2714872"></a><p class="title"><b>例 3.7. 驗證局部變數存儲空間的分配和釋放</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+void foo(void)
+{
+	int i;
+	printf("%d\n", i);
+	i = 777;
+}
+
+int main(void)
+{
+	foo();
+	foo();
+	return 0;
+}</pre></div></div><br class="example-break" /><p>第一次調用<code class="literal">foo</code>函數，分配變數<code class="literal">i</code>的存儲空間，然後打印<code class="literal">i</code>的值，由於<code class="literal">i</code>未初始化，打印的應該是一個不確定的值，然後把<code class="literal">i</code>賦值為777，函數返回，釋放<code class="literal">i</code>的存儲空間。第二次調用<code class="literal">foo</code>函數，分配變數<code class="literal">i</code>的存儲空間，然後打印<code class="literal">i</code>的值，由於<code class="literal">i</code>未初始化，如果打印的又是一個不確定的值，就證明了“<span class="quote">局部變數的存儲空間在每次函數調用時分配，在函數返回時釋放</span>”。分析完了，我們運行程序看看是不是像我們分析的這樣：</p><pre class="screen">134518128
+777</pre><p>結果出乎意料，第二次調用打印的<code class="literal">i</code>值正是第一次調用末尾賦給<code class="literal">i</code>的值777。有一種初學者是這樣，原本就沒有把這條語法規則記牢，或者對自己的記憶力沒信心，看到這個結果就會想：哦那肯定是我記錯了，改過來記吧，應該是“<span class="quote">函數中的局部變數具有一直存在的固定的存儲空間，每次函數調用時使用它，返回時也不釋放，再次調用函數時它應該還能保持上次的值</span>”。還有一種初學者是懷疑論者或不可知論者，看到這個結果就會想：教材上明明說“<span class="quote">局部變數的存儲空間在每次函數調用時分配，在函數返回時釋放</span>”，那一定是教材寫錯了，教材也是人寫的，是人寫的就難免出錯，哦，連C99也這麼寫的啊，C99也是人寫的，也難免出錯，或者C99也許沒錯，但是反正運行結果就是錯了，計算機這東西真靠不住，太容易受電磁干擾和宇宙射線影響了，我的程序寫得再正確也有可能被干擾得不能正確運行。</p><p>這是初學者最常見的兩種心態。不從客觀事實和邏輯推理出發分析問題的真正原因，而僅憑主觀臆斷胡亂給問題定性，“<span class="quote">說你有罪你就有罪</span>”。先不要胡亂懷疑，我們再做一次實驗，在兩次<code class="literal">foo</code>函數調用之間插一個別的函數調用，結果就大不相同了：</p><pre class="programlisting">int main(void)
+{
+	foo();
+	printf("hello\n");
+	foo();
+	return 0;
+}</pre><p>結果是：</p><pre class="screen">134518200
+hello
+0</pre><p>這一回，第二次調用<code class="literal">foo</code>打印的<code class="literal">i</code>值又不是777了而是0，“<span class="quote">局部變數的存儲空間在每次函數調用時分配，在函數返回時釋放</span>”這個結論似乎對了，但另一個結論又不對了：全局變數不初始化才是0啊，不是說“<span class="quote">局部變數不初始化則初值不確定</span>”嗎？</p><p>關鍵的一點是，我說“<span class="quote">初值不確定</span>”，有沒有說這個不確定值不能是0？有沒有說這個不確定值不能是上次調用賦的值？在這裡“<span class="quote">不確定</span>”的準確含義是：每次調用這個函數時局部變數的初值可能不一樣，運行環境不同，函數的調用次序不同，都會影響到局部變數的初值。在運用邏輯推理時一定要注意，<span class="emphasis"><em>不要把必要條件（Necessary Condition）<a id="id2715069" class="indexterm"></a>當充分條件（Sufficient Condition）<a id="id2715076" class="indexterm"></a></em></span>，這一點在Debug時尤其重要，看到錯誤現象不要輕易斷定原因是什麼，一定要考慮再三，找出它的真正原因。例如，不要看到第二次調用打印777就下結論“<span class="quote">函數中的局部變數具有一直存在的固定的存儲空間，每次函數調用時使用它，返回時也不釋放，再次調用函數時它應該還能保持上次的值</span>”，這個結論倒是能推出777這個結果，但反過來由777這個結果卻不能推出這樣的結論。所以說777這個結果是該結論的必要條件，但不是充分條件。也不要看到第二次調用打印0就斷定“<span class="quote">局部變數未初始化則初值為0</span>”，0這個結果是該結論的必要條件，但也不是充分條件。至于為什麼會有這些現象，為什麼這個不確定的值剛好是777，或者剛好是0，等學到<a class="xref" href="ch19s01.html#asmc.func">例 19.1 “研究函數的調用過程”</a>就能解釋這些現象了。</p><p>從<a class="xref" href="ch03s02.html#func.ourfirstfunc">第 2 節 “自定義函數”</a>介紹的語法規則可以看出，非定義的函數聲明也可以寫在局部作用域中，例如：</p><pre class="programlisting">int main(void)
+{
+	void print_time(int, int);
+	print_time(23, 59);
+	return 0;
+}</pre><p>這樣聲明的標識符<code class="literal">print_time</code>具有局部作域，只在<code class="literal">main</code>函數中是有效的函數名，出了<code class="literal">main</code>函數就不存在<code class="literal">print_time</code>這個標識符了。</p><p>寫非定義的函數聲明時參數可以只寫類型而不起名，例如上面代碼中的<code class="literal">void print_time(int, int);</code>，只要告訴編譯器參數類型是什麼，編譯器就能為<code class="literal">print_time(23, 59)</code>函數調用生成正確的指令。另外注意，雖然在一個函數體中可以聲明另一個函數，但不能定義另一個函數，C語言不允許嵌套定義函數<sup>[<a id="id2715167" href="#ftn.id2715167" class="footnote">5</a>]</sup>。</p><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2715167" href="#id2715167" class="para">5</a>] </sup>但<code class="literal">gcc</code>的擴展特性允許嵌套定義函數，本書不做詳細討論。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 形參和實參 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 第 4 章 分支語句</td></tr></table></div></body></html>

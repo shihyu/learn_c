@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3. 靜態庫</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch20.html" title="第 20 章 連結詳解" /><link rel="prev" href="ch20s02.html" title="2. 定義和聲明" /><link rel="next" href="ch20s04.html" title="4. 共享庫" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3. 靜態庫</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch20s02.html">上一頁</a> </td><th width="60%" align="center">第 20 章 連結詳解</th><td width="20%" align="right"> <a accesskey="n" href="ch20s04.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2789183"></a>3. 靜態庫</h2></div></div></div><p>有時候需要把一組代碼編譯成一個庫，這個庫在很多項目中都要用到，例如<code class="literal">libc</code>就是這樣一個庫，我們在不同的程序中都會用到<code class="literal">libc</code>中的庫函數（例如<code class="literal">printf</code>），也會用到<code class="literal">libc</code>中的變數（例如以後要講到的<code class="literal">environ</code>變數）。本節介紹怎麼創建這樣一個庫。</p><p>我們繼續用<code class="literal">stack.c</code>的例子。為了便於理解，我們把<code class="literal">stack.c</code>拆成四個程序檔案（雖然實際上沒太大必要），把<code class="literal">main.c</code>改得簡單一些，標頭檔<code class="literal">stack.h</code>不變，本節用到的代碼如下所示：</p><pre class="programlisting">/* stack.c */
+char stack[512];
+int top = -1;</pre><pre class="programlisting">/* push.c */
+extern char stack[512];
+extern int top;
+
+void push(char c)
+{
+	stack[++top] = c;
+}</pre><pre class="programlisting">/* pop.c */
+extern char stack[512];
+extern int top;
+
+char pop(void)
+{
+	return stack[top--];
+}</pre><pre class="programlisting">/* is_empty.c */
+extern int top;
+
+int is_empty(void)
+{
+	return top == -1;
+}</pre><pre class="programlisting">/* stack.h */
+#ifndef STACK_H
+#define STACK_H
+extern void push(char);
+extern char pop(void);
+extern int is_empty(void);
+#endif</pre><pre class="programlisting">/* main.c */
+#include &lt;stdio.h&gt;
+#include "stack.h"
+
+int main(void)
+{
+	push('a');
+	return 0;
+}</pre><p>這些檔案的目錄結構是：</p><pre class="screen">$ tree
+.
+|-- main.c
+`-- stack
+    |-- is_empty.c
+    |-- pop.c
+    |-- push.c
+    |-- stack.c
+    `-- stack.h
+
+1 directory, 6 files</pre><p>我們把<code class="literal">stack.c</code>、<code class="literal">push.c</code>、<code class="literal">pop.c</code>、<code class="literal">is_empty.c</code>編譯成目標檔案：</p><pre class="screen">$ gcc -c stack/stack.c stack/push.c stack/pop.c stack/is_empty.c</pre><p>然後打包成一個靜態庫<code class="literal">libstack.a</code>：</p><pre class="screen">$ ar rs libstack.a stack.o push.o pop.o is_empty.o
+ar: creating libstack.a</pre><p>庫檔案名都是以<code class="literal">lib</code>開頭的，靜態庫以<code class="literal">.a</code>作為尾碼，表示Archive。<code class="literal">ar</code>命令類似於<code class="literal">tar</code>命令，起一個打包的作用，但是把目標檔案打包成靜態庫只能用<code class="literal">ar</code>命令而不能用<code class="literal">tar</code>命令。選項<code class="literal">r</code>表示將後面的檔案列表添加到檔案包，如果檔案包不存在就創建它，如果檔案包中已有同名檔案就替換成新的。<code class="literal">s</code>是專用於生成靜態庫的，表示為靜態庫創建索引，這個索引被連結器使用。<code class="literal">ranlib</code>命令也可以為靜態庫創建索引，以上命令等價于：</p><pre class="screen">$ ar r libstack.a stack.o push.o pop.o is_empty.o
+$ ranlib libstack.a</pre><p>然後我們把<code class="literal">libstack.a</code>和<code class="literal">main.c</code>編譯連結在一起：</p><pre class="screen">$ gcc main.c -L. -lstack -Istack -o main</pre><p><code class="literal">-L</code>選項告訴編譯器去哪裡找需要的庫檔案，<code class="literal">-L.</code>表示在當前目錄找。<code class="literal">-lstack</code>告訴編譯器要連結<code class="literal">libstack</code>庫，<code class="literal">-I</code>選項告訴編譯器去哪裡找標頭檔。注意，即使庫檔案就在當前目錄，編譯器預設也不會去找的，所以<code class="literal">-L.</code>選項不能少。編譯器預設會找的目錄可以用<code class="literal">-print-search-dirs</code>選項查看：</p><pre class="screen">$ gcc -print-search-dirs
+install: /usr/lib/gcc/i486-linux-gnu/4.3.2/
+programs: =/usr/lib/gcc/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/:/usr/lib/gcc/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/:/usr/libexec/gcc/i486-linux-gnu/4.3.2/:/usr/libexec/gcc/i486-linux-gnu/:/usr/lib/gcc/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../../i486-linux-gnu/bin/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../../i486-linux-gnu/bin/
+libraries: =/usr/lib/gcc/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../../i486-linux-gnu/lib/i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../../i486-linux-gnu/lib/../lib/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../i486-linux-gnu/4.3.2/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../../lib/:/lib/i486-linux-gnu/4.3.2/:/lib/../lib/:/usr/lib/i486-linux-gnu/4.3.2/:/usr/lib/../lib/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../../i486-linux-gnu/lib/:/usr/lib/gcc/i486-linux-gnu/4.3.2/../../../:/lib/:/usr/lib/</pre><p>其中的<code class="literal">libraries</code>就是庫檔案的搜索路徑列表，各路徑之間用<code class="literal">:</code>號隔開。編譯器會在這些搜索路徑以及<code class="literal">-L</code>選項指定的路徑中查找用<code class="literal">-l</code>選項指定的庫，比如<code class="literal">-lstack</code>，編譯器會首先找有沒有共享庫<code class="literal">libstack.so</code>，如果有就連結它，如果沒有就找有沒有靜態庫<code class="literal">libstack.a</code>，如果有就連結它。所以編譯器是優先考慮共享庫的，如果希望編譯器只連結靜態庫，可以指定<code class="literal">-static</code>選項。</p><p>那麼連結共享庫和連結靜態庫有什麼區別呢？在<a class="xref" href="ch19s02.html#asmc.main">第 2 節 “<code class="literal">main</code>函數和啟動常式”</a>講過，在連結<code class="literal">libc</code>共享庫時只是指定了動態連結器和該程序所需要的庫檔案，並沒有真的做連結，執行檔<code class="literal">main</code>中調用的<code class="literal">libc</code>庫函數仍然是未定義符號，要在運行時做動態連結。而在連結靜態庫時，連結器會把靜態庫中的目標檔案取出來和執行檔真正連結在一起。我們通過反彙編看上一步生成的執行檔<code class="literal">main</code>：</p><pre class="screen">$ objdump -d main
+...
+08048394 &lt;main&gt;:
+ 8048394:       8d 4c 24 04             lea    0x4(%esp),%ecx
+ 8048398:       83 e4 f0                and    $0xfffffff0,%esp
+ 804839b:       ff 71 fc                pushl  -0x4(%ecx)
+...
+080483c0 &lt;push&gt;:
+ 80483c0:       55                      push   %ebp
+ 80483c1:       89 e5                   mov    %esp,%ebp
+ 80483c3:       83 ec 04                sub    $0x4,%esp</pre><p>有意思的是，<code class="literal">main.c</code>只調用了<code class="literal">push</code>這一個函數，所以連結生成的執行檔中也只有<code class="literal">push</code>而沒有<code class="literal">pop</code>和<code class="literal">is_empty</code>。這是使用靜態庫的一個好處，連結器可以從靜態庫中只取出需要的部分來做連結。如果是直接把那些目標檔案和<code class="literal">main.c</code>編譯連結在一起：</p><pre class="screen">$ gcc main.c stack.o push.o pop.o is_empty.o -Istack -o main</pre><p>則沒有用到的函數也會連結進來。當然另一個好處就是使用靜態庫只需寫一個庫檔案名，而不需要寫一長串目標檔案名。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch20s02.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch20.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch20s04.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">2. 定義和聲明 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 4. 共享庫</td></tr></table></div></body></html>

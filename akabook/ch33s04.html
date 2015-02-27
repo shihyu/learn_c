@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 捕捉信號</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch33.html" title="第 33 章 信號" /><link rel="prev" href="ch33s03.html" title="3. 阻塞信號" /><link rel="next" href="ch34.html" title="第 34 章 終端、作業控制與守護進程" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 捕捉信號</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch33s03.html">上一頁</a> </td><th width="60%" align="center">第 33 章 信號</th><td width="20%" align="right"> <a accesskey="n" href="ch34.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2885284"></a>4. 捕捉信號</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2885289"></a>4.1. 內核如何實現信號的捕捉</h3></div></div></div><p>如果信號的處理動作是用戶自定義函數，在信號遞達時就調用這個函數，這稱為捕捉信號。由於信號處理函數的代碼是在用戶空間的，處理過程比較複雜，舉例如下：</p><div class="orderedlist"><ol type="1"><li><p>用戶程序註冊了<code class="literal">SIGQUIT</code>信號的處理函數<code class="literal">sighandler</code>。</p></li><li><p>當前正在執行<code class="literal">main</code>函數，這時發生中斷或異常切換到內核態。</p></li><li><p>在中斷處理完畢後要返回用戶態的<code class="literal">main</code>函數之前檢查到有信號<code class="literal">SIGQUIT</code>遞達。</p></li><li><p>內核決定返回用戶態後不是恢復<code class="literal">main</code>函數的上下文繼續執行，而是執行<code class="literal">sighandler</code>函數，<code class="literal">sighandler</code>和<code class="literal">main</code>函數使用不同的堆棧空間，它們之間不存在調用和被調用的關係，是兩個獨立的控制流程。</p></li><li><p><code class="literal">sighandler</code>函數返回後自動執行特殊的系統調用<code class="literal">sigreturn</code>再次進入內核態。</p></li><li><p>如果沒有新的信號要遞達，這次再返回用戶態就是恢復<code class="literal">main</code>函數的上下文繼續執行了。</p></li></ol></div><div class="figure"><a id="id2885414"></a><p class="title"><b>圖 33.2. 信號的捕捉</b></p><div class="figure-contents"><div><img src="images/signal.catch.png" alt="信號的捕捉" /></div></div></div><br class="figure-break" /><p>上圖出自<a class="xref" href="bi01.html#bibli.ulk" title="Understanding the Linux Kernel">[<abbr class="abbrev">ULK</abbr>]</a>。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2885439"></a>4.2. sigaction</h3></div></div></div><pre class="programlisting">#include &lt;signal.h&gt;
+
+int sigaction(int signo, const struct sigaction *act, struct sigaction *oact);</pre><p><code class="literal">sigaction</code>函數可以讀取和修改與指定信號相關聯的處理動作。調用成功則返回0，出錯則返回-1。<code class="literal">signo</code>是指定信號的編號。若<code class="literal">act</code>指針非空，則根據<code class="literal">act</code>修改該信號的處理動作。若<code class="literal">oact</code>指針非空，則通過<code class="literal">oact</code>傳出該信號原來的處理動作。<code class="literal">act</code>和<code class="literal">oact</code>指向<code class="literal">sigaction</code>結構體：</p><pre class="programlisting">struct sigaction {
+   void      (*sa_handler)(int);   /* addr of signal handler, */
+                                       /* or SIG_IGN, or SIG_DFL */
+   sigset_t sa_mask;               /* additional signals to block */
+   int      sa_flags;              /* signal options, Figure 10.16 */
+
+   /* alternate handler */
+   void     (*sa_sigaction)(int, siginfo_t *, void *);
+};</pre><p>將<code class="literal">sa_handler</code>賦值為常數<code class="literal">SIG_IGN</code>傳給<code class="literal">sigaction</code>表示忽略信號，賦值為常數<code class="literal">SIG_DFL</code>表示執行系統預設動作，賦值為一個函數指針表示用自定義函數捕捉信號，或者說向內核註冊了一個信號處理函數，該函數返回值為<code class="literal">void</code>，可以帶一個<code class="literal">int</code>參數，通過參數可以得知當前信號的編號，這樣就可以用同一個函數處理多種信號。顯然，這也是一個回調函數，不是被<code class="literal">main</code>函數調用，而是被系統所調用。</p><p>當某個信號的處理函數被調用時，內核自動將當前信號加入進程的信號屏蔽字，當信號處理函數返回時自動恢復原來的信號屏蔽字，這樣就保證了在處理某個信號時，如果這種信號再次產生，那麼它會被阻塞到當前處理結束為止。如果在調用信號處理函數時，除了當前信號被自動屏蔽之外，還希望自動屏蔽另外一些信號，則用<code class="literal">sa_mask</code>欄位說明這些需要額外屏蔽的信號，當信號處理函數返回時自動恢復原來的信號屏蔽字。</p><p><code class="literal">sa_flags</code>欄位包含一些選項，本章的代碼都把<code class="literal">sa_flags</code>設為0，<code class="literal">sa_sigaction</code>是實時信號的處理函數，本章不詳細解釋這兩個欄位，有興趣的讀者參考<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2885627"></a>4.3. pause</h3></div></div></div><pre class="programlisting">#include &lt;unistd.h&gt;
+
+int pause(void);</pre><p><code class="literal">pause</code>函數使調用進程掛起直到有信號遞達。如果信號的處理動作是終止進程，則進程終止，<code class="literal">pause</code>函數沒有機會返回；如果信號的處理動作是忽略，則進程繼續處于掛起狀態，<code class="literal">pause</code>不返回；如果信號的處理動作是捕捉，則調用了信號處理函數之後<code class="literal">pause</code>返回-1，<code class="literal">errno</code>設置為<code class="literal">EINTR</code>，所以<code class="literal">pause</code>只有出錯的返回值（想想以前還學過什麼函數只有出錯返回值？）。錯誤碼<code class="literal">EINTR</code>表示“<span class="quote">被信號中斷</span>”。</p><p>下面我們用<code class="literal">alarm</code>和<code class="literal">pause</code>實現<code class="literal">sleep(3)</code>函數，稱為<code class="literal">mysleep</code>。</p><div class="example"><a id="id2885725"></a><p class="title"><b>例 33.2. mysleep</b></p><div class="example-contents"><pre class="programlisting">#include &lt;unistd.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;stdio.h&gt;
+
+void sig_alrm(int signo)
+{
+	/* nothing to do */
+}
+
+unsigned int mysleep(unsigned int nsecs)
+{
+	struct sigaction newact, oldact;
+	unsigned int unslept;
+
+	newact.sa_handler = sig_alrm;
+	sigemptyset(&amp;newact.sa_mask);
+	newact.sa_flags = 0;
+	sigaction(SIGALRM, &amp;newact, &amp;oldact);
+
+	alarm(nsecs);
+	pause();
+
+	unslept = alarm(0);
+	sigaction(SIGALRM, &amp;oldact, NULL);
+
+	return unslept;
+}
+
+int main(void)
+{
+	while(1){
+		mysleep(2);
+		printf("Two seconds passed\n");
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><div class="orderedlist"><ol type="1"><li><p><code class="literal">main</code>函數調用<code class="literal">mysleep</code>函數，後者調用<code class="literal">sigaction</code>註冊了<code class="literal">SIGALRM</code>信號的處理函數<code class="literal">sig_alrm</code>。</p></li><li><p>調用<code class="literal">alarm(nsecs)</code>設定閙鐘。</p></li><li><p>調用<code class="literal">pause</code>等待，內核切換到別的進程運行。</p></li><li><p><code class="literal">nsecs</code>秒之後，閙鐘超時，內核發<code class="literal">SIGALRM</code>給這個進程。</p></li><li><p>從內核態返回這個進程的用戶態之前處理未決信號，發現有<code class="literal">SIGALRM</code>信號，其處理函數是<code class="literal">sig_alrm</code>。</p></li><li><p>切換到用戶態執行<code class="literal">sig_alrm</code>函數，進入<code class="literal">sig_alrm</code>函數時<code class="literal">SIGALRM</code>信號被自動屏蔽，從<code class="literal">sig_alrm</code>函數返回時<code class="literal">SIGALRM</code>信號自動解除屏蔽。然後自動執行系統調用<code class="literal">sigreturn</code>再次進入內核，再返回用戶態繼續執行進程的主控制流程（<code class="literal">main</code>函數調用的<code class="literal">mysleep</code>函數）。</p></li><li><p><code class="literal">pause</code>函數返回-1，然後調用<code class="literal">alarm(0)</code>取消閙鐘，調用<code class="literal">sigaction</code>恢復<code class="literal">SIGALRM</code>信號以前的處理動作。</p></li></ol></div><p>以下問題留給讀者思考：</p><p>1、信號處理函數<code class="literal">sig_alrm</code>什麼都沒幹，為什麼還要註冊它作為<code class="literal">SIGALRM</code>的處理函數？不註冊信號處理函數可以嗎？</p><p>2、為什麼在<code class="literal">mysleep</code>函數返回前要恢復<code class="literal">SIGALRM</code>信號原來的<code class="literal">sigaction</code>？</p><p>3、<code class="literal">mysleep</code>函數的返回值表示什麼含義？什麼情況下返回非0值？。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2885983"></a>4.4. 可重入函數</h3></div></div></div><p>當捕捉到信號時，不論進程的主控制流程當前執行到哪兒，都會先跳到信號處理函數中執行，從信號處理函數返回後再繼續執行主控制流程。信號處理函數是一個單獨的控制流程，因為它和主控制流程是非同步的，二者不存在調用和被調用的關係，並且使用不同的堆棧空間。引入了信號處理函數使得一個進程具有多個控制流程，如果這些控制流程訪問相同的全局資源（全局變數、硬件資源等），就有可能出現衝突，如下面的例子所示。</p><div class="figure"><a id="id2886010"></a><p class="title"><b>圖 33.3. 不可重入函數</b></p><div class="figure-contents"><div><img src="images/signal.reentrancy.png" alt="不可重入函數" /></div></div></div><br class="figure-break" /><p><code class="literal">main</code>函數調用<code class="literal">insert</code>函數向一個鏈表<code class="literal">head</code>中插入節點<code class="literal">node1</code>，插入操作分為兩步，剛做完第一步的時候，因為硬件中斷使進程切換到內核，再次回用戶態之前檢查到有信號待處理，於是切換到<code class="literal">sighandler</code>函數，<code class="literal">sighandler</code>也調用<code class="literal">insert</code>函數向同一個鏈表<code class="literal">head</code>中插入節點<code class="literal">node2</code>，插入操作的兩步都做完之後從<code class="literal">sighandler</code>返回內核態，再次回到用戶態就從<code class="literal">main</code>函數調用的<code class="literal">insert</code>函數中繼續往下執行，先前做第一步之後被打斷，現在繼續做完第二步。結果是，<code class="literal">main</code>函數和<code class="literal">sighandler</code>先後向鏈表中插入兩個節點，而最後只有一個節點真正插入鏈表中了。</p><p>像上例這樣，<code class="literal">insert</code>函數被不同的控制流程調用，有可能在第一次調用還沒返回時就再次進入該函數，這稱為重入，<code class="literal">insert</code>函數訪問一個全局鏈表，有可能因為重入而造成錯亂，像這樣的函數稱為不可重入函數，反之，如果一個函數隻訪問自己的局部變數或參數，則稱為可重入（<code class="literal">Reentrant</code>）函數。想一下，為什麼兩個不同的控制流程調用同一個函數，訪問它的同一個局部變數或參數就不會造成錯亂？</p><p>如果一個函數符合以下條件之一則是不可重入的：</p><div class="itemizedlist"><ul type="disc"><li><p>調用了<code class="literal">malloc</code>或<code class="literal">free</code>，因為<code class="literal">malloc</code>也是用全局鏈表來管理堆的。</p></li><li><p>調用了標準I/O庫函數。標準I/O庫的很多實現都以不可重入的方式使用全局資料結構。</p></li></ul></div><p>SUS規定有些系統函數必須以綫程安全的方式實現，這裡就不列了，請參考<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2886197"></a>4.5. sig_atomic_t類型與volatile限定符</h3></div></div></div><p>在上面的例子中，<code class="literal">main</code>和<code class="literal">sighandler</code>都調用<code class="literal">insert</code>函數則有可能出現鏈表的錯亂，其根本原因在於，對全局鏈表的插入操作要分兩步完成，不是一個原子操作，假如這兩步操作必定會一起做完，中間不可能被打斷，就不會出現錯亂了。下一節綫程會講到如何保證一個代碼段以原子操作完成。</p><p>現在想一下，如果對全局數據的訪問只有一行代碼，是不是原子操作呢？比如，<code class="literal">main</code>和<code class="literal">sighandler</code>都對一個全局變數賦值，會不會出現錯亂呢？比如下面的程序：</p><pre class="programlisting">long long a;
+int main(void)
+{
+	a=5;
+	return 0;
+}</pre><p>帶調試信息編譯，然後帶原始碼反彙編：</p><pre class="screen">$ gcc main.c -g
+$ objdump -dS a.out</pre><p>其中main函數的指令中有：</p><pre class="screen">	a=5;
+ 8048352:       c7 05 50 95 04 08 05    movl   $0x5,0x8049550
+ 8048359:       00 00 00 
+ 804835c:       c7 05 54 95 04 08 00    movl   $0x0,0x8049554
+ 8048363:       00 00 00</pre><p>雖然C代碼只有一行，但是在32位機上對一個64位的<code class="literal">long long</code>變數賦值需要兩條指令完成，因此不是原子操作。同樣地，讀取這個變數到寄存器需要兩個32位寄存器才放得下，也需要兩條指令，不是原子操作。請讀者設想一種時序，<code class="literal">main</code>和<code class="literal">sighandler</code>都對這個變數<code class="literal">a</code>賦值，最後變數<code class="literal">a</code>的值發生錯亂。</p><p>如果上述程序在64位機上編譯執行，則有可能用一條指令完成賦值，因而是原子操作。如果<code class="literal">a</code>是32位的<code class="literal">int</code>變數，在32位機上賦值是原子操作，在16位機上就不是。如果在程序中需要使用一個變數，要保證對它的讀寫都是原子操作，應該採用什麼類型呢？為瞭解決這些平台相關的問題，C標準定義了一個類型<code class="literal">sig_atomic_t</code>，在不同平台的C語言庫中取不同的類型，例如在32位機上定義<code class="literal">sig_atomic_t</code>為<code class="literal">int</code>類型。</p><p>在使用<code class="literal">sig_atomic_t</code>類型的變數時，還需要注意另一個問題。看如下的例子：</p><pre class="programlisting">#include &lt;signal.h&gt;
+
+sig_atomic_t a=0;
+int main(void)
+{
+	/* register a sighandler */
+	while(!a); /* wait until a changes in sighandler */
+	/* do something after signal arrives */
+	return 0;
+}</pre><p>為了簡潔，這裡只寫了一個代碼框架來說明問題。在<code class="literal">main</code>函數中首先要註冊某個信號的處理函數<code class="literal">sighandler</code>，然後在一個<code class="literal">while</code>死循環中等待信號發生，如果有信號遞達則執行<code class="literal">sighandler</code>，在<code class="literal">sighandler</code>中將<code class="literal">a</code>改為1，這樣再次回到<code class="literal">main</code>函數時就可以退出<code class="literal">while</code>循環，執行後續處理。用上面的方法編譯和反彙編這個程序，在<code class="literal">main</code>函數的指令中有：</p><pre class="screen">	/* register a sighandler */
+	while(!a); /* wait until a changes in sighandler */
+ 8048352:       a1 3c 95 04 08          mov    0x804953c,%eax
+ 8048357:       85 c0                   test   %eax,%eax
+ 8048359:       74 f7                   je     8048352 &lt;main+0xe&gt;</pre><p>將全局變數<code class="literal">a</code>從內存讀到<code class="literal">eax</code>寄存器，對<code class="literal">eax</code>和<code class="literal">eax</code>做AND運算，若結果為0則跳回循環開頭，再次從內存讀變數<code class="literal">a</code>的值，可見這三條指令等價于C代碼的<code class="literal">while(!a);</code>循環。如果在編譯時加了優化選項，例如：</p><pre class="screen">$ gcc main.c -O1 -g
+$ objdump -dS a.out</pre><p>則<code class="literal">main</code>函數的指令中有：</p><pre class="screen"> 8048352:       83 3d 3c 95 04 08 00    cmpl   $0x0,0x804953c
+	/* register a sighandler */
+	while(!a); /* wait until a changes in sighandler */
+ 8048359:       74 fe                   je     8048359 &lt;main+0x15&gt;</pre><p>第一條指令將全局變數<code class="literal">a</code>的內存單元直接和0比較，如果相等，則第二條指令成了一個死循環，注意，這是一個真正的死循環：即使<code class="literal">sighandler</code>將<code class="literal">a</code>改為1，只要沒有影響Zero標誌位，回到<code class="literal">main</code>函數後仍然死在第二條指令上，因為不會再次從內存讀取變數<code class="literal">a</code>的值。</p><p>是編譯器優化得有錯誤嗎？不是的。設想一下，如果程序只有單一的執行流程，只要當前執行流程沒有改變<code class="literal">a</code>的值，<code class="literal">a</code>的值就沒有理由會變，不需要反覆從內存讀取，因此上面的兩條指令和<code class="literal">while(!a);</code>循環是等價的，並且優化之後省去了每次循環讀內存的操作，效率非常高。所以不能說編譯器做錯了，只能說<span class="emphasis"><em>編譯器無法識別程序中存在多個執行流程</em></span>。之所以程序中存在多個執行流程，是因為調用了特定平台上的特定庫函數，比如<code class="literal">sigaction</code>、<code class="literal">pthread_create</code>，這些不是C語言本身的規範，不歸編譯器管，程序員應該自己處理這些問題。C語言提供了<code class="literal">volatile</code>限定符，如果將上述變數定義為<code class="literal">volatile sig_atomic_t a=0;</code>那麼即使指定了優化選項，編譯器也不會優化掉對變數a內存單元的讀寫。</p><p>對於程序中存在多個執行流程訪問同一全局變數的情況，<code class="literal">volatile</code>限定符是必要的，此外，雖然程序只有單一的執行流程，但是變數屬於以下情況之一的，也需要<code class="literal">volatile</code>限定：</p><div class="itemizedlist"><ul type="disc"><li><p>變數的內存單元中的數據不需要寫操作就可以自己發生變化，每次讀上來的值都可能不一樣</p></li><li><p>即使多次向變數的內存單元中寫數據，只寫不讀，也並不是在做無用功，而是有特殊意義的</p></li></ul></div><p>什麼樣的內存單元會具有這樣的特性呢？肯定不是普通的內存，而是映射到內存地址空間的硬件寄存器，例如串口的接收寄存器屬於上述第一種情況，而發送寄存器屬於上述第二種情況。</p><p><span class="emphasis"><em><code class="literal">sig_atomic_t</code>類型的變數應該總是加上<code class="literal">volatile</code>限定符</em></span>，因為要使用<code class="literal">sig_atomic_t</code>類型的理由也正是要加<code class="literal">volatile</code>限定符的理由。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2886686"></a>4.6. 競態條件與sigsuspend函數</h3></div></div></div><p>現在重新審視<a class="xref" href="ch33s04.html#signal.mysleep">例 33.2 “mysleep”</a>，設想這樣的時序：</p><div class="orderedlist"><ol type="1"><li><p>註冊<code class="literal">SIGALRM</code>信號的處理函數。</p></li><li><p>調用<code class="literal">alarm(nsecs)</code>設定閙鐘。</p></li><li><p>內核調度優先順序更高的進程取代當前進程執行，並且優先順序更高的進程有很多個，每個都要執行很長時間</p></li><li><p><code class="literal">nsecs</code>秒鐘之後閙鐘超時了，內核發送<code class="literal">SIGALRM</code>信號給這個進程，處于未決狀態。</p></li><li><p>優先順序更高的進程執行完了，內核要調度回這個進程執行。<code class="literal">SIGALRM</code>信號遞達，執行處理函數<code class="literal">sig_alrm</code>之後再次進入內核。</p></li><li><p>返回這個進程的主控制流程，<code class="literal">alarm(nsecs)</code>返回，調用<code class="literal">pause()</code>掛起等待。</p></li><li><p>可是<code class="literal">SIGALRM</code>信號已經處理完了，還等待什麼呢？</p></li></ol></div><p>出現這個問題的根本原因是系統運行的時序（Timing）<a id="id2886805" class="indexterm"></a>並不像我們寫程序時所設想的那樣。雖然<code class="literal">alarm(nsecs)</code>緊接着的下一行就是<code class="literal">pause()</code>，但是無法保證<code class="literal">pause()</code>一定會在調用<code class="literal">alarm(nsecs)</code>之後的<code class="literal">nsecs</code>秒之內被調用。由於非同步事件在任何時候都有可能發生（這裡的非同步事件指出現更高優先順序的進程），如果我們寫程序時考慮不周密，就可能由於時序問題而導致錯誤，這叫做競態條件（Race Condition）<a id="id2886848" class="indexterm"></a>。</p><p>如何解決上述問題呢？讀者可能會想到，在調用<code class="literal">pause</code>之前屏蔽<code class="literal">SIGALRM</code>信號使它不能提前遞達就可以了。看看以下方法可行嗎？</p><div class="orderedlist"><ol type="1"><li><p>屏蔽<code class="literal">SIGALRM</code>信號;</p></li><li><p><code class="literal">alarm(nsecs);</code></p></li><li><p>解除對<code class="literal">SIGALRM</code>信號的屏蔽;</p></li><li><p><code class="literal">pause();</code></p></li></ol></div><p>從解除信號屏蔽到調用<code class="literal">pause</code>之間存在間隙，<code class="literal">SIGALRM</code>仍有可能在這個間隙遞達。要消除這個間隙，我們把解除屏蔽移到<code class="literal">pause</code>後面可以嗎？</p><div class="orderedlist"><ol type="1"><li><p>屏蔽<code class="literal">SIGALRM</code>信號;</p></li><li><p><code class="literal">alarm(nsecs);</code></p></li><li><p><code class="literal">pause();</code></p></li><li><p>解除對<code class="literal">SIGALRM</code>信號的屏蔽;</p></li></ol></div><p>這樣更不行了，還沒有解除屏蔽就調用<code class="literal">pause</code>，<code class="literal">pause</code>根本不可能等到<code class="literal">SIGALRM</code>信號。要是“<span class="quote">解除信號屏蔽</span>”和“<span class="quote">掛起等待信號</span>”這兩步能合併成一個原子操作就好了，這正是<code class="literal">sigsuspend</code>函數的功能。<code class="literal">sigsuspend</code>包含了<code class="literal">pause</code>的掛起等待功能，同時解決了競態條件的問題，在對時序要求嚴格的場合下都應該調用<code class="literal">sigsuspend</code>而不是<code class="literal">pause</code>。</p><pre class="programlisting">#include &lt;signal.h&gt;
+
+int sigsuspend(const sigset_t *sigmask);</pre><p>和<code class="literal">pause</code>一樣，<code class="literal">sigsuspend</code>沒有成功返回值，只有執行了一個信號處理函數之後<code class="literal">sigsuspend</code>才返回，返回值為-1，<code class="literal">errno</code>設置為<code class="literal">EINTR</code>。</p><p>調用<code class="literal">sigsuspend</code>時，進程的信號屏蔽字由<code class="literal">sigmask</code>參數指定，可以通過指定<code class="literal">sigmask</code>來臨時解除對某個信號的屏蔽，然後掛起等待，當<code class="literal">sigsuspend</code>返回時，進程的信號屏蔽字恢復為原來的值，如果原來對該信號是屏蔽的，從<code class="literal">sigsuspend</code>返回後仍然是屏蔽的。</p><p>以下用<code class="literal">sigsuspend</code>重新實現<code class="literal">mysleep</code>函數：</p><pre class="programlisting">unsigned int mysleep(unsigned int nsecs)
+{
+	struct sigaction    newact, oldact;
+	sigset_t            newmask, oldmask, suspmask;
+	unsigned int        unslept;
+
+	/* set our handler, save previous information */
+	newact.sa_handler = sig_alrm;
+	sigemptyset(&amp;newact.sa_mask);
+	newact.sa_flags = 0;
+	sigaction(SIGALRM, &amp;newact, &amp;oldact);
+
+	/* block SIGALRM and save current signal mask */
+	sigemptyset(&amp;newmask);
+	sigaddset(&amp;newmask, SIGALRM);
+	sigprocmask(SIG_BLOCK, &amp;newmask, &amp;oldmask);
+
+	alarm(nsecs);
+
+	suspmask = oldmask;
+	sigdelset(&amp;suspmask, SIGALRM);    /* make sure SIGALRM isn't blocked */
+	sigsuspend(&amp;suspmask);            /* wait for any signal to be caught */
+
+	/* some signal has been caught,   SIGALRM is now blocked */
+
+	unslept = alarm(0);
+	sigaction(SIGALRM, &amp;oldact, NULL);  /* reset previous action */
+
+	/* reset signal mask, which unblocks SIGALRM */
+	sigprocmask(SIG_SETMASK, &amp;oldmask, NULL);
+	return(unslept);
+}</pre><p>如果在調用<code class="literal">mysleep</code>函數時<code class="literal">SIGALRM</code>信號沒有屏蔽：</p><div class="orderedlist"><ol type="1"><li><p>調用<code class="literal">sigprocmask(SIG_BLOCK, &amp;newmask, &amp;oldmask);</code>時屏蔽<code class="literal">SIGALRM</code>。</p></li><li><p>調用<code class="literal">sigsuspend(&amp;suspmask);</code>時解除對<code class="literal">SIGALRM</code>的屏蔽，然後掛起等待待。</p></li><li><p><code class="literal">SIGALRM</code>遞達後<code class="literal">suspend</code>返回，自動恢復原來的屏蔽字，也就是再次屏蔽<code class="literal">SIGALRM</code>。</p></li><li><p>調用<code class="literal">sigprocmask(SIG_SETMASK, &amp;oldmask, NULL);</code>時再次解除對<code class="literal">SIGALRM</code>的屏蔽。</p></li></ol></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2887260"></a>4.7. 關於SIGCHLD信號</h3></div></div></div><p>進程一章講過用<code class="literal">wait</code>和<code class="literal">waitpid</code>函數清理殭屍進程，父進程可以阻塞等待子進程結束，也可以非阻塞地查詢是否有子進程結束等待清理（也就是輪詢的方式）。採用第一種方式，父進程阻塞了就不能處理自己的工作了；採用第二種方式，父進程在處理自己的工作的同時還要記得時不時地輪詢一下，程序實現複雜。</p><p>其實，子進程在終止時會給父進程發<code class="literal">SIGCHLD</code>信號，該信號的預設處理動作是忽略，父進程可以自定義<code class="literal">SIGCHLD</code>信號的處理函數，這樣父進程只需專心處理自己的工作，不必關心子進程了，子進程終止時會通知父進程，父進程在信號處理函數中調用<code class="literal">wait</code>清理子進程即可。</p><p>請編寫一個程序完成以下功能：父進程<code class="literal">fork</code>出子進程，子進程調用<code class="literal">exit(2)</code>終止，父進程自定義<code class="literal">SIGCHLD</code>信號的處理函數，在其中調用<code class="literal">wait</code>獲得子進程的退出狀態並打印。 </p><p>事實上，由於UNIX的歷史原因，要想不產生殭屍進程還有另外一種辦法：父進程調用<code class="literal">sigaction</code>將<code class="literal">SIGCHLD</code>的處理動作置為<code class="literal">SIG_IGN</code>，這樣<code class="literal">fork</code>出來的子進程在終止時會自動清理掉，不會產生殭屍進程，也不會通知父進程。系統預設的忽略動作和用戶用<code class="literal">sigaction</code>函數自定義的忽略通常是沒有區別的，但這是一個特例。此方法對於Linux可用，但不保證在其它UNIX系統上都可用。請編寫程序驗證這樣做不會產生殭屍進程。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch33s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch33.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch34.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 阻塞信號 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 第 34 章 終端、作業控制與守護進程</td></tr></table></div></body></html>

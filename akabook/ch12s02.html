@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 堆棧</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch12.html" title="第 12 章 棧與隊列" /><link rel="prev" href="ch12s01.html" title="1. 資料結構的概念" /><link rel="next" href="ch12s03.html" title="3. 深度優先搜索" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 堆棧</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch12s01.html">上一頁</a> </td><th width="60%" align="center">第 12 章 棧與隊列</th><td width="20%" align="right"> <a accesskey="n" href="ch12s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2749855"></a>2. 堆棧</h2></div></div></div><p>在<a class="xref" href="ch05s03.html#func2.recursion">第 3 節 “遞歸”</a>中我們已經對堆棧這種資料結構有了初步認識。堆棧是一組元素的集合，類似於數組，不同之處在於，數組可以按下標隨機訪問，這次訪問<code class="literal">a[5]</code>下次可以訪問<code class="literal">a[1]</code>，但是堆棧的訪問規則被限製為Push和Pop兩種操作，Push（入棧或壓棧）<a id="id2749888" class="indexterm"></a>向棧頂添加元素，Pop（出棧或彈出）<a id="id2749896" class="indexterm"></a>則取出當前棧頂的元素，也就是說，只能訪問棧頂元素而不能訪問棧中其它元素。如果所有元素的類型相同，堆棧的存儲也可以用數組來實現，訪問操作可以通過函數介面提供。看以下的示常式序。</p><div class="example"><a id="id2749908"></a><p class="title"><b>例 12.1. 用堆棧實現倒序打印</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+char stack[512];
+int top = 0;
+
+void push(char c)
+{
+	stack[top++] = c;
+}
+
+char pop(void)
+{
+	return stack[--top];
+}
+
+int is_empty(void)
+{
+	return top == 0;
+}
+
+int main(void)
+{
+	push('a');
+	push('b');
+	push('c');
+	
+	while(!is_empty())
+		putchar(pop());
+	putchar('\n');
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>運行結果是<code class="literal">cba</code>。運行過程圖示如下：</p><div class="figure"><a id="id2749936"></a><p class="title"><b>圖 12.1. 用堆棧實現倒序打印</b></p><div class="figure-contents"><div><img src="images/stackqueue.stack.png" alt="用堆棧實現倒序打印" /></div></div></div><br class="figure-break" /><p>數組<code class="literal">stack</code>是堆棧的存儲空間，變數<code class="literal">top</code>總是保存數組中棧頂的下一個元素的下標，我們說“<span class="quote"><code class="literal">top</code>總是指向棧頂的下一個元素</span>”，或者把<code class="literal">top</code>叫做棧頂指針（Pointer）<a id="id2749979" class="indexterm"></a>。在<a class="xref" href="ch11s02.html#sortsearch.insertion">第 2 節 “插入排序”</a>中介紹了Loop Invariant的概念，可以用它檢驗循環的正確性，這裡的“<span class="quote"><code class="literal">top</code>總是指向棧頂的下一個元素</span>”其實也是一種Invariant，Push和Pop操作總是維持這個條件不變，這種Invariant描述的對象是一個資料結構而不是一個循環，在DbC中稱為Class Invariant<a id="id2750005" class="indexterm"></a>。Pop操作的語義是取出棧頂元素，但上例的實現其實並沒有清除原來的棧頂元素，只是把<code class="literal">top</code>指針移動了一下，原來的棧頂元素仍然存在那裡，這就足夠了，因為此後通過Push和Pop操作不可能再訪問到已經取出的元素，下次Push操作就會覆蓋它。<code class="literal">putchar</code>函數的作用是把一個字元打印到屏幕上，和<code class="literal">printf</code>的<code class="literal">%c</code>作用相同。布爾函數<code class="literal">is_empty</code>的作用是防止Pop操作訪問越界。這裡我們預留了足夠大的棧空間（512個元素），其實嚴格來說Push操作之前也應該檢查棧是否滿了。</p><p>在<code class="literal">main</code>函數中，入棧的順序是<code class="literal">'a'</code>、<code class="literal">'b'</code>、<code class="literal">'c'</code>，而出棧打印的順序卻是<code class="literal">'c'</code>、<code class="literal">'b'</code>、<code class="literal">'a'</code>，最後入棧的<code class="literal">'c'</code>最早出來，因此堆棧這種資料結構的特點可以概括為LIFO（Last In First Out，後進先出）<a id="id2750103" class="indexterm"></a>。我們也可以寫一個遞歸函數做倒序打印，利用函數調用的棧幀實現後進先出：</p><div class="example"><a id="id2750113"></a><p class="title"><b>例 12.2. 用遞歸實現倒序打印</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#define LEN 3
+
+char buf[LEN]={'a', 'b', 'c'};
+
+void print_backward(int pos)
+{
+     if(pos == LEN)
+	  return;
+     print_backward(pos+1);
+     putchar(buf[pos]);
+}
+
+int main(void)
+{
+     print_backward(0);
+     putchar('\n');
+     
+     return 0;
+}</pre></div></div><br class="example-break" /><p>也許你會說，又是堆棧又是遞歸的，倒序打印一個數組犯得着這麼大動干戈嗎？寫一個簡單的循環不就行了：</p><pre class="programlisting">for (i = LEN-1; i &gt;= 0; i--)
+	putchar(buf[i]);</pre><p>對於數組來說確實沒必要搞這麼複雜，因為數組既可以從前向後訪問也可以從後向前訪問，甚至可以隨機訪問，但有些資料結構的訪問並沒有這麼自由，下一節你就會看到這樣的資料結構。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch12s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch12.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch12s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 資料結構的概念 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 深度優先搜索</td></tr></table></div></body></html>

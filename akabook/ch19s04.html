@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 結構體和聯合體</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch19.html" title="第 19 章 彙編與C之間的關係" /><link rel="prev" href="ch19s03.html" title="3. 變數的存儲佈局" /><link rel="next" href="ch19s05.html" title="5. C內聯彙編" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 結構體和聯合體</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch19s03.html">上一頁</a> </td><th width="60%" align="center">第 19 章 彙編與C之間的關係</th><td width="20%" align="right"> <a accesskey="n" href="ch19s05.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2779313"></a>4. 結構體和聯合體</h2></div></div></div><p>我們繼續用反彙編的方法研究一下C語言的結構體：</p><div class="example"><a id="id2779326"></a><p class="title"><b>例 19.3. 研究結構體</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(int argc, char** argv)
+{
+	struct {
+		char a;
+		short b;
+		int c;
+		char d;
+	} s;
+
+	s.a = 1;
+	s.b = 2;
+	s.c = 3;
+	s.d = 4;
+	printf("%u\n", sizeof(s));
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p><code class="literal">main</code>函數中幾條語句的反彙編結果如下：</p><pre class="screen">        s.a = 1;
+ 80483d5:       c6 45 f0 01             movb   $0x1,-0x10(%ebp)
+        s.b = 2;
+ 80483d9:       66 c7 45 f2 02 00       movw   $0x2,-0xe(%ebp)
+        s.c = 3;
+ 80483df:       c7 45 f4 03 00 00 00    movl   $0x3,-0xc(%ebp)
+        s.d = 4;
+ 80483e6:       c6 45 f8 04             movb   $0x4,-0x8(%ebp)</pre><p>從訪問結構體成員的指令可以看出，結構體的四個成員在棧上是這樣排列的：</p><div class="figure"><a id="id2779360"></a><p class="title"><b>圖 19.5. 結構體的存儲佈局</b></p><div class="figure-contents"><div><img src="images/asmc.struct.png" alt="結構體的存儲佈局" /></div></div></div><br class="figure-break" /><p>雖然棧是從高地址向低地址增長的，但結構體成員也是從低地址向高地址排列的，這一點和數組類似。但有一點和數組不同，結構體的各成員並不是一個緊挨一個排列的，中間有空隙，稱為填充（Padding）<a id="id2779381" class="indexterm"></a>，不僅如此，在這個結構體的末尾也有三個位元組的填充，所以<code class="literal">sizeof(s)</code>的值是12。注意，<code class="literal">printf</code>的<code class="literal">%u</code>轉換說明表示無符號數，<code class="literal">sizeof</code>的值是<code class="literal">size_t</code>類型的，是某種無符號整型。</p><p>為什麼編譯器要這樣處理呢？有一個知識點我此前一直迴避沒講，那就是大多數計算機體系統結構對於訪問內存的指令是有限制的，在32位平台上，訪問4位元組的指令（比如上面的<code class="literal">movl</code>）所訪問的內存地址應該是4的整數倍，訪問兩位元組的指令（比如上面的<code class="literal">movw</code>）所訪問的內存地址應該是兩位元組的整數倍，這稱為對齊（Alignment）<a id="id2779442" class="indexterm"></a>。以前舉的所有例子中的內存訪問指令都滿足這個限制條件，讀者可以回頭檢驗一下。如果指令所訪問的內存地址沒有正確對齊會怎麼樣呢？在有些平台上將不能訪問內存，而是引發一個異常，在x86平台上倒是仍然能訪問內存，但是不對齊的指令執行效率比對齊的指令要低，所以編譯器在安排各種變數的地址時都會考慮到對齊的問題。對於本例中的結構體，編譯器會把它的基地址對齊到4位元組邊界，也就是說，<code class="literal">ebp-0x10</code>這個地址一定是4的整數倍。<code class="literal">s.a</code>占一個位元組，沒有對齊的問題。<code class="literal">s.b</code>占兩個位元組，如果<code class="literal">s.b</code>緊挨在<code class="literal">s.a</code>後面，它的地址就不能是兩位元組的整數倍了，所以編譯器會在結構體中插入一個填充位元組，使<code class="literal">s.b</code>的地址也是兩位元組的整數倍。<code class="literal">s.c</code>占4位元組，緊挨在<code class="literal">s.b</code>的後面就可以了，因為<code class="literal">ebp-0xc</code>這個地址也是4的整數倍。那麼為什麼<code class="literal">s.d</code>的後面也要有填充位填充到4位元組邊界呢？這是為了便于安排這個結構體後面的變數的地址，假如用這種結構體類型組成一個數組，那麼後一個結構體只需和前一個結構體緊挨着排列就可以保證它的基地址仍然對齊到4位元組邊界了，因為在前一個結構體的末尾已經有了填充位元組。事實上，C標準規定數組元素必須緊挨着排列，不能有空隙，這樣才能保證每個元素的地址可以按“<span class="quote">基地址+n×元素大小</span>”簡單計算出來。</p><p>合理設計結構體各成員的排列順序可以節省存儲空間，例如上例中的結構體改成這樣就可以避免產生填充位元組：</p><pre class="programlisting">struct {
+	char a;
+	char d;
+	short b;
+	int c;
+} s;</pre><p>此外，<code class="literal">gcc</code>提供了一種擴展語法可以消除結構體中的填充位元組：</p><pre class="programlisting">struct {
+	char a;
+	short b;
+	int c;
+	char d;
+} __attribute__((packed)) s;</pre><p>這樣就不能保證結構體成員的對齊了，在訪問<code class="literal">b</code>和<code class="literal">c</code>的時候可能會有效率問題，所以除非有特別的理由，一般不要使用這種語法。</p><p>以前我們使用的數據類型都是占幾個位元組，最小的類型也要占一個位元組，而在結構體中還可以使用Bit-field<a id="id2779601" class="indexterm"></a>語法定義只占幾個bit的成員。下面這個例子出自王聰的網站（www.wangcong.org）：</p><div class="example"><a id="id2779611"></a><p class="title"><b>例 19.4. Bit-field</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+typedef struct {
+	unsigned int one:1;
+	unsigned int two:3;
+	unsigned int three:10;
+	unsigned int four:5;
+	unsigned int :2;
+	unsigned int five:8;
+	unsigned int six:8;
+} demo_type;
+
+int main(void)
+{
+	demo_type s = { 1, 5, 513, 17, 129, 0x81 };
+	printf("sizeof demo_type = %u\n", sizeof(demo_type));
+	printf("values: s=%u,%u,%u,%u,%u,%u\n",
+	       s.one, s.two, s.three, s.four, s.five, s.six);
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p><code class="literal">s</code>這個結構體的佈局如下圖所示：</p><div class="figure"><a id="id2779629"></a><p class="title"><b>圖 19.6. Bit-field的存儲佈局</b></p><div class="figure-contents"><div><img src="images/asmc.bitfield.png" alt="Bit-field的存儲佈局" /></div></div></div><br class="figure-break" /><p>Bit-field成員的類型可以是<code class="literal">int</code>或<code class="literal">unsigned int</code>，表示有符號數或無符號數，但不表示它像普通的<code class="literal">int</code>型一樣占4個位元組，它後面的數字是幾就表示它占多少個bit，也可以像<code class="literal">unsigned int :2;</code>這樣定義一個未命名的Bit-field，即使不寫未命名的Bit-field，編譯器也有可能在兩個成員之間插入填充位，如上圖的<code class="literal">five</code>和<code class="literal">six</code>之間，這樣<code class="literal">six</code>這個成員就剛好單獨占一個位元組了，訪問效率會比較高，這個結構體的末尾還填充了3個位元組，以便對齊到4位元組邊界。以前我們說過x86的Byte Order是小端的，從上圖中<code class="literal">one</code>和<code class="literal">two</code>的排列順序可以看出，如果對一個位元組再細分，則位元組中的Bit Order也是小端的，因為排在結構體前面的成員（靠近低地址一邊的成員）取位元組中的低位。關於如何排列Bit-field在C標準中沒有詳細的規定，這跟Byte Order、Bit Order、對齊等問題都有關，不同的平台和編譯器可能會排列得很不一樣，要編寫可移植的代碼就不能假定Bit-field是按某一種固定方式排列的。Bit-field在驅動程式中是很有用的，因為經常需要單獨操作設備寄存器中的一個或幾個bit，但一定要小心使用，首先弄清楚每個Bit-field和實際bit的對應關係。</p><p>和前面幾個例子不一樣，在上例中我沒有給出反彙編結果，直接畫了個圖說這個結構體的佈局是這樣的，那我有什麼證據這麼說呢？上例的反彙編結果比較繁瑣，我們可以通過另一種手段得到這個結構體的內存佈局。C語言還有一種類型叫聯合體，用關鍵字<code class="literal">union</code>定義，其語法類似於結構體，例如：</p><div class="example"><a id="id2779759"></a><p class="title"><b>例 19.5. 聯合體</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+typedef union {
+	struct {
+		unsigned int one:1;
+		unsigned int two:3;
+		unsigned int three:10;
+		unsigned int four:5;
+		unsigned int :2;
+		unsigned int five:8;
+		unsigned int six:8;
+	} bitfield;
+	unsigned char byte[8];
+} demo_type;
+
+int main(void)
+{
+	demo_type u = {{ 1, 5, 513, 17, 129, 0x81 }};
+	printf("sizeof demo_type = %u\n", sizeof(demo_type));
+	printf("values: u=%u,%u,%u,%u,%u,%u\n",
+	       u.bitfield.one, u.bitfield.two, u.bitfield.three,
+	       u.bitfield.four, u.bitfield.five, u.bitfield.six);
+	printf("hex dump of u: %x %x %x %x %x %x %x %x \n",
+	       u.byte[0], u.byte[1], u.byte[2], u.byte[3],
+	       u.byte[4], u.byte[5], u.byte[6], u.byte[7]);
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>一個聯合體的各個成員占用相同的內存空間，聯合體的長度等於其中最長成員的長度。比如<code class="literal">u</code>這個聯合體占8個位元組，如果訪問成員<code class="literal">u.bitfield</code>，則把這8個位元組看成一個由Bit-field組成的結構體，如果訪問成員<code class="literal">u.byte</code>，則把這8個位元組看成一個數組。聯合體如果用Initializer初始化，則只初始化它的第一個成員，例如<code class="literal">demo_type u = {{ 1, 5, 513, 17, 129, 0x81 }};</code>初始化的是<code class="literal">u.bitfield</code>，但是通過<code class="literal">u.bitfield</code>的成員看不出這8個位元組的內存佈局，而通過<code class="literal">u.byte</code>數組就可以看出每個位元組分別是多少了。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2779834"></a>習題</h3></div></div></div><p>1、編寫一個程序，測試運行它的平台是大端還是小端位元組序。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch19s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch19.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch19s05.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 變數的存儲佈局 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 5. C內聯彙編</td></tr></table></div></body></html>

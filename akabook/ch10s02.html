@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 斷點</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch10.html" title="第 10 章 gdb" /><link rel="prev" href="ch10s01.html" title="1. 單步執行和跟蹤函數調用" /><link rel="next" href="ch10s03.html" title="3. 觀察點" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 斷點</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch10s01.html">上一頁</a> </td><th width="60%" align="center">第 10 章 gdb</th><td width="20%" align="right"> <a accesskey="n" href="ch10s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2741278"></a>2. 斷點</h2></div></div></div><p>看以下程序：</p><div class="example"><a id="id2741289"></a><p class="title"><b>例 10.2. 斷點調試實例</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	int sum = 0, i = 0;
+	char input[5];
+
+	while (1) {
+		scanf("%s", input);
+		for (i = 0; input[i] != '\0'; i++)
+			sum = sum*10 + input[i] - '0';
+		printf("input=%d\n", sum);
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><p>這個程序的作用是：首先從鍵盤讀入一串數字存到字元數組<code class="literal">input</code>中，然後轉換成整型存到<code class="literal">sum</code>中，然後打印出來，一直這樣循環下去。<code class="literal">scanf("%s", input);</code>這個調用的功能是等待用戶輸入一個字元串並回車，<code class="literal">scanf</code>把其中第一段非空白（非空格、Tab、換行）的字元串保存到<code class="literal">input</code>數組中，並自動在末尾添加<code class="literal">'\0'</code>。接下來的循環從左到右掃瞄字元串並把每個數字累加到結果中，例如輸入是<code class="literal">"2345"</code>，則循環累加的過程是(((0*10+2)*10+3)*10+4)*10+5=2345。注意字元型的<code class="literal">'2'</code>要減去<code class="literal">'0'</code>的ASCII碼才能轉換成整數值2。下面編譯運行程序看看有什麼問題：</p><pre class="screen">$ gcc main.c -g -o main
+$ ./main 
+123
+input=123
+234
+input=123234
+（Ctrl-C退出程序）
+$</pre><p>又是這種現象，第一次是對的，第二次就不對。可是這個程序我們並沒有忘了賦初值，不僅<code class="literal">sum</code>賦了初值，連不必賦初值的i都賦了初值。讀者先試試只看代碼能不能看出錯誤原因。下面來調試：</p><pre class="screen">$ gdb main
+...
+(gdb) start
+Breakpoint 1 at 0x80483b5: file main.c, line 5.
+Starting program: /home/akaedu/main 
+main () at main.c:5
+5		int sum = 0, i = 0;</pre><p>有了上一次的經驗，<code class="literal">sum</code>被列為重點懷疑對象，我們可以用<code class="literal">display</code>命令使得每次停下來的時候都顯示當前<code class="literal">sum</code>的值，然後繼續往下走：</p><pre class="screen">(gdb) display sum
+1: sum = -1208103488
+(gdb) n
+9			scanf("%s", input);
+1: sum = 0
+(gdb) 
+123
+10			for (i = 0; input[i] != '\0'; i++)
+1: sum = 0</pre><p><code class="literal">undisplay</code>命令可以取消跟蹤顯示，變數<code class="literal">sum</code>的編號是1，可以用<code class="literal">undisplay 1</code>命令取消它的跟蹤顯示。這個循環應該沒有問題，因為上面第一次輸入時打印的結果是正確的。如果不想一步一步走這個循環，可以用<code class="literal">break</code>命令（簡寫為<code class="literal">b</code>）在第9行設一個斷點（Breakpoint）<a id="id2741456" class="indexterm"></a>：</p><pre class="screen">(gdb) l
+5		int sum = 0, i;
+6		char input[5];
+7	
+8		while (1) {
+9			scanf("%s", input);
+10			for (i = 0; input[i] != '\0'; i++)
+11				sum = sum*10 + input[i] - '0';
+12			printf("input=%d\n", sum);
+13		}
+14		return 0;
+(gdb) b 9
+Breakpoint 2 at 0x80483bc: file main.c, line 9.</pre><p><code class="literal">break</code>命令的參數也可以是函數名，表示在某個函數開頭設斷點。現在用<code class="literal">continue</code>命令（簡寫為<code class="literal">c</code>）連續運行而非單步運行，程序到達斷點會自動停下來，這樣就可以停在下一次循環的開頭：</p><pre class="screen">(gdb) c
+Continuing.
+input=123
+
+Breakpoint 2, main () at main.c:9
+9			scanf("%s", input);
+1: sum = 123</pre><p>然後輸入新的字元串準備轉換：</p><pre class="screen">(gdb) n
+234
+10			for (i = 0; input[i] != '\0'; i++)
+1: sum = 123</pre><p>問題暴露出來了，新的轉換應該再次從0開始累加，而<code class="literal">sum</code>現在已經是123了，原因在於新的循環沒有把<code class="literal">sum</code>歸零。可見斷點有助于快速跳過沒有問題的代碼，然後在有問題的代碼上慢慢走慢慢分析，“<span class="quote">斷點加單步</span>”是使用調試器的基本方法。至于應該在哪裡設置斷點，怎麼知道哪些代碼可以跳過而哪些代碼要慢慢走，也要通過對錯誤現象的分析和假設來確定，以前我們用<code class="literal">printf</code>打印中間結果時也要分析應該在哪裡插入<code class="literal">printf</code>，打印哪些中間結果，調試的基本思路是一樣的。一次調試可以設置多個斷點，用<code class="literal">info</code>命令可以查看已經設置的斷點：</p><pre class="screen">(gdb) b 12
+Breakpoint 3 at 0x8048411: file main.c, line 12.
+(gdb) i breakpoints
+Num     Type           Disp Enb Address    What
+2       breakpoint     keep y   0x080483c3 in main at main.c:9
+	breakpoint already hit 1 time
+3       breakpoint     keep y   0x08048411 in main at main.c:12</pre><p>每個斷點都有一個編號，可以用編號指定刪除某個斷點： </p><pre class="screen">(gdb) delete breakpoints 2
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address    What
+3       breakpoint     keep y   0x08048411 in main at main.c:12</pre><p>有時候一個斷點暫時不用可以禁用掉而不必刪除，這樣以後想用的時候可以直接啟用，而不必重新從代碼裡找應該在哪一行設斷點：</p><pre class="screen">(gdb) disable breakpoints 3
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address    What
+3       breakpoint     keep n   0x08048411 in main at main.c:12
+(gdb) enable 3
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address    What
+3       breakpoint     keep y   0x08048411 in main at main.c:12
+(gdb) delete breakpoints 
+Delete all breakpoints? (y or n) y
+(gdb) i breakpoints
+No breakpoints or watchpoints.</pre><p><code class="literal">gdb</code>的斷點功能非常靈活，還可以設置斷點在滿足某個條件時才激活，例如我們仍然在循環開頭設置斷點，但是僅當<code class="literal">sum</code>不等於0時才中斷，然後用<code class="literal">run</code>命令（簡寫為<code class="literal">r</code>）重新從程序開頭連續運行：</p><pre class="screen">(gdb) break 9 if sum != 0
+Breakpoint 5 at 0x80483c3: file main.c, line 9.
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address    What
+5       breakpoint     keep y   0x080483c3 in main at main.c:9
+	stop only if sum != 0
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /home/akaedu/main 
+123
+input=123
+
+Breakpoint 5, main () at main.c:9
+9			scanf("%s", input);
+1: sum = 123</pre><p>結果是第一次執行<code class="literal">scanf</code>之前沒有中斷，第二次卻中斷了。總結一下本節用到的<code class="literal">gdb</code>命令：</p><div class="table"><a id="id2741647"></a><p class="title"><b>表 10.2. gdb基本命令2</b></p><div class="table-contents"><table summary="gdb基本命令2" border="1"><colgroup><col /><col /></colgroup><thead><tr><th>命令</th><th>描述</th></tr></thead><tbody><tr><td>break（或b） 行號</td><td>在某一行設置斷點</td></tr><tr><td>break 函數名</td><td>在某個函數開頭設置斷點</td></tr><tr><td>break ... if ...</td><td>設置條件斷點</td></tr><tr><td>continue（或c）</td><td>從當前位置開始連續運行程序</td></tr><tr><td>delete breakpoints 斷點號</td><td>刪除斷點</td></tr><tr><td>display 變數名</td><td>跟蹤查看某個變數，每次停下來都顯示它的值</td></tr><tr><td>disable breakpoints 斷點號</td><td>禁用斷點</td></tr><tr><td>enable 斷點號</td><td>啟用斷點</td></tr><tr><td>info（或i） breakpoints</td><td>查看當前設置了哪些斷點</td></tr><tr><td>run（或r）</td><td>從頭開始連續運行程序</td></tr><tr><td>undisplay 跟蹤顯示號</td><td>取消跟蹤顯示</td></tr></tbody></table></div></div><br class="table-break" /><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2741755"></a>習題</h3></div></div></div><p>1、看下面的程序：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	int i;
+	char str[6] = "hello";
+	char reverse_str[6] = "";
+
+	printf("%s\n", str);
+	for (i = 0; i &lt; 5; i++)
+		reverse_str[5-i] = str[i];
+	printf("%s\n", reverse_str);
+	return 0;
+}</pre><p>首先用字元串<code class="literal">"hello"</code>初始化一個字元數組<code class="literal">str</code>（算上<code class="literal">'\0'</code>共6個字元）。然後用空字元串<code class="literal">""</code>初始化一個同樣長的字元數組<code class="literal">reverse_str</code>，相當於所有元素用<code class="literal">'\0'</code>初始化。然後打印<code class="literal">str</code>，把<code class="literal">str</code>倒序存入<code class="literal">reverse_str</code>，再打印<code class="literal">reverse_str</code>。然而結果並不正確：</p><pre class="screen">$ ./main 
+hello
+
+</pre><p>我們本來希望<code class="literal">reverse_str</code>打印出來是<code class="literal">olleh</code>，結果什麼都沒有。重點懷疑對象肯定是循環，那麼簡單驗算一下，<code class="literal">i=0</code>時，<code class="literal">reverse_str[5]=str[0]</code>，也就是<code class="literal">'h'</code>，<code class="literal">i=1</code>時，<code class="literal">reverse_str[4]=str[1]</code>，也就是<code class="literal">'e'</code>，依此類推，i=0,1,2,3,4，共5次循環，正好把h,e,l,l,o五個字母給倒過來了，哪裡不對了？用<code class="literal">gdb</code>跟蹤循環，找出錯誤原因並改正。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch10s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch10.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch10s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 單步執行和跟蹤函數調用 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 觀察點</td></tr></table></div></body></html>

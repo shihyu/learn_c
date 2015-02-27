@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3. 數據類型標誌</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch07.html" title="第 7 章 結構體" /><link rel="prev" href="ch07s02.html" title="2. 數據抽象" /><link rel="next" href="ch07s04.html" title="4. 嵌套結構體" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3. 數據類型標誌</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s02.html">上一頁</a> </td><th width="60%" align="center">第 7 章 結構體</th><td width="20%" align="right"> <a accesskey="n" href="ch07s04.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2731288"></a>3. 數據類型標誌</h2></div></div></div><p>在上一節中，我們通過一個複數存儲表示抽象層把<code class="literal">complex_struct</code>結構體的存儲格式和上層的複數運算函數隔開，<code class="literal">complex_struct</code>結構體既可以採用直角座標也可以採用極座標存儲。但有時候需要同時支持兩種存儲格式，比如先前已經採集了一些數據存在計算機中，有些數據是以極座標存儲的，有些數據是以直角座標存儲的，如果要把這些數據都存到<code class="literal">complex_struct</code>結構體中怎麼辦？一種辦法是規定<code class="literal">complex_struct</code>結構體採用直角座標格式，直角座標的數據可以直接存入<code class="literal">complex_struct</code>結構體，而極座標的數據先轉成直角座標再存，但由於浮點數的精度有限，轉換總是會損失精度的。這裡介紹另一種辦法，<code class="literal">complex_struct</code>結構體由一個數據類型標誌和兩個浮點數組成，如果數據類型標誌為0，那麼兩個浮點數就表示直角座標，如果數據類型標誌為1，那麼兩個浮點數就表示極座標。這樣，直角座標和極座標的數據都可以適配（Adapt）<a id="id2731350" class="indexterm"></a>到<code class="literal">complex_struct</code>結構體中，無需轉換和損失精度：</p><pre class="programlisting">enum coordinate_type { RECTANGULAR, POLAR };
+struct complex_struct {
+	enum coordinate_type t;
+	double a, b;
+};</pre><p><code class="literal">enum</code>關鍵字的作用和<code class="literal">struct</code>關鍵字類似，把<code class="literal">coordinate_type</code>這個標識符定義為一個Tag，<code class="literal">struct complex_struct</code>表示一個結構體類型，而<code class="literal">enum coordinate_type</code>表示一個枚舉（Enumeration）<a id="id2731404" class="indexterm"></a>類型。枚舉類型的成員是常量，它們的值由編譯器自動分配，例如定義了上面的枚舉類型之後，<code class="literal">RECTANGULAR</code>就表示常量0，<code class="literal">POLAR</code>表示常量1。如果不希望從0開始分配，可以這樣定義：</p><pre class="programlisting">enum coordinate_type { RECTANGULAR = 1, POLAR };</pre><p>這樣，<code class="literal">RECTANGULAR</code>就表示常量1，而<code class="literal">POLAR</code>表示常量2。枚舉常量也是一種整型，其值在編譯時確定，因此也可以出現在常量表達式中，可以用於初始化全局變數或者作為<code class="literal">case</code>分支的判斷條件。</p><p>有一點需要注意，雖然結構體的成員名和變數名不在同一命名空間中，但枚舉的成員名卻和變數名在同一命名空間中，所以會出現命名衝突。例如這樣是不合法的：</p><pre class="programlisting">int main(void)
+{
+	enum coordinate_type { RECTANGULAR = 1, POLAR };
+	int RECTANGULAR;
+	printf("%d %d\n", RECTANGULAR, POLAR);
+	return 0;
+}</pre><p><code class="literal">complex_struct</code>結構體的格式變了，就需要修改複數存儲表示層的函數，但只要保持函數介面不變就不會影響到上層函數。例如：</p><pre class="programlisting">struct complex_struct make_from_real_img(double x, double y)
+{
+	struct complex_struct z;
+	z.t = RECTANGULAR;
+	z.a = x;
+	z.b = y;
+	return z;
+}
+
+struct complex_struct make_from_mag_ang(double r, double A)
+{
+	struct complex_struct z;
+	z.t = POLAR;
+	z.a = r;
+	z.b = A;
+	return z;
+}</pre><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2731481"></a>習題</h3></div></div></div><p>1、本節只給出了<code class="literal">make_from_real_img</code>和<code class="literal">make_from_mag_ang</code>函數的實現，請讀者自己實現<code class="literal">real_part</code>、<code class="literal">img_part</code>、<code class="literal">magnitude</code>、<code class="literal">angle</code>這些函數。</p><p>2、編譯運行下面這段程序：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+enum coordinate_type { RECTANGULAR = 1, POLAR };
+
+int main(void)
+{
+	int RECTANGULAR;
+	printf("%d %d\n", RECTANGULAR, POLAR);
+	return 0;
+}</pre><p>結果是什麼？並解釋一下為什麼是這樣的結果。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s02.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s04.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">2. 數據抽象 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 4. 嵌套結構體</td></tr></table></div></body></html>

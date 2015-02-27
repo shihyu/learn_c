@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 自定義函數</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch03.html" title="第 3 章 簡單函數" /><link rel="prev" href="ch03s01.html" title="1. 數學函數" /><link rel="next" href="ch03s03.html" title="3. 形參和實參" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 自定義函數</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s01.html">上一頁</a> </td><th width="60%" align="center">第 3 章 簡單函數</th><td width="20%" align="right"> <a accesskey="n" href="ch03s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2712975"></a>2. 自定義函數</h2></div></div></div><p>我們不僅可以調用C標準庫提供的函數，也可以定義自己的函數，事實上我們已經這麼做了：我們定義了<code class="literal">main</code>函數。例如：</p><pre class="programlisting">int main(void)
+{
+	int hour = 11;
+	int minute = 59;
+	printf("%d and %d hours\n", hour, minute / 60);
+	return 0;
+}</pre><p><code class="literal">main</code>函數的特殊之處在於執行程序時它自動被操作系統調用，操作系統就認準了<code class="literal">main</code>這個名字，除了名字特殊之外，<code class="literal">main</code>函數和別的函數沒有區別。我們對照着<code class="literal">main</code>函數的定義來看語法規則：</p><div class="literallayout"><p>函數定義 → 返回值類型 函數名(參數列表) 函數體<br />
+函數體 → { 語句列表 }<br />
+語句列表 → 語句列表項 語句列表項 ...<br />
+語句列表項 → 語句<br />
+語句列表項 → 變數聲明、類型聲明或非定義的函數聲明<br />
+非定義的函數聲明 → 返回值類型 函數名(參數列表);</p></div><p>我們稍後再詳細解釋“<span class="quote">函數定義</span>”和“<span class="quote">非定義的函數聲明</span>”的區別。從<a class="xref" href="ch07.html#struct">第 7 章 <i>結構體</i></a>開始我們才會看到類型聲明，所以現在暫不討論。</p><p>給函數命名也要遵循上一章講過的標識符命名規則。由於我們定義的<code class="literal">main</code>函數不帶任何參數，參數列表應寫成<code class="literal">void</code>。函數體可以由若干條語句和聲明組成，C89要求所有聲明寫在所有語句之前（本書的示例代碼都遵循這一規定），而C99的新特性允許語句和聲明按任意順序排列，只要每個標識符都遵循先聲明後使用的原則就行。<code class="literal">main</code>函數的返回值是<code class="literal">int</code>型的，<code class="literal">return 0;</code>這個語句表示返回值是0，<code class="literal">main</code>函數的返回值是返回給操作系統看的，因為<code class="literal">main</code>函數是被操作系統調用的，通常程序執行成功就返回0，在執行過程中出錯就返回一個非零值。比如我們將<code class="literal">main</code>函數中的<code class="literal">return</code>語句改為<code class="literal">return 4;</code>再執行它，執行結束後可以在Shell中看到它的退出狀態（Exit Status）<a id="id2713122" class="indexterm"></a>：</p><pre class="screen">$ ./a.out 
+11 and 0 hours
+$ echo $?
+4</pre><p><code class="literal">$?</code>是Shell中的一個特殊變數，表示上一條命令的退出狀態。關於<code class="literal">main</code>函數需要注意兩點：</p><div class="orderedlist"><ol type="1"><li><p><a class="xref" href="bi01.html#bibli.kr" title="The C Programming Language">[<abbr class="abbrev">K&amp;R</abbr>]</a>書上的<code class="literal">main</code>函數定義寫成<code class="literal">main(){...}</code>的形式，不寫返回值類型也不寫參數列表，這是Old Style C的風格。Old Style C規定不寫返回值類型就表示返回<code class="literal">int</code>型，不寫參數列表就表示參數類型和個數沒有明確指出。這種寬鬆的規定使編譯器無法檢查程序中可能存在的Bug，增加了調試難度，不幸的是現在的C標準為了兼容舊的代碼仍然保留了這種語法，但讀者絶不應該繼續使用這種語法。</p></li><li><p>其實操作系統在調用<code class="literal">main</code>函數時是傳參數的，<code class="literal">main</code>函數最標準的形式應該是<code class="literal">int main(int argc, char *argv[])</code>，在<a class="xref" href="ch23s06.html#pointer.parray">第 6 節 “指向指針的指針與指針數組”</a>詳細介紹。C標準也允許<code class="literal">int main(void)</code>這種寫法，如果不使用系統傳進來的兩個參數也可以寫成這種形式。但除了這兩種形式之外，定義<code class="literal">main</code>函數的其它寫法都是錯誤的或不可移植的。</p></li></ol></div><p>關於返回值和<code class="literal">return</code>語句我們將在<a class="xref" href="ch05s01.html#func2.return">第 1 節 “return語句”</a>詳細討論，我們先從不帶參數也沒有返回值的函數開始學習定義和使用函數：</p><div class="example"><a id="id2713244"></a><p class="title"><b>例 3.2. 最簡單的自定義函數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+void newline(void)
+{
+	printf("\n");
+}
+
+int main(void)
+{
+	printf("First Line.\n");
+	newline();
+	printf("Second Line.\n");
+	return 0;
+}</pre></div></div><br class="example-break" /><p>執行結果是：</p><pre class="screen">First Line.
+
+Second Line.</pre><p>我們定義了一個<code class="literal">newline</code>函數給<code class="literal">main</code>函數調用，它的作用是打印一個換行，所以執行結果中間多了一個空行。<code class="literal">newline</code>函數不僅不帶參數，也沒有返回值，返回值類型為<code class="literal">void</code>表示沒有返回值<sup>[<a id="id2713286" href="#ftn.id2713286" class="footnote">4</a>]</sup>，這說明我們調用這個函數完全是為了利用它的Side Effect。如果我們想要多次插入空行就可以多次調用<code class="literal">newline</code>函數：</p><pre class="programlisting">int main(void)
+{
+	printf("First Line.\n");
+	newline();
+	newline();
+	newline();
+	printf("Second Line.\n");
+	return 0;
+}</pre><p>如果我們總需要三個三個地插入空行，我們可以再定義一個<code class="literal">threeline</code>函數每次插入三個空行：</p><div class="example"><a id="id2713366"></a><p class="title"><b>例 3.3. 較簡單的自定義函數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+void newline(void)
+{
+	printf("\n");
+}
+
+void threeline(void)
+{
+	newline();
+	newline();
+	newline();
+}
+
+int main(void)
+{
+	printf("Three lines:\n");
+	threeline();
+	printf("Another three lines.\n");
+	threeline();
+	return 0;
+}</pre></div></div><br class="example-break" /><p>通過這個簡單的例子可以體會到：</p><div class="orderedlist"><ol type="1"><li><p>同一個函數可以被多次調用。</p></li><li><p>可以用一個函數調用另一個函數，後者再去調第三個函數。</p></li><li><p>通過自定義函數可以給一組複雜的操作起一個簡單的名字，例如<code class="literal">threeline</code>。對於<code class="literal">main</code>函數來說，只需要通過<code class="literal">threeline</code>這個簡單的名字來調用就行了，不必知道打印三個空行具體怎麼做，所有的複雜操作都被隱藏在<code class="literal">threeline</code>這個名字後面。</p></li><li><p>使用自定義函數可以使代碼更簡潔，<code class="literal">main</code>函數在任何地方想打印三個空行只需調用一個簡單的<code class="literal">threeline()</code>，而不必每次都寫三個<code class="literal">printf("\n")</code>。</p></li></ol></div><p>讀代碼和讀文章不一樣，按從上到下從左到右的順序讀代碼未必是最好的。比如上面的例子，按源檔案的順序應該是先看<code class="literal">newline</code>再看<code class="literal">threeline</code>再看<code class="literal">main</code>。如果你換一個角度，按代碼的執行順序來讀也許會更好：首先執行的是<code class="literal">main</code>函數中的語句，在一條<code class="literal">printf</code>之後調用了<code class="literal">threeline</code>，這時再去看<code class="literal">threeline</code>的定義，其中又調用了<code class="literal">newline</code>，這時再去看<code class="literal">newline</code>的定義，<code class="literal">newline</code>裡面有一條<code class="literal">printf</code>，執行完成後返回<code class="literal">threeline</code>，這裡還剩下兩次<code class="literal">newline</code>調用，效果也都一樣，執行完之後返回<code class="literal">main</code>，接下來又是一條<code class="literal">printf</code>和一條<code class="literal">threeline</code>。如下圖所示：</p><div class="figure"><a id="id2713546"></a><p class="title"><b>圖 3.1. 函數調用的執行順序</b></p><div class="figure-contents"><div><img src="images/func.funccall.png" alt="函數調用的執行順序" /></div></div></div><br class="figure-break" /><p>讀代碼的過程就是模仿計算機執行程序的過程，我們不僅要記住當前讀到了哪一行代碼，還要記住現在讀的代碼是被哪個函數調用的，這段代碼返回後應該從上一個函數的什麼地方接着往下讀。</p><p>現在澄清一下函數聲明、函數定義、函數原型（Prototype）<a id="id2713570" class="indexterm"></a>這幾個概念。比如<code class="literal">void threeline(void)</code>這一行，聲明了一個函數的名字、參數類型和個數、返回值類型，這稱為函數原型。在代碼中可以單獨寫一個函數原型，後面加<code class="literal">;</code>號結束，而不寫函數體，例如：</p><pre class="programlisting">void threeline(void);</pre><p>這種寫法只能叫函數聲明而不能叫函數定義，只有帶函數體的聲明才叫定義。上一章講過，只有分配存儲空間的變數聲明才叫變數定義，其實函數也是一樣，編譯器只有見到函數定義才會生成指令，而指令在程序運行時當然也要占存儲空間。那麼沒有函數體的函數聲明有什麼用呢？它為編譯器提供了有用的信息，編譯器在翻譯代碼的過程中，只有見到函數原型（不管帶不帶函數體）之後才知道這個函數的名字、參數類型和返回值，這樣碰到函數調用時才知道怎麼生成相應的指令，所以函數原型必須出現在函數調用之前，這也是遵循“<span class="quote">先聲明後使用</span>”的原則。</p><p>在上面的例子中，<code class="literal">main</code>調用<code class="literal">threeline</code>，<code class="literal">threeline</code>再調用<code class="literal">newline</code>，要保證每個函數的原型出現在調用之前，就只能按先<code class="literal">newline</code>再<code class="literal">threeline</code>再<code class="literal">main</code>的順序定義了。如果使用不帶函數體的聲明，則可以改變函數的定義順序：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+void newline(void);
+void threeline(void);
+
+int main(void)
+{
+	...
+}
+
+void newline(void)
+{
+	...
+}
+
+void threeline(void)
+{
+	...
+}</pre><p>這樣仍然遵循了先聲明後使用的原則。</p><p>由於有Old Style C語法的存在，並非所有函數聲明都包含完整的函數原型，例如<code class="literal">void threeline();</code>這個聲明並沒有明確指出參數類型和個數，所以不算函數原型，這個聲明提供給編譯器的信息只有函數名和返回值類型。如果在這樣的聲明之後調用函數，編譯器不知道參數的類型和個數，就不會做語法檢查，所以很容易引入Bug。讀者需要瞭解這個知識點以便維護別人用Old Style C風格寫的代碼，但絶不應該按這種風格寫新的代碼。</p><p>如果在調用函數之前沒有聲明會怎麼樣呢？有的讀者也許碰到過這種情況，我可以解釋一下，但絶不推薦這種寫法。比如按上面的順序定義這三個函數，但是把開頭的兩行聲明去掉：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	printf("Three lines:\n");
+	threeline();
+	printf("Another three lines.\n");
+	threeline();
+	return 0;
+}
+
+void newline(void)
+{
+	printf("\n");
+}
+
+void threeline(void)
+{
+	newline();
+	newline();
+	newline();
+}</pre><p>編譯時會報警告：</p><pre class="screen">$ gcc main.c
+main.c:17: warning: conflicting types for ‘threeline’
+main.c:6: warning: previous implicit declaration of ‘threeline’ was here</pre><p>但仍然能編譯通過，運行結果也對。這裡涉及到的規則稱為函數的隱式聲明（Implicit Declaration）<a id="id2713730" class="indexterm"></a>，在<code class="literal">main</code>函數中調用<code class="literal">threeline</code>時並沒有聲明它，編譯器認為此處隱式聲明了<code class="literal">int threeline(void);</code>，隱式聲明的函數返回值類型都是<code class="literal">int</code>，由於我們調用這個函數時沒有傳任何參數，所以編譯器認為這個隱式聲明的參數類型是<code class="literal">void</code>，這樣函數的參數和返回值類型都確定下來了，編譯器根據這些信息為函數調用生成相應的指令。然後編譯器接着往下看，看到<code class="literal">threeline</code>函數的原型是<code class="literal">void threeline(void)</code>，和先前的隱式聲明的返回值類型不符，所以報警告。好在我們也沒用到這個函數的返回值，所以執行結果仍然正確。</p><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2713286" href="#id2713286" class="para">4</a>] </sup>敏鋭的讀者可能會發現一個矛盾：如果函數<code class="literal">newline</code>沒有返回值，那麼表達式<code class="literal">newline()</code>不就沒有值了嗎？然而上一章講過任何表達式都有值和類型兩個基本屬性。其實這正是設計<code class="literal">void</code>這麼一個關鍵字的原因：首先從語法上規定沒有返回值的函數調用表達式有一個<code class="literal">void</code>類型的值，這樣任何表達式都有值，不必考慮特殊情況，編譯器的語法解析比較容易實現；然後從語義上規定<code class="literal">void</code>類型的表達式不能參與運算，因此<code class="literal">newline() + 1</code>這樣的表達式不能通過語義檢查，從而兼顧了語法上的一致和語義上的不矛盾。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch03s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 數學函數 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 形參和實參</td></tr></table></div></body></html>

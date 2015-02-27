@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 數組應用實例：統計隨機數</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch08.html" title="第 8 章 數組" /><link rel="prev" href="ch08s01.html" title="1. 數組的基本概念" /><link rel="next" href="ch08s03.html" title="3. 數組應用實例：直方圖" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 數組應用實例：統計隨機數</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch08s01.html">上一頁</a> </td><th width="60%" align="center">第 8 章 數組</th><td width="20%" align="right"> <a accesskey="n" href="ch08s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2733695"></a>2. 數組應用實例：統計隨機數</h2></div></div></div><p>本節通過一個實例介紹使用數組的一些基本模式。問題是這樣的：首先生成一列0~9的隨機數保存在數組中，然後統計其中每個數字出現的次數並打印，檢查這些數字的隨機性如何。隨機數在某些場合（例如遊戲程序）是非常有用的，但是用計算機生成完全隨機的數卻不是那麼容易。計算機執行每一條指令的結果都是確定的，沒有一條指令產生的是隨機數，調用C標準庫得到的隨機數其實是偽隨機（Pseudorandom）<a id="id2733724" class="indexterm"></a>數，是用數學公式算出來的確定的數，只不過這些數看起來很隨機，並且從統計意義上也很接近均勻分佈（Uniform Distribution）<a id="id2733734" class="indexterm"></a>的隨機數。</p><p>C標準庫中生成偽隨機數的是<code class="literal">rand</code>函數，使用這個函數需要包含標頭檔<code class="literal">stdlib.h</code>，它沒有參數，返回值是一個介於0和<code class="literal">RAND_MAX</code>之間的接近均勻分佈的整數。<code class="literal">RAND_MAX</code>是該標頭檔中定義的一個常量，在不同的平台上有不同的取值，但可以肯定它是一個非常大的整數。通常我們用到的隨機數是限定在某個範圍之中的，例如0~9，而不是0~<code class="literal">RAND_MAX</code>，我們可以用%運算符將<code class="literal">rand</code>函數的返回值處理一下：</p><pre class="programlisting">int x = rand() % 10;</pre><p>完整的程序如下：</p><div class="example"><a id="id2733797"></a><p class="title"><b>例 8.2. 生成並打印隨機數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define N 20
+
+int a[N];
+
+void gen_random(int upper_bound)
+{
+	int i;
+	for (i = 0; i &lt; N; i++)
+		a[i] = rand() % upper_bound;
+}
+
+void print_random()
+{
+	int i;
+	for (i = 0; i &lt; N; i++)
+		printf("%d ", a[i]);
+	printf("\n");
+}
+
+int main(void)
+{
+	gen_random(10);
+	print_random();
+	return 0;
+}</pre></div></div><br class="example-break" /><p>這裡介紹一種新的語法：用<code class="literal">#define</code>定義一個常量。實際上編譯器的工作分為兩個階段，先是預處理（Preprocess）<a id="id2733822" class="indexterm"></a>階段，然後才是編譯階段，用<code class="literal">gcc</code>的<code class="literal">-E</code>選項可以看到預處理之後、編譯之前的程序，例如：</p><pre class="screen">$ gcc -E main.c
+...（這裡省略了很多行stdio.h和stdlib.h的代碼）
+int a[20];
+
+void gen_random(int upper_bound)
+{
+ int i;
+ for (i = 0; i &lt; 20; i++)
+  a[i] = rand() % upper_bound;
+}
+
+void print_random()
+{
+ int i;
+ for (i = 0; i &lt; 20; i++)
+  printf("%d ", a[i]);
+ printf("\n");
+}
+
+int main(void)
+{
+ gen_random(10);
+ print_random();
+ return 0;
+}</pre><p>可見在這裡預處理器做了兩件事情，一是把標頭檔<code class="literal">stdio.h</code>和<code class="literal">stdlib.h</code>在代碼中展開，二是把<code class="literal">#define</code>定義的標識符<code class="literal">N</code>替換成它的定義20（在代碼中做了三處替換，分別位於數組的定義中和兩個函數中）。像<code class="literal">#include</code>和<code class="literal">#define</code>這種以#號開頭的行稱為預處理指示（Preprocessing Directive）<a id="id2733895" class="indexterm"></a>，我們將在<a class="xref" href="ch21.html#prep">第 21 章 <i>預處理</i></a>學習其它預處理指示。此外，用<code class="literal">cpp main.c</code>命令也可以達到同樣的效果，只做預處理而不編譯，<code class="literal">cpp</code>表示C preprocessor。</p><p>那麼用<code class="literal">#define</code>定義的常量和<a class="xref" href="ch07s03.html#struct.datatag">第 3 節 “數據類型標誌”</a>講的枚舉常量有什麼區別呢？首先，<code class="literal">define</code>不僅用於定義常量，也可以定義更複雜的語法結構，稱為宏（Macro）<a id="id2733947" class="indexterm"></a>定義。其次，<code class="literal">define</code>定義是在預處理階段處理的，而枚舉是在編譯階段處理的。試試看把<a class="xref" href="ch07s03.html#struct.datatag">第 3 節 “數據類型標誌”</a>習題2的程序改成下面這樣是什麼結果。</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#define RECTANGULAR 1
+#define POLAR 2
+
+int main(void)
+{
+	int RECTANGULAR;
+	printf("%d %d\n", RECTANGULAR, POLAR);
+	return 0;
+}</pre><p>注意，雖然<code class="literal">include</code>和<code class="literal">define</code>在預處理指示中有特殊含義，但它們並不是C語言的關鍵字，換句話說，它們也可以用作標識符，例如聲明<code class="literal">int include;</code>或者<code class="literal">void define(int);</code>。在預處理階段，如果一行以#號開頭，後面跟<code class="literal">include</code>或<code class="literal">define</code>，預處理器就認為這是一條預處理指示，除此之外出現在其它地方的<code class="literal">include</code>或<code class="literal">define</code>預處理器並不關心，只是當成普通標識符交給編譯階段去處理。</p><p>回到隨機數這個程序繼續討論，一開始為了便于分析和調試，我們取小一點的數組長度，只生成20個隨機數，這個程序的運行結果為：</p><pre class="screen">3 6 7 5 3 5 6 2 9 1 2 7 0 9 3 6 0 6 2 6</pre><p>看起來很隨機了。但隨機性如何呢？分佈得均勻嗎？所謂均勻分佈，應該每個數出現的概率是一樣的。在上面的20個結果中，6出現了5次，而4和8一次也沒出現過。但這說明不了什麼問題，畢竟我們的樣本太少了，才20個數，如果樣本足夠多，比如說100000個數，統計一下其中每個數字出現的次數也許能說明問題。但總不能把100000個數都打印出來然後挨個去數吧？我們需要寫一個函數統計每個數字出現的次數。完整的程序如下：</p><div class="example"><a id="id2734065"></a><p class="title"><b>例 8.3. 統計隨機數的分佈</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define N 100000
+
+int a[N];
+
+void gen_random(int upper_bound)
+{
+	int i;
+	for (i = 0; i &lt; N; i++)
+		a[i] = rand() % upper_bound;
+}
+
+int howmany(int value)
+{
+	int count = 0, i;
+	for (i = 0; i &lt; N; i++)
+		if (a[i] == value)
+			++count;
+	return count;
+}
+
+int main(void)
+{
+	int i;
+
+	gen_random(10);
+	printf("value\thow many\n");
+	for (i = 0; i &lt; 10; i++)
+		printf("%d\t%d\n", i, howmany(i));
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>我們只要把<code class="literal">#define N</code>的值改為100000，就相當於把整個程序中所有用到<code class="literal">N</code>的地方都改為100000了。如果我們不這麼寫，而是在定義數組時直接寫成<code class="literal">int a[20];</code>，在每個循環中也直接使用20這個值，這稱為硬編碼（Hard coding）<a id="id2734105" class="indexterm"></a>。如果原來的代碼是硬編碼的，那麼一旦需要把20改成100000就非常麻煩，你需要找遍整個代碼，判斷哪些20表示這個數組的長度就改為100000，哪些20表示別的數量則不做改動，如果代碼很長，這是很容易出錯的。所以，<span class="emphasis"><em>寫代碼時應儘可能避免硬編碼</em></span>，這其實也是一個“<span class="quote">提取公因式</span>”的過程，和<a class="xref" href="ch07s02.html#struct.abstract">第 2 節 “數據抽象”</a>講的抽象具有相同的作用，就是避免一個地方的改動波及到大的範圍。這個程序的運行結果如下：</p><pre class="screen">$ ./a.out
+value	how many
+0	10130
+1	10072
+2	9990
+3	9842
+4	10174
+5	9930
+6	10059
+7	9954
+8	9891
+9	9958</pre><p>各數字出現的次數都在10000次左右，可見是比較均勻的。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2734145"></a>習題</h3></div></div></div><p>1、用<code class="literal">rand</code>函數生成[10, 20]之間的隨機整數，表達式應該怎麼寫？</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 數組的基本概念 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 數組應用實例：直方圖</td></tr></table></div></body></html>

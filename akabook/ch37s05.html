@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>5. 練習：實現簡單的Web伺服器</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch37.html" title="第 37 章 socket編程" /><link rel="prev" href="ch37s04.html" title="4. UNIX Domain Socket IPC" /><link rel="next" href="apa.html" title="附錄 A. 字元編碼" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5. 練習：實現簡單的Web伺服器</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch37s04.html">上一頁</a> </td><th width="60%" align="center">第 37 章 socket編程</th><td width="20%" align="right"> <a accesskey="n" href="apa.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2904456"></a>5. 練習：實現簡單的Web伺服器</h2></div></div></div><p>實現一個簡單的Web伺服器myhttpd。伺服器程序啟動時要讀取配置檔案/etc/myhttpd.conf，其中需要指定伺服器監聽的連接埠號和服務目錄，例如：</p><pre class="programlisting">Port=80
+Directory=/var/www</pre><p>注意，1024以下的連接埠號需要超級用戶才能開啟服務。如果你的系統中已經安裝了某種Web伺服器（例如Apache），應該為myhttpd選擇一個不同的連接埠號。當瀏覽器向伺服器請求檔案時，伺服器就從服務目錄（例如/var/www）中找出這個檔案，加上HTTP協議頭一起發給瀏覽器。但是，如果瀏覽器請求的檔案是可執行的則稱為CGI程序，伺服器並不是將這個檔案發給瀏覽器，而是在伺服器端執行這個程序，將它的標準輸出發給瀏覽器，伺服器不發送完整的HTTP協議頭，CGI程序自己負責輸出一部分HTTP協議頭。</p><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2904532"></a>5.1. 基本HTTP協議</h3></div></div></div><p>打開瀏覽器，輸入伺服器IP，例如 http://192.168.0.3 ，如果連接埠號不是80，例如是8000，則輸入 http://192.168.0.3:8000 。這時瀏覽器向伺服器發送的HTTP協議頭如下：</p><pre class="programlisting">GET / HTTP/1.1
+Host: 192.168.0.3:8000
+User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+
+</pre><p>注意，其中每一行的末尾都是回車加換行（C語言的"\r\n"），第一行是GET請求和協議版本，其餘幾行選項欄位我們不討論，<span class="emphasis"><em>HTTP協議頭的最後有一個空行，也是回車加換行</em></span>。</p><p>我們實現的Web伺服器只要能正確解析第一行就行了，這是一個GET請求，請求的是服務目錄的根目錄/（在本例中實際上是/var/www），Web伺服器應該把該目錄下的索引頁（預設是index.html）發給瀏覽器，也就是把/var/www/index.html發給瀏覽器。假如該檔案的內容如下（HTML檔案沒必要以"\r\n"換行，以"\n"換行就可以了）：</p><pre class="programlisting">&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Test Page&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+	&lt;p&gt;Test OK&lt;/p&gt;
+	&lt;img src='mypic.jpg'&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre><p>顯示一行字和一幅圖片，圖片的相對路徑（相對當前的index.html檔案的路徑）是mypic.jpg，也就是/var/www/mypic.jpg，如果用絶對路徑表示應該是：</p><pre class="programlisting">&lt;img src='/mypic.jpg'&gt;</pre><p>伺服器應按如下格式應答瀏覽器：</p><pre class="programlisting">HTTP/1.1 200 OK
+Content-Type: text/html
+
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Test Page&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+	&lt;p&gt;Test OK&lt;/p&gt;
+	&lt;img src='mypic.jpg'&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre><p>伺服器應答的HTTP頭也是每行末尾以回車加換行結束，最後跟一個空行的回車加換行。</p><p>HTTP頭的第一行是協議版本和應答碼，200表示成功，後面的消息OK其實可以隨意寫，瀏覽器是不關心的，主要是為了調試時給開發人員看的。雖然網絡協議最終是程序與程序之間的對話，但是在開發過程中卻是人與程序之間的對話，一個設計透明的網絡協議可以提供很多直觀的信息給開發人員，因此，很多應用層網絡協議，如HTTP、FTP、SMTP、POP3等都是基于文本的協議，為的是透明性（transparency）。</p><p>HTTP頭的第二行表示即將發送的檔案的類型（稱為MIME類型），這裡是text/html，純文字檔案檔案是text/plain，圖片則是image/jpg、image/png等。</p><p>然後就發送檔案的內容，發送完畢之後主動關閉連接，這樣瀏覽器就知道檔案發送完了。這一點比較特殊：通常網絡通信都是客戶端主動發起連接，主動發起請求，主動關閉連接，伺服器只是被動地處理各種情況，而HTTP協議規定伺服器主動關閉連接（有些Web伺服器可以配置成Keep-Alive的，我們不討論這種情況）。</p><p>瀏覽器收到index.html之後，發現其中有一個圖片檔案，就會再發一個GET請求（HTTP協議頭其餘部分略）：</p><pre class="programlisting">GET /mypic.jpg HTTP/1.1</pre><p>一個較大的網頁中可能有很多圖片，瀏覽器可能在下載網頁的同時就開很多綫程下載圖片，因此，'''伺服器即使對同一個客戶端也需要提供並行服務的能力'''。伺服器收到這個請求應該把圖片發過去然後關閉連接：</p><pre class="programlisting">HTTP/1.1 200 OK
+Content-Type: image/jpg
+
+（這裡是mypic.jpg的二進制數據）</pre><p>這時瀏覽器就應該顯示出完整的網頁了。</p><p>如果瀏覽器請求的檔案在伺服器上找不到，要應答一個404錯誤頁面，例如：</p><pre class="programlisting">HTTP/1.1 404 Not Found
+Content-Type: text/html
+
+&lt;html&gt;&lt;body&gt;request file not found&lt;/body&gt;&lt;/html&gt;</pre></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2904687"></a>5.2. 執行CGI程序</h3></div></div></div><p>如果瀏覽器請求的是一個執行檔（不管是什麼樣的執行檔，即使是shell腳本也一樣），那麼伺服器並不把這個檔案本身發給瀏覽器，而是把它的執行結果標準輸出發給瀏覽器。例如一個shell腳本/var/www/myscript.sh（注意一定要加可執行權限）：</p><pre class="programlisting">#!/bin/sh
+echo "Content-Type: text/html"
+echo
+echo "&lt;html&gt;&lt;body&gt;Hello world!&lt;/body&gt;&lt;/html&gt;"</pre><p>這樣瀏覽器收到的是：</p><pre class="programlisting">HTTP/1.1 200 OK
+Content-Type: text/html
+
+&lt;html&gt;&lt;body&gt;Hello world!&lt;/body&gt;&lt;/html&gt;</pre><p>總結一下伺服器的處理步驟：</p><div class="orderedlist"><ol type="1"><li><p>解析瀏覽器的請求，在服務目錄中查找相應的檔案，如果找不到該檔案就返回404錯誤頁面</p></li><li><p>如果找到了瀏覽器請求的檔案，用stat(2)檢查它是否可執行</p></li><li><p>如果該檔案可執行：</p><div class="orderedlist"><ol type="a"><li><p>發送HTTP/1.1 200 OK給客戶端</p></li><li><p>fork(2)，然後用dup2(2)重定向子進程的標準輸出到客戶端socket</p></li><li><p>在子進程中exec(3)該CGI程序</p></li><li><p>關閉連接</p></li></ol></div></li><li><p>如果該檔案不可執行：</p><div class="orderedlist"><ol type="a"><li><p>發送HTTP/1.1 200 OK給客戶端</p></li><li><p>如果是一個圖片檔案，根據圖片的副檔名發送相應的Content-Type給客戶端</p></li><li><p>如果不是圖片檔案，這裡我們簡化處理，都當作Content-Type: text/html</p></li><li><p>簡單的HTTP協議頭有這兩行就足夠了，再發一個空行表示結束</p></li><li><p>讀取檔案的內容發送到客戶端</p></li><li><p>關閉連接</p></li></ol></div></li></ol></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch37s04.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch37.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="apa.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">4. UNIX Domain Socket IPC </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 附錄 A. 字元編碼</td></tr></table></div></body></html>

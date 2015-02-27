@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1. 字元串操作函數</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch25.html" title="第 25 章 C標準庫" /><link rel="prev" href="ch25.html" title="第 25 章 C標準庫" /><link rel="next" href="ch25s02.html" title="2. 標準I/O庫函數" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1. 字元串操作函數</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch25.html">上一頁</a> </td><th width="60%" align="center">第 25 章 C標準庫</th><td width="20%" align="right"> <a accesskey="n" href="ch25s02.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2827571"></a>1. 字元串操作函數</h2></div></div></div><p>程序按功能劃分可分為數值運算、符號處理和I/O操作三類，符號處理程序占相當大的比例，符號處理程序無處不在，編譯器、瀏覽器、Office套件等程序的主要功能都是符號處理。無論多複雜的符號處理都是由各種基本的字元串操作組成的，本節介紹如何用C語言的庫函數做字元串初始化、取長度、拷貝、連接、比較、搜索等基本操作。</p><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2827594"></a>1.1. 初始化字元串</h3></div></div></div><pre class="programlisting">#include &lt;string.h&gt;
+
+void *memset(void *s, int c, size_t n);
+返回值：s指向哪，返回的指針就指向哪</pre><p><code class="literal">memset</code>函數把<code class="literal">s</code>所指的內存地址開始的<code class="literal">n</code>個位元組都填充為<code class="literal">c</code>的值。通常<code class="literal">c</code>的值為0，把一塊內存區清零。例如定義<code class="literal">char buf[10];</code>，如果它是全局變數或靜態變數，則自動初始化為0（位於<code class="literal">.bss</code>段），如果它是函數的局部變數，則初值不確定，可以用<code class="literal">memset(buf, 0, 10)</code>清零，由<code class="literal">malloc</code>分配的內存初值也是不確定的，也可以用<code class="literal">memset</code>清零。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2827671"></a>1.2. 取字元串的長度</h3></div></div></div><pre class="programlisting">#include &lt;string.h&gt;
+
+size_t strlen(const char *s);
+返回值：字元串的長度</pre><p><code class="literal">strlen</code>函數返回<code class="literal">s</code>所指的字元串的長度。該函數從<code class="literal">s</code>所指的第一個字元開始找<code class="literal">'\0'</code>字元，一旦找到就返回，返回的長度不包括<code class="literal">'\0'</code>字元在內。例如定義<code class="literal">char buf[] = "hello";</code>，則<code class="literal">strlen(buf)</code>的值是5，但要注意，如果定義<code class="literal">char buf[5] = "hello";</code>，則調用<code class="literal">strlen(buf)</code>是危險的，會造成數組訪問越界。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2827741"></a>1.3. 拷貝字元串</h3></div></div></div><p>在<a class="xref" href="ch24s01.html#interface.prereq">第 1 節 “本章的預備知識”</a>中介紹了<code class="literal">strcpy</code>和<code class="literal">strncpy</code>函數，拷貝以<code class="literal">'\0'</code>結尾的字元串，<code class="literal">strncpy</code>還帶一個參數指定最多拷貝多少個位元組，此外，<code class="literal">strncpy</code>並不保證緩衝區以<code class="literal">'\0'</code>結尾。現在介紹<code class="literal">memcpy</code>和<code class="literal">memmove</code>函數。</p><pre class="programlisting">#include &lt;string.h&gt;
+
+void *memcpy(void *dest, const void *src, size_t n);
+void *memmove(void *dest, const void *src, size_t n);
+返回值：dest指向哪，返回的指針就指向哪</pre><p><code class="literal">memcpy</code>函數從<code class="literal">src</code>所指的內存地址拷貝<code class="literal">n</code>個位元組到<code class="literal">dest</code>所指的內存地址，和<code class="literal">strncpy</code>不同，<code class="literal">memcpy</code>並不是遇到<code class="literal">'\0'</code>就結束，而是一定會拷貝完<code class="literal">n</code>個位元組。這裡的命名規律是，以<code class="literal">str</code>開頭的函數處理以<code class="literal">'\0'</code>結尾的字元串，而以<code class="literal">mem</code>開頭的函數則不關心<code class="literal">'\0'</code>字元，或者說這些函數並不把參數當字元串看待，因此參數的指針類型是<code class="literal">void *</code>而非<code class="literal">char *</code>。</p><p><code class="literal">memmove</code>也是從<code class="literal">src</code>所指的內存地址拷貝<code class="literal">n</code>個位元組到<code class="literal">dest</code>所指的內存地址，雖然叫move但其實也是拷貝而非移動。但是和<code class="literal">memcpy</code>有一點不同，<code class="literal">memcpy</code>的兩個參數<code class="literal">src</code>和<code class="literal">dest</code>所指的內存區間如果重疊則無法保證正確拷貝，而<code class="literal">memmove</code>卻可以正確拷貝。假設定義了一個數組<code class="literal">char buf[20] = "hello world\n";</code>，如果想把其中的字元串往後移動一個位元組（變成<code class="literal">"hhello world\n"</code>），調用<code class="literal">memcpy(buf + 1, buf, 13)</code>是無法保證正確拷貝的：</p><div class="example"><a id="id2827982"></a><p class="title"><b>例 25.1. 錯誤的memcpy調用</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main(void)
+{
+	char buf[20] = "hello world\n";
+	memcpy(buf + 1, buf, 13);
+	printf(buf);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>在我的機器上運行的結果是<code class="literal">hhhllooworrd</code>。如果把代碼中的<code class="literal">memcpy</code>改成<code class="literal">memmove</code>則可以保證正確拷貝。<code class="literal">memmove</code>可以這樣實現：</p><pre class="programlisting">void *memmove(void *dest, const void *src, size_t n)
+{
+	char temp[n];
+	int i;
+	char *d = dest;
+	const char *s = src;
+
+	for (i = 0; i &lt; n; i++)
+		temp[i] = s[i];
+	for (i = 0; i &lt; n; i++)
+		d[i] = temp[i];
+
+	return dest;
+}</pre><p>借助于一個臨時緩衝區<code class="literal">temp</code>，即使<code class="literal">src</code>和<code class="literal">dest</code>所指的內存區間有重疊也能正確拷貝。思考一下，如果不借助于臨時緩衝區能不能正確處理重疊內存區間的拷貝？</p><p>用<code class="literal">memcpy</code>如果得到的結果是<code class="literal">hhhhhhhhhhhhhh</code>倒不奇怪，可為什麼會得到<code class="literal">hhhllooworrd</code>這個奇怪的結果呢？根據這個結果猜測的一種可能的實現是：</p><pre class="programlisting">void *memcpy(void *dest, const void *src, size_t n)
+{
+	char *d = dest;
+	const char *s = src;
+	int *di;
+	const int *si;
+	int r = n % 4;
+	while (r--)
+		*d++ = *s++;
+	di = (int *)d;
+	si = (const int *)s;
+	n /= 4;
+	while (n--)
+		*di++ = *si++;
+
+	return dest;
+}</pre><p>在32位的x86平台上，每次拷貝1個位元組需要一條指令，每次拷貝4個位元組也只需要一條指令，<code class="literal">memcpy</code>函數的實現儘可能4個位元組4個位元組地拷貝，因而得到上述結果。</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">C99的<code class="literal">restrict</code>關鍵字</h3><p>我們來看一個跟<code class="literal">memcpy</code>/<code class="literal">memmove</code>類似的問題。下面的函數將兩個數組中對應的元素相加，結果保存在第三個數組中。</p><pre class="programlisting">void vector_add(const double *x, const double *y, double *result)
+{  
+	int i;  
+	for (i = 0; i &lt; 64; ++i)  
+		result[i] = x[i] + y[i];  
+}</pre><p>如果這個函數要在多處理器的計算機上執行，編譯器可以做這樣的優化：把這一個循環拆成兩個循環，一個處理器計算i值從0到31的循環，另一個處理器計算i值從32到63的循環，這樣兩個處理器可以同時工作，使計算時間縮短一半。但是這樣的編譯優化能保證得出正確結果嗎？假如<code class="literal">result</code>和<code class="literal">x</code>所指的內存區間是重疊的，<code class="literal">result[0]</code>其實是<code class="literal">x[1]</code>，<code class="literal">result[i]</code>其實是<code class="literal">x[i+1]</code>，這兩個處理器就不能各幹各的事情了，因為第二個處理器的工作依賴于第一個處理器的最終計算結果，這種情況下編譯優化的結果是錯的。這樣看來編譯器是不敢隨便做優化了，那麼多處理器提供的並行性就無法利用，豈不可惜？為此，C99引入<code class="literal">restrict</code>關鍵字，如果程序員把上面的函數聲明為<code class="literal">void vector_add(const double *restrict x, const double *restrict y, double *restrict result)</code>，就是告訴編譯器可以放心地對這個函數做優化，程序員自己會保證這些指針所指的內存區間互不重疊。</p><p>由於<code class="literal">restrict</code>是C99引入的新關鍵字，目前Linux的Man Page還沒有更新，所以都沒有<code class="literal">restrict</code>關鍵字，本書的函數原型都取自Man Page，所以也都沒有<code class="literal">restrict</code>關鍵字。但在C99標準中庫函數的原型都在必要的地方加了<code class="literal">restrict</code>關鍵字，在C99中<code class="literal">memcpy</code>的原型是<code class="literal">void *memcpy(void * restrict s1, const void * restrict s2, size_t n);</code>，就是告訴調用者，這個函數的實現可能會做些優化，編譯器也可能會做些優化，傳進來的指針不允許指向重疊的內存區間，否則結果可能是錯的，而<code class="literal">memmove</code>的原型是<code class="literal">void *memmove(void *s1, const void *s2, size_t n);</code>，沒有<code class="literal">restrict</code>關鍵字，說明傳給這個函數的指針允許指向重疊的內存區間。在<code class="literal">restrict</code>關鍵字出現之前都是用自然語言描述哪些函數的參數不允許指向重疊的內存區間，例如在C89標準的庫函數一章開頭提到，本章描述的所有函數，除非特別說明，都不應該接收兩個指針參數指向重疊的內存區間，例如調用<code class="literal">sprintf</code>時傳進來的格式化字元串和結果字元串的首地址相同，諸如此類的調用都是非法的。本書也遵循這一慣例，除非像<code class="literal">memmove</code>這樣特別說明之外，都表示“<span class="quote">不允許</span>”。</p><p>關於<code class="literal">restrict</code>關鍵字更詳細的解釋可以參考<a class="xref" href="bi01.html#bibli.restrict" title="The New C: It All Began with FORTRAN（http://www.ddj.com/cpp/184401313）">[<abbr class="abbrev">BeganFORTRAN</abbr>]</a>。</p></div><p>字元串的拷貝也可以用<code class="literal">strdup(3)</code>函數，這個函數不屬於C標準庫，是POSIX標準中定義的，POSIX標準定義了UNIX系統的各種介面，包含C標準庫的所有函數和很多其它的系統函數，在<a class="xref" href="ch28s02.html#io.twoioflavors">第 2 節 “C標準I/O庫函數與Unbuffered I/O函數”</a>將詳細介紹POSIX標準。</p><pre class="programlisting">#include &lt;string.h&gt;
+
+char *strdup(const char *s);
+返回值：指向新分配的字元串</pre><p>這個函數調用<code class="literal">malloc</code>動態分配內存，把字元串<code class="literal">s</code>拷貝到新分配的內存中然後返回。用這個函數省去了事先為新字元串分配內存的麻煩，但是用完之後要記得調用<code class="literal">free</code>釋放新字元串的內存。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2828376"></a>1.4. 連接字元串</h3></div></div></div><pre class="programlisting">#include &lt;string.h&gt;
+
+char *strcat(char *dest, const char *src);
+char *strncat(char *dest, const char *src, size_t n);
+返回值：dest指向哪，返回的指針就指向哪</pre><p><code class="literal">strcat</code>把<code class="literal">src</code>所指的字元串連接到<code class="literal">dest</code>所指的字元串後面，例如：</p><pre class="programlisting">char d[10] = "foo";
+char s[10] = "bar";
+strcat(d, s);
+printf("%s %s\n", d, s);</pre><p>調用<code class="literal">strcat</code>函數後，緩衝區<code class="literal">s</code>的內容沒變，緩衝區<code class="literal">d</code>中保存着字元串<code class="literal">"foobar"</code>，注意原來<code class="literal">"foo"</code>後面的<code class="literal">'\0'</code>被連接上來的字元串<code class="literal">"bar"</code>覆蓋掉了，<code class="literal">"bar"</code>後面的<code class="literal">'\0'</code>仍保留。</p><p><code class="literal">strcat</code>和<code class="literal">strcpy</code>有同樣的問題，調用者必須確保<code class="literal">dest</code>緩衝區足夠大，否則會導致緩衝區溢出錯誤。<code class="literal">strncat</code>函數通過參數<code class="literal">n</code>指定一個長度，就可以避免緩衝區溢出錯誤。注意這個參數<code class="literal">n</code>的含義和<code class="literal">strncpy</code>的參數<code class="literal">n</code>不同，它並不是緩衝區<code class="literal">dest</code>的長度，而是表示最多從<code class="literal">src</code>緩衝區中取<code class="literal">n</code>個字元（不包括結尾的<code class="literal">'\0'</code>）連接到<code class="literal">dest</code>後面。如果<code class="literal">src</code>中前<code class="literal">n</code>個字元沒有出現<code class="literal">'\0'</code>，則取前<code class="literal">n</code>個字元再加一個<code class="literal">'\0'</code>連接到<code class="literal">dest</code>後面，所以<code class="literal">strncat</code>總是保證<code class="literal">dest</code>緩衝區以<code class="literal">'\0'</code>結尾，這一點又和<code class="literal">strncpy</code>不同，<code class="literal">strncpy</code>並不保證<code class="literal">dest</code>緩衝區以<code class="literal">'\0'</code>結尾。所以，提供給<code class="literal">strncat</code>函數的<code class="literal">dest</code>緩衝區的大小至少應該是<code class="literal">strlen(dest)+n+1</code>個位元組，才能保證不溢出。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2828656"></a>1.5. 比較字元串</h3></div></div></div><pre class="programlisting">#include &lt;string.h&gt;
+
+int memcmp(const void *s1, const void *s2, size_t n);
+int strcmp(const char *s1, const char *s2);
+int strncmp(const char *s1, const char *s2, size_t n);
+返回值：負值表示s1小於s2，0表示s1等於s2，正值表示s1大於s2</pre><p><code class="literal">memcmp</code>從前到後逐個比較緩衝區<code class="literal">s1</code>和<code class="literal">s2</code>的前<code class="literal">n</code>個位元組（不管裡面有沒有<code class="literal">'\0'</code>），如果<code class="literal">s1</code>和<code class="literal">s2</code>的前<code class="literal">n</code>個位元組全都一樣就返回0，如果遇到不一樣的位元組，<code class="literal">s1</code>的位元組比<code class="literal">s2</code>小就返回負值，<code class="literal">s1</code>的位元組比<code class="literal">s2</code>大就返回正值。</p><p><code class="literal">strcmp</code>把<code class="literal">s1</code>和<code class="literal">s2</code>當字元串比較，在其中一個字元串中遇到<code class="literal">'\0'</code>時結束，按照上面的比較準則，<code class="literal">"ABC"</code>比<code class="literal">"abc"</code>小，<code class="literal">"ABCD"</code>比<code class="literal">"ABC"</code>大，<code class="literal">"123A9"</code>比<code class="literal">"123B2"</code>小。</p><p><code class="literal">strncmp</code>的比較結束條件是：要麼在其中一個字元串中遇到<code class="literal">'\0'</code>結束（類似於<code class="literal">strcmp</code>），要麼比較完<code class="literal">n</code>個字元結束（類似於<code class="literal">memcmp</code>）。例如，<code class="literal">strncmp("ABCD", "ABC", 3)</code>的返回值是0，<code class="literal">strncmp("ABCD", "ABC", 4)</code>的返回值是正值。</p><pre class="programlisting">#include &lt;strings.h&gt;
+
+int strcasecmp(const char *s1, const char *s2);
+int strncasecmp(const char *s1, const char *s2, size_t n);
+返回值：負值表示s1小於s2，0表示s1等於s2，正值表示s1大於s2</pre><p>這兩個函數和<code class="literal">strcmp</code>/<code class="literal">strncmp</code>類似，但在比較過程中忽略大小寫，大寫字母A和小寫字母a認為是相等的。這兩個函數不屬於C標準庫，是POSIX標準中定義的。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2828881"></a>1.6. 搜索字元串</h3></div></div></div><pre class="programlisting">#include &lt;string.h&gt;
+
+char *strchr(const char *s, int c);
+char *strrchr(const char *s, int c);
+返回值：如果找到字元c，返回字元串s中指向字元c的指針，如果找不到就返回NULL</pre><p><code class="literal">strchr</code>在字元串<code class="literal">s</code>中從前到後查找字元<code class="literal">c</code>，找到字元<code class="literal">c</code>第一次出現的位置時就返回，返回值指向這個位置，如果找不到字元<code class="literal">c</code>就返回<code class="literal">NULL</code>。<code class="literal">strrchr</code>和<code class="literal">strchr</code>類似，但是從右向左找字元<code class="literal">c</code>，找到字元<code class="literal">c</code>第一次出現的位置就返回，函數名中間多了一個字母r可以理解為Right-to-left。</p><pre class="programlisting">#include &lt;string.h&gt;
+
+char *strstr(const char *haystack, const char *needle);
+返回值：如果找到子串，返回值指向子串的開頭，如果找不到就返回NULL</pre><p><code class="literal">strstr</code>在一個長字元串中從前到後找一個子串（Substring）<a id="id2828974" class="indexterm"></a>，找到子串第一次出現的位置就返回，返回值指向子串的開頭，如果找不到就返回NULL。這兩個參數名很形象，在乾草堆<code class="literal">haystack</code>中找一根針<code class="literal">needle</code>，按中文的說法叫大海撈針，顯然<code class="literal">haystack</code>是長字元串，<code class="literal">needle</code>是要找的子串。</p><p>搜索子串有一個顯而易見的算法，可以用兩層的循環，外層循環把<code class="literal">haystack</code>中的每一個字元的位置依次假定為子串的開頭，內層循環從這個位置開始逐個比較<code class="literal">haystack</code>和<code class="literal">needle</code>的每個字元是否相同。想想這個算法最多需要做多少次比較？其實有比這個算法高效得多的算法，有興趣的讀者可以參考<a class="xref" href="bi01.html#bibli.algorithm" title="Introduction to Algorithms">[<abbr class="abbrev">算法導論</abbr>]</a>。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2829046"></a>1.7. 分割字元串</h3></div></div></div><p>很多檔案格式或協議格式中會規定一些分隔符或者叫界定符（Delimiter）<a id="id2829054" class="indexterm"></a>，例如<code class="literal">/etc/passwd</code>檔案中保存着系統的帳號信息：</p><pre class="screen">$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+...</pre><p>每條記錄占一行，也就是說記錄之間的分隔符是換行符，每條記錄又由若干個欄位組成，這些欄位包括用戶名、密碼、用戶id、組id、個人信息、主目錄、登錄Shell，欄位之間的分隔符是:號。解析這樣的字元串需要根據分隔符把字元串分割成幾段，C標準庫提供的<code class="literal">strtok</code>函數可以很方便地完成分割字元串的操作。tok是Token的縮寫，分割出來的每一段字元串稱為一個Token。</p><pre class="programlisting">#include &lt;string.h&gt;
+
+char *strtok(char *str, const char *delim);
+char *strtok_r(char *str, const char *delim, char **saveptr);
+返回值：返回指向下一個Token的指針，如果沒有下一個Token了就返回NULL</pre><p>參數<code class="literal">str</code>是待分割的字元串，<code class="literal">delim</code>是分隔符，可以指定一個或多個分隔符，<code class="literal">strtok</code>遇到其中任何一個分隔符就會分割字元串。看下面的例子。</p><div class="example"><a id="id2829130"></a><p class="title"><b>例 25.2. strtok</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main(void)
+{
+	char str[] = "root:x::0:root:/root:/bin/bash:";
+	char *token;
+
+	token = strtok(str, ":");
+	printf("%s\n", token);
+	while ( (token = strtok(NULL, ":")) != NULL)
+		printf("%s\n", token);
+	
+	return 0;
+}</pre></div></div><br class="example-break" /><pre class="screen">$ ./a.out 
+root
+x
+0
+root
+/root
+/bin/bash</pre><p>結合這個例子，<code class="literal">strtok</code>的行為可以這樣理解：冒號是分隔符，把<code class="literal">"root:x::0:root:/root:/bin/bash:"</code>這個字元串分隔成<code class="literal">"root"</code>、<code class="literal">"x"</code>、<code class="literal">""</code>、<code class="literal">"0"</code>、<code class="literal">"root"</code>、<code class="literal">"/root"</code>、<code class="literal">"/bin/bash"</code>、<code class="literal">""</code>等幾個Token，但空字元串的Token被忽略。第一次調用要把字元串首地址傳給<code class="literal">strtok</code>的第一個參數，以後每次調用第一個參數只要傳<code class="literal">NULL</code>就可以了，<code class="literal">strtok</code>函數自己會記住上次處理到字元串的什麼位置（顯然這是通過<code class="literal">strtok</code>函數中的一個靜態指針變數記住的）。</p><p>用<code class="literal">gdb</code>跟蹤這個程序，會發現<code class="literal">str</code>字元串被<code class="literal">strtok</code>不斷修改，每次調用<code class="literal">strtok</code>把<code class="literal">str</code>中的一個分隔符改成<code class="literal">'\0'</code>，分割出一個小字元串，並返回這個小字元串的首地址。</p><pre class="screen">(gdb) start
+Breakpoint 1 at 0x8048415: file main.c, line 5.
+Starting program: /home/akaedu/a.out 
+main () at main.c:5
+5	{
+(gdb) n
+6		char str[] = "root:x::0:root:/root:/bin/bash:";
+(gdb) 
+9		token = strtok(str, ":");
+(gdb) display str
+1: str = "root:x::0:root:/root:/bin/bash:"
+(gdb) n
+10		printf("%s\n", token);
+1: str = "root\000x::0:root:/root:/bin/bash:"
+(gdb) 
+root
+11		while ( (token = strtok(NULL, ":")) != NULL)
+1: str = "root\000x::0:root:/root:/bin/bash:"
+(gdb) 
+12			printf("%s\n", token);
+1: str = "root\000x\000:0:root:/root:/bin/bash:"
+(gdb) 
+x
+11		while ( (token = strtok(NULL, ":")) != NULL)
+1: str = "root\000x\000:0:root:/root:/bin/bash:"</pre><p>剛纔提到在<code class="literal">strtok</code>函數中應該有一個靜態指針變數記住上次處理到字元串中的什麼位置，所以不需要每次調用時都把字元串中的當前處理位置傳給<code class="literal">strtok</code>，但是在函數中使用靜態變數是不好的，以後會講到這樣的函數是不可重入的。<code class="literal">strtok_r</code>函數則不存在這個問題，它的內部沒有靜態變數，調用者需要自己分配一個指針變數來維護字元串中的當前處理位置，每次調用時把這個指針變數的地址傳給<code class="literal">strtok_r</code>的第三個參數，告訴<code class="literal">strtok_r</code>從哪裡開始處理，<code class="literal">strtok_r</code>返回時再把新的處理位置寫回到這個指針變數中（這是一個Value-result參數）。<code class="literal">strtok_r</code>末尾的r就表示可重入（Reentrant），這個函數不屬於C標準庫，是在POSIX標準中定義的。關於<code class="literal">strtok_r</code>的用法Man Page上有一個很好的例子：</p><div class="example"><a id="id2829363"></a><p class="title"><b>例 25.3. strtok_r</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+int main(int argc, char *argv[])
+{
+	char *str1, *str2, *token, *subtoken;
+	char *saveptr1, *saveptr2;
+	int j;
+
+	if (argc != 4) {
+		fprintf(stderr, "Usage: %s string delim subdelim\n",
+			argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	for (j = 1, str1 = argv[1]; ; j++, str1 = NULL) {
+		token = strtok_r(str1, argv[2], &amp;saveptr1);
+		if (token == NULL)
+			break;
+		printf("%d: %s\n", j, token);
+
+		for (str2 = token; ; str2 = NULL) {
+			subtoken = strtok_r(str2, argv[3], &amp;saveptr2);
+			if (subtoken == NULL)
+				break;
+			printf(" --&gt; %s\n", subtoken);
+		}
+	}
+
+	exit(EXIT_SUCCESS);
+}</pre></div></div><br class="example-break" /><pre class="screen">$ ./a.out 'a/bbb///cc;xxx:yyy:' ':;' '/'
+1: a/bbb///cc
+ --&gt; a
+ --&gt; bbb
+ --&gt; cc
+2: xxx
+ --&gt; xxx
+3: yyy
+ --&gt; yyy</pre><p><code class="literal">a/bbb///cc;xxx:yyy:</code>這個字元串有兩級分隔符，一級分隔符是:號或;號，把這個字元串分割成<code class="literal">a/bbb///cc</code>、<code class="literal">xxx</code>、<code class="literal">yyy</code>三個子串，二級分隔符是/，只有第一個子串中有二級分隔符，它被進一步分割成<code class="literal">a</code>、<code class="literal">bbb</code>、<code class="literal">cc</code>三個子串。由於<code class="literal">strtok_r</code>不使用靜態變數，而是要求調用者自己保存字元串的當前處理位置，所以這個例子可以在按一級分隔符分割整個字元串的過程中穿插着用二級分隔符分割其中的每個子串。建議讀者用<code class="literal">gdb</code>的<code class="literal">display</code>命令跟蹤<code class="literal">argv[1]</code>、<code class="literal">saveptr1</code>和<code class="literal">saveptr2</code>，以理解<code class="literal">strtok_r</code>函數的工作方式。</p><p>Man Page的<span class="emphasis"><em>BUGS</em></span>部分指出了用<code class="literal">strtok</code>和<code class="literal">strtok_r</code>函數需要注意的問題：</p><div class="itemizedlist"><ul type="disc"><li><p>這兩個函數要改寫字元串以達到分割的效果</p></li><li><p>這兩個函數不能用於常量字元串，因為試圖改寫<code class="literal">.rodata</code>段會產生段錯誤</p></li><li><p>在做了分割之後，字元串中的分隔符就被<code class="literal">'\0'</code>覆蓋了</p></li><li><p><code class="literal">strtok</code>函數使用了靜態變數，它不是綫程安全的，必要時應該用可重入的<code class="literal">strtok_r</code>函數，以後再詳細介紹“<span class="quote">可重入</span>”和“<span class="quote">綫程安全</span>”這兩個概念</p></li></ul></div><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2829560"></a>習題</h4></div></div></div><p>1、出於練習的目的，<code class="literal">strtok</code>和<code class="literal">strtok_r</code>函數非常值得自己動手實現一遍，在這個過程中不僅可以更深刻地理解這兩個函數的工作原理，也為以後理解“<span class="quote">可重入</span>”和“<span class="quote">綫程安全</span>”這兩個重要概念打下基礎。</p><p>2、解析URL中的路徑和查詢字元串。動態網頁的URL末尾通常帶有查詢，例如：</p><div class="literallayout"><p>http://www.google.cn/search?complete=1&amp;hl=zh-CN&amp;ie=GB2312&amp;q=linux&amp;meta=<br />
+http://www.baidu.com/s?wd=linux&amp;cl=3</p></div><p>比如上面第一個例子，<code class="literal">http://www.google.cn/search</code>是路徑部分，?號後面的<code class="literal">complete=1&amp;hl=zh-CN&amp;ie=GB2312&amp;q=linux&amp;meta=</code>是查詢字元串，由五個“<span class="quote">key=value</span>”形式的鍵值對（Key-value Pair）<a id="id2829629" class="indexterm"></a>組成，以&amp;隔開，有些鍵對應的值可能是空字元串，比如這個例子中的鍵<code class="literal">meta</code>。</p><p>現在要求實現一個函數，傳入一個帶查詢字元串的URL，首先檢查輸入格式的合法性，然後對URL進行切分，將路徑部分和各鍵值對分別傳出，請仔細設計函數介面以便傳出這些字元串。如果函數中有動態分配內存的操作，還要另外實現一個釋放內存的函數。完成之後，為自己設計的函數寫一個Man Page。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch25.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch25.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch25s02.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">第 25 章 C標準庫 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 2. 標準I/O庫函數</td></tr></table></div></body></html>

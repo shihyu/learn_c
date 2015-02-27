@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>6. volatile限定符</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch19.html" title="第 19 章 彙編與C之間的關係" /><link rel="prev" href="ch19s05.html" title="5. C內聯彙編" /><link rel="next" href="ch20.html" title="第 20 章 連結詳解" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6. volatile限定符</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch19s05.html">上一頁</a> </td><th width="60%" align="center">第 19 章 彙編與C之間的關係</th><td width="20%" align="right"> <a accesskey="n" href="ch20.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2780234"></a>6. volatile限定符</h2></div></div></div><p>現在探討一下編譯器優化會對生成的指令產生什麼影響，在此基礎上介紹C語言的<code class="literal">volatile</code>限定符。看下面的例子。</p><div class="example"><a id="id2780254"></a><p class="title"><b>例 19.7. volatile限定符</b></p><div class="example-contents"><pre class="programlisting">/* artificial device registers */
+unsigned char recv;
+unsigned char send;
+
+/* memory buffer */
+unsigned char buf[3];
+
+int main(void)
+{
+	buf[0] = recv;
+	buf[1] = recv;
+	buf[2] = recv;
+	send = ~buf[0];
+	send = ~buf[1];
+	send = ~buf[2];
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>我們用<code class="literal">recv</code>和<code class="literal">send</code>這兩個全局變數來模擬設備寄存器。假設某種平台採用內存映射I/O，串口發送寄存器和串口接收寄存器位於固定的內存地址，而<code class="literal">recv</code>和<code class="literal">send</code>這兩個全局變數也有固定的內存地址，所以在這個例子中把它們假想成串口接收寄存器和串口發送寄存器。在<code class="literal">main</code>函數中，首先從串口接收三個位元組存到<code class="literal">buf</code>中，然後把這三個位元組取反，依次從串口發送出去<sup>[<a id="id2780312" href="#ftn.id2780312" class="footnote">31</a>]</sup>。我們查看這段代碼的反彙編結果：</p><pre class="screen">        buf[0] = recv;
+ 80483a2:       0f b6 05 19 a0 04 08    movzbl 0x804a019,%eax
+ 80483a9:       a2 1a a0 04 08          mov    %al,0x804a01a
+        buf[1] = recv;
+ 80483ae:       0f b6 05 19 a0 04 08    movzbl 0x804a019,%eax
+ 80483b5:       a2 1b a0 04 08          mov    %al,0x804a01b
+        buf[2] = recv;
+ 80483ba:       0f b6 05 19 a0 04 08    movzbl 0x804a019,%eax
+ 80483c1:       a2 1c a0 04 08          mov    %al,0x804a01c
+        send = ~buf[0];
+ 80483c6:       0f b6 05 1a a0 04 08    movzbl 0x804a01a,%eax
+ 80483cd:       f7 d0                   not    %eax
+ 80483cf:       a2 18 a0 04 08          mov    %al,0x804a018
+        send = ~buf[1];
+ 80483d4:       0f b6 05 1b a0 04 08    movzbl 0x804a01b,%eax
+ 80483db:       f7 d0                   not    %eax
+ 80483dd:       a2 18 a0 04 08          mov    %al,0x804a018
+        send = ~buf[2];
+ 80483e2:       0f b6 05 1c a0 04 08    movzbl 0x804a01c,%eax
+ 80483e9:       f7 d0                   not    %eax
+ 80483eb:       a2 18 a0 04 08          mov    %al,0x804a018</pre><p><code class="literal">movz</code>指令把字長較短的值存到字長較長的存儲單元中，存儲單元的高位用0填充。該指令可以有<code class="literal">b</code>（byte）、<code class="literal">w</code>（word）、<code class="literal">l</code>（long）三種尾碼，分別表示單位元組、兩位元組和四位元組。比如<code class="literal">movzbl 0x804a019,%eax</code>表示把地址0x804a019處的一個位元組存到<code class="literal">eax</code>寄存器中，而<code class="literal">eax</code>寄存器是四位元組的，高三位元組用0填充，而下一條指令<code class="literal">mov    %al,0x804a01a</code>中的<code class="literal">al</code>寄存器正是<code class="literal">eax</code>寄存器的低位元組，把這個位元組存到地址0x804a01a處的一個位元組中。可以用不同的名字單獨訪問x86寄存器的低8位、次低8位、低16位或者完整的32位，以<code class="literal">eax</code>為例，<code class="literal">al</code>表示低8位，<code class="literal">ah</code>表示次低8位，<code class="literal">ax</code>表示低16位，如下圖所示。</p><div class="figure"><a id="id2780453"></a><p class="title"><b>圖 19.7. eax寄存器</b></p><div class="figure-contents"><div><img src="images/asmc.eax.png" alt="eax寄存器" /></div></div></div><br class="figure-break" /><p>但如果指定優化選項<code class="literal">-O</code>編譯，反彙編的結果就不一樣了：</p><pre class="screen">$ gcc main.c -g -O
+$ objdump -dS a.out|less
+...
+        buf[0] = recv;
+ 80483ae:       0f b6 05 19 a0 04 08    movzbl 0x804a019,%eax
+ 80483b5:       a2 1a a0 04 08          mov    %al,0x804a01a
+        buf[1] = recv;
+ 80483ba:       a2 1b a0 04 08          mov    %al,0x804a01b
+        buf[2] = recv;
+ 80483bf:       a2 1c a0 04 08          mov    %al,0x804a01c
+        send = ~buf[0];
+        send = ~buf[1];
+        send = ~buf[2];
+ 80483c4:       f7 d0                   not    %eax
+ 80483c6:       a2 18 a0 04 08          mov    %al,0x804a018
+...</pre><p>前三條語句從串口接收三個位元組，而編譯生成的指令顯然不符合我們的意圖：只有第一條語句從內存地址0x804a019讀一個位元組到寄存器<code class="literal">eax</code>中，然後從寄存器<code class="literal">al</code>保存到<code class="literal">buf[0]</code>，後兩條語句就不再從內存地址0x804a019讀取，而是直接把寄存器<code class="literal">al</code>的值保存到<code class="literal">buf[1]</code>和<code class="literal">buf[2]</code>。後三條語句把<code class="literal">buf</code>中的三個位元組取反再發送到串口，編譯生成的指令也不符合我們的意圖：只有最後一條語句把<code class="literal">eax</code>的值取反寫到內存地址0x804a018了，前兩條語句形同虛設，根本不生成指令。</p><p>為什麼編譯器優化的結果會錯呢？因為編譯器並不知道0x804a018和0x804a019是設備寄存器的地址，把它們當成普通的內存單元了。如果是普通的內存單元，只要程序不去改寫它，它就不會變，可以先把內存單元裡的值讀到寄存器緩存起來，以後每次用到這個值就直接從寄存器讀取，這樣效率更高，我們知道讀寄存器遠比讀內存要快。另一方面，如果對一個普通的內存單元連續做三次寫操作，只有最後一次的值會保存到內存單元中，所以前兩次寫操作是多餘的，可以優化掉。訪問設備寄存器的代碼這樣優化就錯了，因為設備寄存器往往具有以下特性：</p><div class="itemizedlist"><ul type="disc"><li><p>設備寄存器中的數據不需要改寫就可以自己發生變化，每次讀上來的值都可能不一樣。</p></li><li><p>連續多次向設備寄存器中寫數據並不是在做無用功，而是有特殊意義的。</p></li></ul></div><p>用優化選項編譯生成的指令明顯效率更高，但使用不當會出錯，為了避免編譯器自作聰明，把不該優化的也優化了，程序員應該明確告訴編譯器哪些內存單元的訪問是不能優化的，在C語言中可以用<code class="literal">volatile</code>限定符修飾變數，就是告訴編譯器，即使在編譯時指定了優化選項，每次讀這個變數仍然要老老實實從內存讀取，每次寫這個變數也仍然要老老實實寫回內存，不能省略任何步驟。我們把代碼的開頭幾行改成：</p><pre class="programlisting">/* artificial device registers */
+volatile unsigned char recv;
+volatile unsigned char send;</pre><p>然後指定優化選項<code class="literal">-O</code>編譯，查看反彙編的結果：</p><pre class="screen">        buf[0] = recv;
+ 80483a2:       0f b6 05 19 a0 04 08    movzbl 0x804a019,%eax
+ 80483a9:       a2 1a a0 04 08          mov    %al,0x804a01a
+        buf[1] = recv;
+ 80483ae:       0f b6 15 19 a0 04 08    movzbl 0x804a019,%edx
+ 80483b5:       88 15 1b a0 04 08       mov    %dl,0x804a01b
+        buf[2] = recv;
+ 80483bb:       0f b6 0d 19 a0 04 08    movzbl 0x804a019,%ecx
+ 80483c2:       88 0d 1c a0 04 08       mov    %cl,0x804a01c
+        send = ~buf[0];
+ 80483c8:       f7 d0                   not    %eax
+ 80483ca:       a2 18 a0 04 08          mov    %al,0x804a018
+        send = ~buf[1];
+ 80483cf:       f7 d2                   not    %edx
+ 80483d1:       88 15 18 a0 04 08       mov    %dl,0x804a018
+        send = ~buf[2];
+ 80483d7:       f7 d1                   not    %ecx
+ 80483d9:       88 0d 18 a0 04 08       mov    %cl,0x804a018</pre><p>確實每次讀<code class="literal">recv</code>都從內存地址0x804a019讀取，每次寫<code class="literal">send</code>也都寫到內存地址0x804a018了。值得注意的是，每次寫<code class="literal">send</code>並不需要取出<code class="literal">buf</code>中的值，而是取出先前緩存在寄存器<code class="literal">eax</code>、<code class="literal">edx</code>、<code class="literal">ecx</code>中的值，做取反運算然後寫下去，這是因為<code class="literal">buf</code>並沒有用<code class="literal">volatile</code>限定，讀者可以試着在<code class="literal">buf</code>的定義前面也加上<code class="literal">volatile</code>，再優化編譯，再查看反彙編的結果。</p><p><code class="literal">gcc</code>的編譯優化選項有<code class="literal">-O0</code>、<code class="literal">-O</code>、<code class="literal">-O1</code>、<code class="literal">-O2</code>、<code class="literal">-O3</code>、<code class="literal">-Os</code>幾種。<code class="literal">-O0</code>表示不優化，這是預設的選項。<code class="literal">-O1</code>、<code class="literal">-O2</code>和<code class="literal">-O3</code>這幾個選項一個比一個優化得更多，編譯時間也更長。<code class="literal">-O</code>和<code class="literal">-O1</code>相同。<code class="literal">-Os</code>表示為縮小目標檔案的尺寸而優化。具體每種選項做了哪些優化請參考<code class="literal">gcc(1)</code>的Man Page。</p><p>從上面的例子還可以看到，如果在編譯時指定了優化選項，原始碼和生成指令的次序可能無法對應，甚至有些原始碼可能不對應任何指令，被徹底優化掉了。這一點在用<code class="literal">gdb</code>做源碼級調試時尤其需要注意（做指令級調試沒關係），在為調試而編譯時不要指定優化選項，否則可能無法一步步跟蹤原始碼的執行過程。</p><p>有了<code class="literal">volatile</code>限定符，是可以防止編譯器優化對設備寄存器的訪問，但是對於有Cache的平台，僅僅這樣還不夠，還是無法防止Cache優化對設備寄存器的訪問。在訪問普通的內存單元時，Cache對程序員是透明的，比如執行了<code class="literal">movzbl 0x804a019,%eax</code>這樣一條指令，我們並不知道<code class="literal">eax</code>的值是真的從內存地址0x804a019讀到的，還是從Cache中讀到的，如果Cache已經緩存了這個地址的數據就從Cache讀，如果Cache沒有緩存就從內存讀，這些步驟都是硬件自動做的，而不是用指令控制Cache去做的，程序員寫的指令中只有寄存器、內存地址，而沒有Cache，程序員甚至不需要知道Cache的存在。同樣道理，如果執行了<code class="literal">mov    %al,0x804a01a</code>這樣一條指令，我們並不知道寄存器的值是真的寫回內存了，還是隻寫到了Cache中，以後再由Cache寫回內存，即使只寫到了Cache中而暫時沒有寫回內存，下次讀0x804a01a這個地址時仍然可以從Cache中讀到上次寫的數據。然而，在讀寫設備寄存器時Cache的存在就不容忽視了，如果串口發送和接收寄存器的內存地址被Cache緩存了會有什麼問題呢？如下圖所示。</p><div class="figure"><a id="id2780881"></a><p class="title"><b>圖 19.8. 串口發送和接收寄存器被Cache緩存會有什麼問題</b></p><div class="figure-contents"><div><img src="images/asmc.nocache.png" alt="串口發送和接收寄存器被Cache緩存會有什麼問題" /></div></div></div><br class="figure-break" /><p>如果串口發送寄存器的地址被Cahce緩存，CPU執行單元對串口發送寄存器做寫操作都寫到Cache中去了，串口發送寄存器並沒有及時得到數據，也就不能及時發送，CPU執行單元先後發出的1、2、3三個位元組都會寫到Cache中的同一個單元，最後Cache中只保存了第3個位元組，如果這時Cache把數據寫回到串口發送寄存器，只能把第3個位元組發送出去，前兩個位元組就丟失了。與此類似，如果串口接收寄存器的地址被Cache緩存，CPU執行單元在讀第1個位元組時，Cache會從串口接收寄存器讀上來緩存，然而串口接收寄存器後面收到的2、3兩個位元組Cache並不知道，因為Cache把串口接收寄存器當作普通內存單元，並且相信內存單元中的數據是不會自己變的，以後每次讀串口接收寄存器時，Cache都會把緩存的第1個位元組提供給CPU執行單元。</p><p>通常，有Cache的平台都有辦法對某一段地址範圍禁用Cache，一般是在頁表中設置的，可以設定哪些頁面允許Cache緩存，哪些頁面不允許Cache緩存，MMU不僅要做地址轉換和訪問權限檢查，也要和Cache協同工作。</p><p>除了設備寄存器需要用<code class="literal">volatile</code>限定之外，當一個全局變數被同一進程中的多個控制流程訪問時也要用<code class="literal">volatile</code>限定，比如信號處理函數和多綫程。</p><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2780312" href="#id2780312" class="para">31</a>] </sup>實際的串口設備通常有一些標誌位指示是否有數據到達以及是否可以發送下一個位元組的數據，通常要先查詢這些標誌位再做讀寫操作，在這個例子中我們抓主要矛盾，忽略這些細節。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch19s05.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch19.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch20.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">5. C內聯彙編 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 第 20 章 連結詳解</td></tr></table></div></body></html>

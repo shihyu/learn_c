@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 數據抽象</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch07.html" title="第 7 章 結構體" /><link rel="prev" href="ch07s01.html" title="1. 復合類型與結構體" /><link rel="next" href="ch07s03.html" title="3. 數據類型標誌" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 數據抽象</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s01.html">上一頁</a> </td><th width="60%" align="center">第 7 章 結構體</th><td width="20%" align="right"> <a accesskey="n" href="ch07s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2730921"></a>2. 數據抽象</h2></div></div></div><p>現在我們來實現一個完整的複數運算程序。在上一節我們已經定義了複數的結構體類型，現在需要圍繞它定義一些函數。複數可以用直角座標或極座標表示，直角座標做加減法比較方便，極座標做乘除法比較方便。如果我們定義的複數結構體是直角座標的，那麼應該提供極座標的轉換函數，以便在需要的時候可以方便地取它的模和輻角：</p><pre class="programlisting">#include &lt;math.h&gt;
+
+struct complex_struct {
+	double x, y;
+};
+
+double real_part(struct complex_struct z)
+{
+	return z.x;
+}
+
+double img_part(struct complex_struct z)
+{
+	return z.y;
+}
+
+double magnitude(struct complex_struct z)
+{
+	return sqrt(z.x * z.x + z.y * z.y);
+}
+
+double angle(struct complex_struct z)
+{
+	return atan2(z.y, z.x);
+}</pre><p>此外，我們還提供兩個函數用來構造複數變數，既可以提供直角座標也可以提供極座標，在函數中自動做相應的轉換然後返回構造的複數變數：</p><pre class="programlisting">struct complex_struct make_from_real_img(double x, double y)
+{
+	struct complex_struct z;
+	z.x = x;
+	z.y = y;
+	return z;
+}
+
+struct complex_struct make_from_mag_ang(double r, double A)
+{
+	struct complex_struct z;
+	z.x = r * cos(A);
+	z.y = r * sin(A);
+	return z;
+}</pre><p>在此基礎上就可以實現複數的加減乘除運算了：</p><pre class="programlisting">struct complex_struct add_complex(struct complex_struct z1, struct complex_struct z2)
+{
+	return make_from_real_img(real_part(z1) + real_part(z2),
+				  img_part(z1) + img_part(z2));
+}
+
+struct complex_struct sub_complex(struct complex_struct z1, struct complex_struct z2)
+{
+	return make_from_real_img(real_part(z1) - real_part(z2),
+				  img_part(z1) - img_part(z2));
+}
+
+struct complex_struct mul_complex(struct complex_struct z1, struct complex_struct z2)
+{
+	return make_from_mag_ang(magnitude(z1) * magnitude(z2),
+				 angle(z1) + angle(z2));
+}
+
+struct complex_struct div_complex(struct complex_struct z1, struct complex_struct z2)
+{
+	return make_from_mag_ang(magnitude(z1) / magnitude(z2),
+				 angle(z1) - angle(z2));
+}</pre><p>可以看出，複數加減乘除運算的實現並沒有直接訪問結構體<code class="literal">complex_struct</code>的成員<code class="literal">x</code>和<code class="literal">y</code>，而是把它看成一個整體，通過調用相關函數來取它的直角座標和極座標。這樣就可以非常方便地替換掉結構體<code class="literal">complex_struct</code>的存儲表示，例如改為用極座標來存儲：</p><pre class="programlisting">#include &lt;math.h&gt;
+
+struct complex_struct {
+	double r, A;
+};
+
+double real_part(struct complex_struct z)
+{
+	return z.r * cos(z.A);
+}
+
+double img_part(struct complex_struct z)
+{
+	return z.r * sin(z.A);
+}
+
+double magnitude(struct complex_struct z)
+{
+	return z.r;
+}
+
+double angle(struct complex_struct z)
+{
+	return z.A;
+}
+
+struct complex_struct make_from_real_img(double x, double y)
+{
+	struct complex_struct z;
+	z.A = atan2(y, x);
+	z.r = sqrt(x * x + y * y);
+}
+
+struct complex_struct make_from_mag_ang(double r, double A)
+{
+	struct complex_struct z;
+	z.r = r;
+	z.A = A;
+	return z;
+}</pre><p>雖然結構體<code class="literal">complex_struct</code>的存儲表示做了這樣的改動，<code class="literal">add_complex</code>、<code class="literal">sub_complex</code>、<code class="literal">mul_complex</code>、<code class="literal">div_complex</code>這幾個複數運算的函數卻不需要做任何改動，仍然可以用，原因在於這幾個函數只把結構體<code class="literal">complex_struct</code>當作一個整體來使用，而沒有直接訪問它的成員，因此也不依賴于它有哪些成員。我們結合下圖具體分析一下。</p><div class="figure"><a id="id2731079"></a><p class="title"><b>圖 7.3. 數據抽象</b></p><div class="figure-contents"><div><img src="images/struct.abstraction.png" alt="數據抽象" /></div></div></div><br class="figure-break" /><p>這裡是一種抽象的思想。其實“<span class="quote">抽象</span>”這個概念並沒有那麼抽象，簡單地說就是“<span class="quote">提取公因式</span>”：ab+ac=a(b+c)。如果a變了，ab和ac這兩項都需要改，但如果寫成a(b+c)的形式就只需要改其中一個因子。</p><p>在我們的複數運算程序中，複數有可能用直角座標或極座標來表示，我們把這個有可能變動的因素提取出來組成複數存儲表示層：<code class="literal">real_part</code>、<code class="literal">img_part</code>、<code class="literal">magnitude</code>、<code class="literal">angle</code>、<code class="literal">make_from_real_img</code>、<code class="literal">make_from_mag_ang</code>。這一層看到的數據是結構體的兩個成員<code class="literal">x</code>和<code class="literal">y</code>，或者<code class="literal">r</code>和<code class="literal">A</code>，如果改變了結構體的實現就要改變這一層函數的實現，但函數介面不改變，因此調用這一層函數介面的複數運算層也不需要改變。複數運算層看到的數據只是一個抽象的“<span class="quote">複數</span>”的概念，知道它有直角座標和極座標，可以調用複數存儲表示層的函數得到這些座標。再往上看，其它使用複數運算的程序看到的數據是一個更為抽象的“<span class="quote">複數</span>”的概念，只知道它是一個數，像整數、小數一樣可以加減乘除，甚至連它有直角座標和極座標也不需要知道。</p><p>這裡的複數存儲表示層和複數運算層稱為抽象層（Abstraction Layer）<a id="id2731193" class="indexterm"></a>，從底層往上層來看，複數越來越抽象了，把所有這些層組合在一起就是一個完整的系統。<span class="emphasis"><em>組合使得系統可以任意複雜，而抽象使得系統的複雜性是可以控制的，任何改動都只侷限在某一層，而不會波及整個系統</em></span>。著名的計算機科學家Butler Lampson說過：“<span class="quote">All problems in computer science can be solved by another level of indirection.</span>”這裡的indirection其實就是abstraction的意思。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2731216"></a>習題</h3></div></div></div><p>1、在本節的基礎上實現一個打印複數的函數，打印的格式是x+yi，如果實部或虛部為0則省略，例如：1.0、-2.0i、-1.0+2.0i、1.0-2.0i。最後編寫一個<code class="literal">main</code>函數測試本節的所有代碼。想一想這個打印函數應該屬於上圖中的哪一層？</p><p>2、實現一個用分子分母的格式來表示有理數的結構體<code class="literal">rational</code>以及相關的函數，<code class="literal">rational</code>結構體之間可以做加減乘除運算，運算的結果仍然是<code class="literal">rational</code>。測試代碼如下：</p><pre class="programlisting">int main(void)
+{
+	struct rational a = make_rational(1, 8); /* a=1/8 */
+	struct rational b = make_rational(-1, 8); /* b=-1/8 */
+	print_rational(add_rational(a, b));
+	print_rational(sub_rational(a, b));
+	print_rational(mul_rational(a, b));
+	print_rational(div_rational(a, b));
+
+	return 0;
+}</pre><p>注意要約分為最簡分數，例如1/8和-1/8相減的打印結果應該是1/4而不是2/8，可以利用<a class="xref" href="ch05s03.html#func2.recursion">第 3 節 “遞歸”</a>練習題中的Euclid算法來約分。在動手編程之前先思考一下這個問題實現了什麼樣的數據抽象，抽象層應該由哪些函數組成。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 復合類型與結構體 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 數據類型標誌</td></tr></table></div></body></html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 段錯誤</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch10.html" title="第 10 章 gdb" /><link rel="prev" href="ch10s03.html" title="3. 觀察點" /><link rel="next" href="ch11.html" title="第 11 章 排序與查找" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 段錯誤</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch10s03.html">上一頁</a> </td><th width="60%" align="center">第 10 章 gdb</th><td width="20%" align="right"> <a accesskey="n" href="ch11.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2742403"></a>4. 段錯誤</h2></div></div></div><p>如果程序運行時出現段錯誤，用<code class="literal">gdb</code>可以很容易定位到究竟是哪一行引發的段錯誤，例如這個小程序：</p><div class="example"><a id="id2742423"></a><p class="title"><b>例 10.4. 段錯誤調試實例一</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	int man = 0;
+	scanf("%d", man);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>調試過程如下：</p><pre class="screen">$ gdb main
+...
+(gdb) r
+Starting program: /home/akaedu/main 
+123
+
+Program received signal SIGSEGV, Segmentation fault.
+0xb7e1404b in _IO_vfscanf () from /lib/tls/i686/cmov/libc.so.6
+(gdb) bt
+#0  0xb7e1404b in _IO_vfscanf () from /lib/tls/i686/cmov/libc.so.6
+#1  0xb7e1dd2b in scanf () from /lib/tls/i686/cmov/libc.so.6
+#2  0x0804839f in main () at main.c:6</pre><p>在<code class="literal">gdb</code>中運行，遇到段錯誤會自動停下來，這時可以用命令查看當前執行到哪一行代碼了。<code class="literal">gdb</code>顯示段錯誤出現在<code class="literal">_IO_vfscanf</code>函數中，用<code class="literal">bt</code>命令可以看到這個函數是被我們的<code class="literal">scanf</code>函數調用的，所以是<code class="literal">scanf</code>這一行代碼引發的段錯誤。仔細觀察程序發現是<code class="literal">man</code>前面少了個&amp;。</p><p>繼續調試上一節的程序，上一節最後提出修正Bug的方法是在循環中加上判斷條件，如果不是數字就報錯退出，不僅輸入字母可以報錯退出，輸入超長的字元串也會報錯退出。表面上看這個程序無論怎麼運行都不出錯了，但假如我們把<code class="literal">while (1)</code>循環去掉，每次執行程序只轉換一個數：</p><div class="example"><a id="id2740082"></a><p class="title"><b>例 10.5. 段錯誤調試實例二</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	int sum = 0, i = 0;
+	char input[5];
+
+	scanf("%s", input);
+	for (i = 0; input[i] != '\0'; i++) {
+		if (input[i] &lt; '0' || input[i] &gt; '9') {
+			printf("Invalid input!\n");
+			sum = -1;
+			break;
+		}
+		sum = sum*10 + input[i] - '0';
+	}
+	printf("input=%d\n", sum);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>然後輸入一個超長的字元串，看看會發生什麼：</p><pre class="screen">$ ./main 
+1234567890
+Invalid input!
+input=-1</pre><p>看起來正常。再來一次，這次輸個更長的：</p><pre class="screen">$ ./main 
+1234567890abcdef
+Invalid input!
+input=-1
+Segmentation fault</pre><p>又出段錯誤了。我們按同樣的方法用<code class="literal">gdb</code>調試看看：</p><pre class="screen">$ gdb main
+...
+(gdb) r
+Starting program: /home/akaedu/main 
+1234567890abcdef
+Invalid input!
+input=-1
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0804848e in main () at main.c:19
+19	}
+(gdb) l
+14			}
+15			sum = sum*10 + input[i] - '0';
+16		}
+17		printf("input=%d\n", sum);
+18		return 0;
+19	}</pre><p><code class="literal">gdb</code>指出，段錯誤發生在第19行。可是這一行什麼都沒有啊，只有表示<code class="literal">main</code>函數結束的}括號。這可以算是一條規律，<span class="emphasis"><em>如果某個函數的局部變數發生訪問越界，有可能並不立即產生段錯誤，而是在函數返回時產生段錯誤</em></span>。</p><p>想要寫出Bug-free的程序是非常不容易的，即使<code class="literal">scanf</code>讀入字元串這麼一個簡單的函數調用都會隱藏着各種各樣的錯誤，有些錯誤現象是我們暫時沒法解釋的：為什麼變數<code class="literal">i</code>的存儲單元緊跟在<code class="literal">input</code>數組後面？為什麼同樣是訪問越界，有時出段錯誤有時不出段錯誤？為什麼訪問越界的段錯誤在函數返回時才出現？還有最基本的問題，為什麼<code class="literal">scanf</code>輸入整型變數就必須要加&amp;，否則就出段錯誤，而輸入字元串就不要加&amp;？這些問題在後續章節中都會解釋清楚。其實現在講<code class="literal">scanf</code>這個函數為時過早，讀者還不具備充足的基礎知識。但還是有必要講的，學完這一階段之後讀者應該能寫出有用的程序了，然而一個只有輸出而沒有輸入的程序算不上是有用的程序，另一方面也讓讀者認識到，學C語言不可能不去瞭解底層計算機體繫結構和操作系統的原理，不瞭解底層原理連一個<code class="literal">scanf</code>函數都沒辦法用好，更沒有辦法保證寫出正確的程序。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch10s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch10.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch11.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 觀察點 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 第 11 章 排序與查找</td></tr></table></div></body></html>

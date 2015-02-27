@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 隊列與廣度優先搜索</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch12.html" title="第 12 章 棧與隊列" /><link rel="prev" href="ch12s03.html" title="3. 深度優先搜索" /><link rel="next" href="ch12s05.html" title="5. 環形隊列" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 隊列與廣度優先搜索</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch12s03.html">上一頁</a> </td><th width="60%" align="center">第 12 章 棧與隊列</th><td width="20%" align="right"> <a accesskey="n" href="ch12s05.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2750621"></a>4. 隊列與廣度優先搜索</h2></div></div></div><p>隊列也是一組元素的集合，也提供兩種基本操作：Enqueue（入隊）<a id="id2750629" class="indexterm"></a>將元素添加到隊尾，Dequeue（出隊）<a id="id2750637" class="indexterm"></a>從隊頭取出元素並返回。就像排隊買票一樣，先來先服務，先入隊的人也是先出隊的，這種方式稱為FIFO（First In First Out，先進先出）<a id="id2750647" class="indexterm"></a>，有時候隊列本身也被稱為FIFO。</p><p>下面我們用隊列解決迷宮問題。程序如下：</p><div class="example"><a id="id2750660"></a><p class="title"><b>例 12.4. 用廣度優先搜索解迷宮問題</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+#define MAX_ROW 5
+#define MAX_COL 5
+
+struct point { int row, col, predecessor; } queue[512];
+int head = 0, tail = 0;
+
+void enqueue(struct point p)
+{
+	queue[tail++] = p;
+}
+
+struct point dequeue(void)
+{
+	return queue[head++];
+}
+
+int is_empty(void)
+{
+	return head == tail;
+}
+
+int maze[MAX_ROW][MAX_COL] = {
+	0, 1, 0, 0, 0,
+	0, 1, 0, 1, 0,
+	0, 0, 0, 0, 0,
+	0, 1, 1, 1, 0,
+	0, 0, 0, 1, 0,
+};
+
+void print_maze(void)
+{
+	int i, j;
+	for (i = 0; i &lt; MAX_ROW; i++) {
+		for (j = 0; j &lt; MAX_COL; j++)
+			printf("%d ", maze[i][j]);
+		putchar('\n');
+	}
+	printf("*********\n");
+}
+
+void visit(int row, int col)
+{
+	struct point visit_point = { row, col, head-1 };
+	maze[row][col] = 2;
+	enqueue(visit_point);
+}
+
+int main(void)
+{
+	struct point p = { 0, 0, -1 };
+
+	maze[p.row][p.col] = 2;
+	enqueue(p);
+	
+	while (!is_empty()) {
+		p = dequeue();
+		if (p.row == MAX_ROW - 1  /* goal */
+		    &amp;&amp; p.col == MAX_COL - 1)
+			break;
+		if (p.col+1 &lt; MAX_COL     /* right */
+		    &amp;&amp; maze[p.row][p.col+1] == 0)
+			visit(p.row, p.col+1);
+		if (p.row+1 &lt; MAX_ROW     /* down */
+		    &amp;&amp; maze[p.row+1][p.col] == 0)
+			visit(p.row+1, p.col);
+		if (p.col-1 &gt;= 0          /* left */
+		    &amp;&amp; maze[p.row][p.col-1] == 0)
+			visit(p.row, p.col-1);
+		if (p.row-1 &gt;= 0          /* up */
+		    &amp;&amp; maze[p.row-1][p.col] == 0)
+			visit(p.row-1, p.col);
+		print_maze();
+	}
+	if (p.row == MAX_ROW - 1 &amp;&amp; p.col == MAX_COL - 1) {
+		printf("(%d, %d)\n", p.row, p.col);
+		while (p.predecessor != -1) {
+			p = queue[p.predecessor];
+			printf("(%d, %d)\n", p.row, p.col);
+		}
+	} else
+		printf("No path!\n");
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>運行結果如下：</p><pre class="screen">2 1 0 0 0 
+2 1 0 1 0 
+0 0 0 0 0 
+0 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 0 0 0 0 
+0 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 0 0 0 
+2 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 2 0 0 
+2 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 2 0 0 
+2 1 1 1 0 
+2 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 2 1 0 
+2 2 2 2 0 
+2 1 1 1 0 
+2 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 2 1 0 
+2 2 2 2 0 
+2 1 1 1 0 
+2 2 0 1 0 
+*********
+2 1 0 0 0 
+2 1 2 1 0 
+2 2 2 2 2 
+2 1 1 1 0 
+2 2 0 1 0 
+*********
+2 1 2 0 0 
+2 1 2 1 0 
+2 2 2 2 2 
+2 1 1 1 0 
+2 2 0 1 0 
+*********
+2 1 2 0 0 
+2 1 2 1 0 
+2 2 2 2 2 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 0 0 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 0 
+*********
+2 1 2 2 0 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 0 
+*********
+2 1 2 2 0 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 0 
+*********
+2 1 2 2 0 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 2 
+*********
+2 1 2 2 2 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 2 
+*********
+2 1 2 2 2 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 2 
+*********
+(4, 4)
+(3, 4)
+(2, 4)
+(2, 3)
+(2, 2)
+(2, 1)
+(2, 0)
+(1, 0)
+(0, 0)</pre><p>其實仍然可以像<a class="xref" href="ch12s03.html#stackqueue.dfs">例 12.3 “用深度優先搜索解迷宮問題”</a>一樣用<code class="literal">predecessor</code>數組表示每個點的前趨，但我想換一種更方便的資料結構，直接在每個點的結構體中加一個成員表示前趨：</p><pre class="programlisting">struct point { int row, col, predecessor; } queue[512];
+int head = 0, tail = 0;</pre><p>變數<code class="literal">head</code>和<code class="literal">tail</code>是隊頭和隊尾指針，<code class="literal">head</code>總是指向隊頭，<code class="literal">tail</code>總是指向隊尾的下一個元素。每個點的<code class="literal">predecessor</code>成員也是一個指針，指向它的前趨在<code class="literal">queue</code>數組中的位置。如下圖所示：</p><div class="figure"><a id="stackqueue.bfsqueue"></a><p class="title"><b>圖 12.3. 廣度優先搜索的隊列資料結構</b></p><div class="figure-contents"><div><img src="images/stackqueue.bfsqueue.png" alt="廣度優先搜索的隊列資料結構" /></div></div></div><br class="figure-break" /><p>為了幫助理解，我把這個算法改寫成偽代碼如下：</p><pre class="programlisting">將起點標記為已走過併入隊;
+while (隊列非空) {
+	出隊一個點p;
+	if (p這個點是終點)
+		break;
+	否則沿右、下、左、上四個方向探索相鄰的點
+	if (和p相鄰的點有路可走，並且還沒走過)
+		將相鄰的點標記為已走過併入隊，它的前趨就是剛出隊的p點;
+}
+if (p點是終點) {
+	打印p點的座標;
+	while (p點有前趨) {
+		p點 = p點的前趨;
+		打印p點的座標;
+	}
+} else
+	沒有路線可以到達終點;</pre><p>從打印的搜索過程可以看出，這個算法的特點是沿各個方向同時展開搜索，每個可以走通的方向輪流往前走一步，這稱為廣度優先搜索（BFS，Breadth First Search）<a id="id2750820" class="indexterm"></a>。探索迷宮和隊列變化的過程如下圖所示。</p><div class="figure"><a id="id2750839"></a><p class="title"><b>圖 12.4. 廣度優先搜索</b></p><div class="figure-contents"><div><img src="images/stackqueue.bfs.png" alt="廣度優先搜索" /></div></div></div><br class="figure-break" /><p>廣度優先是一種步步為營的策略，每次都從各個方向探索一步，將前線推進一步，圖中的虛線就表示這個前線，隊列中的元素總是由前線的點組成的，可見正是隊列先進先出的性質使這個算法具有了廣度優先的特點。廣度優先搜索還有一個特點是可以找到從起點到終點的最短路徑，而深度優先搜索找到的不一定是最短路徑，比較本節和上一節程序的運行結果可以看出這一點，想一想為什麼。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2750872"></a>習題</h3></div></div></div><p>1、本節的例子直接在隊列元素中加一個指針成員表示前趨，想一想為什麼上一節的<a class="xref" href="ch12s03.html#stackqueue.dfs">例 12.3 “用深度優先搜索解迷宮問題”</a>不能採用這種方法表示前趨？</p><p>2、本節例子中給隊列分配的存儲空間是512個元素，其實沒必要這麼多，那麼解決這個問題至少要分配多少個元素的隊列空間呢？跟什麼因素有關？</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch12s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch12.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch12s05.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 深度優先搜索 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 5. 環形隊列</td></tr></table></div></body></html>

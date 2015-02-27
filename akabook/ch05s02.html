@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 增量式開發</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch05.html" title="第 5 章 深入理解函數" /><link rel="prev" href="ch05s01.html" title="1. return語句" /><link rel="next" href="ch05s03.html" title="3. 遞歸" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 增量式開發</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch05s01.html">上一頁</a> </td><th width="60%" align="center">第 5 章 深入理解函數</th><td width="20%" align="right"> <a accesskey="n" href="ch05s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2721551"></a>2. 增量式開發</h2></div></div></div><p>目前為止你看到了很多示例代碼，也在它們的基礎上做了很多改動並在這個過程中鞏固所學的知識。但是如果從頭開始編寫一個程序解決某個問題，應該按什麼步驟來寫呢？本節提出一種增量式（Incremental）<a id="id2721566" class="indexterm"></a>開發的思路，很適合初學者。</p><p>現在問題來了：我們要編一個程序求圓的面積，圓的半徑以兩個端點的座標(x<sub>1</sub>, y<sub>1</sub>)和(x<sub>2</sub>, y<sub>2</sub>)給出。首先分析和分解問題，把大問題分解成小問題，再對小問題分別求解。這個問題可分為兩步：</p><div class="orderedlist"><ol type="1"><li><p>由兩個端點座標求半徑的長度，我們知道平面上兩點間距離的公式是：</p><div class="literallayout"><p>distance = √((x<sub>2</sub>-x<sub>1</sub>)<sup>2</sup>+(y<sub>2</sub>-y<sub>1</sub>)<sup>2</sup>)</p></div><p>括號裡的部分都可以用我們學過的C語言表達式來表示，求平方根可以用<code class="literal">math.h</code>中的<code class="literal">sqrt</code>函數，因此這個小問題全部都可以用我們學過的知識解決。這個公式可以實現成一個函數，參數是兩點的座標，返回值是<code class="literal">distance</code>。</p></li><li><p>上一步算出的距離是圓的半徑，已知圓的半徑之後求面積的公式是：</p><div class="literallayout"><p>area = π·radius<sup>2</sup></p></div><p>也可以用我們學過的C語言表達式來解決，這個公式也可以實現成一個函數，參數是<code class="literal">radius</code>，返回值是<code class="literal">area</code>。</p></li></ol></div><p>首先編寫<code class="literal">distance</code>這個函數，我們已經明確了它的參數是兩點的座標，返回值是兩點間距離，可以先寫一個簡單的函數定義：</p><pre class="programlisting">double distance(double x1, double y1, double x2, double y2)
+{
+	return 0.0;
+}</pre><p>初學者寫到這裡就已經不太自信了：這個函數定義寫得對嗎？雖然我是按我理解的語法規則寫的，但書上沒有和這個一模一樣的例子，萬一不小心遺漏了什麼呢？既然不自信就不要再往下寫了，沒有一個平穩的心態來寫程序很可能會引入Bug。所以在函數定義中插一個<code class="literal">return 0.0</code>立刻結束掉它，然後立刻測試這個函數定義得有沒有錯：</p><pre class="programlisting">int main(void)
+{
+	printf("distance is %f\n", distance(1.0, 2.0, 4.0, 6.0));
+	return 0;
+}</pre><p>編譯，運行，一切正常。這時你就會建立起信心了：既然沒問題，就不用管它了，繼續往下寫。在測試時給這個函數的參數是(1.0, 2.0)和(4.0, 6.0)，兩點的<code class="literal">x</code>座標距離是3.0，<code class="literal">y</code>座標距離是4.0，因此兩點間距離應該是5.0，你必須事先知道正確答案是5.0，這樣你才能測試程序計算的結果對不對。當然，現在函數還沒實現，計算結果肯定是不對的。現在我們再往函數里添一點代碼：</p><pre class="programlisting">double distance(double x1, double y1, double x2, double y2)
+{
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	printf("dx is %f\ndy is %f\n", dx, dy);
+
+	return 0.0;
+}</pre><p>如果你不確定<code class="literal">dx</code>和<code class="literal">dy</code>這樣初始化行不行，那麼就此打住，在函數里插一條打印語句把<code class="literal">dx</code>和<code class="literal">dy</code>的值打出來看看。把它和上面的<code class="literal">main</code>函數一起編譯運行，由於我們事先知道結果應該是3.0和4.0，因此能夠驗證程序算得對不對。一旦驗證無誤，函數里的這句打印就可以撤掉了，像這種打印語句，以及我們用來測試的<code class="literal">main</code>函數，都起到了類似腳手架（Scaffold）<a id="id2722506" class="indexterm"></a>的作用：在蓋房子時很有用，但它不是房子的一部分，房子蓋好之後就可以拆掉了。房子蓋好之後可能還需要維修、加蓋、翻新，又要再加上腳手架，這很麻煩，要是當初不用拆就好了，可是不拆不行，不拆多難看啊。寫代碼卻可以有一個更高明的解決辦法：把Scaffolding的代碼註釋掉。</p><pre class="programlisting">double distance(double x1, double y1, double x2, double y2)
+{
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	/* printf("dx is %f\ndy is %f\n", dx, dy); */
+	return 0.0;
+}</pre><p>這樣如果以後出了新的Bug又需要跟蹤調試時，還可以把這句重新加進代碼中使用。兩點的x座標距離和y座標距離都沒問題了，下面求它們的平方和：</p><pre class="programlisting">double distance(double x1, double y1, double x2, double y2)
+{
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	double dsquared = dx * dx + dy * dy;
+	printf("dsquared is %f\n", dsquared);
+
+	return 0.0;
+}</pre><p>然後再編譯、運行，看看是不是得25.0。這樣的增量式開發非常適合初學者，每寫一行代碼都編譯運行，確保沒問題了再寫一下行，一方面在寫代碼時更有信心，另一方面也方便了調試：總是有一個先前的正確版本做參照，改動之後如果出了問題，几乎可以肯定就是剛纔改的那行代碼出的問題，這樣就避免了必須從很多行代碼中查找分析到底是哪一行出的問題。在這個過程中<code class="literal">printf</code>功不可沒，你懷疑哪一行代碼有問題，就插一個<code class="literal">printf</code>進去看看中間的計算結果，任何錯誤都可以通過這個辦法找出來。以後我們會介紹程序調試工具<code class="literal">gdb</code>，它提供了更強大的調試功能幫你分析更隱蔽的錯誤。但即使有了<code class="literal">gdb</code>，<code class="literal">printf</code>這個最原始的辦法仍然是最直接、最有效的。最後一步，我們完成這個函數：</p><div class="example"><a id="id2722600"></a><p class="title"><b>例 5.1. distance函數</b></p><div class="example-contents"><pre class="programlisting">#include &lt;math.h&gt;
+#include &lt;stdio.h&gt;
+
+double distance(double x1, double y1, double x2, double y2)
+{
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	double dsquared = dx * dx + dy * dy;
+	double result = sqrt(dsquared);
+
+	return result;
+}
+
+int main(void)
+{
+	printf("distance is %f\n", distance(1.0, 2.0, 4.0, 6.0));
+	return 0;
+}</pre></div></div><br class="example-break" /><p>然後編譯運行，看看是不是得5.0。隨着編程經驗越來越豐富，你可能每次寫若干行代碼再一起測試，而不是像現在這樣每寫一行就測試一次，但不管怎麼樣，增量式開發的思路是很有用的，它可以幫你節省大量的調試時間，不管你有多強，都不應該一口氣寫完整個程序再編譯運行，那几乎是一定會有Bug的，到那時候再找Bug就難了。</p><p>這個程序中引入了很多臨時變數：<code class="literal">dx</code>、<code class="literal">dy</code>、<code class="literal">dsquared</code>、<code class="literal">result</code>，如果你有信心把整個表達式一次性寫好，也可以不用臨時變數：</p><pre class="programlisting">double distance(double x1, double y1, double x2, double y2)
+{
+	return sqrt((x2-x1) * (x2-x1) + (y2-y1) * (y2-y1));
+}</pre><p>這樣寫簡潔得多了。但如果寫錯了呢？只知道是這一長串表達式有錯，根本不知道錯在哪，而且整個函數就一個語句，插<code class="literal">printf</code>都沒地方插。所以用臨時變數有它的好處，使程序更清晰，調試更方便，而且有時候可以避免不必要的計算，例如上面這一行表達式要把<code class="literal">(x2-x1)</code>計算兩遍，如果算完<code class="literal">(x2-x1)</code>把結果存在一個臨時變數<code class="literal">dx</code>裡，就不需要再算第二遍了。</p><p>接下來編寫<code class="literal">area</code>這個函數：</p><pre class="programlisting">double area(double radius)
+{
+	return 3.1416 * radius * radius;
+}</pre><p>給出兩點的座標求距離，給出半徑求圓的面積，這兩個子問題都解決了，如何把它們組合起來解決整個問題呢？給出半徑的兩端點座標(1.0, 2.0)和(4.0, 6.0)求圓的面積，先用<code class="literal">distance</code>函數求出半徑的長度，再把這個長度傳給<code class="literal">area</code>函數：</p><pre class="programlisting">double radius = distance(1.0, 2.0, 4.0, 6.0);
+double result = area(radius);</pre><p>也可以這樣：</p><pre class="programlisting">double result = area(distance(1.0, 2.0, 4.0, 6.0));</pre><p>我們一直把“<span class="quote">給出半徑的兩端點座標求圓的面積</span>”這個問題當作整個問題來看，如果它也是一個更大的程序當中的子問題呢？我們可以把先前的兩個函數組合起來做成一個新的函數以便日後使用：</p><pre class="programlisting">double area_point(double x1, double y1, double x2, double y2)
+{
+	return area(distance(x1, y1, x2, y2));
+}</pre><p>還有另一種組合的思路，不是把<code class="literal">distance</code>和<code class="literal">area</code>兩個函數調用組合起來，而是把那兩個函數中的語句組合到一起：</p><pre class="programlisting">double area_point(double x1, double y1, double x2, double y2)
+{
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	double radius = sqrt(dx * dx + dy * dy);
+
+	return 3.1416 * radius * radius;
+}</pre><p>這樣組合是不理想的。這樣組合了之後，原來寫的<code class="literal">distance</code>和<code class="literal">area</code>兩個函數還要不要了呢？如果不要了刪掉，那麼如果有些情況只需要求兩點間的距離，或者只需要給定半徑長度求圓的面積呢？<code class="literal">area_point</code>把所有語句都寫在一起，太不靈活了，滿足不了這樣的需要。如果保留<code class="literal">distance</code>和<code class="literal">area</code>同時也保留這個<code class="literal">area_point</code>怎麼樣呢？<code class="literal">area_point</code>和<code class="literal">distance</code>有相同的代碼，一旦在<code class="literal">distance</code>函數中發現了Bug，或者要升級<code class="literal">distance</code>這個函數採用更高的計算精度，那麼不僅要修改<code class="literal">distance</code>，還要記着修改<code class="literal">area_point</code>，同理，要修改<code class="literal">area</code>也要記着修改<code class="literal">area_point</code>，維護重複的代碼是非常容易出錯的，在任何時候都要儘量避免。因此，<span class="emphasis"><em>儘可能復用（Reuse）<a id="id2722882" class="indexterm"></a>以前寫的代碼，避免寫重複的代碼</em></span>。封裝就是為了復用，把解決各種小問題的代碼封裝成函數，在解決第一個大問題時可以用這些函數，在解決第二個大問題時可以復用這些函數。</p><p>解決問題的過程是把大的問題分成小的問題，小的問題再分成更小的問題，這個過程在代碼中的體現就是函數的分層設計（Stratify）<a id="id2722901" class="indexterm"></a>。<code class="literal">distance</code>和<code class="literal">area</code>是兩個底層函數，解決一些很小的問題，而<code class="literal">area_point</code>是一個上層函數，上層函數通過調用底層函數來解決更大的問題，底層和上層函數都可以被更上一層的函數調用，最終所有的函數都直接或間接地被<code class="literal">main</code>函數調用。如下圖所示：</p><div class="figure"><a id="id2722937"></a><p class="title"><b>圖 5.1. 函數的分層設計</b></p><div class="figure-contents"><div><img src="images/func2.stratify.png" alt="函數的分層設計" /></div></div></div><br class="figure-break" /></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch05s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch05.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch05s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. return語句 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 遞歸</td></tr></table></div></body></html>

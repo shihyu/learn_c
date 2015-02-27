@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. if/else語句</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch04.html" title="第 4 章 分支語句" /><link rel="prev" href="ch04s01.html" title="1. if語句" /><link rel="next" href="ch04s03.html" title="3. 布爾代數" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. if/else語句</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s01.html">上一頁</a> </td><th width="60%" align="center">第 4 章 分支語句</th><td width="20%" align="right"> <a accesskey="n" href="ch04s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2718511"></a>2. if/else語句</h2></div></div></div><p><code class="literal">if</code>語句還可以帶一個<code class="literal">else</code>子句（Clause）<a id="id2718531" class="indexterm"></a>，例如：</p><pre class="programlisting">if (x % 2 == 0)
+	printf("x is even.\n");
+else
+	printf("x is odd.\n");</pre><p>這裡的%是取模（Modulo）<a id="id2718547" class="indexterm"></a>運算符，<code class="literal">x%2</code>表示<code class="literal">x</code>除以2所得的餘數（Remainder）<a id="id2718567" class="indexterm"></a>，C語言規定%運算符的兩個操作數必須是整型的。兩個正數相除取餘數很好理解，如果操作數中有負數，結果應該是正是負呢？C99規定，如果<code class="literal">a</code>和<code class="literal">b</code>是整型，<code class="literal">b</code>不等於0，則表達式<code class="literal">(a/b)*b+a%b</code>的值總是等於<code class="literal">a</code>，再結合<a class="xref" href="expr.expression.html" title="5. 表達式">第 5 節 “表達式”</a>講過的整數除法運算要Truncate Toward Zero，可以得到一個結論：<span class="emphasis"><em>%運算符的結果總是與被除數同號</em></span>（想一想為什麼）。其它編程語言對取模運算的規定各不相同，也有規定結果和除數同號的，也有不做明確規定的。</p><p>取模運算在程序中是非常有用的，例如上面的例子判斷<code class="literal">x</code>的奇偶性（Parity）<a id="id2718632" class="indexterm"></a>，看<code class="literal">x</code>除以2的餘數是不是0，如果是0則打印<code class="literal">x is even.</code>，如果不是0則打印<code class="literal">x is odd.</code>，讀者應該能看出<code class="literal">else</code>在這裡的作用了，如果在上面的例子中去掉<code class="literal">else</code>，則不管<code class="literal">x</code>是奇是偶，<code class="literal">printf("x is odd.\n");</code>總是執行。為了讓這條語句更有用，可以把它封裝（Encapsulate）<a id="id2718684" class="indexterm"></a>成一個函數：</p><pre class="programlisting">void print_parity(int x)
+{
+	if (x % 2 == 0)
+		printf("x is even.\n");
+	else
+		printf("x is odd.\n");
+}</pre><p>把語句封裝成函數的基本步驟是：<span class="emphasis"><em>把語句放到函數體中，把變數改成函數的參數</em></span>。這樣，以後要檢查一個數的奇偶性只需調用這個函數而不必重複寫這條語句了，例如：</p><pre class="programlisting">print_parity(17);
+print_parity(18);</pre><p><code class="literal">if/else</code>語句的語法規則如下：</p><div class="literallayout"><p>語句 → if (控製表達式) 語句 else 語句</p></div><p>右邊的“<span class="quote">語句</span>”既可以是一條語句，也可以是由{}括起來的語句塊。一條<code class="literal">if</code>語句中包含一條子語句，一條<code class="literal">if/else</code>語句中包含兩條子語句，子語句可以是任何語句或語句塊，當然也可以是另外一條<code class="literal">if</code>或<code class="literal">if/else</code>語句。根據組合規則，<code class="literal">if</code>或<code class="literal">if/else</code>可以嵌套使用。例如可以這樣：</p><pre class="programlisting">if (x &gt; 0)
+	printf("x is positive.\n");
+else if (x &lt; 0)
+	printf("x is negative.\n");
+else
+	printf("x is zero.\n");</pre><p>也可以這樣：</p><pre class="programlisting">if (x &gt; 0) {
+	printf("x is positive.\n");
+} else {
+	if (x &lt; 0)
+		printf("x is negative.\n");
+	else
+		printf("x is zero.\n");
+}</pre><p>現在有一個問題，類似<code class="literal">if (A) if (B) C; else D;</code>形式的語句怎麼理解呢？可以理解成</p><pre class="programlisting">if (A)
+	if (B)
+		C;
+else
+	D;</pre><p>也可以理解成</p><pre class="programlisting">if (A)
+	if (B)
+		C;
+	else
+		D;</pre><p>在<a class="xref" href="ch02s01.html#expr.helloworldcont">第 1 節 “繼續Hello World”</a>講過，C代碼的縮進只是為了程序員看起來方便，實際上對編譯器不起任何作用，你的代碼不管寫成上面哪一種縮進格式，在編譯器看起來都是一樣的。那麼編譯器到底按哪種方式理解呢？也就是說，<code class="literal">else</code>到底是和<code class="literal">if (A)</code>配對還是和<code class="literal">if (B)</code>配對？很多編程語言的語法都有這個問題，稱為Dangling-else<a id="id2718844" class="indexterm"></a>問題。C語言規定，<span class="emphasis"><em><code class="literal">else</code>總是和它上面最近的一個<code class="literal">if</code>配對</em></span>，因此應該理解成<code class="literal">else</code>和<code class="literal">if (B)</code>配對，也就是按第二種方式理解。如果你寫成上面第一種縮進的格式就很危險了：你看到的是這樣，而編譯器理解的卻是那樣。如果你希望編譯器按第一種方式理解，應該明確加上{}：</p><pre class="programlisting">if (A) {
+	if (B)
+		C;
+} else
+	D;</pre><p>順便提一下，浮點型的精度有限，不適合用==運算符做精確比較。以下代碼可以說明問題：</p><pre class="programlisting">double i = 20.0;
+double j = i / 7.0;
+if (j * 7.0 == i)
+	printf("Equal.\n");
+else
+	printf("Unequal.\n");</pre><p>不同平台的浮點數實現有很多不同之處，在我的平台上運行這段程序結果為<code class="literal">Unequal</code>，即使在你的平台上運行結果為<code class="literal">Equal</code>，你再把<code class="literal">i</code>改成其它值試試，總有些值會使得結果為<code class="literal">Unequal</code>。等學習了<a class="xref" href="ch14s04.html#number.float">第 4 節 “浮點數”</a>你就知道為什麼浮點型不能做精確比較了。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2718936"></a>習題</h3></div></div></div><p>1、寫兩個表達式，分別取整型變數<code class="literal">x</code>的個位和十位。</p><p>2、寫一個函數，參數是整型變數<code class="literal">x</code>，功能是打印<code class="literal">x</code>的個位和十位。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. if語句 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 布爾代數</td></tr></table></div></body></html>

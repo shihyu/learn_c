@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 隱含規則和模式規則</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch22.html" title="第 22 章 Makefile基礎" /><link rel="prev" href="ch22s01.html" title="1. 基本規則" /><link rel="next" href="ch22s03.html" title="3. 變數" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 隱含規則和模式規則</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch22s01.html">上一頁</a> </td><th width="60%" align="center">第 22 章 Makefile基礎</th><td width="20%" align="right"> <a accesskey="n" href="ch22s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2804203"></a>2. 隱含規則和模式規則</h2></div></div></div><p>上一節的Makefile寫得中規中矩，比較繁瑣，是為了講清楚基本概念，其實Makefile有很多靈活的寫法，可以寫得更簡潔，同時減少出錯的可能。本節我們來看看這樣一個例子還有哪些改進的餘地。</p><p>一個目標依賴的所有條件不一定非得寫在一條規則中，也可以拆開寫，例如：</p><pre class="programlisting">main.o: main.h stack.h maze.h
+
+main.o: main.c
+	gcc -c main.c</pre><p>就相當於：</p><pre class="programlisting">main.o: main.c main.h stack.h maze.h
+	gcc -c main.c</pre><p>如果一個目標拆開寫多條規則，其中只有一條規則允許有命令列表，其它規則應該沒有命令列表，否則<code class="literal">make</code>會報警告並且採用最後一條規則的命令列表。</p><p>這樣我們的例子可以改寫成：</p><pre class="programlisting">main: main.o stack.o maze.o
+	gcc main.o stack.o maze.o -o main
+
+main.o: main.h stack.h maze.h
+stack.o: stack.h main.h
+maze.o: maze.h main.h
+
+main.o: main.c
+	gcc -c main.c
+
+stack.o: stack.c
+	gcc -c stack.c
+
+maze.o: maze.c
+	gcc -c maze.c
+
+clean:
+	-rm main *.o
+
+.PHONY: clean</pre><p>這不是比原來更繁瑣了嗎？現在可以把提出來的三條規則刪去，寫成：</p><pre class="programlisting">main: main.o stack.o maze.o
+	gcc main.o stack.o maze.o -o main
+
+main.o: main.h stack.h maze.h
+stack.o: stack.h main.h
+maze.o: maze.h main.h
+
+clean:
+	-rm main *.o
+
+.PHONY: clean</pre><p>這就比原來簡單多了。可是現在<code class="literal">main.o</code>、<code class="literal">stack.o</code>和<code class="literal">maze.o</code>這三個目標連編譯命令都沒有了，怎麼編譯的呢？試試看：</p><pre class="screen">$ make
+cc    -c -o main.o main.c
+cc    -c -o stack.o stack.c
+cc    -c -o maze.o maze.c
+gcc main.o stack.o maze.o -o main</pre><p>現在解釋一下前三條編譯命令是怎麼來。如果一個目標在Makefile中的所有規則都沒有命令列表，<code class="literal">make</code>會嘗試在內建的隱含規則（Implicit Rule）<a id="id2804308" class="indexterm"></a>資料庫中查找適用的規則。<code class="literal">make</code>的隱含規則資料庫可以用<code class="literal">make -p</code>命令打印，打印出來的格式也是Makefile的格式，包括很多變數和規則，其中和我們這個例子有關的隱含規則有：</p><pre class="screen"># default
+OUTPUT_OPTION = -o $@
+
+# default
+CC = cc
+
+# default
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+
+%.o: %.c
+#  commands to execute (built-in):
+        $(COMPILE.c) $(OUTPUT_OPTION) $&lt;</pre><p><code class="literal">#</code>號在Makefile中表示單行註釋，就像C語言的<code class="literal">//</code>註釋一樣。<code class="literal">CC</code>是一個Makefile變數，用<code class="literal">CC = cc</code>定義和賦值，用<code class="literal">$(CC)</code>取它的值，其值應該是<code class="literal">cc</code>。Makefile變數像C的宏定義一樣，代表一串字元，在取值的地方展開。<code class="literal">cc</code>是一個符號連結，通常指向<code class="literal">gcc</code>，在有些UNIX系統上可能指向另外一種C編譯器。</p><pre class="screen">$ which cc
+/usr/bin/cc
+$ ls -l /usr/bin/cc
+lrwxrwxrwx 1 root root 20 2008-07-04 05:59 /usr/bin/cc -&gt; /etc/alternatives/cc
+$ ls -l /etc/alternatives/cc
+lrwxrwxrwx 1 root root 12 2008-11-01 09:10 /etc/alternatives/cc -&gt; /usr/bin/gcc</pre><p><code class="literal">CFLAGS</code>這個變數沒有定義，<code class="literal">$(CFLAGS)</code>展開是空，<code class="literal">CPPFLAGS</code>和<code class="literal">TARGET_ARCH</code>也是如此。這樣<code class="literal">$(COMPILE.c)</code>展開應該是<code class="literal">cc␣空␣空␣空␣-c</code>，去掉所有的“<span class="quote">空</span>”得到<code class="literal">cc␣␣␣␣-c</code>，注意中間留下4個空格，所以<code class="literal">%.o: %.c</code>規則的命令<code class="literal">$(COMPILE.c)␣$(OUTPUT_OPTION)␣$&lt;</code>展開之後是<code class="literal">cc␣␣␣␣-c␣-o␣$@␣$&lt;</code>，和上面的編譯命令已經很接近了。</p><p><code class="literal">$@</code>和<code class="literal">$&lt;</code>是兩個特殊的變數，<code class="literal">$@</code>的取值為規則中的目標，<code class="literal">$&lt;</code>的取值為規則中的第一個條件。<code class="literal">%.o: %.c</code>是一種特殊的規則，稱為模式規則（Pattern Rule）<a id="id2804506" class="indexterm"></a>。現在回顧一下整個過程，在我們的Makefile中以<code class="literal">main.o</code>為目標的規則都沒有命令列表，所以<code class="literal">make</code>會查找隱含規則，發現隱含規則中有這樣一條模式規則適用，<code class="literal">main.o</code>符合<code class="literal">%.o</code>的模式，現在<code class="literal">%</code>就代表<code class="literal">main</code>（稱為<code class="literal">main.o</code>這個名字的Stem<a id="id2804558" class="indexterm"></a>），再替換到<code class="literal">%.c</code>中就是<code class="literal">main.c</code>。所以這條模式規則相當於：</p><pre class="programlisting">main.o: main.c
+	cc    -c -o main.o main.c</pre><p>隨後，在處理<code class="literal">stack.o</code>目標時又用到這條模式規則，這時又相當於：</p><pre class="programlisting">stack.o: stack.c
+	cc    -c -o stack.o stack.c</pre><p><code class="literal">maze.o</code>也同樣處理。這三條規則可以由<code class="literal">make</code>的隱含規則推導出來，所以不必寫在Makefile中。</p><p>先前我們寫Makefile都是以目標為中心，一個目標依賴于若干條件，現在換個角度，以條件為中心，Makefile還可以這麼寫：</p><pre class="programlisting">main: main.o stack.o maze.o
+	gcc main.o stack.o maze.o -o main
+
+main.o stack.o maze.o: main.h
+main.o maze.o: maze.h
+main.o stack.o: stack.h
+
+clean:
+	-rm main *.o
+
+.PHONY: clean</pre><p>我們知道，寫規則的目的是讓<code class="literal">make</code>建立依賴關係圖，不管怎麼寫，只要把所有的依賴關係都描述清楚了就行。對於多目標的規則，<code class="literal">make</code>會拆成幾條單目標的規則來處理，例如</p><pre class="programlisting">target1 target2: prerequisite1 prerequisite2
+	command $&lt; -o $@</pre><p>這樣一條規則相當於：</p><pre class="programlisting">target1: prerequisite1 prerequisite2
+	command prerequisite1 -o target1
+
+target2: prerequisite1 prerequisite2
+	command prerequisite1 -o target2</pre><p>注意兩條規則的命令列表是一樣的，但<code class="literal">$@</code>的取值不同。</p></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch22s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch22.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch22s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 基本規則 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 變數</td></tr></table></div></body></html>

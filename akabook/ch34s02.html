@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 作業控制</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch34.html" title="第 34 章 終端、作業控制與守護進程" /><link rel="prev" href="ch34s01.html" title="1. 終端" /><link rel="next" href="ch34s03.html" title="3. 守護進程" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 作業控制</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch34s01.html">上一頁</a> </td><th width="60%" align="center">第 34 章 終端、作業控制與守護進程</th><td width="20%" align="right"> <a accesskey="n" href="ch34s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2892066"></a>2. 作業控制</h2></div></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2892071"></a>2.1. Session與進程組</h3></div></div></div><p>在<a class="xref" href="ch33s01.html#signal.intro">第 1 節 “信號的基本概念”</a>中我說過“<span class="quote">Shell可以同時運行一個前台進程和任意多個後台進程</span>”其實是不全面的，現在我們來研究更複雜的情況。事實上，Shell分前後台來控制的不是進程而是作業（Job）<a id="id2892093" class="indexterm"></a>或者進程組（Process Group）<a id="id2892100" class="indexterm"></a>。一個前台作業可以由多個進程組成，一個後台作業也可以由多個進程組成，Shell可以同時運行一個前台作業和任意多個後台作業，這稱為作業控制（Job Control）<a id="id2892111" class="indexterm"></a>。例如用以下命令啟動5個進程（這個例子出自<a class="xref" href="bi01.html#bibli.apue" title="Advanced Programming in the UNIX Environment">[<abbr class="abbrev">APUE2e</abbr>]</a>）：</p><pre class="screen">$ proc1 | proc2 &amp;
+$ proc3 | proc4 | proc5</pre><p>其中<code class="literal">proc1</code>和<code class="literal">proc2</code>屬於同一個後台進程組，<code class="literal">proc3</code>、<code class="literal">proc4</code>、<code class="literal">proc5</code>屬於同一個前台進程組，Shell進程本身屬於一個單獨的進程組。這些進程組的控制終端相同，它們屬於同一個Session<a id="id2892166" class="indexterm"></a>。當用戶在控制終端輸入特殊的修飾鍵（例如Ctrl-C）時，內核會發送相應的信號（例如<code class="literal">SIGINT</code>）給前台進程組的所有進程。各進程、進程組、Session的關係如下圖所示。</p><div class="figure"><a id="id2892183"></a><p class="title"><b>圖 34.4. Session與進程組</b></p><div class="figure-contents"><div><img src="images/jobs.pg.png" alt="Session與進程組" /></div></div></div><br class="figure-break" /><p>現在我們從Session和進程組的角度重新來看登錄和執行命令的過程。</p><div class="orderedlist"><ol type="1"><li><p><code class="literal">getty</code>或<code class="literal">telnetd</code>進程在打開終端設備之前調用<code class="literal">setsid</code>函數創建一個新的Session，該進程稱為Session Leader<a id="id2892229" class="indexterm"></a>，該進程的id也可以看作Session的id，然後該進程打開終端設備作為這個Session中所有進程的控制終端。在創建新Session的同時也創建了一個新的進程組，該進程是這個進程組的Process Group Leader<a id="id2892241" class="indexterm"></a>，該進程的id也是進程組的id。</p></li><li><p>在登錄過程中，<code class="literal">getty</code>或<code class="literal">telnetd</code>進程變成<code class="literal">login</code>，然後變成Shell，但仍然是同一個進程，仍然是Session Leader。</p></li><li><p>由Shell進程<code class="literal">fork</code>出的子進程本來具有和Shell相同的Session、進程組和控制終端，但是Shell調用<code class="literal">setpgid</code>函數將作業中的某個子進程指定為一個新進程組的Leader，然後調用<code class="literal">setpgid</code>將該作業中的其它子進程也轉移到這個進程組中。如果這個進程組需要在前台運行，就調用<code class="literal">tcsetpgrp</code>函數將它設置為前台進程組，由於一個Session只能有一個前台進程組，所以Shell所在的進程組就自動變成後台進程組。</p><p>在上面的例子中，<code class="literal">proc3</code>、<code class="literal">proc4</code>、<code class="literal">proc5</code>被Shell放到同一個前台進程組，其中有一個進程是該進程組的Leader，Shell調用<code class="literal">wait</code>等待它們運行結束。一旦它們全部運行結束，Shell就調用<code class="literal">tcsetpgrp</code>函數將自己提到前台繼續接受命令。但是注意，如果<code class="literal">proc3</code>、<code class="literal">proc4</code>、<code class="literal">proc5</code>中的某個進程又<code class="literal">fork</code>出子進程，子進程也屬於同一進程組，但是Shell並不知道子進程的存在，也不會調用<code class="literal">wait</code>等待它結束。換句話說，<code class="literal">proc3 | proc4 | proc5</code>是Shell的作業，而這個子進程不是，這是作業和進程組在概念上的區別。一旦作業運行結束，Shell就把自己提到前台，如果原來的前台進程組還存在（如果這個子進程還沒終止），則它自動變成後台進程組（回顧一下<a class="xref" href="ch30s03.html#process.simplefork">例 30.3 “fork”</a>）。</p></li></ol></div><p>下面看兩個例子。</p><pre class="screen">$ ps -o pid,ppid,pgrp,session,tpgid,comm | cat
+  PID  PPID  PGRP  SESS TPGID COMMAND
+ 6994  6989  6994  6994  8762 bash
+ 8762  6994  8762  6994  8762 ps
+ 8763  6994  8762  6994  8762 cat</pre><p>這個作業由<code class="literal">ps</code>和<code class="literal">cat</code>兩個進程組成，在前台運行。從<code class="literal">PPID</code>列可以看出這兩個進程的父進程是<code class="literal">bash</code>。從<code class="literal">PGRP</code>列可以看出，<code class="literal">bash</code>在id為6994的進程組中，這個id等於<code class="literal">bash</code>的進程id，所以它是進程組的Leader，而兩個子進程在id為8762的進程組中，<code class="literal">ps</code>是這個進程組的Leader。從<code class="literal">SESS</code>可以看出三個進程都在同一Session中，<code class="literal">bash</code>是Session Leader。從<code class="literal">TPGID</code>可以看出，前台進程組的id是8762，也就是兩個子進程所在的進程組。</p><pre class="screen">$ ps -o pid,ppid,pgrp,session,tpgid,comm | cat &amp;
+[1] 8835
+$   PID  PPID  PGRP  SESS TPGID COMMAND
+ 6994  6989  6994  6994  6994 bash
+ 8834  6994  8834  6994  6994 ps
+ 8835  6994  8834  6994  6994 cat</pre><p>這個作業由<code class="literal">ps</code>和<code class="literal">cat</code>兩個進程組成，在後台運行，<code class="literal">bash</code>不等作業結束就打印提示信息<code class="literal">[1] 8835</code>然後給出提示符接受新的命令，<code class="literal">[1]</code>是作業的編號，如果同時運行多個作業可以用這個編號區分，8835是該作業中某個進程的id。請讀者自己分析<code class="literal">ps</code>命令的輸出結果。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2892541"></a>2.2. 與作業控制有關的信號</h3></div></div></div><p>我們通過實驗來理解與作業控制有關的信號。</p><pre class="screen">$ cat &amp;
+[1] 9386
+$ （再次回車） 
+
+[1]+  Stopped                 cat</pre><p>將<code class="literal">cat</code>放到後台運行，由於<code class="literal">cat</code>需要讀標準輸入（也就是終端輸入），而後台進程是不能讀終端輸入的，因此內核發<code class="literal">SIGTTIN</code>信號給進程，該信號的預設處理動作是使進程停止。</p><pre class="screen">$ jobs
+[1]+  Stopped                 cat
+$ fg %1
+cat
+hello（回車）
+hello
+^Z
+[1]+  Stopped                 cat</pre><p><code class="literal">jobs</code>命令可以查看當前有哪些作業。<code class="literal">fg</code>命令可以將某個作業提至前台運行，如果該作業的進程組正在後台運行則提至前台運行，如果該作業處于停止狀態，則給進程組的每個進程發<code class="literal">SIGCONT</code>信號使它繼續運行。參數<code class="literal">%1</code>表示將第1個作業提至前台運行。<code class="literal">cat</code>提到前台運行後，掛起等待終端輸入，當輸入<code class="literal">hello</code>並回車後，<code class="literal">cat</code>打印出同樣的一行，然後繼續掛起等待輸入。如果輸入Ctrl-Z則向所有前台進程發<code class="literal">SIGTSTP</code>信號，該信號的預設動作是使進程停止。</p><pre class="screen">$ bg %1
+[1]+ cat &amp;
+
+[1]+  Stopped                 cat</pre><p><code class="literal">bg</code>命令可以讓某個停止的作業在後台繼續運行，也需要給該作業的進程組的每個進程發<code class="literal">SIGCONT</code>信號。<code class="literal">cat</code>進程繼續運行，又要讀終端輸入，然而它在後台不能讀終端輸入，所以又收到<code class="literal">SIGTTIN</code>信號而停止。</p><pre class="screen">$ ps
+  PID TTY          TIME CMD
+ 6994 pts/0    00:00:05 bash
+11022 pts/0    00:00:00 cat
+11023 pts/0    00:00:00 ps
+$ kill 11022
+$ ps
+  PID TTY          TIME CMD
+ 6994 pts/0    00:00:05 bash
+11022 pts/0    00:00:00 cat
+11024 pts/0    00:00:00 ps
+$ fg %1
+cat
+Terminated</pre><p>用<code class="literal">kill</code>命令給一個停止的進程發<code class="literal">SIGTERM</code>信號，這個信號並不會立刻處理，而要等進程準備繼續運行之前處理，預設動作是終止進程。但如果給一個停止的進程發<code class="literal">SIGKILL</code>信號就不同了。</p><pre class="screen">$ cat &amp;
+[1] 11121
+$ ps
+  PID TTY          TIME CMD
+ 6994 pts/0    00:00:05 bash
+11121 pts/0    00:00:00 cat
+11122 pts/0    00:00:00 ps
+
+[1]+  Stopped                 cat
+$ kill -KILL 11121
+[1]+  Killed                  cat</pre><p><code class="literal">SIGKILL</code>信號既不能被阻塞也不能被忽略，也不能用自定義函數捕捉，只能按系統的預設動作立刻處理。與此類似的還有<code class="literal">SIGSTOP</code>信號，給一個進程發<code class="literal">SIGSTOP</code>信號會使進程停止，這個預設的處理動作不能改變。這樣保證了不管什麼樣的進程都能用<code class="literal">SIGKILL</code>終止或者用<code class="literal">SIGSTOP</code>停止，當系統出現異常時管理員總是有辦法殺掉有問題的進程或者暫時停掉懷疑有問題的進程。</p><p>上面講了如果後台進程試圖從控制終端讀，會收到<code class="literal">SIGTTIN</code>信號而停止，如果試圖向控制終端寫呢？通常是允許寫的。如果覺得後台進程向控制終端輸出信息干擾了用戶使用終端，可以設置一個終端選項禁止後台進程寫。</p><pre class="screen">$ cat testfile &amp;
+[1] 11426
+$ hello
+
+[1]+  Done                    cat testfile
+$ stty tostop
+$ cat testfile &amp;
+[1] 11428
+
+[1]+  Stopped                 cat testfile
+$ fg %1
+cat testfile
+hello</pre><p>首先用<code class="literal">stty</code>命令設置終端選項，禁止後台進程寫，然後啟動一個後台進程準備往終端寫，這時進程收到一個<code class="literal">SIGTTOU</code>信號，預設處理動作也是停止進程。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch34s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch34.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch34s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 終端 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 守護進程</td></tr></table></div></body></html>

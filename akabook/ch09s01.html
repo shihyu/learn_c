@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1. 縮進和空白</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch09.html" title="第 9 章 編碼風格" /><link rel="prev" href="ch09.html" title="第 9 章 編碼風格" /><link rel="next" href="ch09s02.html" title="2. 註釋" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1. 縮進和空白</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch09.html">上一頁</a> </td><th width="60%" align="center">第 9 章 編碼風格</th><td width="20%" align="right"> <a accesskey="n" href="ch09s02.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2737006"></a>1. 縮進和空白</h2></div></div></div><p>我們知道C語言的語法對縮進和空白沒有要求，空格、Tab、換行都可以隨意寫，實現同樣功能的代碼可以寫得很好看，也可以寫得很難看。例如上一章<a class="xref" href="ch08s05.html#array.scissor">例 8.5 “剪刀石頭布”</a>的代碼如果寫成這樣就很難看了：</p><div class="example"><a id="id2737667"></a><p class="title"><b>例 9.1. 缺少縮進和空白的代碼</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+int main(void)
+{
+char gesture[3][10]={"scissor","stone","cloth"};
+int man,computer,result, ret;
+srand(time(NULL));
+while(1){
+computer=rand()%3;
+printf("\nInput your gesture (0-scissor 1-stone 2-cloth):\n");
+ret=scanf("%d",&amp;man);
+if(ret!=1||man&lt;0||man&gt;2){
+printf("Invalid input! Please input 0, 1 or 2.\n");
+continue;
+}
+printf("Your gesture: %s\tComputer's gesture: %s\n",gesture[man],gesture[computer]);
+result=(man-computer+4)%3-1;
+if(result&gt;0)printf("You win!\n");
+else if(result==0)printf("Draw!\n");
+else printf("You lose!\n");
+}
+return 0;
+}</pre></div></div><br class="example-break" /><p>一是缺少空白字元，代碼密度太大，看著很費勁。二是沒有縮進，看不出來哪個{和哪個}配對，像這麼短的代碼還能湊合著看，如果代碼超過一屏就完全沒法看了。<a class="xref" href="bi01.html#bibli.codingstyle" title="Linux內核原始碼目錄下的Documentation/CodingStyle檔案">[<abbr class="abbrev">CodingStyle</abbr>]</a>中關於空白字元並沒有特別規定，因為基本上所有的C代碼風格對於空白字元的規定都差不多，主要有以下幾條。</p><p>1、關鍵字<code class="literal">if</code>、<code class="literal">while</code>、<code class="literal">for</code>與其後的控製表達式的(括號之間插入一個空格分隔，但括號內的表達式應緊貼括號。例如：</p><pre class="programlisting">while␣(1);</pre><p>2、雙目運算符的兩側各插入一個空格分隔，單目運算符和操作數之間不加空格，例如<code class="literal">i␣=␣i␣+␣1</code>、<code class="literal">++i</code>、<code class="literal">!(i␣&lt;␣1)</code>、<code class="literal">-x</code>、<code class="literal">&amp;a[1]</code>等。</p><p>3、尾碼運算符和操作數之間也不加空格，例如取結構體成員<code class="literal">s.a</code>、函數調用<code class="literal">foo(arg1)</code>、取數組成員<code class="literal">a[i]</code>。</p><p>4、,號和;號之後要加空格，這是英文的書寫習慣，例如<code class="literal">for␣(i␣=␣1;␣i␣&lt;␣10;␣i++)</code>、<code class="literal">foo(arg1,␣arg2)</code>。</p><p>5、以上關於雙目運算符和尾碼運算符的規則並沒有嚴格要求，有時候為了突出優先順序也可以寫得更緊湊一些，例如<code class="literal">for␣(i=1;␣i&lt;10;␣i++)</code>、<code class="literal">distance␣=␣sqrt(x*x␣+␣y*y)</code>等。但是省略的空格一定不要誤導了讀代碼的人，例如<code class="literal">a||b␣&amp;&amp;␣c</code>很容易讓人理解成錯誤的優先順序。</p><p>6、由於UNIX系統標準的字元終端是24行80列的，接近或大於80個字元的較長語句要折行寫，折行後用空格和上面的表達式或參數對齊，例如：</p><pre class="programlisting">if␣(sqrt(x*x␣+␣y*y)␣&gt;␣5.0
+    &amp;&amp;␣x␣&lt;␣0.0
+    &amp;&amp;␣y␣&gt;␣0.0)</pre><p>再比如：</p><pre class="programlisting">foo(sqrt(x*x␣+␣y*y),
+    a[i-1]␣+␣b[i-1]␣+␣c[i-1])</pre><p>7、較長的字元串可以斷成多個字元串然後分行書寫，例如：</p><pre class="programlisting">printf("This is such a long sentence that "
+       "it cannot be held within a line\n");</pre><p>C編譯器會自動把相鄰的多個字元串接在一起，以上兩個字元串相當於一個字元串<code class="literal">"This is such a long sentence that it cannot be held within a line\n"</code>。</p><p>8、有的人喜歡在變數定義語句中用Tab字元，使變數名對齊，這樣看起來很美觀。</p><pre class="programlisting">       →int    →a, b;
+       →double →c;</pre><p>內核代碼風格關於縮進的規則有以下幾條。</p><p>1、要用縮進體現出語句塊的層次關係，使用Tab字元縮進，不能用空格代替Tab。在標準的字元終端上一個Tab看起來是8個空格的寬度，如果你的文本編輯器可以設置Tab的顯示寬度是幾個空格，建議也設成8，這樣大的縮進使代碼看起來非常清晰。如果有的行用空格做縮進，有的行用Tab做縮進，甚至空格和Tab混用，那麼一旦改變了文本編輯器的Tab顯示寬度就會看起來非常混亂，所以內核代碼風格規定只能用Tab做縮進，不能用空格代替Tab。</p><p>2、<code class="literal">if/else</code>、<code class="literal">while</code>、<code class="literal">do/while</code>、<code class="literal">for</code>、<code class="literal">switch</code>這些可以帶語句塊的語句，語句塊的{或}應該和關鍵字寫在同一行，用空格隔開，而不是單獨占一行。例如應該這樣寫：</p><pre class="programlisting">if␣(...)␣{
+       →語句列表
+}␣else␣if␣(...)␣{
+       →語句列表
+}</pre><p>但很多人習慣這樣寫：</p><pre class="programlisting">if␣(...)
+{
+       →語句列表
+}
+else␣if␣(...)
+{
+       →語句列表
+}</pre><p>內核的寫法和<a class="xref" href="bi01.html#bibli.kr" title="The C Programming Language">[<abbr class="abbrev">K&amp;R</abbr>]</a>一致，好處是不必占太多行，使得一屏能顯示更多代碼。這兩種寫法用得都很廣泛，只要在同一個項目中能保持統一就可以了。</p><p>3、函數定義的{和}單獨占一行，這一點和語句塊的規定不同，例如：</p><pre class="programlisting">int␣foo(int␣a,␣int␣b)
+{
+       →語句列表
+}</pre><p>4、<code class="literal">switch</code>和語句塊裡的<code class="literal">case</code>、<code class="literal">default</code>對齊寫，也就是說語句塊裡的<code class="literal">case</code>、<code class="literal">default</code>標號相對於<code class="literal">switch</code>不往裡縮進，但標號下的語句要往裡縮進。例如：</p><pre class="programlisting">      →switch␣(c)␣{
+      →case 'A':
+      →       →語句列表
+      →case 'B':
+      →       →語句列表
+      →default:
+      →       →語句列表
+      →}</pre><p>用於<code class="literal">goto</code>語句的自定義標號應該頂頭寫不縮進，而不管標號下的語句縮進到第幾層。</p><p>5、代碼中每個邏輯段落之間應該用一個空行分隔開。例如每個函數定義之間應該插入一個空行，標頭檔、全局變數定義和函數定義之間也應該插入空行，例如：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int g;
+double h;
+
+int foo(void)
+{
+       →語句列表
+}
+
+int bar(int a)
+{
+       →語句列表
+}
+
+int main(void)
+{
+       →語句列表
+}</pre><p>6、一個函數的語句列表如果很長，也可以根據相關性分成若干組，用空行分隔。這條規定不是嚴格要求，通常把變數定義組成一組，後面加空行，<code class="literal">return</code>語句之前加空行，例如：</p><pre class="programlisting">int main(void)
+{
+       →int    →a, b;
+       →double →c;
+
+       →語句組1
+
+       →語句組2
+
+       →return 0;
+}</pre></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch09.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch09.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch09s02.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">第 9 章 編碼風格 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 2. 註釋</td></tr></table></div></body></html>

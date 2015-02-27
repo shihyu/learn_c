@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1. 函數調用</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch19.html" title="第 19 章 彙編與C之間的關係" /><link rel="prev" href="ch19.html" title="第 19 章 彙編與C之間的關係" /><link rel="next" href="ch19s02.html" title="2. main函數和啟動常式" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1. 函數調用</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch19.html">上一頁</a> </td><th width="60%" align="center">第 19 章 彙編與C之間的關係</th><td width="20%" align="right"> <a accesskey="n" href="ch19s02.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2774377"></a>1. 函數調用</h2></div></div></div><p>我們用下面的代碼來研究函數調用的過程。</p><div class="example"><a id="id2774388"></a><p class="title"><b>例 19.1. 研究函數的調用過程</b></p><div class="example-contents"><pre class="programlisting">int bar(int c, int d)
+{
+	int e = c + d;
+	return e;
+}
+
+int foo(int a, int b)
+{
+	return bar(a, b);
+}
+
+int main(void)
+{
+	foo(2, 3);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>如果在編譯時加上<code class="literal">-g</code>選項（在<a class="xref" href="ch10.html#gdb">第 10 章 <i>gdb</i></a>講過<code class="literal">-g</code>選項），那麼用<code class="literal">objdump</code>反彙編時可以把C代碼和彙編代碼穿插起來顯示，這樣C代碼和彙編代碼的對應關係看得更清楚。反彙編的結果很長，以下只列出我們關心的部分。</p><pre class="screen">$ gcc main.c -g
+$ objdump -dS a.out 
+...
+08048394 &lt;bar&gt;:
+int bar(int c, int d)
+{
+ 8048394:	55                   	push   %ebp
+ 8048395:	89 e5                	mov    %esp,%ebp
+ 8048397:	83 ec 10             	sub    $0x10,%esp
+	int e = c + d;
+ 804839a:	8b 55 0c             	mov    0xc(%ebp),%edx
+ 804839d:	8b 45 08             	mov    0x8(%ebp),%eax
+ 80483a0:	01 d0                	add    %edx,%eax
+ 80483a2:	89 45 fc             	mov    %eax,-0x4(%ebp)
+	return e;
+ 80483a5:	8b 45 fc             	mov    -0x4(%ebp),%eax
+}
+ 80483a8:	c9                   	leave  
+ 80483a9:	c3                   	ret    
+
+080483aa &lt;foo&gt;:
+
+int foo(int a, int b)
+{
+ 80483aa:	55                   	push   %ebp
+ 80483ab:	89 e5                	mov    %esp,%ebp
+ 80483ad:	83 ec 08             	sub    $0x8,%esp
+	return bar(a, b);
+ 80483b0:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 80483b3:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 80483b7:	8b 45 08             	mov    0x8(%ebp),%eax
+ 80483ba:	89 04 24             	mov    %eax,(%esp)
+ 80483bd:	e8 d2 ff ff ff       	call   8048394 &lt;bar&gt;
+}
+ 80483c2:	c9                   	leave  
+ 80483c3:	c3                   	ret    
+
+080483c4 &lt;main&gt;:
+
+int main(void)
+{
+ 80483c4:	8d 4c 24 04          	lea    0x4(%esp),%ecx
+ 80483c8:	83 e4 f0             	and    $0xfffffff0,%esp
+ 80483cb:	ff 71 fc             	pushl  -0x4(%ecx)
+ 80483ce:	55                   	push   %ebp
+ 80483cf:	89 e5                	mov    %esp,%ebp
+ 80483d1:	51                   	push   %ecx
+ 80483d2:	83 ec 08             	sub    $0x8,%esp
+	foo(2, 3);
+ 80483d5:	c7 44 24 04 03 00 00 	movl   $0x3,0x4(%esp)
+ 80483dc:	00 
+ 80483dd:	c7 04 24 02 00 00 00 	movl   $0x2,(%esp)
+ 80483e4:	e8 c1 ff ff ff       	call   80483aa &lt;foo&gt;
+	return 0;
+ 80483e9:	b8 00 00 00 00       	mov    $0x0,%eax
+}
+ 80483ee:	83 c4 08             	add    $0x8,%esp
+ 80483f1:	59                   	pop    %ecx
+ 80483f2:	5d                   	pop    %ebp
+ 80483f3:	8d 61 fc             	lea    -0x4(%ecx),%esp
+ 80483f6:	c3                   	ret   
+...</pre><p>要查看編譯後的彙編代碼，其實還有一種辦法是<code class="literal">gcc -S main.c</code>，這樣只生成彙編代碼<code class="literal">main.s</code>，而不生成二進制的目標檔案。</p><p>整個程序的執行過程是<code class="literal">main</code>調用<code class="literal">foo</code>，<code class="literal">foo</code>調用<code class="literal">bar</code>，我們用<code class="literal">gdb</code>跟蹤程序的執行，直到<code class="literal">bar</code>函數中的<code class="literal">int e = c + d;</code>語句執行完畢準備返回時，這時在<code class="literal">gdb</code>中打印函數棧幀。</p><pre class="screen">(gdb) start
+...
+main () at main.c:14
+14		foo(2, 3);
+(gdb) s
+foo (a=2, b=3) at main.c:9
+9		return bar(a, b);
+(gdb) s
+bar (c=2, d=3) at main.c:3
+3		int e = c + d;
+(gdb) disassemble 
+Dump of assembler code for function bar:
+0x08048394 &lt;bar+0&gt;:	push   %ebp
+0x08048395 &lt;bar+1&gt;:	mov    %esp,%ebp
+0x08048397 &lt;bar+3&gt;:	sub    $0x10,%esp
+0x0804839a &lt;bar+6&gt;:	mov    0xc(%ebp),%edx
+0x0804839d &lt;bar+9&gt;:	mov    0x8(%ebp),%eax
+0x080483a0 &lt;bar+12&gt;:	add    %edx,%eax
+0x080483a2 &lt;bar+14&gt;:	mov    %eax,-0x4(%ebp)
+0x080483a5 &lt;bar+17&gt;:	mov    -0x4(%ebp),%eax
+0x080483a8 &lt;bar+20&gt;:	leave  
+0x080483a9 &lt;bar+21&gt;:	ret    
+End of assembler dump.
+(gdb) si
+0x0804839d	3		int e = c + d;
+(gdb) si
+0x080483a0	3		int e = c + d;
+(gdb) si
+0x080483a2	3		int e = c + d;
+(gdb) si
+4		return e;
+(gdb) si
+5	}
+(gdb) bt
+#0  bar (c=2, d=3) at main.c:5
+#1  0x080483c2 in foo (a=2, b=3) at main.c:9
+#2  0x080483e9 in main () at main.c:14
+(gdb) info registers 
+eax            0x5	5
+ecx            0xbff1c440	-1074674624
+edx            0x3	3
+ebx            0xb7fe6ff4	-1208061964
+esp            0xbff1c3f4	0xbff1c3f4
+ebp            0xbff1c404	0xbff1c404
+esi            0x8048410	134513680
+edi            0x80482e0	134513376
+eip            0x80483a8	0x80483a8 &lt;bar+20&gt;
+eflags         0x200206	[ PF IF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+(gdb) x/20 $esp
+0xbff1c3f4:	0x00000000	0xbff1c6f7	0xb7efbdae	0x00000005
+0xbff1c404:	0xbff1c414	0x080483c2	0x00000002	0x00000003
+0xbff1c414:	0xbff1c428	0x080483e9	0x00000002	0x00000003
+0xbff1c424:	0xbff1c440	0xbff1c498	0xb7ea3685	0x08048410
+0xbff1c434:	0x080482e0	0xbff1c498	0xb7ea3685	0x00000001
+(gdb)</pre><p>這裡又用到幾個新的<code class="literal">gdb</code>命令。<code class="literal">disassemble</code>可以反彙編當前函數或者指定的函數，單獨用<code class="literal">disassemble</code>命令是反彙編當前函數，如果<code class="literal">disassemble</code>命令後面跟函數名或地址則反彙編指定的函數。以前我們講過<code class="literal">step</code>命令可以一行代碼一行代碼地單步調試，而這裡用到的<code class="literal">si</code>命令可以一條指令一條指令地單步調試。<code class="literal">info registers</code>可以顯示所有寄存器的當前值。在<code class="literal">gdb</code>中表示寄存器名時前面要加個<code class="literal">$</code>，例如<code class="literal">p $esp</code>可以打印<code class="literal">esp</code>寄存器的值，在上例中<code class="literal">esp</code>寄存器的值是0xbff1c3f4，所以<code class="literal">x/20 $esp</code>命令查看內存中從0xbff1c3f4地址開始的20個32位數。在執行程序時，操作系統為進程分配一塊棧空間來保存函數棧幀，<code class="literal">esp</code>寄存器總是指向棧頂，在x86平台上這個棧是從高地址向低地址增長的，我們知道每次調用一個函數都要分配一個棧幀來保存參數和局部變數，現在我們詳細分析這些數據在棧空間的佈局，根據<code class="literal">gdb</code>的輸出結果圖示如下<sup>[<a id="id2775282" href="#ftn.id2775282" class="footnote">29</a>]</sup>：</p><div class="figure"><a id="id2775294"></a><p class="title"><b>圖 19.1. 函數棧幀</b></p><div class="figure-contents"><div><img src="images/asmc.stackframe.png" alt="函數棧幀" /></div></div></div><br class="figure-break" /><p>圖中每個小方格表示4個位元組的內存單元，例如<code class="literal">b: 3</code>這個小方格占的內存地址是0xbf822d20~0xbf822d23，我把地址寫在每個小方格的下邊界線上，是為了強調該地址是內存單元的起始地址。我們從<code class="literal">main</code>函數的這裡開始看起：</p><pre class="screen">	foo(2, 3);
+ 80483d5:	c7 44 24 04 03 00 00 	movl   $0x3,0x4(%esp)
+ 80483dc:	00 
+ 80483dd:	c7 04 24 02 00 00 00 	movl   $0x2,(%esp)
+ 80483e4:	e8 c1 ff ff ff       	call   80483aa &lt;foo&gt;
+	return 0;
+ 80483e9:	b8 00 00 00 00       	mov    $0x0,%eax</pre><p>要調用函數<code class="literal">foo</code>先要把參數準備好，第二個參數保存在<code class="literal">esp+4</code>指向的內存位置，第一個參數保存在<code class="literal">esp</code>指向的內存位置，可見參數是從右向左依次壓棧的。然後執行<code class="literal">call</code>指令，這個指令有兩個作用：</p><div class="orderedlist"><ol type="1"><li><p><code class="literal">foo</code>函數調用完之後要返回到<code class="literal">call</code>的下一條指令繼續執行，所以把<code class="literal">call</code>的下一條指令的地址0x80483e9壓棧，同時把<code class="literal">esp</code>的值減4，<code class="literal">esp</code>的值現在是0xbf822d18。</p></li><li><p>修改程序計數器<code class="literal">eip</code>，跳轉到<code class="literal">foo</code>函數的開頭執行。</p></li></ol></div><p>現在看<code class="literal">foo</code>函數的彙編代碼：</p><pre class="screen">int foo(int a, int b)
+{
+ 80483aa:	55                   	push   %ebp
+ 80483ab:	89 e5                	mov    %esp,%ebp
+ 80483ad:	83 ec 08             	sub    $0x8,%esp</pre><p><code class="literal">push %ebp</code>指令把<code class="literal">ebp</code>寄存器的值壓棧，同時把<code class="literal">esp</code>的值減4。<code class="literal">esp</code>的值現在是0xbf822d14，下一條指令把這個值傳送給<code class="literal">ebp</code>寄存器。這兩條指令合起來是把原來<code class="literal">ebp</code>的值保存在棧上，然後又給<code class="literal">ebp</code>賦了新值。在每個函數的棧幀中，<code class="literal">ebp</code>指向棧底，而<code class="literal">esp</code>指向棧頂，在函數執行過程中<code class="literal">esp</code>隨着壓棧和出棧操作隨時變化，而<code class="literal">ebp</code>是不動的，函數的參數和局部變數都是通過<code class="literal">ebp</code>的值加上一個偏移量來訪問，例如<code class="literal">foo</code>函數的參數<code class="literal">a</code>和<code class="literal">b</code>分別通過<code class="literal">ebp+8</code>和<code class="literal">ebp+12</code>來訪問。所以下面的指令把參數<code class="literal">a</code>和<code class="literal">b</code>再次壓棧，為調用<code class="literal">bar</code>函數做準備，然後把返回地址壓棧，調用<code class="literal">bar</code>函數：</p><pre class="screen">	return bar(a, b);
+ 80483b0:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 80483b3:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 80483b7:	8b 45 08             	mov    0x8(%ebp),%eax
+ 80483ba:	89 04 24             	mov    %eax,(%esp)
+ 80483bd:	e8 d2 ff ff ff       	call   8048394 &lt;bar&gt;</pre><p>現在看<code class="literal">bar</code>函數的指令：</p><pre class="screen">int bar(int c, int d)
+{
+ 8048394:	55                   	push   %ebp
+ 8048395:	89 e5                	mov    %esp,%ebp
+ 8048397:	83 ec 10             	sub    $0x10,%esp
+	int e = c + d;
+ 804839a:	8b 55 0c             	mov    0xc(%ebp),%edx
+ 804839d:	8b 45 08             	mov    0x8(%ebp),%eax
+ 80483a0:	01 d0                	add    %edx,%eax
+ 80483a2:	89 45 fc             	mov    %eax,-0x4(%ebp)</pre><p>這次又把<code class="literal">foo</code>函數的<code class="literal">ebp</code>壓棧保存，然後給<code class="literal">ebp</code>賦了新值，指向<code class="literal">bar</code>函數棧幀的棧底，通過<code class="literal">ebp+8</code>和<code class="literal">ebp+12</code>分別可以訪問參數<code class="literal">c</code>和<code class="literal">d</code>。<code class="literal">bar</code>函數還有一個局部變數<code class="literal">e</code>，可以通過<code class="literal">ebp-4</code>來訪問。所以後面幾條指令的意思是把參數<code class="literal">c</code>和<code class="literal">d</code>取出來存在寄存器中做加法，計算結果保存在<code class="literal">eax</code>寄存器中，再把<code class="literal">eax</code>寄存器存回局部變數<code class="literal">e</code>的內存單元。</p><p>在<code class="literal">gdb</code>中可以用<code class="literal">bt</code>命令和<code class="literal">frame</code>命令查看每層棧幀上的參數和局部變數，現在可以解釋它的工作原理了：如果我當前在<code class="literal">bar</code>函數中，我可以通過<code class="literal">ebp</code>找到<code class="literal">bar</code>函數的參數和局部變數，也可以找到<code class="literal">foo</code>函數的<code class="literal">ebp</code>保存在棧上的值，有了<code class="literal">foo</code>函數的<code class="literal">ebp</code>，又可以找到它的參數和局部變數，也可以找到<code class="literal">main</code>函數的<code class="literal">ebp</code>保存在棧上的值，因此各層函數棧幀通過保存在棧上的<code class="literal">ebp</code>的值串起來了。</p><p>現在看<code class="literal">bar</code>函數的返回指令：</p><pre class="screen">	return e;
+ 80483a5:	8b 45 fc             	mov    -0x4(%ebp),%eax
+}
+ 80483a8:	c9                   	leave  
+ 80483a9:	c3                   	ret</pre><p><code class="literal">bar</code>函數有一個<code class="literal">int</code>型的返回值，這個返回值是通過<code class="literal">eax</code>寄存器傳遞的，所以首先把<code class="literal">e</code>的值讀到<code class="literal">eax</code>寄存器中。然後執行<code class="literal">leave</code>指令，這個指令是函數開頭的<code class="literal">push %ebp</code>和<code class="literal">mov %esp,%ebp</code>的逆操作：</p><div class="orderedlist"><ol type="1"><li><p>把<code class="literal">ebp</code>的值賦給<code class="literal">esp</code>，現在<code class="literal">esp</code>的值是0xbf822d04。</p></li><li><p>現在<code class="literal">esp</code>所指向的棧頂保存着<code class="literal">foo</code>函數棧幀的<code class="literal">ebp</code>，把這個值恢復給<code class="literal">ebp</code>，同時<code class="literal">esp</code>增加4，<code class="literal">esp</code>的值變成0xbf822d08。</p></li></ol></div><p>最後是<code class="literal">ret</code>指令，它是<code class="literal">call</code>指令的逆操作：</p><div class="orderedlist"><ol type="1"><li><p>現在<code class="literal">esp</code>所指向的棧頂保存着返回地址，把這個值恢復給<code class="literal">eip</code>，同時<code class="literal">esp</code>增加4，<code class="literal">esp</code>的值變成0xbf822d0c。</p></li><li><p>修改了程序計數器<code class="literal">eip</code>，因此跳轉到返回地址0x80483c2繼續執行。</p></li></ol></div><p>地址0x80483c2處是<code class="literal">foo</code>函數的返回指令：</p><pre class="screen"> 80483c2:	c9                   	leave  
+ 80483c3:	c3                   	ret</pre><p>重複同樣的過程，又返回到了<code class="literal">main</code>函數。注意涵數調用和返回過程中的這些規則：</p><div class="orderedlist"><ol type="1"><li><p>參數壓棧傳遞，並且是從右向左依次壓棧。</p></li><li><p><code class="literal">ebp</code>總是指向當前棧幀的棧底。</p></li><li><p>返回值通過<code class="literal">eax</code>寄存器傳遞。</p></li></ol></div><p>這些規則並不是體繫結構所強加的，<code class="literal">ebp</code>寄存器並不是必須這麼用，函數的參數和返回值也不是必須這麼傳，只是操作系統和編譯器選擇了以這樣的方式實現C代碼中的函數調用，這稱為Calling Convention<a id="id2776053" class="indexterm"></a>，Calling Convention是操作系統二進制介面規範（ABI，Application Binary Interface）<a id="id2776062" class="indexterm"></a>的一部分。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2776074"></a>習題</h3></div></div></div><p>1、在<a class="xref" href="ch03s02.html#func.ourfirstfunc">第 2 節 “自定義函數”</a>講過，Old Style C風格的函數聲明可以不指定參數個數和類型，這樣編譯器不會對函數調用做檢查，那麼如果調用時的參數類型不對或者參數個數不對會怎麼樣呢？比如把本節的例子改成這樣：</p><pre class="programlisting">int foo();
+int bar();
+
+int main(void)
+{
+	foo(2, 3, 4);
+	return 0;
+}
+
+int foo(int a, int b)
+{
+	return bar(a);
+}
+
+int bar(int c, int d)
+{
+	int e = c + d;
+	return e;
+}</pre><p><code class="literal">main</code>函數調用<code class="literal">foo</code>時多傳了一個參數，那麼參數<code class="literal">a</code>和<code class="literal">b</code>分別取什麼值？多的參數怎麼辦？<code class="literal">foo</code>調用<code class="literal">bar</code>時少傳了一個參數，那麼參數<code class="literal">d</code>的值從哪裡取得？請讀者利用反彙編和<code class="literal">gdb</code>自己分析一下。我們再看一個參數類型不符的例子：</p><pre class="programlisting">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	void foo();
+	char c = 60;
+	foo(c);
+	return 0;
+}
+
+void foo(double d)
+{
+	printf("%f\n", d);
+}</pre><p>打印結果是多少？如果把聲明<code class="literal">void foo();</code>改成<code class="literal">void foo(double);</code>，打印結果又是多少？</p></div><div class="footnotes"><br /><hr width="100" align="left" /><div class="footnote"><p><sup>[<a id="ftn.id2775282" href="#id2775282" class="para">29</a>] </sup>Linux內核為每個新進程指定的棧空間的起始地址都會有些不同，所以每次運行這個程序得到的地址都不一樣，但通常都是0xbf??????這樣一個地址。</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch19.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch19.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch19s02.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">第 19 章 彙編與C之間的關係 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 2. <code class="literal">main</code>函數和啟動常式</td></tr></table></div></body></html>

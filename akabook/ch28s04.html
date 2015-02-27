@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. read/write</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch28.html" title="第 28 章 檔案與I/O" /><link rel="prev" href="ch28s03.html" title="3. open/close" /><link rel="next" href="ch28s05.html" title="5. lseek" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. read/write</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch28s03.html">上一頁</a> </td><th width="60%" align="center">第 28 章 檔案與I/O</th><td width="20%" align="right"> <a accesskey="n" href="ch28s05.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2852134"></a>4. read/write</h2></div></div></div><p><code class="literal">read</code>函數從打開的設備或檔案中讀取數據。</p><pre class="programlisting">#include &lt;unistd.h&gt;
+
+ssize_t read(int fd, void *buf, size_t count);
+返回值：成功返回讀取的位元組數，出錯返回-1並設置errno，如果在調read之前已到達檔案末尾，則這次read返回0</pre><p></p><p>參數<code class="literal">count</code>是請求讀取的位元組數，讀上來的數據保存在緩衝區<code class="literal">buf</code>中，同時檔案的當前讀寫位置向後移。注意這個讀寫位置和使用C標準I/O庫時的讀寫位置有可能不同，這個讀寫位置是記在內核中的，而使用C標準I/O庫時的讀寫位置是用戶空間I/O緩衝區中的位置。比如用<code class="literal">fgetc</code>讀一個位元組，<code class="literal">fgetc</code>有可能從內核中預讀1024個位元組到I/O緩衝區中，再返回第一個位元組，這時該檔案在內核中記錄的讀寫位置是1024，而在<code class="literal">FILE</code>結構體中記錄的讀寫位置是1。注意返回值類型是<code class="literal">ssize_t</code>，表示有符號的<code class="literal">size_t</code>，這樣既可以返回正的位元組數、0（表示到達檔案末尾）也可以返回負值-1（表示出錯）。<code class="literal">read</code>函數返回時，返回值說明了<code class="literal">buf</code>中前多少個位元組是剛讀上來的。有些情況下，實際讀到的位元組數（返回值）會小於請求讀的位元組數<code class="literal">count</code>，例如：</p><div class="itemizedlist"><ul type="disc"><li><p>讀常規檔案時，在讀到<code class="literal">count</code>個位元組之前已到達檔案末尾。例如，距檔案末尾還有30個位元組而請求讀100個位元組，則<code class="literal">read</code>返回30，下次<code class="literal">read</code>將返回0。</p></li><li><p>從終端設備讀，通常以行為單位，讀到換行符就返回了。</p></li><li><p>從網絡讀，根據不同的傳輸層協議和內核緩存機制，返回值可能小於請求的位元組數，後面socket編程部分會詳細講解。</p></li></ul></div><p><code class="literal">write</code>函數向打開的設備或檔案中寫數據。</p><pre class="programlisting">#include &lt;unistd.h&gt;
+
+ssize_t write(int fd, const void *buf, size_t count);
+返回值：成功返回寫入的位元組數，出錯返回-1並設置errno</pre><p>寫常規檔案時，<code class="literal">write</code>的返回值通常等於請求寫的位元組數<code class="literal">count</code>，而向終端設備或網絡寫則不一定。</p><p>讀常規檔案是不會阻塞的，不管讀多少位元組，<code class="literal">read</code>一定會在有限的時間內返回。從終端設備或網絡讀則不一定，如果從終端輸入的數據沒有換行符，調用<code class="literal">read</code>讀終端設備就會阻塞，如果網絡上沒有接收到數據包，調用<code class="literal">read</code>從網絡讀就會阻塞，至于會阻塞多長時間也是不確定的，如果一直沒有數據到達就一直阻塞在那裡。同樣，寫常規檔案是不會阻塞的，而向終端設備或網絡寫則不一定。</p><p>現在明確一下阻塞（Block）<a id="id2852343" class="indexterm"></a>這個概念。當進程調用一個阻塞的系統函數時，該進程被置於睡眠（Sleep）<a id="id2852352" class="indexterm"></a>狀態，這時內核調度其它進程運行，直到該進程等待的事件發生了（比如網絡上接收到數據包，或者調用<code class="literal">sleep</code>指定的睡眠時間到了）它才有可能繼續運行。與睡眠狀態相對的是運行（Running）<a id="id2852368" class="indexterm"></a>狀態，在Linux內核中，處于運行狀態的進程分為兩種情況：</p><div class="itemizedlist"><ul type="disc"><li><p>正在被調度執行。CPU處于該進程的上下文環境中，程序計數器（<code class="literal">eip</code>）裡保存着該進程的指令地址，通用寄存器裡保存着該進程運算過程的中間結果，正在執行該進程的指令，正在讀寫該進程的地址空間。</p></li><li><p>就緒狀態。該進程不需要等待什麼事件發生，隨時都可以執行，但CPU暫時還在執行另一個進程，所以該進程在一個就緒隊列中等待被內核調度。系統中可能同時有多個就緒的進程，那麼該調度誰執行呢？內核的調度算法是基于優先順序和時間片的，而且會根據每個進程的運行情況動態調整它的優先順序和時間片，讓每個進程都能比較公平地得到機會執行，同時要兼顧用戶體驗，不能讓和用戶交互的進程響應太慢。</p></li></ul></div><p>下面這個小程序從終端讀數據再寫回終端。</p><div class="example"><a id="id2852428"></a><p class="title"><b>例 28.2. 阻塞讀終端</b></p><div class="example-contents"><pre class="programlisting">#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+	char buf[10];
+	int n;
+	n = read(STDIN_FILENO, buf, 10);
+	if (n &lt; 0) {
+		perror("read STDIN_FILENO");
+		exit(1);
+	}
+	write(STDOUT_FILENO, buf, n);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>執行結果如下：</p><pre class="programlisting">$ ./a.out 
+hello（回車）
+hello
+$ ./a.out 
+hello world（回車）
+hello worl$ d
+bash: d: command not found</pre><p>第一次執行<code class="literal">a.out</code>的結果很正常，而第二次執行的過程有點特殊，現在分析一下：</p><div class="orderedlist"><ol type="1"><li><p>Shell進程創建<code class="literal">a.out</code>進程，<code class="literal">a.out</code>進程開始執行，而Shell進程睡眠等待<code class="literal">a.out</code>進程退出。</p></li><li><p><code class="literal">a.out</code>調用<code class="literal">read</code>時睡眠等待，直到終端設備輸入了換行符才從<code class="literal">read</code>返回，<code class="literal">read</code>只讀走10個字元，剩下的字元仍然保存在內核的終端設備輸入緩衝區中。</p></li><li><p><code class="literal">a.out</code>進程打印並退出，這時Shell進程恢復運行，Shell繼續從終端讀取用戶輸入的命令，於是讀走了終端設備輸入緩衝區中剩下的字元d和換行符，把它當成一條命令解釋執行，結果發現執行不了，沒有d這個命令。</p></li></ol></div><p>如果在<code class="literal">open</code>一個設備時指定了<code class="literal">O_NONBLOCK</code>標誌，<code class="literal">read</code>/<code class="literal">write</code>就不會阻塞。以<code class="literal">read</code>為例，如果設備暫時沒有數據可讀就返回-1，同時置<code class="literal">errno</code>為<code class="literal">EWOULDBLOCK</code>（或者<code class="literal">EAGAIN</code>，這兩個宏定義的值相同），表示本來應該阻塞在這裡（would block，虛擬語氣），事實上並沒有阻塞而是直接返回錯誤，調用者應該試着再讀一次（again）。這種行為方式稱為輪詢（Poll）<a id="id2852596" class="indexterm"></a>，調用者只是查詢一下，而不是阻塞在這裡死等，這樣可以同時監視多個設備：</p><pre class="programlisting">while(1) {
+	非阻塞read(設備1);
+	if(設備1有數據到達)
+		處理數據;
+	非阻塞read(設備2);
+	if(設備2有數據到達)
+		處理數據;
+	...
+}</pre><p>如果<code class="literal">read(設備1)</code>是阻塞的，那麼只要設備1沒有數據到達就會一直阻塞在設備1的<code class="literal">read</code>調用上，即使設備2有數據到達也不能處理，使用非阻塞I/O就可以避免設備2得不到及時處理。</p><p>非阻塞I/O有一個缺點，如果所有設備都一直沒有數據到達，調用者需要反覆查詢做無用功，如果阻塞在那裡，操作系統可以調度別的進程執行，就不會做無用功了。在使用非阻塞I/O時，通常不會在一個<code class="literal">while</code>循環中一直不停地查詢（這稱為Tight Loop<a id="id2852646" class="indexterm"></a>），而是每延遲等待一會兒來查詢一下，以免做太多無用功，在延遲等待的時候可以調度其它進程執行。</p><pre class="programlisting">while(1) {
+	非阻塞read(設備1);
+	if(設備1有數據到達)
+		處理數據;
+	非阻塞read(設備2);
+	if(設備2有數據到達)
+		處理數據;
+	...
+	sleep(n);
+}</pre><p>這樣做的問題是，設備1有數據到達時可能不能及時處理，最長需延遲n秒才能處理，而且反覆查詢還是做了很多無用功。以後要學習的<code class="literal">select(2)</code>函數可以阻塞地同時監視多個設備，還可以設定阻塞等待的超時時間，從而圓滿地解決了這個問題。</p><p>以下是一個非阻塞I/O的例子。目前我們學過的可能引起阻塞的設備只有終端，所以我們用終端來做這個實驗。程序開始執行時在0、1、2檔案描述符上自動打開的檔案就是終端，但是沒有<code class="literal">O_NONBLOCK</code>標誌。所以就像<a class="xref" href="ch28s04.html#io.blockread">例 28.2 “阻塞讀終端”</a>一樣，讀標準輸入是阻塞的。我們可以重新打開一遍設備檔案<code class="literal">/dev/tty</code>（表示當前終端），在打開時指定<code class="literal">O_NONBLOCK</code>標誌。</p><div class="example"><a id="id2852714"></a><p class="title"><b>例 28.3. 非阻塞讀終端</b></p><div class="example-contents"><pre class="programlisting">#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define MSG_TRY "try again\n"
+
+int main(void)
+{
+	char buf[10];
+	int fd, n;
+	fd = open("/dev/tty", O_RDONLY|O_NONBLOCK);
+	if(fd&lt;0) {
+		perror("open /dev/tty");
+		exit(1);
+	}
+tryagain:
+	n = read(fd, buf, 10);
+	if (n &lt; 0) {
+		if (errno == EAGAIN) {
+			sleep(1);
+			write(STDOUT_FILENO, MSG_TRY, strlen(MSG_TRY));
+			goto tryagain;
+		}	
+		perror("read /dev/tty");
+		exit(1);
+	}
+	write(STDOUT_FILENO, buf, n);
+	close(fd);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>以下是用非阻塞I/O實現等待超時的例子。既保證了超時退出的邏輯又保證了有數據到達時處理延遲較小。</p><div class="example"><a id="id2852731"></a><p class="title"><b>例 28.4. 非阻塞讀終端和等待超時</b></p><div class="example-contents"><pre class="programlisting">#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define MSG_TRY "try again\n"
+#define MSG_TIMEOUT "timeout\n"
+
+int main(void)
+{
+	char buf[10];
+	int fd, n, i;
+	fd = open("/dev/tty", O_RDONLY|O_NONBLOCK);
+	if(fd&lt;0) {
+		perror("open /dev/tty");
+		exit(1);
+	}
+	for(i=0; i&lt;5; i++) {
+		n = read(fd, buf, 10);
+		if(n&gt;=0)
+			break;
+		if(errno!=EAGAIN) {
+			perror("read /dev/tty");
+			exit(1);
+		}
+		sleep(1);
+		write(STDOUT_FILENO, MSG_TRY, strlen(MSG_TRY));
+	}
+	if(i==5)
+		write(STDOUT_FILENO, MSG_TIMEOUT, strlen(MSG_TIMEOUT));
+	else
+		write(STDOUT_FILENO, buf, n);
+	close(fd);
+	return 0;
+}</pre></div></div><br class="example-break" /></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch28s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch28s05.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. open/close </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 5. lseek</td></tr></table></div></body></html>

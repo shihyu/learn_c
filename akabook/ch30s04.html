@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4. 進程間通信</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch30.html" title="第 30 章 進程" /><link rel="prev" href="ch30s03.html" title="3. 進程控制" /><link rel="next" href="ch30s05.html" title="5. 練習：實現簡單的Shell" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4. 進程間通信</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch30s03.html">上一頁</a> </td><th width="60%" align="center">第 30 章 進程</th><td width="20%" align="right"> <a accesskey="n" href="ch30s05.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2867770"></a>4. 進程間通信</h2></div></div></div><p>每個進程各自有不同的用戶地址空間，任何一個進程的全局變數在另一個進程中都看不到，所以進程之間要交換數據必須通過內核，在內核中開闢一塊緩衝區，進程1把數據從用戶空間拷到內核緩衝區，進程2再從內核緩衝區把數據讀走，內核提供的這種機制稱為進程間通信（IPC，InterProcess Communication）<a id="id2867790" class="indexterm"></a>。如下圖所示。</p><div class="figure"><a id="id2867799"></a><p class="title"><b>圖 30.6. 進程間通信</b></p><div class="figure-contents"><div><img src="images/process.ipc.png" alt="進程間通信" /></div></div></div><br class="figure-break" /><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2867812"></a>4.1. 管道</h3></div></div></div><p>管道是一種最基本的IPC機制，由<code class="literal">pipe</code>函數創建：</p><pre class="programlisting">#include &lt;unistd.h&gt;
+
+int pipe(int filedes[2]);</pre><p>調用<code class="literal">pipe</code>函數時在內核中開闢一塊緩衝區（稱為管道）用於通信，它有一個讀端一個寫端，然後通過<code class="literal">filedes</code>參數傳出給用戶程序兩個檔案描述符，<code class="literal">filedes[0]</code>指向管道的讀端，<code class="literal">filedes[1]</code>指向管道的寫端（很好記，就像0是標準輸入1是標準輸出一樣）。所以管道在用戶程序看起來就像一個打開的檔案，通過<code class="literal">read(filedes[0]);</code>或者<code class="literal">write(filedes[1]);</code>向這個檔案讀寫數據其實是在讀寫內核緩衝區。<code class="literal">pipe</code>函數調用成功返回0，調用失敗返回-1。</p><p>開闢了管道之後如何實現兩個進程間的通信呢？比如可以按下面的步驟通信。</p><div class="figure"><a id="id2867888"></a><p class="title"><b>圖 30.7. 管道</b></p><div class="figure-contents"><div><img src="images/process.pipe.png" alt="管道" /></div></div></div><br class="figure-break" /><div class="orderedlist"><ol type="1"><li><p>父進程調用<code class="literal">pipe</code>開闢管道，得到兩個檔案描述符指向管道的兩端。</p></li><li><p>父進程調用<code class="literal">fork</code>創建子進程，那麼子進程也有兩個檔案描述符指向同一管道。</p></li><li><p>父進程關閉管道讀端，子進程關閉管道寫端。父進程可以往管道里寫，子進程可以從管道里讀，管道是用環形隊列實現的，數據從寫端流入從讀端流出，這樣就實現了進程間通信。</p></li></ol></div><div class="example"><a id="id2867940"></a><p class="title"><b>例 30.7. 管道</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#define MAXLINE 80
+
+int main(void)
+{
+	int n;
+	int fd[2];
+	pid_t pid;
+	char line[MAXLINE];
+
+	if (pipe(fd) &lt; 0) {
+		perror("pipe");
+		exit(1);
+	}
+	if ((pid = fork()) &lt; 0) {
+		perror("fork");
+		exit(1);
+	}
+	if (pid &gt; 0) { /* parent */
+		close(fd[0]);
+		write(fd[1], "hello world\n", 12);
+		wait(NULL);
+	} else {       /* child */
+		close(fd[1]);
+		n = read(fd[0], line, MAXLINE);
+		write(STDOUT_FILENO, line, n);
+	}
+	return 0;
+}</pre></div></div><br class="example-break" /><p>使用管道有一些限制：</p><div class="itemizedlist"><ul type="disc"><li><p>兩個進程通過一個管道只能實現單向通信，比如上面的例子，父進程寫子進程讀，如果有時候也需要子進程寫父進程讀，就必須另開一個管道。請讀者思考，如果只開一個管道，但是父進程不關閉讀端，子進程也不關閉寫端，雙方都有讀端和寫端，為什麼不能實現雙向通信？</p></li><li><p>管道的讀寫端通過打開的檔案描述符來傳遞，因此要通信的兩個進程必須從它們的公共祖先那裡繼承管道檔案描述符。上面的例子是父進程把檔案描述符傳給子進程之後父子進程之間通信，也可以父進程<code class="literal">fork</code>兩次，把檔案描述符傳給兩個子進程，然後兩個子進程之間通信，總之需要通過<code class="literal">fork</code>傳遞檔案描述符使兩個進程都能訪問同一管道，它們才能通信。</p></li></ul></div><p>使用管道需要注意以下4種特殊情況（假設都是阻塞I/O操作，沒有設置<code class="literal">O_NONBLOCK</code>標誌）：</p><div class="orderedlist"><ol type="1"><li><p>如果所有指向管道寫端的檔案描述符都關閉了（管道寫端的引用計數等於0），而仍然有進程從管道的讀端讀數據，那麼管道中剩餘的數據都被讀取後，再次<code class="literal">read</code>會返回0，就像讀到檔案末尾一樣。</p></li><li><p>如果有指向管道寫端的檔案描述符沒關閉（管道寫端的引用計數大於0），而持有管道寫端的進程也沒有向管道中寫數據，這時有進程從管道讀端讀數據，那麼管道中剩餘的數據都被讀取後，再次<code class="literal">read</code>會阻塞，直到管道中有數據可讀了才讀取數據並返回。</p></li><li><p>如果所有指向管道讀端的檔案描述符都關閉了（管道讀端的引用計數等於0），這時有進程向管道的寫端<code class="literal">write</code>，那麼該進程會收到信號<code class="literal">SIGPIPE</code>，通常會導致進程異常終止。在<a class="xref" href="ch33.html#signal">第 33 章 <i>信號</i></a>會講到怎樣使<code class="literal">SIGPIPE</code>信號不終止進程。</p></li><li><p>如果有指向管道讀端的檔案描述符沒關閉（管道讀端的引用計數大於0），而持有管道讀端的進程也沒有從管道中讀數據，這時有進程向管道寫端寫數據，那麼在管道被寫滿時再次<code class="literal">write</code>會阻塞，直到管道中有空位置了才寫入數據並返回。</p></li></ol></div><p>管道的這四種特殊情況具有普遍意義。在<a class="xref" href="ch37.html#socket">第 37 章 <i>socket編程</i></a>要講的TCP socket也具有管道的這些特性。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h4 class="title"><a id="id2868118"></a>習題</h4></div></div></div><p>1、在<a class="xref" href="ch30s04.html#process.pipe">例 30.7 “管道”</a>中，父進程只用到寫端，因而把讀端關閉，子進程只用到讀端，因而把寫端關閉，然後互相通信，不使用的讀端或寫端必須關閉，請讀者想一想如果不關閉會有什麼問題。</p><p>2、請讀者修改<a class="xref" href="ch30s04.html#process.pipe">例 30.7 “管道”</a>的代碼和實驗條件，驗證我上面所說的四種特殊情況。</p></div></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2868153"></a>4.2. 其它IPC機制</h3></div></div></div><p>進程間通信必須通過內核提供的通道，而且必須有一種辦法在進程中標識內核提供的某個通道，上一節講的管道是用打開的檔案描述符來標識的。如果要互相通信的幾個進程沒有從公共祖先那裡繼承檔案描述符，它們怎麼通信呢？內核提供一條通道不成問題，問題是如何標識這條通道才能使各進程都可以訪問它？檔案系統中的路徑名是全局的，各進程都可以訪問，因此可以用檔案系統中的路徑名來標識一個IPC通道。</p><p>FIFO和UNIX Domain Socket這兩種IPC機制都是利用檔案系統中的特殊檔案來標識的。可以用<code class="literal">mkfifo</code>命令創建一個FIFO檔案：</p><pre class="screen">$ mkfifo hello
+$ ls -l hello
+prw-r--r-- 1 akaedu akaedu 0 2008-10-30 10:44 hello</pre><p>FIFO檔案在磁碟上沒有數據塊，僅用來標識內核中的一條通道，各進程可以打開這個檔案進行<code class="literal">read</code>/<code class="literal">write</code>，實際上是在讀寫內核通道（根本原因在於這個<code class="literal">file</code>結構體所指向的<code class="literal">read</code>、<code class="literal">write</code>函數和常規檔案不一樣），這樣就實現了進程間通信。UNIX Domain Socket和FIFO的原理類似，也需要一個特殊的socket檔案來標識內核中的通道，例如<code class="literal">/var/run</code>目錄下有很多系統服務的socket檔案：</p><pre class="screen">$ ls -l /var/run/
+total 52
+srw-rw-rw- 1 root        root           0 2008-10-30 00:24 acpid.socket
+...
+srw-rw-rw- 1 root        root           0 2008-10-30 00:25 gdm_socket
+...
+srw-rw-rw- 1 root        root           0 2008-10-30 00:24 sdp
+...
+srwxr-xr-x 1 root        root           0 2008-10-30 00:42 synaptic.socket</pre><p>檔案類型s表示socket，這些檔案在磁碟上也沒有數據塊。UNIX Domain Socket是目前最廣泛使用的IPC機制，到後面講socket編程時再詳細介紹。</p><p>現在把進程之間傳遞信息的各種途徑（包括各種IPC機制）總結如下：</p><div class="itemizedlist"><ul type="disc"><li><p>父進程通過<code class="literal">fork</code>可以將打開檔案的描述符傳遞給子進程</p></li><li><p>子進程結束時，父進程調用<code class="literal">wait</code>可以得到子進程的終止信息</p></li><li><p>幾個進程可以在檔案系統中讀寫某個共享檔案，也可以通過給檔案加鎖來實現進程間同步</p></li><li><p>進程之間互發信號，一般使用<code class="literal">SIGUSR1</code>和<code class="literal">SIGUSR2</code>實現用戶自定義功能</p></li><li><p>管道</p></li><li><p>FIFO</p></li><li><p>mmap函數，幾個進程可以映射同一內存區</p></li><li><p>SYS V IPC，以前的SYS V UNIX系統實現的IPC機制，包括消息隊列、信號量和共享內存，現在已經基本廢棄</p></li><li><p>UNIX Domain Socket，目前最廣泛使用的IPC機制</p></li></ul></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch30s03.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch30.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch30s05.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">3. 進程控制 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 5. 練習：實現簡單的Shell</td></tr></table></div></body></html>

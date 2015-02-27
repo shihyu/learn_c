@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3. 深度優先搜索</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch12.html" title="第 12 章 棧與隊列" /><link rel="prev" href="ch12s02.html" title="2. 堆棧" /><link rel="next" href="ch12s04.html" title="4. 隊列與廣度優先搜索" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3. 深度優先搜索</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch12s02.html">上一頁</a> </td><th width="60%" align="center">第 12 章 棧與隊列</th><td width="20%" align="right"> <a accesskey="n" href="ch12s04.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2750145"></a>3. 深度優先搜索</h2></div></div></div><p>現在我們用堆棧解決一個有意思的問題，定義一個二維數組：</p><pre class="programlisting">int maze[5][5] = {
+	0, 1, 0, 0, 0,
+	0, 1, 0, 1, 0,
+	0, 0, 0, 0, 0,
+	0, 1, 1, 1, 0,
+	0, 0, 0, 1, 0,
+};</pre><p>它表示一個迷宮，其中的1表示牆壁，0表示可以走的路，只能橫着走或豎著走，不能斜着走，要求編程序找出從左上角到右下角的路線。程序如下：</p><div class="example"><a id="id2750166"></a><p class="title"><b>例 12.3. 用深度優先搜索解迷宮問題</b></p><div class="example-contents"><pre class="programlisting">#include &lt;stdio.h&gt;
+
+#define MAX_ROW 5
+#define MAX_COL 5
+
+struct point { int row, col; } stack[512];
+int top = 0;
+
+void push(struct point p)
+{
+	stack[top++] = p;
+}
+
+struct point pop(void)
+{
+	return stack[--top];
+}
+
+int is_empty(void)
+{
+	return top == 0;
+}
+
+int maze[MAX_ROW][MAX_COL] = {
+	0, 1, 0, 0, 0,
+	0, 1, 0, 1, 0,
+	0, 0, 0, 0, 0,
+	0, 1, 1, 1, 0,
+	0, 0, 0, 1, 0,
+};
+
+void print_maze(void)
+{
+	int i, j;
+	for (i = 0; i &lt; MAX_ROW; i++) {
+		for (j = 0; j &lt; MAX_COL; j++)
+			printf("%d ", maze[i][j]);
+		putchar('\n');
+	}
+	printf("*********\n");
+}
+
+struct point predecessor[MAX_ROW][MAX_COL] = {
+	{{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}},
+	{{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}},
+	{{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}},
+	{{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}},
+	{{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}},
+};
+
+void visit(int row, int col, struct point pre)
+{
+	struct point visit_point = { row, col };
+	maze[row][col] = 2;
+	predecessor[row][col] = pre;
+	push(visit_point);
+}
+
+int main(void)
+{
+	struct point p = { 0, 0 };
+
+	maze[p.row][p.col] = 2;
+	push(p);	
+	
+	while (!is_empty()) {
+		p = pop();
+		if (p.row == MAX_ROW - 1  /* goal */
+		    &amp;&amp; p.col == MAX_COL - 1)
+			break;
+		if (p.col+1 &lt; MAX_COL     /* right */
+		    &amp;&amp; maze[p.row][p.col+1] == 0)
+			visit(p.row, p.col+1, p);
+		if (p.row+1 &lt; MAX_ROW     /* down */
+		    &amp;&amp; maze[p.row+1][p.col] == 0)
+			visit(p.row+1, p.col, p);
+		if (p.col-1 &gt;= 0          /* left */
+		    &amp;&amp; maze[p.row][p.col-1] == 0)
+			visit(p.row, p.col-1, p);
+		if (p.row-1 &gt;= 0          /* up */
+		    &amp;&amp; maze[p.row-1][p.col] == 0)
+			visit(p.row-1, p.col, p);
+		print_maze();
+	}
+	if (p.row == MAX_ROW - 1 &amp;&amp; p.col == MAX_COL - 1) {
+		printf("(%d, %d)\n", p.row, p.col);
+		while (predecessor[p.row][p.col].row != -1) {
+			p = predecessor[p.row][p.col];
+			printf("(%d, %d)\n", p.row, p.col);
+		}
+	} else
+		printf("No path!\n");
+
+	return 0;
+}</pre></div></div><br class="example-break" /><p>運行結果如下：</p><pre class="screen">2 1 0 0 0 
+2 1 0 1 0 
+0 0 0 0 0 
+0 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 0 0 0 0 
+0 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 0 0 0 
+2 1 1 1 0 
+0 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 0 0 0 
+2 1 1 1 0 
+2 0 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 0 0 0 
+2 1 1 1 0 
+2 2 0 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 0 0 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 0 0 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 0 0 0 
+2 1 0 1 0 
+2 2 2 0 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 0 0 0 
+2 1 2 1 0 
+2 2 2 2 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 0 0 
+2 1 2 1 0 
+2 2 2 2 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 2 0 
+2 1 2 1 0 
+2 2 2 2 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 2 2 
+2 1 2 1 0 
+2 2 2 2 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 2 2 
+2 1 2 1 2 
+2 2 2 2 0 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 2 2 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 0 
+2 2 2 1 0 
+*********
+2 1 2 2 2 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 0 
+*********
+2 1 2 2 2 
+2 1 2 1 2 
+2 2 2 2 2 
+2 1 1 1 2 
+2 2 2 1 2 
+*********
+(4, 4)
+(3, 4)
+(2, 4)
+(1, 4)
+(0, 4)
+(0, 3)
+(0, 2)
+(1, 2)
+(2, 2)
+(2, 1)
+(2, 0)
+(1, 0)
+(0, 0)</pre><p>這次堆棧裡的元素是結構體類型的，用來表示迷宮中一個點的x和y座標。我們用一個新的資料結構保存走迷宮的路線，每個走過的點都有一個前趨（Predecessor）<a id="id2750190" class="indexterm"></a>點，表示是從哪兒走到當前點的，比如<code class="literal">predecessor[4][4]</code>是座標為(3, 4)的點，就表示從(3, 4)走到了(4, 4)，一開始<code class="literal">predecessor</code>的各元素初始化為無效座標(-1, -1)。在迷宮中探索路線的同時就把路線保存在<code class="literal">predecessor</code>數組中，已經走過的點在<code class="literal">maze</code>數組中記為2防止重複走，最後找到終點時就根據<code class="literal">predecessor</code>數組保存的路線從終點打印到起點。為了幫助理解，我把這個算法改寫成偽代碼（Pseudocode）<a id="id2749807" class="indexterm"></a>如下：</p><pre class="programlisting">將起點標記為已走過並壓棧;
+while (棧非空) {
+	從棧頂彈出一個點p;
+	if (p這個點是終點)
+		break;
+	否則沿右、下、左、上四個方向探索相鄰的點
+	if (和p相鄰的點有路可走，並且還沒走過)
+		將相鄰的點標記為已走過並壓棧，它的前趨就是p點;
+}
+if (p點是終點) {
+	打印p點的座標;
+	while (p點有前趨) {
+		p點 = p點的前趨;
+		打印p點的座標;
+	}
+} else
+	沒有路線可以到達終點;</pre><p>我在<code class="literal">while</code>循環的末尾插了打印語句，每探索一步都打印出當前迷宮的狀態（標記了哪些點），從打印結果可以看出這種搜索算法的特點是：每次探索完各個方向相鄰的點之後，取其中一個相鄰的點走下去，一直走到無路可走了再退回來，取另一個相鄰的點再走下去。這稱為深度優先搜索（DFS，Depth First Search）<a id="id2749689" class="indexterm"></a>。探索迷宮和堆棧變化的過程如下圖所示。</p><div class="figure"><a id="id2749722"></a><p class="title"><b>圖 12.2. 深度優先搜索</b></p><div class="figure-contents"><div><img src="images/stackqueue.dfs.png" alt="深度優先搜索" /></div></div></div><br class="figure-break" /><p>圖中各點的編號表示探索順序，堆棧中保存的應該是座標，我在畫圖時為了直觀就把各點的編號寫在堆棧裡了。可見正是堆棧後進先出的性質使這個算法具有了深度優先的特點。如果在探索問題的解時走進了死衚衕，則需要退回來從另一條路繼續探索，這種思想稱為回溯（Backtrack），一個典型的例子是很多編程書上都會講的八皇后問題。</p><p>最後我們打印終點的座標並通過<code class="literal">predecessor</code>資料結構找到它的前趨，這樣順藤摸瓜一直打印到起點。那麼能不能從起點到終點正向打印路線呢？在上一節我們看到，數組支持隨機訪問也支持順序訪問，如果在一個循環裡打印數組，既可以正向打印也可以反向打印。但<code class="literal">predecessor</code>這種資料結構卻有很多限制：</p><div class="orderedlist"><ol type="1"><li><p>不能隨機訪問一條路線上的任意點，只能通過一個點找到另一個點，通過另一個點再找第三個點，因此只能順序訪問。</p></li><li><p>每個點只知道它的前趨是誰，而不知道它的後繼（Successor）<a id="id2750541" class="indexterm"></a>是誰，所以只能反向順序訪問。</p></li></ol></div><p>可見，<span class="emphasis"><em>有什麼樣的資料結構就決定了可以用什麼樣的算法</em></span>。那為什麼不再建一個<code class="literal">successor</code>數組來保存每個點的後繼呢？從DFS算法的過程可以看出，雖然每個點的前趨只有一個，後繼卻不止一個，如果我們為每個點只保存一個後繼，則無法保證這個後繼指向正確的路線。由此可見，<span class="emphasis"><em>有什麼樣的算法就決定了可以用什麼樣的資料結構</em></span>。設計算法和設計資料結構這兩件工作是緊密聯繫的。</p><div class="simplesect" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2750575"></a>習題</h3></div></div></div><p>1、修改本節的程序，要求從起點到終點正向打印路線。你能想到幾種辦法？</p><p>2、本節程序中<code class="literal">predecessor</code>這個資料結構占用的存儲空間太多了，改變它的存儲方式可以節省空間，想想該怎麼改。</p><p>3、上一節我們實現了一個基于堆棧的程序，然後改寫成遞歸程序，用函數調用的棧幀替代自己實現的堆棧。本節的DFS算法也是基于堆棧的，請把它改寫成遞歸程序，這樣改寫可以避免使用<code class="literal">predecessor</code>資料結構，想想該怎麼做。</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch12s02.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch12.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch12s04.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">2. 堆棧 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 4. 隊列與廣度優先搜索</td></tr></table></div></body></html>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2. 宏定義</title><link rel="stylesheet" href="styles.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Linux C編程一站式學習" /><link rel="up" href="ch21.html" title="第 21 章 預處理" /><link rel="prev" href="ch21s01.html" title="1. 預處理的步驟" /><link rel="next" href="ch21s03.html" title="3. 條件預處理指示" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2. 宏定義</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch21s01.html">上一頁</a> </td><th width="60%" align="center">第 21 章 預處理</th><td width="20%" align="right"> <a accesskey="n" href="ch21s03.html">下一頁</a></td></tr></table><hr /></div><div class="sect1" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2797195"></a>2. 宏定義</h2></div></div></div><p>較大的項目都會用大量的宏定義來組織代碼，你可以看看<code class="literal">/usr/include</code>下面的標頭檔中用了多少個宏定義。看起來宏展開就是做個替換而已，其實裡面有比較複雜的規則，C語言有很多複雜但不常用的語法規則本書並不涉及，但有關宏展開的語法規則本節卻力圖做全面講解，因為它很重要也很常用。</p><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2797214"></a>2.1. 函數式宏定義</h3></div></div></div><p>以前我們用過的<code class="literal">#define N 20</code>或<code class="literal">#define STR "hello, world"</code>這種宏定義可以稱為變數式宏定義（Object-like Macro）<a id="id2797239" class="indexterm"></a>，宏定義名可以像變數一樣在代碼中使用。另外一種宏定義可以像函數調用一樣在代碼中使用，稱為函數式宏定義（Function-like Macro）<a id="id2797249" class="indexterm"></a>。例如編輯一個檔案<code class="literal">main.c</code>：</p><pre class="programlisting">#define MAX(a, b) ((a)&gt;(b)?(a):(b))
+k = MAX(i&amp;0x0f, j&amp;0x0f)</pre><p>我們想看第二行的表達式展開成什麼樣，可以用<code class="literal">gcc</code>的<code class="literal">-E</code>選項或<code class="literal">cpp</code>命令，儘管這個C程序不合語法，但沒關係，我們只做預處理而不編譯，不會檢查程序是否符合C語法。</p><pre class="screen">$ cpp main.c
+# 1 "main.c"
+# 1 "&lt;built-in&gt;"
+# 1 "&lt;command-line&gt;"
+# 1 "main.c"
+
+k = ((i&amp;0x0f)&gt;(j&amp;0x0f)?(i&amp;0x0f):(j&amp;0x0f))</pre><p>就像函數調用一樣，把兩個實參分別替換到宏定義中形參<code class="literal">a</code>和<code class="literal">b</code>的位置。注意這種函數式宏定義和真正的函數調用有什麼不同：</p><p>1、函數式宏定義的參數沒有類型，預處理器只負責做形式上的替換，而不做參數類型檢查，所以傳參時要格外小心。</p><p>2、調用真正函數的代碼和調用函數式宏定義的代碼編譯生成的指令不同。如果<code class="literal">MAX</code>是個真正的函數，那麼它的函數體<code class="literal">return a &gt; b ? a : b;</code>要編譯生成指令，代碼中出現的每次調用也要編譯生成傳參指令和<code class="literal">call</code>指令。而如果<code class="literal">MAX</code>是個函數式宏定義，這個宏定義本身倒不必編譯生成指令，但是代碼中出現的每次調用編譯生成的指令都相當於一個函數體，而不是簡單的幾條傳參指令和<code class="literal">call</code>指令。所以，使用函數式宏定義編譯生成的目標檔案會比較大。</p><p>3、定義這種宏要格外小心，如果上面的定義寫成<code class="literal">#define MAX(a, b) (a&gt;b?a:b)</code>，省去內層括號，則宏展開就成了<code class="literal">k = (i&amp;0x0f&gt;j&amp;0x0f?i&amp;0x0f:j&amp;0x0f)</code>，運算的優先順序就錯了。同樣道理，這個宏定義的外層括號也是不能省的，想一想為什麼。</p><p>4、調用函數時先求實參表達式的值再傳給形參，如果實參表達式有Side Effect，那麼這些Side Effect只發生一次。例如<code class="literal">MAX(++a, ++b)</code>，如果<code class="literal">MAX</code>是個真正的函數，<code class="literal">a</code>和<code class="literal">b</code>只增加一次。但如果<code class="literal">MAX</code>是上面那樣的宏定義，則要展開成<code class="literal">k = ((++a)&gt;(++b)?(++a):(++b))</code>，<code class="literal">a</code>和<code class="literal">b</code>就不一定是增加一次還是兩次了。</p><p>5、即使實參沒有Side Effect，使用函數式宏定義也往往會導致較低的代碼執行效率。下面舉一個極端的例子，也是個很有意思的例子。</p><div class="example"><a id="id2797453"></a><p class="title"><b>例 21.1. 函數式宏定義</b></p><div class="example-contents"><pre class="programlisting">#define MAX(a, b) ((a)&gt;(b)?(a):(b))
+
+int a[] = { 9, 3, 5, 2, 1, 0, 8, 7, 6, 4 };
+
+int max(int n)
+{
+	return n == 0 ? a[0] : MAX(a[n], max(n-1));
+}
+
+int main(void)
+{
+	max(9);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>這段代碼從一個數組中找出最大的數，如果<code class="literal">MAX</code>是個真正的函數，這個算法就是從前到後遍歷一遍數組，時間複雜度是Θ(n)，而現在<code class="literal">MAX</code>是這樣一個函數式宏定義，思考一下這個算法的時間複雜度是多少？</p><p>儘管函數式宏定義和真正的函數相比有很多缺點，但只要小心使用還是會顯著提高代碼的執行效率，畢竟省去了分配和釋放棧幀、傳參、傳返回值等一系列工作，因此那些簡短並且被頻繁調用的函數經常用函數式宏定義來代替實現。例如C標準庫的很多函數都提供兩種實現，一種是真正的函數實現，一種是宏定義實現，這一點以後還要詳細解釋。</p><p>函數式宏定義經常寫成這樣的形式（取自內核代碼<code class="literal">include/linux/pm.h</code>）：</p><pre class="programlisting">#define device_init_wakeup(dev,val) \
+        do { \
+                device_can_wakeup(dev) = !!(val); \
+                device_set_wakeup_enable(dev,val); \
+        } while(0)</pre><p>為什麼要用<code class="literal">do { ... } while(0)</code>括起來呢？不括起來會有什麼問題呢？</p><pre class="programlisting">#define device_init_wakeup(dev,val) \
+                device_can_wakeup(dev) = !!(val); \
+                device_set_wakeup_enable(dev,val);
+
+if (n &gt; 0)
+	device_init_wakeup(d, v);</pre><p>這樣宏展開之後，函數體的第二條語句不在<code class="literal">if</code>條件中。那麼簡單地用<code class="literal">{ ... }</code>括起來組成一個語句塊不行嗎？</p><pre class="programlisting">#define device_init_wakeup(dev,val) \
+                { device_can_wakeup(dev) = !!(val); \
+                device_set_wakeup_enable(dev,val); }
+
+if (n &gt; 0)
+	device_init_wakeup(d, v);
+else
+	continue;</pre><p>問題出在<code class="literal">device_init_wakeup(d, v);</code>末尾的<code class="literal">;</code>號，如果不允許寫這個<code class="literal">;</code>號，看起來不像個函數調用，可如果寫了這個<code class="literal">;</code>號，宏展開之後就有語法錯誤，<code class="literal">if</code>語句被這個<code class="literal">;</code>號結束掉了，沒法跟<code class="literal">else</code>配對。因此，<code class="literal">do { ... } while(0)</code>是一種比較好的解決辦法。</p><p>如果在一個程序檔案中重複定義一個宏，C語言規定這些重複的宏定義必須一模一樣。例如這樣的重複定義是允許的：</p><pre class="programlisting">#define OBJ_LIKE (1 - 1)
+#define OBJ_LIKE /* comment */ (1/* comment */-/* comment */  1)/* comment */</pre><p>在定義的前後多些空白（空格、Tab、註釋）沒有關係，在定義之中多些空白或少些空白也沒有關係，但在定義之中有空白和沒有空白被認為是不同的，所以這樣的重複定義是不允許的：</p><pre class="programlisting">#define OBJ_LIKE (1 - 1)
+#define OBJ_LIKE (1-1)</pre><p>如果需要重新定義一個宏，和原來的定義不同，可以先用<code class="literal">#undef</code>取消原來的定義，再重新定義，例如：</p><pre class="programlisting">#define X 3
+... /* X is 3 */
+#undef X
+... /* X has no definition */
+#define X 2
+... /* X is 2 */</pre></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2797661"></a>2.2. 內聯函數</h3></div></div></div><p>C99引入一個新關鍵字<code class="literal">inline</code>，用於定義內聯函數（inline function）<a id="id2797678" class="indexterm"></a>。這種用法在內核代碼中很常見，例如<code class="literal">include/linux/rwsem.h</code>中：</p><pre class="programlisting">static inline void down_read(struct rw_semaphore *sem)
+{
+        might_sleep();
+        rwsemtrace(sem,"Entering down_read");
+        __down_read(sem);
+        rwsemtrace(sem,"Leaving down_read");
+}</pre><p><code class="literal">inline</code>關鍵字告訴編譯器，這個函數的調用要儘可能快，可以當普通的函數調用實現，也可以用宏展開的辦法實現。我們做個實驗，把上一節的例子改一下：</p><div class="example"><a id="id2797711"></a><p class="title"><b>例 21.2. 內聯函數</b></p><div class="example-contents"><pre class="programlisting">inline int MAX(int a, int b)
+{
+	return a &gt; b ? a : b;
+}
+
+int a[] = { 9, 3, 5, 2, 1, 0, 8, 7, 6, 4 };
+
+int max(int n)
+{
+	return n == 0 ? a[0] : MAX(a[n], max(n-1));
+}
+
+int main(void)
+{
+	max(9);
+	return 0;
+}</pre></div></div><br class="example-break" /><p>按往常的步驟編譯然後反彙編：</p><pre class="screen">$ gcc main.c -g
+$ objdump -dS a.out
+...
+int max(int n)
+{
+ 8048369:       55                      push   %ebp
+ 804836a:       89 e5                   mov    %esp,%ebp
+ 804836c:       83 ec 0c                sub    $0xc,%esp
+        return n == 0 ? a[0] : MAX(a[n], max(n-1));
+ 804836f:       83 7d 08 00             cmpl   $0x0,0x8(%ebp)
+ 8048373:       75 0a                   jne    804837f &lt;max+0x16&gt;
+ 8048375:       a1 c0 95 04 08          mov    0x80495c0,%eax
+ 804837a:       89 45 fc                mov    %eax,-0x4(%ebp)
+ 804837d:       eb 29                   jmp    80483a8 &lt;max+0x3f&gt;
+ 804837f:       8b 45 08                mov    0x8(%ebp),%eax
+ 8048382:       83 e8 01                sub    $0x1,%eax
+ 8048385:       89 04 24                mov    %eax,(%esp)
+ 8048388:       e8 dc ff ff ff          call   8048369 &lt;max&gt;
+ 804838d:       89 c2                   mov    %eax,%edx
+ 804838f:       8b 45 08                mov    0x8(%ebp),%eax
+ 8048392:       8b 04 85 c0 95 04 08    mov    0x80495c0(,%eax,4),%eax
+ 8048399:       89 54 24 04             mov    %edx,0x4(%esp)
+ 804839d:       89 04 24                mov    %eax,(%esp)
+ 80483a0:       e8 9f ff ff ff          call   8048344 &lt;MAX&gt;
+ 80483a5:       89 45 fc                mov    %eax,-0x4(%ebp)
+ 80483a8:       8b 45 fc                mov    -0x4(%ebp),%eax
+}
+...</pre><p>可以看到<code class="literal">MAX</code>是作為普通函數調用的。如果指定優化選項編譯，然後反彙編：</p><pre class="screen">$ gcc main.c -g -O
+$ objdump -dS a.out
+...
+int max(int n)
+{
+ 8048355:       55                      push   %ebp
+ 8048356:       89 e5                   mov    %esp,%ebp
+ 8048358:       53                      push   %ebx
+ 8048359:       83 ec 04                sub    $0x4,%esp
+ 804835c:       8b 5d 08                mov    0x8(%ebp),%ebx
+        return n == 0 ? a[0] : MAX(a[n], max(n-1));
+ 804835f:       85 db                   test   %ebx,%ebx
+ 8048361:       75 07                   jne    804836a &lt;max+0x15&gt;
+ 8048363:       a1 a0 95 04 08          mov    0x80495a0,%eax
+ 8048368:       eb 18                   jmp    8048382 &lt;max+0x2d&gt;
+ 804836a:       8d 43 ff                lea    -0x1(%ebx),%eax
+ 804836d:       89 04 24                mov    %eax,(%esp)
+ 8048370:       e8 e0 ff ff ff          call   8048355 &lt;max&gt;
+inline int MAX(int a, int b)
+{
+        return a &gt; b ? a : b;
+ 8048375:       8b 14 9d a0 95 04 08    mov    0x80495a0(,%ebx,4),%edx
+ 804837c:       39 d0                   cmp    %edx,%eax
+ 804837e:       7d 02                   jge    8048382 &lt;max+0x2d&gt;
+ 8048380:       89 d0                   mov    %edx,%eax
+int a[] = { 9, 3, 5, 2, 1, 0, 8, 7, 6, 4 };
+
+int max(int n)
+{
+        return n == 0 ? a[0] : MAX(a[n], max(n-1));
+}
+ 8048382:       83 c4 04                add    $0x4,%esp
+ 8048385:       5b                      pop    %ebx
+ 8048386:       5d                      pop    %ebp
+ 8048387:       c3                      ret    
+...</pre><p>可以看到，並沒有<code class="literal">call</code>指令調用<code class="literal">MAX</code>函數，<code class="literal">MAX</code>函數的指令是內聯在<code class="literal">max</code>函數中的，由於原始碼和指令的次序無法對應，<code class="literal">max</code>和<code class="literal">MAX</code>函數的原始碼也交錯在一起顯示。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2797840"></a>2.3. <code class="literal">#</code>、<code class="literal">##</code>運算符和可變參數</h3></div></div></div><p>在函數式宏定義中，<code class="literal">#</code>運算符用於創建字元串，<code class="literal">#</code>運算符後面應該跟一個形參（中間可以有空格或Tab），例如：</p><pre class="programlisting">#define STR(s) # s
+STR(hello 	world)</pre><p>用<code class="literal">cpp</code>命令預處理之後是<code class="literal">"hello␣world"</code>，自動用<code class="literal">"</code>號把實參括起來成為一個字元串，並且實參中的連續多個空白字元被替換成一個空格。</p><p>再比如：</p><pre class="programlisting">#define STR(s) #s
+fputs(STR(strncmp("ab\"c\0d", "abc", '\4"')
+	== 0) STR(: @\n), s);</pre><p>預處理之後是<code class="literal">fputs("strncmp(\"ab\\\"c\\0d\", \"abc\", '\\4\"') == 0" ": @\n", s);</code>，注意如果實參中包含字元常量或字元串，則宏展開之後字元串的界定符<code class="literal">"</code>要替換成<code class="literal">\"</code>，字元常量或字元串中的<code class="literal">\</code>和<code class="literal">"</code>字元要替換成<code class="literal">\\</code>和<code class="literal">\"</code>。</p><p>在宏定義中可以用<code class="literal">##</code>運算符把前後兩個預處理Token連接成一個預處理Token，和<code class="literal">#</code>運算符不同，<code class="literal">##</code>運算符不僅限于函數式宏定義，變數式宏定義也可以用。例如：</p><pre class="programlisting">#define CONCAT(a, b) a##b
+CONCAT(con, cat)</pre><p>預處理之後是<code class="literal">concat</code>。再比如，要定義一個宏展開成兩個<code class="literal">#</code>號，可以這樣定義：</p><pre class="programlisting">#define HASH_HASH # ## #</pre><p>中間的<code class="literal">##</code>是運算符，宏展開時前後兩個<code class="literal">#</code>號被這個運算符連接在一起。注意中間的兩個空格是不可少的，如果寫成<code class="literal">####</code>，會被劃分成<code class="literal">##</code>和<code class="literal">##</code>兩個Token，而根據定義<code class="literal">##</code>運算符用於連接前後兩個預處理Token，不能出現在宏定義的開頭或末尾，所以會報錯。</p><p>我們知道<code class="literal">printf</code>函數帶有可變參數，函數式宏定義也可以帶可變參數，同樣是在參數列表中用<code class="literal">...</code>表示可變參數。例如：</p><pre class="programlisting">#define showlist(...) printf(#__VA_ARGS__)
+#define report(test, ...) ((test)?printf(#test):\
+	printf(__VA_ARGS__))
+showlist(The first, second, and third items.);
+report(x&gt;y, "x is %d but y is %d", x, y);</pre><p>預處理之後變成：</p><pre class="programlisting">printf("The first, second, and third items.");
+((x&gt;y)?printf("x&gt;y"): printf("x is %d but y is %d", x, y));</pre><p>在宏定義中，可變參數的部分用<code class="literal">__VA_ARGS__</code>表示，實參中對應<code class="literal">...</code>的幾個參數可以看成一個參數替換到宏定義中<code class="literal">__VA_ARGS__</code>所在的地方。</p><p>調用函數式宏定義允許傳空參數，這一點和函數調用不同，通過下面幾個例子理解空參數的用法。</p><pre class="programlisting">#define FOO() foo
+FOO()</pre><p>預處理之後變成<code class="literal">foo</code>。<code class="literal">FOO</code>在定義時不帶參數，在調用時也不允許傳參數給它。</p><pre class="programlisting">#define FOO(a) foo##a
+FOO(bar)
+FOO()</pre><p>預處理之後變成：</p><pre class="programlisting">foobar
+foo</pre><p><code class="literal">FOO</code>在定義時帶一個參數，在調用時必須傳一個參數給它，如果不傳參數則表示傳了一個空參數。</p><pre class="programlisting">#define FOO(a, b, c) a##b##c
+FOO(1,2,3)
+FOO(1,2,)
+FOO(1,,3)
+FOO(,,3)</pre><p>預處理之後變成：</p><pre class="programlisting">123
+12
+13
+3</pre><p><code class="literal">FOO</code>在定義時帶三個參數，在調用時也必須傳三個參數給它，空參數的位置可以空着，但必須給夠三個參數，<code class="literal">FOO(1,2)</code>這樣的調用是錯誤的。</p><pre class="programlisting">#define FOO(a, ...) a##__VA_ARGS__
+FOO(1)
+FOO(1,2,3,)</pre><p>預處理之後變成：</p><pre class="programlisting">1
+12,3,</pre><p><code class="literal">FOO(1)</code>這個調用相當於可變參數部分傳了一個空參數，<code class="literal">FOO(1,2,3,)</code>這個調用相當於可變參數部分傳了三個參數，第三個是空參數。</p><p><code class="literal">gcc</code>有一種擴展語法，如果<code class="literal">##</code>運算符用在<code class="literal">__VA_ARGS__</code>前面，除了起連接作用之外還有特殊的含義，例如內核代碼<code class="literal">net/netfilter/nf_conntrack_proto_sctp.c</code>中的：</p><pre class="programlisting">#define DEBUGP(format, ...) printk(format, ## __VA_ARGS__)</pre><p><code class="literal">printk</code>這個內核函數相當於<code class="literal">printf</code>，也帶有格式化字元串和可變參數，由於內核不能調用<code class="literal">libc</code>的函數，所以另外實現了一個打印函數。這個函數式宏定義可以這樣調用：<code class="literal">DEBUGP("info no. %d", 1)</code>。也可以這樣調用：<code class="literal">DEBUGP("info")</code>。後者相當於可變參數部分傳了一個空參數，但展開後並不是<code class="literal">printk("info",)</code>，而是<code class="literal">printk("info")</code>，當<code class="literal">__VA_ARGS</code>是空參數時，<code class="literal">##</code>運算符把它前面的<code class="literal">,</code>號“<span class="quote">吃</span>”掉了。</p></div><div class="sect2" lang="zh-cn" xml:lang="zh-cn"><div class="titlepage"><div><div><h3 class="title"><a id="id2798306"></a>2.4. 宏展開的步驟</h3></div></div></div><p>以上舉的宏展開的例子都是最簡單的，有些宏展開的過程要做多次替換，例如：</p><pre class="programlisting">#define sh(x) printf("n" #x "=%d, or %d\n",n##x,alt[x])
+#define sub_z  26
+sh(sub_z)</pre><p><code class="literal">sh(sub_z)</code>要用<code class="literal">sh(x)</code>這個宏定義來展開，形參<code class="literal">x</code>對應的實參是<code class="literal">sub_z</code>，替換過程如下：</p><div class="orderedlist"><ol type="1"><li><p><code class="literal">#x</code>要替換成<code class="literal">"sub_z"</code>。</p></li><li><p><code class="literal">n##x</code>要替換成<code class="literal">nsub_z</code>。</p></li><li><p>除了帶<code class="literal">#</code>和<code class="literal">##</code>運算符的參數之外，其它參數在替換之前要對實參本身做充分的展開，所以應該先把<code class="literal">sub_z</code>展開成26再替換到<code class="literal">alt[x]</code>中<code class="literal">x</code>的位置。</p></li><li><p>現在展開成了<code class="literal">printf("n" "sub_z" "=%d, or %d\n",nsub_z,alt[26])</code>，所有參數都替換完了，這時編譯器會再掃瞄一遍，再找出可以展開的宏定義來展開，假設<code class="literal">nsub_z</code>或<code class="literal">alt</code>是變數式宏定義，這時會進一步展開。</p></li></ol></div><p>再舉一個例子：</p><pre class="programlisting">#define x 3
+#define f(a) f(x * (a))
+#undef x
+#define x 2
+#define g f
+#define t(a) a
+
+t(t(g)(0) + t)(1);</pre><p>展開的步驟是：</p><div class="orderedlist"><ol type="1"><li><p>先把<code class="literal">g</code>展開成<code class="literal">f</code>再替換到<code class="literal">#define t(a) a</code>中，得到<code class="literal">t(f(0) + t)(1);</code>。</p></li><li><p>根據<code class="literal">#define f(a) f(x * (a))</code>，得到<code class="literal">t(f(x * (0)) + t)(1);</code>。</p></li><li><p>把<code class="literal">x</code>替換成2，得到<code class="literal">t(f(2 * (0)) + t)(1);</code>。注意，一開始定義<code class="literal">x</code>為3，但是後來用<code class="literal">#undef x</code>取消了<code class="literal">x</code>的定義，又重新定義<code class="literal">x</code>為2。當處理到<code class="literal">t(t(g)(0) + t)(1);</code>這一行代碼時<code class="literal">x</code>已經定義成2了，所以用2來替換。還要注意一點，現在得到的<code class="literal">t(f(2 * (0)) + t)(1);</code>中仍然有<code class="literal">f</code>，但不能再次根據<code class="literal">#define f(a) f(x * (a))</code>展開了，<code class="literal">f(2 * (0))</code>就是由展開<code class="literal">f(0)</code>得到的，這裡面再遇到<code class="literal">f</code>就不展開了，這樣規定可以避免無窮展開（類似於無窮遞歸），因此我們可以放心地使用遞歸定義，例如<code class="literal">#define a a[0]</code>，<code class="literal">#define a a.member</code>等。</p></li><li><p>根據<code class="literal">#define t(a) a</code>，最終展開成<code class="literal">f(2 * (0)) + t(1);</code>。這時不能再展開<code class="literal">t(1)</code>了，因為這裡的<code class="literal">t</code>就是由展開<code class="literal">t(f(2 * (0)) + t)</code>得到的，所以不能再展開了。</p></li></ol></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch21s01.html">上一頁</a> </td><td width="20%" align="center"><a accesskey="u" href="ch21.html">上一級</a></td><td width="40%" align="right"> <a accesskey="n" href="ch21s03.html">下一頁</a></td></tr><tr><td width="40%" align="left" valign="top">1. 預處理的步驟 </td><td width="20%" align="center"><a accesskey="h" href="index.html">起始頁</a></td><td width="40%" align="right" valign="top"> 3. 條件預處理指示</td></tr></table></div></body></html>
