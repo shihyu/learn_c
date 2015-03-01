@@ -32,9 +32,12 @@ void tarin_feature_begin() {
 
     for (i = 0; i < 10; ++i) {
         for (j = 0; j < 10; ++j) {
+            // 讀取圖檔路徑
             sprintf(FilePathName, "number1_bmp/%d/%d.bmp", i, j);
             // printf("%s\n",FilePathName);
+            // 計算一張圖特徵
             cal_image_feature(feature_vectors, FilePathName);
+
             stats_features_vectors(i,  feature_vectors, feature_vectors_table);
         }
     }
@@ -62,10 +65,11 @@ void tarin_feature_begin() {
 
 void cal_image_feature(int feature_vector[], char FilePathName[]) {
     IplImage *Image = NULL;
-    int i, j;
+    int i, j, k;
 
     printf("\n%p[+]\n", Image);
-    Image = cvLoadImage(FilePathName, 0);
+    // load  image 
+    Image = cvLoadImage(FilePathName, CV_LOAD_IMAGE_GRAYSCALE);
     printf("%p[-]\n", Image);
 
     if (Image == NULL) {
@@ -73,8 +77,10 @@ void cal_image_feature(int feature_vector[], char FilePathName[]) {
         exit(-1);
     }
 
+    // change one dim to two dim via c++ template
     BwImage BlockA(Image);
 
+    /*
     for (i = 0; i < Image->height; ++i) {
         for (j = 0; j < Image->width; ++j) {
             printf("%3d ", BlockA[i][j]);
@@ -84,6 +90,32 @@ void cal_image_feature(int feature_vector[], char FilePathName[]) {
     }
 
     printf("\n");
+    */ 
+
+    k = 0;
+
+    for (i = 0; i < Image->height; ++i) {
+        for (j = 0; j < Image->width; ++j) {
+            k = j + 1;
+
+            if (k < Image->width && BlockA[i][j] != BlockA[i][k]) {
+                feature_vector[i] += 1;
+            }
+
+        }
+    }
+
+    for (i = 0; i < Image->height; ++i) {
+        for (j = 0; j < Image->width; ++j) {
+            k = j + 1;
+
+
+            if (k < Image->width && BlockA[j][i] != BlockA[k][i]) {
+                feature_vector[i + 32] += 1;
+            }
+        }
+    }
+
 }
 
 void stats_feature() {
