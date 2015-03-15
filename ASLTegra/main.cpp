@@ -4,6 +4,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/video/background_segm.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/types_c.h>
+#include <opencv2/highgui/highgui_c.h>
 // C
 #include <stdio.h>
 // C++
@@ -18,13 +20,13 @@ using namespace std;
 #define DIFF_THRESH 230
 
 enum {
-	MAX_WORDS = 26,          // Number of letters
-	SAMPLE_RATE = 1,         // Frame sampling rate (every x loops)
-	NUM_LAST_LETTERS = 3,    // Number of letters to store
-	MIN_FREQ = 2,            // Minimum frequency of last letters
-	RESET_THRESH = 25000000, // Minimum sum pixel data to automatically reset
-	THRESH = 200,            // Threshold to eliminate background noise
-	KEY_ESC = 27,            // 'esc' key code
+    MAX_WORDS = 26,          // Number of letters
+    SAMPLE_RATE = 1,         // Frame sampling rate (every x loops)
+    NUM_LAST_LETTERS = 3,    // Number of letters to store
+    MIN_FREQ = 2,            // Minimum frequency of last letters
+    RESET_THRESH = 25000000, // Minimum sum pixel data to automatically reset
+    THRESH = 200,            // Threshold to eliminate background noise
+    KEY_ESC = 27,            // 'esc' key code
 };
 
 // Global variables
@@ -35,230 +37,268 @@ vector<Point> letters[MAX_WORDS];
 void processVideo();
 void doSystemCalls(char c);
 
-int main(int argc, char* argv[]) {
-	// Create GUI windows
-	namedWindow("Crop Frame");
-	namedWindow("Foreground");
-	namedWindow("Contour");
-	namedWindow("Letter");
+int main(int argc, char* argv[])
+{
+    // Create GUI windows
+    namedWindow("Crop Frame");
+#if 1
+    namedWindow("Foreground");
+    namedWindow("Contour");
+    namedWindow("Letter");
 
-	// Create Background Subtractor objects (MOG2 approach)
-	pMOG2 = new BackgroundSubtractorMOG2();
+    // Create Background Subtractor objects (MOG2 approach)
+    pMOG2 = createBackgroundSubtractorMOG2();
 
-	// Preload letter images
-	for (int i = 0; i < MAX_WORDS; i++) {
-		char buf[13 * sizeof(char)];
-		sprintf(buf, "images/%c.png", (char)('a' + i));
-		Mat im = imread(buf, 1);
-		if (im.data) {
-			Mat bwim;
-			cvtColor(im, bwim, CV_RGB2GRAY);
-			Mat threshold_output;
-			vector<Vec4i> hierarchy;
-			vector<vector<Point> > contours;
+    // Preload letter images
+    for (int i = 0; i < MAX_WORDS; i++) {
+        char buf[13 * sizeof(char)];
+        sprintf(buf, "images/%c.png", (char)('a' + i));
+        Mat im = imread(buf, 1);
 
-			// Detect edges using Threshold
-			threshold( bwim, threshold_output, THRESH, 255, THRESH_BINARY );
-			findContours(threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-			letters[i] = contours[0];
-		}
-	}
+        if (im.data) {
+            Mat bwim;
+            cvtColor(im, bwim, CV_RGB2GRAY);
+            Mat threshold_output;
+            vector<Vec4i> hierarchy;
+            vector<vector<Point> > contours;
 
-	processVideo();
+            // Detect edges using Threshold
+            threshold(bwim, threshold_output, THRESH, 255, THRESH_BINARY);
+            findContours(threshold_output, contours, hierarchy, CV_RETR_TREE,
+                         CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+            letters[i] = contours[0];
+        }
+    }
 
-	// Destroy GUI windows
-	destroyAllWindows();
-	return EXIT_SUCCESS;
+    processVideo();
+
+    // Destroy GUI windows
+    destroyAllWindows();
+#endif
+    return EXIT_SUCCESS;
 }
 
 // Source: http://stackoverflow.com/questions/21482534/how-to-use-shape-distance-and-common-interfaces-to-find-hausdorff-distance-in-op
-int distance_2(vector<Point> a, vector<Point> b) {
-	int maxDistAB = 0;
-	for (size_t i = 0; i < a.size(); i++) {
-		int minB = 1000000;
-		for (size_t j = 0; j < b.size(); j++) {
-			int dx = (a[i].x - b[j].x);
-			int dy = (a[i].y - b[j].y);
-			int tmpDist = dx*dx + dy*dy;
+int distance_2(vector<Point> a, vector<Point> b)
+{
+    int maxDistAB = 0;
 
-			if (tmpDist < minB) {
-				minB = tmpDist;
-			}
-			if (tmpDist == 0) {
-				break; // can't get better than equal.
-			}
-		}
-		maxDistAB += minB;
-	}
-	return maxDistAB;
+    for (size_t i = 0; i < a.size(); i++) {
+        int minB = 1000000;
+
+        for (size_t j = 0; j < b.size(); j++) {
+            int dx = (a[i].x - b[j].x);
+            int dy = (a[i].y - b[j].y);
+            int tmpDist = dx * dx + dy * dy;
+
+            if (tmpDist < minB) {
+                minB = tmpDist;
+            }
+
+            if (tmpDist == 0) {
+                break; // can't get better than equal.
+            }
+        }
+
+        maxDistAB += minB;
+    }
+
+    return maxDistAB;
 }
-double distance_hausdorff(vector<Point> a, vector<Point> b) {
-	int maxDistAB = distance_2(a, b);
-	int maxDistBA = distance_2(b, a);
-	int maxDist = max(maxDistAB,maxDistBA);
+double distance_hausdorff(vector<Point> a, vector<Point> b)
+{
+    int maxDistAB = distance_2(a, b);
+    int maxDistBA = distance_2(b, a);
+    int maxDist = max(maxDistAB, maxDistBA);
 
-	return sqrt((double)maxDist);
+    return sqrt((double)maxDist);
 }
 
-void processVideo() {
-	// Create the capture object
-	VideoCapture capture = VideoCapture(0);
-	if (!capture.isOpened()) {
-		// Error in opening the video input
-		cerr << "Cannot Open Webcam... " << endl;
-		exit(EXIT_FAILURE);
-	}
+void processVideo()
+{
+    // Create the capture object
+    VideoCapture capture = VideoCapture(0);
 
-	Mat frame;           // current frame
-	Mat fgMaskMOG2;      // fg mask fg mask generated by MOG2 method
-	int keyboard = 0;    // last key pressed
-	int frames = 0;      // number of frames since last sample
-	int letterCount = 0; // number of letters captured since last display
-	char lastLetters[NUM_LAST_LETTERS] = {0};
-        char lastExecLetter = 0;  // last letter sent to doSystemCalls()
-	Mat letterText = Mat::zeros(200, 200, CV_8UC3);
+    if (!capture.isOpened()) {
+        // Error in opening the video input
+        cerr << "Cannot Open Webcam... " << endl;
+        exit(EXIT_FAILURE);
+    }
 
-	// Read input data
-	while ((char)keyboard != KEY_ESC) {
-		// Read the current frame
-		if (!capture.read(frame)) {
-			cerr << "Unable to read next frame." << endl;
-			cerr << "Exiting..." << endl;
-			exit(EXIT_FAILURE);
-		}
+    Mat frame;           // current frame
+    Mat fgMaskMOG2;      // fg mask fg mask generated by MOG2 method
+    int keyboard = 0;    // last key pressed
+    int frames = 0;      // number of frames since last sample
+    int letterCount = 0; // number of letters captured since last display
+    char lastLetters[NUM_LAST_LETTERS] = {0};
+    char lastExecLetter = 0;  // last letter sent to doSystemCalls()
+    Mat letterText = Mat::zeros(200, 200, CV_8UC3);
 
-		// Crop Frame to smaller region
-		cv::Rect myROI(50, 150, 200, 200);
-		Mat cropFrame = frame(myROI);
+    // Read input data
+    while ((char)keyboard != KEY_ESC) {
+        // Read the current frame
+        if (!capture.read(frame)) {
+            cerr << "Unable to read next frame." << endl;
+            cerr << "Exiting..." << endl;
+            exit(EXIT_FAILURE);
+        }
 
-		// Update the background model
-		pMOG2->operator()(cropFrame, fgMaskMOG2);
+        // Crop Frame to smaller region
+        cv::Rect myROI(50, 150, 200, 200);
+        Mat cropFrame = frame(myROI);
 
-		// Generate Convex Hull
-		Mat threshold_output;
-		vector<Vec4i> hierarchy;
-		vector<vector<Point> > contours;
+        // Update the background model
+        pMOG2->apply(cropFrame, fgMaskMOG2);
 
-		// Detect edges using Threshold
-		threshold( fgMaskMOG2, threshold_output, THRESH, 255, THRESH_BINARY );
+        // Generate Convex Hull
+        Mat threshold_output;
+        vector<Vec4i> hierarchy;
+        vector<vector<Point> > contours;
 
-		// Find contours
-		findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+        // Detect edges using Threshold
+        threshold(fgMaskMOG2, threshold_output, THRESH, 255, THRESH_BINARY);
 
-		// Find largest contour
-		Mat drawing = Mat::zeros(cropFrame.size(), CV_8UC3);
-		double largest_area = 0;
-		int maxIndex = 0;
-		for (int j = 0; j < contours.size(); j++) {
-			double area = contourArea(contours[j], false);	// Find the area of contour
-			if (area > largest_area) {
-				largest_area = area;
-				maxIndex = j;  // Store the index of largest contour
-			}
-		}
+        // Find contours
+        findContours(threshold_output, contours, hierarchy, CV_RETR_TREE,
+                     CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-		// Draw Largest Contours
-		Scalar color = Scalar(0, 0, 255);
-		drawContours(drawing, contours, maxIndex, Scalar(255, 255, 255), CV_FILLED); // fill white
-		// Draw Contours
-		Mat contourImg = Mat::zeros(cropFrame.size(), CV_8UC3);
-		drawContours( contourImg, contours, maxIndex, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point(0, 0) );
+        // Find largest contour
+        Mat drawing = Mat::zeros(cropFrame.size(), CV_8UC3);
+        double largest_area = 0;
+        int maxIndex = 0;
 
-		// Reset if too much noise
-		Scalar sums = sum(drawing);
-		int s = sums[0] + sums[1] + sums[2] + sums[3];
-		if (s >= RESET_THRESH) {
-			pMOG2 = new BackgroundSubtractorMOG2();
-			continue;
-		}
+        for (int j = 0; j < contours.size(); j++) {
+            double area = contourArea(contours[j], false);  // Find the area of contour
 
-		// Compare to reference images
-		if (contours.size() > 0 && frames++ > SAMPLE_RATE && contours[maxIndex].size() >= 5) {
-			RotatedRect testRect = fitEllipse(contours[maxIndex]);
-			frames = 0;
-			double lowestDiff = HUGE_VAL;
-			char best = 0;
-			for (int i = 0; i < MAX_WORDS; i++) {
-				if (letters[i].size() == 0) continue;
+            if (area > largest_area) {
+                largest_area = area;
+                maxIndex = j;  // Store the index of largest contour
+            }
+        }
 
-				// Match Shapes functions (possible alternative)
-				/* double diff = matchShapes(letters[i], contours[maxIndex],
-										  CV_CONTOURS_MATCH_I3, 0);
-				diff += matchShapes(letters[i], contours[maxIndex],
-										  CV_CONTOURS_MATCH_I2, 0);
-				diff += matchShapes(letters[i], contours[maxIndex],
-										  CV_CONTOURS_MATCH_I1, 0); */
+        // Draw Largest Contours
+        Scalar color = Scalar(0, 0, 255);
+        drawContours(drawing, contours, maxIndex, Scalar(255, 255, 255),
+                     CV_FILLED); // fill white
+        // Draw Contours
+        Mat contourImg = Mat::zeros(cropFrame.size(), CV_8UC3);
+        drawContours(contourImg, contours, maxIndex, Scalar(0, 0, 255), 2, 8, hierarchy,
+                     0, Point(0, 0));
 
-				double diff = distance_hausdorff(letters[i], contours[maxIndex]);
+        // Reset if too much noise
+        Scalar sums = sum(drawing);
+        int s = sums[0] + sums[1] + sums[2] + sums[3];
 
-				if (diff < lowestDiff) {
-					lowestDiff = diff;
-					best = 'a' + i;
-				}
-			}
-			if (lowestDiff > DIFF_THRESH) { // Dust
-				best = 0;
-			}
-			cout << best << " | diff: " << lowestDiff << endl;
+        if (s >= RESET_THRESH) {
+            pMOG2 = createBackgroundSubtractorMOG2();
+            continue;
+        }
 
-			// Show majority of last letters captured
-			letterCount %= NUM_LAST_LETTERS;
-			lastLetters[letterCount++] = best;
-			letterText = Mat::zeros(200, 200, CV_8UC3);
-			int counts[MAX_WORDS+1] = {0};
-			for (int i = 0; i < NUM_LAST_LETTERS; i++)
-				counts[lastLetters[i] + 1 - 'a']++;
-			int maxCount = 0;
-			char maxChar = 0;
-			for (int i = 0; i < MAX_WORDS+1; i++) {
-				if (counts[i] > maxCount) {
-					maxCount = counts[i];
-					maxChar = i;
-				}
-			}
-			if (maxChar && maxCount >= MIN_FREQ) {
-				maxChar = maxChar - 1 + 'a';
-				char buf[2 * sizeof(char)];
-				sprintf(buf, "%c", maxChar);
-				putText(letterText, buf, Point(10, 75), CV_FONT_NORMAL, 3, Scalar(255, 255, 255), 1, 1);
-				vector<vector<Point> > dummy;
-				dummy.push_back(letters[maxChar-'a']);
-				drawContours( letterText, dummy, 0, Scalar(255, 0, 0), 2, 8, hierarchy, 0, Point(0, 0) );
-				if (maxChar != lastExecLetter) {
-					lastExecLetter = maxChar;
-					doSystemCalls(maxChar);
-				}
-			}
-		}
+        // Compare to reference images
+        if (contours.size() > 0 && frames++ > SAMPLE_RATE &&
+            contours[maxIndex].size() >= 5) {
+            RotatedRect testRect = fitEllipse(contours[maxIndex]);
+            frames = 0;
+            double lowestDiff = HUGE_VAL;
+            char best = 0;
 
-		// Show the current frame and the fg masks
-		imshow("Crop Frame", cropFrame);
-		imshow("Foreground", drawing);
-		if (contourImg.rows > 0)
-			imshow("Contour", contourImg);
-		imshow("Letter", letterText);
+            for (int i = 0; i < MAX_WORDS; i++) {
+                if (letters[i].size() == 0) {
+                    continue;
+                }
 
-		// Get the input from the keyboard
-		keyboard = waitKey(1);
+                // Match Shapes functions (possible alternative)
+                /* double diff = matchShapes(letters[i], contours[maxIndex],
+                                          CV_CONTOURS_MATCH_I3, 0);
+                diff += matchShapes(letters[i], contours[maxIndex],
+                                          CV_CONTOURS_MATCH_I2, 0);
+                diff += matchShapes(letters[i], contours[maxIndex],
+                                          CV_CONTOURS_MATCH_I1, 0); */
 
-		// Save image as keyboard input
-		if (keyboard >= 'a' && keyboard <= 'z') {
-			cout << "Wrote letter '" << (char)keyboard << '\'' << endl;
+                double diff = distance_hausdorff(letters[i], contours[maxIndex]);
 
-			// save in memory
-			letters[keyboard - 'a'] = contours[maxIndex];
+                if (diff < lowestDiff) {
+                    lowestDiff = diff;
+                    best = 'a' + i;
+                }
+            }
 
-			// write to file
-			char buf[13 * sizeof(char)];
-			sprintf(buf, "images/%c.png", (char)keyboard);
-			imwrite(buf, drawing);
-		}
+            if (lowestDiff > DIFF_THRESH) { // Dust
+                best = 0;
+            }
 
-		// Manual reset
-		if (keyboard == ' ')
-			pMOG2 = new BackgroundSubtractorMOG2();
-	}
+            cout << best << " | diff: " << lowestDiff << endl;
 
-	// Delete capture object
-	capture.release();
+            // Show majority of last letters captured
+            letterCount %= NUM_LAST_LETTERS;
+            lastLetters[letterCount++] = best;
+            letterText = Mat::zeros(200, 200, CV_8UC3);
+            int counts[MAX_WORDS + 1] = {0};
+
+            for (int i = 0; i < NUM_LAST_LETTERS; i++) {
+                counts[lastLetters[i] + 1 - 'a']++;
+            }
+
+            int maxCount = 0;
+            char maxChar = 0;
+
+            for (int i = 0; i < MAX_WORDS + 1; i++) {
+                if (counts[i] > maxCount) {
+                    maxCount = counts[i];
+                    maxChar = i;
+                }
+            }
+
+            if (maxChar && maxCount >= MIN_FREQ) {
+                maxChar = maxChar - 1 + 'a';
+                char buf[2 * sizeof(char)];
+                sprintf(buf, "%c", maxChar);
+                putText(letterText, buf, Point(10, 75), CV_FONT_NORMAL, 3, Scalar(255, 255,
+                        255), 1, 1);
+                vector<vector<Point> > dummy;
+                dummy.push_back(letters[maxChar - 'a']);
+                drawContours(letterText, dummy, 0, Scalar(255, 0, 0), 2, 8, hierarchy, 0,
+                             Point(0, 0));
+
+                if (maxChar != lastExecLetter) {
+                    lastExecLetter = maxChar;
+                    doSystemCalls(maxChar);
+                }
+            }
+        }
+
+        // Show the current frame and the fg masks
+        imshow("Crop Frame", cropFrame);
+        imshow("Foreground", drawing);
+
+        if (contourImg.rows > 0) {
+            imshow("Contour", contourImg);
+        }
+
+        imshow("Letter", letterText);
+
+        // Get the input from the keyboard
+        keyboard = waitKey(1);
+
+        // Save image as keyboard input
+        if (keyboard >= 'a' && keyboard <= 'z') {
+            cout << "Wrote letter '" << (char)keyboard << '\'' << endl;
+
+            // save in memory
+            letters[keyboard - 'a'] = contours[maxIndex];
+
+            // write to file
+            char buf[13 * sizeof(char)];
+            sprintf(buf, "images/%c.png", (char)keyboard);
+            imwrite(buf, drawing);
+        }
+
+        // Manual reset
+        if (keyboard == ' ') {
+            pMOG2 = createBackgroundSubtractorMOG2();
+        }
+    }
+
+    // Delete capture object
+    capture.release();
 }
