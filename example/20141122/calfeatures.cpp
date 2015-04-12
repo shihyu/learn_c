@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "opencv.h"
 #include "calfeatures.h"
 
