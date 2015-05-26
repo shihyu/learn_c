@@ -1,15 +1,21 @@
 #include<stdio.h>
+#include <unistd.h>
+
 int main()
 {
-    int item, x, y;
+    int item, x, y, fd;
+
+    fd = dup(fileno(stdout));
+    fflush(stdout);
+
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
 
-    scanf("%d",&x);
-    scanf("%d",&y);
+    scanf("%d", &x);
+    scanf("%d", &y);
 
-    printf("%d\n",x);
-    printf("%d\n",y);
+    printf("%d\n", x);
+    printf("%d\n", y);
 
     while (scanf("%d%d%d", &item, &x, &y) == 3) {
         printf("%d %d %d %d ", item, x, y, x + y);
@@ -21,7 +27,11 @@ int main()
         }
     }
 
-    fclose(stdin);
-    fclose(stdout);
+    fflush(stdout);
+    dup2(fd, fileno(stdout));
+    close(fd);
+
+    printf("HHHHHH\n");
+
     return 0;
 }
