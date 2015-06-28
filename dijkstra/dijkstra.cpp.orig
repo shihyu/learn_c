@@ -22,11 +22,9 @@ int n, line;             // 圖的結點數和路徑數
 // dist[] -- the distance from the ith node to the source node
 // prev[] -- the previous node of the ith node
 // c[][] -- every two nodes' distance
-// void Dijkstra(int n, int v, int* dist, int* prev, int c[maxnum][maxnum])
-void Dijkstra(int n, int v, int* dist, int* prev, int (*c)[maxnum])
+void Dijkstra(int n, int v, int* dist, int* prev, int c[maxnum][maxnum])
 {
     bool s[maxnum];    // 判斷是否已存入該點到S集閤中
-    cout << "bool size " << sizeof(bool) << endl;
 
     for (int i = 1; i <= n; ++i) {
         dist[i] = c[v][i];
@@ -103,6 +101,7 @@ int main()
     // 各數組都從下標1開始
     if (fp == NULL) {
         printf("open file fail");
+        exit(1);
     }
 
      fscanf(fp, "%d", &n);
@@ -121,20 +120,18 @@ int main()
     int p, q, len;          // 輸入p, q兩點及其路徑長度
 
     // 初始化c[][]爲maxint
-    for (int i = 1; i <= n; ++i) {
+    for (int i = 1; i <= n; ++i)
         for (int j = 1; j <= n; ++j) {
             c[i][j] = maxint;
         }
-    }
 
-    // 建圖
     for (int i = 1; i <= line; ++i) {
         // cin >> p >> q >> len;
         fscanf(fp, "%d%d%d", &p, &q ,&len);
 
         if (len < c[p][q]) {    // 有重邊
             c[p][q] = len;      // p指向q
-            //c[q][p] = len;      // q指向p，這樣表示無向圖
+            c[q][p] = len;      // q指向p，這樣表示無向圖
         }
     }
 
