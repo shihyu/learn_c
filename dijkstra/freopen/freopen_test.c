@@ -1,12 +1,16 @@
 #include<stdio.h>
 #include <unistd.h>
+#include <unistd.h>
 
 int main()
 {
     int item, x, y, fd;
+    int i, o;
 
-    fd = dup(fileno(stdout));
-    fflush(stdout);
+    i = dup(0);
+    o = dup(1);
+
+    printf("SSSSSS\n");
 
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
@@ -27,11 +31,11 @@ int main()
         }
     }
 
-    fflush(stdout);
-    dup2(fd, fileno(stdout));
-    close(fd);
+    dup2(i, 0);
+    dup2(o, 1);
 
     printf("HHHHHH\n");
-
+    fflush(stdout);
+    getchar();
     return 0;
 }
