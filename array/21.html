@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=11; IE=10; IE=9; IE=8; IE=7; IE=EDGE" />
-        <title>Array | C</title>
+        <title>Rand 矩陣相乘 | C</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.0.1">
@@ -20,10 +20,10 @@
         
     
     
-    <link rel="next" href="../array/21.html" />
+    <link rel="next" href="../vim/index.html" />
     
     
-    <link rel="prev" href="../c/index.html" />
+    <link rel="prev" href="../array/index.html" />
     
 
         
@@ -36,7 +36,7 @@
     
 
         
-    <div class="book" data-level="0.2" data-basepath=".." data-revision="Sun Jul 26 2015 00:36:32 GMT+0800 (CST)">
+    <div class="book" data-level="0.2.1" data-basepath=".." data-revision="Sun Jul 26 2015 00:36:32 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -82,7 +82,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="0.2" data-path="array/index.html">
+        <li class="chapter " data-level="0.2" data-path="array/index.html">
             
                 
                     <a href="../array/index.html">
@@ -98,7 +98,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="0.2.1" data-path="array/21.html">
+        <li class="chapter active" data-level="0.2.1" data-path="array/21.html">
             
                 
                     <a href="../array/21.html">
@@ -328,10 +328,73 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="array">Array</h1>
+                        <h1 id="21">21</h1>
 <ul>
-<li>&#x9663;&#x5217;&#xFF08;Array&#xFF09;&#x4E5F;&#x662F;&#x4E00;&#x7A2E;&#x5FA9;&#x5408;&#x8CC7;&#x6599;&#x578B;&#x614B;&#xFF0C;&#x5B83;&#x7531;&#x4E00;&#x7CFB;&#x5217;&#x76F8;&#x540C;&#x578B;&#x614B;&#x7684;&#x5143;&#x7D20;&#xFF08;Element&#xFF09;&#x7D44;&#x6210;</li>
+<li>rand &#x77E9;&#x9663;&#x76F8;&#x4E58;</li>
 </ul>
+<pre><code class="lang-c"><span class="hljs-preprocessor">#<span class="hljs-keyword">include</span> &lt;stdio.h&gt;</span>
+<span class="hljs-preprocessor">#<span class="hljs-keyword">include</span> &lt;stdlib.h&gt;</span>
+<span class="hljs-preprocessor">#<span class="hljs-keyword">include</span> &lt;time.h&gt;</span>
+
+<span class="hljs-preprocessor">#<span class="hljs-keyword">define</span> RANGE 10</span>
+<span class="hljs-preprocessor">#<span class="hljs-keyword">define</span> M 3</span>
+<span class="hljs-preprocessor">#<span class="hljs-keyword">define</span> N 4</span>
+<span class="hljs-preprocessor">#<span class="hljs-keyword">define</span> K 2</span>
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">show</span><span class="hljs-params">(<span class="hljs-keyword">int</span> row, <span class="hljs-keyword">int</span> col, <span class="hljs-keyword">int</span> ar[row][col])</span> </span>{
+    <span class="hljs-keyword">int</span> i, j;
+
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; row; ++i) {
+        <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; col; ++j) {
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, ar[i][j]);
+        }
+
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);
+    }
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">generator_data</span><span class="hljs-params">(<span class="hljs-keyword">int</span> row, <span class="hljs-keyword">int</span> col, <span class="hljs-keyword">int</span> ar[][col])</span> </span>{
+    <span class="hljs-keyword">int</span> i, j;
+
+    srand(time(NULL)); <span class="hljs-comment">// &#x8A2D;&#x5B9A;&#x4E0D;&#x540C;&#x7684;&#x4E82;&#x6578;&#x7A2E;&#x5B50;</span>
+
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; row; ++i) {
+        <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; col; ++j) {
+            ar[i][j] = rand() % RANGE;
+
+        }
+    }
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+    <span class="hljs-keyword">int</span> matrix_a[M][K]; <span class="hljs-comment">// 3 x 2</span>
+    <span class="hljs-keyword">int</span> matrix_b[K][N]; <span class="hljs-comment">// 2 X 4</span>
+    <span class="hljs-keyword">int</span> matrix_c[M][N] = {<span class="hljs-number">0</span>}; <span class="hljs-comment">// 3 X 4</span>
+    <span class="hljs-keyword">int</span> i, j, k;
+
+    generator_data(M,K,matrix_a);
+    generator_data(K,N,matrix_b);
+
+    show(M, K, matrix_a);
+    show(K, N, matrix_b);
+
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; M; ++i) {
+        <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; N; ++j) {
+
+            <span class="hljs-keyword">for</span> (k = <span class="hljs-number">0</span>; k &lt; K; k++) {
+                matrix_c[i][j] += matrix_a[i][k] * matrix_b[k][j];
+            }
+        }
+    }
+
+    show(M, N, matrix_c);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</code></pre>
 
                     
                     </section>
@@ -342,10 +405,10 @@
         </div>
 
         
-        <a href="../c/index.html" class="navigation navigation-prev " aria-label="Previous page: C 型態"><i class="fa fa-angle-left"></i></a>
+        <a href="../array/index.html" class="navigation navigation-prev " aria-label="Previous page: Array"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../array/21.html" class="navigation navigation-next " aria-label="Next page: Rand 矩陣相乘"><i class="fa fa-angle-right"></i></a>
+        <a href="../vim/index.html" class="navigation navigation-next " aria-label="Next page: Tool"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
