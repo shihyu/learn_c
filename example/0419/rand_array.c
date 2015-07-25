@@ -17,40 +17,38 @@ void show(int row, int col, int ar[row][col]) {
 
         printf("\n");
     }
+    printf("\n");
 }
 
-int main(int argc, char *argv[]) {
-    int matrix_a[M][K];
-    int matrix_b[K][N];
-    int matrix_c[M][N];
-    int i, j, k;
+
+void generator_data(int row, int col, int ar[][col]) {
+    int i, j;
 
     srand(time(NULL)); // 設定不同的亂數種子
 
-    for (i = 0; i < M; ++i) {
-        for (j = 0; j < K; ++j) {
-            matrix_a[i][j] = rand() % RANGE;
+    for (i = 0; i < row; ++i) {
+        for (j = 0; j < col; ++j) {
+            ar[i][j] = rand() % RANGE;
 
         }
     }
+}
 
-    for (i = 0; i < K; ++i) {
-        for (j = 0; j < N; ++j) {
-            matrix_b[i][j] = rand() % RANGE;
 
-        }
-    }
+int main(int argc, char *argv[]) {
+    int matrix_a[M][K]; // 3 x 2
+    int matrix_b[K][N]; // 2 X 4
+    int matrix_c[M][N] = {0}; // 3 X 4
+    int i, j, k;
+
+    generator_data(M,K,matrix_a);
+    generator_data(K,N,matrix_b);
 
     show(M, K, matrix_a);
-    printf("\n");
     show(K, N, matrix_b);
-    printf("\n");
-
-#if 1
 
     for (i = 0; i < M; ++i) {
         for (j = 0; j < N; ++j) {
-            matrix_c[i][j] = 0;
 
             for (k = 0; k < K; k++) {
                 matrix_c[i][j] += matrix_a[i][k] * matrix_b[k][j];
@@ -59,7 +57,6 @@ int main(int argc, char *argv[]) {
     }
 
     show(M, N, matrix_c);
-#endif
 
     return 0;
 }
