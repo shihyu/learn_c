@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=11; IE=10; IE=9; IE=8; IE=7; IE=EDGE" />
-        <title>Tool | C</title>
+        <title>VLA | C</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.0.1">
@@ -20,10 +20,10 @@
         
     
     
-    <link rel="next" href="../ag/index.html" />
+    <link rel="next" href="../vim/index.html" />
     
     
-    <link rel="prev" href="../array/vla.html" />
+    <link rel="prev" href="../array/21.html" />
     
 
         
@@ -36,7 +36,7 @@
     
 
         
-    <div class="book" data-level="1" data-basepath=".." data-revision="Mon Jul 27 2015 22:25:34 GMT+0800 (CST)">
+    <div class="book" data-level="0.2.2" data-basepath=".." data-revision="Mon Jul 27 2015 22:25:34 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -113,7 +113,7 @@
             
         </li>
     
-        <li class="chapter " data-level="0.2.2" data-path="array/vla.html">
+        <li class="chapter active" data-level="0.2.2" data-path="array/vla.html">
             
                 
                     <a href="../array/vla.html">
@@ -138,7 +138,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1" data-path="vim/index.html">
+        <li class="chapter " data-level="1" data-path="vim/index.html">
             
                 
                     <a href="../vim/index.html">
@@ -343,7 +343,81 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="vim">VIM</h1>
+                        <h1 id="vla">VLA</h1>
+<p>&#x8B8A;&#x9577;&#x9663;&#x5217;(VLA)&#x7684;&#x539F;&#x578B;&#x5BEB;&#x6CD5;&#x3001;&#x8072;&#x660E;&#x4F4D;&#x7F6E;&#x53CA;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x7684;&#x672C;&#x8CEA;&#xFF0C;vla&#x539F;&#x578B;&#x8B8A;&#x9577;&#x9663;&#x5217;&#xFF08;variable-length array&#xFF09;&#x662F;C&#x8A9E;&#x8A00;C99&#x6A19;&#x6E96;&#x4E2D;&#x65B0;&#x589E;&#x52A0;&#x7684;&#x5167;&#x5BB9;&#xFF0C;<strong>&#x6B64;&#x8655;&#x6240;&#x8B02;&#x7684;&#x300C;&#x8B8A;&#x300D;&#x4E26;&#x975E;&#x5728;&#x8AAA;&#x8A72;&#x985E;&#x578B;&#x7684;&#x9663;&#x5217;&#x5728;&#x5275;&#x5EFA;&#x5F8C;&#x53EF;&#x4FEE;&#x6539;&#x5927;&#x5C0F;&#xFF0C;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x7684;&#x5927;&#x5C0F;&#x5728;&#x5275;&#x5EFA;&#x5F8C;&#x4E5F;&#x662F;&#x4E0D;&#x80FD;&#x4FEE;&#x6539;&#x7684;&#x3002;&#x90A3;&#x70BA;&#x4EC0;&#x9EBC;&#x6B64;&#x8655;&#x7A31;&#x70BA;&#x300C;&#x8B8A;&#x9577;&#x300D;&#x5462;&#xFF0C;&#x662F;&#x56E0;&#x70BA;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x7684;&#x7DAD;&#x53EF;&#x4EE5;&#x7528;&#x8B8A;&#x6578;&#x4F86;&#x6307;&#x5B9A;&#x3002;&#x9019;&#x4E00;&#x9EDE;&#x7279;&#x6027;&#x5F4C;&#x88DC;&#x4E86;C99&#x4E4B;&#x524D;&#x7684;&#x8B8A;&#x6578;&#x7DAD;&#x5EA6;&#x53EA;&#x80FD;&#x7528;&#x5E38;&#x91CF;&#x6216;&#x5E38;&#x91CF;&#x8868;&#x9054;&#x5F0F;&#x6307;&#x5B9A;&#x7684;&#x4E0D;&#x8DB3;&#x3002;</strong></p>
+<p>&#x8B8A;&#x9577;&#x9663;&#x5217;&#x662F;&#x6709;&#x4E00;&#x4E9B;&#x9650;&#x5236;&#x7684;&#xFF0C;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x53EA;&#x53EF;&#x5728;&#x51FD;&#x6578;&#x5167;&#x90E8;&#x6216;&#x4F5C;&#x70BA;&#x51FD;&#x6578;&#x53C3;&#x6578;&#x8072;&#x660E;&#x3002;&#x4E26;&#x4E14;&#x5728;&#x8072;&#x660E;&#x662F;&#x4E0D;&#x80FD;&#x521D;&#x59CB;&#x5316;&#x3002;</p>
+<p>&#x4F86;&#x770B;&#x4E00;&#x500B;&#x4F8B;&#x5B50;&#xFF1A;</p>
+<p>&#x7DE8;&#x5BEB;&#x4E00;&#x500B;&#x7A0B;&#x5E8F;&#xFF0C;&#x521D;&#x59CB;&#x5316;&#x4E00;&#x500B;3x5&#x7684;&#x4E8C;&#x7DAD;double&#x9663;&#x5217;&#xFF0C;&#x4E26;&#x5229;&#x7528;&#x4E00;&#x500B;&#x57FA;&#x65BC;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x7684;&#x51FD;&#x6578;&#x628A;&#x8A72;&#x9663;&#x5217;&#x8907;&#x88FD;&#x5230;&#x53E6;&#x4E00;&#x500B;&#x4E8C;&#x7DAD;&#x9663;&#x5217;&#x3002;&#x9084;&#x8981;&#x7DE8;&#x5BEB;&#x4E00;&#x500B;&#x57FA;&#x65BC;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x7684;&#x51FD;&#x6578;&#x4F86;&#x986F;&#x793A;&#x5169;&#x500B;&#x9663;&#x5217;&#x7684;&#x5167;&#x5BB9;&#x3002;&#x9019;&#x5169;&#x500B;&#x51FD;&#x6578;&#x61C9;&#x8A72;&#x80FD;&#x5920;&#x8655;&#x7406;&#x4EFB;&#x610F;&#x7684;NxM&#x9663;&#x5217;&#x3002;</p>
+<pre><code class="lang-cpp">#include &lt;stdio.h&gt;
+
+void copy(int row, int col, double arr[][col], double tar[row][col]);
+void show(int, int, double arr[*][*]);
+
+int main(void)
+{
+
+    double num[3][5] = {
+        {2.3, 1.2, 5.2, 6.1, 1.1},
+        {4.2, 3.2, 6.2, 1.7, 7.4},
+        {8.5, 6.2, 4.7, 2.8, 2.1}
+    };
+
+    double rain[5][12] = {
+        {4.3, 4.3, 4.3, 3.0, 2.0, 1.2, 0.2, 0.2, 0.4, 2.4, 3.5, 6.6},
+        {8.5, 8.2, 1.2, 1.6, 2.4, 0.0, 5.2, 0.9, 0.3, 0.9, 1.4, 7.3},
+        {9.1, 8.5, 6.7, 4.3, 2.1, 0.8, 0.2, 0.2, 1.1, 2.3, 6.1, 8.4},
+        {7.2, 9.9, 8.4, 3.3, 1.2, 0.8, 0.4, 0.0, 0.6, 1.7, 4.3, 6.2},
+        {7.6, 5.6, 3.8, 2.8, 3.8, 0.2, 0.0, 0.0, 0.0, 1.3, 2.6, 5.2}
+    };
+
+    double tar[3][5] = {0};
+    double tar2[5][12] = {0};
+
+    copy(3, 5, num, tar);
+    show(3, 5, tar);
+
+    copy(5, 12, rain, tar2);
+    show(5, 12, tar2);
+
+    return 0;
+}
+
+void copy(int row, int col, double arr[][col], double tar[row][col])
+{
+    int i, j;
+
+    for (i = 0; i &lt; row; i++) {
+        for (j = 0; j &lt; col; j++) {
+            tar[i][j] = arr[i][j];
+        }
+    }
+}
+
+void show(int row, int col, double arr[row][col])
+{
+    int i, j;
+
+    for (i = 0; i &lt; row; i++) {
+        for (j = 0; j &lt; col; j++) {
+            printf(&quot;%.1f&quot;, arr[i][j]);
+
+            if (j != col - 1) {
+                printf(&quot;, &quot;);
+            }
+        }
+
+        printf(&quot;\n&quot;);
+    }
+
+    printf(&quot;------------------------------
+</code></pre>
+<p>&#x5728;&#x9019;&#x500B;&#x4F8B;&#x5B50;&#x4E2D;&#xFF0C;&#x7D66;&#x5B9A;&#x5169;&#x500B;&#x4E8C;&#x7DAD;&#x9663;&#x5217;&#xFF0C;&#x4E00;&#x500B;3X5&#x9663;&#x5217;&#x548C;&#x4E00;&#x500B;5X12&#x9663;&#x5217;&#xFF0C;&#x800C;&#x4F8B;&#x5B50;&#x4E2D;&#x9019;&#x5169;&#x500B;&#x9663;&#x5217;&#x7528;&#x540C;&#x4E00;&#x500B;&#x51FD;&#x6578;&#x8655;&#x7406;&#x62F7;&#x8C9D;&#x6216;&#x7528;&#x540C;&#x4E00;&#x500B;&#x51FD;&#x6578;&#x986F;&#x793A;&#x3002;</p>
+<p>&#x5176;&#x4E2D;&#x7528;&#x65BC;&#x986F;&#x793A;&#x7684;&#x51FD;&#x6578;&#xFF1A;</p>
+<pre><code class="lang-cpp"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">show</span><span class="hljs-params">(<span class="hljs-keyword">int</span> row,<span class="hljs-keyword">int</span> col,<span class="hljs-keyword">double</span> arr[row][col])</span>
+</span></code></pre>
+<p>&#x662F;&#x4E00;&#x500B;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x7684;&#x5B9A;&#x7FA9;&#x65B9;&#x6CD5;&#xFF0C;&#x5C07;&#x4EE3;&#x8868;&#x7DAD;&#x7684;&#x6574;&#x6578;&#x8072;&#x660E;&#x5728;&#x4F7F;&#x7528;&#x8A72;&#x7DAD;&#x7684;&#x8B8A;&#x9577;&#x9663;&#x5217;&#x4E4B;&#x524D;&#x3002;&#x56E0;&#x70BA;&#x5728;&#x539F;&#x578B;&#x4E2D;&#x53EF;&#x4EE5;&#x7701;&#x7565;&#x8B8A;&#x6578;&#x540D;&#xFF0C;&#x6240;&#x4EE5;&#x539F;&#x578B;&#x53EF;&#x4EE5;&#x5BEB;&#x70BA;&#xFF1A;</p>
+<pre><code class="lang-cpp"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">show</span><span class="hljs-params">(<span class="hljs-keyword">int</span>,<span class="hljs-keyword">int</span>,<span class="hljs-keyword">double</span> arr[*][*])</span>
+</span></code></pre>
 
                     
                     </section>
@@ -354,10 +428,10 @@
         </div>
 
         
-        <a href="../array/vla.html" class="navigation navigation-prev " aria-label="Previous page: VLA"><i class="fa fa-angle-left"></i></a>
+        <a href="../array/21.html" class="navigation navigation-prev " aria-label="Previous page: Rand 矩陣相乘"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../ag/index.html" class="navigation navigation-next " aria-label="Next page: ag"><i class="fa fa-angle-right"></i></a>
+        <a href="../vim/index.html" class="navigation navigation-next " aria-label="Next page: Tool"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
