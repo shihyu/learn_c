@@ -4,6 +4,7 @@
    * [C 型態](c/README.md)
    * [Array](array/README.md)
        * [Rand 矩陣相乘](array/21.md)
+       * [VLA](array/vla.md)
 * [Tool](vim/README.md)
    * [ag](ag/README.md)
    * [vim](vim/vimrc.md)
